@@ -19,10 +19,11 @@
 /* if src is not of type dst, something terrible has happened to the JVM. */
 #ifndef DONT_USE_DC
 #define ASSERT_CAST(dst,src,type,loc,thing) \
-	if((dst=dynamic_cast<type>(src))==0) { kprintf("%s -- %x is not a %s, aborting.\n",loc,src,thing); abort();}
+	if((dst=dynamic_cast<type>(src))==0) { kprintf("%s -- %x is not a %s, aborting.\n",loc,src,thing); abort(); }
 #else
-#define ASSERT_CAST(one,two,type,loc,thing) \
-	if(one!=two) { kprintf( "%s -- %x is not a %s, aborting.\n",loc,src,thing); abort();}
-#endif
+#define ASSERT_CAST(dst,type1,type2,pos,thing) \
+	if(type1!=type2) { kprintf("%s -- %x is not a %s, aborting.\n", pos, dst, thing ); abort(); }
+
+#endif /* DONT_USE_DC */
 
 #endif

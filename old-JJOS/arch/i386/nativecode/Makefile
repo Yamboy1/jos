@@ -10,15 +10,16 @@ IFLAGS = -I. -I../../../common/nativecode -I../../../common/decaf
 # being defined; this current solution is a hack,
 # because it also requires manually undefining
 # all the other alternatives.  *sigh*
+
 CFLAGS = \
  -g -Wall -fno-builtin -fno-exceptions \
  -DPARANOID \
  -DHANDLE_CLOCK -DNATIVE_CLOCK \
  -DNEW_INTERRUPT_HANDLING \
- -DDONT_USE_DC \
  -DTEST_A20 $(IFLAGS)
 
 # -DETHERBOOT \
+# -DDONT_USE_DC \
 
 ETHER_SOURCES = \
  head_ether.s86 \
