@@ -92,7 +92,12 @@ class ClassInfo : public CPEntry {
 
     jju16 getMyClassIndex() { return myClassIndex; }
 
-    JavaClass * getMyClass( ConstantPool * cp = NULL );
+	// This would require access to the classloader, as well;
+	// $$$$ $$$$: the current code (javaclass.cc:146, 163),
+	// incidentally, assumes that the classloader
+	// can parse class specifications.
+    // JavaClass * getMyClass( ConstantPool * cp = NULL );
+    
     void setMyClass( JavaClass * jc ) {
         if ( myJavaClass != NULL ) {
             kprintf( "ClassInfo::setMyJavaClass() -- attempt to reset the constant, aborting.\n" );
@@ -253,7 +258,7 @@ class NameAndType : public CPEntry {
         return nat;
         }
 
-    JavaString * getMyName( ConstantPool * cp = NULL );
+    // JavaString * getMyName( ConstantPool * cp = NULL );
     void setMyName( JavaString * js ) {
         if ( myName != NULL ) {
             kprintf( "NameAndType::setMyName() -- attempt to reset the constant, aborting.\n" );
@@ -262,7 +267,7 @@ class NameAndType : public CPEntry {
         myName = js;
         }
     
-    JavaString * getMyType( ConstantPool * cp = NULL );
+    // JavaString * getMyType( ConstantPool * cp = NULL );
     void setMyType( JavaString * js ) {
         if ( myType != NULL ) {
             kprintf( "NameAndType::setMyType() -- attempt to reset the constant, aborting.\n" );

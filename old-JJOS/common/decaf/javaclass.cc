@@ -233,7 +233,11 @@ JavaString * JavaClass::getMyName() {
         kprintf( "urJavaClass::getMyName() -- erroneous name index, aborting.\n" );
         abort();
         }
-#endif    
+#endif
+
+    /* myName is now a class specification.
+     * $$$$ $$$$: As long as ClassLoader parses specifications,
+     * we're OK. */
     return myName;
     } /* end getMyName() */
 

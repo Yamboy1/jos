@@ -215,12 +215,15 @@ void CPString::setMyJavaString( JavaString * js ) {
 
 #warning Ref::getMy[Name|Type|Class]() undefined -- fixme!
 #ifdef NOT_DEF
-JavaString * Ref::getMyName( ConstantPool * cp = NULL );
-JavaString * Ref::getMyType( ConstantPool * cp = NULL );
-JavaString * Ref::getMyClass( ConstantPool * cp = NULL );
+JavaString * Ref::getMyName( ConstantPool * cp );
+JavaString * Ref::getMyType( ConstantPool * cp );
+JavaClass * Ref::getMyClass( ConstantPool * cp );
 #endif
 
-#warning ClassInfo::getMyClass() undefined -- fixme!
+/* We may very not need these.
+ * #warning NameAndType::getMy[Name|Type]() undefined -- fixme!
+ */
 #ifdef NOT_DEF
-JavaClass * ClassInfo::getMyClass( ConstantPool * cp = NULL );
+JavaString * NameAndType::getMyName( ConstantPool * cp );
+JavaString * NameAndType::getMyType( ConstantPool * cp );
 #endif
