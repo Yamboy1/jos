@@ -237,7 +237,7 @@ bool Frame::aaload(Exception & e)
 			return false;
 			}
 			
-	TRACE(("aaload (%x = %x[%d])", jci, joa, index ));
+	TRACE(("aaload (%x = %x[%d])", jci, joa, index));
 	push_jref( jci );
 	return true;
 
@@ -246,3 +246,21 @@ bool Frame::aaload(Exception & e)
 #endif /* DONT_USE_DC */
 
 	} /* end aaload() */
+
+bool Frame::aastore(Exception & e) {
+	/* fetch the object */
+	JavaClassInstance * jci = pop_jref();
+	
+	/* fetch the index */
+	jint index = pop_jint();
+
+	/* fetch the array */
+	JavaObjectArray * joa = NULL;
+	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *, "frame::aastore()", "attempt to store to non-array" );
+
+	/* store the object in the array at the index */
+	TRACE(("aastore (%x[%d] = %x)", joa, index, jci));
+	joa->setElement( index, jci );
+	
+	return true;
+	} /* end aastore() */

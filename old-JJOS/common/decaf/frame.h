@@ -69,6 +69,7 @@ class Frame {
 
 	/* BYTECODE: A */
 	bool aaload(Exception &e);
+	bool aastore(Exception &e);
 
   protected:
     jju32 myPC;
