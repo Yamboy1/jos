@@ -14,12 +14,12 @@ IFLAGS = -I. -I../../../common/nativecode -I../../../common/decaf
 CFLAGS = \
  -g -Wall -fno-builtin -fno-exceptions \
  -DPARANOID \
+ -DDONT_USE_DC \
  -DHANDLE_CLOCK -DNATIVE_CLOCK \
  -DNEW_INTERRUPT_HANDLING \
  -DTEST_A20 $(IFLAGS)
 
 # -DETHERBOOT \
-# -DDONT_USE_DC \
 
 ETHER_SOURCES = \
  head_ether.s86 \
