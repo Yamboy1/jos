@@ -210,3 +210,17 @@ void CPString::setMyJavaString( JavaString * js ) {
         abort();
         }
     } /* end setMyJavaString() */
+
+/* Ref */
+
+#warning Ref::getMy[Name|Type|Class]() undefined -- fixme!
+#ifdef NOT_DEF
+JavaString * Ref::getMyName( ConstantPool * cp = NULL );
+JavaString * Ref::getMyType( ConstantPool * cp = NULL );
+JavaString * Ref::getMyClass( ConstantPool * cp = NULL );
+#endif
+
+#warning ClassInfo::getMyClass() undefined -- fixme!
+#ifdef NOT_DEF
+JavaClass * ClassInfo::getMyClass( ConstantPool * cp = NULL );
+#endif

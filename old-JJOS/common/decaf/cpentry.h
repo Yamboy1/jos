@@ -60,7 +60,7 @@ class ConstantUTF8 : public CPEntry {
     static ConstantUTF8 * generateConstantUTF8( istream & s );
 
     JavaString * getMyJavaString();
-    void setMyJavaString( JavaString * );
+    void setMyJavaString( JavaString * js );
     bool usesTwoEntries() { return false; }
     int type () { return TAG_UTF8; }
 
@@ -92,8 +92,8 @@ class ClassInfo : public CPEntry {
 
     jju16 getMyClassIndex() { return myClassIndex; }
 
-    JavaClass * getMyJavaClass() { return myJavaClass; }
-    void setMyJavaClass( JavaClass * jc ) {
+    JavaClass * getMyClass( ConstantPool * cp = NULL );
+    void setMyClass( JavaClass * jc ) {
         if ( myJavaClass != NULL ) {
             kprintf( "ClassInfo::setMyJavaClass() -- attempt to reset the constant, aborting.\n" );
             abort();
@@ -143,7 +143,7 @@ class Ref : public CPEntry {
         return *this;
         }
 
-    JavaClassInstance * getMyClass() { return myJavaClass; }
+    JavaClassInstance * getMyClass( ConstantPool * cp = NULL) ;
     void setMyClass( JavaClassInstance * jci ) {
         if ( myJavaClass != NULL ) {
             kprintf( "Ref::setMyClass() -- attempt to reset the constant, aborting.\n" );
@@ -152,7 +152,7 @@ class Ref : public CPEntry {
         myJavaClass = jci;
         }
 
-    JavaString * getMyName() { return myName; }
+    JavaString * getMyName( ConstantPool * cp = NULL );
     void setMyName( JavaString * js ) {
         if ( myName != NULL ) {
             kprintf( "Ref::setMyName() -- attempt to reset the constant, aborting.\n" );
@@ -161,7 +161,7 @@ class Ref : public CPEntry {
         myName = js;
         }
 
-    JavaString * getMyType() { return myType; }
+    JavaString * getMyType( ConstantPool * cp = NULL );
     void setMyType( JavaString * js ) {
         if ( myType != NULL ) {
             kprintf( "Ref::setMyType() -- attempt to reset the constant, aborting.\n" );
@@ -253,7 +253,7 @@ class NameAndType : public CPEntry {
         return nat;
         }
 
-    JavaString * getMyName() { return myName; }
+    JavaString * getMyName( ConstantPool * cp = NULL );
     void setMyName( JavaString * js ) {
         if ( myName != NULL ) {
             kprintf( "NameAndType::setMyName() -- attempt to reset the constant, aborting.\n" );
@@ -262,7 +262,7 @@ class NameAndType : public CPEntry {
         myName = js;
         }
     
-    JavaString * getMyType() { return myType; }
+    JavaString * getMyType( ConstantPool * cp = NULL );
     void setMyType( JavaString * js ) {
         if ( myType != NULL ) {
             kprintf( "NameAndType::setMyType() -- attempt to reset the constant, aborting.\n" );

@@ -502,6 +502,7 @@ bool frame::aaload(Exception & e)
 		kprintf( "frame::aaload() -- attempt to load from non-array, aborting.\n" );
 		abort();
 		}
+#endif /* DONT_USE_DC */
 }
 
 #ifdef INTERPRETATION

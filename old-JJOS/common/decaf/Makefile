@@ -13,11 +13,11 @@ DECAF_SOURCES = \
  ../../../common/decaf/javaword.cc \
  ../../../common/decaf/cpentry.cc \
  ../../../common/decaf/istream.cc \
+ ../../../common/decaf/decaf.cc \
  ../../../common/decaf/frame.cc \
  ../../../common/decaf/dmain.cc \
  ../../../common/decaf/jvm.cc
 
-# ../../../common/decaf/decaf.cc \
 
 
 DECAF_OBJECTS = \
@@ -35,11 +35,11 @@ DECAF_OBJECTS = \
  javaword.o \
  cpentry.o \
  istream.o \
+ decaf.o \
  frame.o \
  dmain.o \
  jvm.o
 
-# decaf.o \
 
 %.o : ../../../common/decaf/%.cc
 	$(CC) $(CFLAGS) -c $<

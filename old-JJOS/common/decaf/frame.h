@@ -16,8 +16,7 @@ class LocalVariables;
 #include "staticstack.h"
 #include "javastring.h"
 
-typedef JavaWord                    Operand;
-typedef StaticStack< Operand >      OperandStack;
+typedef StaticStack< JavaWord >      OperandStack;
 
 #include "attributelist.h"
 #include "javathread.h"
@@ -41,9 +40,35 @@ class Frame {
 
 	/* The interpreter is defined by a set of methods operating on stack frames. */
 
+	/* UTILITY */
+	jju16 getImmediate_jju16( jju32 index );
+	jji16 getImmediate_jji16( jju32 index );
+	jji32 getImmediate_jji32( jju32 index );
+
+	jint pop_jint() { return (jint)*myOpStack->pop(); }
+	JavaClassInstance * pop_jref() { 
+		/* I want a static cast here so that JavaWord's cast operator is called. */
+		return (JavaClassInstance*)*myOpStack->pop();
+		}
+
+	/* $: return bool? */
+	void push_jint( jint value ) {
+		/* $: lots of potential for garbage */
+		myOpStack->push( new JavaWord( value ) );
+		}
+	void push_jref( JavaClassInstance * jci ) {
+		/* $: lots of potential for garbage */
+		myOpStack->push( new JavaWord( jci ) );
+		}
+		
+
 	/* INVOCATION */
 	bool pushInvocationFrame( JavaClassInstance * jci, MethodInfo * mi, JavaWord * arguments );
+	
 	bool invokestatic(Exception &e);
+
+	/* BYTECODE: A */
+	bool aaload(Exception &e);
 
   protected:
     jju32 myPC;

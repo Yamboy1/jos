@@ -52,6 +52,7 @@ template <class Type> bool StaticStack<Type>::push( Type * t ) {
 	abort();
 	}
     myStack[myCurDepth] = t;
+    return true;
     } /* end push() */
 
 template <class Type> Type * StaticStack<Type>::pop() {
