@@ -104,8 +104,8 @@ class JavaClassInstance : public JavaClass, public Threadable {
   public:
     JavaClassInstance( JavaClass * myClass );
 
-    ClassFields * getMyClassFields() { return myClassFields; }
-    PrimitiveType type() { return PT_CLASS_INSTANCE; }
+    virtual ClassFields * getMyClassFields() { return myClassFields; }
+    virtual PrimitiveType type() { return PT_CLASS_INSTANCE; }
 
     bool isInstanceOf( JavaClassInstance * jci );
     

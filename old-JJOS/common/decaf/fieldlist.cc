@@ -169,9 +169,8 @@ ClassFields::ClassFields( FieldList * fl, ConstantPool * cp ) {
     	    
                 case TAG_INTEGER:
                     if ( flc == 'B' || flc == 'C' || flc == 'I' || flc == 'S' || flc == 'Z' ) {
-			CPInteger * cpi = NULL;
-			ASSERT_CAST( cpi, cpe, CPInteger *, CPEntry *,
-				"ClassFields::ClassFields", "constant integer" );
+						CPInteger * cpi = NULL;
+						ASSERT_CAST( cpi, cpe, CPInteger *, CPEntry *, "ClassFields::ClassFields", "constant integer" );
     	                fd[x].value = cpi->getMyInteger();
                         } else {
     	                kprintf( "ClassFields::ClassFields() -- attempt to initialize integer field with non-integer constant, aborting\n" );
@@ -181,10 +180,9 @@ ClassFields::ClassFields( FieldList * fl, ConstantPool * cp ) {
 
                 case TAG_LONG:
                     if ( flc == 'J' ) {
-			CPLong * cpl = NULL;
-			ASSERT_CAST( cpl, cpe, CPLong *, CPEntry *,
-				"ClassFields::ClassFields", "constant long" );
-			fd[x].value = (jju32) (new jlong( cpl->getMyLong() ));
+						CPLong * cpl = NULL;
+						ASSERT_CAST( cpl, cpe, CPLong *, CPEntry *, "ClassFields::ClassFields", "constant long" );
+						fd[x].value = (jju32) (new jlong( cpl->getMyLong() ));
                         } else {
     	                kprintf( "ClassFields::ClassFields() -- attempt to initialize long field with non-long constant, aborting\n" );
     	                abort();
@@ -193,9 +191,8 @@ ClassFields::ClassFields( FieldList * fl, ConstantPool * cp ) {
 
                 case TAG_FLOAT:
                     if ( flc == 'F' ) {
-			CPFloat * cpf = NULL;
-			ASSERT_CAST( cpf, cpe, CPFloat *, CPEntry *,
-				"ClassFields::ClassFields", "constant float" );
+						CPFloat * cpf = NULL;
+						ASSERT_CAST( cpf, cpe, CPFloat *, CPEntry *, "ClassFields::ClassFields", "constant float" );
     	                fd[x].value = cpf->getMyFloat();
                         } else {
     	                kprintf( "ClassFields::ClassFields() -- attempt to initialize float field with non-float constant, aborting\n" );
@@ -205,9 +202,8 @@ ClassFields::ClassFields( FieldList * fl, ConstantPool * cp ) {
 
                 case TAG_DOUBLE:
                     if ( flc == 'D' ) {
-			CPDouble * cpd = NULL;
-			ASSERT_CAST( cpd, cpe, CPDouble *, CPEntry *,
-				"ClassFields::ClassFields", "constant double" );
+						CPDouble * cpd = NULL;
+						ASSERT_CAST( cpd, cpe, CPDouble *, CPEntry *, "ClassFields::ClassFields", "constant double" );
     	                fd[x].value = (jju32) (new jdouble (cpd->getMyDouble()));
                         } else {
     	                kprintf( "ClassFields::ClassFields() -- attempt to initialize double field with non-double constant, aborting\n" );
@@ -217,11 +213,9 @@ ClassFields::ClassFields( FieldList * fl, ConstantPool * cp ) {
 
                 case TAG_STRING:
                     if ( flc == 'L' && * ((*fl)[x])->getMyDescriptor(cp) == JavaString( "java/lang/String" ) /* intern? */ ) {
-#ifdef DONT_USE_DC
-                        fd[x].value = (jju32)((CPString*)cpe)->getMyJavaString();
-#else
-                        fd[x].value = (jju32)(dynamic_cast<CPString*>(cpe))->getMyJavaString();
-#endif                                                
+						CPString * cps = NULL;
+						ASSERT_CAST( cps, cpe, CPString *, CPEntry *, "ClassFields::ClassFields", "constant string" );
+						fd[x].value = (jju32)cps->getMyJavaString();
                         } else {
     	                kprintf( "ClassFields::ClassFields() -- attempt to initialize string field with non-string constant, aborting\n" );
     	                abort();
@@ -363,53 +357,21 @@ bool matchDescriptorAndPrimitiveType( JavaString * desc, PrimitiveType pt ) {
     } /* end mDAP() */
 
 JavaString * RawFieldInfo::getMyName( ConstantPool * cp ) {
-	// should this be cached?
+	// could be cached...
     // if ( myName != NULL ) { return myName; }
 
-	JavaString * myName = NULL;
-    
-#ifdef DONT_USE_DC
-    CPEntry * cpe = (*cp)[myNameIndex];
-    if ( cpe->type() != TAG_UTF8 ) {
-        kprintf( "RawFieldInfo::getMyName() -- erroneous constant pool entry type (%d), aborting.\n", cpe->type() );
-        abort();
-        }
-    myName = ((ConstantUTF8*)cpe)->getMyJavaString();
-#else
-    if ( ConstantUTF8 * cu8 = dynamic_cast<ConstantUTF8*>( (*cp)[myNameIndex] ) ) {
-        myName = cu8->getMyJavaString();
-        } else {
-        kprintf( "RawFieldInfo::getMyName() -- erroneous constant pool entry type (%d), aborting.\n", ((*cp)[myNameIndex])->type() );
-        abort();
-        }        
-#endif        
-
-    return myName;
+	ConstantUTF8 * cu8 = NULL;
+	ASSERT_CAST( cu8, (*cp)[myNameIndex], ConstantUTF8 *, CPEntry *, "RawFieldInfo::getMyName()", "my name" );
+	return cu8->getMyJavaString();
 	}
 
 JavaString * RawFieldInfo::getMyDescriptor( ConstantPool * cp ) {
-	// should this be cached?
-    // if ( myType != NULL ) { return myName; }
+	// could be caached...
+    // if ( myType != NULL ) { return myType; }
 
-	JavaString * myType = NULL;
-    
-#ifdef DONT_USE_DC
-    CPEntry * cpe = (*cp)[myDescriptorIndex];
-    if ( cpe->type() != TAG_UTF8 ) {
-        kprintf( "RawFieldInfo::getMyDescriptor() -- erroneous constant pool entry type (%d), aborting.\n", cpe->type() );
-        abort();
-        }
-    myType = ((ConstantUTF8*)cpe)->getMyJavaString();
-#else
-    if ( ConstantUTF8 * cu8 = dynamic_cast<ConstantUTF8*>( (*cp)[myNameIndex] ) ) {
-        myType = cu8->getMyJavaString();
-        } else {
-        kprintf( "RawFieldInfo::getMyDescriptor() -- erroneous constant pool entry type (%d), aborting.\n", ((*cp)[myNameIndex])->type() );
-        abort();
-        }        
-#endif        
-
-    return myType;
+	ConstantUTF8 * cu8 = NULL;
+	ASSERT_CAST( cu8, (*cp)[myDescriptorIndex], ConstantUTF8 *, CPEntry *, "RawFieldInfo::getMyDescriptor()", "my descriptor" );
+	return cu8->getMyJavaString();
 	}
 
 bool RawFieldInfo::hasInitialValue( ConstantPool * cp ) {
@@ -424,11 +386,10 @@ RawConstantValueAttribute * RawFieldInfo::findMyCV( ConstantPool * cp ) {
 	/* iterate over elements in my attribute list, looking for the "ConstantValue" */
     for ( int x = 0; x < myAttributeList->getMyAttributeCount(); x++ ) {
         if ( * ((*myAttributeList)[x]->getMyName( cp )) == JavaString("ConstantValue") ) { /* intern! */
-#ifdef DONT_USE_DC            
-            return (RawConstantValueAttribute*)(*myAttributeList)[x];
-#else
-            return dynamic_cast<RawConstantValueAttribute*>((*myAttributeList)[x]);
-#endif                        
+			RawConstantValueAttribute * rcva = NULL;
+			ASSERT_CAST_NO_TYPE( rcva, (*myAttributeList)[x], RawConstantValueAttribute *, AttributeInfo *,
+					"RawFieldInfo::findMyCV()", "my constant value" );
+			return rcva;
             }
         } /* end attribute list iteration */
     return NULL;

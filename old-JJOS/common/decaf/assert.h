@@ -42,6 +42,14 @@
 		{ kprintf("%s -- %x is not a %s, aborting.\n", pos, dst, thing ); abort(); } \
 	} /* closes scope */
 
+/* Some classes don't have a type() function and/or can't have one
+ * because of the static-cast single-virtual-inheritance rule */
+#define ASSERT_CAST_NO_TYPE(dst,src,dptr,sptr,pos,thing) \
+	{ /* opens scope */ \
+	sptr tsrc = (src); \
+	dst = (dptr)(tsrc); \
+	}
+
 #endif /* DONT_USE_DC */
 
 #endif

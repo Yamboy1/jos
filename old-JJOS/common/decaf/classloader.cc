@@ -35,6 +35,15 @@ JavaClassInstance * ClassLoader::getClass( char * name ) {
     }
 
 JavaClassInstance * ClassLoader::getClass( JavaString * js ) {
+	/* Is it an array class? */
+	if ( (*js)[0] == '[' ) {
+		/* Add the instance field `length' to the java.lang.Object's
+		 * field list to generate the ClassFields for the JavaClassInstance
+		 * object to return. */
+		kprintf( "ClassLoader::getClass(): fixme -- return array class\n" );
+		abort();
+		}
+
     /* Have we already done this class? */
     JavaClassInstance * jci = myClassHashTable->lookup( js );
     if ( jci != NULL ) { return jci; }

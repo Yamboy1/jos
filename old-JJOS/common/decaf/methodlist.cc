@@ -135,11 +135,9 @@ CodeAttribute * RawMethodInfo::getMyCodeAttribute( ConstantPool * cp ) {
     /* any point in caching this? */
     for ( int x = 0; x < myAttributeList->getMyAttributeCount(); x++ ) {
         if ( * ((*myAttributeList)[x]->getMyName( cp )) == JavaString("Code") ) { /* intern! */
-#ifdef DONT_USE_DC            
-            return (CodeAttribute*)(*myAttributeList)[x];
-#else
-            return dynamic_cast<CodeAttribute*>((*myAttributeList)[x]);
-#endif                        
+			CodeAttribute * ca = NULL;
+			ASSERT_CAST_NO_TYPE( ca, (*myAttributeList)[x], CodeAttribute *, AttributeInfo *, "RawMethodInfo::getMyCodeAttribute()", "code attribute" );
+			return ca;
             }
         } /* end attribute list iteration */
     kprintf( "RawMethodInfo::getMyCodeAttribute() -- unable to find code in attribute list, aborting.\n" );

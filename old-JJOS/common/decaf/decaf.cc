@@ -170,3 +170,5 @@ bool Frame::aastore(Exception & e) {
 	
 	return true;
 	} /* end aastore() */
+
+	
