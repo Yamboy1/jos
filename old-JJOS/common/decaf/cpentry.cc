@@ -188,19 +188,11 @@ JavaString * CPString::getMyJavaString( ConstantPool * cp ) {
 	if ( cp == NULL ) { return myJavaString; }
 
 	/* fetch the JavaString from the cu8 index */
-#ifndef DONT_USE_DC
-	if ( ConstantUTF8 * cu8 = dynamic_cast<ConstantUTF8 *>( (*cp)[myCU8Index] ) ) {
-		myJavaString = cu8->getMyJavaString();
-#else
-	CPEntry * cpe = (*cp)[myCU8Index];
-	if ( cpe->type() == TAG_UTF8 ) {
-		myJavaString = ((ConstantUTF8*)cpe)->getMyJavaString();
-#endif
-		} else {
-		kprintf( "CPString::getMyJavaString() -- illegal entry (%d) in string lookup, aborting.\n", (*cp)[myCU8Index]->type() );
-		abort();
-		}
-		
+	ConstantUTF8 * cu8 = NULL;
+	ASSERT_CAST( cu8, (*cp)[myCU8Index], ConstantUTF8 *, CPEntry *,
+		"CPString::getMyJavaString()", "constant UTF-8 string" );
+	myJavaString = cu8->getMyJavaString();
+
 	return myJavaString;
 	}
 

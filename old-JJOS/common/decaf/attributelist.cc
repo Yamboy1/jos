@@ -7,6 +7,7 @@
  */
 
 #include "attributelist.h"
+#include "assert.h"
 
 AttributeList::AttributeList() { myAttributeCount = 0; }
 
@@ -62,23 +63,12 @@ AttributeInfo * AttributeInfo::generateAttributeInfo( istream & is, JavaClass * 
 RawAttributeInfo::RawAttributeInfo() : AttributeInfo() { myNameIndex = 0; myAttributeLength = 0; }
 
 JavaString * RawAttributeInfo::getMyName( ConstantPool * cp ) {
-    if ( myName != NULL ) { return myName; }
-    
-#ifdef DONT_USE_DC
-    CPEntry * cpe = (*cp)[myNameIndex];
-    if ( cpe->type() != TAG_UTF8 ) {
-        kprintf( "RawAttributeInfo::getMyName() -- erroneous constant pool entry type (%d), aborting.\n", cpe->type() );
-        abort();
-        }
-    myName = ((ConstantUTF8*)cpe)->getMyJavaString();
-#else
-    if ( ConstantUTF8 * cu8 = dynamic_cast<ConstantUTF8*>( (*cp)[myNameIndex] ) ) {
-        myName = cu8->getMyJavaString();
-        } else {
-        kprintf( "RawAttributeInfo::getMyName() -- erroneous constant pool entry type (%d), aborting.\n", ((*cp)[myNameIndex])->type() );
-        abort();
-        }        
-#endif        
+	if ( myName != NULL ) { return myName; }
+
+	ConstantUTF8 * cu8 = NULL;
+	ASSERT_CAST( cu8, (*cp)[myNameIndex], ConstantUTF8 *, CPEntry *,
+		"RawAttributeInfo::getMyName()", "constant string" );
+	myName = cu8->getMyJavaString();
 
     return myName;
     }

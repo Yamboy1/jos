@@ -7,6 +7,7 @@
  */
 
 #include "fieldlist.h"
+#include "assert.h"
 
 FieldList * FieldList::generateFieldList( istream & is, JavaClass * jc, FieldList * parent ) {
     return RawFieldList::generateRawFieldList( is, jc, parent );
@@ -144,7 +145,7 @@ jju32 ClassFields::getFieldIndex( JavaString * name, JavaString * type ) {
     } /* end getFieldIndex() */
 
 ClassFields::ClassFields( FieldList * fl, ConstantPool * cp ) {
-	/* store our context */
+    /* store our context */
     this->fl = fl;
     this->cp = cp;
     
@@ -168,28 +169,22 @@ ClassFields::ClassFields( FieldList * fl, ConstantPool * cp ) {
     	    
                 case TAG_INTEGER:
                     if ( flc == 'B' || flc == 'C' || flc == 'I' || flc == 'S' || flc == 'Z' ) {
-#ifdef DONT_USE_DC
-    	                fd[x].value = ((CPInteger*)cpe)->getMyInteger();
-#else
-                        /* if a .type()-checked conversion like this fails,
-                         * we've got bigger problems than a NULL pointer... */
-                        fd[x].value = (dynamic_cast<CPInteger*>(cpe))->getMyInteger();   	                
-#endif                        
-    	                } else {
-    	                kprintf( "ClassFields::ClassFields() -- attempt to initialize integral field with non-integral constant, aborting\n" );
+			CPInteger * cpi = NULL;
+			ASSERT_CAST( cpi, cpe, CPInteger *, CPEntry *,
+				"ClassFields::ClassFields", "constant integer" );
+    	                fd[x].value = cpi->getMyInteger();
+                        } else {
+    	                kprintf( "ClassFields::ClassFields() -- attempt to initialize integer field with non-integer constant, aborting\n" );
     	                abort();
     	                }
     	            break;
 
                 case TAG_LONG:
                     if ( flc == 'J' ) {
-#ifdef DONT_USE_DC                    
-                        fd[x].value = (jju32)(new jlong( ((CPLong*)cpe)->getMyLong() ));
-#else
-                        /* if a .type()-checked conversion like this fails,
-                         * we've got bigger problems than a NULL pointer... */
-                        fd[x].value = (jju32)(new jlong( (dynamic_cast<CPLong*>(cpe))->getMyLong() ));
-#endif                        
+			CPLong * cpl = NULL;
+			ASSERT_CAST( cpl, cpe, CPLong *, CPEntry *,
+				"ClassFields::ClassFields", "constant long" );
+			fd[x].value = (jju32) (new jlong( cpl->getMyLong() ));
                         } else {
     	                kprintf( "ClassFields::ClassFields() -- attempt to initialize long field with non-long constant, aborting\n" );
     	                abort();
@@ -198,13 +193,10 @@ ClassFields::ClassFields( FieldList * fl, ConstantPool * cp ) {
 
                 case TAG_FLOAT:
                     if ( flc == 'F' ) {
-#ifdef DONT_USE_DC                    
-                        fd[x].value = ((CPFloat*)cpe)->getMyFloat();
-#else
-                        /* if a .type()-checked conversion like this fails,
-                         * we've got bigger problems than a NULL pointer... */
-                        fd[x].value = (dynamic_cast<CPFloat*>(cpe))->getMyFloat();
-#endif                        
+			CPFloat * cpf = NULL;
+			ASSERT_CAST( cpf, cpe, CPFloat *, CPEntry *,
+				"ClassFields::ClassFields", "constant float" );
+    	                fd[x].value = cpf->getMyFloat();
                         } else {
     	                kprintf( "ClassFields::ClassFields() -- attempt to initialize float field with non-float constant, aborting\n" );
     	                abort();
@@ -213,13 +205,10 @@ ClassFields::ClassFields( FieldList * fl, ConstantPool * cp ) {
 
                 case TAG_DOUBLE:
                     if ( flc == 'D' ) {
-#ifdef DONT_USE_DC                    
-                        fd[x].value = (jju32)(new jdouble( ((CPDouble*)cpe)->getMyDouble() ));
-#else
-                        /* if a .type()-checked conversion like this fails,
-                         * we've got bigger problems than a NULL pointer... */
-                        fd[x].value = (jju32)(new jdouble( (dynamic_cast<CPDouble*>(cpe))->getMyDouble() ));
-#endif                        
+			CPDouble * cpd = NULL;
+			ASSERT_CAST( cpd, cpe, CPDouble *, CPEntry *,
+				"ClassFields::ClassFields", "constant double" );
+    	                fd[x].value = (jju32) (new jdouble (cpd->getMyDouble()));
                         } else {
     	                kprintf( "ClassFields::ClassFields() -- attempt to initialize double field with non-double constant, aborting\n" );
     	                abort();

@@ -27,6 +27,10 @@
 /*
  * This defines an array template class which checks array bounds.
  * It uses one level of indirection to get at the elements.
+ *
+ * Because the array objects in decaf inherit from Object and
+ * from jbArray, jbArray must not have any virtual functions
+ * to ensure that the native build's static casts will work.
  */
 
 template <class elem_t> class jbArray

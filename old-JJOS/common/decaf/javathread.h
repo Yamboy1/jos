@@ -25,6 +25,11 @@ class JavaThreadList;
  * a Threadable object is any
  * object which may be the
  * subject of a monitor.
+ * 
+ * NOTE: because static casts don't work
+ * with multiple virtual inheritance,
+ * Threadable must never have virtual functions.
+ * (JavaClassInstance and its inheritors.)
  */
  
 class Threadable {
