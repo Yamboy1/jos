@@ -1,0 +1,33 @@
+        For the last bit, you'll need some introduction.  I/We define a
+Java process as a Java thread running in a thread(group) with a unique
+classloader.  If a Java thread is spawned without knowledge of its parent,
+the only shared memory is located in the statics area of the classes
+available from the classloader.  If the child's classloader has a
+different instance of those classes than the parent's, no shared memory
+exists, because Java doesn't have pointers.  While this means one could
+simply create entirely new classloaders for every process, this gets
+expensive quickly.  Ideally, we want classloaders to share class
+*definitions* but not class *instances*.  This separation is (will be)
+present in the rewrite.  What we want to be able to do is associate two
+pointers against the class name for each classloader, one to the JavaClass
+and one to the JavaClassInstance.  It's safe to share definitions accross
+classloaders because any alternate definition is going to be defined by
+the Java code.  However, the class definitions need to be 'copy-on-write'
+so that the Java code can call defineClass() and so the Right Thing will
+happen.  This, in turn, implies that different classloaders need to
+maintain different lists of what they have or have not defined, either as
+the primordial classloader or for a Java classloader.  Furthermore, any
+subclasses of the class ( or any class implementing it ) must be
+invalidated so that a subclass from the parent classloader isn't loaded
+into the child with a different superclass.
+
+        Phew!  For each classloader, then, each pointer pair can be
+(a) valid (=copy-on-write), (b) in use (= copied), xor (c) invalid
+(e.g. the pointers are null).  The parent (root) set of class definitions
+can be pointed to by the child as a hashtable.  The child maintains its
+own hashtable, which is checked before it (recursively) checks its
+parent's table.  defineClass() then, will always write to the child
+hashtable.  Marking a class invalid can be achieved by adding the class to
+the child's hashtable with double-NULL pointers.
+
+

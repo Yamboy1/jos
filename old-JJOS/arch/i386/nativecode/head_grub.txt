@@ -1,0 +1,182 @@
+     1                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     2                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     3                                  ;;
+     4                                  ;; The contents of this file are subject to the JJOS Public License
+     5                                  ;; Version 0.0 (the "License"); you may not use this file except in
+     6                                  ;; compliance with the License.  You may obtain a copy of the License
+     7                                  ;; at http://www.jos.org/
+     8                                  ;;
+     9                                  ;; Software distributed under the License is distributed on an "AS IS"
+    10                                  ;; basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+    11                                  ;; the License for the specific language governing rights and limitations
+    12                                  ;; under the License.
+    13                                  ;;
+    14                                  ;; The Original Code is JJOS code, released October, 1998.
+    15                                  ;;
+    16                                  ;; The Initial Developer of the Original Code is George Marrows.
+    17                                  ;; Portions created by George Marrows are Copyright (C) 1999.
+    18                                  ;; All rights reserved.
+    19                                  ;;
+    20                                  ;; Contributor(s):
+    21                                  ;;   John Morrison -- heavily based on his etherboot code.
+    22                                  ;;
+    23                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    24                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    25                                  
+    26                                  
+    27                                  BITS	32
+    28                                  
+    29                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    30                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    31                                  ;;; 
+    32                                  ;;; Entry point.
+    33                                  ;;; 
+    34                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    35                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    36                                  	
+    37                                  SECTION .text
+    38                                  	
+    39                                  global _start
+    40                                  _start:
+    41                                  
+    42 00000000 E913000000              	jmp beyond_multiboot_header
+    43                                  
+    44                                  
+    45 00000005 90<rept>                ALIGN 4
+    46                                  
+    47                                  multiboot_header:
+    48                                  
+    49                                  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    50                                  	;; the multiboot header
+    51                                  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    52                                  
+    53                                  	; multiboot magic number
+    54 00000008 02B0AD1B                	dd	0x1badb002
+    55                                  
+    56                                  	; flags - request memory map
+    57 0000000C 02000000                	dd      0x00000002
+    58                                  
+    59                                  	; checksum
+    60 00000010 FC4F52E4                	dd      (0xffffffff-(0x1badb002+0x00000002))+1
+    61                                  	
+    62                                  
+    63                                  
+    64                                  global multiboot_info_ptr
+    65                                  multiboot_info_ptr:
+    66                                  
+    67                                  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    68                                  	;; storage for a pointer to the 
+    69                                  	;; multiboot info structure
+    70                                  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    71                                  
+    72 00000014 00000000                	dd	0
+    73                                  
+    74                                  
+    75                                  
+    76                                  beyond_multiboot_header:
+    77                                  	
+    78                                  
+    79                                  	;; squirrel away the location of the multiboot_info block
+    80                                  
+    81 00000018 891D[14000000]          	mov [multiboot_info_ptr], ebx
+    82                                  
+    83                                  	;; Set up our own GDT - the multiboot spec says we should
+    84                                  
+    85 0000001E 0F0115[58000000]        	lgdt [GDT]	
+    86                                  
+    87                                  	
+    88                                  	;; I've not seen an explanation of why you need
+    89                                  	;; to jump after doing lgdt - anybody care to explain?
+    90                                  
+    91 00000025 E900000000              	jmp why_need_this
+    92                                  
+    93                                  why_need_this:
+    94                                  
+    95                                  	
+    96                                  	;; The DataSegmentDescriptor-GDT part is a bit cheeky.
+    97                                  	;; Because a segment descriptor is 8 bytes, DSD-GDT is
+    98                                  	;; a multiple of eight, and so has the low 3 bits clear.
+    99                                  	;; These bits control segment type and protection level,
+   100                                  	;; and it turns out that having them clear is *exactly*
+   101                                  	;; what we want.
+   102                                  	
+   103 0000002A 66B81000                	mov	ax, DataSegmentDescriptor-GDT
+   104 0000002E 668ED0                  	mov	ss, ax
+   105 00000031 668ED8                  	mov	ds, ax
+   106 00000034 668EC0                  	mov	es, ax
+   107 00000037 668EE0                  	mov	fs, ax
+   108 0000003A 668EE8                  	mov	gs, ax
+   109                                  
+   110                                  	
+   111                                  	;; Give us a little stack now, and a zeroth stack frame.
+   112                                  
+   113 0000003D BC00600900              	mov	esp, 0x96000	; 600K (below video ram)
+   114 00000042 BD00000000              	mov	ebp, 0x0
+   115 00000047 55                      	push	ebp
+   116 00000048 89E5                    	mov	ebp, esp
+   117                                  	
+   118                                  
+   119                                  extern kernel_entry_point__Fv
+   120 0000004A E8(00000000)            	call	kernel_entry_point__Fv; 
+   121 0000004F FA                      	cli	; Don't let interrupts interrupt ...
+   122 00000050 F4                      	hlt	; our permanent sleep.
+   123                                  
+   124                                  
+   125                                  
+   126                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+   127                                  ;;; 
+   128                                  ;;; Basic flat model Global Descriptor Table.
+   129                                  ;;; Intel systems programming guide pages 3-10, 3-13, and 4-3
+   130                                  ;;;
+   131                                  ;;;
+   132                                  ;;; Global Descriptor Table base and limit for GDTR
+   133                                  ;;;
+   134                                  ;;; We abuse the NULL GDT entry as most people seem to -- we
+   135                                  ;;; put the GDT pointer into it.
+   136                                  ;;; 
+   137                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   138                                  	
+   139 00000051 90<rept>                ALIGN 8				; page 3-16
+   140                                  
+   141                                  GDT:	
+   142 00000058 1700                    	dw (8*3)-1		; use only NULL, DataSegmentDescriptor, and CodeSegmentDescriptor
+   143 0000005A [58000000]                      dd GDT
+   144 0000005E 0000                    	dw 0
+   145                                  
+   146                                  CodeSegmentDescriptor:	
+   147 00000060 FFFF                    	dw	0xffff		; segment limit 15:00
+   148 00000062 0000                    	dw	0x0000		; base address 15:00
+   149 00000064 00                      	db	0x00		; base 23:16
+   150 00000065 9E                      	db	0x9e		; p=1, dpl=0, 1, bit11=1, CRA (C=1,R=1,A=0)
+   151 00000066 CF                      	db	0xcf		; G=1, D/B=1, 0, AVL=0, seg limit 19:16
+   152 00000067 00                      	db	0x00		; base 31:24
+   153                                  
+   154                                  DataSegmentDescriptor:
+   155 00000068 FFFF                    	dw	0xffff		; segment limit 15:00
+   156 0000006A 0000                    	dw	0x0000		; base address 15:00
+   157 0000006C 00                      	db	0x00		; base 23:16
+   158 0000006D 92                      	db	0x92		; p=1, dpl=0, 1, bit11=0, type (E=0,W=1,A=0)
+   159 0000006E CF                      	db	0xcf		; G=1, D/B=1, 0, AVL=0, seg limit 19:16
+   160 0000006F 00                      	db	0x00		; base 31:24
+   161                                  	
+   162                                  
+   163                                  GDTPadding:
+   164 00000070 00000000                	dd	0x00
+   165 00000074 00000000                	dd	0x00
+   166                                  
+   167                                  
+   168                                  
+   169                                  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   170                                  	;; Bit of a hack this -- only here so that
+   171                                  	;; an etherboot specific part of jjmachin.cc
+   172                                  	;; compiles.
+   173                                  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   174                                  
+   175                                  global xmsize_in_kbytes
+   176                                  xmsize_in_kbytes:
+   177 00000078 00000000                	dd 	0
+   178                                  
+   179                                  
+   180                                  
+   181                                  
+   182                                  

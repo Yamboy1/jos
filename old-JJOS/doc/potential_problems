@@ -1,0 +1,45 @@
+interp.cc
+	handleException
+		68   * can the operand_stack initializer fail?
+		74   * can a d_stack ( ->myStack ) push() call fail?
+		76   * can kprintf fail?
+		86   * can kprintf fail?
+	getExceptionHandler
+		pre  * can an exception handler ever be legitimately
+		       located at PC = 0?
+		114  * is there any way to verify that cel is legit?
+		126  * can operator[] fail for code_exception_list?
+		160  * can checkcast() fail?
+	printString
+		192  * can c_str() fail in a non-NULL returning way?
+	pushInvocationFrame
+		288  * can myThread->classLoader() fail in a non-NULL
+		       returning way?  -- Verify that
+		       doLateResolutionAsNecessary() can handle a NULL
+		       class_loader reference.  
+		     * can doLate...() fail?
+		289  * can doStaticInitializationIfNecessary() fail?
+		301  * can method() fail in a non-NULL returning way?
+		306  * can a d_stack ( ->stack() ) push() fail?
+	dynLink
+		388  * Throw canonical VM exception.
+		434  * can setMethodOffset fail?
+	popArgs
+		None.
+	lookupMethod
+		474  * Should abort instead of returning NULL
+		       on an unresolved method error?
+		       Problem is, if it's unresolved because it doesn't
+		       exist, you need to throw a Java exception
+		       (*Error) /now/, and not at link time.
+	..kludge...
+		494  * how test if array goes N deep?
+		512  * Is the dummy Throwable ever used for anything?
+		518  * Ignoring the kludge() function because it's
+		       hopefully going away soon anyway.
+	invokeStatic
+		660  * Do we check things used only in the trace?
+		692  * if rm's class is unresolved, what do we do?
+	invokeSpecial
+		
+		

@@ -1,0 +1,191 @@
+.\" @(#)mknbi-linux.8
+.\"
+.\" Copyright (C) 1995,1998 Gero Kuhlmann   <gero@gkminix.han.de>
+.\" Copyright (C) 1996,1997 Gero Kuhlmann   <gero@gkminix.han.de>
+.\"                and Markus Gutschke <gutschk@math.uni-muenster.de>
+.\"
+.\"  This program is free software; you can redistribute it and/or modify
+.\"  it under the terms of the GNU General Public License as published by
+.\"  the Free Software Foundation; either version 2 of the License, or
+.\"  any later version.
+.\"
+.\"  This program is distributed in the hope that it will be useful,
+.\"  but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"  GNU General Public License for more details.
+.\"
+.\"  You should have received a copy of the GNU General Public License
+.\"  along with this program; if not, write to the Free Software
+.\"  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.TH MKNBI-LINUX 8 "19 Jan 1997"
+.SH NAME
+mknbi\-linux \- MaKe NetBoot Image for Linux kernel
+
+.SH SYNOPSIS
+.LP
+.B mknbi-linux
+[\-x] [\-d rom|ram|kernel|<path>] [\-i rom|kernel|<client:server:gateway:netmask:hostname>]
+[\-a <append>] [\-s <max command line size>] [\-l auto|eom|<address>]
+[\-r <ramdisk>] [[\-k] <image>] [\-o] <output>
+.LP
+.B mknbi-linux
+\-h
+.LP
+.B mknbi-linux
+\-v
+
+.SH DESCRIPTION
+.B mknbi-linux
+is a program to convert a
+.SM Linux
+kernel image into a file suitable for loading by diskless
+systems using a
+.SM Boot-Rom.
+
+.SH OPTIONS
+.TP
+.B \-a
+String to append to the end of the kernel command line.
+.TP
+.B \-d
+Define name of directory to mount via NFS from the boot server.
+If
+.B rom
+is given, that directory is used as root in which the loaded netboot
+image file is located. This is determined by the
+.SM Boot-Rom
+at run time, usually by using the bootp-Protocol.
+If the bootp Server is able to handle the RFC 1497 extensions,
+it is possible to define a different root directory. With
+.B kernel
+the directory name is the default name used by the kernel.
+Given
+.B ram
+the kernel will use a ramdisk for booting, and no NFS directory will
+be mounted. Also if the name given to the
+.B \-d
+option starts with "/dev/", the corresponding device is used as the
+root device, and no NFS directory will be mounted.
+If the
+.B \-d
+option is missing, the default is
+.IR /tftpboot/%s ,
+with the
+.B "%s"
+representing the IP-Number of the booting system.
+.TP
+.B \-h
+Output short usage information.
+.TP
+.B \-i
+Define client and server IP addresses. If
+.B rom
+is given, determine all necessary IP addresses for mounting
+the root directory via NFS using the bootp answer the Boot-Rom
+got from the server during run time. With
+.B kernel
+no IP addresses are defined, and the kernel should determine them
+by itself, usually by using RARP or bootp. If the
+.B \-i
+option is missing, the default is to let the kernel determine the
+addresses. However, it's also possible to define the addresses
+during compilation of the boot image. Then, all addresses must be
+seperated by a colon, and ordered in the following way:
+<client-IP:server-IP:gateway-IP:netmask:hostname>. Using this option
+.B mknbi-linux
+will automatically convert system names into decimal IP addresses,
+except for the hostname which is a normal string.
+.TP
+.B \-k
+Pathname of kernel image file. The default is
+.IR /vmlinuz .
+.TP
+.B \-l
+The startup code that will be include in the netboot image, can
+usually take care of moving the ramdisk image to a valid location in
+memory. But depending on the version of your BIOS, the kind of
+Boot-Prom you use, and the fact that you might have more than 16MB of
+memory, there could be difficulties. In this case, you will have to
+provide further information:
+.RS
+.TP
+.B auto
+This is the default behavior. The Boot-Prom will load the ramdisk
+image at address 0x100000 (if the kernel is already loaded there, the
+ramdisk image will be moved right behind the kernel image). The
+startup code will then try to determine the last legal address in the
+lower 16MB and subsequently move the ramdisk image there. This
+technique will work in most cases and provides the highest degree of
+compatibility and portability among different machines.
+.TP
+.B eom
+If
+.B auto
+does not work for you, you should check if your Boot-Prom is capable
+of loading the ramdisk image to the end of the physical memory. This
+might work fine, but it is slightly less compatible than
+.BR auto .
+.TP
+.B <address>
+If everything else fails, you can resort to explicitly specifying the
+load address. Although beware that this is likely to cause problems,
+when trying to use the same image on machines with different amounts
+of memory. You should try to specify an address that is both below
+16MB and below the physical end of memory; you will have to leave
+enough room for the entire (compressed) ramdisk image. If you move the
+image too low, it will collide with the uncompressed kernel image and
+the kernel will ignore the contents of the ramdisk; you will notice a
+warning message, when booting. If you have at least 16MB of main
+memory, you should try to load the image to
+.BR 0xD30000 ,
+as this leaves enough room for an uncompressed 2.88MB ramdisk image,
+but is unlikely to conflict with the uncompressed kernel image. If you
+want to see, if there is a conflict between the ramdisk image and
+other parts of the compiled netboot image, you can increase the
+verbosity level until detailed load record information is output.
+.RE
+.TP
+.B \-o
+Pathname of output file, which is lateron loaded by the
+.SM Boot-Rom
+via
+.SM tftp.
+The default is
+.B stdout.
+.TP
+.B \-r
+Preloaded ramdisk image; for further information look into
+.I linux/Documentation/initrd.txt
+in the Linux source tree. This requires Linux V1.3.73 or above.
+.TP
+.B \-s
+Maximum size of command line. This parameter specifies how much
+memory the boot loader should reserve for assembling the kernel
+command line. If the kernel command line is longer it automatically
+gets truncated. The lowest usable value for this parameter is 2048.
+Use
+.B \-s
+only if you know what you are doing because it can scramble the
+memory layout of the boot loader.
+.TP
+.B \-v
+Output version information.
+.TP
+.B \-x
+Verbose output to let you know what
+.B mknbi-linux
+is doing. Each
+.B \-x
+increases the verbosity level.
+
+.SH BUGS
+None known yet
+
+.SH AUTHOR
+.B mknbi-linux
+was written by
+.SM Gero Kuhlmann <gero@gkminix.han.de>.
+Support for preloaded ramdisks and loading into extended memory has
+been added by
+.SM Markus Gutschke <gutschk@uni-muenster.de>.
+

@@ -1,0 +1,309 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; The contents of this file are subject to the JJOS Public License
+;; Version 0.0 (the "License"); you may not use this file except in
+;; compliance with the License.  You may obtain a copy of the License
+;; at http://www.jos.org/
+;;
+;; Software distributed under the License is distributed on an "AS IS"
+;; basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+;; the License for the specific language governing rights and limitations
+;; under the License.
+;;
+;; The Original Code is JJOS code, released October, 1998.
+;;
+;; The Initial Developer of the Original Code is John Morrison.
+;; Portions created by John Morrison are Copyright (C) 1998.
+;; All rights reserved.
+;;
+;; Contributor(s):
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+BITS	16
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 
+;;; Entry point.
+;;; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+SECTION .text
+	
+global _start
+_start:
+
+	mov	ax, cs
+;	mov	ss, ax
+	mov	ds, ax
+	mov	es, ax
+	mov	fs, ax
+	mov	gs, ax
+
+	;;
+	;; Save Etherboot parameters.
+	;; 
+	;; 1st far pointer (follows 2 byte return address) 
+	;; points to loaded boot image header.
+	;; 
+	;; 2nd far pointer points to saved bootp reply.
+	;;
+
+	;; Deal with boot image header pointer
+	
+	mov	eax, [esp+4]
+	mov	bx, boot_image_header_far_pointer-_start
+	mov	[bx], eax
+	
+	;; Deal with bootp reply pointer
+	
+	mov	eax, [esp+8]
+	mov	bx, bootp_reply_far_pointer-_start
+	mov	[bx], eax
+
+	;;
+	;; Set up VGA text video mode (Undoc PC pg. 396).
+	;;
+
+
+	mov	ah, 0
+	mov	al, 0x7		; Clear screen buffer, text mode.
+	int	0x10
+
+	;; 
+	;; Say "Hello."
+	;; 
+	
+	mov	esi, bootmsg-_start
+	call	puts
+	
+	;;
+	;; How much RAM do we have? (Undoc PC pg. 776)
+	;; This is kind of a kludge
+	;; -- xmsize_in_kbytes must be within 64KB of _start for this to work
+	;; so we make it a text (vs bss) symbol
+	;;
+
+	mov	ah, 0x88
+	int	0x15
+	mov	bx, xmsize_in_kbytes-_start
+	mov	[bx], ax
+	jnc	enable_a20
+	mov	esi, xmsize_query_failed_msg-_start
+	call	puts
+	cli
+	hlt	
+
+	;;
+	;; Enable A20. (Undoc PC pg. 756)
+	;;
+
+enable_a20:
+	mov	ax, 0x2401
+	int	0x15
+	jmp	a20_successfully_enabled
+;	jnc	a20_successfully_enabled
+;	mov	esi, a20_failed_msg-_start
+;	call	puts
+;	cli
+;	hlt
+
+a20_successfully_enabled:	
+	mov	esi, a20_successfully_enabled_msg-_start
+	call	puts
+
+	;;
+	;; Set up protected mode stuff. (Could use BIOS.)
+	;;
+	
+	cli			; Don't want surprises until interrupts are trapped
+	call	SetUpProtectedMode
+	cli
+	hlt	
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Prints a string.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+puts:
+	lodsb
+	or	al,al
+	jz	putsdone
+	mov	ah,0x0e
+	mov	bx,0x07
+	int	0x10
+	jmp	puts
+putsdone:
+	ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; String constants.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+bootmsg:
+	db	'KERNEL: boot'
+	db	0x0a
+	db	0x0d
+	db	0x00
+
+goingtoprotectedmode:
+	db	'KERNEL: going to protected mode'
+	db	0x0a
+	db	0x0d
+	db	0x00
+
+newlinestring:
+	db	0x0a
+	db	0x0d
+	db	0x00
+
+xmsize_query_failed_msg:
+	db	'KERNEL: xmsize query failed'
+	db	0x0a
+	db	0x0d
+	db	0x00
+
+a20_successfully_enabled_msg:
+	db	'KERNEL: a20 enabled'
+	db	0x0a
+	db	0x0d
+	db	0x00
+	
+a20_failed_msg:
+	db	'KERNEL:A20 ENABLE FAILED'
+	db	0x0a
+	db	0x0d
+	db	0x00
+	
+	
+;;; 
+;;; Basic flat model Global Descriptor Table.
+;;; Intel systems programming guide pages 3-10, 3-13, and 4-3
+;;;
+	
+;;;
+;;; Global Descriptor Table base and limit for GDTR
+;;;
+;;; We abuse the NULL GDT entry as most people seem to -- we
+;;; put the GDT pointer into it.
+;;; 
+	
+ALIGN 8				; page 3-16
+
+GDT:	
+	dw (8*3)-1		; use only NULL, DataSegmentDescriptor, and CodeSegmentDescriptor
+        dd GDT
+	dw 0
+
+CodeSegmentDescriptor:	
+	dw	0xffff		; segment limit 15:00
+	dw	0x0000		; base address 15:00
+	db	0x00		; base 23:16
+	db	0x9e		; p=1, dpl=0, 1, bit11=1, CRA (C=1,R=1,A=0)
+	db	0xcf		; G=1, D/B=1, 0, AVL=0, seg limit 19:16
+	db	0x00		; base 31:24
+
+DataSegmentDescriptor:
+	dw	0xffff		; segment limit 15:00
+	dw	0x0000		; base address 15:00
+	db	0x00		; base 23:16
+	db	0x92		; p=1, dpl=0, 1, bit11=0, type (E=0,W=1,A=0)
+	db	0xcf		; G=1, D/B=1, 0, AVL=0, seg limit 19:16
+	db	0x00		; base 31:24
+	
+
+GDTPadding:
+	dd	0x00
+	dd	0x00
+
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 32-bit protected mode code starts here.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	;; Sequence is described on SysProgGuide Page 8-13.
+
+SetUpProtectedMode:	
+	
+	lgdt [GDT-_start]	; Get around stupid NASM behavior when in ELF mode.
+	
+	;; 
+	;; Set Protected Mode
+	;;
+	
+	mov	eax,cr0		; Get control register
+	or	eax,1		; Set protected mode bit
+	mov	cr0,eax		; put it back
+	
+	;; Clear prefetch queue.
+	
+	jmp	cache_flushed_here
+
+cache_flushed_here:
+
+	;; 
+	;; Jump to protected mode.
+	;; 
+
+	jmp	 CodeSegmentDescriptor-GDT:dword clear_label
+
+	
+BITS	32
+clear_label:
+	
+	;; Set up these segment registers to point to the flat DataSegmentDescriptor.
+	
+	mov	ax, DataSegmentDescriptor-GDT
+	mov	ss, ax
+	mov	ds, ax
+	mov	es, ax
+	mov	fs, ax
+	mov	gs, ax
+	
+	;; Give us a little stack now, and a zeroth stack frame.
+	
+;	mov	esp, 0x200000-4	; 2MB less 4 bytes
+	mov	esp, 0x96000	; 600K (below video ram)
+	mov	ebp, 0x0
+	push	ebp
+	mov	ebp, esp
+	
+extern kernel_entry_point__Fv
+	call	kernel_entry_point__Fv; 
+	cli			; Don't let interrupts interrupt ...
+	hlt			; our permanent sleep.
+	
+
+
+;;;
+;;; Here's where we stick text-section variables
+;;; so they're within 64KB of _start
+;;;
+
+global xmsize_in_kbytes
+xmsize_in_kbytes:
+	dw	0
+
+global bootp_reply_far_pointer
+bootp_reply_far_pointer:
+	dd	0
+
+global boot_image_header_far_pointer
+boot_image_header_far_pointer:
+	dd	0
+

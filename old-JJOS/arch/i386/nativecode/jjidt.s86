@@ -1,0 +1,319 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; The contents of this file are subject to the JJOS Public License
+;; Version 0.0 (the "License"); you may not use this file except in
+;; compliance with the License.  You may obtain a copy of the License
+;; at http://www.jos.org/
+;;
+;; Software distributed under the License is distributed on an "AS IS"
+;; basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+;; the License for the specific language governing rights and limitations
+;; under the License.
+;;
+;; The Original Code is JJOS code, released October, 1998.
+;;
+;; The Initial Developer of the Original Code is John Morrison.
+;; Portions created by John Morrison are Copyright (C) 1998.
+;; All rights reserved.
+;;
+;; Contributor(s):
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+%macro InterruptHandler 2
+	global %1	; advertise our function name as global symbol
+	extern %2	; declare C++ fcn of no args as accessible symbol
+%1:			; define our global symbol location
+	cli		; disable other interrupts for now
+	pushad		; save ALL registers (kind of extreme, but what the hell)
+	call %2		; call the C++ function with no arguments
+	mov al, 0x20	; load code to acknowledge interrupt
+	out 0x20, al	; whack 8259 PIC so it shuts up
+	popad		; restore ALL the registers
+	sti		; re-enable interrupts
+	iret		; return from exception
+%endmacro
+	
+	InterruptHandler int000handler, interrupt000Handler__15jj386Interrupts
+	InterruptHandler int001handler, interrupt001Handler__15jj386Interrupts
+	InterruptHandler int002handler, interrupt002Handler__15jj386Interrupts
+	InterruptHandler int003handler, interrupt003Handler__15jj386Interrupts
+	InterruptHandler int004handler, interrupt004Handler__15jj386Interrupts
+	InterruptHandler int005handler, interrupt005Handler__15jj386Interrupts
+	InterruptHandler int006handler, interrupt006Handler__15jj386Interrupts
+	InterruptHandler int007handler, interrupt007Handler__15jj386Interrupts
+	InterruptHandler int008handler, interrupt008Handler__15jj386Interrupts
+	InterruptHandler int009handler, interrupt009Handler__15jj386Interrupts
+
+	InterruptHandler int010handler, interrupt010Handler__15jj386Interrupts
+	InterruptHandler int011handler, interrupt011Handler__15jj386Interrupts
+	InterruptHandler int012handler, interrupt012Handler__15jj386Interrupts
+	InterruptHandler int013handler, interrupt013Handler__15jj386Interrupts
+	InterruptHandler int014handler, interrupt014Handler__15jj386Interrupts
+	InterruptHandler int015handler, interrupt015Handler__15jj386Interrupts
+	InterruptHandler int016handler, interrupt016Handler__15jj386Interrupts
+	InterruptHandler int017handler, interrupt017Handler__15jj386Interrupts
+	InterruptHandler int018handler, interrupt018Handler__15jj386Interrupts
+	InterruptHandler int019handler, interrupt019Handler__15jj386Interrupts
+
+	InterruptHandler int020handler, interrupt020Handler__15jj386Interrupts
+	InterruptHandler int021handler, interrupt021Handler__15jj386Interrupts
+	InterruptHandler int022handler, interrupt022Handler__15jj386Interrupts
+	InterruptHandler int023handler, interrupt023Handler__15jj386Interrupts
+	InterruptHandler int024handler, interrupt024Handler__15jj386Interrupts
+	InterruptHandler int025handler, interrupt025Handler__15jj386Interrupts
+	InterruptHandler int026handler, interrupt026Handler__15jj386Interrupts
+	InterruptHandler int027handler, interrupt027Handler__15jj386Interrupts
+	InterruptHandler int028handler, interrupt028Handler__15jj386Interrupts
+	InterruptHandler int029handler, interrupt029Handler__15jj386Interrupts
+
+	InterruptHandler int030handler, interrupt030Handler__15jj386Interrupts
+	InterruptHandler int031handler, interrupt031Handler__15jj386Interrupts
+	InterruptHandler int032handler, interrupt032Handler__15jj386Interrupts
+	InterruptHandler int033handler, interrupt033Handler__15jj386Interrupts
+	InterruptHandler int034handler, interrupt034Handler__15jj386Interrupts
+	InterruptHandler int035handler, interrupt035Handler__15jj386Interrupts
+	InterruptHandler int036handler, interrupt036Handler__15jj386Interrupts
+	InterruptHandler int037handler, interrupt037Handler__15jj386Interrupts
+	InterruptHandler int038handler, interrupt038Handler__15jj386Interrupts
+	InterruptHandler int039handler, interrupt039Handler__15jj386Interrupts
+
+	InterruptHandler int040handler, interrupt040Handler__15jj386Interrupts
+	InterruptHandler int041handler, interrupt041Handler__15jj386Interrupts
+	InterruptHandler int042handler, interrupt042Handler__15jj386Interrupts
+	InterruptHandler int043handler, interrupt043Handler__15jj386Interrupts
+	InterruptHandler int044handler, interrupt044Handler__15jj386Interrupts
+	InterruptHandler int045handler, interrupt045Handler__15jj386Interrupts
+	InterruptHandler int046handler, interrupt046Handler__15jj386Interrupts
+	InterruptHandler int047handler, interrupt047Handler__15jj386Interrupts
+	InterruptHandler int048handler, interrupt048Handler__15jj386Interrupts
+	InterruptHandler int049handler, interrupt049Handler__15jj386Interrupts
+
+	InterruptHandler int050handler, interrupt050Handler__15jj386Interrupts
+	InterruptHandler int051handler, interrupt051Handler__15jj386Interrupts
+	InterruptHandler int052handler, interrupt052Handler__15jj386Interrupts
+	InterruptHandler int053handler, interrupt053Handler__15jj386Interrupts
+	InterruptHandler int054handler, interrupt054Handler__15jj386Interrupts
+	InterruptHandler int055handler, interrupt055Handler__15jj386Interrupts
+	InterruptHandler int056handler, interrupt056Handler__15jj386Interrupts
+	InterruptHandler int057handler, interrupt057Handler__15jj386Interrupts
+	InterruptHandler int058handler, interrupt058Handler__15jj386Interrupts
+	InterruptHandler int059handler, interrupt059Handler__15jj386Interrupts
+
+	InterruptHandler int060handler, interrupt060Handler__15jj386Interrupts
+	InterruptHandler int061handler, interrupt061Handler__15jj386Interrupts
+	InterruptHandler int062handler, interrupt062Handler__15jj386Interrupts
+	InterruptHandler int063handler, interrupt063Handler__15jj386Interrupts
+	InterruptHandler int064handler, interrupt064Handler__15jj386Interrupts
+	InterruptHandler int065handler, interrupt065Handler__15jj386Interrupts
+	InterruptHandler int066handler, interrupt066Handler__15jj386Interrupts
+	InterruptHandler int067handler, interrupt067Handler__15jj386Interrupts
+	InterruptHandler int068handler, interrupt068Handler__15jj386Interrupts
+	InterruptHandler int069handler, interrupt069Handler__15jj386Interrupts
+
+	InterruptHandler int070handler, interrupt070Handler__15jj386Interrupts
+	InterruptHandler int071handler, interrupt071Handler__15jj386Interrupts
+	InterruptHandler int072handler, interrupt072Handler__15jj386Interrupts
+	InterruptHandler int073handler, interrupt073Handler__15jj386Interrupts
+	InterruptHandler int074handler, interrupt074Handler__15jj386Interrupts
+	InterruptHandler int075handler, interrupt075Handler__15jj386Interrupts
+	InterruptHandler int076handler, interrupt076Handler__15jj386Interrupts
+	InterruptHandler int077handler, interrupt077Handler__15jj386Interrupts
+	InterruptHandler int078handler, interrupt078Handler__15jj386Interrupts
+	InterruptHandler int079handler, interrupt079Handler__15jj386Interrupts
+
+	InterruptHandler int080handler, interrupt080Handler__15jj386Interrupts
+	InterruptHandler int081handler, interrupt081Handler__15jj386Interrupts
+	InterruptHandler int082handler, interrupt082Handler__15jj386Interrupts
+	InterruptHandler int083handler, interrupt083Handler__15jj386Interrupts
+	InterruptHandler int084handler, interrupt084Handler__15jj386Interrupts
+	InterruptHandler int085handler, interrupt085Handler__15jj386Interrupts
+	InterruptHandler int086handler, interrupt086Handler__15jj386Interrupts
+	InterruptHandler int087handler, interrupt087Handler__15jj386Interrupts
+	InterruptHandler int088handler, interrupt088Handler__15jj386Interrupts
+	InterruptHandler int089handler, interrupt089Handler__15jj386Interrupts
+
+	InterruptHandler int090handler, interrupt090Handler__15jj386Interrupts
+	InterruptHandler int091handler, interrupt091Handler__15jj386Interrupts
+	InterruptHandler int092handler, interrupt092Handler__15jj386Interrupts
+	InterruptHandler int093handler, interrupt093Handler__15jj386Interrupts
+	InterruptHandler int094handler, interrupt094Handler__15jj386Interrupts
+	InterruptHandler int095handler, interrupt095Handler__15jj386Interrupts
+	InterruptHandler int096handler, interrupt096Handler__15jj386Interrupts
+	InterruptHandler int097handler, interrupt097Handler__15jj386Interrupts
+	InterruptHandler int098handler, interrupt098Handler__15jj386Interrupts
+	InterruptHandler int099handler, interrupt099Handler__15jj386Interrupts
+
+	InterruptHandler int100handler, interrupt100Handler__15jj386Interrupts
+	InterruptHandler int101handler, interrupt101Handler__15jj386Interrupts
+	InterruptHandler int102handler, interrupt102Handler__15jj386Interrupts
+	InterruptHandler int103handler, interrupt103Handler__15jj386Interrupts
+	InterruptHandler int104handler, interrupt104Handler__15jj386Interrupts
+	InterruptHandler int105handler, interrupt105Handler__15jj386Interrupts
+	InterruptHandler int106handler, interrupt106Handler__15jj386Interrupts
+	InterruptHandler int107handler, interrupt107Handler__15jj386Interrupts
+	InterruptHandler int108handler, interrupt108Handler__15jj386Interrupts
+	InterruptHandler int109handler, interrupt109Handler__15jj386Interrupts
+
+	InterruptHandler int110handler, interrupt110Handler__15jj386Interrupts
+	InterruptHandler int111handler, interrupt111Handler__15jj386Interrupts
+	InterruptHandler int112handler, interrupt112Handler__15jj386Interrupts
+	InterruptHandler int113handler, interrupt113Handler__15jj386Interrupts
+	InterruptHandler int114handler, interrupt114Handler__15jj386Interrupts
+	InterruptHandler int115handler, interrupt115Handler__15jj386Interrupts
+	InterruptHandler int116handler, interrupt116Handler__15jj386Interrupts
+	InterruptHandler int117handler, interrupt117Handler__15jj386Interrupts
+	InterruptHandler int118handler, interrupt118Handler__15jj386Interrupts
+	InterruptHandler int119handler, interrupt119Handler__15jj386Interrupts
+
+	InterruptHandler int120handler, interrupt120Handler__15jj386Interrupts
+	InterruptHandler int121handler, interrupt121Handler__15jj386Interrupts
+	InterruptHandler int122handler, interrupt122Handler__15jj386Interrupts
+	InterruptHandler int123handler, interrupt123Handler__15jj386Interrupts
+	InterruptHandler int124handler, interrupt124Handler__15jj386Interrupts
+	InterruptHandler int125handler, interrupt125Handler__15jj386Interrupts
+	InterruptHandler int126handler, interrupt126Handler__15jj386Interrupts
+	InterruptHandler int127handler, interrupt127Handler__15jj386Interrupts
+	InterruptHandler int128handler, interrupt128Handler__15jj386Interrupts
+	InterruptHandler int129handler, interrupt129Handler__15jj386Interrupts
+
+	InterruptHandler int130handler, interrupt130Handler__15jj386Interrupts
+	InterruptHandler int131handler, interrupt131Handler__15jj386Interrupts
+	InterruptHandler int132handler, interrupt132Handler__15jj386Interrupts
+	InterruptHandler int133handler, interrupt133Handler__15jj386Interrupts
+	InterruptHandler int134handler, interrupt134Handler__15jj386Interrupts
+	InterruptHandler int135handler, interrupt135Handler__15jj386Interrupts
+	InterruptHandler int136handler, interrupt136Handler__15jj386Interrupts
+	InterruptHandler int137handler, interrupt137Handler__15jj386Interrupts
+	InterruptHandler int138handler, interrupt138Handler__15jj386Interrupts
+	InterruptHandler int139handler, interrupt139Handler__15jj386Interrupts
+
+	InterruptHandler int140handler, interrupt140Handler__15jj386Interrupts
+	InterruptHandler int141handler, interrupt141Handler__15jj386Interrupts
+	InterruptHandler int142handler, interrupt142Handler__15jj386Interrupts
+	InterruptHandler int143handler, interrupt143Handler__15jj386Interrupts
+	InterruptHandler int144handler, interrupt144Handler__15jj386Interrupts
+	InterruptHandler int145handler, interrupt145Handler__15jj386Interrupts
+	InterruptHandler int146handler, interrupt146Handler__15jj386Interrupts
+	InterruptHandler int147handler, interrupt147Handler__15jj386Interrupts
+	InterruptHandler int148handler, interrupt148Handler__15jj386Interrupts
+	InterruptHandler int149handler, interrupt149Handler__15jj386Interrupts
+
+	InterruptHandler int150handler, interrupt150Handler__15jj386Interrupts
+	InterruptHandler int151handler, interrupt151Handler__15jj386Interrupts
+	InterruptHandler int152handler, interrupt152Handler__15jj386Interrupts
+	InterruptHandler int153handler, interrupt153Handler__15jj386Interrupts
+	InterruptHandler int154handler, interrupt154Handler__15jj386Interrupts
+	InterruptHandler int155handler, interrupt155Handler__15jj386Interrupts
+	InterruptHandler int156handler, interrupt156Handler__15jj386Interrupts
+	InterruptHandler int157handler, interrupt157Handler__15jj386Interrupts
+	InterruptHandler int158handler, interrupt158Handler__15jj386Interrupts
+	InterruptHandler int159handler, interrupt159Handler__15jj386Interrupts
+
+	InterruptHandler int160handler, interrupt160Handler__15jj386Interrupts
+	InterruptHandler int161handler, interrupt161Handler__15jj386Interrupts
+	InterruptHandler int162handler, interrupt162Handler__15jj386Interrupts
+	InterruptHandler int163handler, interrupt163Handler__15jj386Interrupts
+	InterruptHandler int164handler, interrupt164Handler__15jj386Interrupts
+	InterruptHandler int165handler, interrupt165Handler__15jj386Interrupts
+	InterruptHandler int166handler, interrupt166Handler__15jj386Interrupts
+	InterruptHandler int167handler, interrupt167Handler__15jj386Interrupts
+	InterruptHandler int168handler, interrupt168Handler__15jj386Interrupts
+	InterruptHandler int169handler, interrupt169Handler__15jj386Interrupts
+
+	InterruptHandler int170handler, interrupt170Handler__15jj386Interrupts
+	InterruptHandler int171handler, interrupt171Handler__15jj386Interrupts
+	InterruptHandler int172handler, interrupt172Handler__15jj386Interrupts
+	InterruptHandler int173handler, interrupt173Handler__15jj386Interrupts
+	InterruptHandler int174handler, interrupt174Handler__15jj386Interrupts
+	InterruptHandler int175handler, interrupt175Handler__15jj386Interrupts
+	InterruptHandler int176handler, interrupt176Handler__15jj386Interrupts
+	InterruptHandler int177handler, interrupt177Handler__15jj386Interrupts
+	InterruptHandler int178handler, interrupt178Handler__15jj386Interrupts
+	InterruptHandler int179handler, interrupt179Handler__15jj386Interrupts
+
+	InterruptHandler int180handler, interrupt180Handler__15jj386Interrupts
+	InterruptHandler int181handler, interrupt181Handler__15jj386Interrupts
+	InterruptHandler int182handler, interrupt182Handler__15jj386Interrupts
+	InterruptHandler int183handler, interrupt183Handler__15jj386Interrupts
+	InterruptHandler int184handler, interrupt184Handler__15jj386Interrupts
+	InterruptHandler int185handler, interrupt185Handler__15jj386Interrupts
+	InterruptHandler int186handler, interrupt186Handler__15jj386Interrupts
+	InterruptHandler int187handler, interrupt187Handler__15jj386Interrupts
+	InterruptHandler int188handler, interrupt188Handler__15jj386Interrupts
+	InterruptHandler int189handler, interrupt189Handler__15jj386Interrupts
+
+	InterruptHandler int190handler, interrupt190Handler__15jj386Interrupts
+	InterruptHandler int191handler, interrupt191Handler__15jj386Interrupts
+	InterruptHandler int192handler, interrupt192Handler__15jj386Interrupts
+	InterruptHandler int193handler, interrupt193Handler__15jj386Interrupts
+	InterruptHandler int194handler, interrupt194Handler__15jj386Interrupts
+	InterruptHandler int195handler, interrupt195Handler__15jj386Interrupts
+	InterruptHandler int196handler, interrupt196Handler__15jj386Interrupts
+	InterruptHandler int197handler, interrupt197Handler__15jj386Interrupts
+	InterruptHandler int198handler, interrupt198Handler__15jj386Interrupts
+	InterruptHandler int199handler, interrupt199Handler__15jj386Interrupts
+
+	InterruptHandler int200handler, interrupt200Handler__15jj386Interrupts
+	InterruptHandler int201handler, interrupt201Handler__15jj386Interrupts
+	InterruptHandler int202handler, interrupt202Handler__15jj386Interrupts
+	InterruptHandler int203handler, interrupt203Handler__15jj386Interrupts
+	InterruptHandler int204handler, interrupt204Handler__15jj386Interrupts
+	InterruptHandler int205handler, interrupt205Handler__15jj386Interrupts
+	InterruptHandler int206handler, interrupt206Handler__15jj386Interrupts
+	InterruptHandler int207handler, interrupt207Handler__15jj386Interrupts
+	InterruptHandler int208handler, interrupt208Handler__15jj386Interrupts
+	InterruptHandler int209handler, interrupt209Handler__15jj386Interrupts
+
+	InterruptHandler int210handler, interrupt210Handler__15jj386Interrupts
+	InterruptHandler int211handler, interrupt211Handler__15jj386Interrupts
+	InterruptHandler int212handler, interrupt212Handler__15jj386Interrupts
+	InterruptHandler int213handler, interrupt213Handler__15jj386Interrupts
+	InterruptHandler int214handler, interrupt214Handler__15jj386Interrupts
+	InterruptHandler int215handler, interrupt215Handler__15jj386Interrupts
+	InterruptHandler int216handler, interrupt216Handler__15jj386Interrupts
+	InterruptHandler int217handler, interrupt217Handler__15jj386Interrupts
+	InterruptHandler int218handler, interrupt218Handler__15jj386Interrupts
+	InterruptHandler int219handler, interrupt219Handler__15jj386Interrupts
+
+	InterruptHandler int220handler, interrupt220Handler__15jj386Interrupts
+	InterruptHandler int221handler, interrupt221Handler__15jj386Interrupts
+	InterruptHandler int222handler, interrupt222Handler__15jj386Interrupts
+	InterruptHandler int223handler, interrupt223Handler__15jj386Interrupts
+	InterruptHandler int224handler, interrupt224Handler__15jj386Interrupts
+	InterruptHandler int225handler, interrupt225Handler__15jj386Interrupts
+	InterruptHandler int226handler, interrupt226Handler__15jj386Interrupts
+	InterruptHandler int227handler, interrupt227Handler__15jj386Interrupts
+	InterruptHandler int228handler, interrupt228Handler__15jj386Interrupts
+	InterruptHandler int229handler, interrupt229Handler__15jj386Interrupts
+
+	InterruptHandler int230handler, interrupt230Handler__15jj386Interrupts
+	InterruptHandler int231handler, interrupt231Handler__15jj386Interrupts
+	InterruptHandler int232handler, interrupt232Handler__15jj386Interrupts
+	InterruptHandler int233handler, interrupt233Handler__15jj386Interrupts
+	InterruptHandler int234handler, interrupt234Handler__15jj386Interrupts
+	InterruptHandler int235handler, interrupt235Handler__15jj386Interrupts
+	InterruptHandler int236handler, interrupt236Handler__15jj386Interrupts
+	InterruptHandler int237handler, interrupt237Handler__15jj386Interrupts
+	InterruptHandler int238handler, interrupt238Handler__15jj386Interrupts
+	InterruptHandler int239handler, interrupt239Handler__15jj386Interrupts
+
+	InterruptHandler int240handler, interrupt240Handler__15jj386Interrupts
+	InterruptHandler int241handler, interrupt241Handler__15jj386Interrupts
+	InterruptHandler int242handler, interrupt242Handler__15jj386Interrupts
+	InterruptHandler int243handler, interrupt243Handler__15jj386Interrupts
+	InterruptHandler int244handler, interrupt244Handler__15jj386Interrupts
+	InterruptHandler int245handler, interrupt245Handler__15jj386Interrupts
+	InterruptHandler int246handler, interrupt246Handler__15jj386Interrupts
+	InterruptHandler int247handler, interrupt247Handler__15jj386Interrupts
+	InterruptHandler int248handler, interrupt248Handler__15jj386Interrupts
+	InterruptHandler int249handler, interrupt249Handler__15jj386Interrupts
+
+	InterruptHandler int250handler, interrupt250Handler__15jj386Interrupts
+	InterruptHandler int251handler, interrupt251Handler__15jj386Interrupts
+	InterruptHandler int252handler, interrupt252Handler__15jj386Interrupts
+	InterruptHandler int253handler, interrupt253Handler__15jj386Interrupts
+	InterruptHandler int254handler, interrupt254Handler__15jj386Interrupts
+	InterruptHandler int255handler, interrupt255Handler__15jj386Interrupts

@@ -1,0 +1,216 @@
+Thu Jun 26 17:15:44 MEST 1997  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* IP address support gets only compiled in if the proper header
+	  files exist
+
+Sun Jun 15 23:21:36 MEST 1997  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* Fixed a bug which allowed not giving the kernel and outfile names
+
+Fri Jun 13 01:41:57 MEST 1997  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* Added support for non-Intel architectures
+
+Mon Apr 14 19:14:35 MEST 1997  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* Recycled the version number to the main version number of the
+	  whole netboot package
+
+Mon Mar 10 00:50:58 MET 1997  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* Added some more debugging messages to first.S
+
+Sat Jan 25 11:54:01 MET 1997  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* Cleaned up Markus code
+
+	* Raised version number up to 1.6
+
+Sat Jan 18 00:50:00 1996  Markus Gutschke  <gutschk@math.uni-muenster.de>
+
+	* Fixed the code for determining the maximum size available for
+	the BOOTP record.
+
+	* New support for extracting command line parameters from the
+	vendor tags.
+
+Sun Jan  5 20:25:33 MET 1997  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* Changed Makefile.in to support compilation without master makefile,
+	and to work with the bin86 from the ELKS project
+
+	* Removed writing boot image to stdout, because it's not possible
+	to seek on character devices
+
+Thu Dec 26 21:56:41 MET 1996  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* Fixed a problem with loading a ramdisk image at a fixed
+	location per Markus Gutschke's suggestion.
+
+Sun Oct 20 13:45:07 MET DST 1996  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* Added support for choosing the root device if not NFS to -d
+	option.
+
+Sun Oct 13 13:11:00 MET DST 1996  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* Added "ram" pseudo directory name to -d option, so that the
+	kernel can boot from a ramdisk without using init_rd.
+
+	* The configuration now uses GNU's autoconf, so all files
+	include a main config.h file, and the Makefile had to be
+	changed and is now renamed to Makefile.in
+
+	* Added support for different byte orders. It should now be
+	possible to compile and run mknbi-linux on any UNIX style
+	operating system. However, I don't have the means of testing
+	this.
+
+	* Raised the version number to 1.5
+
+Mon Sep 23 15:01:59 MET DST 1996  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* Changed the name of the program from mknbi to mknbi-linux in
+	order to allow this program to coexist with similar programs
+	for other operating systems. Also changed the Makefile so that
+	everything is installed correctly. The mknbi.h header file is
+	now identified by _MKNBI_H_LINUX_ to prevent inclusion of a
+	wrong one.
+
+Thu May 23 13:01:55 1996  Markus Gutschke  <gutschk@math.uni-muenster.de>
+
+	* Reformated ChangeLog file so that it can automatically be
+	maintained by Emacs; this required changing the filename from
+	Changelog to ChangeLog.
+
+	* Apparently, Gero missed some of my most recent patches. So, I
+	retrofitted them into his code:
+	  - Compile-time option ASM_FREEZE_AFTER_INIT.
+	  - Different levels of verbosity in mknbi.c.
+	  - Alignment to 4kB boundaries when loading ramdisk image.
+	  - Check magic number in kernel image.
+	  - Miscellaneous changes to the manual page (filename changed
+	    from mknbi.8 to mknbi.man).
+
+	* Added the new compile-time option ASM_DEBUG_VERBOSE.
+	
+	* Added autodection of big kernels. This obsoletes the option
+	"-b".
+
+	* Clean the command line from multiple or contradictory
+	parameters. This is useful for configurations that use /linuxrc
+	for setting up the environment.
+
+	* first.S would not compile with full debugging information
+	enabled. Added a few more jump instructions to fix this problem.
+
+	* While updating the error handling in first.S, Gero introduced a
+	bug that made relocating the ramdisk image impossible. Fixed by
+	reloading "si".
+
+	* Added support for the "vga=" command line option.
+	
+	* Updated the manual page.
+
+	* Raised the version number to 1.4.
+
+Thu May 16 10:07:38 MET DST 1996  Gero Kuhlmann  <gero@gkminix.han.de>
+
+	* Code cleanup
+	
+	* Changed assembler code back to native 16-bit 80x86 opcodes
+	
+	* Fixed a couple of stack problems in the assembler code
+	introduced with initrd support
+	
+ 	* Changed to allow compilation of mknbi on UNIX systems other than
+	Linux
+
+Sun Mar 24 23:13:36 MET 1996  Markus Gutschke  <gutschk@math.uni-muenster.de>
+
+	* Merged my source code with Gero's most recent source tree;
+	basically this required adding:
+          - new command line options: "-s", "-x"
+          - minor clean ups
+          - adding "hostname" to "-i" command line option
+          - updating manual page
+        I hope, I found all changes that Gero made after releasing the
+	last public version.
+	
+	* Added new compile-time option ASM_FREEZE_AFTER_INIT to first.S
+	and Makefile.
+
+	* Added new command line option "-v".
+
+	* Added second verbosity level to mknbi.c (this will output
+	detailed load record information).
+
+	* This release is now known as: Version 1.2 <Sun Mar 24 23:13:36
+	MET 1996>
+
+	* Updated manual page and ordered options alphabetically.
+
+March 23nd 1996, Markus Gutschke <gutschk@math.uni-muenster.de>
+
+	* Pim reported that ramdisk images have to be aligned to 4kB page
+	boundaries; applied fix to first.S and mknbi.c.
+
+March 22nd 1996, Markus Gutschke <gutschk@math.uni-muenster.de>
+
+	* Changed the internal data structure for creating the load
+	map. This allows for adding vendor specific data to the load
+	records.
+
+	* Added "auto" support for location of ramdisk image and made it
+	the default behavior.
+
+	* Added vendor specific flag to end of ramdisk load record; this
+	flag tells about the desired load mode (auto|eom|<address>)
+
+	* Reordered indexes of load records to fit the new algorithm.
+
+	* Cleaned up assembly code -- at least a little bit :-)
+
+	* Updated manual page mknbi.8.	
+
+March 21st 1996, Markus Gutschke <gutschk@math.uni-muenster.de>
+
+	* Added support for loading kernel into high memory.
+
+	* Added "-b" and "-l" command line options.
+
+	* Ramdisk images can now be loaded either to end of memory or at a
+	user supplied position.
+
+	* Determine size of kernel's setup code by looking into the boot
+	sector.
+
+	* Verify magic number in boot sector before accepting a kernel
+	image.
+
+	* Changed ID for type_of_bootloader to 0x41 as the old value
+	collided with Peter Anvin's SYSLINUX.
+
+	* Initialized heap pointer for kernel's setup code.
+
+	* Allocated 8kB for kernel's setup code.
+
+	* Disabled extra debugging messages in first.S.
+
+	* Updated manual page mknbi.8.
+
+March 20th 1996, Markus Gutschke <gutschk@math.uni-muenster.de>
+
+	* Added support for preloading of ramdisk images to mknbi.c,
+	first.S and mknbi.8.
+
+	* Verified kernel's setup magic in first.S.
+
+	* Allocated ID 0x31 for type_of_bootloader.
+
+	* Ramdisk images will always be loaded to end of memory as
+	reported by "int 0x15".
+
+	* Removed extra block of junk that mknbi added to end of image.
+	
+	

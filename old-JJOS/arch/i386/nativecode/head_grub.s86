@@ -1,0 +1,182 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; The contents of this file are subject to the JJOS Public License
+;; Version 0.0 (the "License"); you may not use this file except in
+;; compliance with the License.  You may obtain a copy of the License
+;; at http://www.jos.org/
+;;
+;; Software distributed under the License is distributed on an "AS IS"
+;; basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+;; the License for the specific language governing rights and limitations
+;; under the License.
+;;
+;; The Original Code is JJOS code, released October, 1998.
+;;
+;; The Initial Developer of the Original Code is George Marrows.
+;; Portions created by George Marrows are Copyright (C) 1999.
+;; All rights reserved.
+;;
+;; Contributor(s):
+;;   John Morrison -- heavily based on his etherboot code.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+BITS	32
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 
+;;; Entry point.
+;;; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+SECTION .text
+	
+global _start
+_start:
+
+	jmp beyond_multiboot_header
+
+
+ALIGN 4
+
+multiboot_header:
+
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;; the multiboot header
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	; multiboot magic number
+	dd	0x1badb002
+
+	; flags - request memory map
+	dd      0x00000002
+
+	; checksum
+	dd      (0xffffffff-(0x1badb002+0x00000002))+1
+	
+
+
+global multiboot_info_ptr
+multiboot_info_ptr:
+
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;; storage for a pointer to the 
+	;; multiboot info structure
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	dd	0
+
+
+
+beyond_multiboot_header:
+	
+
+	;; squirrel away the location of the multiboot_info block
+
+	mov [multiboot_info_ptr], ebx
+
+	;; Set up our own GDT - the multiboot spec says we should
+
+	lgdt [GDT]	
+
+	
+	;; I've not seen an explanation of why you need
+	;; to jump after doing lgdt - anybody care to explain?
+
+	jmp why_need_this
+
+why_need_this:
+
+	
+	;; The DataSegmentDescriptor-GDT part is a bit cheeky.
+	;; Because a segment descriptor is 8 bytes, DSD-GDT is
+	;; a multiple of eight, and so has the low 3 bits clear.
+	;; These bits control segment type and protection level,
+	;; and it turns out that having them clear is *exactly*
+	;; what we want.
+	
+	mov	ax, DataSegmentDescriptor-GDT
+	mov	ss, ax
+	mov	ds, ax
+	mov	es, ax
+	mov	fs, ax
+	mov	gs, ax
+
+	
+	;; Give us a little stack now, and a zeroth stack frame.
+
+	mov	esp, 0x96000	; 600K (below video ram)
+	mov	ebp, 0x0
+	push	ebp
+	mov	ebp, esp
+	
+
+extern kernel_entry_point__Fv
+	call	kernel_entry_point__Fv; 
+	cli	; Don't let interrupts interrupt ...
+	hlt	; our permanent sleep.
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+;;; 
+;;; Basic flat model Global Descriptor Table.
+;;; Intel systems programming guide pages 3-10, 3-13, and 4-3
+;;;
+;;;
+;;; Global Descriptor Table base and limit for GDTR
+;;;
+;;; We abuse the NULL GDT entry as most people seem to -- we
+;;; put the GDT pointer into it.
+;;; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+ALIGN 8				; page 3-16
+
+GDT:	
+	dw (8*3)-1		; use only NULL, DataSegmentDescriptor, and CodeSegmentDescriptor
+        dd GDT
+	dw 0
+
+CodeSegmentDescriptor:	
+	dw	0xffff		; segment limit 15:00
+	dw	0x0000		; base address 15:00
+	db	0x00		; base 23:16
+	db	0x9e		; p=1, dpl=0, 1, bit11=1, CRA (C=1,R=1,A=0)
+	db	0xcf		; G=1, D/B=1, 0, AVL=0, seg limit 19:16
+	db	0x00		; base 31:24
+
+DataSegmentDescriptor:
+	dw	0xffff		; segment limit 15:00
+	dw	0x0000		; base address 15:00
+	db	0x00		; base 23:16
+	db	0x92		; p=1, dpl=0, 1, bit11=0, type (E=0,W=1,A=0)
+	db	0xcf		; G=1, D/B=1, 0, AVL=0, seg limit 19:16
+	db	0x00		; base 31:24
+	
+
+GDTPadding:
+	dd	0x00
+	dd	0x00
+
+
+
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;; Bit of a hack this -- only here so that
+	;; an etherboot specific part of jjmachin.cc
+	;; compiles.
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+global xmsize_in_kbytes
+xmsize_in_kbytes:
+	dd 	0
+
+
+
+
+
