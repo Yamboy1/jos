@@ -91,13 +91,8 @@ bool Frame::invokestatic(Exception &e) {
   /* Fetch the referenced method & the class in which the method resides. */
   MethodRef * mr = NULL;
 
-#ifdef DONT_USE_DC
   ASSERT_CAST(mr, myClass->getMyConstant(methodIndex), MethodRef *, CPEntry *,
   				"Frame::invokestatic()", "method reference");
-#else
-  ASSERT_CAST(mr, myClass->getMyConstant(methodIndex), MethodRef *,
-  				"Frame::invokestatic()", "method reference");  		
-#endif
 
   JavaClassInstance * jci = mr->getMyClass();
   ASSERT_NOT_NULL(jci, "Frame::invokestatic()", "unable to get method's class");
@@ -140,13 +135,8 @@ bool Frame::aaload(Exception & e)
 	jint index = pop_jint();
 	JavaObjectArray * joa =  NULL;
 
-#ifdef DONT_USE_DC
 	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *, JavaClassInstance *,
 		"Frame::aaload()", "JavaObjectArray");	
-#else
-	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *,
-		"frame::aaload()", "JavaObjectArray" );
-#endif
 
 	/* fetch the reference */
 	JavaClassInstance * jci = joa->getElement( index );
@@ -171,13 +161,8 @@ bool Frame::aastore(Exception & e) {
 	/* fetch the array */
 	JavaObjectArray * joa = NULL;
 
-#ifndef DONT_USE_DC	
-	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *,
-		"frame::aastore()", "JavaObjectArray" );
-#else
 	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *, JavaClassInstance *,
 		"frame::aastore()", "JavaObjectArray" );
-#endif	
 
 	/* store the object in the array at the index */
 	TRACE(("aastore (%x[%d] = %x)", joa, index, jci));

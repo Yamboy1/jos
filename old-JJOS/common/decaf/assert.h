@@ -19,7 +19,7 @@
 #ifndef DONT_USE_DC
 /* Test, by attempting to cast from src to dst by way of type, if dst is an instance of type;
  * if not, report the error at loc, saying that src is not a thing. */
-#define ASSERT_CAST(dst,src,type,loc,thing) \
+#define ASSERT_CAST(dst,src,type,dummy,loc,thing) \
 	if((dst=dynamic_cast<type>(src))==0) { kprintf("%s -- %x is not a %s, aborting.\n",loc,src,thing); abort(); }
 #else
 /* Test, by attempting to cast from src to dst by way of type, if dst is an instance of type;
