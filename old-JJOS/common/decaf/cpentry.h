@@ -92,24 +92,23 @@ class ClassInfo : public CPEntry {
 
     jju16 getMyClassIndex() { return myClassIndex; }
 
-	// This would require access to the classloader, as well;
 	// $$$$ $$$$: the current code (javaclass.cc:146, 163),
 	// incidentally, assumes that the classloader
 	// can parse class specifications.
-    // JavaClass * getMyClass( ConstantPool * cp = NULL );
+    JavaClassInstance * getMyClass( ConstantPool * cp = NULL, ClassLoader * cl = NULL );
     
-    void setMyClass( JavaClass * jc ) {
+    void setMyClass( JavaClassInstance * jci ) {
         if ( myJavaClass != NULL ) {
             kprintf( "ClassInfo::setMyJavaClass() -- attempt to reset the constant, aborting.\n" );
             abort();
             }
-        myJavaClass = jc;
+        myJavaClass = jci;
         }
     bool usesTwoEntries() { return false; }
     int type() { return TAG_CLASSINFO; }
 
   protected:
-    JavaClass * myJavaClass;
+    JavaClassInstance * myJavaClass;
     jju16 myClassIndex;
 
 }; /* end class ClassInfo */    
@@ -148,7 +147,7 @@ class Ref : public CPEntry {
         return *this;
         }
 
-    JavaClassInstance * getMyClass( ConstantPool * cp = NULL) ;
+    JavaClassInstance * getMyClass( ConstantPool * cp = NULL, ClassLoader * cl = NULL );
     void setMyClass( JavaClassInstance * jci ) {
         if ( myJavaClass != NULL ) {
             kprintf( "Ref::setMyClass() -- attempt to reset the constant, aborting.\n" );
@@ -258,7 +257,7 @@ class NameAndType : public CPEntry {
         return nat;
         }
 
-    // JavaString * getMyName( ConstantPool * cp = NULL );
+    JavaString * getMyName( ConstantPool * cp = NULL );
     void setMyName( JavaString * js ) {
         if ( myName != NULL ) {
             kprintf( "NameAndType::setMyName() -- attempt to reset the constant, aborting.\n" );
@@ -267,7 +266,7 @@ class NameAndType : public CPEntry {
         myName = js;
         }
     
-    // JavaString * getMyType( ConstantPool * cp = NULL );
+    JavaString * getMyType( ConstantPool * cp = NULL );
     void setMyType( JavaString * js ) {
         if ( myType != NULL ) {
             kprintf( "NameAndType::setMyType() -- attempt to reset the constant, aborting.\n" );

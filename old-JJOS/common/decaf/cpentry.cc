@@ -9,6 +9,7 @@
  */
 
 #include "cpentry.h"
+#include "assert.h"
 
 /* CPEntry */
 
@@ -213,17 +214,70 @@ void CPString::setMyJavaString( JavaString * js ) {
 
 /* Ref */
 
-#warning Ref::getMy[Name|Type|Class]() undefined -- fixme!
-#ifdef NOT_DEF
-JavaString * Ref::getMyName( ConstantPool * cp );
-JavaString * Ref::getMyType( ConstantPool * cp );
-JavaClass * Ref::getMyClass( ConstantPool * cp );
-#endif
+JavaString * Ref::getMyName( ConstantPool * cp ) {
+	if ( myName != NULL ) { return myName; }
 
-/* We may very not need these.
- * #warning NameAndType::getMy[Name|Type]() undefined -- fixme!
- */
-#ifdef NOT_DEF
-JavaString * NameAndType::getMyName( ConstantPool * cp );
-JavaString * NameAndType::getMyType( ConstantPool * cp );
-#endif
+	/* fetch & verify NameAndTypeIndex */
+	NameAndType * nat = NULL;
+	ASSERT_CAST( nat, (*cp)[myNameAndTypeIndex], NameAndType *, "Ref::getMyName()", "invalid name and type index" );
+
+	myName = nat->getMyName( cp );
+	return myName;
+	} /* end getMyName() */
+
+JavaString * Ref::getMyType( ConstantPool * cp ) {
+	if ( myType != NULL ) { return myType; }
+
+	/* fetch & verify NameAndTypeIndex */
+	NameAndType * nat = NULL;
+	ASSERT_CAST( nat, (*cp)[myNameAndTypeIndex], NameAndType *, "Ref::getMyType()", "invalid name and type index" );
+
+	myType = nat->getMyType( cp );
+	return myType;
+	} /* end getMyName() */
+
+JavaClassInstance * Ref::getMyClass( ConstantPool * cp = NULL, ClassLoader * cl = NULL ) {
+	if ( myJavaClass != NULL ) { return myJavaClass; }
+
+	/* fetch & verify myClassIndex */
+	ClassInfo * ci = NULL;
+	ASSERT_CAST( ci, (*cp)[myClassIndex], ClassInfo *, "Ref::getMyClass()", "invalid class index" );
+
+	myJavaClass = ci->getMyClass(cp, cl);
+	return myJavaClass;
+	}
+
+/* NameAndType */
+
+JavaString * NameAndType::getMyName( ConstantPool * cp ) {
+	if ( myName != NULL ) { return myName; }
+
+	ConstantUTF8 * cu8 = NULL;
+	ASSERT_CAST( cu8, (*cp)[myNameIndex], ConstantUTF8 *, "NameAndType::getMyName()", "invalid name index" );
+
+	myName = cu8->getMyJavaString();
+	return myName;
+	}
+	
+JavaString * NameAndType::getMyType( ConstantPool * cp ) {
+	if ( myType != NULL ) { return myName; }
+
+	ConstantUTF8 * cu8 = NULL;
+	ASSERT_CAST( cu8, (*cp)[myTypeIndex], ConstantUTF8 *, "NameAndType::getMyType()", "invalid type index" );
+
+	myType = cu8->getMyJavaString();
+	return myType;
+	}
+
+/* ClassInfo */
+
+JavaClassInstance * ClassInfo::getMyClass( ConstantPool * cp, ClassLoader * cl ) {
+	if ( myJavaClass != NULL ) { return myJavaClass; }
+
+	ConstantUTF8 * cu8 = NULL;
+	ASSERT_CAST( cu8, (*cp)[myClassIndex], ConstantUTF8 *, "ClassInfo::getMyClass()", "invalid class index" );
+
+	myJavaClass = cl->getClass( cu8->getMyJavaString() );
+	return myJavaClass;
+	}
+
