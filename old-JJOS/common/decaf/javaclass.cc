@@ -250,5 +250,39 @@ JavaClassInstance::JavaClassInstance( JavaClass * myClass ) : JavaClass( myClass
 
 bool JavaClassInstance::isInstanceOf( JavaClassInstance * jci ) {
 	#warning JavaClassInstance:isInstanceOf( JavaClassInstance * jci ) is unimplemented.
+
+#ifdef NOT_READY_YET
+
+	/* definition:
+	 * 
+	 * (1) if this is a non-array class, it is an instance of jci iff either
+	 *   (A) it is, or is a subclass of, jci OR
+	 *   (B) it implements the interface jci.
+	 * (2) if this an interface, it is an instance of jci iff either
+	 *   (A) jci is java.lang.Object OR
+	 *   (B) it is, or is a subinterface of, jci.
+	 * (3) if this an array, it is an instance of jci iff either
+	 *   (A) jci is java.lang.Object OR
+	 *   (B) jci is an array of the same type (reference by these rules, or primitive exactly) OR
+	 *   (B) jci is an interface supported by arrays.  (java.lang.Cloneable, java.io.Serializable)
+	 *
+	 *
+	 * If we make this a virtual function, (3) will be taken care of by the JCI subclass implementing
+	 * arrays.  One and two are fairly simple conditions, and will be handled here. */
+
+	/* definition:
+	 * equivalance and inheritance MUST be checked by name /and/ ClassLoader. */
+
+	/* $$$$ $$$$: do we need to check for illegal casts? */
+
+	/* are we the same class? */
+	if( (this->getMyClassLoader() == jci->getMyClassLoader) && (* this->getMyName() == jci->getMyName()) )
+		return true;
+		}
+
+	/* ... more ... */	
+
+#endif
+	
 	return true;
 	} /* end isInstanceOf() */
