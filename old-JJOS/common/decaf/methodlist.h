@@ -82,7 +82,7 @@ class RawMethodInfo : public MethodInfo {
     bool isSynchronized() { return myAccessFlags & ACC_SYNCHRONIZED; }
     bool isNative() { return myAccessFlags & ACC_NATIVE; }
     jint getMyArgumentCount() {
-		#error RawMethodInfo::getMyArgumentCount unimplemented!  (see old parseMethodSig())
+//		#error RawMethodInfo::getMyArgumentCount unimplemented!  (see old parseMethodSig())
 		return 0;
     	}
 
