@@ -21,7 +21,6 @@ class RawExceptionsAttribute;
 
 class ConstantValueAttribute;
 class CodeAttribute;
-class RawCodeAttribute;
 class ExceptionsAttribute;
 
 #define ACC_PUBLIC        0x0001
@@ -91,7 +90,7 @@ class RawAttributeInfo : public AttributeInfo {
 
   friend UnknownRawAttribute;
   friend RawConstantValueAttribute;
-  friend RawCodeAttribute;
+  friend CodeAttribute; /* would be RawCodeAttribute; see note at CodeAttribute */
   friend RawExceptionsAttribute;
 
   public:
@@ -142,30 +141,15 @@ class RawConstantValueAttribute : public RawAttributeInfo {
 
 }; /* end class RawConstantValueAttribute */
 
-class CodeAttribute {
+/* would have preferred this to have been an interface class,
+   but the RawAttributeInfo stuff takes precedence, and we
+   can't use multiple virtual inheritance on the i386 build. */
+class CodeAttribute : public RawAttributeInfo {
 
   public:
-    CodeAttribute() {}
+    CodeAttribute();
 
     static CodeAttribute * generateCodeAttribute( istream & is, RawAttributeInfo * rai, JavaClass * jc );
-
-    virtual jju16 getMyMaxStack() = 0;
-    virtual jju16 getMyMaxLocals() = 0;
-    virtual jju32 getMyCodeLength() = 0;
-    virtual jju8 * getMyCode() = 0;
-
-    virtual ExceptionTable * getMyExceptionTable() = 0;
-    virtual AttributeList * getMyAttributeList() = 0;
-
-}; /* end CodeAttribute */
-    
-class RawCodeAttribute : public RawAttributeInfo, public CodeAttribute {
-  friend RawAttributeInfo;
-
-  public:
-    RawCodeAttribute();
-
-    static RawCodeAttribute * generateRawCodeAttribute( istream & is, RawAttributeInfo * rai, JavaClass * jc );
 
     jju16 getMyMaxStack() { return myMaxStack; }
     jju16 getMyMaxLocals() { return myMaxLocals; }

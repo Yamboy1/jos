@@ -107,7 +107,7 @@ RawAttributeInfo * RawAttributeInfo::generateRawAttributeInfo( istream & is, Jav
         r = RawConstantValueAttribute::generateRawConstantValueAttribute( is, rai );
         }
     else if ( (*js) == JavaString("Code") ) {
-        r = RawCodeAttribute::generateRawCodeAttribute( is, rai, jc );
+        r = CodeAttribute::generateCodeAttribute( is, rai, jc );
         }
     else if ( (*js) == JavaString("Exceptions") ) {
         r = RawExceptionsAttribute::generateRawExceptionsAttribute( is, rai );
@@ -169,27 +169,23 @@ RawConstantValueAttribute * RawConstantValueAttribute::generateRawConstantValueA
     return rcva;
     } /* end generateRawConstantValueAttribute() */
 
-RawCodeAttribute::RawCodeAttribute() {
+CodeAttribute::CodeAttribute() {
     myMaxStack = 0;
     myMaxLocals = 0;
     myCodeLength = 0;
     myCode = NULL;
     myExceptionTable = NULL;
     myAttributeList = NULL;
-    } /* end RawCodeAttribute() */
+    } /* end CodeAttribute() */
 
-ExceptionTable * RawCodeAttribute::getMyExceptionTable() { return myExceptionTable; }
-AttributeList * RawCodeAttribute::getMyAttributeList() { return myAttributeList; }
+ExceptionTable * CodeAttribute::getMyExceptionTable() { return myExceptionTable; }
+AttributeList * CodeAttribute::getMyAttributeList() { return myAttributeList; }
 
 CodeAttribute * CodeAttribute::generateCodeAttribute( istream & is, RawAttributeInfo * rai, JavaClass * jc ) {
-    return RawCodeAttribute::generateRawCodeAttribute( is, rai, jc );
-    }
-
-RawCodeAttribute * RawCodeAttribute::generateRawCodeAttribute( istream & is, RawAttributeInfo * rai, JavaClass * jc ) {
-    /* Generate a clean RCA */
-    RawCodeAttribute * rca = new RawCodeAttribute();
+    /* Generate a clean CA */
+    CodeAttribute * rca = new CodeAttribute();
     if ( rca == NULL ) {
-        kprintf( "generateRawCodeAttribute() -- unable to allocate rca, aborting.\n" );
+        kprintf( "generateCodeAttribute() -- unable to allocate rca, aborting.\n" );
         abort();
         }
 
@@ -203,13 +199,13 @@ RawCodeAttribute * RawCodeAttribute::generateRawCodeAttribute( istream & is, Raw
 
     /* Allocate the Code array. */
     if ( rca->myCodeLength == 0 ) {
-        kprintf( "generateRawCodeAttribute() -- panic, no code in code attribute.\n" );
+        kprintf( "generateCodeAttribute() -- panic, no code in code attribute.\n" );
         abort();
         }
 
     rca->myCode = new jju8[ rca->myCodeLength ];
     if ( rca->myCode == NULL ) {
-        kprintf( "generateRawCodeAttribute() -- unable to allocate code, aborting.\n" );
+        kprintf( "generateCodeAttribute() -- unable to allocate code, aborting.\n" );
         abort();
         }
 
@@ -221,19 +217,19 @@ RawCodeAttribute * RawCodeAttribute::generateRawCodeAttribute( istream & is, Raw
     /* Generate the exception table */
     rca->myExceptionTable = ExceptionTable::generateExceptionTable( is );
     if ( rca->myExceptionTable == NULL ) {
-        kprintf( "generateRawCodeAttribute() -- void exception table, aborting.\n" );
+        kprintf( "generateCodeAttribute() -- void exception table, aborting.\n" );
         abort();
         }
 
     /* Generate the attribute list */
     rca->myAttributeList = AttributeList::generateAttributeList( is, jc );
     if ( rca->myAttributeList == NULL ) {
-        kprintf( "generateRawCodeAttribute() -- void attribute list, aborting.\n" );
+        kprintf( "generateCodeAttribute() -- void attribute list, aborting.\n" );
         abort();
         }
 
     return rca;
-    } /* end generateRawCodeAttribute() */
+    } /* end generateCodeAttribute() */
 
 
 ExceptionTable::ExceptionTable() { myExceptionCount = 0; myExceptionTable = NULL; }

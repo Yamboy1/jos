@@ -15,7 +15,7 @@ IFLAGS = -I. -I../../../common/nativecode -I../../../common/decaf
 #				; classpath's shared library.  Probably
 #				; most useful with -DFAST_NATIVE_CODE.
 CFLAGS = -g -Wall -fno-builtin -DTARGET_UNIX -DPARANOID \
- -DDONT_USE_DC -DNEW_INTERRUPT_HANDLING -DUSE_CURSES $(IFLAGS)
+ -DNEW_INTERRUPT_HANDLING -DUSE_CURSES $(IFLAGS)
 
 # -lcurses is optional, see above
 LDFLAGS = -g -lm -g++ -ldl -lncurses

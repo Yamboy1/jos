@@ -34,8 +34,8 @@ template <class elem_t> class jbArray
  public:
     jbArray(jju32 size, jju32 dims = 1);
 
-    virtual elem_t  store(jju32 index, elem_t value); /* Returns value param. */
-    virtual elem_t  load(jju32 index);
+    /*virtual*/ elem_t  store(jju32 index, elem_t value); /* Returns value param. */
+    /*virtual*/ elem_t  load(jju32 index);
     jju32   size();
     jju32   dims();
 
