@@ -15,7 +15,6 @@ class FieldInfo;
 class RawFieldInfo;
 
 class ClassFields;
-class ArrayClassFields;
 class InstanceFields;
 class ArrayInstanceFields;
 

@@ -273,7 +273,7 @@ JavaClassInstance * ClassInfo::getMyClass( ConstantPool * cp, ClassLoader * cl )
 
 	ConstantUTF8 * cu8 = NULL;
 	ASSERT_CAST( cu8, (*cp)[myClassIndex], ConstantUTF8 *, CPEntry *,
-		"NameAndType::getMyName()", "invalid name index" );
+		"ClassInfo::getMyClass()", "invalid name index" );
 
 	myJavaClass = cl->getClass( cu8->getMyJavaString() );
 	return myJavaClass;

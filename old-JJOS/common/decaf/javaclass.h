@@ -71,12 +71,13 @@ class JavaClass : Typed {
 
     CPEntry * getMyConstant( jju16 index );
     ConstantPool * getMyConstantPool() { return myConstantPool; }
+    FieldList * getMyFieldList() { return myFieldList; }
     JavaString * getMyConstantUTF8( jju16 index );
     ClassLoader * getMyClassLoader() { return myClassLoader; }
     MethodInfo * getMethodInfo( JavaString * method, JavaString * methodSig );
     CodeAttribute * getMethodCode( JavaString * method, JavaString * methodSig );
 
-    virtual JavaString * getMyName();
+    virtual JavaString * getMyName(); // does this need to be virtual?
 
     PrimitiveType type() { return PT_CLASS; }
 
@@ -104,11 +105,9 @@ class JavaClassInstance : public JavaClass, public Threadable {
   public:
     JavaClassInstance( JavaClass * myClass );
 
-    virtual ClassFields * getMyClassFields() { return myClassFields; }
-    virtual PrimitiveType type() { return PT_CLASS_INSTANCE; }
+    ClassFields * getMyClassFields() { return myClassFields; }
+    PrimitiveType type() { return PT_CLASS_INSTANCE; }
 
-    bool isInstanceOf( JavaClassInstance * jci );
-    
   protected:
     ClassFields * myClassFields;
 

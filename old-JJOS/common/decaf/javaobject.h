@@ -26,6 +26,8 @@ class JavaObject : JavaClassInstance {
     InstanceFields * getMyInstanceFields() { return myInstanceFields; }
     PrimitiveType type() { return PT_OBJECT; }
 
+    bool isInstanceOf( ClassInfo * cpe ); /* "symbolic class reference" from VM spec / bytecode op */
+
   protected:
     InstanceFields * myInstanceFields;
 
