@@ -20,18 +20,24 @@
 /* Test, by attempting to cast from src to dst by way of type, if dst is an instance of type;
  * if not, report the error at loc, saying that src is not a thing. */
 #define ASSERT_CAST(dst,src,type,dummy,loc,thing) \
-	if((dst=dynamic_cast<type>(src))==0) { kprintf("%s -- %x is not a %s, aborting.\n",loc,src,thing); abort(); }
+	{ \
+	dst = dynamic_cast<type>(src); \
+	if( dst == NULL ) { \
+		kprintf("%s -- %x is not a %s, aborting.\n",loc,src,thing); \
+		abort(); \
+		} \
+	}
 #else
 /* Test, by attempting to cast from src to dst by way of type, if dst is an instance of type;
  * if not, report the error at loc, saying that src is not a thing.
  * Note that the routine with temporaries is necessary if ASSERT_CAST is passed a function
  * as either dst or src; if they're both variables, the extra assignments will be optmized
- * away, so we're okay. */
+ * away, so we're okay.  Further note that because dst or src may be functions/macros/etc,
+ * we can only evaluate (use) each once.*/
 #define ASSERT_CAST(dst,src,dptr,sptr,pos,thing) \
 	{ /* opens scope */ \
 	sptr tsrc = (src); \
-	dptr tdst = (dst); \
-	tdst =  (dptr)(tsrc); \
+	dptr tdst = dst = (dptr)(tsrc); \
 	if((tdst)->type()!=(tsrc)->type()) \
 		{ kprintf("%s -- %x is not a %s, aborting.\n", pos, dst, thing ); abort(); } \
 	} /* closes scope */

@@ -10,6 +10,7 @@
  */
 
 #include "scheduler.h"
+#include "assert.h"
 
 Scheduler::Scheduler() {
     myThreadList = new JavaThreadSLL();
@@ -158,48 +159,22 @@ bool Scheduler::doInterruptNotification() {
         }
 
     /* Extract the array of arrays from the interrupt class. */
-    JavaClassInstance * setArray = jci->getMyClassFields()->getStaticObject( 0 );
-    if ( setArray == NULL ) {
-        /* could be waiting for static initialization */
-        return false;
-        }
-        
-#ifdef DONT_USE_DC
-    if ( setArray->type() != PT_OBJECT_ARRAY || ((JavaArrayObject*)setArray)->arrayType() != PT_OBJECT  ) {
-        kprintf( "Scheduler::doInterruptNotification() -- VM corrupted: interrupt set unavailable, aborting.\n" );
-        abort();
-        }
-        
-    /* Extract the array of interrupt handlers for this particular interrupt. */
-    JavaClassInstance * handlerArray = ((JavaObjectArray*)setArray)->getElement( interruptNumber );
-    if ( handlerArray == NULL ) {
-        /* could be waiting for static initialization */
-        return false;
-        }
-    if ( handlerArray->type() != PT_OBJECT_ARRAY || ((JavaArrayObject*)handlerArray)->arrayType() != PT_OBJECT ) {
-        kprintf( "Scheduler::doInterruptNotification() -- VM corrupted: interrupt handlers unavailable, aborting.\n" );
-        abort();
-        }
+	JavaObjectArray * setArray = NULL;
+	ASSERT_CAST( setArray, jci->getMyClassFields()->getStaticObject( 0 ),
+				 JavaObjectArray *, JavaClassInstance *,
+				 "Scheduler::doInterruptNotification()", "java array of objects" );
 
+    /* Extract the array of interrupt handlers for this particular interrupt. */
+	JavaObjectArray * handlerArray = NULL;
+	ASSERT_CAST( handlerArray, setArray->getElement( interruptNumber ),
+				 JavaObjectArray *, JavaClassInstance *,
+				 "Scheduler::doInterruptNotification()", "java array of objects" );
+				 
     /* Iterate over the interrupt handler array. */
-    for ( jju32 x = 0; x < ((JavaObjectArray*)handlerArray)->getMySize(); x++ ) {
-        doInterruptHandler( ((JavaObjectArray*)handlerArray)->getElement( x ), interruptNumber );
+    for ( jju32 x = 0; x < handlerArray->getMySize(); x++ ) {
+        doInterruptHandler( handlerArray->getElement( x ), interruptNumber );
         } /* end handler iteration */
-#else        
-    if ( JavaObjectArray * setArrayA = dynamic_cast<JavaObjectArray*>( setArray ) ) {
-        if ( JavaObjectArray * handlerArrayA = dynamic_cast<JavaObjectArray*>( setArrayA->getElement( interruptNumber ) ) ) {
-            for ( jju32 x = 0; x < handlerArrayA->getMySize(); x++ ) {
-                doInterruptHandler( handlerArrayA->getElement(x), interruptNumber );
-                }                
-        } else {
-            kprintf( "Scheduler::doInterruptNotification() -- VM corrupted: interrupt handlers unavailable, aborting.\n" );
-            abort();
-            }
-    } else {
-        kprintf( "Scheduler::doInterruptNotification() -- VM corrupted: interrupt set unavailable, aborting.\n" );
-        abort();
-        }
-#endif    
+
     return true;
     } /* end doInterruptNotification() */
 

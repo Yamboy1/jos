@@ -7,6 +7,7 @@
  */
 
 #include "methodlist.h"
+#include "assert.h"
 
 MethodList::MethodList() {
     myMethodCount = 0;
@@ -112,21 +113,10 @@ JavaString * RawMethodInfo::getMyName( ConstantPool * cp ) {
     if ( myName != NULL ) { return myName; }
 
     /* If not, fetch it from the constant pool. */
-#ifdef DONT_USE_DC
-    CPEntry * cpe = (*cp)[myNameIndex];
-    if ( cpe->type() != TAG_UTF8 ) {
-        kprintf( "RawMethodInfo::getMyName() -- erroneous constant pool tag (%d), aborting.\n", cpe->type() );
-        abort();
-        }
-    myName = ((ConstantUTF8 *)cpe)->getMyJavaString();
-#else
-    if ( ConstantUTF8 * cu8 = dynamic_cast<ConstantUTF8 *>( (*cp)[myNameIndex] ) ) {
-        myName = cu8->getMyJavaString();
-        } else {
-        kprintf( "RawMethodInfo::getMyName() -- erroneous constant pool tag (%d), aborting.\n", ((*cp)[myNameIndex])->type() );
-        abort();
-        }
-#endif
+    ConstantUTF8 * cu8 = NULL;
+    ASSERT_CAST( cu8, (*cp)[myNameIndex], ConstantUTF8 *, CPEntry *, "RawMethodInfo::getMyName()", "constant string" ); 
+
+    myName = cu8->getMyJavaString();
     return myName;
     } /* end getMyName() */
 
@@ -134,21 +124,10 @@ JavaString * RawMethodInfo::getMySig( ConstantPool * cp ) {
     if ( mySig != NULL ) { return mySig; }
 
     /* If not, fetch it from the constant pool. */
-#ifdef DONT_USE_DC 
-    CPEntry * cpe = (*cp)[myDescriptorIndex];
-    if ( cpe->type() != TAG_UTF8 ) {
-        kprintf( "RawMethodInfo::getMyName() -- erroneous constant pool tag (%d), aborting.\n", cpe->type() );
-        abort();
-        }
-    mySig = ((ConstantUTF8 *)cpe)->getMyJavaString();
-#else
-    if ( ConstantUTF8 * cu8 = dynamic_cast<ConstantUTF8 *>( (*cp)[myDescriptorIndex] ) ) {
-        mySig = cu8->getMyJavaString();
-        } else {
-        kprintf( "RawMethodInfo::getMyName() -- erroneous constant pool tag (%d), aborting.\n", ((*cp)[myDescriptorIndex])->type() );
-        abort();
-        }
-#endif
+    ConstantUTF8 * cu8 = NULL;
+    ASSERT_CAST( cu8, (*cp)[myDescriptorIndex], ConstantUTF8 *, CPEntry *, "RawMethodInfo::getMySig()", "constant string" ); 
+
+    mySig = cu8->getMyJavaString();
     return mySig;    
     } /* end getMySig() */
 

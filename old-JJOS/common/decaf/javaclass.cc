@@ -8,6 +8,7 @@
 
 #include "javaclass.h"
 #include "cpentry.h"
+#include "assert.h"
 
 /* JavaClass */
 
@@ -41,35 +42,12 @@ CPEntry * JavaClass::getMyConstant( jju16 index ) {
     } /* end getMyConstantUTF8 */
 
 JavaString * JavaClass::getMyConstantUTF8( jju16 index ) {
-    /* fetch the constant */
-    CPEntry * cpe = getMyConstant( index );
-
-    if ( cpe == NULL ) {
-        kprintf( "JavaClass::getMyConstantUTF8(%d) -- unable to fetch constant, aborting.\n", index );
-        abort();
-        }
-        
-#ifdef DONT_USE_DC
-    if ( cpe->type() != TAG_UTF8 ) {
-        kprintf( "JavaClass::getMyConstantUTF8(%d) -- fetched non-UTF8 constant, continuing...\n", index );
-        return NULL;
-        }
-
-    /* return the JavaString */
-    return ((ConstantUTF8*)cpe)->getMyJavaString();
-#else
-#ifndef DONT_USE_DC
-    if( ConstantUTF8 * cu8 = dynamic_cast<ConstantUTF8*>( cpe ) ) {
-        return cu8->getMyJavaString();
-#else
-   if( cpe->type() == TAG_CU8 ) {
-	return ((ConstantUTF8*)cpe)->getMyJavaString();
-#endif
-        } else {
-        kprintf( "JavaClass::getMyConstantUTF8(%d) -- fetched non-UTF8 constant, continuing...\n", index );
-        return NULL;
-        }
-#endif
+    /* fetch the constant string */
+	ConstantUTF8 * cu8 = NULL;
+	ASSERT_CAST( cu8, getMyConstant( index ), ConstantUTF8 *, CPEntry *,
+				 "JavaClass::getMyConstantUTF8()", "constant string" );
+				 
+	return cu8->getMyJavaString();
     } /* end getMyConstantUTF8 */
 
 JavaClassInstance * JavaClass::generateClassInstance( istream & is, ClassLoader * cl ) {
@@ -139,40 +117,20 @@ urJavaClass::urJavaClass( istream & is, ClassLoader * cl ) {
 
 	JavaClassInstance * myParent = NULL;
 	if ( mySuperClassIndex != 0 ) {
+		/* fetch my parent class constant (reference) */
+		ClassInfo * ci = NULL;
+		ASSERT_CAST( ci, (*myConstantPool)[mySuperClassIndex], ClassInfo *, CPEntry *,
+					 "urJavaClass::urJavaClass()", "parent class symbolic reference" );
+					 
+		/* fetch my parent class's name */
+		ConstantUTF8 * cu8 = NULL;
+		ASSERT_CAST( cu8, (*myConstantPool)[ci->getMyClassIndex()], ConstantUTF8 *, CPEntry *,
+					 "urJavaClass::urJavaClass()", "parent class name" );
+
 		/* fetch my parent class */
-#ifndef DONT_USE_DC
-		if ( ClassInfo * ci = dynamic_cast<ClassInfo *>((*myConstantPool)[mySuperClassIndex]) ) {
-			if ( ConstantUTF8 * cu8 = dynamic_cast<ConstantUTF8 *>((*myConstantPool)[ci->getMyClassIndex()]) ) {
-				myParent = myClassLoader->getClass( cu8->getMyJavaString() );
-				}
-			else {
-				kprintf( "urJavaClass::urJavaClass() -- illegal constant pool entry while fetching parent, aborting.\n" );
-				abort();
-				}
-			}
-		else {
-			kprintf( "urJavaClass::urJavaClass() -- illegal constant pool entry while fetching parent, aborting.\n" );
-			abort();
-			}
-
-#else
-		CPEntry * cpe = (*myConstantPool)[mySuperClassIndex];
-		if ( cpe->type() == TAG_CLASSINFO ) {
-			CPEntry * cpeb = (*myConstantPool)[((ClassInfo*)cpe)->getMyClassIndex()];
-			if ( cpeb->type () == TAG_UTF8 ) {
-				myParent = myClassLoader->getClass(((ConstantUTF8*)cpeb)->getMyJavaString() );
-				}
-			else {
-				kprintf( "urJavaClass::urJavaClass() -- illegal constant pool entry (%d) while fetching parent, aborting.\n", cpeb->type() );
-				abort();	
-				}
-			}
-		else {
-			kprintf( "urJavaClass::urJavaClass() -- illegal constant pool entry (%d) while fetching parent, aborting.\n", cpe->type() );
-			abort();
-			}			
-#endif
-
+		myParent = myClassLoader->getClass( cu8->getMyJavaString() );
+		 
+		/* update the field list */
 		myParentsFList = myParent->myFieldList;
 		}
 
@@ -207,33 +165,13 @@ bool urJavaClass::verifyStream( istream & is ) {
 JavaString * JavaClass::getMyName() {
     if ( myName != NULL ) { return myName; }
 
-    CPEntry * cpe = (*myConstantPool)[myThisClassIndex];
-    if( cpe->type() != TAG_CLASSINFO ) {
-        kprintf( "urJavaClass::getMyName() -- erroneous constant pool tag (%d), aborting.\n", cpe->type() );
-        abort();
-        }
+	ClassInfo * ci = NULL;
+	ASSERT_CAST( ci, (*myConstantPool)[myThisClassIndex], ClassInfo *, CPEntry *, "JavaClass::getMyName()", "class info" );
 
-#ifdef DONT_USE_DC
-    CPEntry * cu8 = (*myConstantPool)[((ClassInfo*)cpe)->getMyClassIndex()];
-    if ( cu8->type() != TAG_UTF8 ) {
-        kprintf( "urJavaClass::getMyName() -- erroneous secondary constant pool tag (%d), aborting.\n", cpe->type() );
-        abort();
-        }
-        
-    myName = ((ConstantUTF8*)cu8)->getMyJavaString();
-#else
-    if ( ClassInfo * cip = dynamic_cast<ClassInfo*>( (*myConstantPool)[myThisClassIndex] ) ) {
-	    if ( ConstantUTF8 * cu8 = dynamic_cast<ConstantUTF8*>( (*myConstantPool)[cip->getMyClassIndex()] ) ) {
-	        myName = cu8->getMyJavaString();
-	        } else {
-	        kprintf( "urJavaClass::getMyName() -- erroneous secondary constant pool tag (%d), aborting.\n", cpe->type() );
-	        abort();
-	        }
-        } else {
-        kprintf( "urJavaClass::getMyName() -- erroneous name index, aborting.\n" );
-        abort();
-        }
-#endif
+	ConstantUTF8 * cu8 = NULL;
+	ASSERT_CAST( cu8, (*myConstantPool)[ci->getMyClassIndex()], ConstantUTF8 *, CPEntry *, "JavaClass::getMyName()", "class name" );
+
+	myName = cu8->getMyJavaString();
 
     /* myName is now a class specification.
      * $$$$ $$$$: As long as ClassLoader parses specifications,
