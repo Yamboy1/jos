@@ -209,51 +209,25 @@ int kprintf(const char *format, ...)
   return(number_formatted_items);
 }
 
-/*
- * String compare.
- * This should NOT be recursive.
- * (How lazy am *I*?)
- */
+/* string compare, courtesy of Gilbert Carl Herschberger II */
+int strcmp(char *v1, char *v2 ) {
+  if ( v1 == NULL && v2 == NULL ) {
+    return 0;
+  }
+  if ( v1 == NULL ) {
+    return -1;
+  }
+  if ( v2 == NULL ) {
+    return 1;
+  }
 
-int strcmp(char *a, char *b)
-{
-  if ((a == NULL) || (b == NULL))
-    {
-      kprintf("strcmp NULL args\n");
-      return(0);
+  for (;; v1++, v2++ )
+    if ( *v1 == *v2 ) {
+      if ( *v1 == '\0' ) return 0;
     }
-  else if ((*a == '\0') && (*b == '\0'))
-    {
-      return(0);
-    }
-  else if ((*a) == '\0')
-    {
-      return(-1);
-    }
-  else if ((*b) == '\0')
-    {
-      return(1);
-    }
-  else if ((*a) == (*b))
-    {
-      return(strcmp(++a, ++b));
-    }
-  else if (*a < *b)
-    {
-      return(-1);
-    }
-  else if (*a > *b)
-    {
-      return(1);
-    }
-  else
-    {
-      kprintf("strcmp ????\n");
-      return(0);
-    }
+    else
+      return ( *v1 < *v2 ) ? -1 : 1;
 }
-
-
 
 size_t strlen(const char *s)
 {

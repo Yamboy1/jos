@@ -65,7 +65,7 @@ include ../../../common/nativecode/Makefile
 include ../../../common/decaf/Makefile
 include ../../../common/nativecode/gc/Makefile
 
-OBJECTS = $(DECAF_OBJECTS) $(COMMON_OBJECTS) $(HOST_OBJECTS) $(GC_OBJECTS)
+OBJECTS = $(DECAF_OBJECTS) $(HOST_OBJECTS) $(GC_OBJECTS) $(COMMON_OBJECTS)
 
 #
 # Cumulative flags

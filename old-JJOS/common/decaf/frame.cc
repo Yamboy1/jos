@@ -113,20 +113,20 @@ LocalVariables::LocalVariables( jju32 variableCount ) {
         }
      } /* end LocalVariable() */
 
-JavaWord LocalVariables::getJavaWord( jju32 index ) {
+JavaWord * LocalVariables::getJavaWord( jju32 index ) {
     if ( index < myLocalVariableCount ) {
-        return myLocalVariables[index];
+        return & myLocalVariables[index];
         } else {
         kprintf( "LocalVariables::getJavaWord(%d) -- index out of bounds, aborting.\n", index );
         abort();
         }
     /* should never do this. */
-    return JavaWord();
+    return new JavaWord();
 	}
 	
-void LocalVariables::setJavaWord( jju32 index, JavaWord jw ) {
+void LocalVariables::setJavaWord( jju32 index, JavaWord * jw ) {
     if ( index < myLocalVariableCount ) {
-        myLocalVariables[index] = jw;
+        myLocalVariables[index] = * jw;
         } else {
         kprintf( "LocalVariables::setJavaWord(%d) -- index out of bounds, aborting.\n", index );
         abort();

@@ -12,6 +12,8 @@
 static int trace = 1;
 #define TRACE(args) if(trace){ kprintf args; }
 
+jju8  Frame::getImmediate_jju8 ( jju32 index ) { return (myCode->getMyCode())[index]; }
+jji8  Frame::getImmediate_jji8 ( jju32 index ) { return (myCode->getMyCode())[index]; }
 jju16 Frame::getImmediate_jju16( jju32 index ) { return ((myCode->getMyCode())[index] << 8) | (myCode->getMyCode())[index+1]; }
 jji16 Frame::getImmediate_jji16( jju32 index ) { return ((myCode->getMyCode())[index] << 8) | (myCode->getMyCode())[index+1]; }
 
@@ -66,7 +68,7 @@ bool Frame::pushInvocationFrame( JavaClassInstance * jci, MethodInfo * mi, JavaW
 
   /* Othewise, pass the method its arguments and push its frame onto the stack. */
   for ( jint i = 0; i < mi->getMyArgumentCount(); i++ ) {
-	myLocalVariables->setJavaWord( i, arguments[i] );
+	myLocalVariables->setJavaWord( i, & arguments[i] );
     } delete arguments;
   myThread->pushFrame( this );
 
@@ -133,7 +135,7 @@ bool Frame::invokestatic(Exception &e) {
 bool Frame::aaload(Exception & e)
 {
 	jint index = pop_jint();
-	JavaObjectArray * joa =  NULL;
+	JavaObjectArray * joa = NULL;
 
 	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *, JavaClassInstance *,
 		"Frame::aaload()", "JavaObjectArray");	
@@ -146,7 +148,7 @@ bool Frame::aaload(Exception & e)
 			return false;
 			}
 			
-	TRACE(("aaload (%x = %x[%d])", jci, joa, index));
+	TRACE(("aaload (%x = %x[%d])\n", jci, joa, index));
 	push_jref( jci );
 	return true;
 	} /* end aaload() */
@@ -161,13 +163,308 @@ bool Frame::aastore(Exception & e) {
 	/* fetch the array */
 	JavaObjectArray * joa = NULL;
 
-	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *, JavaClassInstance *,
+	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *, JavaClassInstance *, 
 		"frame::aastore()", "JavaObjectArray" );
 
 	/* store the object in the array at the index */
-	TRACE(("aastore (%x[%d] = %x)", joa, index, jci));
+	TRACE(("aastore (%x[%d] = %x)\n", joa, index, jci));
 	joa->setElement( index, jci );
 	
 	return true;
 	} /* end aastore() */
 
+bool Frame::aconst_null(Exception & e) {
+	/* push the constant null */
+	TRACE(("aconst_null\n"));
+	push_jref( NULL );
+
+	return true;
+	} /* end acons_null() */
+
+bool Frame::aload(Exception & e) {
+	/* which local variable are we loading from? */
+	jju8 idx = getImmediate_jju8( myPC ); myPC++;
+	JavaWord * jw = myLocalVariables->getJavaWord( idx );
+
+	TRACE(("aload (%x from lv #%d)\n", jw, idx ));
+	myOpStack->push( jw );
+	
+	return true;
+	} /* end aload() */
+
+bool Frame::aload_0(Exception & e) {
+	JavaWord * jw = myLocalVariables->getJavaWord( 0 );
+
+	TRACE(("aload_0 (%x from lv #d)\n", jw, 0 ));
+	myOpStack->push( jw );
+
+	return true;
+	}
+bool Frame::aload_1(Exception & e) {
+	JavaWord * jw = myLocalVariables->getJavaWord( 1 );
+
+	TRACE(("aload_1 (%x from lv #d)\n", jw, 1 ));
+	myOpStack->push( jw );
+
+	return true;
+	}
+bool Frame::aload_2(Exception & e) {
+	JavaWord * jw = myLocalVariables->getJavaWord( 2 );
+
+	TRACE(("aload_2 (%x from lv #d)\n", jw, 2 ));
+	myOpStack->push( jw );
+
+	return true;
+	}
+bool Frame::aload_3(Exception & e) {
+	JavaWord * jw = myLocalVariables->getJavaWord( 3 );
+
+	TRACE(("aload_3 (%x from lv #d)\n", jw, 3 ));
+	myOpStack->push( jw );
+
+	return true;
+	}
+
+#warning anewarray
+#warning areturn
+
+bool Frame::arraysize(Exception & e) {
+	JavaClassInstance * jci = pop_jref();
+	JavaArrayObject * jao = NULL;
+	
+	ASSERT_CAST( jao, jci, JavaArrayObject *, JavaClassInstance *,
+				 "Frame::arraysize()", "array" );
+
+	TRACE(( "arraysize = %d\n", jao->getMySize() ));
+	push_jint( jao->getMySize() );	
+	return true;
+	}
+
+bool Frame::astore(Exception &e) {
+	jju8 idx = getImmediate_jju8( myPC ); myPC++;
+	JavaWord * jw = myOpStack->pop();
+
+	TRACE(( "astore %x at %d\n", jw, idx ));
+	myLocalVariables->setJavaWord( idx, jw );
+	return true;
+	}
+
+bool Frame::astore_0(Exception &e) {
+	JavaWord * jw = myOpStack->pop();
+
+	TRACE(( "astore %x at 0\n", jw ));
+	myLocalVariables->setJavaWord( 0, jw );
+	return true;
+	}
+bool Frame::astore_1(Exception &e) {
+	JavaWord * jw = myOpStack->pop();
+
+	TRACE(( "astore %x at 1\n", jw ));	
+	myLocalVariables->setJavaWord( 1, jw );
+	return true;
+	}
+bool Frame::astore_2(Exception &e) {
+	JavaWord * jw = myOpStack->pop();
+
+	TRACE(( "astore %x at 2\n", jw ));	
+	myLocalVariables->setJavaWord( 2, jw );
+	return true;
+	}
+bool Frame::astore_3(Exception &e) {
+	JavaWord * jw = myOpStack->pop();
+
+	TRACE(( "astore %x at 3", jw ));	
+	myLocalVariables->setJavaWord( 3, jw );
+	return true;
+	}
+
+#warning athrow
+
+
+/* BYTECODE: B */
+
+bool Frame::baload(Exception &e) {
+	jint idx = pop_jint();
+	JavaPrimitiveArray<jbyte> * jao = NULL;
+
+	ASSERT_CAST(jao, pop_jref(), JavaPrimitiveArray<jbyte> *, JavaClassInstance *, 
+		"frame::baload()", "JavaArrayObject" );
+
+	TRACE(( "baload %d from %x\n", idx, jao ));
+	push_jint( jao->getElement( idx ) );
+
+	return true;
+	}
+
+bool Frame::bastore(Exception &e) {
+	jint val = pop_jint();
+	jint idx = pop_jint();
+	JavaPrimitiveArray<jbyte> * jao = NULL;
+
+	ASSERT_CAST(jao, pop_jref(), JavaPrimitiveArray<jbyte> *, JavaClassInstance *, 
+		"frame::bastore()", "JavaArrayObject" );
+
+	TRACE(( "bastore %d in %d to %x\n", val, idx, jao ));	 
+	jao->setElement( idx, val );
+
+	return true;
+	}
+
+bool Frame::bipush(Exception &e) {
+	/* the sign-extension bit might not work right here... */
+	TRACE(( "bipush %d", (myCode->getMyCode())[(myPC+1)] ));
+	push_jint( (myCode->getMyCode())[(myPC++)] );
+	return true;
+	}
+
+/* BYTECODE: C */
+ 
+bool Frame::caload(Exception &e) {
+	jint idx = pop_jint();
+	JavaPrimitiveArray<jchar> * jao = NULL;
+
+	ASSERT_CAST(jao, pop_jref(), JavaPrimitiveArray<jchar> *, JavaClassInstance *, 
+		"frame::caload()", "JavaArrayObject" );
+
+	TRACE(( "caload %d from %x\n", idx, jao ));
+	push_jint( jao->getElement( idx ) );
+
+	return true;
+	}  
+
+bool Frame::castore(Exception &e) {
+	jint val = pop_jint();
+	jint idx = pop_jint();
+	JavaPrimitiveArray<jchar> * jao = NULL;
+
+	ASSERT_CAST(jao, pop_jref(), JavaPrimitiveArray<jchar> *, JavaClassInstance *, 
+		"frame::castore()", "JavaArrayObject" );
+
+	TRACE(( "castore %d in %d to %x\n", val, idx, jao ));	 
+	jao->setElement( idx, val );
+
+	return true;
+	}
+
+#warning checkcast
+
+/* BYTECODE: D */
+
+#warning obey fp_strict in double ops
+
+bool Frame::d2f(Exception &e) {
+	jdouble val = pop_jdouble();
+	jfloat conv = (jfloat)val;
+
+	TRACE(( "d2f: %f to %f\n", val, conv ));
+	push_jfloat( conv );
+
+	return true;
+	}
+	
+bool Frame::d2i(Exception &e) {
+	jdouble val = pop_jdouble();
+	jint conv = (jint)val;
+
+	TRACE(( "d2i: %f to %d\n", val, conv ));
+	push_jint( conv );
+
+	return true;
+	}
+
+bool Frame::d2l(Exception &e) {
+	jdouble val = pop_jdouble();
+	jlong conv = (jlong)val;
+
+	TRACE(( "d2l: %f\n", val ));
+	push_jlong( conv );
+
+	return true;
+	}
+
+bool Frame::dadd(Exception &e) {
+	jdouble jd2 = pop_jdouble();
+	jdouble jd1 = pop_jdouble();
+
+	TRACE(( "dadd: %f + %f = %f\n", jd1, jd2, jd1 + jd2 ));
+	push_jdouble( jd1 + jd2 );
+
+	return true;
+	}
+
+bool Frame::daload(Exception &e) {
+	jint idx = pop_jint();
+	JavaPrimitiveArray<jdouble> * jao = NULL;
+
+	ASSERT_CAST(jao, pop_jref(), JavaPrimitiveArray<jdouble> *, JavaClassInstance *, 
+		"frame::daload()", "JavaArrayObject" );
+
+	TRACE(( "daload %d from %x\n", idx, jao ));
+	push_jint( jao->getElement( idx ) );
+
+	return true;
+	}
+
+bool Frame::dastore(Exception &e) {
+	jdouble val = pop_jdouble();
+	jint idx = pop_jint();
+	JavaPrimitiveArray<jdouble> * jao = NULL;
+
+	ASSERT_CAST(jao, pop_jref(), JavaPrimitiveArray<jdouble> *, JavaClassInstance *, 
+		"frame::dastore()", "JavaArrayObject" );
+
+	TRACE(( "dastore %f in %d to %x\n", val, idx, jao ));	 
+	jao->setElement( idx, val );
+
+	return true;
+	}
+
+bool Frame::dcmpg(Exception &e) {
+	jdouble jd2 = pop_jdouble();
+	jdouble jd1 = pop_jdouble();
+
+	TRACE(( "dcmpg %f vs %f\n", jd1, jd2 ));
+
+	if( jd1 > jd2 ) { push_jint( 1 ); }
+	else if ( jd1 == jd2 ) { push_jint( 0 ); }
+	else if ( jd1 > jd2 ) { push_jint( -1 ); }
+	else { /* jd1 or jd2 is NaN */ push_jint( 1 ); }
+
+	return true;
+	}
+
+bool Frame::dcmpl(Exception &e) {
+	jdouble jd2 = pop_jdouble();
+	jdouble jd1 = pop_jdouble();
+
+	TRACE(( "dcmpl %f vs %f\n", jd1, jd2 ));
+
+	if( jd1 > jd2 ) { push_jint( 1 ); }
+	else if ( jd1 == jd2 ) { push_jint( 0 ); }
+	else if ( jd1 > jd2 ) { push_jint( -1 ); }
+	else { /* jd1 or jd2 is NaN */ push_jint( -1 ); }
+
+	return true;
+	}
+
+bool Frame::dconst_0(Exception &e) {
+	TRACE(( "dconst_0\n" ));
+	push_jdouble( 0 );
+	return true;
+	}
+
+bool Frame::dconst_1(Exception &e) {
+	TRACE(( "dconst_1\n" ));
+	push_jdouble( 1 );
+	return true;
+	}
+
+bool Frame::ddiv(Exception &e) {
+	jdouble jd2 = pop_jdouble();
+	jdouble jd1 = pop_jdouble();
+
+	TRACE(( "ddiv %f / %f\n", jd1, jd2 ));
+	push_jdouble( jd1 / jd2 );
+	
+	return true;
+	}

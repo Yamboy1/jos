@@ -62,10 +62,6 @@ JavaArrayObject * JavaArrayObject::generateJavaArrayObject( JavaClassInstance * 
 /* JavaObjectArray */
 
 void JavaObjectArray::setElement( jju32 index, JavaClassInstance * jci ) {
-		if ( jci != NULL && jci->isInstanceOf( myArrayType ) ) {
-    		store( index, jci );
-    		} else {
-    		kprintf( "JavaObjectArray::setElement() -- attempt to set element of an illegal type, aborting.\n" );
-    		abort();
-    		}
-    	}
+	#warning Do type-checking in JOA:setElement()!
+	store( index, jci );
+   	}

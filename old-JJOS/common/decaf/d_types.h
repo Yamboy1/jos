@@ -17,6 +17,7 @@
 typedef bool jbool;
 typedef jji8 jbyte;
 typedef jji16 jshort;
+typedef jju16 jchar;
 typedef jji32 jint;
 typedef jji64 jlong;
 typedef float jfloat;

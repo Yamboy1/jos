@@ -18,6 +18,7 @@ class JavaObjectArray;
 #include "javathread.h"
 #include "javaclass.h"
 #include "fieldlist.h"
+class ClassInfo;
 
 class JavaObject : JavaClassInstance {
   public:
@@ -26,8 +27,8 @@ class JavaObject : JavaClassInstance {
     InstanceFields * getMyInstanceFields() { return myInstanceFields; }
     PrimitiveType type() { return PT_OBJECT; }
 
-    bool isInstanceOf( ClassInfo * cpe ); /* "symbolic class reference" from VM spec / bytecode op */
-
+    bool isInstanceOf ( ClassInfo * cpe ) { return true; }
+    
   protected:
     InstanceFields * myInstanceFields;
 
@@ -65,12 +66,12 @@ class JavaObjectArray : public JavaArrayObject, jbArray<JavaClassInstance *> {
 }; /* end JavaObjectArray */
 
 template <class T>
-class JavaPrimitiveArray : public JavaArrayObject, jbArray<T *> {
+class JavaPrimitiveArray : public JavaArrayObject, jbArray<T> {
   public:
-  	JavaPrimitiveArray( JavaClassInstance * jLObject, jint size, PrimitiveType pt ) : JavaArrayObject( jLObject, size ), jbArray< T* >( size ) { this->myPT = pt;};
+  	JavaPrimitiveArray( JavaClassInstance * jLObject, jint size, PrimitiveType pt ) : JavaArrayObject( jLObject, size ), jbArray< T >( size ) { this->myPT = pt;};
 
-	T * getElement( jju32 index ) { return load( index ); }
-	void setElement( jju32 index, T * t ) { store( index, t ); }
+	T getElement( jju32 index ) { return load( index ); }
+	void setElement( jju32 index, T t ) { store( index, t ); }
 
 	jju32 getMySize() { return size(); }
 	PrimitiveType type() { return PT_ARRAY; }

@@ -33,13 +33,13 @@ class JavaWord {
 	JavaWord( jju8 val );
 	JavaWord( jju16 val );
 	JavaWord( jju32 val );
-    	JavaWord( jju64 val, WORD which );
+    JavaWord( jju64 val, WORD which );
 
 	JavaWord( jbool val );
 	JavaWord( jbyte val );
 	JavaWord( jshort val );
 	JavaWord( jint val );
-    	JavaWord( jfloat val );
+    JavaWord( jfloat val );
 	/* When jji64 is written, this will no longer be ambigous. */
 	/* JavaWord( jlong val, WORD which ); */
 	JavaWord( jdouble val, WORD which );
