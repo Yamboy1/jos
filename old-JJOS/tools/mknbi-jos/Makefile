@@ -27,7 +27,7 @@ prefix = /usr/local
 exec_prefix = ${prefix}
 bindir = ${exec_prefix}/bin
 mandir = ${prefix}/man
-netboot = ../etherboot/netboot-0.7.3
+netboot = ../../../etherboot/netboot-0.7.3
 
 # CMDAD defines the vendor tag ID to be used for additions to the
 # kernel command line. It must be in the range of 128 - 254 as per
