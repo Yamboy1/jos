@@ -27,7 +27,7 @@ JavaString::JavaString( jju32 length ) {
 JavaString::JavaString( char * str ) {
 	/* determine length */
 	jju32 x = 0;
-	while ( str[x] != 0 ) { x++; }
+	while ( str[x] != '\0' ) { x++; }
 	myLength = x;
 
 	/* allocate wide string */
@@ -47,7 +47,7 @@ char * JavaString::c_str() {
 	if ( myNarrowString != NULL ) { return myNarrowString; }
 
 	/* allocate narrow */
-	myNarrowString = new char[ myLength ];
+	myNarrowString = new char[ myLength + 1 ];
 	if ( myNarrowString == NULL ) {
 		kprintf( "JavaString::c_str() -- unable to allocate narrow string, aborting.\n" );
 		abort();
@@ -57,6 +57,7 @@ char * JavaString::c_str() {
 	for ( jju32 x = 0; x < myLength; x++ ) {
 		myNarrowString[x] = (char)myWideString[x];
 		}
+	myNarrowString[myLength] = '\0';
 
 	return myNarrowString;
 	}
