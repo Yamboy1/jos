@@ -79,7 +79,7 @@ Frame * Frame::generateFrame( JavaClassInstance * jc, JavaString * method, JavaS
         abort();
         }
 
-    /* Initializ the frame's local variables. */
+    /* Initialize the frame's local variables. */
     f->myLocalVariables = new LocalVariables( f->myCode->getMyMaxLocals() );
     if ( f->myLocalVariables == NULL ) {
         kprintf( "Frame::generateFrame() -- unable to allocate local variables, aborting.\n" );

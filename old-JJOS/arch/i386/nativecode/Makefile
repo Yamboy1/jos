@@ -133,7 +133,7 @@ $(GRUBIMAGE): $(GRUB_OBJECTS) entry.cc $(TARGET_ZIP) Makefile
 	@echo compiling entry.cc ...
 	$(CC) $(CFLAGS) -UETHERBOOT -DMULTIBOOT -c -o entry.o entry.cc	
 	@echo ... done.  building grub image...
-	ld -Bstatic -m elf_i386 -Ttext 100000 -e _start -o $(GRUBIMAGE) entry.o $(GRUB_OBJECTS)
+	ld -Bstatic -m elf_i386 -Ttext 100000 -e _start -o $(GRUBIMAGE) entry.o $(GRUB_OBJECTS) 
 	@echo ... done.
 
 ##############

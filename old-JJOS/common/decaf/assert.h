@@ -17,17 +17,24 @@
 	if(ptr==NULL) {kprintf("%s -- %s, aborting.\n",loc,error); abort();}
 
 #ifndef DONT_USE_DC
-/* is 'dst' of type 'type'?  if so, cast it into dst; otherwise,
-   loc is where in the code we are, and thing is what the cast
-   is checking for. */
+/* Test, by attempting to cast from src to dst by way of type, if dst is an instance of type;
+ * if not, report the error at loc, saying that src is not a thing. */
 #define ASSERT_CAST(dst,src,type,loc,thing) \
 	if((dst=dynamic_cast<type>(src))==0) { kprintf("%s -- %x is not a %s, aborting.\n",loc,src,thing); abort(); }
 #else
-/* type1 is a type() return, and type2 the constant against
-   which to check it.  pos is where in the code we are, thing is
-   what the cast is checking for, and dst the pointer. */
-#define ASSERT_CAST(dst,type1,type2,pos,thing) \
-	if(type1!=type2) { kprintf("%s -- %x is not a %s, aborting.\n", pos, dst, thing ); abort(); }
+/* Test, by attempting to cast from src to dst by way of type, if dst is an instance of type;
+ * if not, report the error at loc, saying that src is not a thing.
+ * Note that the routine with temporaries is necessary if ASSERT_CAST is passed a function
+ * as either dst or src; if they're both variables, the extra assignments will be optmized
+ * away, so we're okay. */
+#define ASSERT_CAST(dst,src,dptr,sptr,pos,thing) \
+	{ /* opens scope */ \
+	sptr tsrc = (src); \
+	dptr tdst = (dst); \
+	tdst =  (dptr)(tsrc); \
+	if((tdst)->type()!=(tsrc)->type()) \
+		{ kprintf("%s -- %x is not a %s, aborting.\n", pos, dst, thing ); abort(); } \
+	} /* closes scope */
 
 #endif /* DONT_USE_DC */
 

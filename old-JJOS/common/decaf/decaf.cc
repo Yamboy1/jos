@@ -29,9 +29,13 @@ jji32 Frame::getImmediate_jji32( jju32 index ) {
  * of the method being invoked.
  */
 
-/* invokeNativeMethod( MethodInfo * mi, JavaWord * arguments ) */
-#warning Frame::invokeNativeMethod() unimplemented -- fixme!
-
+/* invokeNativeMethod is used by the other invocation functions
+ * to handle calling native methods, which may, for JOS, be
+ * bytecode! See GCHII's BCNI. */
+bool invokeNativeMethod( MethodInfo * mi, JavaWord * arguments ) {
+	#warning Frame::invokeNativeMethod() unimplemented -- fixme!
+	return true;
+	}
 
 /* pushInvocationFrame is a utility method for the invocation
  * methods; note that arguments must have been allocated with
@@ -85,105 +89,39 @@ bool Frame::invokestatic(Exception &e) {
   myPC += 2;
 
   /* Fetch the referenced method & the class in which the method resides. */
-
-#ifdef DONT_USE_DC
-  MethodRef * mr = myClass->getMyConstant( methodIndex );
-
-#ifdef NO_ASSERTIONS
-  if ( mr->type() != TAG_METHODINFO ) {
-    kprintf( "Frame::invokestatic() -- method references non-method constant, aborting.\n" );
-    abort();
-    }
-#else
-  ASSERT_CAST(mr, mr->type(), TAG_METHODINFO, "Frame::invokestatic()", "method reference");
-#endif
-  
-  JavaClassInstance * jci = mr->getMyClass();
-
-#else
-
-  JavaClassInstance * jci = NULL;
   MethodRef * mr = NULL;
 
-#ifdef NO_ASSERTIONS
-  if ( (mr = dynamic_cast<MethodRef *>(myClass->getMyConstant(methodIndex))) ) {
-  		jci = mr->getMyClass();
-  		} else {
-  		kprintf( "Frame::invokestatic() -- method reference non-method constant, aborting.\n" );
-  		abort();
-  		}
-#endif
-
-  ASSERT_CAST(mr, myClass->getMyConstant(methodIndex), MethodRef *,
+#ifdef DONT_USE_DC
+  ASSERT_CAST(mr, myClass->getMyConstant(methodIndex), MethodRef *, CPEntry *,
   				"Frame::invokestatic()", "method reference");
-  jci = mr->getMyClass();
-  		
+#else
+  ASSERT_CAST(mr, myClass->getMyConstant(methodIndex), MethodRef *,
+  				"Frame::invokestatic()", "method reference");  		
 #endif
 
-#ifdef NO_ASSERTIONS
-  if ( jci == NULL ) {
-	kprintf( "Frame::invokestatic() -- unable to get method's class, aboring.\n" );
-	abort(); 
-	}
-#else
-	ASSERT_NOT_NULL(jci, "Frame::invokestatic()", "unable to get method's class");
-#endif
+  JavaClassInstance * jci = mr->getMyClass();
+  ASSERT_NOT_NULL(jci, "Frame::invokestatic()", "unable to get method's class");
 
   /* Fetch the method's name and signature. */
   JavaString * methodName = mr->getMyName();
-#ifdef NO_ASSERTIONS
-  if ( methodName == NULL ) {
-    kprintf( "Frame::invokestatic() -- unable to get method's name, aborting.\n" );
-    abort();
-    }
-#else
-	ASSERT_NOT_NULL(methodName, "Frame::invokestatic()", "unable to get method's name" );
-#endif	
+  ASSERT_NOT_NULL(methodName, "Frame::invokestatic()", "unable to get method's name" );
 
   /* $: assumes that handing off a bad constant pool will be handled gracefully */
   JavaString * methodSignature = mr->getMyType( jci->getMyConstantPool() );
-#ifdef NO_ASSERTIONS
-  if ( methodSignature == NULL ) {
-    kprintf( "Frame::invokestatic() -- unable to get method's signature, aborting.\n" );
-    abort();
-    }
-#else
-	ASSERT_NOT_NULL(methodSignature, "Frame::invokestatic()", "unable to get method's signature" );
-#endif 
+  ASSERT_NOT_NULL(methodSignature, "Frame::invokestatic()", "unable to get method's signature" );
 
   /* Generate the method's frame.  If the method is native,
    * its Code attribute will be NULL. */
   Frame * f = Frame::generateFrame( jci, methodName, methodSignature );
-#ifdef NO_ASSERTIONS  
-  if ( f == NULL ) {
-    kprintf( "Frame::invokestatic() -- failed to generate frame, aborting.\n" );
-    abort();
-    }
-#else
-	ASSERT_NOT_NULL(f, "Frame::invokestatic()", "failed to generate frame" );
-#endif		
+  ASSERT_NOT_NULL(f, "Frame::invokestatic()", "failed to generate frame" );
 
   /* Fetch the method information. */
   MethodInfo * mi = jci->getMethodInfo( methodName, methodSignature );
-#ifdef NO_ASSERTIONS  
-  if ( mi == NULL ) {
-    kprintf( "Frame::invokestatic() -- unable to get method's information, aborting.\n" );
-    abort();
-    }
-#else
-	ASSERT_NOT_NULL(mi, "Frame::invokestatic()", "unable to get method's information" );
-#endif	
+  ASSERT_NOT_NULL(mi, "Frame::invokestatic()", "unable to get method's information" );
 
   /* Generate the arguments. */
   JavaWord * argument = new JavaWord[mi->getMyArgumentCount()];
-#ifdef NO_ASSERTIONS
-  if ( argument == NULL ) {
-  	kprintf( "Frame::invokestatic() -- unable to allocate argument array, aborting\n" );
-  	abort();
-  	}
-#else
-	ASSERT_ALLOCATED(argument, "Frame::invokestatic()", "argument array" );
-#endif	
+  ASSERT_ALLOCATED(argument, "Frame::invokestatic()", "argument array" );
 
   /* Pop the arguments off the operand stack. */ 
   for ( jint i = (mi->getMyArgumentCount() - 1); i >= 0; i-- ) {
@@ -200,51 +138,27 @@ bool Frame::invokestatic(Exception &e) {
 bool Frame::aaload(Exception & e)
 {
 	jint index = pop_jint();
+	JavaObjectArray * joa =  NULL;
 
 #ifdef DONT_USE_DC
-#error frame::aaload() -- DONT_USE_DC unavailable, fixme.
+	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *, JavaClassInstance *,
+		"Frame::aaload()", "JavaObjectArray");	
 #else
-
-#ifdef NO_ASSERTIONS
-	JavaObjectArray * joa = NULL;
-	if ( joa = dynamic_cast<JavaObjectArray *>(pop_jref()) ) {
-		JavaClassInstance * jci = joa->getElement( index );
-		if ( jci == NULL ) {
-			/* $: make sure getElement returns NULL rather than barfing. */
-			e = Exception::generateException( "IndexOutOfBoundsException" );
-			return false;
-			}
-		TRACE(("aaload (%x = %x[%d]", jci, joa, index );
-		myOpStack->push( jci );
-		return true;
-		} else {
-		/* if joa is not an instance of JavaObjectArray,
-		 * the VM is hosed. */
-		kprintf( "frame::aaload() -- attempt to load from non-array, aborting.\n" );
-		abort();
-		}
-#else
-
-	JavaObjectArray * joa = NULL;
-	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *, "frame::aaload()", "attempt to load from non-array" );
+	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *,
+		"frame::aaload()", "JavaObjectArray" );
+#endif
 
 	/* fetch the reference */
 	JavaClassInstance * jci = joa->getElement( index );
 	if ( jci == NULL ) {
 			/* $: make sure getElement returns NULL rather than barfing. */
 			// e = Exception::generateException( "IndexOutOfBoundsException" );
-			e = 1;
 			return false;
 			}
 			
 	TRACE(("aaload (%x = %x[%d])", jci, joa, index));
 	push_jref( jci );
 	return true;
-
-#endif /* NO_ASSERTIONS */
-		
-#endif /* DONT_USE_DC */
-
 	} /* end aaload() */
 
 bool Frame::aastore(Exception & e) {
@@ -256,7 +170,14 @@ bool Frame::aastore(Exception & e) {
 
 	/* fetch the array */
 	JavaObjectArray * joa = NULL;
-	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *, "frame::aastore()", "attempt to store to non-array" );
+
+#ifndef DONT_USE_DC	
+	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *,
+		"frame::aastore()", "JavaObjectArray" );
+#else
+	ASSERT_CAST(joa, pop_jref(), JavaObjectArray *, JavaClassInstance *,
+		"frame::aastore()", "JavaObjectArray" );
+#endif	
 
 	/* store the object in the array at the index */
 	TRACE(("aastore (%x[%d] = %x)", joa, index, jci));

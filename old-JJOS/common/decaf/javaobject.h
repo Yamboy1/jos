@@ -54,7 +54,7 @@ class JavaObjectArray : public JavaArrayObject, jbArray<JavaClassInstance *> {
 	void setElement( jju32 index, JavaClassInstance * jci );
     
     jju32 getMySize() { return size(); }
-    PrimitiveType type() { return PT_ARRAY; }
+    PrimitiveType type() { return PT_OBJECT_ARRAY; }
     PrimitiveType arrayType() { return PT_CLASS_INSTANCE; }
 
   protected:

@@ -22,8 +22,9 @@ typedef jji64 jlong;
 typedef float jfloat;
 typedef double jdouble;
 
-/* run-time type information; defined values are from the spec for bytecode 0x188 (newarray) */
-enum PrimitiveType { PT_OBJECT, PT_ARRAY, PT_CLASS, PT_CLASS_INSTANCE,
+/* run-time type information; decimal values are from the spec for bytecode 0x188 (newarray);
+ * the other values are defined so as to allow type() to return bitmasks. */
+enum PrimitiveType { PT_OBJECT, PT_ARRAY, PT_PRIMITIVE_ARRAY, PT_CLASS, PT_CLASS_INSTANCE, PT_OBJECT_ARRAY,
                      PT_LONG = 11, PT_INT = 10, PT_SHORT = 9,
                      PT_BYTE = 8, PT_DOUBLE = 7, PT_FLOAT = 6, PT_CHAR = 5, PT_BOOLEAN = 4 };
 

@@ -165,7 +165,7 @@ bool Scheduler::doInterruptNotification() {
         }
         
 #ifdef DONT_USE_DC
-    if ( setArray->type() != PT_ARRAY || ((JavaArrayObject*)setArray)->arrayType() != PT_OBJECT  ) {
+    if ( setArray->type() != PT_OBJECT_ARRAY || ((JavaArrayObject*)setArray)->arrayType() != PT_OBJECT  ) {
         kprintf( "Scheduler::doInterruptNotification() -- VM corrupted: interrupt set unavailable, aborting.\n" );
         abort();
         }
@@ -176,7 +176,7 @@ bool Scheduler::doInterruptNotification() {
         /* could be waiting for static initialization */
         return false;
         }
-    if ( handlerArray->type() != PT_ARRAY || ((JavaArrayObject*)handlerArray)->arrayType() != PT_OBJECT ) {
+    if ( handlerArray->type() != PT_OBJECT_ARRAY || ((JavaArrayObject*)handlerArray)->arrayType() != PT_OBJECT ) {
         kprintf( "Scheduler::doInterruptNotification() -- VM corrupted: interrupt handlers unavailable, aborting.\n" );
         abort();
         }
