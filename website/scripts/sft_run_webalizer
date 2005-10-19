@@ -1,0 +1,430 @@
+#!/bin/bash
+
+###########################################################################
+#
+#	Shell program to maintain webalizer stats for your project.
+#
+#	Copyright 2001, William Shotts <bshotts@clark.net>.
+#
+#	This program is free software; you can redistribute it and/or
+#	modify it under the terms of the GNU General Public License as
+#	published by the Free Software Foundation; either version 2 of the
+#	License, or (at your option) any later version. 
+#
+#	This program is distributed in the hope that it will be useful, but
+#	WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+#	General Public License for more details.
+#
+#	This software is part of the LinuxCommand.org project, a site for
+#	Linux education and advocacy devoted to helping users of legacy
+#	operating systems migrate into the future.
+#
+#	You may contact the LinuxCommand.org project at:
+#
+#		http://www.linuxcommand.org
+#
+#	SourceForge is a trademark of VA Linux Systems, Inc.
+#
+#	Description:
+#
+#	This program maintains webalizer statistics for your SourceForge
+#	project site. This version is designed to support the arrangement of
+#	server log files implemented in early 2001 by SourceForge.
+#	
+#	Install this script and the webalizer.conf file in the
+#	/home/groups/your_project/scripts directory.  Note that this script
+#	and the webalizer.conf file must be edited to include the name of
+#	your project (PROJECT_NAME) before use.
+#	
+#	The first time this script runs, it will scan all of the available
+#	log files starting with the year set in the FIRST_YEAR constant.  If
+#	your project started in 2000, set this constant to 2000.  Please be
+#	aware that the first run may take a *LONG* time (an hour and half or
+#	more) to complete. Subsequent runs will complete in less than a
+#	minute if the script is run daily.
+#	
+#	I suggest that you run this script from your crontab every night.
+#	
+#	Usage:
+#
+#		sft_run_webalizer [ -h | --help ] [-r]
+#
+#	Options:
+#
+#		-h, --help	Display this help message and exit.
+#		-r              Reset statistics. Use this if you need
+#				to start over.
+#
+#
+#	Revisions:
+#
+#	01/20/2001	File created by lc_new_script v.2.0.6
+#
+#
+#	$Id$
+###########################################################################
+
+
+###########################################################################
+#	Constants
+###########################################################################
+
+PROGNAME=$(basename $0)
+VERSION="0.0.1"
+
+# Should actually be the regex to look for.
+PROJECT_NAME='"\( jos.sourceforge.net\)\|\( wiki.jos.org\)"'
+
+PROJECT_ROOT="/home/groups/jos"
+PROJECT_SCRIPTS="${PROJECT_ROOT}/scripts"
+WEBALIZER_OUTPUT="${PROJECT_ROOT}/htdocs/webalizer"
+WEBALIZER_HISTORY="${WEBALIZER_OUTPUT}/webalizer.hist"
+WEBALIZER_CURRENT="${WEBALIZER_OUTPUT}/webalizer.current"
+
+FIRST_YEAR=2000		# Set this to the year your project started
+
+THIS_YEAR=$(date +"%Y")
+MONTHS="01 02 03 04 05 06 07 08 09 10 11 12"
+DAYS="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31"
+
+# These constants configure the script for SourceForge.
+# The web server log files are found in the /home/logs
+# directory.  There are 5 current servers (called
+# pr-web1 through pr-web5) and several old servers
+# in the /home/logs/old directory.  This script will
+# automatically find any server name starting with "pr-web"
+# and anything in the /home/logs/old directory.  If SF
+# decides to change the naming convention, these constants
+# will need modification.
+ 
+ACCESS_LOG_ROOT=/home/logs
+SERVER_DIRS=$ACCESS_LOG_ROOT/pr-web*
+OLD_SERVER_DIRS=$ACCESS_LOG_ROOT/old/*
+
+
+###########################################################################
+#	Functions
+###########################################################################
+
+
+function clean_up
+{
+
+	#####	
+	#	Function to remove temporary files and other housekeeping
+	#	No arguments
+	#####
+
+	return # Nothing is needed.
+}
+
+
+function error_exit 
+{
+	#####	
+	# 	Function for exit due to fatal program error
+	# 	Accepts 1 argument
+	#		string containing descriptive error message
+	#####
+
+	
+	echo "${PROGNAME}: ${1:-"Unknown Error"}" >&2
+	clean_up
+	exit 1
+}
+
+
+function graceful_exit
+{
+	#####
+	#	Function called for a graceful exit
+	#	No arguments
+	#####
+
+	clean_up
+	exit
+}
+
+
+function term_exit
+{
+	#####
+	#	Function to perform exit if termination signal is trapped
+	#	No arguments
+	#####
+
+	echo "${PROGNAME}: Terminated"
+	clean_up
+	exit
+}
+
+
+function int_exit
+{
+	#####
+	#	Function to perform exit if interrupt signal is trapped
+	#	No arguments
+	#####
+
+	echo "${PROGNAME}: Aborted by user"
+	clean_up
+	exit
+}
+
+
+function usage
+{
+	#####
+	#	Function to display usage message (does not exit)
+	#	No arguments
+	#####
+
+	echo "Usage: ${PROGNAME} [-h | --help] [-r]"
+}
+
+
+function helptext
+{
+	#####
+	#	Function to display help message for program
+	#	No arguments
+	#####
+	
+	local tab=$(echo -en "\t\t")
+		
+	cat <<- -EOF-
+
+	${PROGNAME} ver. ${VERSION}	
+	This is a program to maintain webalizer stats for your project web site.
+	
+	$(usage)
+	
+	Options:
+	
+	-h, --help	Display this help message and exit.
+	-r              Reset statistics. Use this if you need to start over.
+					
+-EOF-
+}	
+
+
+function list_of_years
+{
+	#####
+	#	creates a list of years from FIRST_YEAR to THIS_YEAR
+	#	Arguments:
+	#		none
+	#####
+
+	# This routine always contrains the list of years to
+	# THIS_YEAR-1 THIS_YEAR to fit the twelve month
+	# range limitation in webalizer 1.30.
+	
+	if [ $THIS_YEAR -eq $FIRST_YEAR ] ; then
+        	echo $THIS_YEAR
+	else
+        	echo "$((THIS_YEAR - 1)) $THIS_YEAR"
+	fi                                                                              	
+
+}	# end of list_of_years
+
+
+function run_full_statistics
+{
+	#####
+	#	Perform a full statistics run with all log files
+	#	Arguments:
+	#		none
+	#####
+
+	local y m d s start_time=$(date)
+	
+	cat <<- _EOF_
+	
+	----------------------------
+	$PROGNAME - Full statistics run - $start_time
+	
+_EOF_
+
+	cd $PROJECT_SCRIPTS || error_exit "cannot cd to $PROJECT_SCRIPTS directory"
+	
+	# If the webalizer directory does not exist, create it
+	
+	if [ ! -d $WEBALIZER_OUTPUT ]; then
+		mkdir $WEBALIZER_OUTPUT
+	fi
+	
+	# Delete webalizer.current file so we can do a full count
+	
+	rm -f $WEBALIZER_CURRENT
+	
+	# Ok, the tricky part.  Since webalizer expects the server logs to be in
+	# strict chronological order, we must carefully merge the different log
+	# files together.  For each year, month, day, and server we extract the
+	# log entries for the project.  We process one day at a time so that
+	# we can easily sort the log timestamps (fields 4 and 5).  The log
+	# files can be either compressed or uncompressed (or both!), so we 
+	# look for both.
+
+	( for y in $(list_of_years); do
+		for m in $MONTHS ; do
+			for d in $DAYS ; do
+				( for s in $SERVER_DIRS $OLD_SERVER_DIRS ; do
+					log_name=$s/$y/$m/$d/access_log
+					if [ -f ${log_name}.gz ]; then
+						zcat ${log_name}.gz | grep "$PROJECT_NAME"
+					elif [ -f $log_name ]; then
+						grep "$PROJECT_NAME" $log_name
+					fi
+				done ) | sort -k 4,5
+			done
+		done
+	done ) | webalizer -T  -Y -p -o $WEBALIZER_OUTPUT
+
+	echo -e "\nRun completed: $(date)\nStarted:       $start_time"
+	
+}	# end of run_full_statistics
+
+
+function run_incremental_statistics
+{
+	#####
+	#	Perform incremental statistics run
+	#	Arguments:
+	#		none
+	#####
+
+	local y m d s start_time=$(date)
+
+	# If the webalizer.current file does not exist, we can't do
+	# incremental processing - force a full stats run
+	
+	if [ ! -f $WEBALIZER_CURRENT ]; then
+		echo -e "\n$PROGNAME: current state file not found - forcing full scan\n"
+		run_full_statistics
+		return
+	fi
+	
+	cat <<- _EOF_
+	
+	----------------------------
+	$PROGNAME - Incremental statistics run - $start_time
+	
+_EOF_
+
+	cd $PROJECT_SCRIPTS || error_exit "cannot cd to $PROJECT_SCRIPTS directory"
+	
+	( for y in $(list_of_years); do
+		for m in $MONTHS ; do
+			for d in $DAYS ; do
+				( for s in $SERVER_DIRS $OLD_SERVER_DIRS ; do
+					log_name=$s/$y/$m/$d/access_log
+					if [ -f ${log_name}.gz ]; then
+						if [ ${log_name}.gz -nt $WEBALIZER_HISTORY ]; then
+							zcat ${log_name}.gz | grep "$PROJECT_NAME"
+						fi
+					elif [ -f $log_name ]; then
+						if [ $log_name -nt $WEBALIZER_HISTORY ]; then
+							grep "$PROJECT_NAME" $log_name
+						fi
+					fi
+				done ) | sort -k 4,5
+			done
+		done
+	done ) | webalizer -T  -Y -p -o $WEBALIZER_OUTPUT
+
+	echo -e "\nRun completed: $(date)\nStarted:       $start_time"
+	
+}	# end of run_incremental_statistics
+
+
+###########################################################################
+#	Program starts here
+###########################################################################
+	
+##### Initialization And Setup #####
+
+
+# Trap TERM, HUP, and INT signals and properly exit
+
+trap term_exit TERM HUP
+trap int_exit INT
+
+
+##### Command Line Processing #####
+
+if [ "$1" = "--help" ]; then
+	helptext
+	graceful_exit
+fi
+
+# Some sanity checks
+
+if [ "$PROJECT_NAME" = "your_project" -o "$PROJECT_NAME" = "" ]; then
+	cat >&2 <<- _EOF_
+		PROJECT_NAME has not been set.  Please edit this
+		script and assign your project name to the
+		PROJECT_NAME constant.
+_EOF_
+	error_exit "Configuration error"
+fi
+
+if [ ! -d "$PROJECT_ROOT" ]; then
+	cat >&2 <<- _EOF_
+		Project directory does not exist.
+		Perhaps project name (PROJECT_NAME) is misspelled.
+_EOF_
+	error_exit "Configuration error"
+fi
+
+if [ ! -d "$PROJECT_SCRIPTS" ]; then
+	cat >&2 <<- _EOF_
+		Project scripts directory does not exist.
+		You should have a directory called "$PROJECT_SCRIPTS"
+		in your project directory.
+_EOF_
+	error_exit "Configuration error"
+fi
+
+if [ ! -r "${PROJECT_SCRIPTS}/webalizer.conf" ]; then
+	cat >&2 <<- _EOF_
+		Webalizer configuration file is missing.
+		Please put the webalizer.conf file in
+		the $PROJECT_SCRIPTS directory.
+_EOF_
+	error_exit "Configuration error"
+fi
+
+if [ ! -d "$ACCESS_LOG_ROOT" ]; then
+	cat >&2 <<- _EOF_
+		The directory where the web server logs are kept
+		no longer exists.  This probably means that
+		somebody at SourceForge changed the system
+		configuration again.  Try to find out where they
+		are now located and edit this script to set the
+		ACCESS_LOG_ROOT constant to the new location.
+_EOF_
+	error_exit "Configuration error"
+fi
+
+
+while getopts ":hr" opt; do
+	case $opt in
+		r )	run_full_statistics
+			graceful_exit
+			;;
+		h )	helptext
+			graceful_exit
+			;;
+		* )	usage
+			clean_up
+			exit 1
+	esac
+done
+
+
+##### Main Logic #####
+
+run_incremental_statistics
+graceful_exit

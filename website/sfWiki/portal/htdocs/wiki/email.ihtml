@@ -1,0 +1,24 @@
+<?php
+	/* Send email either by user name or by email address. */
+	$useUserName = true;
+	$useEmail = true;
+
+	/* Has the user tried to login yet? */
+	if( ! isset( $HTTP_POST_VARS["username"] ) ) {
+		print( "Enter either your UserName or email address and " );
+		print( "click \"email\" to send yourself your password." );
+		} else {
+		$response = mailPassword( $postusername, $postemail );
+		if( $response ) {
+			print( $response );
+			} else {
+			print( "Password sent to registered account." );
+			print( '<BR>Please <a href="user.php?op=login&' );
+			print( 'redirect=' ); print( urlencode($redirect) );
+			print( '">login</a> or ' );
+			print( '<a href="' . $redirect . '">continue browsing</a>.' );
+			$useUserName = false;
+			$useEmail = false;
+			}
+		}
+?>	

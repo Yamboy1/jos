@@ -1,0 +1,27 @@
+<?php
+	/* A new account has been successfully created. */
+
+	mail( $postemail, "sfWiki account",
+		"Welcome to the sfWiki, $postusername!  " .
+		"Your password is \"$postpassword\".  If you " .
+		"forget it, it can be mailed to you at any time.\n" .
+		"\n" . "http://" . $SERVER_NAME . $_SITE["docrootdir"] .
+		"view/Users/$postusername " .
+		"will take you to your homepage on the sfWiki.  Enjoy!" );
+	
+?>
+<H4>Welcome to the sfWiki!</H4>
+You should shortly receive an e-mail confirming your account information.  You
+can 
+<a href="<?php print( $_SITE["docrootdir"] ); ?>user.php?op=change">change</a>
+your password or email address, if you'd like.
+<p>
+We strongly recommend you edit the WikiPage
+<a href="<?php print( $_SITE["docrootdir"] . "edit/Users/$postusername\">$postusername" ); ?></a>,
+where people will look to find out more about you.
+<p>
+<?php
+	if( isset( $redirect ) && $redirect != "" ) {
+		print( '<P>Please <a href="' . $redirect . '">continue</a>.' );
+		}
+?>

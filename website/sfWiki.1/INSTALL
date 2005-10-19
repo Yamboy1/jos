@@ -1,0 +1,61 @@
+I.   Getting an sfWiki distribution.
+
+	The sfWiki homepage is at http://sfwiki.sourceforge.net,
+	and it has links to the distributions available for download.
+
+	Alternatively, the sfWiki project page is at
+	http://sourceforge.net/projects/sfwiki/, which also has links to CVS.
+
+	sfWiki assumes it will be installed at SourceForge, but if you
+	have a similar enough server elsewhere, it should work.
+
+	You will need a MySQL database.  Ask SourceForge for one, if your
+	project doesn't have one already; from the `project admin' link,
+	select `database admin.'
+
+	Since you'll need to use SourceForge's shell server to set the
+	sfWiki up, I'd recommend using CVS from there to get the source,
+	so you can keep it up to date easily and you don't have to worry
+	about transferring files from your local machine to SourceForge.
+	This should work:
+
+		cd /home/groups/projectname
+		cvs -d :pserver:anonymous@cvs1:/cvsroot/sfwiki login
+			<press the 'Enter' key instead of a password>
+		cvs -z 3 -d :pserver:anonymous@cvs1:/cvsroot/sfwiki co sfWiki
+
+	It will create a 'sfWiki' subdirectory in your project's directory,
+	and I'll assume you're in it for the rest of the instructons.
+
+II.  Configuring the sfWiki
+
+	(1) Build the database tables:
+		(A) cp ./portal/example/site.inc ./site.inc
+		(B) edit ./site.inc to reflect your particular project
+		(C) ./gen-table.php3
+	(2) Edit the formatting:
+		(A) Edit ./portal/Static*.ihtml to your liking.
+		    ./portal/example/ has sfWiki's formatting in it.
+		(B) Edit ./portal/Common*.ihtml to your liking.
+		    ./portal/example/ has sfWiki's formatting in it.
+		(C) Edit ./portal/htdocs/wiki/IndexBody.ihtml to suit.  
+		    This will be displayed by index.php3, with the common
+		    and static headers and footers as appropriate.
+		    Alternately, mv htdocs/index.php out of the way and
+		    ln -s htdocs/view.php htdocs/index.php to use 
+		    a WikiPage as the introductory page.
+		(D) Adjust ./portal/htdocs/wiki/success.ihtml
+		    to reflect your website.
+	(3) If you'd like, import the default Wiki pages, which include
+	    instructions on using WikiFormatting:
+		(A) cd portal
+		(B) ./import.php3
+	(4) Symlink sfWiki/htdocs into your htdocs directory.
+	    Be sure to use link to the same place you specified as
+	    `docrootdir' `in site.inc'.
+	(6) copy either portal/example/sfWiki.htaccess or 
+		        portal/example/root.htaccess to htdocs/.htaccess,
+	    depending on what your `docrootdir' is.  (Change the RewriteBase
+	    line in the .htaccess file to be your docrootdir, if necessary.)
+
+III.  Enjoy!

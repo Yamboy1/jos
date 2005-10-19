@@ -1,0 +1,15 @@
+* backup.php3 dumps the MySQL tables to the backup directory, and
+* restore.php3 does the reverse.
+* Be careful scheduling backup.php3 as a cron job; the MySQL tables
+	can get very big very quickly, and you'll hit your quota. 
+* portal/import.php3 can be used to import /any/ text file into the Wiki.
+	This can be useful if you're migrating from another Wiki, or have
+	a large document.  If it times out, run it again; it moves the
+	imported files from .txt to .imp extensions to allow for this.
+* portal/export.php3 writes out the text of the WikiTopic(s).  This
+	can be useful if you're migrating to a different Wiki.
+* portal/touch.php3 calls checkRendering() on every topic in the Wiki.  If
+	portal/*.ihtml is newer than the last save, the topic is re-saved.
+	While this /will/ happen automagically behind the scenes as each topic
+	is viewed, you can use this script if some feature is introduced, and
+	you want to take fullest advantage of it.

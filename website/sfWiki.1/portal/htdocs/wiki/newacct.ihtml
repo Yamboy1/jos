@@ -1,0 +1,53 @@
+<?php
+	/* Creating a new account uses all four inputs. */
+	$useUserName = true;
+	$usePassword = true;
+	$useVerified = true;
+	$useEmail = true;
+
+	/* Has the user tried to make a new account yet? */
+	if( ! isset( $HTTP_POST_VARS["username"] ) ) {
+		print( "To make a new account, fill in the four blanks " );
+		print( "below and click the 'newacct' button." );
+
+		print( "<P>Your <EM>UserName</EM> must a be a valid " );
+		print( "<a href=\"" . $_SITE["docrootdir"] . "view//WikiName\">WikiName</a>, " );
+		print( "which means it must start with a capital " );
+		print( "letter, and contain at least one other capital " );
+		print( "letter, and be only letters." );
+
+		print( "<P>Your <EM>password</EM> can be anything.  Type " );
+		print( "it again in the next field down to verify it." );
+
+		print( "<P>Please fill in a valid <EM>e-mail</EM> address. " );
+		print( "You will need it if you ever forget your password." );
+		}
+
+	else {
+		if( $postpassword != $postverified || $postpassword == "" ) {
+			print( "<H4>Your passwords don't match, please " );
+			print( "try again.</H4>" );
+			} else {
+			$response = createNewLogin( $postusername, $postpassword, $postemail );
+			if( ! $response ) {
+ 				/* A new account was successfully created. */
+				include( $_SITE["mirrordir"] . "success.ihtml" );
+
+				/* Update the session variables. */
+				$username = $postusername;
+				$password = $postpassword;
+				$email = $postemail;
+				sessionSave();
+
+				/* No need to present the form again. */
+				$useUserName = false;
+				$usePassword = false;
+				$useVerified = false;
+				$useEmail = false;
+			
+				} else {
+				print( '<H4>' . $response . '</H4>' );
+				}	
+			} /* end if passwords matched. */
+		} /* end if user attempted to create new account. */
+?>	

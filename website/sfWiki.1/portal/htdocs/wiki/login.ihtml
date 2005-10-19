@@ -1,0 +1,28 @@
+<?php
+	/* Logging in uses only two inputs. */
+	$useUserName = true;
+	$usePassword = true;
+
+	/* Has the user tried to login yet? */
+	if( ! isset( $HTTP_POST_VARS["username"] ) ) {
+		print( "To login, enter your username and password, " );
+		print( "and click the 'login' button." );
+		} else {
+		print( "Login incorrect, please try again." );
+		}
+?>	
+<BR>
+If you've forgotten your password, click <a href="user.php?op=email<?php
+
+	if( isset( $redirect ) && $redirect != "" ) {
+		print( '&redirect=' . urlencode($redirect) );
+		}
+
+?>">here</a>.
+<BR>
+Would you like to <a href="user.php?op=newacct<?php
+	if( isset( $redirect ) && $redirect != "" ) {
+		print( '&redirect=' . urlencode($redirect) );
+		}
+
+?>">create</a> a new user?

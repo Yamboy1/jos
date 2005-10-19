@@ -1,0 +1,70 @@
+<CENTER>
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="50%" BGCOLOR="Black">
+ <TR>
+  <TD ALIGN="CENTER">
+	<FONT COLOR="Red">Editing
+  	<B><?php print ($topic) ?></B>
+	</FONT>
+  </TD>
+ </TR>
+</TABLE>
+</CENTER>
+
+<!-- body of edit page !-->
+
+<CENTER>
+<FORM METHOD="POST"
+	<?php
+	print( 'ACTION="' . $_SITE["docrootdir"] . 'edit.php?topic=' );
+	print( urlencode ($topic) . "&web=" . $web . '"' );
+	?>>
+Summary:
+<INPUT TYPE="TEXT" MAXLENGTH=64 SIZE=32 NAME="summary" VALUE="<?php
+	if (isset($summary)) { print (stripslashes($summary)); }
+	else { printWikiSummary($topic,$web,false); }
+?>">&nbsp;
+Web: <SELECT NAME="web">
+<?php
+	/* fetch the web list */	
+	$webs = getWebList();
+	$webselected = false;
+	for( reset($webs); $key = key($webs); next($webs) ) {
+		if( $key == $web ) {
+			print( "<OPTION SELECTED>" . $key . "</OPTION>" );
+			$webselected = true;
+			} else {
+			print( "<OPTION>" . $key . "</OPTION>" );
+			}
+		}
+	if (! $webselected ) {
+		print( "<OPTION SELECTED>" . $web . "</OPTION>" );
+		}
+?>
+</SELECT><BR>
+<TEXTAREA COLS=80 ROWS=24 NAME="body_text" WORDWRAP="VIRTUAL" WRAP="VIRTUAL"><?php
+
+	/* If we're coming from a preview or a rollback, $body_text != printWikiBodyText() */
+	if( isset($body_text) ) {
+		print(htmlentities(stripslashes($body_text)));
+		} else {
+		printWikiBodyText($topic, $web, false);
+		}
+?></TEXTAREA><BR>
+<INPUT TYPE="SUBMIT" NAME="preview" VALUE="Preview">
+<INPUT TYPE="SUBMIT" NAME="save" VALUE="Save">
+<INPUT TYPE="SUBMIT" NAME="rollback" VALUE="Rollback">
+</FORM>
+</CENTER>
+
+<CENTER>
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="50%" BGCOLOR="Black">   
+ <TR>
+  <TD ALIGN="CENTER">
+        <FONT COLOR="Red">Editing
+        <B><?php print ($topic) ?></B>   
+        </FONT>
+  </TD>
+ </TR>   
+</TABLE> 
+</CENTER>
+

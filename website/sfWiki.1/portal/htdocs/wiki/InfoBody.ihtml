@@ -1,0 +1,96 @@
+<CENTER>
+<TABLE WIDTH="100%" CELLSPACING="1" CELLPADDING="2" BORDER="0"><TR><TD ALIGN="LEFT">
+<?php
+require( $_SITE["mirrordir"] . "orphan.inc" );
+require( $_SITE["mirrordir"] . "table.inc" );
+
+$topicsl = addslashes( $topic );
+
+/* Print last edited on, by */
+$result = wikiQuery( "SELECT topic,lastedit,lasteditor,linksfrom FROM " . 
+		     $_SITE["dbtable"] . " WHERE topic = \"$topicsl\";" );
+
+$row = mysql_fetch_array( $result );
+
+print( '"' . $topic . '" ' );
+print( ' was last edited <B>' . $row["lastedit"] . '</B>' );
+if( $row["lasteditor"] != "" && isset($row["lasteditor"]) ) {
+	print( ', by <B>' );
+	print( '<a href="' . $_SITE["docrootdir"] . 'view//' . $row["lasteditor"] . '">' . $row["lasteditor"] . '</a>' );
+	print( '</B>.<BR><BR>' );
+	} else {
+	print ( '.<BR><BR>' );
+	}
+$linksfrom = $row["linksfrom"];
+
+/* print links into */
+if( isOrphan( $topic ) ) {
+        print( "It is an <B>orphan</B>.  " .  
+                        "Please link to it!<BR>" );
+        } else {
+	print( "The following pages link to it:" );
+
+	/* fetch the list of links */
+	$result = wikiQuery( "SELECT topic,linksfrom,summary,ltcount,lastedit FROM " . $_SITE["dbtable"] .
+		" WHERE linksfrom REGEXP \"\n" . $topicsl . "\n\";" );
+
+	printWikiTable( $result, "topic" );
+	} /* end if page is not an orphan */
+
+/* print links from it which lead nowhere */
+
+/* First, find the links which lead somewhere... */
+$lfstring = addslashes( $linksfrom );
+$result = wikiQuery( "SELECT topic FROM " . $_SITE["dbtable"] . 
+		     " WHERE \"$lfstring\" REGEXP CONCAT( \"\n\", topic, \"\n\" );" );
+while( $array = mysql_fetch_array( $result ) ) {
+	$found[$array["topic"]] = $array["topic"];
+	} 
+
+$linksfrom = trim( $linksfrom );
+$lfarray = explode( "\n", $linksfrom );
+
+function insensitiveDiff( &$value, $key, $array ) {
+	$same = false;
+	for ( reset( $array ); $compare = current( $array ); next( $array ) ) {
+		if( strcasecmp( $value, $compare ) == 0 ) {
+			$value = "";
+			return;
+			}
+		}
+	} /* end insensitiveDiff() */
+
+if( sizeof( $found ) != 0 ) {
+	reset( $lfarray );	
+	array_walk( $lfarray, "insensitiveDiff", $found );
+	}
+
+$first = true;
+for( reset($lfarray); list( $key, $link ) = each( $lfarray ); ) {
+	if( $link != "" ) { 
+		if( $first ) { $first = false; print( "\n<BR>Some topics this page links to do not exist.  Click below to create them.<BR>\n<BR>\n" ); }
+		print( "<a href=\"" . $_SITE["docrootdir"] . "edit/$web/" . urlencode( $link ) . "\">$link</a><BR>\n" );
+		}
+	}
+
+/* Finally, print out the view counts. */
+$result = wikiQuery( "SELECT * FROM " . $_SITE["dbstattable"] . 
+	" WHERE topic = \"$topicsl\";" );
+$row = mysql_fetch_array( $result );
+
+$current_mo_number = date( "m" );
+$total = 0;
+print( '<BR>Views in the current month, previous eleven: | ' );
+for( $mo_number = $current_mo_number; $mo_number > $current_mo_number - 12; $mo_number-- ) {
+	if( $mo_number <= 0 ) { $use_mo_number = $mo_number + 12; }
+		else { $use_mo_number = $mo_number; }
+
+	$use_mo_name = sprintf( "m%'02d", $use_mo_number );
+	$total += $row[$use_mo_name];
+	print( $row[$use_mo_name] . " | " );
+	} /* end month printing loop. */ 
+print( " total: $total." );
+
+?>
+</TD></TR></TABLE>
+</CENTER>

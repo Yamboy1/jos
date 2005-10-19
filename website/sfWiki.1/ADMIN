@@ -1,0 +1,143 @@
+I.    Scripts
+
+	sfWiki ships with a variety of PHP scripts designed to help you
+administrate it.  We'll begin in the sfWiki root directory, with
+backup.php3 and restore.php3.  (You already met gen-tables.php3 in the
+installation process.)
+
+	backup.php3 dumps the raw table data to two files in the
+"backupdir" specified by sfWiki/site.inc: outfile.users.<date> and
+outfile.topics.<date>, which is the larger of the two.
+
+	restore.php3 reads the most recent of the raw table data backups
+into the MySQL database.  It overwrites topics (and users) present in
+the backup and the database, and should insert missing topics/users; it will
+destroy users or topics created between the backup and the restore.  If
+you want an exact replacement, do the following:
+
+$ mysql -h <host> -u <user> -p<password> <database>
+mysql> delete from <topicstablename>;
+mysql> delete from <userstablename>;
+
+which will empty out both tables.
+
+
+	The scripts in portal are a little more interesting.  The
+import.php3 script you may have used during the installation has a
+counterpart, export.php3; be sure to make the sfWiki/export directory before
+running it.  It will prompt you for a specific WikiName, or let you
+choose [all] of them; it will then write their body texts out to
+export/<TopicName>.txt, in a fashion suitable for use with import.php3.
+This is intended to help migrating to and from the sfWiki, though
+WikiFormat differences are for you and your users to deal with.  (A
+warning, however.  SourceForge enforces a thirty-second limit on the
+running time of a PHP script; this means some scripts may not complete
+on time.  import.php3, however, renames the files it succesfully imports,
+so as to let you just run it again, if necessary.  (To undo the
+renaming. try this:
+
+$ for name in `/bin/ls *.imp`; do mv $name `echo $name | sed -e's/\.imp//'`; done
+
+	)  export.php3 currently does /not/ have an auto-resume
+feature.  Sorry.  
+
+	touch.php3 re-renders every topic in the Wiki.  This is useful
+primarily after updating the sfWiki source.  The note about running time
+applies here, as well.  Again, my apologies.
+
+	offsite.php3 helps manage the huge files that backup.php3
+produces.  It will tar and gzip them, deleting the original(s), and copy
+the new .tar.gz files to a specified off-site location, where,
+presumambly, you have more room to store them.  You can then delete the
+.tar.gz files at your leisure; more on this later.  offsite.php3
+requires that the remote site accept scp (secure copy) connections from
+your SourceForge user.  (It may require that it accept scp connections
+without a password, e.g. using key identification -- I haven't tested
+the password version.)
+
+
+II.   Using cron
+
+	You can automate the backup process using cron.  Run 'crontab
+-e' to edit your crontab, adding lines similar like:
+
+# # * * * <path to sfWiki>/backup.php3
+# # * * * <path to sfWiki/portal/offsite.php3
+
+	Replacing the # signs with numbers signifying minute and hour of
+when to run the cron job (daily).  (See man cron, man crontab for more
+information.) Don't do exactly high midnight; SF had to shut down
+per-project website statistics because too many people started analyzing
+it at the same time.  Try to pick an unusual time (one when you now the
+offsite machine will be available), and make sure that offsite.php3 is
+delayed from backup.php3 by a good chunk of time (unless you /want/ it
+to be a day behind).  The key is here to make sure that both backup.php3
+and offsite.php3 can run without your intervention. backup.php3 should
+do so without any effort on your part.  offsite.php3 will probably
+require a bit of work.  Basically, you want to run an SSH server on your
+offsite machine, and make sure that your user's key is both on
+SourceForge and in your site's authorized_keys file.  If you've got the
+shell (or CVS) servers set up with authorized_keys -- you don't need to
+type your password to login -- you can just copy the relevant files from
+one machine to the other (provided the offsite is already running an SSH
+server):
+
+$ scp ~/.ssh/authorized_keys username@offsite:~username/.ssh/
+$ scp username@offsite:~username/.ssh/identity* ~/.ssh
+
+typing in your password when indicated.  Setting up an SSH server is
+outside the scope of this document.
+
+	offsite.php3 rather deliberately never deletes the .tar.gz
+files it creates, in case the offsite copy fails.  If your offsite
+machine isn't reliably connected to the internet, however, you may want
+not to put offsite.php3 in your crontab, and run by hand when you know
+your machine is available; or you can manually create the compressed
+files:
+
+$ tar -z -c -f <date>.tar.gz outfile.topics.<date> outfile.users.<date>
+
+and delete the originals, if you want, moving or copying the .tar.gz
+files to your ftp space and copying them to your offsite machine that
+way.
+
+	On the other hand, you can just type 'du' in your BACKUP
+directory and see how much space you're using; if your site is small, it
+may not be enough to matter.  (Your group/project directory gets 100
+MB.)
+
+
+III.  Updating sfWiki
+
+	Please, please, /please/ back everything up before updating
+sfWiki.  I test my patches as best I can, but I won't catch everything.
+Don't only use backup.php3; use 'cp -R sfWiki sfWiki.backup', or
+something similar, to copy the whole tree away before you update sfWiki.
+
+	That being said, getting sfWiki via CVS is far and away the
+best way to do it, because it's much easier and convient, etc, to
+update; just type 'cvs update' from sfWiki.  This should work even for
+the downloaded sfWiki files; you may have to do a 'cvs login' before the
+update, though.  The packaged files aren't updated as often as the CVS
+is.
+
+
+IV.   feedback
+
+	Please, complain.  Use sfWiki's bug tracker, feature requester,
+support manager, and forums; I'll be watching them.  Odds are good I
+won't implement the feature you're looking for, or the fix the bug
+that's bothering you, until you bother me about it.  If the fix or
+feature is straightforward, it's usually less than a week to turn it
+into a patch.  (Sometimes less than a day.)  On the other hand, I have
+to put off some requests for weeks or months, until the codebase gets into
+shape, or I have time.  So no promises. :)
+
+
+V.    helping out
+
+	If you find some neat way of doing something, or a cool trick,
+or something that I don't cover in the docs, let me know, and I'll
+spread the word.  Thanks.
+
+-jQuinn@users.sourceforge.net

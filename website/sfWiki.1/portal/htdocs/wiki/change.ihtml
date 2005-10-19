@@ -1,0 +1,27 @@
+<?php
+
+	$useUserName = true;
+	$usePassword = true;
+	$useVerified = true;
+	$useEmail = true;
+
+	if( isAuthenticated() ) {
+		if ( (isset( $postverified ) && $postverified != "") || 
+		     (isset( $postemail ) && $postemail != "") ) {
+			changeLogin( $postpassword, $postverified, $postemail );
+			print( "Changes made to account." );
+			print( '<BR>Please <a href="' . $redirect );
+			print( '">continue</a> browsing.<BR><BR>' );
+			}
+		print( "To change your password, enter and then verify it " );
+		print( "in the field below, and click \"change\".  To change " );
+		print( "your e-mail address, type in the new one and click " );
+		print( "\"change.\"" );
+		}
+	else {
+		print( "You must be logged in before changing your account " );
+		print( "information.  Log in by entering your UserName and " );
+		print( "password.  You may change your email simultaneously, " );
+		print( "if you wish." );
+	}
+?>

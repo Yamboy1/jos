@@ -1,0 +1,91 @@
+<!-- The WikiHeader. !-->
+<TR><TD COLSPAN="2">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="CENTER">
+		<?php
+			if( isset($topic) && $topic != "" ) {
+				print( '<B>[&nbsp;' . $topic . '&nbsp;]</B>' . "\n" );
+				} else {
+				print( '<B>[ not viewing a topic ]</B>' . "\n" );
+				}
+		?>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="CENTER">
+		<?php
+			if( isAuthenticated() ) {
+				print( '<B>[ ' );
+				print( "<a href=\"" . $_SITE["docrootdir"] . "view/Users/$username\">$username</a>" );
+				print( ' ]</B>' );
+				} else {
+				print( '<B>[ not logged in ]</B>' );
+				}
+		?>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="CENTER">
+		<?php
+			if( isset($web) && $web != "" ) {
+				print( '<B>[ ' );
+				print( "Web: <a href=\"" . $_SITE["docrootdir"] . "view/$web/\">$web</a>" );
+				print( ' ]</B>' );
+				} else {
+				print( '<B>[ in all webs: ]</B>' );
+				}
+		?>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFCC66" VALIGN="CENTER">
+		goto:&nbsp;<INPUT TYPE="TEXT" SIZE="10" NAME="topic"><!--<INPUT TYPE="IMAGE" SRC="/media/go.gif" BORDER="0" VALUE="topic" ALT="goto">!-->&nbsp;<a href="/debug/search.php"><FONT SIZE="-1">options</FONT></a>
+	</TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+	<TR>
+	<TD ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="TOP">
+		<?php
+			if( isset($topic) && $topic != "" ) {
+				print( '[&nbsp;links <a href="' );
+				print( $_SITE["docrootdir"] . "info/$web/$topic" );
+				print( '">in&nbsp;to</a> or <a href="' );
+				print( $_SITE["docrootdir"] . "edit/$web/$topic" );
+				print( '">edit</a>&nbsp;]' );
+				} else {
+				print( '[&nbsp;use the goto box&nbsp;]' );
+				}
+		?>
+	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="TOP">
+		<?php
+		print( '[&nbsp;' );
+		include( $_SITE["mirrordir"] . "user_actions.ihtml" );
+		print( '&nbsp;]' );
+		?>
+	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="TOP">
+		<?php
+			if( ! isset($web) || $web == "" ) {
+				print( '[&nbsp;list of <a href="' );
+				print( $_SITE["docrootdir"] . "topics/$web/\">topics</a>" );
+				print( ', <a href="' . $_SITE["docrootdir"] );
+				print( "hubsnodes/$web/\">hubs&nbsp;&amp;&nbsp;nodes</a>" );
+				print( ', or <a href="' . $_SITE["docrootdir"] );
+				print( "changes/$web/\">recent&nbsp;changes</a>&nbsp;]" );				
+				} else {
+				print( '[&nbsp;list of <a href="' );
+				print( $_SITE["docrootdir"] . "topics/$web/\">topics</a>" );
+				print( ', <a href="' . $_SITE["docrootdir"] );
+				print( "hubsnodes/$web/\">hubs&nbsp;&amp;&nbsp;nodes</a>" );
+				print( ', or <a href="' . $_SITE["docrootdir"] );
+				print( "changes/$web/\">recent&nbsp;changes</a>&nbsp;]" );
+				}
+		?>
+	</TD>
+	</TR>
+</TABLE>
+
+<!-- From CommonHeader !-->
+</TR></TD>
+</TABLE>
+</FORM>
+
+<!-- start BODY page !-->

@@ -1,0 +1,16 @@
+<?php
+if( preg_match( '/user\.php/', $REQUEST_URI ) ) {
+	print( 'user actions' ); return;
+	}
+
+if( isAuthenticated() ) {
+	print( 'edit <a href="' . $_SITE["docrootdir"] . 'user.php?op=change&redirect=' . urlencode($REQUEST_URI) . '">user</a> or ' );
+	print( '<a href="' . $_SITE["docrootdir"] . 'user.php?op=logout&redirect=' . urlencode($REQUEST_URI) . '">logout</a>' );
+	} else {
+	print( '<a href="' . $_SITE["docrootdir"]  . 'user.php?op=login&redirect=' . urlencode($REQUEST_URI) . '">' .
+		'login</a>' );
+	print( ' or <a href="' . $_SITE["docrootdir"] . 'user.php?op=newacct&redirect=' .
+		urlencode($REQUEST_URI) . 
+		'">new&nbsp;user</a>' );
+	}
+?>

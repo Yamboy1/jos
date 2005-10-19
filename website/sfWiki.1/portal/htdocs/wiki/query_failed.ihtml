@@ -1,0 +1,15 @@
+<BR>
+This sfWiki's database has returned an error, "
+<?php
+	global $SERVER_NAME;
+
+	print( $error_body );
+	if( isset($_SITE["mailto"]) && $_SITE["mailto"] != "" ) {
+		mail( $_SITE["mailto"], $SERVER_NAME . " sfWiki database failure", $SERVER_NAME . " had an sfWiki database error:\n" . $error_body );
+		print( '", and mail has been sent to the administrator.' );
+		} /* end mail should be sent to administrator on failure */
+	else {
+		print( '".' );
+		}
+?>
+<BR>

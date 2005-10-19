@@ -1,0 +1,85 @@
+<div align="center">
+<?
+require( $_SITE["mirrordir"] . "orphan.inc" );
+require( $_SITE["mirrordir"] . "table.inc" );
+
+function printTopics( $web, $offset ) {
+	global $_SITE;
+
+	if( $offset == -1 ) {
+		$result = wikiQuery( "SELECT topic,web,summary,ltcount,lastedit FROM " . $_SITE["dbtable"] . 
+			" WHERE web=\"" . $web . "\" ORDER BY topic" );
+		} else {
+		$result = wikiQuery( "SELECT topic,web,summary,ltcount,lastedit FROM " . $_SITE["dbtable"] . 
+			" WHERE web=\"" . $web . "\" ORDER BY topic LIMIT $offset,100;" );
+		}
+
+	printWikiTable( $result, "topics in $web" );		
+	} /* end printTopics() */
+
+if( ! isset($total) || $total == "" ) {
+	$result = wikiQuery( "SELECT COUNT(*) FROM " . $_SITE["dbtable"] );
+	$row = mysql_fetch_row( $result );
+	$total = $row[0];
+	}
+
+$printingAll = false;
+if( isset($all) && $all == "true" ) {
+	$printingAll = true;
+	}
+
+print( '<TABLE WIDTH="100%"><TR><TD ALIGN="LEFT">' );
+if( $offset != 0 && ! $printingAll ) {
+	print( '<a href="' . $_SITE["docrootdir"] . 'topics.php?offset=' .
+	       ($offset - 100) . '&total=' . $total . "&web=$web" . '">previous</a>' );
+	} else {
+	print( '&nbsp;' );
+	}
+
+print( '</TD><TD>' );
+if( ! $printingAll ) {
+	if( isset( $web ) && $web != "" ) {
+		$inweb = " in $web";
+		} else { $inweb = " "; }
+	if( $offset + 100 < $total ) {
+		print( "Viewing topics $offset to " . ($offset + 100) . "$inweb out of $total in all webs." );
+		} else {
+		print( "Viewing topics $offset to " . $total . " $inweb out of $total total in all webs." );
+		}
+	if( $count >= $total ) {
+		print( ' <a href="' . $_SITE["docrootdir"] .
+		       'topics.php?all=true&offset=' . $offset . '&total=' . $total . "&web=$web" . '">[all]</a>' );
+		}
+	} else {
+	print( "Viewing all $total topics." );
+	print( ' <a href="' . $_SITE["docrootdir"] .
+	       'topics.php?all=false&offset=' . $offset . '&total=' . $total . "&web=$web" . '">[view topics ' . $offset . " to " . ($offset + 100) . ']</a>' );
+	}
+
+print( '</TD><TD ALIGN="RIGHT">' );
+
+if( $offset + 100 < $total && ! $printingAll ) {
+	print( '<a href="' . $_SITE["docrootdir"] . 'topics.php?offset=' .
+	       ($offset + 100) . '&total=' . $total . "&web=$web" . '">next</a>' );
+	} else {
+	print( '&nbsp;' );
+	}
+
+print( '</TD></TR></TABLE>' );
+
+if( ! isset($web) || $web == "" ) {
+	/* fetch a list of the webs */
+	$result = wikiQuery( "SELECT DISTINCT web FROM " . $_SITE["dbtable"] . ";" ); 
+
+	/* print the topics in each */
+	while( $row = mysql_fetch_array( $result ) ) {
+		printTopics( $row["web"], $offset );
+		print( '<BR>' );
+		}
+	} else {
+		printTopics( $web, $offset );
+		}
+
+?>
+</div>
+<BR>

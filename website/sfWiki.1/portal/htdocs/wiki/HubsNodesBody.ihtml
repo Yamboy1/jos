@@ -1,0 +1,91 @@
+<div align="center">
+<?
+require( $_SITE["mirrordir"] . "table.inc" );
+
+function printTopics( $offset, $count, $total ) {
+	global $_SITE;
+	global $web;
+
+	if( $offset < 0 ) { $offset = 0; }
+
+	print( '<TABLE WIDTH="100%"><TR><TD ALIGN="LEFT">' );
+	if( $offset != 0 ) {
+        	print( '<a href="' . $_SITE["docrootdir"] . 'hubsnodes.php?offset=' .
+               	       ($offset - $count) . '&total=' . $total . '&count=' . $count . "&web=$web" . '">previous</a>' );
+	        } else {	
+        	print( '&nbsp;' );
+        	}
+	
+	print( '</TD><TD>' );
+	print( "Viewing hubs & nodes " . ($offset + 1) . " - " ) ;
+	if( $count + $offset > $total ) {
+		print( $total );
+		} else {
+		print( $count + $offset );
+		}
+	print( " out of $total in all webs:" );
+
+	if( $count < 100 && $count < $total ) {
+		print( ' <a href="' . $_SITE["docrootdir"] . 'hubsnodes.php?offset='.
+		        $offset . '&total=' . $total . '&count=' . ($count + 10) . "&web=$web" . '">[more]</a>' );
+		}
+	if( $count > 10 ) {
+		print( ' <a href="' . $_SITE["docrootdir"] . 'hubsnodes.php?offset='.
+		        $offset . '&total=' . $total . '&count=' . ($count - 10) . "&web=$web" . '">[fewer]</a>' );
+		}
+
+	print( '</TD><TD ALIGN="RIGHT">' );
+
+	if( $offset + $count < $total ) {
+        	print( '<a href="' . $_SITE["docrootdir"] . 'hubsnodes.php?offset=' .
+	               ($offset + $count) . '&total=' . $total . '&count=' . $count . "&web=$web" . '">next</a>' );
+        	} else {
+	        print( '&nbsp;' );
+        	}
+
+	print( '</TD></TR></TABLE>' );
+
+	/* get $count hubs */
+	if( isset( $web ) && $web != "" ) {
+		$ifweb = " WHERE web=\"$web\"";
+		} else { $ifweb = " "; }
+	$result = wikiQuery( "SELECT topic,web,lfcount,summary,lastedit,ltcount FROM " . $_SITE["dbtable"] .
+		"$ifweb ORDER BY lfcount DESC LIMIT $offset, $count;" );
+
+	printWikiTable( $result, "hubs (links out of)" );
+	print( '<BR>' );
+
+	/* get $count nodes */
+	$result = wikiQuery( "SELECT topic,web,ltcount,summary,lastedit FROM " . $_SITE["dbtable"] .
+		"$ifweb ORDER BY ltcount DESC LIMIT $offset, $count;" );
+
+	printWikiTable( $result, "nodes (links in to)" );
+	print( '<BR>' );
+
+	/* get $count attractors */
+	$curMo = date( "m" );
+	$lastMo = $curMo - 1; if( $lastMo < 1 ) { $lastMo = 12; }
+	$curMo = sprintf( "m%'02d" , $curMo );
+	$lastMo = sprintf( "m%'02d" , $lastMo );
+	$result = wikiQuery(	/* this is going to be ugly. */
+				"SELECT " . $_SITE["dbtable"] . ".topic," .
+				"web,ltcount,summary,lastedit FROM " .
+			     	$_SITE["dbtable"] . " LEFT JOIN " .
+				$_SITE["dbstattable"] . " ON " .
+				$_SITE["dbtable"] . ".topic = " .
+				$_SITE["dbstattable"] . ".topic ORDER BY " .
+				"($curMo + $lastMo) DESC LIMIT $offset, $count;" );
+
+	printWikiTable( $result, "attractors (most views)", false, true );
+	} /* end printTopics() */
+
+if( ! isset($total) || $total == "" ) {
+        $result = wikiQuery( "SELECT COUNT(*) FROM " . $_SITE["dbtable"] );
+        $row = mysql_fetch_row( $result );
+        $total = $row[0];
+        }
+
+printTopics( $offset, $count, $total );
+?>
+</div>
+<br>

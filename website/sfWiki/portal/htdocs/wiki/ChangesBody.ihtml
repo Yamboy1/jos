@@ -1,0 +1,76 @@
+<div align="center">
+<?
+require( $_SITE["mirrordir"] . "orphan.inc" );
+require( $_SITE["mirrordir"] . "table.inc" );
+
+function printTopics( $offset, $count, $total ) {
+	global $_SITE;
+	global $web;
+
+	if( $offset < 0 ) { $offset = 0; }
+
+        print( '<TABLE WIDTH="100%" BORDER="0" CELLSPACING="1" CELLPADDING="2" >' . "\n" );
+        print( '<TR><TD ALIGN=LEFT>' );
+	if( $offset != 0 ) {
+		print( '<a href="' . $_SITE["docrootdir"] .
+		       'changes.php?count=' . $count .
+		       '&offset=' . ($offset - $count) .
+			"&web=$web" .
+		       '&total=' . $total . '">previous</a>' );
+		} else {
+		print( '&nbsp;' );
+		}
+	print( '</TD><TD>Most recently changed topics ' . $offset . ' - ' );
+	if( $offset + $count > $total ) {
+		print( $total );
+		} else {
+		print( ($offset + $count) );
+		}
+	print( " out of $total in all webs:" );
+
+	if( $count + 10 < $total && $count < 100 ) {
+		print( ' <a href="' . $_SITE["docrootdir"] .
+		       'changes.php?count=' . ($count + 10).
+		       '&offset=' . $offset .
+			"&web=$web" .
+		       '&total=' . $total . '">[more]</a>' );
+		}
+	if( $count > 10 ) {
+		print( ' <a href="' . $_SITE["docrootdir"] .
+		       'changes.php?count=' . ($count - 10).
+		       '&offset=' . $offset .
+			"&web=$web" .
+		       '&total=' . $total . '">[fewer]</a>' );
+		}
+
+	print( '</TD><TD ALIGN=RIGHT>' );
+	if( $offset + $count < $total ) {
+		print( '<a href="' . $_SITE["docrootdir"] .
+		       'changes.php?count=' . $count .
+		       '&offset=' . ($offset + $count) .
+			"&web=$web" .
+		       '&total=' . $total . '">next</a>' );
+		} else {
+		print( '&nbsp;' );
+		}
+	print( '</TD></TR></TABLE>' );
+
+        if( isset( $web ) && $web != "" ) {
+                $ifweb = " WHERE web=\"$web\"";
+                } else { $ifweb = " "; }
+	$result = wikiQuery( "SELECT topic,web,summary,ltcount,lastedit FROM " . $_SITE["dbtable"] .
+		"$ifweb ORDER BY lastedit DESC LIMIT $offset, $count;" );
+
+	printWikiTable( $result, "topic" );
+	} /* end printTopics() */
+
+if( ! isset($total) || $total == "" ) {
+        $result = wikiQuery( "SELECT COUNT(*) FROM " . $_SITE["dbtable"] );
+        $row = mysql_fetch_row( $result );
+        $total = $row[0];
+	}
+
+printTopics( $offset, $count, $total );
+?>
+</div>
+<BR>

@@ -1,0 +1,59 @@
+<?
+require( $_SITE["mirrordir"] . "orphan.inc" );
+require( $_SITE["mirrordir"] . "table.inc" );
+
+function printTopics( $offset, $count, $total ) {
+	global $_SITE;
+
+	$result = wikiQuery( "SELECT topic,web,summary,ltcount,lastedit FROM " . $_SITE["dbtable"] .
+		" ORDER BY lastedit DESC LIMIT $offset, $count;" );
+
+	printWikiTable( $result, "topic" );
+	} /* end printTopics() */
+
+if( ! isset($total) || $total == "" ) {
+        $result = wikiQuery( "SELECT COUNT(*) FROM " . $_SITE["dbtable"] );
+        $row = mysql_fetch_row( $result );
+        $total = $row[0];
+	}
+?>
+
+Welcome to the JOS Wiki!<P>
+A few word for those of you joining us from our old home at metamech
+(thanks, <a href="/view/Users/IainS">IainShigeoka</a>!):
+
+because so many of the old Wiki pages used HTML markup, the sfWiki will
+now render them <EM>without</EM> stripping the HTML.  The new
+<a href="view/Main/WikiFormat">WikiFormat</a>
+is intentionally much more restrictive about what HTML is allowed, and will
+not allow you to save edits to the old pages -- those in the 'Imported' web --
+into the 'Imported' web.  Saving to another web will render the page
+under the link above.  Please report problems with the bug report link below.
+See <a href="/view//NewFormattingRules">NewFormattingRules</a> for discussion.
+<p>
+You'll need <a href="user.php?op=newacct">create</a> a user
+to edit pages in this Wiki.
+<p>
+Finally, please note that topic (article) names are unique across the entire Wiki;
+the web (forum) names exist only for organizational purposes.  If you encounter problems
+with topic/web (article/forum) confusion(s), file a <a href="http://sourceforge.net/tracker/?group_id=5181&atid=105181">bug report</a>, or if you've got an idea,
+a <a href="http://sourceforge.net/tracker/?func=add&group_id=5181&atid=355181">feature request</a>.
+<p>
+Of the <?php print($total); ?> topics, these are the ten most recently edited.
+
+<div align="center">
+<?php
+printTopics( 0, 10, $total );
+?>
+</div>
+<BR>
+<TABLE border=3 cellPadding=3 cellSpacing=3 align="center"> <TR bgColor=khaki><td
+align="center"> <FONT size=-1> Member Of <A
+href="http://members.tripod.com/~mpTOOLS/ring.html"> The Open Source Java Web-Ring</A>
+</FONT> </td></TR> <TR bgColor=aliceblue><td align="center"> <FONT size=-1> [ <A
+href="http://www.webring.org/cgi-bin/webring?ring=osj123;id=5;sprev" target=_top>Skip
+Prev</A>] [ <A href="http://www.webring.org/cgi-bin/webring?ring=osj123;id=5;prev" target=_top>Prev</A> ] [ <A href="http://www.webring.org/cgi-bin/webring?ring=osj123;id=5;next" target=_top>Next</A> ] [ <A href="http://www.webring.org/cgi-bin/webring?ring=osj123;id=5;skip" target=_top>Skip Next</A>
+] [ <A href="http://www.webring.org/cgi-bin/webring?random;ring=osj123"
+target=_top>Random</A> ] [ <A href="http://www.webring.org/cgi-bin/webring?ring=osj123;id=1;next5" target=_top>Next 5</A> ]
+[ <A href="http://www.webring.org/cgi-bin/webring?ring=osj123;list" target=_top>List Sites</A> ]
+</FONT> </td></TR> </TABLE> 

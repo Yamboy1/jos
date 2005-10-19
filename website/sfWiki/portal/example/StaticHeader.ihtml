@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+<HTML>
+<?php
+
+/* set default title */
+if (!isset($_PORTAL["title"]) || $_PORTAL["title"] == ""){
+  $_PORTAL["title"] = "sfWiki -- PHP/MySQL-based WikiWikiWeb for SourceForge";
+  if( isset( $topic ) && $topic != "" ) {
+	$_PORTAL["title"] = "\"$topic\".$web";
+	}
+  }
+
+$_PORTAL["title"] = $_PORTAL["title"] . " (sfWiki)";
+
+/* prints browsing links */
+function printBrowse($links)
+{
+  for (reset($links);
+       $key = key($links);
+       next($links))
+  {
+    print ("-> <A HREF=\"" . $links[$key] . "\"><FONT COLOR=\"WHITE\">" . $key . "</FONT></A> ");
+  }
+}
+
+?>
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+    <TITLE><?php print($_PORTAL["title"]); ?></TITLE>
+    <style type="text/css">
+      <!--
+        .titlebar {text-decoration:none; color:; font-family: ,Lucida; font-weight: bold; font-size:small}
+        .title {text-decoration:none; color:#000000; font-family: Helvetica; font-weight: bold; font-size:20px}
+        .normal {text-decoration:none; color:#000000; font-family: Helvetica; font-weight: light; font-size:12px}
+
+        BODY { background-color: #FFFFFF; font-family: Lucida,verdana,arial,helvetica,sans-serif; font-size:small; }
+
+        A { text-decoration: none; color #6666FF; }
+        A:visited { text-decoration: none; color: #6666AA; }
+        A:link { text-decoration: none; color: #6666AA; }
+        A:active { text-decoration: none; color: #6666AA; }
+        A:hover { text-decoration: none; color: #FF6666 }
+        OL,UL,P,BODY,TD,TR,TH,FORM,SPAN { font-family: Lucida,arial,helvetica,sans-serif;color: #333333; }
+        H1,H2,H3,H4,H5,H6 { font-family: Lucida,arial,helvetica,sans-serif }
+        PRE,TT { font-family: courier,sans-serif }
+
+        SPAN.center { text-align: center }
+        SPAN.boxspace { font-size: 2pt; }
+
+        A.maintitlebar { color: #FFFFFF }
+        A.maintitlebar:visited { color: #FFFFFF }
+
+        A.sortbutton { color: #FFFFFF; text-decoration: underline; }
+        A.sortbutton:visited { color: #FFFFFF; text-decoration: underline; }
+
+        A.menus { color: #000000; text-decoration: underline; }
+        A.menus:visited { color: #000000; text-decoration: underline; }
+
+        A.tabs { color: #000000; text-decoration: underline; }
+        A.tabs:visited { color: #000000; text-decoration: underline; }
+
+        SPAN.alignright { text-align: right }
+        SPAN.maintitlebar { font-size: small; color: #FFFFFF }
+        SPAN.titlebar { text-align: center; font-size: small; color: #FFFFFF; font-weight: bold }
+        SPAN.develtitle { text-align: center; font-size: small; color: #000000; font-weight: bold }
+
+        SPAN.osdn {font-size: x-small; font-family: verdana,arial,helvetica,sans-serif;}
+        SPAN.search {font-size: x-small; font-family: verdana,arial,helvetica,sans-serif;}
+        SPAN.slogan {font-size: large; font-weight: bold; font-family: verdana,arial,helvetica,sans-serif;}
+        SPAN.footer {font-size: x-small; font-family: verdana,arial,helvetica,sans-serif;}
+
+        TD.featurebox { font-size: small; }
+
+      -->
+   </style>
+  </HEAD>
+
+<BODY bgcolor=#FFFFFF topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" marginheight="0" marginwidth="0">
+
+<FORM TYPE=GET ACTION="<? print( $_SITE["docrootdir"] ); ?>view.php">
+<!-- top strip -->
+<TABLE width="100%" border=0 cellspacing=0 cellpadding=0 bgcolor="737b9c">
+ <TR>
+  <TD ALIGN=CENTER>
+   sfWiki <a class=maintitlebar href="http://sourceforge.net/project?group_id=5181">at SourceForge</a>
+  </TD>
+  <TD ALIGN=LEFT>
+   sfWiki-devel <a class=maintitlebar href="http://lists.sourceforge.net/mailman/listinfo/sfwiki-devel">mailing list</a>
+  </TD>
+  <TD ALIGN=LEFT>
+   sfWiki <a class=maintitlebar href="http://cvs.sourceforge.net/cgi-bin/cvsweb.cgi/?cvsroot=sfwiki">CVS</a>
+  </TD>
+  <TD ALIGN=LEFT>
+   <a class=maintitlebar href="<?php print( $_SITE["docrootdir"] ); ?>search.php">search</a> the sfWiki
+  </TD>
+ </TR>
+</TABLE>
+
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=5 WIDTH="100%" ALIGN="CENTER">
+ <TR bgcolor="#eeeef8">
+  <TD VALIGN=Middle ALIGN=CENTER>
+   <FONT SIZE=+2><B>
+    [sfWiki] -- the Wiki                       
+   </B></FONT>
+  </TD>
+  <TD VALIGN=Middle ALIGN=Right>
+    <TT>Topic: </TT>
+    <INPUT ACTION=GET TYPE=Text NAME="topic" SIZE=15>
+  </TD>
+ </TR>
+</TABLE>
+
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=3 WIDTH="100%" BGCOLOR="Navy">
+ <TR>
+  <TD>
+   <FONT COLOR="White">Now Browsing <?php include( $_SITE["mirrordir"] . "browse.inc" ); printBrowse($links); ?> </FONT>
+  </TD>
+  <TD ALIGN=RIGHT>
+   <?php include( $_SITE["mirrordir"] . "user_actions.ihtml" ); ?>	
+  </TD>
+ </TR>
+</TABLE>
+
+</FORM>
+
+<!-- start BODY page !-->
+<DIV ALIGN=CENTER>
+<TABLE WIDTH="98%">
+<TR><TD>
+
+<DIV ALIGN="CENTER">
+<TABLE WIDTH="98%">
+<TR><TD>
