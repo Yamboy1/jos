@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+
+<!--
+
+  website/module/joswiki/build.xml
+  Installation : JOS Project @ jos.sourceforge.net
+  Date Written : GCHII 27 October 2005
+  Switched wiki.dest to ${target.dir}/html.
+
+-->
+
+<project name="joswiki" default="build" basedir=".">
+  <property file="${basedir}/../module.properties"/>
+
+  <property name="debug" value="false"/>
+
+  <!-- staticwiki settings -->
+  <!-- *D!
+  <property name="wiki.program" value="org.jos.gchii.staticwiki3d.StaticWikiProgram"/>
+  -->
+  <property name="wiki.dest" value="${target.dir}/html"/>
+
+
+  <target name="init">
+    <tstamp/>
+    <echo>${basedir}</echo>
+  </target>
+
+
+  <target name="clean">
+    <delete dir="${build}" failonerror="false"/>
+    <delete dir="${wiki.dest}"/>
+  </target>
+
+
+  <target name="taskdef" depends="init">
+    <taskdef name="smartapi" classname="gchii.tools.ant.SmartApiTask"/>
+  </target>
+
+
+  <target name="source"/>
+
+
+  <target name="image" depends="init">
+    <copy todir="${wiki.dest}">
+      <fileset dir="${basedir}" includes="image/**"/>
+    </copy>
+  </target>
+
+
+  <target name="staticwiki" depends="init,taskdef">
+    <smartapi spec="run:program:${wiki.program}?joste=false&amp;path=${wikiAtoZ.dir}&amp;show=all&amp;debug=${debug}&amp;dest=${wiki.dest}/"/>
+  </target>
+
+
+  <target name="build" depends="init,image,staticwiki"/>
+</project>
+

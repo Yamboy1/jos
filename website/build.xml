@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<!--
+
+  website/build.xml
+  Installation : JOS Project @ jos.sourceforge.net
+  Date Written : GCHII 27 October 2005
+
+-->
+
+<project name="website" default="build" basedir=".">
+  <target name="init">
+    <tstamp/>
+    <echo>${basedir}</echo>
+  </target>
+
+
+  <target name="_visit">
+    <ant dir="${basedir}/module/joswiki" target="${name}" inheritAll="false"/>
+  </target>
+
+
+  <target name="clean">
+    <antcall target="_visit">
+      <param name="name" value="clean"/>
+    </antcall>
+  </target>
+
+
+  <target name="build" depends="init">
+    <antcall target="_visit">
+      <param name="name" value="build"/>
+    </antcall>
+  </target>
+</project>
+

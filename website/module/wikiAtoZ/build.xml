@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+
+<!--
+
+  website/module/wikiAtoZ/build.xml
+  Installation : JOS Project @ cjos.sourceforge.net
+  Date Written : GCHII 26 October 2005
+
+-->
+
+<project name="jos-wikiAtoZ" default="build" basedir=".">
+  <property file="${basedir}/../module.properties"/>
+
+  <!--project settings -->
+  <property name="website" value="http://jos.sourceforge.net"/>
+  <property name="website.view" value="${website}/view//"/>
+  <property name="local.changes" value="file:${basedir}/changes.php.html"/>
+
+  <property name="remote.count" value="40"/>
+  <property name="remote.total" value="2148"/>
+  <property name="remote.test" value="${website}/changes.php?count=${remote.count}%26offset=0%26web=%26total=${remote.total}"/>
+  <property name="remote.changes" value="${website}/changes.php?count=${remote.total}%26offset=0%26web=%26total=${remote.total}"/>
+  <property name="website.changes" value="${remote.changes}"/>
+
+  <property name="debug" value="false"/>
+
+  <property name="changes.program" value="gchii.wiki.changes1c.DownloadChangesProgram"/>
+  <property name="delta.program" value="gchii.wiki.changes1b.NewArticleProgram"/>
+  <property name="download.program" value="gchii.wiki.download1d.DownloadWiki"/>
+  <property name="download.tree" value="true"/>
+
+
+  <target name="init">
+    <tstamp/>
+  </target>
+
+
+  <target name="clean">
+    <!-- *D!
+    <delete dir="${wikiAtoZ.dir}" failonerror="false"/>
+    -->
+  </target>
+
+
+  <target name="clean-index">
+    <delete>
+      <fileset dir="${basedir}">
+        <include name="**/?.html"/>
+      </fileset>
+    </delete>
+  </target>
+
+
+  <target name="taskdef" depends="init">
+    <taskdef name="smartapi" classname="gchii.tools.ant.SmartApiTask"/>
+  </target>
+
+
+  <target name="changes" depends="taskdef">
+    <smartapi spec="run:program:${changes.program}?location=${website.changes}&amp;debug=${debug}"/>
+  </target>
+
+
+  <target name="delta" depends="taskdef">
+    <smartapi spec="run:program:${delta.program}"/>
+  </target>
+
+
+  <target name="download" depends="taskdef">
+    <smartapi spec="run:program:${download.program}?prefix=${website.view}&amp;dest=${wikiAtoZ.dir}&amp;tree=${download.tree}"/>
+  </target>
+
+
+  <target name="epilog" depends="init">
+    <delete failonerror="false">
+      <fileset dir="${wikiAtoZ.dir}">
+        <include name="N/Namespace*and*Package*FAQ.html"/>
+      </fileset>
+    </delete>
+  </target>
+
+
+  <target name="build" depends="init,changes,delta,download,epilog"/>
+</project>
+
