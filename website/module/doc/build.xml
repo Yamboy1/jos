@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+
+<!--
+
+  website/module/doc/build.xml
+  Installation : JOS Project @ jos.sourceforge.net
+  Date Written : GCHII 28 January 2006
+
+-->
+
+<project name="doc" default="build" basedir=".">
+  <property file="${basedir}/../module.properties"/>
+  <property name="build" value="${basedir}/build"/>
+  <property name="project.tar" value="${build}/project.tar"/>
+  <property name="prefix" value="jos-website"/>
+
+
+  <target name="init">
+    <tstamp/>
+    <echo>${basedir}</echo>
+
+    <property name="target.tgz" value="${target.dir}/jos-website-${DSTAMP}.tgz"/>
+  </target>
+
+
+  <target name="env" depends="init">
+    <echo message="target.tgz=${target.tgz}"/>
+  </target>
+
+
+  <target name="clean">
+    <delete dir="${build}" failonerror="false"/>
+  </target>
+
+
+  <target name="build-tar" depends="init">
+    <delete file="${project.tar}" failonerror="false"/>
+
+    <mkdir dir="${build}"/>
+
+    <tar longfile="gnu" destfile="${project.tar}">
+      <tarfileset dir="${basedir}/src" prefix="${prefix}">
+        <include name="**"/>
+        <exclude name="htaccess.txt"/>
+      </tarfileset>
+      <tarfileset dir="${target.dir}" prefix="${prefix}" includes="html/**"/>
+    </tar>
+  </target>
+
+
+  <target name="build-tgz" depends="build-tar">
+    <mkdir dir="${target.dir}"/>
+    <delete file="${target.tgz}" failonerror="false"/>
+    <gzip zipfile="${target.tgz}" src="${project.tar}"/>
+    <delete file="${project.tar}"/>
+  </target>
+
+  <target name="build" depends="build-tgz"/>
+</project>
+
