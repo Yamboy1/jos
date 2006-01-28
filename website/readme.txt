@@ -3,6 +3,7 @@
   website/readme.txt
   Installation : JOS Project @ sourceforge.net
   Date Written : GCHII 19 October 2005
+  Date Revised : GCHII 28 January 2006
 
 */
 
@@ -18,8 +19,10 @@ http://jos.sourceforge.net/
 1.2 Tree
 backup/ - Backup directory is excluded from CVS.
 cgi-bin/ - Empty directory is excluded from CVS.
-exclude - File contains a list of article names.
-htdocs/ -> ./sfWiki/htdocs/ (symbolic link)
+exclude - A list of article names.
+htdocs/ - Contains our homepage and htaccess file. This is
+no longer a symbolic link to ./sfWiki/htdocs/.
+htdocs/html/ - Contains rendered JOS Wiki pages.
 josdata.tar.gz
 scripts/
 sfWiki/ - Directory contains production wiki.
@@ -33,10 +36,16 @@ www/ -> htdocs/ (symbolic link)
 1.3 Building
 build.xml - Ant script builds a snapshot to install in production.
 
-  ant
-  scp jos-20051019.tgz jos.sourceforge.net:/home/groups/j/jo/jos/mirror
-  ssh jos.sourceforge.net
-  cd /home/groups/j/jo/jos
-  tar xzf mirror/jos-20051019.tgz
-  mv joswebsite/html/ sfWiki/htdocs/
+ $ ant
+ $ scp jos-20051019.tgz jos.sourceforge.net:/home/groups/j/jo/jos/mirror
+ $ ssh jos.sourceforge.net
+ $ cd /home/groups/j/jo/jos
+ $ tar xzf mirror/jos-20051019.tgz
+ $ mv joswebsite/html/ sfWiki/htdocs/
+
+1.4 Homepage
+index.html - ?
+
+1.5 htaccess
+.htaccess - ?
 
