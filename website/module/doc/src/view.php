@@ -5,6 +5,5 @@
     $topic = "WebHome";
   }
 
-  /* body */
-  require( "html/" . $topic . ".html" )
+  header( "Location: " . "/html/" . $topic . ".html" );
 ?>
