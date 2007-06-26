@@ -19,11 +19,14 @@
   <property name="wiki.program" value="org.jos.gchii.staticwiki3d.StaticWikiProgram"/>
   -->
   <property name="wiki.dest" value="${target.dir}/html"/>
+	
+  <property name="smartapitask" value="gchii.tools.ant.SmartApiTask"/>
 
 
   <target name="init">
     <tstamp/>
     <echo>${basedir}</echo>
+  	<available classname="${smartapitask}" property="smartapitask.available"/>
   </target>
 
 
@@ -33,9 +36,28 @@
   </target>
 
 
-  <target name="taskdef" depends="init">
+  <target name="x-taskdef" depends="init">
     <taskdef name="smartapi" classname="gchii.tools.ant.SmartApiTask"/>
   </target>
+
+	
+	<target name="taskdef-1" depends="init" if="smartapitask.available">
+	    <taskdef name="smartapi" classname="${smartapitask}"/>
+	</target>
+	
+	
+	<target name="taskdef-2" depends="init" unless="smartapitask.available">
+		<taskdef name="smartapi" classname="${smartapitask}">
+			<classpath>
+				<fileset dir="../../lib">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</taskdef>
+	</target>
+
+	
+	<target name="taskdef" depends="init,taskdef-1,taskdef-2"/>
 
 
   <target name="source"/>
@@ -49,7 +71,10 @@
 
 
   <target name="staticwiki" depends="init,taskdef">
+  	<!-- *D!
     <smartapi spec="run:program:${wiki.program}?joste=false&amp;path=${wikiAtoZ.dir}&amp;show=all&amp;debug=${debug}&amp;dest=${wiki.dest}/"/>
+    -->
+  	<smartapi spec="run:command:${wiki.command}?joste=false&amp;path=${wikiAtoZ.dir}&amp;show=all&amp;debug=${debug}&amp;dest=${wiki.dest}/"/>
   </target>
 
 
