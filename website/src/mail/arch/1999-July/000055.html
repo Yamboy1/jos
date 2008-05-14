@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] RE: [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000052.html">
+   <LINK REL="Next" HREF="000060.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] RE: [JOS-UI] peer-ui mappings</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] RE: [JOS-UI] peer-ui mappings">tmiller@haverford.edu</A><BR>
+    <I>Sun, 25 Jul 1999 16:22:57 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000052.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000060.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#55">[ date ]</a>
+              <a href="thread.html#55">[ thread ]</a>
+              <a href="subject.html#55">[ subject ]</a>
+              <a href="author.html#55">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> My proposal suggests that it is possible to unify three Java platforms
+</I>&gt;<i> under one JOS platform. Such unification would eliminate arbitrary
+</I>&gt;<i> duplication and redundency. It would also enable us to write native code
+</I>&gt;<i> once, not once per Java platform. It would enable us to write our Java
+</I>&gt;<i> applications once, not once per Java platform.
+</I>
+	It should be posisble to write an O/S that will run Sun's current
+three platforms.  Whether or not it can be done is still open to question,
+as is the exact mechanism by which such a task might be accomplished.  I
+would suggest the Right Thing to do is to write JOS's platform without
+worrying too much about Sun's, and take care of compatibility problems
+with compatability modules.  Sun's platforms will change again, and
+probably in ways that aren't compatible with any unified problem we might
+come with.  Again, to my understanding, the exact changes to the VM spec
+involve either (a) additions that older VMs can safely ignore or
+(b) alterations to the interpertation of some parts of the VM or language
+spec which either were or are incorrect.
+
+&gt;<i> We don't need an &quot;oddly written&quot; compiler. If we build a multiple process
+</I>&gt;<i> JVM, we are already breaking away from the single process JVM standard
+</I>&gt;<i> created by Sun. The Java virtual machine specification is clear. By design,
+</I>&gt;<i> a JVM must support a single process. 
+</I>
+	If you don't want your classfile to have java.lang.* references in
+it, you need an oddly-written compiler.  By default, all java compilers
+import java.lang.*, and java.lang.Object is the defined superclass of
+every other class...
+
+	So far as I've read the spec, it doesn't require a single-process
+model (thought it might assume one) -- large chunks of the class library
+will break in amusing ways if the VM doesn't fake one, but it's entirely
+possible to write a multi-process VM that will execute non-process-aware
+programs without difficulty; as a matter of fact, for JOS to work, we
+*have* to write such a JVM.
+
+&gt;<i> I believe we need a JOS-compatible javac tool. A multiple process JVM is
+</I>&gt;<i> likely to need a compiler with multiple process support.
+</I>
+	Absolutely not.  Processes MUST be an API that has native-code
+links into our JVM, otherwise we've just cut ourselves off from every
+other java developer out there, which is unacceptable.
+
+	Multiple java processes in a single JVM are simply a matter of
+keeping namespaces disjoint.  Certain elements of the extant Java API will
+have to be rewritten to act appropriately (i.e. System.exit() will kill
+the process, not the system), but the classfile will remain the
+same.  To maintain separate namespaces requires a slight modification to
+the primordial classloader, and that's it.  Every Java class already
+maintains the classloader that loaded it.
+
+-_Quinn
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000052.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000060.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#55">[ date ]</a>
+              <a href="thread.html#55">[ thread ]</a>
+              <a href="subject.html#55">[ subject ]</a>
+              <a href="author.html#55">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

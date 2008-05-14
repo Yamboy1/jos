@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Widgets</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000087.html">
+   <LINK REL="Next" HREF="000089.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Widgets</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-UI] Widgets">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 28 Jul 1999 15:06:04 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000087.html">[JOS-UI] Widgets</A></li>
+        <LI> Next message: <A HREF="000089.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#88">[ date ]</a>
+              <a href="thread.html#88">[ thread ]</a>
+              <a href="subject.html#88">[ subject ]</a>
+              <a href="author.html#88">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>DigiGod Q Frasché wrote:
+&gt;<i> 
+</I>&gt;<i> I use widget in a broad sense not tied to either the AWT or Swing.
+</I>&gt;<i> 
+</I>&gt;<i> JADE's widgets should be defined in this broad sense, hence we should
+</I>&gt;<i> define them first as interfaces create a default set using swing then
+</I>&gt;<i> extends that to create the &quot;JOS Standard GUI&quot; widgets.
+</I>&gt;<i> 
+</I>&gt;<i> here's all the widgets I can think of
+</I>&gt;<i> 
+</I>&gt;<i> Widget
+</I>&gt;<i>  |
+</I>&gt;<i>  +-DesktopWidget
+</I>&gt;<i>  |
+</I>&gt;<i>  +-ClockWidget
+</I>&gt;<i>  |
+</I>&gt;<i>  +-DockWidget
+</I>&gt;<i>  |
+</I>&gt;<i>  +-TaskbarWidget
+</I>&gt;<i>  |
+</I>&gt;<i>  +-ToolbarWidget
+</I>&gt;<i>  |
+</I>&gt;<i>  +-PropertyPageWidget
+</I>&gt;<i> 
+</I>&gt;<i> Widget is the super interface (it doesnt even have to define any
+</I>&gt;<i> methods).
+</I>&gt;<i> 
+</I>&gt;<i> DesktopWidget represents the actual desktop and has methods for moving
+</I>&gt;<i> windows around, adding widgets (like a taskbar) and the like.
+</I>
+If you take the MVC approach, the methods in DesktopWidget would not be
+at all interesting. In fact DesktopWidget could be defined to have no
+methods. Instead, we have the following design:
+
+class DesktopModel
+ - showWindow(win)
+ - hideWindow(win)
+ - selectWindow(win)
+ - disposeWindow(win)
+ - moveWindow(win, x, y)
+ - resizeWindow(win, w, h)
+
+interface DesktopListener
+ - windowShown(event)
+ - windowHidden(event)
+ - windowSelected(event)
+ - windowDisposed(event)
+ - windowMoved(event)
+ - windowResized(event)
+
+Then perhaps:
+
+class SwingDesktopWidget extends JDesktopPane implements Widget
+{
+	class SwingDesktopListener implements DesktopListener
+	{
+		public void windowShown(DesktopEvent e)
+		{
+			findWindow(e.getWindow()).setVisible(true);
+		}
+	}
+}
+
+As you can see, there is no need for a DesktopWidget interface that
+defines methods to move windows around. In MVC, you would call
+controller.moveWindow(...) to move the window. As a result, all
+DesktopListeners will be notified through the windowMoved() method,
+which as you can see I have handled with an inner class to prevent
+people from calling these methods directly.
+
+I mentioned in another email that you don't really need a separate
+controller class, SwingDesktopWidget could interact directly with
+DesktopModel to move the window but SwingDesktopWidget itself has no
+public methods to move a window. It is not an interface for moving
+windows, it is just a view that internally is allowed to move windows.
+
+Now, the class design above was just given to demonstrate MVC. It is not
+necessarily the best design. It is possible to divide DesktopModel into
+a finer set of model components.
+
+If you go with MVC, the first step is to define the *Model, *Listener
+and *Event interfaces. As for the Widget interfaces, I think you will
+need only a single Widget interface. The requirements for the view layer
+will become clearer later on.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000087.html">[JOS-UI] Widgets</A></li>
+	<LI> Next message: <A HREF="000089.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#88">[ date ]</a>
+              <a href="thread.html#88">[ thread ]</a>
+              <a href="subject.html#88">[ subject ]</a>
+              <a href="author.html#88">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

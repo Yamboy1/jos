@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] ScreenSaver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000086.html">
+   <LINK REL="Next" HREF="000080.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] ScreenSaver</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-UI] ScreenSaver">ryan@whitewolf.com.au</A><BR>
+    <I>Tue, 27 Jul 1999 17:11:42 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000086.html">[JOS-UI] ScreenSaver</A></li>
+        <LI> Next message: <A HREF="000080.html">[JOS-UI] ScreenSaver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#79">[ date ]</a>
+              <a href="thread.html#79">[ thread ]</a>
+              <a href="subject.html#79">[ subject ]</a>
+              <a href="author.html#79">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>DigiGod Q Frasché wrote:
+&gt;<i> 
+</I>&gt;<i> hows this for a screensaver class?
+</I>
+&lt;snip&gt;
+
+&gt;<i> public abstract class ScreenSaver implements Runnable {
+</I>
+If ScreenSaver extends Window, we don't need ...
+
+&gt;<i>  private Graphics2D g;
+</I>
+Graphics handling can get messy if you keep a reference to your own
+graphics context. There was once a problem with a Windows JVM where you
+could not have open more than 5 or 6 graphics contexts without exceeding
+the resource limit. Graphics contexts are intended to be short term
+objects. They are also intended to be used from within the AWT thread -
+I'm not sure exactly what could go wrong if you don't but I could
+imagine swing getting confused. It likes to manage Graphics contexts
+itself since most of the graphics handling stuff is written in Java
+(instead of native peers).
+
+&gt;<i>  public Toolkit getDefaultToolkit() { //convience method
+</I>&gt;<i>   return Toolkit.getDefaultToolkit();
+</I>&gt;<i>  }
+</I>
+If you extend Window, you will inherit a similar method. It may sound
+like I'm suggesting that you extend Window. I don't actually mind. You
+could extend Canvas. You could define an interface with a paint() method
+just like Component. Luckily, the screensaver module is isolated enough
+that you can easily change your design as many times without breaking
+much.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000086.html">[JOS-UI] ScreenSaver</A></li>
+	<LI> Next message: <A HREF="000080.html">[JOS-UI] ScreenSaver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#79">[ date ]</a>
+              <a href="thread.html#79">[ thread ]</a>
+              <a href="subject.html#79">[ subject ]</a>
+              <a href="author.html#79">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

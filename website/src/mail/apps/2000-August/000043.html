@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [dd] Opening /dev/fd0 on Linux</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000042.html">
+   <LINK REL="Next" HREF="000045.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [dd] Opening /dev/fd0 on Linux</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [dd] Opening /dev/fd0 on Linux">gchii@mindspring.com</A><BR>
+    <I>Tue, 08 Aug 2000 13:05:11 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000042.html">[JOS-Apps] [GRUB] Install from source</A></li>
+        <LI> Next message: <A HREF="000045.html">[JOS-Apps] [dd] Opening /dev/fd0 on Linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#43">[ date ]</a>
+              <a href="thread.html#43">[ thread ]</a>
+              <a href="subject.html#43">[ subject ]</a>
+              <a href="author.html#43">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Is there a pure Java replacement for the dd command?
+
+buf1 and buf2 are loaded from the stage1 and stage2 files, respectively.
+
+Should the following code work properly on Linux?
+
+  public void example1() {
+    byte[] buf1 = loadStage1();
+    byte[] buf2 = loadStage2();
+
+    OutputStream output = FileOutputStream( &quot;/dev/fd0&quot; );
+    output.write( buf1 );
+    output.write( buf2 );
+    output.close();
+  }
+
+Result: this floppy is not bootable. It seems as if this implementation of
+FileOutputStream does not seek to the beginning of the floppy disk.
+
+  public void example2() {
+    byte[] buf1 = loadStage1();
+    byte[] buf2 = loadStage2();
+
+    RandomAccessFile output = RandomAccessFile( &quot;/dev/fd0&quot; );
+    output.seek( 0L );
+    output.write( buf1 );
+    output.write( buf2 );
+    output.close();
+  }
+
+Outside of Java, this works with the same files:
+
+dd if=stage1 of=/dev/fd0 bs=512 count=1
+dd if=stage2 of=/dev/fd0 bs=512 seek=1
+
+How does the dd command work? It copies stage1 and stage2 to the floppy.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000042.html">[JOS-Apps] [GRUB] Install from source</A></li>
+	<LI> Next message: <A HREF="000045.html">[JOS-Apps] [dd] Opening /dev/fd0 on Linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#43">[ date ]</a>
+              <a href="thread.html#43">[ thread ]</a>
+              <a href="subject.html#43">[ subject ]</a>
+              <a href="author.html#43">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

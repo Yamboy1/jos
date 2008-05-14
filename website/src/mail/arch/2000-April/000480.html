@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Kernel class loader</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000519.html">
+   <LINK REL="Next" HREF="000484.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Kernel class loader</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Kernel class loader">gchii@mindspring.com</A><BR>
+    <I>Wed, 19 Apr 2000 09:48:02 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000519.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000484.html">[JOS-Arch] [multiple process] Kernel class loader</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#480">[ date ]</a>
+              <a href="thread.html#480">[ thread ]</a>
+              <a href="subject.html#480">[ subject ]</a>
+              <a href="author.html#480">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Eventually, something must be added to reduce redundent bytecode. It is the
+right thing to do. That was my conclusion over a year ago. But, it is not a
+class loader.
+
+Whatever it is, we should first add it to a virtual machine (decaf), refine
+it through experience and testing, and then -- if necessary -- add it to a
+kernel (jJOS). Any virtual machine would benefit from it. When we add it to
+a kernel, it can work intimately with the kerne's virtual memory manager.
+
+Without a virtual machine, there is no class loader. A &quot;kernel class
+loader&quot; is not a genuine class loader. It cannot return an instance of
+java.lang.Class. A class loader, implemented in machine code, can be added
+to decaf, not jJOS. A kernel is not a virtual machine. It has zero or more
+virtual machines.
+
+Let's say there are 100 separate processes running in decaf at once. In the
+worst case, 100 separate copies of the java.* packages would be loaded into
+virtual memory (assuming jJOS has virtual memory). If the java.* packages
+are 20+MB, thats 100 * 20+MB or 2000+MB. jJOS would require at least a 2GB
+swap partition exclusively for system bytecode.
+
+We already know that 100 separate processes won't load every class in the
+java.* packages. In the typical case, a process might use 2+MB, not 20+MB.
+That's 100 * 2+MB or 200+MB. jJOS would require at least a 200MB swap
+partition exclusively for system bytecode.
+
+Together, 100 processes would typically load every class file in the java.*
+packages. With a bytecode or class definition cache, jJOS would &quot;only&quot;
+require a 20+MB swap partition exclusively for system bytecode. Bytecode
+would be loaded for each process and intern'd. The intern'd bytecode might
+stay in the cache for the lifetime of the kernel. The intern'd bytecode
+might stay in the cache until it is no longer used by any process.
+
+A kernel must have a bytecode cache or a class definition cache; it cannot
+have a class loader. With a bytecode cache, a kernel would offer a
+VM-independent interface, usable by any virtual machine. It is not specific
+to decaf. A bytecode cache maps correctly to bytecode resource, where
+bytecode is part of the executable image of a virtual machine. A bytecode
+cache works simultaneously for any virtual machine from Java 0 through Java 2.
+
+With a class definition cache, a kernel would offer a VM-dependent
+interface. A class definition cache must be recompiled when a virtual
+machine changes. That means the kernel depends on the implementation
+details of a virtual machine. This undermines a kernel's ability to host
+different versions of a virtual machine.
+
+ClassDefinition and Bytecode are not the same thing. Both are needed.
+Bytecode is a VM-independent design; ClassDefinition is not.
+
+A class definition class must return an instance of ClassDefinition when
+given a ClassDefinition object:
+
+const ClassDefinition intern( const ClassDefinition *v );
+
+It must find an existing class definition quickly and compare it with the
+given class definition. If they are equal, the existing class definition is
+returned. Otherwise, a new class definition is added and it's returned.
+
+A bytecode cache is at fast or faster than a corresponding class definition
+cache. A bytecode cache must return an instance of Bytecode when given a
+Bytecode object.
+
+const Bytecode intern( const Bytecode *v );
+
+The Bytecode class knows how to decode a class file. Its getThisClassSpec()
+method returns a class spec. For java.lang.Object, the class spec is
+java/lang/Object. The class spec is key to a large hash table. The large
+hash table contains one hash table for each class spec. In the following
+example, the C++ source has been translated to the equivalent for the Java
+programming language.
+
+  public Bytecode intern( Bytecode v ) {
+    String cs = v.getThisClassSpec();
+    Hashtable ch = findBytecode( v );
+    if ( ch == null ) {
+      return null;
+    }
+    Enumeration list = ch.keys();
+    for (;;) {
+      if ( !list.hasMoreElements() ) {
+        return null;
+      }
+
+      Bytecode item = (Bytecode) list.nextElement();
+      if ( item.getPayload().equals( v.getPayload() ) ) {
+        return item;
+      }
+    }
+  }
+  public Hashtable findBytecode( String v ) {
+    cache.get( &quot;java/lang/Object&quot; );
+  }
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000519.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000484.html">[JOS-Arch] [multiple process] Kernel class loader</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#480">[ date ]</a>
+              <a href="thread.html#480">[ thread ]</a>
+              <a href="subject.html#480">[ subject ]</a>
+              <a href="author.html#480">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

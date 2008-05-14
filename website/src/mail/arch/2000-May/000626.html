@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:donaldp%40mad.scientist.com">
+   <LINK REL="Previous"  HREF="000619.html">
+   <LINK REL="Next" HREF="000627.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</H1>
+    <B>Peter Donald</B> 
+    <A HREF="mailto:donaldp%40mad.scientist.com"
+       TITLE="[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs">donaldp@mad.scientist.com</A><BR>
+    <I>Fri, 19 May 2000 17:41:20 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000619.html">[JOS-Arch] [bytecode resource] Methods</A></li>
+        <LI> Next message: <A HREF="000627.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#626">[ date ]</a>
+              <a href="thread.html#626">[ thread ]</a>
+              <a href="subject.html#626">[ subject ]</a>
+              <a href="author.html#626">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi,
+
+Just joined the list if I say something stupid ignore me :P.
+
+At 03:00  19/5/00 -0400, you wrote:
+&gt;<i>Not entirely. A process is owned by a user and is granted the
+</I>&gt;<i>permissions of that user (eg. permission to write to /home/john/*).
+</I>&gt;<i>Since a servlet engine is a single process, it grants the same
+</I>&gt;<i>permissions to every servlet running, and ideally you would like to
+</I>&gt;<i>grant each servlet its own permission set (different users running
+</I>&gt;<i>different servlets intending to be accessed on the same standard port).
+</I>
+There is also an arguement for allowing a single user to have multiple
+permission sets depending on a number of factors. For example, source of
+code is an important factor in current browsers when they allocate
+permissions. ie you can have un-trusted, semi-trusted, trusted applets
+running around each with their own security sets. Security could also be
+based on the signee of code or various other factors ...
+
+It could be very useful on a OS level. Consider the latest email hijinx.
+This could have been stoped if the attatchment had been forced to run in a
+secure sandbox. Big corporations may even go to the extreme of only
+allowing code that has been signed by them to run with any useful
+permissions. 
+
+&gt;<i>This means it would be useful to invent something to contain a servlet.
+</I>&gt;<i>It could be a threadless process (contradiction?), or it could be
+</I>&gt;<i>something else. 
+</I>
+How about something like unix su command that changes the permissions of
+running process to appropriate individual. The permissions could then be
+changed back after that particular servlet had serviced it's client.
+
+&gt;<i>Subject: Re: [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes
+</I>&gt;&gt;<i> &gt; There is actually a placeholder method in my code,
+</I>&gt;&gt;<i> &gt; JavaProcess.reuseClassLoader(). That was based on your original idea of
+</I>&gt;&gt;<i> &gt; sharing classes, not class definitions. Perhaps we need one for reusing
+</I>&gt;&gt;<i> &gt; class definitions too.
+</I>&gt;&gt;<i> 
+</I>&gt;&gt;<i>         I think we've shown that you can't legitimately share whole
+</I>&gt;&gt;<i> classes between processes, but I'm not sure.  And designing it will be a
+</I>&gt;&gt;<i> pain -- and I agree that we can sit on this for six months.
+</I>
+This could cause problems in two cases that I can see. 
+
+* Accessing statics as you said means that each process has to own it's own
+copy of the static
+
+* JIT either is forced to only optimise code that is inside class but can
+never inline code from other classes. For instance if in class A you use
+String objects. The method calls can never be inlined because another
+process may load a different version of String.
+
+Thus you only really end up sharing the raw bytecode and constant pool
+which could and you have to make sure that when it is shared the source
+.class files are identical.
+
+Another thing in a single process is defined by it's classloader + class. I
+once tried to write a builder program (think GUI builder but not) and had
+to juggle classloaders to make sure that .class files could be loaded even
+if there was a class with tthe same name.
+
+
+Cheers,
+
+Pete
+
+*------------------------------------------------------*
+|<i> &quot;Nearly all men can stand adversity, but if you want |
+</I>|<i> to test a man's character, give him power.&quot;          |
+</I>|<i>       -Abraham Lincoln                               |
+</I>*------------------------------------------------------*
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000619.html">[JOS-Arch] [bytecode resource] Methods</A></li>
+	<LI> Next message: <A HREF="000627.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#626">[ date ]</a>
+              <a href="thread.html#626">[ thread ]</a>
+              <a href="subject.html#626">[ subject ]</a>
+              <a href="author.html#626">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

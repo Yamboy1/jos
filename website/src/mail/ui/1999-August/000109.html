@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Re: [JOS-Kernel] Garbage collection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   
+   <LINK REL="Next" HREF="000110.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Re: [JOS-Kernel] Garbage collection</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-UI] Re: [JOS-Kernel] Garbage collection">jm@mak.com</A><BR>
+    <I>Thu, 05 Aug 1999 09:35:05 -0400</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000110.html">[JOS-UI] Mac L&amp;F</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#109">[ date ]</a>
+              <a href="thread.html#109">[ thread ]</a>
+              <a href="subject.html#109">[ subject ]</a>
+              <a href="author.html#109">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi George (and others);
+
+<A HREF="mailto:George.Marrows@Smallworld.co.uk">George.Marrows@Smallworld.co.uk</A> wrote:
+&gt;<i>         [GAM]  Hmm.. plenty of warnings about doing arithmetic with void*.
+</I>&gt;<i> I'll sort them out.
+</I>
+Yeah, this particular embarrassment is my fault, not Todd's.  It worked, so I
+focussed upon new functionality, not cleaning it up.  If you have already done
+so, please let me know.  If not, this would be a good time to also put in Robert
+Fitzsimons' (Hi, Robert!) code to enable booting via GRUB (I seem to recall
+that, amongst the worst offenders in generating warnings, was the code which
+looked for the Etherboot-specific data structures located in various bits of
+memory...)
+
+&gt;<i>         [GAM]  I propose to put the gc code in a separate directory:
+</I>&gt;<i> common/nativecode/gc. How does that sound? It's currently in
+</I>&gt;<i> common/nativecode, but it bloats that directory somewhat. Now I've just got
+</I>&gt;<i> to sort out the accursed makefile :-(
+</I>
+OK.  Works for me.  Sorry about the makefile trouble.  If there's a better way
+to do this, I'd sure be interested...  I think we have similar problems in the
+bytecode directory, in that we have no platform-specific bytecode files (e.g.,
+VGA driver) yet.
+
+Hmm... this also brings up the issue of debugging this stuff under UNIX.  Should
+we try and build the host version with libVGA (or whatever it's called)? 
+libGGI?  I don't know either of them.  Anybody out there with any ideas (&quot;Hi&quot;
+and &quot;help,&quot; <A HREF="mailto:UI@jos.org">UI@jos.org</A> guys -- check out recent kernel postings about a VGA
+driver working)...
+
+&gt;<i>         [GAM]  I'll see if I can work out a modified interface for jbheap
+</I>&gt;<i> earlier than the 14th. It needs to allow the rest of JJOS pass back
+</I>&gt;<i> information about roots and kick off an on-demand garbage collect, in
+</I>&gt;<i> addition to jbheap's current allocate functionality.
+</I>
+Fabulous!  I look forward to this with great anticipation.  It'll enable us to
+keep jjos+decaf running long enough to be interesting!
+
+&gt;<i> &gt; &gt; with this: do we need to look in registers; how to find top and bottom
+</I>&gt;<i> &gt; of
+</I>&gt;<i> &gt; &gt; the native code stack for scanning.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; I'm thinking with green threads we won't have to, but that's based upon a
+</I>&gt;<i> &gt; whole
+</I>&gt;<i> &gt; 10 seconds of thought...  Todd, what sayest thou?
+</I>&gt;<i> &gt;
+</I>&gt;<i>         [GAM]  But if I'm also doing gc for the C++ code, and the only ref
+</I>&gt;<i> to some C++ heap object is in a local variable somewhere on the native code
+</I>&gt;<i> stack, I'll need to find that ref. Otherwise that object is gone (or rather,
+</I>&gt;<i> the memory for it doesn't get marked as in use and could end up being reused
+</I>&gt;<i> for something else, which in turn could lead to some very nasty bugs).
+</I>
+The location of the sole native-code stack (sole because we're not doing
+multithreading yet in the kernel) is easily-computable at the point where you
+need to scan for the GC roots.  Right now (I don't have the sources in front of
+me, so this is from memory), I think there's a magic value that gets crammed
+into the stack pointer register (2MB?), but I don't think this is saved into any
+easily-accessible-from-C++ variable, although the heap-initialization code
+*does* avoid stepping on the stack.  Sorry...  I can fix this...  Really!
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000110.html">[JOS-UI] Mac L&amp;F</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#109">[ date ]</a>
+              <a href="thread.html#109">[ thread ]</a>
+              <a href="subject.html#109">[ subject ]</a>
+              <a href="author.html#109">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

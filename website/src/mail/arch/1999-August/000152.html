@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000147.html">
+   <LINK REL="Next" HREF="000163.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Program and ProgramContext">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 12 Aug 1999 19:09:42 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000147.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000163.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#152">[ date ]</a>
+              <a href="thread.html#152">[ thread ]</a>
+              <a href="subject.html#152">[ subject ]</a>
+              <a href="author.html#152">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>         In our case, JOS.  (See above.)  However, I do have an argument in
+</I>&gt;<i> favor of pipes and redirection, aside from the obvious (they work and we
+</I>&gt;<i> know how to use them) -- streams are a good model for IPC.  Because JOS is
+</I>&gt;<i> not Unix, we can do interesting things with streams, like reflecting on
+</I>&gt;<i> them to find out what kind of stream it is, or asking the stream object
+</I>&gt;<i> what data it thinks it's carrying.
+</I>
+I agree that pipes and redirection are useful. What I meant to say was
+that of the two models for linking tiny programs together to achieve an
+outcome, I think JavaBeans is more useful than UNIX pipes:
+
+1. UNIX pipes are usually linear because UNIX processes typically read
+from stdin and write to stdout. It is difficult to achieve the effect of
+parallel and forking pipes.
+
+2. JavaBeans have multiple entry points (one for each method) where as
+UNIX processes have a single entry (stdin) and a dodgy way of switching
+its function (command-line arguments).
+
+3. It is possible to overlay pipes on top of JavaBeans in the cases
+where pipes are extremely useful (eg. filters).
+
+As for IPC, you are right that we definitely need streams. The
+usefulness of method invocations (when it is desirable) can be emulated
+through RMI on top of streams.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000147.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000163.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#152">[ date ]</a>
+              <a href="thread.html#152">[ thread ]</a>
+              <a href="subject.html#152">[ subject ]</a>
+              <a href="author.html#152">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

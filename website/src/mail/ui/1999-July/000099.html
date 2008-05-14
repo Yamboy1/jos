@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] general idea</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:scribbs%40ida.org">
+   <LINK REL="Previous"  HREF="000098.html">
+   <LINK REL="Next" HREF="000101.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] general idea</H1>
+    <B>Sean Cribbs</B> 
+    <A HREF="mailto:scribbs%40ida.org"
+       TITLE="[JOS-UI] general idea">scribbs@ida.org</A><BR>
+    <I>Thu, 29 Jul 1999 13:09:07 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000098.html">[JOS-UI] general idea</A></li>
+        <LI> Next message: <A HREF="000101.html">[JOS-UI] general idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#99">[ date ]</a>
+              <a href="thread.html#99">[ thread ]</a>
+              <a href="subject.html#99">[ subject ]</a>
+              <a href="author.html#99">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Corevisions wrote:
+&gt;<i> 
+</I>&gt;<i> hi .. i just read the ui discussion about widgets and have some
+</I>&gt;<i> questions and ideas about it ..(think they are not really finished so
+</I>&gt;<i> excuse me).
+</I>&gt;<i> 
+</I>&gt;<i> first i want to give you my idea of how JOS should work ...
+</I>&gt;<i> 
+</I>&gt;<i> - the first thing JOS should do on bootup is to initialize the desktop
+</I>&gt;<i> (like MacOS) so you have no text based views
+</I>
+I disagree.  While I believe that a gui-only system is nice, many people
+prefer text-based user interfaces or command-line interfaces.  Plus,
+they are much simpler to create and will give us something to test our
+code on once the bare-bones system is ready.
+
+&gt;<i> - with a special keycombination you can now enter the system-setup where
+</I>&gt;<i> you can add/remove drivers etc
+</I>
+Hmm... I don't know if this is necessary because JOS is supposed to
+allow users to specify drivers while the system (gui/cli/etc) is
+running.  Most driver changes should not require a reboot or special
+startup selection procedures.
+
+&gt;<i> 
+</I>&gt;<i> i think of a fully plugable system :
+</I>&gt;<i> 
+</I>&gt;<i>   ROOT
+</I>&gt;<i>    |- driver
+</I>&gt;<i>    |  |- sound
+</I>&gt;<i>    |  |  |- (driver) soundblaster
+</I>&gt;<i>    |  |  |- (driver) MPU401 comp
+</I>&gt;<i>    |  |  .
+</I>&gt;<i>    |  |
+</I>&gt;<i>    |  |- video
+</I>&gt;<i>    |  |  |- (driver) VESA gfx
+</I>&gt;<i>    |  |  |- (driver) OpenGL
+</I>&gt;<i>    |  |  .
+</I>&gt;<i>    |  |
+</I>&gt;<i>    |  |- filesystem
+</I>&gt;<i>    |  |  |- (driver) JOSFs
+</I>&gt;<i>    |  |  |- (driver) FAT
+</I>&gt;<i>    |  |  |- (driver) Amiga FFS
+</I>&gt;<i>    |  |  .
+</I>&gt;<i>    |  .
+</I>&gt;<i>    |
+</I>&gt;<i>    |- ui
+</I>&gt;<i>    |  |- desktop
+</I>&gt;<i>    |  |  |- (desktop) standard JOS desktop _OR_ (desktop) experimental
+</I>&gt;<i> 3D desktop
+</I>&gt;<i>    |  |  .
+</I>&gt;<i>    |  |
+</I>&gt;<i>    |  |- l&amp;f
+</I>&gt;<i>    |  |  |- (l&amp;f) Swing _OR_ (l&amp;f) MacOS X Server _OR_ ...
+</I>&gt;<i>    |  |  .
+</I>&gt;<i>    |  |
+</I>&gt;<i>    |  .
+</I>&gt;<i>    .
+</I>
+There are already many packages specified... see the Packages page on
+the JOS Wiki.
+
+&gt;<i> 
+</I>&gt;<i> this should be stored somewhere and all things should be implemented on
+</I>&gt;<i> startup
+</I>
+What are you trying to say?  If you're referring to a registry, there is
+already one in the making.
+
+&gt;<i> 
+</I>&gt;<i> of couse you will need interfaces like
+</I>&gt;<i> 
+</I>&gt;<i>   public class W9XlikeDesktop extends JOSDesktop
+</I>&gt;<i> 
+</I>&gt;<i> or
+</I>&gt;<i> 
+</I>&gt;<i>   public class JOSFS_AmigaFFS extends JOSFileSystem
+</I>&gt;<i> 
+</I>&gt;<i> - this should be the maximum the system should provide to the user. all
+</I>&gt;<i> other things should be plugged into it to asure
+</I>&gt;<i>   a maximum of configurability
+</I>
+I agree that it should be maximally configurable, but I think it's a
+little early to say what initial OOB configuration should be.
+
+&gt;<i> 
+</I>&gt;<i> sorry if it is not really part of the ui section.
+</I>&gt;<i> please give me a response and more of your ideas ...
+</I>&gt;<i> 
+</I>&gt;<i> btw how exactly shold JADE work ? are there any links on the JOS page ?
+</I>
+AFAIK from discussions with Digigod, JADE is the underlying system upon
+which all UIs rest.  It provides things that are common among the UIs,
+like receiving keystrokes, handling graphics devices, input devices, and
+other output devices.  The other UIs can be then defined using JADE as
+the workbeast.  For example, a Traditional GUI would ask JADE to put the
+video card in graphics mode, and ask for a specific part of the screen
+to draw on.  It would not have to know how all of this is being done. 
+JADE is for UIs what OO is for imperative programming -- hiding all the
+work behind a nice interface, and making it reusable.
+
+Sean Cribbs,
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000098.html">[JOS-UI] general idea</A></li>
+	<LI> Next message: <A HREF="000101.html">[JOS-UI] general idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#99">[ date ]</a>
+              <a href="thread.html#99">[ thread ]</a>
+              <a href="subject.html#99">[ subject ]</a>
+              <a href="author.html#99">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

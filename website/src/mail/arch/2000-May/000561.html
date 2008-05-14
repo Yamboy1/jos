@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000557.html">
+   <LINK REL="Next" HREF="000562.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 04 May 2000 09:52:47 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000557.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000562.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#561">[ date ]</a>
+              <a href="thread.html#561">[ thread ]</a>
+              <a href="subject.html#561">[ subject ]</a>
+              <a href="author.html#561">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; The key reference when talking about the GC is the reference from the
+</I>&gt;<i> &gt; shared object to its owning process (via the ProcessClassLoader).
+</I>&gt;<i> 
+</I>&gt;<i>         Which is maintained in the kernel.  Therefore, we can program the
+</I>&gt;<i> garbage collector to ignore it.  (And if we've got a GC that ignores
+</I>&gt;<i> reference cycles for purposes of determining liveness -- which it can do,
+</I>&gt;<i> when it runs a GC from the root -- we don't need this, either.)
+</I>
+I'm not sure this is a good idea. If the GC ignores the link from
+ProcessClassLoader to ClassLoader, you also need to ensure that the
+reference value of this link becomes null. And a better way to
+accomplish the same thing would probably be to simply set this reference
+to null the standard way. But what are the implications? Well for
+starters, ProcessManager.getOwningProcess() will fail, and I think this
+is conceptually bad. Setting this reference to point to another process
+rather than null would be better, and a better way of doing this is to
+re-assign the class loader link as I have been saying.
+
+I don't know if I understand you're goal here. What makes it desirable
+to break the conceptual model? (ie. that an object is always contained
+within a process)
+
+&gt;<i> &gt; Not its entire memory tree. If another process has a reference to one of
+</I>&gt;<i> &gt; its shared objects, the memory tree of that object will hang around in
+</I>&gt;<i> &gt; memory.
+</I>&gt;<i> 
+</I>&gt;<i>         I should have said, its exclusive tree.  Anything shared is now in
+</I>&gt;<i> someone else's tree as well... which sounds alot like shared 'ownership',
+</I>&gt;<i> doesn't it? :)
+</I>
+The way I have been seeing it (as I described in another email) is that
+there is a difference between sharing ownership and sharing access. This
+looks like sharing access - meaning that there is still an original
+owner and that affects things when you find that the owning process is
+hanging around in memory until the other processes let go of the shared
+object which it owns.
+
+&gt;<i> &gt; You want to depend on a dead process for functionality? I think that if
+</I>&gt;<i> &gt; a process was ever alive, its purpose was to live, and any functionality
+</I>&gt;<i> &gt; you're talking about should be carried on while it is still alive.
+</I>&gt;<i> 
+</I>&gt;<i>         Exactly.  Therefore, something absolutely terrible should happen
+</I>&gt;<i> to the shared object if the process it depends on for functionality is
+</I>&gt;<i> killed.  The handling of such objects is an open question; weak references
+</I>&gt;<i> are designed to allow something awful to happen (e.g. GC), so they seemed
+</I>&gt;<i> like a natural answer to me.
+</I>
+So, the functionality you're depending on in the dead process is to make
+something terrible happen. Fair enough.
+
+&gt;<i> &gt; However, and this is an idea I couldn't work out how to implement until
+</I>&gt;<i> &gt; you gave me the idea, it might be desirable to have processes that have
+</I>&gt;<i> &gt; no threads.
+</I>&gt;<i> 
+</I>&gt;<i>         The 'ObjectBroker' process comes to mind.  It may be
+</I>&gt;<i> cleaner/easier to implement this as a process that has a single thread
+</I>&gt;<i> whose run() method is &quot;sleep();&quot;, though.
+</I>
+Maybe the ObjectBroker might want to have its own threads to do other
+stuff anyway. I suppose you could implement the ObjectBroker the way you
+suggested. But I would like something more convenient for embedded
+programs like servlets where the parent server simply calls
+servlet.service(request, response) and the code in that method is
+restricted to its namespace and its own UserToken. When you look at the
+way the service() method is called, it is natural that the thread is
+owned by the parent process, and the servlet doesn't actually have its
+own thread. JDK 1.2 has the concept of changing privileges granted to
+the running code depending on where the current class was loaded from.
+That's sort of what I want. I need to work on the idea some more.
+
+&gt;<i>         I understand now.  (I think.  I sure didn't before.)  The proposal
+</I>&gt;<i> is that the kerne/JVM adds only ownership-reassignment, and the user
+</I>&gt;<i> library can provide the rest of the sharing API and implementation.
+</I>
+Right. And the ownership-reassignment function depends on how we share
+class definitions w.r.t. superclasses. See my response to Matt's email
+for my thoughts on that. If we only share class definitions if the
+superclasses also share class definitions, then ownership-reassignment
+can easily be managed for all superclasses. If we can share class
+definitions independently of the superclasses, then ownership
+reassignment may fail if the superclasses don't match.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000557.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000562.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#561">[ date ]</a>
+              <a href="thread.html#561">[ thread ]</a>
+              <a href="subject.html#561">[ subject ]</a>
+              <a href="author.html#561">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

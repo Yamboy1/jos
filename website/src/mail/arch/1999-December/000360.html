@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Classpath Project</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000358.html">
+   <LINK REL="Next" HREF="000353.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Classpath Project</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Classpath Project">tmiller@haverford.edu</A><BR>
+    <I>Thu, 30 Dec 1999 13:20:54 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000358.html">[JOS-Arch] Classpath Project</A></li>
+        <LI> Next message: <A HREF="000353.html">[JOS-Arch] Smart API Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#360">[ date ]</a>
+              <a href="thread.html#360">[ thread ]</a>
+              <a href="subject.html#360">[ subject ]</a>
+              <a href="author.html#360">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Okay, I understand the desire for the org.classpath namespace
+now; my apologies for being obtuse.  Nonetheless, their system is intended
+as a drop-in class library for japhar (and kaffe), so it makes sense from
+their p.o.v. to just go ahead and name their stuff 'right' the first
+time.  I don't think we'll be able to change their minds...
+
+	Regarding the class library as not strictly integrated with the
+Virtual Machine, you're quite right: technically, only a very few classes
+have anything at all to do with the virtual machine, and that it's the
+java.lang.* and company packages that make it a /java/ virtual
+machine.  A better phrasing would be &quot;the class library is an integral
+part of the java platform.&quot; 
+
+&gt;<i> A true core is defined as the packages that all virtual machines depends
+</I>&gt;<i> on. The true core is very small. There are only a few packages and few
+</I>&gt;<i> class that all virtual machines depends on.
+</I>
+	Yes.  Everything else -- aside from the native methods -- is or
+should be directly portable from library to library.
+
+&gt;<i> This does not include JVM-specific classes either. One virtual machine
+</I>&gt;<i> depends on a JVM-specific class.
+</I>
+	I believe Sun designed their library so that the overlap between
+this and the above is nearly complete, but I haven't checked.
+
+&gt;<i> Everything else is non-essential. While it might be nice to have all these
+</I>&gt;<i> packages in one namespace, it is unnecessary and undesireable to put
+</I>&gt;<i> non-essencial classes into the virtual machine specification.
+</I>
+	It is, unfortunately, what we're stuck with.
+
+&gt;<i> You understand what classpath means to us. What approach should we use?
+</I>&gt;<i> What plan should we have to help classpath put together the best cleanroom
+</I>&gt;<i> implementation of Java class libraries?
+</I>&gt;<i> 
+</I>&gt;<i> On the one hand, bad habits are hard to break. Classpath has already set
+</I>&gt;<i> precedent by developing their classes in the java.* namespace. How will
+</I>&gt;<i> they learn there's an easier way?
+</I>&gt;<i> 
+</I>&gt;<i> What are the implications of merging with gcj? Does it mean that I will be
+</I>&gt;<i> able to use C/C++ pre-processor with Java source code?
+</I>
+	While that would be nice, I'm not sure if it's the
+case.  (Actually, you can run java code through the C preprocessor by hand
+right now: cpp code.java.cpp | sed -e 's/#.*//' &gt; code.java; javac
+code.java -- where the sed removes the leading '# 1 &lt;filename&gt;' that cpp
+inserts.  YMMV.)
+
+&gt;<i> A bytecode verifier is important to the success of a Java-compatible
+</I>&gt;<i> virtual machine. I am still looking for the bytecode verifier in decaf.
+</I>
+	It's not there.  The only verification I perform what's implicit
+in checking for proper operation of the VM and clean .class files.
+
+-_Quinn
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000358.html">[JOS-Arch] Classpath Project</A></li>
+	<LI> Next message: <A HREF="000353.html">[JOS-Arch] Smart API Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#360">[ date ]</a>
+              <a href="thread.html#360">[ thread ]</a>
+              <a href="subject.html#360">[ subject ]</a>
+              <a href="author.html#360">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

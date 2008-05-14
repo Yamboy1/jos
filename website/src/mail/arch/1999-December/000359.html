@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Smart API Distribution</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000357.html">
+   <LINK REL="Next" HREF="000361.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Smart API Distribution</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Smart API Distribution">gchii@mindspring.com</A><BR>
+    <I>Thu, 30 Dec 1999 10:55:35 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000357.html">[JOS-Arch] Smart API Distribution</A></li>
+        <LI> Next message: <A HREF="000361.html">[JOS-Arch] Smart API Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#359">[ date ]</a>
+              <a href="thread.html#359">[ thread ]</a>
+              <a href="subject.html#359">[ subject ]</a>
+              <a href="author.html#359">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 03:22 PM 12/29/99 -0500, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>(Right now, I'm managing 8 machines 250 miles away without any problems at
+</I>&gt;<i>all, with one keyboard/mouse/monitor.  I'm using xterms, because I'm hooking
+</I>&gt;<i>up over a modem, but if I were on something faster, I could run X programs
+</I>&gt;<i>remotely just as easily.)
+</I>
+You are representative of all kinds of people. You manage 8 machines. You
+get involved in configuring and optimizing those eight machines. And yet,
+you only have one keyboard/mouse/monitor.
+
+In an evolutionary first step, I would like you to continue doing what you
+are already doing. Even with 8 machines were in the next room, it is easier
+to maintain them with one keyboard/mouse/monitor.
+
+-----
+
+From my viewpoint, a server-farm-in-a-box must never be a 16-way cluster of
+16-way SMPs. By my definition, a 16-CPU SMP would only be one &quot;unit&quot;.
+
+Units always use a network interface card for inter-machine communication
+-- just like all other serverfarms. Each unit in a serverfarm-in-a-box must
+be a wholy independent general purpose processor, like a PC. It never uses
+&quot;shared memory&quot; to communicate between processors.
+
+You have 8 machines that are 250 miles away. Are all 8 machine in the same
+server closet? Are all 8 in close physical proximity?
+
+Imagine I have 8 machines in a room next door. Why do these 8 machines need
+8 separate power supplies. Why do they need 8 separate cases? Why did I
+need to purchase 8 separate motherboards, with one CPU on each motherboard?
+
+A serverfarm-in-a-box is useful if I would normally go out and buy eight
+(or more) separate PCs and put them together in a serverfarm. I would buy
+one case, with one power supply. I could buy all 8 PCs at once, one box,
+one transaction.
+
+Between these 8 machines, I would have no network cabling exposed. By
+optimizing such a design, I could eliminate the need for 8 separate
+&quot;motherboards&quot;. Optimization would combine 8 PCs on single card, while
+maintaining indepdendence.
+
+It might be possible to engineer &quot;network interface cards&quot; for a
+serverfarm-in-a-box that does not physically have an ethernet cable.
+Network interface cards can be integrated into the motherboard.
+
+-----
+
+With one computer, I am always waiting. I type in a command to recompile
+something like the source code from Source Server. Then I have to wait for
+what seems like an eternity to type in the next command. My computer is
+never fast enough to do all the things I want to do. Programmers use
+computers, too.
+
+I want a hardware architecture that frees us from the idea that speed comes
+from faster and faster CPUs. The Internet is proof that large scale
+distributed processing is possible with &quot;slow&quot; CPUs. A serverfarm-in-a-box
+takes the successful model of the Internet and brings it &quot;home&quot; to a small
+or medium sized office. Where else can hardware manufacturers go?
+
+I believe the only &quot;thing&quot; missing from a serverfarm-in-a-box is a suitable
+operating system. None of these other &quot;stand-alone&quot; operating systems will
+do because they are not scaleable.
+
+-----
+
+I have experimented with &quot;agents&quot; in my lab. An agent cooperates with its
+agent environment to move around from one agent environment to another.
+Typically, an agent is serialized on one agent environment and deserialized
+on another.
+
+On a single machine, I can have two agent environments, each in its own
+process, connected by TCP/IP. Through a priority scheme, I designed an
+agent that changes its own priority. The &quot;high priority&quot; environment has
+one and only one agent running at a time. The &quot;low priority&quot; environment
+has more than one agent running, each in its own thread. A change in
+priority might cause the agent environment to &quot;move&quot; it to the other
+environment.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000357.html">[JOS-Arch] Smart API Distribution</A></li>
+	<LI> Next message: <A HREF="000361.html">[JOS-Arch] Smart API Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#359">[ date ]</a>
+              <a href="thread.html#359">[ thread ]</a>
+              <a href="subject.html#359">[ subject ]</a>
+              <a href="author.html#359">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

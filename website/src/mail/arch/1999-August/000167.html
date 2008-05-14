@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000161.html">
+   <LINK REL="Next" HREF="000171.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Program and ProgramContext">digigod@earthling.net</A><BR>
+    <I>Thu, 12 Aug 1999 19:54:29 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000161.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000171.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#167">[ date ]</a>
+              <a href="thread.html#167">[ thread ]</a>
+              <a href="subject.html#167">[ subject ]</a>
+              <a href="author.html#167">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> I is about time I used an example of how test1, test2 and test3 *should* work.
+</I>&gt;<i> 
+</I>&gt;<i> // Application.java
+</I>&gt;<i> public abstract Application
+</I>&gt;<i>     implements Program {
+</I>&gt;<i>   public Application() {
+</I>&gt;<i>   }
+</I>&gt;<i>   public ProgramContext getProgramContext() {
+</I>&gt;<i>     return context;
+</I>&gt;<i>   }
+</I>&gt;<i>   public void setProgramContext( ProgramContext v ) {
+</I>&gt;<i>     context = v;
+</I>&gt;<i>   }
+</I>&gt;<i>   public void exit( int v ) {
+</I>&gt;<i>     context.setResultCode( (byte) v );
+</I>&gt;<i>   }
+</I>&gt;<i>   private ProgramContext context = null;
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> // test1.java
+</I>&gt;<i> public class test1
+</I>&gt;<i>     extends Application {
+</I>&gt;<i>   public test1() {
+</I>&gt;<i>   }
+</I>&gt;<i>   public void run() {
+</I>&gt;<i>     System.out.println( &quot;Running &quot; + getClass().getName() + &quot;...&quot; );
+</I>&gt;<i>     System.out.println( &quot;one&quot; );
+</I>&gt;<i>   }
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> // test2.java
+</I>&gt;<i> public class test2
+</I>&gt;<i>     extends test1 {
+</I>&gt;<i>   public test2() {
+</I>&gt;<i>     super();
+</I>&gt;<i>   }
+</I>&gt;<i>   public void run() {
+</I>&gt;<i>     super.run();
+</I>&gt;<i>     System.out.println( &quot;two&quot; );
+</I>&gt;<i>   }
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> // test3.java
+</I>&gt;<i> public class test3
+</I>&gt;<i>     extends test1 {
+</I>&gt;<i>   public test3() {
+</I>&gt;<i>   }
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> $ test1
+</I>&gt;<i> Running test1...
+</I>&gt;<i> one
+</I>&gt;<i> 
+</I>&gt;<i> $ test2
+</I>&gt;<i> Running test2...
+</I>&gt;<i> one
+</I>&gt;<i> two
+</I>&gt;<i> 
+</I>&gt;<i> $ test3
+</I>&gt;<i> Running test3...
+</I>&gt;<i> one
+</I>&gt;<i> 
+</I>&gt;<i> This uses all non-static methods and, in Java, benefits from all that
+</I>&gt;<i> object-oriented stuff. You should put all of the common functionality of a
+</I>&gt;<i> program into a base class and reuse it. With a Program and ProgramContext,
+</I>&gt;<i> you can.
+</I>
+ok, I see what you mean; but also note that you could do this with my
+application class just as easily, or you could do something like:
+
+public class apptop {
+ protected static apptop realapp;
+ static {
+  realapp = new apptop();
+ }
+ public static void main(String args[]) {
+  realapp.realmain();
+ }
+ public void realmain() {
+  System.out.print(&quot;Hello&quot;);
+ }
+}
+
+public class appbot extends apptop {
+ static {
+  realapp = new appbot();
+ }
+ public void realmain() {
+  super.realmain();
+  System.out.print(&quot; world.&quot;);
+ }
+}
+
+
+note that this static initializer &quot;trick&quot; is what I use in my app class,
+a workaround nesseacary for the program to run both as a regular
+application and have the ability to be used in another easily. 
+
+&gt;<i> Historical note: Please don't take this as a critisism of the command-line
+</I>&gt;<i> utilities. The command-line utilities are great! Each command line utility
+</I>&gt;<i> has common functionality. With a stronger model for &quot;programs&quot;, that
+</I>&gt;<i> bytecode could have been stored only once, not duplicated in each archive.
+</I>
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000161.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000171.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#167">[ date ]</a>
+              <a href="thread.html#167">[ thread ]</a>
+              <a href="subject.html#167">[ subject ]</a>
+              <a href="author.html#167">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

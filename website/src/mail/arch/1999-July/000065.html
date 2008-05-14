@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Multi-process VM</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000064.html">
+   <LINK REL="Next" HREF="000052.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Multi-process VM</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Multi-process VM">tmiller@haverford.edu</A><BR>
+    <I>Tue, 27 Jul 1999 20:32:44 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000064.html">[JOS-Arch] Multi-process VM</A></li>
+        <LI> Next message: <A HREF="000052.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#65">[ date ]</a>
+              <a href="thread.html#65">[ thread ]</a>
+              <a href="subject.html#65">[ subject ]</a>
+              <a href="author.html#65">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I have been looking for this mechanism in the wrong place. IF we have a
+</I>&gt;<i> single process JVM that works, why can't we create multiple instances of
+</I>&gt;<i> it? We should plan to create a multiple process JVM in three steps: (1)
+</I>&gt;<i> single-process, (2) inefficient multi-process, (3) streamlined multi-process.
+</I>
+	Primarily because multiple native threads/processes is an
+enourmous project for the kernel author.  Once we had such a kernel,
+however, it would be another project of only slightly lesser difficulty to
+make such an arrangement efficient, because we'd have to implement IPC and
+all that attendant nastiness.  (Basically, we'd be implementing
+multi-processor support without the benefit of a second processor...)
+Aside from the difficulties of groundwork (including a new garbage
+collector!), the interperter currently assumes that it can't be
+interrupted in the middle of a java bytecode.  Allowing this to happen
+would be Very Bad Mojo, and either of the ways to handle it (forbidding it
+to happen, or rewriting to make it safe) are labor and code intensive. 
+
+-_Quinn
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000064.html">[JOS-Arch] Multi-process VM</A></li>
+	<LI> Next message: <A HREF="000052.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#65">[ date ]</a>
+              <a href="thread.html#65">[ thread ]</a>
+              <a href="subject.html#65">[ subject ]</a>
+              <a href="author.html#65">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

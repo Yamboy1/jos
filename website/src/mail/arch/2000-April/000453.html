@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Great discussion!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000451.html">
+   <LINK REL="Next" HREF="000457.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Great discussion!</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Great discussion!">gchii@mindspring.com</A><BR>
+    <I>Tue, 11 Apr 2000 20:59:36 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000451.html">[JOS-Arch] (testing... for a third time...)</A></li>
+        <LI> Next message: <A HREF="000457.html">[JOS-Arch] [multiple process] Great discussion!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#453">[ date ]</a>
+              <a href="thread.html#453">[ thread ]</a>
+              <a href="subject.html#453">[ subject ]</a>
+              <a href="author.html#453">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Thank you for this discussion on the architecture mailing list. It has been
+great. I hope we can keep it going. Today, I have a much better idea about
+what it will take to create a multiple process virtual machine.
+
+1. I recommend a &quot;MPCL/M&quot; design for a first pass at jJOS/decaf.
+
+MPLC/M is &quot;multiple primordial class loader in machine code&quot;. Inside the
+jJOS/decaf, there is only one machine code process. The kernel and virtual
+machine are a primary machine code process. Kernel modules are machine code
+extensions. They run within the primary machine code process.
+
+2. I recommend a &quot;MPCL/B&quot; design for a second pass.
+
+MPCL/B is &quot;multiple primordial class loader in bytecode&quot;. MPCL/B -- as far
+as I can tell -- depends on our ability to demonstrate MPLC/M. MPLC/M
+should come first.
+
+3. I cannot ignore the JNI design.
+
+The JNI design won't go away. The JNI design also provides multiple
+bytecode processes within a machine code process. Multiple instances of a
+virtual machine is infinitely more complex.
+
+On the other hand, it ensures that each bytecode process has its own heap,
+its own garbage collector, its own user interface thread, and its own
+finalizer thread.
+
+For more information, see also ProcessDiagramJNI.
+
+4. I stand corrected.
+
+For the first time, I see that it is not necessary to have multiple
+instances of a virtual machine to accomplish multiple processes in
+bytecode. By constantly chipping away at the assumptions of the Java
+Virtual Machine Specification, the JOS Project has convinced me that the
+primordial class loader is the critical component.
+
+A virtual machine can have many primordial class loaders. And, these class
+loaders can be hybrid classes, implimented partly in machine code and
+partly in bytecode.
+
+Enabling more than one primordial class loader seems to be the minimum
+clarification to the Java Virtual Machine Specification that give us
+multiple bytecode processes.
+
+5. I have been too concerned with efficiency.
+
+I am sorry. I have been working long and hard on the efficiency of a
+bytecode cache. We can enjoy multiple processes for a long time before we
+need to be concerned with virtual machine efficiency.
+
+IF ONLY we had a virtual memory manager and a 10GB swap partition, we could
+load 20+MB of bytecode for each process and really not worry about it.
+
+Before we optimize a bytecode cache, or class definition cache, or class
+cache, we should demonstrate a multiple process virtual machine (MPVM).
+
+6. Demonstration
+
+When I boot JOS from the JOS Binary Distribution, it should invoke init. In
+turn, init should run a command line shell in a new user process. From the
+keyboard, I should be able to type the name of a runnable class using a
+line editor. By the way, /all/ implementations of org.jos.program2a.Program
+are runnable.
+
+When I press enter, the shell program should create a new user process. The
+new user process re-loads parts of the Java standard class library. The
+runnable class runs in the new user process.
+
+We should invent the classpath application. The classpath application might
+re-set the classpath property of a shell -- for creating user processes in
+the future.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000451.html">[JOS-Arch] (testing... for a third time...)</A></li>
+	<LI> Next message: <A HREF="000457.html">[JOS-Arch] [multiple process] Great discussion!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#453">[ date ]</a>
+              <a href="thread.html#453">[ thread ]</a>
+              <a href="subject.html#453">[ subject ]</a>
+              <a href="author.html#453">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [test case] JDSK</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000607.html">
+   <LINK REL="Next" HREF="000616.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [test case] JDSK</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [test case] JDSK">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 18 May 2000 18:10:51 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000607.html">[JOS-Arch] [test case] JDSK</A></li>
+        <LI> Next message: <A HREF="000616.html">[JOS-Arch] [test case] JDSK</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#618">[ date ]</a>
+              <a href="thread.html#618">[ thread ]</a>
+              <a href="subject.html#618">[ subject ]</a>
+              <a href="author.html#618">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&quot; wrote:
+
+&gt;<i> Hmm, as I remember one of the initial things about servlets that made them
+</I>&gt;<i> &quot;cool&quot; was the fact that you didn't need to start a new process to handle
+</I>&gt;<i> each request.
+</I>
+I think he meant just to test the behaviour of the servletrunner
+process, not the termination of individual servlets (correct me if I'm
+wrong).
+
+&gt;<i> In a classic UNIX environment you need the protection that a process
+</I>&gt;<i> provides (because of user rights, ability to access all process memory
+</I>&gt;<i> etc), but with Java this falls away.
+</I>
+Not entirely. A process is owned by a user and is granted the
+permissions of that user (eg. permission to write to /home/john/*).
+Since a servlet engine is a single process, it grants the same
+permissions to every servlet running, and ideally you would like to
+grant each servlet its own permission set (different users running
+different servlets intending to be accessed on the same standard port).
+
+This means it would be useful to invent something to contain a servlet.
+It could be a threadless process (contradiction?), or it could be
+something else. Perhaps these two things, whatever they are, inherit
+from a base class this commonality:
+
+- They are both owned by users.
+- They are both restricted by a permission set.
+- They can both potentially exist in separate namespaces. 
+
+The third one is interesting because it allows you to run two different
+versions of the same servlet in the same servlet engine. My ideas on
+this are incomplete at the moment so if you have anything to add, you're
+very welcome.
+
+&gt;<i> I don't think Java protects very well against a rogue servlet spawning
+</I>&gt;<i> many threads and consuming lots of CPU time though.
+</I>
+Good point. It is the duty of an operating system to place restrictions
+on resources like this. For example, max processes per user, max threads
+per process, max memory usage per user/per process etc. I haven't worked
+out where it fits in yet.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000607.html">[JOS-Arch] [test case] JDSK</A></li>
+	<LI> Next message: <A HREF="000616.html">[JOS-Arch] [test case] JDSK</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#618">[ date ]</a>
+              <a href="thread.html#618">[ thread ]</a>
+              <a href="subject.html#618">[ subject ]</a>
+              <a href="author.html#618">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

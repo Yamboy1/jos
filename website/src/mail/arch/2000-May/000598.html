@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000595.html">
+   <LINK REL="Next" HREF="000600.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">gchii@mindspring.com</A><BR>
+    <I>Wed, 17 May 2000 14:11:47 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000595.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000600.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#598">[ date ]</a>
+              <a href="thread.html#598">[ thread ]</a>
+              <a href="subject.html#598">[ subject ]</a>
+              <a href="author.html#598">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Let's get back to the discussion. The reloading of classes cannot be
+ignored. Each process has its own potentially unique CLASSPATH. So, each
+process must load its own classes.
+
+All classes must be unique to a bytecode process. None can be shared
+without a proxy. Each class in process A must be different than each class
+in process B. When the process is garbage collected, all of its classes are
+garbage collected.
+
+In a classic design, all classes in a virtual machine are discarded when a
+virtual machine dies. In a JNI design, all classes in a virtual machine are
+discarded when a virtual machine dies. Sometimes, these classes are not
+even finalized.
+
+When a Java application runs inside a MPCL-compatible virtual machine, all
+of its classes must be discarded when a process dies. All classes created
+by a process are owned by a process. Everything owned by a process is
+discarded when the process dies.
+
+A process can share objects with any other process, not just the process
+that created it. For more information, see also ParentProcess article on
+JOS Wiki.
+
+-----
+
+Here again are processes A and B. Because each process might have its own
+CLASSPATH, the superclass of a class can change from one process to another.
+
+In one process, I can have this:
+
+public abstract class AbstractWidget {
+}
+
+public class CustomWidget
+    extends AbstractWidget {
+}
+
+while in another, I can have this:
+
+public abstract class AbstractWidget {
+}
+
+public class BasicWidget 
+    extends AbstractWidget {
+}
+
+public class CustomWidget
+    extends BasicWidget {
+}
+
+Both are valid and appropriate within their own process. The CLASSPATH of
+process A can be different than the CLASSPATH of process B.
+
+-----
+
+A versionless virtual machine is able to adapt at runtime to different
+versions of the Java standard class libraries. The class library is plugged
+into a versionless virtual machine through CLASSPATH. Within a single
+virtual machine, each process is built upon a different platform. One
+process can run Java 2 platform while another runs Java 1.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000595.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000600.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#598">[ date ]</a>
+              <a href="thread.html#598">[ thread ]</a>
+              <a href="subject.html#598">[ subject ]</a>
+              <a href="author.html#598">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

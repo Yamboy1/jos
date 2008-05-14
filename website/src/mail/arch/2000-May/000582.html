@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [bytecode resource] Status report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000580.html">
+   <LINK REL="Next" HREF="000585.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [bytecode resource] Status report</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [bytecode resource] Status report">gchii@mindspring.com</A><BR>
+    <I>Mon, 15 May 2000 10:23:39 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000580.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+        <LI> Next message: <A HREF="000585.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#582">[ date ]</a>
+              <a href="thread.html#582">[ thread ]</a>
+              <a href="subject.html#582">[ subject ]</a>
+              <a href="author.html#582">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 11:39 PM 5/14/00 -0200, &quot;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&quot; &lt;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&gt; wrote:
+&gt;<i>Forgive me for asking (I haven't been following the list closely), but why
+</I>&gt;<i>do you want to do this?
+</I>
+Treating bytecode as a C/C++ resource puts the raw data from a .class file
+into the DATA segment. It stores bytecode in the same file with a virtual
+machine.
+
+I am working toward a primordial class loader that enables a virtual
+machine and its vm-specific classes to be statically linked into a single
+executable image. A single executable image is easier to boot and easier to
+make ROM-able.
+
+A primordial class loader must load vm-specific classes. It is one of the
+implementation details outlined in the Java Virtual Machine Specification.
+Each virtual machine must implement some kind of primordial class loader.
+
+IBM's JDK 1.1.6 on OS/400 is a good example of how it should work. This
+virtual machine always knows how to load its vm-specific classes. It never
+puts the standard class library on CLASSPATH. It simplifies the launch of a
+Java application. Compared to other virtual machines, it is more difficult
+to get CLASSPATH wrong. Its primordial class loader won't allow you to load
+the wrong vm-specific classes. It is neither necessary nor desirable to
+store a virtual machine and its vm-specific classes in separate files. It
+is certainly not desireable to load vm-specific classes through CLASSPATH.
+
+In addition, an executable image is always read-only. There is a critical
+advantage in letting a virtual memory manager know what is read-only versus
+read-write. Bytecode is read-only, too. Using bytecode as a resource in the
+DATA segment reduces the footprint of a virtual machine at runtime.
+
+If that were not enough, it is possible to reduce the size of a virtual
+machine further. This enables a file subsystem to be written in bytecode
+and then used to load the rest of the standard class library -- as needed
+-- from a local storage device. Elsewhere, the rest of the standard class
+library can be downloaded -- as needed -- across a network.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000580.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+	<LI> Next message: <A HREF="000585.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#582">[ date ]</a>
+              <a href="thread.html#582">[ thread ]</a>
+              <a href="subject.html#582">[ subject ]</a>
+              <a href="author.html#582">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

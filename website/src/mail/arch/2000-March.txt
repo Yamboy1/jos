@@ -1,0 +1,690 @@
+From gchii@mindspring.com Thu, 02 Mar 2000 13:32:48 -0500
+Date: Thu, 02 Mar 2000 13:32:48 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] New releases
+
+New releases are available for immediate download:
+
+Release 7 of Smart API 2a
+
+<URL:http://www.metamech/wiki/view/Main/JOSDistribution1e#smartapi2a>
+
+Release 1 of WebSource 3a
+
+<URL:http://www.metamech/wiki/view/Main/JOSDistribution1e#websource3a>
+
+
+
+
+From gchii@mindspring.com Thu, 02 Mar 2000 16:19:22 -0500
+Date: Thu, 02 Mar 2000 16:19:22 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] New releases - again
+
+New releases are available for immediate download:
+
+Release 7 of Smart API 2a
+
+<URL:http://www.metamech.com/wiki/view/Main/JOSDistribution1e#smartapi2a>
+
+Release 1 of WebSource 3a
+
+<URL:http://www.metamech.com/wiki/view/Main/JOSDistribution1e#websource3a>
+
+
+
+
+From gchii@mindspring.com Thu, 02 Mar 2000 17:49:46 -0500
+Date: Thu, 02 Mar 2000 17:49:46 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] ERIC/zerich
+
+Release 4 of ERIC 1b is (about to be) available.
+
+<URL:http://www.metamech.com/wiki/view/Main/JOSDistribution1e#eric1b>
+
+-----
+
+About Zerich
+Zerich is part of ERIC. Zerich is not yet available. The next generation of
+ERIC needs to be compiled for both Linux(r) and Microsoft Windows(tm). Work
+on the next generation is code-named "Zerich".
+
+Zerich contains the experimental SharedLibrary class.
+
+
+
+
+From gchii@mindspring.com Thu, 02 Mar 2000 22:02:01 -0500
+Date: Thu, 02 Mar 2000 22:02:01 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] WebSource 3a - Release 2
+
+Release 2 of WebSource 3a is now available. For more information, see also
+
+<URL:http://www.metamech.com/wiki/view/Main/JOSDistribution1e#websource3a>
+
+
+
+
+From gchii@mindspring.com Mon, 06 Mar 2000 11:40:53 -0500
+Date: Mon, 06 Mar 2000 11:40:53 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Future Smart API
+
+I have a habit of using the Smart API in all my programs. Recently, I
+designed a custom controller for the Smart API. I assumed that I could use
+the org.jos.smartapi2a.URI class in the constructor of my custom
+controller. Imagine my surprise. I had accidentally disabled the entire
+subsystem. I exposed a design flaw.
+
+The default factory is configured within its constructor. The code inside
+URI looks something like this:
+
+  public Controller getController() {
+    if ( controller == null ) {
+      controller = new Factory();
+    }
+    return controller;
+  }
+
+There seems to be recursion when a controller's constructor tries to create
+a URI. The first instance of URI finds controller == null. The second
+instance of URI also finds controller == null because controller = new
+Factory() has not returned yet.
+
+The construction of a top-level Factory and its configuration should be
+separate. The code should be more like this:
+
+  public Controller getController() {
+    if ( controller == null ) {
+      controller = Factory();
+      ((Factory) controller).init();
+    }
+    return controller;
+  }
+
+The first instance of URI would create a top-level factory. All other
+instances would get the factory as it is has been configured so far.
+Therefore, it would possible for other plug-ins to use the Smart API to
+configure themselves within their constructor.
+
+With registry links, it is possible for the system-wide configuration to
+link in configuration information for plug-ins. The old getRegistry()
+method expects only a registry object. The new getRegistry() method should
+expect a registry or registry link. It should be rewritten something like
+this:
+
+  public Registry getRegistry( String n ) {
+    Object o = getObject( n );
+    if ( o instanceof String ) {
+      String scheme = SchemeTool.getTool().getScheme( (String) o );
+      if ( scheme.equals( "x-registry:" ) ) {
+        URI uri = new URI( s );
+        o = uri.getObject();
+      }
+    }
+    if ( !( o instanceof Registry ) ) {
+      return null;
+    }
+    return (Registry);
+  }
+
+To link one registry to another, use setString() of the first registry to
+save the link to the second. To use a registry link, use getRegistry() of
+the first registry to load the second.
+
+  public void example() {
+    URI uri = new URI( "x-registry:new:" );
+    Registry r = (Registry) uri.getObject();
+    r.setString( "user", "x-registry:ini:file:user.ini" );
+    Registry user = r.getRegistry( "user" );
+    :
+  }
+
+
+
+
+From gchii@mindspring.com Tue, 07 Mar 2000 14:12:47 -0500
+Date: Tue, 07 Mar 2000 14:12:47 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Release 3 of WebSource 3a
+
+Release 3 of WebSource 3a is available for immediate download.
+
+Go: JOSDistribution1e.
+
+This is the first release of 3a that generates HTML links from one class to
+another.
+
+-----
+
+To Do:
+1. JavaSourceProgram should read a tag line from configuration.txt. The tag
+line is output across the top of every HTML page.
+
+tag=htmlcode
+
+2. JavaSourceProgram should support a package alias. An alias is used to
+shorten HTML pages names so that they will fit on a ISO standard CD-ROM.
+
+[alias]
+alias=packagename
+
+
+
+
+From gchii@mindspring.com Tue, 07 Mar 2000 14:20:50 -0500
+Date: Tue, 07 Mar 2000 14:20:50 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] ERIC/WebSource Demonstration
+
+ERIC for Windows enables you to run the latest release of an application,
+like WebSource 3a, without upgrading. Would anyone like to participate in a
+demonstration of ERIC for Windows?
+
+1. Download and install ERIC 1b for Windows. (Double-click on eric.exe to
+make sure the eric tool working.)
+
+2. Create an ERIC shortcut called "websource.eric":
+
+path=http://www.jos.org/redist/jpkg
+location=run:program:gchii.tools.websource3a.WebSource
+
+3. Double-click on "websource.eric" to run the latest version of WebSource
+on your computer.
+
+
+
+
+From gchii@mindspring.com Sat, 11 Mar 2000 20:38:21 -0500
+Date: Sat, 11 Mar 2000 20:38:21 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] AltBridge 1a
+
+When I recompiled the Kore-Alt packages from scratch, I noticed that I had
+missed the bridge functions for java.lang.Runtime in AltBridge 1a - Release
+1. As soon as I can, I'll repackage and distribute release 2.
+
+I think I understand where Kore-Alt can help us. It helps us during the
+debugging of a standard class library for Java. It helps us run regression
+testing. We can compare the behavior of one standard class library with
+another.
+
+The test package can be used to test more than Alt packages, like Kore-Alt.
+I moved the test package out of alt.test and into its own package. The new
+package is org.jos.gchii.test1a. I thought of an enhancement to TestSuite
+while I was working on the next version of the Find application. A generic
+test suite program should be able to read specific information out of a
+configuration file. The list of test programs should be soft. The TestSuite
+configuration might look something like this:
+
+// custom test suite.txt
+package=org.jos.gchii.find2a.test
+
+[list]
+LiteralProcessor_Test
+SingleProcessor_Test
+MultipleProcessor_Test
+
+A test suite is just another a program. When you can run any program from
+within a Java servlet, you'll be able to run test suites from within your
+HTTP service.
+
+
+
+
+From gchii@mindspring.com Sat, 11 Mar 2000 20:43:27 -0500
+Date: Sat, 11 Mar 2000 20:43:27 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Registry 100
+
+Check it out. I have added more to <URL:http://www.jos.org/redist/mirror>.
+
+Of special note is the latest JOS Registry from Al <mailto:al@outworld.org>:
+
+<URL:http://www.jos.org/redist/mirror/TIO-Utility-100.jar>
+<URL:http://www.jos.org/redist/mirror/TIO-Registry-100.jar>
+
+
+
+
+
+
+From gchii@mindspring.com Sun, 12 Mar 2000 10:31:28 -0500
+Date: Sun, 12 Mar 2000 10:31:28 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Optimistic reflection
+
+Try this on your off-the-shelf virtual machine:
+
+  public void example() {
+    throw new NoSuchFieldError();
+  }
+
+What happens? What should happen? When any method throws an extension of
+"java.lang.Error", what happens to your virtual machine? Can an applet
+throw an error? Can a servlet?
+
+There are two kinds of class file reflection: pure and practical. The first
+kind is pure reflection as demonstrated in the com.realignsoft.reflection2a
+package. The second kind is practical reflection as demonstrated in
+java.lang and java.lang.reflect.
+
+As of this morning, I have a simple, step-by-step procedure that you can
+perform on your own computer to demonstrate for yourself the difference
+between pure and practical reflection. This demonstrates that practical
+reflection is very optimistic. It does not anticipate that anything might
+go wrong in the reflection of a class. It assumes a class file is valid and
+passes verification.
+
+With any binary editor, create an incomplete class file:
+
+1. Call it 'Sample.class'.
+2. Store four bytes, 0xCA, 0xFE, 0xBE and 0xBE, at the beginning of the file.
+3. Save it.
+4. Check the size of the new file; it must be 4.
+
+With pure reflection, load the 'Sample.class' file as a Bytecode object.
+The Bytecode object will be created successfully, without shutting down
+your virtual machine.
+
+  public void example() {
+    Bytecode bc;
+    try {
+      bc = new BasicBytecode( "Sample.class" );
+    }
+    catch( Throwable e ) {
+    }
+  }
+
+With practical reflection, load 'Sample.class' as an instance of
+java.lang.Class, with something like this:
+
+  public void example() {
+    Class c;
+    try {
+      c = Class.forName( "Sample" );
+    }
+    catch( Throwable e ) {
+    }
+  }
+
+
+What happens to your virtual machine? Practical reflection is a bit
+optimistic, isn't it? It expects all the class files to be perfect.
+
+About jJOS/decaf:
+How does jJOS/decaf handle an error? Will an error bring down the whole
+operating system? As shown, any application that uses practical reflection
+has the potential to throw an error. If I have 50+ applications running on
+jJOS/decaf and one of them loads a malformed class file, does that bring
+down my operating system?
+
+While I might desire JOS to load many applications inside one virtual
+machine, I cannot use an operating system that fails when one of its hosted
+application fails. I believe the architecture of JOS should be slightly
+different than jJOS/decaf in the following way:
+
+For optimization, all bytecode should be intern'd. The virtual machine
+class must maintain the list of intern'd bytecode across all virtual machines.
+
+Each virtual machine is an *instance* of decaf. Each virtual machine has
+its own object space. Each virtual machine has its own garbage collector.
+When an error is thrown inside one virtual machine, it shuts down one
+virtual machine. All other instances of a virtual machine are independent.
+
+This says nothing of preemptive or non-preemptive multi-tasking. More than
+one instance of decaf can be created without moving to preemptive
+multi-tasking. The virtual machine class becomes responsible for
+maintaining a list of all the bytecode that has every been used
+(virtually). Each instance of the virtual machine uses the internBytecode()
+method to get the bytecode it uses.
+
+JOS must be a robust, reliable, dependable, rock solid, stable, hard
+working operating system. If it fails just because an error is thrown, an
+operating system will be none of that.
+
+
+
+
+From tmiller@haverford.edu Mon, 13 Mar 2000 17:09:01 -0500 (EST)
+Date: Mon, 13 Mar 2000 17:09:01 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Optimistic reflection
+
+	More than one instance of the decaf interpreter can, in fact, be
+created w/o multitasking at all by sharing a scheduler; as it stands,
+however, the abort()-on-error idea, which works fine for multiple
+processes (e.g. fork() on the host) doesn't work at all for a
+multiple-instance single-process design, and more elegant error recovery
+may be desirable anyway.  If you've got any ideas, let me know -- it needs
+to be something where the shared scheduler won't bomb, either.
+
+	W.r.t. to multiple garbage collectors, this could be accomplished
+fairly easily, by handing off a different (collection of) root
+pointer(s).  Integration with the scheduler still needs to happen,
+though.
+
+-_Quinn
+
+
+
+
+From George.Marrows@Smallworld.co.uk Wed, 15 Mar 2000 11:45:02 -0000
+Date: Wed, 15 Mar 2000 11:45:02 -0000
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Arch] Binary distribution for booting via GRUB
+
+Can anyone point Jay in the right direction please? Gilbert, did you build a
+binary distribution that boots via GRUB?
+
+Jay -- if there isn't a binary distribution available I'm afraid you'll have
+to get the source out of CVS and build it yourself. Sorry!
+
+-- George
+
+> -----Original Message-----
+> From:	Jay Ramlakan [SMTP:Jay@rewards.co.za]
+> Sent:	Wednesday, March 15, 2000 11:25 AM
+> To:	George.Marrows@Smallworld.co.uk
+> Subject:	RE: Grub Exe's
+> 
+> Hi
+> 
+> Thanks for the files.
+> 
+> I'm having difficulty finding downloads for JOS.
+> Where is a binary image that will work in conjunction with GRUB?
+> The Install page leads one around in circles.
+> 
+> Regards,
+> -Jay
+
+
+
+From mgangelen@quintop.nl Thu, 16 Mar 2000 11:43:29 +0100
+Date: Thu, 16 Mar 2000 11:43:29 +0100
+From: mgangelen@quintop.nl mgangelen@quintop.nl
+Subject: [JOS-Arch] Good article on JVM's
+
+Hi there,
+
+I found a really interesting article discribing the inner workings of
+japaleno, a JVM written in JAVA, for JAVA.
+The programmers follow an approach that is appealing to me. They have
+written the main JVM in JAVA...
+
+http://www-4.ibm.com/software/developer/library/jalapeno/index.html
+
+To be short, they are dong the following:
+On startup, a classic VM (lets call it VM1) is loaded, which loads the main
+VM ( VM2 ). Both VM's are written in JAVA, but VM1 has been compiled to
+static machinecode, and is not really optimized.
+VM1 doesn't need to be oprimized, cause the only job it must do is to load
+and invoke VM2. VM2 has a very optimized JIT: it takes bytecodes and
+transformes them into machinecode.
+The last thing isn't really surprising, but it is if you consider that VM2
+is written in JAVA it is.
+
+IBM claims that the entire source of the VM's contains only 1000 lines of C
+code. It's that small because the only thing they need to program in C are
+the glue-functions to IO, memory and interrrupts. All the other things
+suchs as thread-switching, memory-management and synchronisation are
+written in JAVA.
+
+There are also some other interesting issues addressed in this article,
+such as how they prevent normal users from executing privileged code,
+locking and parallel-garbage-collecting.
+
+I think that this approach should also be interesting to JOS: write the VM
+in JAVA insteadof C++...
+
+Just some thoughts.
+
+Fushion.
+
+
+
+
+From gchii@mindspring.com Thu, 16 Mar 2000 10:16:49 -0500
+Date: Thu, 16 Mar 2000 10:16:49 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [WebSource] Release 4
+
+Release 4 of WebSource 3a is available now in the "redist" directory at
+<URL:http://www.jos.org/redist/mirror>. Here are some of its latest features:
+
+1. On a package statement, a package name is linked to its package page.
+When inside the source code for a class, you can move to a list of classes
+for the package. This enables you to provide a link to a specific *class*
+when sending URLs to other programmers.
+
+2. An import statement has two forms. You can import a class or a package.
+On an import package statement, such as "import java.awt.*;", a package
+name is linked to its package page. As before, an import class statement,
+such as "import java.awt.Button;", a class name is linked to its class page.
+
+3. Configuration options have been added (at last!) to JavaSourceProgram.
+This is the first release of version 3a that enables you to put a custom
+banner at the top of each class page. This is stored in configuration.txt,
+loaded through the Registry API.
+
+4. Choose your own custom colors. Title, link and vlink colors have been
+added to the list of configurable colors. The title color is used as a
+background for the title box on each class page. The link and vlink colors
+are used on every page. As with previous versions, custom colors include
+foreground, background, keyword, constant and comment.
+
+5. A package alias is supported for the first time in version 3a. As with
+previous versions, an alias is a (shorter) replacement for a full package
+name. This capability is most important when publishing HTML on a CD-ROM.
+
+-----
+
+To do:
+
+WebSource 3a is the first version that supports plug-ins. Ryan Heise
+<ryan@whitewolf.com.au> has been a tremendous help in defining a new
+plug-in for full featured java->html conversion. We might be able to add
+pretty printing. We'll keep you posted.
+
+I am thinking about a full class index program. Such a program would sort
+all classes in alphabetical order, display their package name, and link to
+their corresponding class page. There would also be a corresponding
+multi-product full class index for multi-product vaults.
+
+
+
+
+From gchii@mindspring.com Fri, 17 Mar 2000 16:15:45 -0500
+Date: Fri, 17 Mar 2000 16:15:45 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [Smart API 2a] Release 8
+
+Release 8 of Smart API 2a is available now. Look in the "redist" directory:
+
+<URL:http://www.jos.org/redist/mirror/>
+
+It includes the new ansynchronous I/O finder package (org.jos.finder1a) and
+corresponding Find application (org.jos.gchii.find2a.Find). It includes the
+new test package (org.jos.gchii.test1a) for creating test programs and suites.
+
+This release introduces the new x-finder:file: scheme. A finder is just
+another digital resource and is available through a URI.
+
+
+
+
+From gchii@mindspring.com Mon, 27 Mar 2000 11:53:02 -0500
+Date: Mon, 27 Mar 2000 11:53:02 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [Asynchronous I/O] Service
+
+Using the latest technique on asynchronous I/O, I wrote a generic service
+interface. Also, I wrote a corresponding service controller for the Smart API.
+
+How easy is it to build a multiple-threaded TCP service? Just extend the
+BaseServiceProgram and define your own onSocket() method. Here is a base
+service program:
+
+public abstract class BaseServiceProgram
+    extends BaseConsoleProgram
+    implements ServiceListener {
+  public BaseServiceProgram() {
+  }
+  public void run() {
+    int port = getIntValue( "port" );
+    int count = getIntValue( "count" );
+    URI uri = new URI( "x-service:" +
+        "?port=" + port +
+        "&count=" + count
+        );
+    Service s = (Service) uri.getObject();
+    if ( s == null ) {
+      println( "service resource is missing." );
+      setResultCode( 2 );
+      return;
+    }
+    s.setListener( this );
+    s.run();
+  }
+}
+
+
+
+
+From R.Argentini@student.tudelft.nl Mon, 27 Mar 2000 19:35:08 +0200
+Date: Mon, 27 Mar 2000 19:35:08 +0200
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Arch] Asynchronous I/O Service and JEPS
+
+>How easy is it to build a multiple-threaded TCP service? Just extend the
+>BaseServiceProgram and define your own onSocket() method. Here is a base
+>service program:
+
+Thanks for the effort Gilbert! I will try and fit it in this framework when
+i have something working.
+Currently i'm thinking of ways to process timed events throughout the whole
+stack.
+I have decided i would like to use a variation on the famous Delta-list, as
+it seems to be the easiest way to schedule events with varying periods, as
+well as one time event. For periodic events i'm toying with the idea of
+having them reschedule themselves upon execution.
+
+This brings us to my present dilemma: should every part of the stack that
+needs timing (ARP for cache expiration, route tables, TCP etc) have it's
+own delta queue (at the expense of one thread plus a fixed overhead per
+list) or should i go for the added complexity of puttign everything in one
+deltalist, thereby lowering the overhead?
+Personally i have the feeling i should go for the first alternative. If i
+had been after speed i would not have chosen JAVA in the first place, and
+reducing complexity always pays off more than increasing performance in the
+long run.
+
+What do you guys think? I need your input! :)
+
+Ranieri.
+
+
+
+From tmiller@haverford.edu Mon, 27 Mar 2000 13:08:25 -0500 (EST)
+Date: Mon, 27 Mar 2000 13:08:25 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Asynchronous I/O Service and JEPS
+
+> Personally i have the feeling i should go for the first alternative. If i
+> had been after speed i would not have chosen JAVA in the first place, and
+> reducing complexity always pays off more than increasing performance in the
+> long run.
+
+	In part because simplicity is easier to optimize :)  (Running
+Java, especially, we can expect very thread-heavy applications, so it
+would behoove us to optimize thread ops anyway...)  So my advice is to go
+with the first alternative.
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Mon, 27 Mar 2000 13:48:56 -0500
+Date: Mon, 27 Mar 2000 13:48:56 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Re: Asynchronous I/O Service and JEPS
+
+At 07:35 PM 3/27/00 +0200, Ranieri Argentini
+<R.Argentini@student.tudelft.nl> wrote:
+>Thanks for the effort Gilbert! I will try and fit it in this framework when
+>i have something working.
+
+Here we need a little bit of caution. We have to think about the impact of
+this on the architecture. As an architect, I worry about this is the kind
+of thing. The asynchronous TCP service I wrote does not need to be
+JOS-specific. I can use it in any Java application. Anything that does not
+need to be JOS-specific should not be JOS-specific.
+
+It doesn't need to go inside the JEPS package, does it?
+
+When I mentioned a TCP service, I had JEPS in mind but in a different way.
+I think JEPS runs in its own user process. JEPS must run in a user process
+so that it can be started, shutdown and restarted. Typically, JOS will be
+configured to starts JEPS at start-up. It is a system-wide protocol stack.
+There is only one. Or rather, one for each network interface card.
+
+A network interface card is a limited resource. If JEPS ran in each user
+process, only one would obtain the driver for each network interface card.
+
+A service that uses JEPS runs in its own user process, too. It does not run
+in the same process with JEPS. A service must run in a user process so that
+it can be started, shutdown and restarted.
+
+Personally, I would like use a corresponding UDP service, but have no idea
+where to begin. I have never written a UDP client or daemon using the
+standard class libraries.
+
+>This brings us to my present dilemma: should every part of the stack that
+>needs timing (ARP for cache expiration, route tables, TCP etc) have it's
+>own delta queue (at the expense of one thread plus a fixed overhead per
+>list) or should i go for the added complexity of puttign everything in one
+>deltalist, thereby lowering the overhead?
+
+Your answer might come from thinking about the extreme case. Imagine you
+have a processor that is so slow it can only process one event per second.
+If someone has scheduled three events to occur each second, spawning
+additional threads won't help.
+
+Like you said, the schedule must be updated at the beginning of each event.
+A scheduler must know when an event started. A schedule is really a
+mimimum. At least one interval must pass from the beginning of one event
+and the beginning of another.
+
+If an event takes almost one second to process and someone has scheduled it
+for once every second, the actual interval begins to depend on the
+efficiency of the scheduler. The scheduler itself takes time to schedule
+the next event.
+
+When you have three scheduled events with the same priority, the event with
+the longest delay since it should have been launched must be launched first.
+
+Write a scheduler. I imagine that one scheduler class can be written. While
+one configuration might use one instance of the scheduler for all events,
+another might use more than one. Each event scheduler should run in its own
+thread.
+
+This is a true story. Our business program was scheduled to run once each
+day. Over time, more and more features were added. We don't know exactly
+when, but at some point it ran for more than 24 hours. The original
+scheduler launched each program in a separate thread. So one Thursday
+morning in the middle of 1988, the first and second instance were running
+at the same time. On Friday morning, the first, second and third instances
+were running. The first instance didn't finish in 48 hours because both the
+first and second were competing for the same resources. The first instance
+didn't finish in 72 hours because the first, second and third were
+competing for the same resources. Needless to say, none of the data
+processed by the program could be used. Programmers didn't expect more than
+one instance to run at the same time.
+
+
+
+

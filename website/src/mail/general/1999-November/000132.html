@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS] JDK incompatibility solutions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gilead%40linart.pl">
+   <LINK REL="Previous"  HREF="000131.html">
+   <LINK REL="Next" HREF="000135.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS] JDK incompatibility solutions</H1>
+    <B>Max Gilead</B> 
+    <A HREF="mailto:gilead%40linart.pl"
+       TITLE="[JOS] JDK incompatibility solutions">gilead@linart.pl</A><BR>
+    <I>Sat, 13 Nov 1999 00:16:20 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000131.html">[JOS] Javalobby</A></li>
+        <LI> Next message: <A HREF="000135.html">[JOS] JDK incompatibility solutions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#132">[ date ]</a>
+              <a href="thread.html#132">[ thread ]</a>
+              <a href="subject.html#132">[ subject ]</a>
+              <a href="author.html#132">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi, all!
+
+I have read JOS mailing lists archives. On UI group there were a thread
+some time ago about this. Although I think that making different JDK
+releases fully compatible (even if only backward compatible) would be a
+very useful thing but I doubt this will happen soon. The bad thing is
+that JDK is so monolithic piece of software. It would be much better
+IMHO if instead of one JDK we would have separate libraries - eg.
+Utility library, AWT library etc. It's just an example and I'm not sure
+but security issues of JDK1.2 rather don't affect AWT ;-), am I right?
+So why release it in one piece? If it won't happen the whole system
+would be more flexible. But these are just my wishes :-(. Even libraries
+for languages that are on market for much longer than Java, for example
+C++ are undergoing changes, sometimes breaking any compatibility
+(libc&lt;-&gt;glibc change in GNU libraries, recent change in C++ specs which
+causes many problems with compilers).
+
+These are my thoughts about possible solutions to problem with
+incompatible JDK releases:
+
+1. Static linking.
+Let's take a look at C++ applications (I'm talking about such basic
+things to make me clear). They can be dynamically or statically linked.
+Dynamically means that they use some external libraries, in fact a
+specific version of these libraries. They are smaller than statically
+linked versions but suffer from possible incompatibility problems.
+Statically linked applications does not use external libraries - they
+have all of them compiled into executable file.
+In Java, all applications are 'dynamically linked'. Possible solution is
+to package classes it uses with program. But this is not possible for
+native classes and doesn't solve VM incompatibility problems.
+
+2. JDK for JOS (much better solution)
+Some people think that JOS should mimic JDK. I think it should not (at
+least not its core). I think that JOS core should provide VM to run
+bytecode and its own hardwired system classes (jos.org.* and below?) -
+that's all. This way it would be possible to run applications compiled
+for different JDKs (even ancient ones) without any problems. Which JDK
+to run under could be choosen from some property panel or detected at
+runtime(?).
+
+Incompatibility problem can be breaked into two smaller problems:
+- VM incompatibility.
+As VM functionality is provided by system, system should have
+possibility to run applications in different VM versions. It would not
+be a problem since VM changes should be very rare (I hope :-)
+- Core classes incompatibility.
+As JDKs are mostly backward compatible, providing older class library
+would require substituting incompatible classes only. Say, application
+was compiled for JDK 1.1 and current standard JOS classpath is 1.2. So
+an imaginary classpath would look like:
+./application.jar:/classpath/ver1.1.jar:/classpath/ver1.2.jar
+As JOS is a _Java_ OS I think that native classes problem would go away,
+too, as they could be implemented as JOS system calls in Java.
+Easy enough, I think. And very flexible. If user doesn't want to run any
+older applications, he does not install compatibility libraries. But he
+may do so at any time.
+
+These are just my thoughts, so let people criticise (or express awe ;-)
+
+Bye,
+Max
+
+
+-------
+-- Max Gilead (<A HREF="mailto:gilead@linart.pl">gilead@linart.pl</A>) ----------
+|<i> <A HREF="http://3d.linart.krakow.pl/OfficinaArtificialis">http://3d.linart.krakow.pl/OfficinaArtificialis</A> |
+</I>---------------------------------------------------
+{EOF}
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000131.html">[JOS] Javalobby</A></li>
+	<LI> Next message: <A HREF="000135.html">[JOS] JDK incompatibility solutions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#132">[ date ]</a>
+              <a href="thread.html#132">[ thread ]</a>
+              <a href="subject.html#132">[ subject ]</a>
+              <a href="author.html#132">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

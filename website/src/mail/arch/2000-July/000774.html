@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [boot disk] byte array</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000771.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [boot disk] byte array</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [boot disk] byte array">tmiller@haverford.edu</A><BR>
+    <I>Sat, 1 Jul 2000 00:05:10 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000771.html">[JOS-Arch] Java VGA driver on linux</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#774">[ date ]</a>
+              <a href="thread.html#774">[ thread ]</a>
+              <a href="subject.html#774">[ subject ]</a>
+              <a href="author.html#774">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> A system programming language might support an extension of a native method
+</I>&gt;<i> with assembler or C/C++. I really don't like the idea of keeping my .java
+</I>&gt;<i> and .c code in separate files.
+</I>
+	Java is designed to be a portable application language, so it does
+make sense to write machine-specific code in another language.  (It is, of
+course, possible to provide a library which isolates that machine code,
+and there is the beginning of such a library in the last distribution of
+jJOS/decaf.  The problem is that the code is interpreted, which makes it
+run very slowly; JIT compiling the calls to their equivalent ASM should
+not be terribly difficult, though it's quite a bit away.  At that point,
+the argument for or against drivers in Java becomes more a language
+purity issue.)  That being said, your proposal makes sense.
+
+	The first-pass approach to implementing this would be a
+pre-processor (actually, running a C preprocessor on Java source files
+could come in handy, but I digress) which sucked the C code out of native
+function blocks, rewrote the .java file to remove that code and have the
+proper syntax, wrapped the C code with JNI, and dumped it into a .c file,
+then called the appropriate compilers.  While this is a lot of grunt work,
+it also doesn't look particularly difficult; you could probably get a
+reasonable approximation done in shell script :)
+
+-_Quinn
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000771.html">[JOS-Arch] Java VGA driver on linux</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#774">[ date ]</a>
+              <a href="thread.html#774">[ thread ]</a>
+              <a href="subject.html#774">[ subject ]</a>
+              <a href="author.html#774">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,429 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000145.html">
+   <LINK REL="Next" HREF="000148.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Program and ProgramContext">digigod@earthling.net</A><BR>
+    <I>Wed, 11 Aug 1999 10:35:17 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000145.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000148.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#146">[ date ]</a>
+              <a href="thread.html#146">[ thread ]</a>
+              <a href="subject.html#146">[ subject ]</a>
+              <a href="author.html#146">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> JOS is expected to run all kinds of programs. In theory, a uniform API for
+</I>&gt;<i> all kinds programs is possible. This is what we're working toward.
+</I>&gt;<i> 
+</I>&gt;<i> We should learn from the success and failures of other operating systems.
+</I>&gt;<i> Each new operating system has a brief opportunity to challenge the
+</I>&gt;<i> assumptions of traditional data processing models. JOS must fortify the
+</I>&gt;<i> strengths and minimize the weaknesses of all operating systems that have
+</I>&gt;<i> gone before.
+</I>&gt;<i> 
+</I>&gt;<i> Are Java Beans the best model of batch data processing? What are the
+</I>&gt;<i> implications of running non-inherited static main()? Why are there separate
+</I>&gt;<i> models for Java applications, Java applets, Java servlets and Java aglets?
+</I>&gt;<i> Aren't all of these trying to do exactly the same thing?
+</I>&gt;<i> 
+</I>&gt;<i> JOS is not UNIX(tm). JOS is not TSO(tm) or OS/400(tm). JOS is not Microsoft
+</I>&gt;<i> Windows(tm) or MS-DOS(tm). JOS is not Linux. JOS is not Java(tm). So, what
+</I>&gt;<i> is it? That's what we're trying to figure out.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;I always thought of a program as something with a main() method.
+</I>&gt;<i> 
+</I>&gt;<i> An &quot;Java application&quot; is a kind-of program. It is defined as any class with
+</I>&gt;<i> a static main() method. While an &quot;application&quot; is always a program, a
+</I>&gt;<i> program is not always an &quot;application&quot;. An application is a self-contained,
+</I>&gt;<i> independent program. A result code is irrelevant for an &quot;application&quot;
+</I>&gt;<i> because it is never expected to &quot;fail&quot;.
+</I>&gt;<i> 
+</I>&gt;<i> While the &quot;Java applet&quot; is a strong model for a program, an &quot;application&quot;
+</I>&gt;<i> is not. What is wrong with static main()? Since a static method cannot be
+</I>&gt;<i> inherited, an application cannot inherit the main() behavior of its
+</I>&gt;<i> superclass.
+</I>
+static methods are inherited, to test it I made these three files:
+/////
+public class test1 {
+ public static void main(String args[]) {
+  System.out.println(&quot;one&quot;);
+ }
+}
+/////
+/////
+public class test2 extends test1 {
+ public static void main(String args[]) {
+  test1.main(args);         // this is the only way to access a
+superclasses static methods in another static method...
+  System.out.println(&quot;two&quot;);
+ }
+}
+/////
+/////
+public class test3 extends test1 {
+}
+/////
+
+if you run these...
+test 1 outputs:
+one
+test 2 outputs:
+one
+two
+test 3 outputs:
+one
+
+which means test2 accesed its superclasses main() method (although not
+in the best way)
+
+and test3 inherited its main method and didnt need one of its own
+ 
+&gt;<i> Also, the static main() is declared as void. When one application launches
+</I>&gt;<i> another, a result code is not expected or desired. That's the nature of
+</I>&gt;<i> applications.
+</I>&gt;<i> 
+</I>&gt;<i> On the other hand, a result code is critical when a program runs a
+</I>&gt;<i> sub-program. It is the nature of programs. If applications are used where
+</I>&gt;<i> programs are required, there is no result code.
+</I>
+thats what exit(int) is for
+ 
+&gt;<i> &gt;Now, my program (with it's main method n'all), can:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;1. get parameters from the argument list of the main() method.
+</I>&gt;<i> &gt;2. get environment parameters from System.getProperties()
+</I>&gt;<i> &gt;3. exit with a result code using System.exit(code)
+</I>&gt;<i> 
+</I>&gt;<i> Yes, Java provides the perfect environment for applications. The
+</I>&gt;<i> application context is java.lang.System and java.lang.Runtime. An
+</I>&gt;<i> application is all alone inside a JVM, and should be.
+</I>&gt;<i> 
+</I>&gt;<i> This is a hostile environment for programs. Each program must have its own
+</I>&gt;<i> unique context. Programs cannot share java.lang.System and
+</I>&gt;<i> java.lang.Runtime because each program has its own unique set of
+</I>&gt;<i> parameters. Each has its own unique result code.
+</I>&gt;<i> 
+</I>&gt;<i> This model enables a program to use another program within a single JVM,
+</I>&gt;<i> without resorting to the Runtime/Process model. We retain the benefit of
+</I>&gt;<i> knowing when a program's result code.
+</I>
+arguably, you could do this currently if you dont mind creating another
+JVM
+ 
+&gt;<i> Since applications, applets, servlets and aglets are different kinds of
+</I>&gt;<i> &quot;programs&quot;, it becomes possible to unify all programs under a program API.
+</I>&gt;<i> A program browser would provide a host environment for running (and
+</I>&gt;<i> debugging!) all kinds of programs.
+</I>
+this would only be internal, right? I mean you have the program
+interface then you have an ApplicationProgram that runs a java app as a
+program or a ServletProgram, so that all programs can be handled the
+same way internally; and still allow for the prospect of someone making
+his app a program or use programs as plugins or whatever...
+ 
+&gt;<i> &gt;&gt; A program is not a process. It does not have its own System.in, System.out,
+</I>&gt;<i> &gt;&gt; and System.err. It is a well-defined interface.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;Ok, I think this suggests (a lot of guess work here) that the use of
+</I>&gt;<i> &gt;this Program interface is where a program wants to interact with a
+</I>&gt;<i> &gt;number of other programs to achieve a goal, all in a single process
+</I>&gt;<i> &gt;(optional).
+</I>&gt;<i> 
+</I>&gt;<i> Traditional runtime code reuse has always started with the program model.
+</I>&gt;<i> You can build many little programs, like UNIX(tm) and all other operating
+</I>&gt;<i> systems, an combine them with scripts (and batch files). Since JOS needs a
+</I>&gt;<i> program model and Java API doesn't have one, we thought we'd create it.
+</I>&gt;<i> 
+</I>&gt;<i> It would be a bad thing if your shell launches a sub-program that calls
+</I>&gt;<i> System.exit() with a result code. Your shell would end prematurely.
+</I>
+The Security manager would deny that request in a properly designed
+shell, or it would simply run the app in its own process
+ 
+&gt;<i> The make tool demonstrates the need for a program model. The make tool's
+</I>&gt;<i> purpose is to run sub-programs based on simple rules. It is critical to the
+</I>&gt;<i> make tool to &quot;know&quot; when a sub-program failed. When a sub-program fails,
+</I>&gt;<i> the whole make fails.
+</I>&gt;<i> 
+</I>&gt;<i> It would be a bad thing if the make tool launches a sub-program that calls
+</I>&gt;<i> System.exit() with a result code. A make script would end prematurely.
+</I>
+again, security manager...
+ 
+&gt;<i> It would be a bad thing for your servlet to call System.exit() with a
+</I>&gt;<i> result code. It would end the servlet enviroment prematurely. Servlets are
+</I>&gt;<i> expected to use an &quot;honor system&quot; among serlet programmers, instead of a
+</I>&gt;<i> security system.
+</I>
+I was under the impression that servlets were sandboxed when it came to
+stuff like that
+ 
+&gt;<i> &gt;The concept of the main() method (and therefore, your Program interface
+</I>&gt;<i> &gt;too) is very primitive.
+</I>&gt;<i> 
+</I>&gt;<i> Exactly. A minimal interface is our goal. We are trying to reduce a program
+</I>&gt;<i> down to its barest essentials. We are not adding the complexity of multiple
+</I>&gt;<i> threads or multiple independent processes.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;If you would like to achieve a higher goal by linking together several
+</I>&gt;<i> &gt;programs, the main/run() method is a very limiting solution to the problem.
+</I>&gt;<i> &gt;UNIX is about as good as it gets (UNIX consists of lots of little programs
+</I>&gt;<i> &gt;cooperating with each other by calling each other's main() methods. The shell
+</I>&gt;<i> &gt;orchestrates this with pipes and redirection symbols.
+</I>&gt;<i> 
+</I>&gt;<i> UNIX(tm) is as good as it gets. The reason it exists on UNIX(tm) is simply
+</I>&gt;<i> because it is needed. The classic data processing model has been expanded
+</I>&gt;<i> beyond UNIX(tm). It is available on every major operating system, except Java.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;With the advent of Java, piping and main() arguments seem unintuitive.
+</I>&gt;<i> 
+</I>&gt;<i> Sun Microsystems insists that an instance of the JVM must be created for
+</I>&gt;<i> each application. The JVM still support piping and a result code on the
+</I>&gt;<i> outside. The native OS can still redirect standard in, standard out and
+</I>&gt;<i> standard err. The result code passed to System.exit() is returned to the
+</I>&gt;<i> native OS.
+</I>&gt;<i> 
+</I>&gt;<i> The benefit of the program model have not been passed on to your Java code.
+</I>&gt;<i> It would be very difficult to get &quot;public static int main( String[] args )&quot;
+</I>&gt;<i> to work anyway.
+</I>
+you could do:
+
+public static void main(String args[]) {
+ System.exit(intmain(args));
+}
+
+public static int intmain(String args[]) {
+ //bla bla bla
+ return 0;
+}
+
+but that just spells hack, on the other hand since static methods are
+inherited you could put that main in a superclass and have its children
+define an intmain() 
+
+&gt;<i> &gt;Instead we could have JavaBeans interacting with each other.
+</I>&gt;<i> 
+</I>&gt;<i> Sure. I supposed you could have JavaBeans acting like programs without a
+</I>&gt;<i> well-defined program interface. Each bean might have a different interface.
+</I>&gt;<i> Parameters for a program could be thought of as properties of a bean. The
+</I>&gt;<i> result code from a bean would be the return value of some method.
+</I>&gt;<i> 
+</I>&gt;<i> This program and program context model provides a way to use JavaBeans as
+</I>&gt;<i> if they were programs. A well-defined interface is used instead of
+</I>&gt;<i> reflection. And class, even a bean, can implement the program interface.
+</I>&gt;<i> 
+</I>&gt;<i> More importantly, this gives us a unified model for JOS programs. When you
+</I>&gt;<i> want to run a program from a shell, the shell can check for a program
+</I>&gt;<i> interface. The shell can run many programs, properly, with result codes,
+</I>&gt;<i> within a single JVM.
+</I>
+but it would support legacy by saying &quot;oh, this is an Applet that doesnt
+implemtn Program, Ill use the AppletProgram class to proxy and load
+it...&quot;
+ 
+&gt;<i> Further, we bring back the power of shell scripting. When the shell runs a
+</I>&gt;<i> shell script, it can return the result code of every program it runs. The
+</I>&gt;<i> shell script can handle non-zero result codes.
+</I>&gt;<i> 
+</I>&gt;<i> Plus, the shell can launch a program in a separate thread or a separate
+</I>&gt;<i> process.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;Given JavaBeans and (standard) programs, do we really need a third
+</I>&gt;<i> &gt;option?
+</I>&gt;<i> 
+</I>&gt;<i> We have Java &quot;applications&quot;, &quot;applets&quot;, &quot;servlets&quot;, &quot;aglets&quot;, &quot;browslets&quot;,
+</I>&gt;<i> &quot;pluglets&quot; and &quot;jarlets&quot;. We have beans, too. All these things are
+</I>&gt;<i> different kinds of programs. Instead of having a separate (incompatible)
+</I>&gt;<i> interface for each speciality, there are benefits to bringing them together.
+</I>
+Im for this, although I think it needs some work.
+
+on another semi-related note I have a handy way of making your &quot;main()&quot;
+class a bit easier to read and program:
+////
+package digigod.apps;
+
+import java.io.*;
+
+public abstract class Application {
+ private          String         arguments[];
+ private          BufferedReader reader      = null;
+ protected static Application    app         = null;
+
+ public static void main(String args[]) {
+  if(app==null)
+   System.exit(255);
+  app.parseArgs(args);
+  app.exit(app.appMain());
+ }
+
+ public int getArgsLength() {
+  return arguments.length;
+ }
+
+ public String getArg(int idx) {
+  return arguments[idx];
+ }
+
+ public String[] getArgs() {
+  return arguments;
+ }
+ 
+ public void exit() {
+  exit(0);
+ }
+
+ public void exit(int code) {
+  System.exit(code);
+ }
+
+ public void print(String str) {
+  System.out.print(str);
+ }
+
+ public void println(String str) {
+  System.out.println(str);
+ }
+
+ public void printerr(String str) {
+  System.err.println(str);
+ }
+
+ public String readln() throws IOException {
+  if(reader==null)
+   reader = new BufferedReader(new InputStreamReader(System.in));
+  return reader.readLine();
+ }
+
+ // only these methods below should be altered by a child, and only the
+first required to be
+ 
+ public abstract int appMain();
+
+ public void parseArgs(String args[]) { //can be overridden to add extra
+parsing functionality
+  arguments = args;
+ }
+ 
+ public String getApplicationInfo() {
+  return &quot;&quot;;
+ } 
+}
+////
+
+this is basically just a wrapper and doesnt have to be used, you can
+make your hello world either way:
+
+public class hello {
+ public static void main(String args[]) {
+  System.out.println(&quot;hello world&quot;);
+ }
+}
+
+or
+
+import digigod.apps.Application; //if this was in jos Id imagine it
+would be in org.jos.apps
+
+public class HelloHello extends Application {
+ static {
+  app = new HelloHello(); //somewhat hackish, but somehow more
+explanatory...
+ }
+
+ public int appMain() {
+  println(&quot;Hello World!&quot;);
+ }
+}
+
+which is better? neither, they're both the same you'd run them the same
+and use them the same; the only difference is a) your class now IS-An
+Application and b) its easier to program since most of that crap is
+taken care of.
+
+if you want to use parameters it has some methods for getting them, and
+if you want you can overide the default parseArgs() behavior to do the
+parsing outside of the main method (for readability/seperation of use)
+if you want you could build a HashSet (Hashtable for those who dont know
+collections yet) of the parsed args so the app doesnt have to deal with
+them in main at all.
+
+I bring this up because they are related, look at the other class in the
+digigod.apps package:
+/////
+package digigod.apps;
+
+public abstract class JOSApplication extends Application {
+ public static void main(String args[]) {
+  if(System.getProperty(&quot;os.name&quot;).equals(&quot;JOS&quot;))
+   System.out.println(&quot;Requires JOS (www.jos.org)&quot;);
+  Application.main(args);
+ }
+
+ public abstract int appMain();
+}
+/////
+
+this is for Applications that are dependednt on JOS, as you can see
+theres nothing in it now... since nothing exists really... but it could
+have stuff like acess to Process information, a GSI and a Registry
+binding, but more on topic, it could implement program (using the
+appMain in its run, mind you)
+
+jeez, that was long. anyway, what do you think?
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000145.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000148.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#146">[ date ]</a>
+              <a href="thread.html#146">[ thread ]</a>
+              <a href="subject.html#146">[ subject ]</a>
+              <a href="author.html#146">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

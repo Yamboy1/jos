@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [boot disk] byte array</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:iainshigeoka%40yahoo.com">
+   <LINK REL="Previous"  HREF="000766.html">
+   <LINK REL="Next" HREF="000768.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [boot disk] byte array</H1>
+    <B>Iain Shigeoka</B> 
+    <A HREF="mailto:iainshigeoka%40yahoo.com"
+       TITLE="[JOS-Arch] [boot disk] byte array">iainshigeoka@yahoo.com</A><BR>
+    <I>Tue, 27 Jun 2000 19:37:16 -0700 (PDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000766.html">[JOS-Arch] [boot disk] byte array</A></li>
+        <LI> Next message: <A HREF="000768.html">[JOS-Arch] [boot disk] byte array</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#767">[ date ]</a>
+              <a href="thread.html#767">[ thread ]</a>
+              <a href="subject.html#767">[ subject ]</a>
+              <a href="author.html#767">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>--- Gilbert Carl Herschberger II &lt;<A HREF="mailto:gchii@mindspring.com">gchii@mindspring.com</A>&gt; wrote:
+&gt;<i> At 04:06 PM 6/27/00 -0700, Iain Shigeoka &lt;<A HREF="mailto:iainshigeoka@yahoo.com">iainshigeoka@yahoo.com</A>&gt; wrote:
+</I>
+&gt;<i> BootDisk, while immediately useful, is an exercise. It was designed for
+</I>&gt;<i> me
+</I>&gt;<i> to test the limits of Java. It tries to answer the question of putting a
+</I>&gt;<i> binary resource into a class file. Until I tried it, I was surprised
+</I>&gt;<i> that
+</I>&gt;<i> my compiler failed to optimize my static final byte array. I assumed it
+</I>&gt;<i> would be smarter than it is.
+</I>
+Nope.  Java compilation by default optimizes for 'safety'.  If you have a
+byte array, its an array (the object) of bytes.  Whether this is a good
+idea or not is a judgement call.
+
+&gt;<i> I do not intend to limit my application to Java 2. While I could put a
+</I>&gt;<i> binary resource into a jar file, I would be hard pressed to get it out
+</I>&gt;<i> with
+</I>&gt;<i> a virtual machine compatible with the Java 0 Platform.
+</I>
+OK.  Well, then put it in the classpath or serve it via an httpd server.
+
+&gt;<i> Sometimes, I wish Java were more of a system programming language, like
+</I>&gt;<i> C/C++. I would like it to support porting from one version of Java to
+</I>&gt;<i> another!
+</I>&gt;<i> 
+</I>&gt;<i> How are we going to write system programs for an operating system
+</I>&gt;<i> without
+</I>&gt;<i> support for binary data? Isn't the byte array one of the fundamental
+</I>&gt;<i> constructs of programming?
+</I>
+Well, if you want to do systems programming in java, you need to write a
+new extension to java and a special java compiler to handle it.  It
+shouldn't be too big a stretch since its been done before with other
+languages (but could be a good amount of work).
+
+&gt;<i> CLASSPATH always available as a system property?
+</I>
+yes and no.  It doesn't have to be but it is for now.  its an
+implementation detail I believe.  Once again, i could be wrong since I
+don't have my spec with me.
+
+&gt;<i> &gt;Nope.  You can jam the data into a constant String for the class or
+</I>&gt;<i> hack
+</I>&gt;<i> &gt;the raw class file.
+</I>&gt;<i> 
+</I>&gt;<i> I jammed the data into a constant String. I don't have access to a raw
+</I>&gt;<i> class file in an off-the-shelf virtual machine.
+</I>
+Well, its not the virtual machine but rather a hex editor you need (even
+nicer, a java class hex editor that understands proper java class file
+format).
+
+&gt;<i> &gt;The tool should be separate from the data.  You can distribute them
+</I>&gt;<i> &gt;together in the same jar but it doesn't seem to make much sense to
+</I>&gt;<i> compile
+</I>&gt;<i> &gt;it into the tool itself.
+</I>&gt;<i> 
+</I>&gt;<i> While the tool should be separate from the data, a class loader is the
+</I>&gt;<i> only
+</I>&gt;<i> mechanism to load anything. When a class loader does not support
+</I>&gt;<i> external
+</I>&gt;<i> resources, separate data becomes a problem.
+</I>
+No.  Why not just use a File object.
+
+&gt;<i> &gt;Won't you also need native methods to implement the actual disk writing
+</I>&gt;<i> &gt;(rawwrite)?
+</I>&gt;<i> 
+</I>&gt;<i> I don't think so. On Linux, I am working under the assumption that
+</I>&gt;<i> BootDisk
+</I>&gt;<i> writes directly to /dev/fd0. It's like rawwrite.
+</I>&gt;<i> 
+</I>&gt;<i> On Windows, I am working under the assumption that BootDisk can invoke
+</I>&gt;<i> the
+</I>&gt;<i> external rawwrite program.
+</I>
+OK.  Essentially the same thing.  Just making sure you weren't hoping to
+use just java to get the write done.  :)
+
+-iain
+
+__________________________________________________
+Do You Yahoo!?
+Get Yahoo! Mail - Free email you can access from anywhere!
+<A HREF="http://mail.yahoo.com/">http://mail.yahoo.com/</A>
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000766.html">[JOS-Arch] [boot disk] byte array</A></li>
+	<LI> Next message: <A HREF="000768.html">[JOS-Arch] [boot disk] byte array</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#767">[ date ]</a>
+              <a href="thread.html#767">[ thread ]</a>
+              <a href="subject.html#767">[ subject ]</a>
+              <a href="author.html#767">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

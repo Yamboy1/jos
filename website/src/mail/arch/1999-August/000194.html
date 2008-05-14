@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Console for Program</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000193.html">
+   <LINK REL="Next" HREF="000195.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Console for Program</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Console for Program">gchii@mindspring.com</A><BR>
+    <I>Tue, 17 Aug 1999 11:01:54 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000193.html">[JOS-Arch] Console for Program</A></li>
+        <LI> Next message: <A HREF="000195.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#194">[ date ]</a>
+              <a href="thread.html#194">[ thread ]</a>
+              <a href="subject.html#194">[ subject ]</a>
+              <a href="author.html#194">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 05:27 PM 8/16/99 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>	This is one of the places where decaf would step in and NOT load
+</I>&gt;<i>java.lang.System primordially, so that it, and its singletons, could be
+</I>&gt;<i>over-ridden in the appropriate per-process fashion, as determined by the
+</I>&gt;<i>`canonical' shell ops.  Over-riding java.lang.System on a per-process
+</I>&gt;<i>basis also neatly solves the problem of what to do about System.exit() for
+</I>&gt;<i>compatibility with old single-app/single-jvm code.  (The process
+</I>&gt;<i>associated with that particular java.lang.System is terminated.)
+</I>
+Our search continues. We want to build a multiple &quot;process&quot; JVM. We might
+need a multiple instances of a few JVM classes that all other JVMs consider
+singletons. For example, we might have multiple instances of
+PrimordialClassLoader, one class loader for each &quot;process&quot;. We might have
+multiple instances java.lang.Runtime.
+
+We might need multiple instances of java.lang.System, not because of
+System.exit() which calls java.lang.Runtime, but because it holds
+System.in, System.out, and System.err.
+
+What is our approach to solving the unsolvable? Divide and conquer. How do
+we find a mechanism for multiple processes in a single JVM? By dividing
+this puzzle into Process and Program. Our approach has been to break the
+puzzle into two independent problems. Solving one piece helps us understand
+and solve the other. We work from the bottom up.
+
+Instead of going after Process and ProcessContext directly, we are going
+after Program and ProgramContext. What is the difference between a program
+and process?
+
+A process may be a fully independent environment. A process is similar to a
+JVM running in a fully independent native process, in a traditional
+JVM-runs-on-OS model. It has its own security manager. It has it own
+instance of java.lang.Runtime. It has its own instance of java.lang.System
+for in, out and err.
+
+A program is a semi-independent environment. A program is similar to a
+semi-independent thread, in a traditional JVM model. A program is not a
+process. It does *not* have its own instance of java.lang.Runtime. It does
+*not* have its own instance of java.lang.System.
+
+And yet, Program and ProgramContext must support piping and redirection. So
+far, my model proposes the equivalent of a System.in and System.out for a
+IOStreamProgram. My model continue to use System.err as standard errors
+stream, shared among all programs.
+
+The Program - Release 1d package provides a few kinds of programs:
+
+Program - This kind of program supports neither IOStreams, Console or
+Terminal. This might be a good choice for GUI programs and daemons.
+
+IOStreamProgram - This kind of program supports piping and redirection.
+Instead of using System.in and System.out, you use getInputStream() and
+getOutputStream() which returns the input/output streams for this program.
+
+ConsoleProgram - This kind of program has a console, the equivalent of an
+output stream; but no input stream. All of its input must come from a
+parameter list. This might be a good choice for a servlet transaction and
+many JOS commands. (What does $ ls &lt; x do anyway?)
+
+TerminalProgram - This kind of program has a terminal, the equivalent of a
+input and output stream. This might be a good choice for a command line
+interface, like a classic shell (bash), shell script, browser plug-in or
+Internet chat relay (IRC).
+
+When a IOStreamProgram is run as a Java application, getInputStream()
+returns System.in and getOutputStream() returns System.out.
+
+How does this help? It demonstrates that you can already run
+semi-independent &quot;programs&quot; inside all traditional JVMs. You do not have to
+modify a JVM to do it.
+
+What's the catch? You must trust that all of Programs are well-behaved.
+Since the JOS Project is going to write lots of programs, we can safely
+assume that all our programs are going to be well-behaved. Otherwise, it's
+a bug. When the time comes, a well-behaved program will run--unchanged--in
+a separate process.
+
+I trust all code that I write. I trust all of the open source code that I
+read and understand (in C, C++ and Java). I trust all code that trustworthy
+people write. I trust code distributed by book publishers and many other
+software vendors. I trust code until it's proven that I can't.
+
+While a Program is built on trust, a Process is built upon dis-trust. Why
+should I wait until a Process and ProcessContext is ready? Why should I
+pass sentence on all my code so it must be confined to an off-brand
+multiple process JVM? It doesn't have to be that way.
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000193.html">[JOS-Arch] Console for Program</A></li>
+	<LI> Next message: <A HREF="000195.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#194">[ date ]</a>
+              <a href="thread.html#194">[ thread ]</a>
+              <a href="subject.html#194">[ subject ]</a>
+              <a href="author.html#194">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [subprogram] Definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000662.html">
+   <LINK REL="Next" HREF="000641.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [subprogram] Definition</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [subprogram] Definition">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 24 May 2000 00:34:44 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000662.html">[JOS-Arch] [subprogram] Definition</A></li>
+        <LI> Next message: <A HREF="000641.html">[JOS-Arch] Picture this.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#668">[ date ]</a>
+              <a href="thread.html#668">[ thread ]</a>
+              <a href="subject.html#668">[ subject ]</a>
+              <a href="author.html#668">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&lt;snipped: 4 examples of programs launching other programs&gt;
+
+&gt;<i> 5. In turn, the classic java tool launches a Java application as a
+</I>&gt;<i> subprogram. By ignoring how the Java application runs inside a machine code
+</I>&gt;<i> process, one might think the Java application is the first program running
+</I>&gt;<i> when, in fact, it is not. Inthe classic model, a Java application is hardly
+</I>&gt;<i> comparable to a BIOS or kernel.
+</I>
+A subprogram is a program within a program. This is not implied by a
+program launching another program. It seems somewhere along the line you
+&quot;extended&quot; your definition of the term to fit your current idea on how
+to implement a process API (*)
+
+The distinction between Application and subprogram is necessary to
+distinguish programs that are designed to be in other programs. If you
+use the term subprogram to refer to them both generically (which you
+have (**) ), then you lose that distinction.
+
+(*) ie. to treat everything as a subprogram, and have processes just
+execute subprograms. You have already stated that rheise.os does not cut
+it in this respect, and that a new process API is needed. If you believe
+this, please go ahead and start your own one from scratch.
+
+(**) you mention in this email (to which I am replying) that &quot;a program
+is a kind of subprogram. A Java application is a kind-of program, which
+is a kind-of subprogram.&quot;
+
+&gt;<i> &gt;Again, it is only required for your way of looking at it. To say it is
+</I>&gt;<i> &gt;required, period, is to force your views upon others. And this is
+</I>&gt;<i> &gt;especially unfortunate when you claim someone else's project as a
+</I>&gt;<i> &gt;dead-end project (ie. that rheise.os can never become a &quot;genuine&quot;
+</I>&gt;<i> &gt;bytecode process) simply because it does not meet &quot;your&quot; requirements.
+</I>&gt;<i> 
+</I>&gt;<i> Something is required. Something must sit between a process and an
+</I>&gt;<i> arbitrary subprogram. What else would you have us call it? How would you
+</I>&gt;<i> explain it? The purpose of this thread is to define it. We need to define
+</I>&gt;<i> it well enough so that when a programmer writes a JOS-compatible
+</I>&gt;<i> subprogram, it will run on any implementation of JOS.
+</I>
+I call it a mechanism for executing programs inside a process.
+[Mis]Defining what a subprogram is gives you a basis for such a
+mechanism. I have also invented such a mechanism, different from yours
+because of fundamentally different design influences. You can refer to
+my past email for the details, but an additional remark I would like to
+make is that the mechanism I use considers two types of program APIs,
+those that require an instance of a class, and those that don't. The
+second category covers Java Applications (and can easily be extended to
+support different static method names if that turns out to be useful).
+The first category covers servlets and applets (among others), which
+incidentally both happen to be subprograms. Unlike in your approach, the
+process API does not need to know anything about the object-based
+program API (*). Instead, the parent process is given the responsibility
+of dealing with the specific program API (eg. applet or servlet). This
+is based on the fact that the parent process always knows what type of
+program API it is dealing with because it launched it (the interaction
+then becomes strongly typed). A tool that can generically launch any
+process (eg. SmartAPI) can be built on top of this model.
+
+I'm sure that if you misdefine subprogram, it will work just as well.
+Although IMHO it is a way of achieving the same result by
+overgeneralising and becoming weakly typed (because of the nature of the
+model, not just because of the &quot;subprogram&quot; terminology). But as I said,
+I fully understand that your idea will work if you choose to implement
+it.
+
+(*) It is probably the case that all object-based program APIs are
+subprograms because of the nature of objects (who interacts with them).
+
+&gt;<i> Within the Java Native Interface Specification, Sun describes this as an
+</I>&gt;<i> important feature of JNI: the ability to define any method of any class as
+</I>&gt;<i> the starting point of your JNI-compatible program. Most importantly, this
+</I>&gt;<i> method does not have to be static.
+</I>
+For starters, I don't know whether we are supporting the Java Native
+Interface because we are focusing on a pure Java environment. But let's
+look at your examples:
+
+&gt;<i> &gt;I can allow the name of the method to be invoked to be passed in, but
+</I>&gt;<i> &gt;maybe you can give useful examples of this before I implement it.
+</I>&gt;<i> 
+</I>&gt;<i> There are plenty of examples shown on this mailing list and JOS Wiki. Here
+</I>&gt;<i> are my favorites.
+</I>&gt;<i> 
+</I>&gt;<i> 1. java.lang.Runnable. The simplest instance method for a Java subprogram
+</I>&gt;<i> is run(). Run is a blocking call.
+</I>
+This fits the category of object-based program API. The reason (a
+reason) I made the distinction is that object-based APIs can be handled
+without reflection and don't need special support within the process
+framework. The client can invoke methods directly on the object (whereas
+it cannot do that as easily with a static method).
+
+I was asking specifically about invoking static methods other than
+'main'. While there are many examples of object-based APIs with all
+sorts of methods (applet.start(), applet.stop(), servlet.service()),
+there is only one example I can think of for static methods: main. There
+is one other example of a static entry point I am aware of (used in the
+Javadoc system) but even it does not need the support from the process
+framework. However, it opens up the possibility that there &quot;might&quot; be
+examples. Can you think of any?
+
+&gt;<i> 2. java.lang.Component.
+</I>
+Another object-based API (which can be interacted with &quot;directly&quot; in
+order to remain strongly typed).
+
+&gt;<i> 3. The classes in my subprogram APIs have been explicitly designed with
+</I>&gt;<i> subprograms in mind. My subprogram APIs has been plugged into the Smart
+</I>&gt;<i> API, so that any shell can invoke many different kind of subprograms,
+</I>&gt;<i> including foreign OS subprograms and Java applications. All this and more
+</I>&gt;<i> is documented on the Smart API pages of JOS Wiki.
+</I>
+They too are object-based, are they not? However this is the closest we
+have come yet to a static entry point. I could imagine you doing certain
+of your subprogram types as static APIs. IN THE CASE where you wished to
+run those subprograms as processes, then it would be useful to specify a
+method name (and arg types) other than main. But then again, why not use
+&quot;main&quot; as the method name? In this example, your subprogram is
+effectively a &quot;Java Application&quot; anyway. OTOH, you may wish to define
+different argument types. Still, perhaps if you wanted to do this,
+you're program API would already start diverging from the standard
+command-line API (procedural/static entry) that it may as well be an
+object..
+
+&gt;<i> Here are examples of what I would like to do with a process:
+</I>&gt;<i> 
+</I>&gt;<i>   public void example() {
+</I>&gt;<i>     Runtime.exec( &quot;jrew -classpath ~/debug:$CLASSPATH MyApp&quot; );
+</I>&gt;<i>     Runtime.exec( &quot;java.awt.Button&quot; );
+</I>&gt;<i>     Runtime.exec( &quot;MyCustomApplet height=10 width=60&quot; );
+</I>&gt;<i>     Runtime.exec( &quot;<A HREF="http://www.jos.org/"">http://www.jos.org/&quot;</A> );
+</I>&gt;<i>     Runtime.exec( &quot;<A HREF="ftp://mindspring.com/"">ftp://mindspring.com/&quot;</A> );
+</I>&gt;<i>   }
+</I>
+These weakly typed examples can be implemented on-top-of the simpler
+mechanism I have proposed (and it makes sense to have the strongly typed
+API underly the weakly typed one).
+
+However, since we fundamentally disagree, you may as well roll your own
+process API. I never claimed rheise.os to be the standard JOS one. It
+can be used by JOS if JOS wants to use it. Choice is good.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000662.html">[JOS-Arch] [subprogram] Definition</A></li>
+	<LI> Next message: <A HREF="000641.html">[JOS-Arch] Picture this.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#668">[ date ]</a>
+              <a href="thread.html#668">[ thread ]</a>
+              <a href="subject.html#668">[ subject ]</a>
+              <a href="author.html#668">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

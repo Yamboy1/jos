@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Static fields/object sharing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000705.html">
+   <LINK REL="Next" HREF="000712.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Static fields/object sharing</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Static fields/object sharing">gchii@mindspring.com</A><BR>
+    <I>Fri, 02 Jun 2000 12:51:43 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000705.html">[JOS-Arch] [subprogram] Test program</A></li>
+        <LI> Next message: <A HREF="000712.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#708">[ date ]</a>
+              <a href="thread.html#708">[ thread ]</a>
+              <a href="subject.html#708">[ subject ]</a>
+              <a href="author.html#708">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 06:43 PM 5/30/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>	What happens if we generate a JavaObject on the share, as if a
+</I>&gt;<i>'new' instruction were executed, but with its instance variable pointer
+</I>&gt;<i>the same as the shared object's?  Clearly, the proxy would automatically
+</I>&gt;<i>synchronize with the shared object.  The type safety of each JVM is
+</I>&gt;<i>guaranteed because neither JVM uses the other's class(es).  (Though their
+</I>&gt;<i>definitions/bytecode may be shared.)  The only requirement imposed by
+</I>&gt;<i>sharing instance data is that the two classes have identical fields in
+</I>&gt;<i>identical locations; otherwise, the JVM's behavior will be erroneous.
+</I>&gt;<i>
+</I>&gt;<i>	We could then consider ensuring 'correct' behavior across the two
+</I>&gt;<i>processes the domain of library or application code.  (However one might
+</I>&gt;<i>ensure that the classes (methods) loaded by two different process are the
+</I>&gt;<i>same; the API is still indeterminate/undecided.)  This would include
+</I>&gt;<i>ensuring 'proper' parent classes.
+</I>
+If I understand a JavaObject correctly, I'm pretty sure this is the essence
+of an object-sharing mechanism in a multiple process virtual machine.
+
+Internal to a virtual machine, I should be able to share() an object in
+basically the same way I can clone() it. The share() method might
+automatically load classes in a new primordial class loader. Potentially,
+this is equivalent to fork(). Imagine that! You could fully duplicate a
+bytecode process by a single call to share().
+
+The new operator always creates something owned by a bytecode process. A
+shared-new operator must create something owned by a bytecode process too,
+and yet, it shares instance fields that already exist in another bytecode
+process. The mutex for synchronization must be shared, so that even threads
+from different bytecode processes respect the synchronized sections.
+
+A JavaObject sounds like it points to its class and points to its instance
+fields. Its class must not be shared. Its instance fields can be shared. An
+object-sharing mechanism can work with all kinds of class loaders, not just
+the primordial kind.
+
+Earlier, I described type safety in detail. There are three cases:
+identical, equal and equivalent. Identical and equal are &quot;easy&quot; in
+bytecode. We might provide a hard-coded list of well-known casts that are
+allowed for equivalent classes. Once an object-sharing mechanism has
+allowed an object to be cast, a thread doesn't treat an object differently
+just because it is shared. A thread always runs at full speed. None of the
+opcode methods are adversely affected by sharing.
+
+Does this mean that a Java object without instance fields, like
+java.lang.Runnable, is always safe to type cast? Maybe it does.
+
+If JavaObject &quot;points&quot; to instance fields, JavaObject is already a proxy to
+an object's state. Could it be that simple? Maybe it is.
+
+Obviously, garbage collection must be aware of two JavaObjects that share a
+collection of instance fields. State must be garbage collected when there
+are no more objects that refer to it.
+
+It makes me think of the other extreme, where methods are ignored. A
+certain level of literal compatibility is possible. Two classes with two
+different names could be &quot;compatible&quot; if they happen to have the same
+number/type of instance fields, in the same order. Here is an example,
+because field names are arbitrary:
+
+public class ClassA {
+  private int i;
+  private float f;
+  private long l;
+  private double d;
+}
+
+public class ClassB {
+  private int size;
+  private float percent;
+  private long time;
+  private double angle;
+}
+
+Here is another because, interally, short and int may be identical:
+
+public class PointA {
+  private short x;
+  private short y;
+}
+
+public class PointB {
+  private int x;
+  private int y;
+}
+
+I can see where that kind of object sharing might be useful to data
+conversion, upgrades and re-serialization. It sure helps with compatibility
+across different implementations of a package.
+
+Of course, I would prefer to start out with a conservative approach where
+objects can be shared only if their bytecode is identical or equal.
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000705.html">[JOS-Arch] [subprogram] Test program</A></li>
+	<LI> Next message: <A HREF="000712.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#708">[ date ]</a>
+              <a href="thread.html#708">[ thread ]</a>
+              <a href="subject.html#708">[ subject ]</a>
+              <a href="author.html#708">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

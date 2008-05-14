@@ -1,0 +1,263 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000157.html">
+   <LINK REL="Next" HREF="000169.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Program and ProgramContext">gchii@mindspring.com</A><BR>
+    <I>Thu, 12 Aug 1999 20:47:00 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000157.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000169.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#162">[ date ]</a>
+              <a href="thread.html#162">[ thread ]</a>
+              <a href="subject.html#162">[ subject ]</a>
+              <a href="author.html#162">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:47 AM 8/12/99 -0700, DigiGod Q Frasché &lt;<A HREF="mailto:digigod@earthling.net">digigod@earthling.net</A>&gt; wrote:
+&gt;<i>whats wrong with just making applications that act as a &quot;default&quot;
+</I>&gt;<i>environment for these?
+</I>
+In an object-oriented world, a program is an object, not a class. A JOS
+program should be an object, too. You should be able to use a program like
+other objects.
+
+A smart object factory should be able to return an object--not a
+class--when you want to load a JOS program. Let's go back to the
+DemoProgram, again. When I type this URI into my program browser, it should
+return an instance of the DemoProgram.
+
+x-program:org.jos.demo.DemoProgram
+
+  public void example() {
+    exec( &quot;x-program:org.jos.demo.DemoProgram&quot; ); 
+  }
+  public int exec( String uri ) {
+    try {
+      Program p = (Program) new URI( uri ).getObject();
+    }
+    catch( ClassCastException e ) {
+      return;
+    }
+    p.setProgramContext( whatever );
+    p.run();
+    return whatever.getResultCode();
+  }
+
+When we have a smart object factory that can create all kinds of digital
+resources, it would be straight forward to create a smart program factory.
+
+- If I pass the name of a class that implements the Program interface, the
+factory returns a Program object.
+
+- If I pass the name of a class that implements the java.awt.Applet
+interface, the factory returns a Program object.
+
+- If I pass the name of a class that implements the javax.servlet.Servlet
+interface, the factory returns a Program object.
+
+- In Java 1.1 and higher, if I pass the name of a class that declares
+static main(), the factory returns a Program object.
+
+Our uniform browser would be much simpler. Given any URI, the uniform
+browser would able to do handle it:
+
+:<i>
+</I>Object o = new URI( uri ).getObject();
+
+if ( o instanceof Program ) {
+  runProgram( (Program) o );
+}
+if ( o instanceof InputStream ) {
+  displayInput( (InputStream) o );
+}
+:<i>
+</I>
+I propose the Program and ProgramContext as a simple way to write programs
+now that will run on JOS through a consistent in-process mechanism. I
+believe that implementations of Program is more object-oriented than static
+main() and provides better support for inheritence. Program and
+ProgramContext do not depend on the reflection API.
+
+&gt;<i>ok, you made a good point about how one should be able to test ones
+</I>&gt;<i>servlet; but how does this argue that they HAVE to be a Program?
+</I>
+A servlet does not have to implement the Program interface. A servlet
+should be able to run any program. The output from any program should be
+piped through the response output stream. You can create a generic servlet
+that can run programs by program name. You can pass parameters to the
+program with a query string.
+
+An HTML browser should be able to run any program, including the
+ServletProgram. In the marketplace, people might use a JOS browser
+*because* it can run servlets without an HTTP service.
+
+&gt;<i>isnt a Servlet (at the very top) just an interface (what they should
+</I>&gt;<i>have done with Applet, btw) and isnt it unasuming about HTTP, that is
+</I>&gt;<i>not locked to it? Ive always thought of a Servlet as a service-let not a
+</I>&gt;<i>server-let, just a handy stream based IPO plugin.
+</I>
+Yes, thankfully. Servlet is an interface. It seems that Sun Microsystems
+may have learned something after all. It is unassuming about HTTP, too. I'm
+not sure what to call it. It is something like a Java I/O Bean.
+ 
+&gt;<i>(&quot;JOS putting the U in URI&quot; --how market does that sound?)
+</I>
+JOS is a future-oriented operating system. We are trying to make JOS more
+uniform than any other operating system. In a sense, we are re-defining the
+U in URI.
+
+&gt;<i>I can see Programs being an internal abstraction used to work with all
+</I>&gt;<i>programs uniformly (with proxies like ServletProgram) but I dont see
+</I>&gt;<i>making people use them.
+</I>
+You're right. I'm not trying to change the way everybody else writes code.
+I'm trying to change the way I write code. I would like all my Java
+programs to run inside a strong OO model. Could there will be more
+&quot;programs&quot; in JOS?
+ 
+&gt;<i>this, again, is an argument for URI's and smart browsers but not
+</I>&gt;<i>Programs (although again I can see its use internally, especially by
+</I>&gt;<i>your browser)
+</I>
+I want a ProgramFactory plugged into the ObjectFactory. Each object
+returned by the ProgramFactory must be an implementation of Program. That's
+what makes the smart browser possible. Otherwise, the smart browser would
+be complicated with having to too much.
+
+And probably more important for architecture, I want any Java object to be
+able to run any JOS program the minimum number of lines of code.
+
+Think about what it takes to learn how to run a program using the
+reflection API. Many Java programmers won't want to learn all that just to
+run a program.
+
+Think about how easy it will be to write a scripting language to run one
+JOS program after another. It does not have the overhead of separate
+processes. It works without a modified JVM. It even works in Java 1.0.2.
+
+What does a JOS batch file look like? It looks a lot like a URI list. If
+one of these programs returns a non-zero result code, the script is shut down.
+
+#org.jos.shellscript.Script
+x-program:org.jos.demo.DemoProgram
+x-program:org.jos.demo.DemoServlet
+run:os:mkdir temp
+run:os:cp * .
+x-program:org.jos.demo.DemoApplet
+
+For those working on a generic scripting API, a script is a kind of
+program, too.
+
+We should build a JOS demonstration script. It should show off all of the
+things you can do with JOS that all the other operating systems can only
+dream about. Wouldn't you be impressed with an operating system that runs
+all of the Java applications, applets and servlets you already wrote? I would.
+
+Oh, and did I mention piping? You can do it.
+
+x-program:org.jos.demo.DemoProgram &gt; temp/log.txt
+
+&gt;<i>you can do that now though, add a main() to your servlet. implementing
+</I>&gt;<i>program is pointless... (except on a IS-A basis, but then the interface
+</I>&gt;<i>might just as well be empty)
+</I>
+Why should I go back and add main() to my old applets and servlets when I
+don't have to? It doesn't have to be that way. Once I have AppletProgram
+and ServletProgram and ApplicationProgram, I'm done. Further, I can use
+(and test) all those Java applications, applets and servlets that other
+people write.
+
+And I keep forgetting to mention this. You can &quot;run&quot; any Java class that
+implements java.awt.Component. You can also &quot;run&quot; any Java class that is a
+Java Bean. The uniform browser uses URIs in the location field. It also
+uses shortcuts and shortcut editor so that you don't have to create a URI
+manually.
+
+What is a shortcut? It might as well be any registry-compatible file with a
+uri property.
+
+uri=x-component:java.awt.Button?label=&quot;Hello, World!&quot;
+
+It might help to &quot;browse&quot; around a new component library to see what
+everything looks like. When you want to learn the AWT or Swing, would you
+like to see each component as it works at runtime? Would you like to see
+all components within the same component browser? When other programmers
+receive a copy of our JOS distribution (someday), they will want to see
+what's there. I think we can easily put together a point-and-click tour of
+all kinds of components, even those components added at the &quot;last minute&quot;.
+And more, when other people ship component librarys for JOS, all those
+components will be assimilated into the JOS demo program.
+
+Think about the JOS out-of-box experience. Based on the strengh of Java, we
+can re-define the concept of &quot;try before you buy&quot;. We can create a JOS
+distribution that people can run components--before they are installed--to
+see what they look like. They can download the uniform browser and take JOS
+for a test drive before downloading a JOS distribution. They start the
+uniform browser from a CD-ROM and start browsing around.
+
+Our installation/configuration programs are written in Java and run
+unchanged on 22 platforms. The Linux community could use JOS to make Linux
+easier to install.
+
+When we reach higher than a high level third generation language like Java,
+we need a strong model for programs. Using an interactive, visual IDE, you
+should be able to configure even the most complicated program. The
+configuration of a single step program is reduced to a single URI. A
+step-by-step script is reduced to a URI list.
+
+A uniform browser puts any digital resource within your reach. You can
+create a shortcut for it. You can write a program that uses it. You can do
+whatever you want.
+
+We need to reduce a program to its bare essentials. It must be platform
+independent. It must assume neither UNIX(tm)-style or MS-DOS-style command
+line parameters. That's better left to an abstract base class.
+
+Sun Microsystems went too far. They reduced it to pre-object oriented
+static main() from C. It must have been reassuring to C programmers that
+started writing Java code.
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000157.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000169.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#162">[ date ]</a>
+              <a href="thread.html#162">[ thread ]</a>
+              <a href="subject.html#162">[ subject ]</a>
+              <a href="author.html#162">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

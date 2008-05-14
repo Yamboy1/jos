@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000523.html">
+   <LINK REL="Next" HREF="000540.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Mon, 1 May 2000 16:10:50 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000523.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000540.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#533">[ date ]</a>
+              <a href="thread.html#533">[ thread ]</a>
+              <a href="subject.html#533">[ subject ]</a>
+              <a href="author.html#533">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	This message concerns Ryan's response to Gilbert's implementation
+of object-sharing by proxy/ownership lists.  I feel like I'm missing
+something of importance -- I don't find myself concerned by having
+multiple 'owners' of an object.  Ownership is a concern of the security
+system, rather than of IPC.  (I realize that security has to be built in
+from the ground up to really work, but hold on a second here.)  All that
+garbage collection cares about is the number of references -- one per
+accessor/(shared) owner.  If an object is shared, our security system has
+OK'd it, so the 'ownership' of an object doesn't seem particularly
+important; security should be checking permissions against the process,
+not the object, so having a higher-permission process share an object with
+a lower priority class isn't a problem.  (BTW -- I really like the idea
+of just re-assigning the classloader property for object passing.)
+
+	Ownership seems to be important only if it confers privileges that
+accessors don't have.  Maybe I'm missing something, but it seems like the
+processes sharing the object must have equal access to it, because once
+the object is shared, the JVM isn't going to call security again, unless
+explicitly directed to do so.  Being able to do some things but not others
+to an object, without those explicit security checks, also seems like it
+would violate the spec.  What am I missing here?
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000523.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000540.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#533">[ date ]</a>
+              <a href="thread.html#533">[ thread ]</a>
+              <a href="subject.html#533">[ subject ]</a>
+              <a href="author.html#533">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

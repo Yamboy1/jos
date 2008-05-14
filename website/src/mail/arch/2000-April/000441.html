@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000439.html">
+   <LINK REL="Next" HREF="000444.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">ryan@whitewolf.com.au</A><BR>
+    <I>Tue, 11 Apr 2000 00:28:42 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000439.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000444.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#441">[ date ]</a>
+              <a href="thread.html#441">[ thread ]</a>
+              <a href="subject.html#441">[ subject ]</a>
+              <a href="author.html#441">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Sun, 9 Apr 2000, Todd L. Miller wrote:
+
+&gt;<i> 	Is this an accurate summary?
+</I>&gt;<i> 
+</I>&gt;<i> 	We agree then -- for Java processes, we need native support to
+</I>&gt;<i> handle 'illegal' class casts; I proposed a mechanism where only class
+</I>&gt;<i> definitions that are explicitly shared -- quite possibly by default -- are
+</I>&gt;<i> considered the same for 'illegal' casts, because byte-for-byte checks are
+</I>&gt;<i> grossly expensive.
+</I>
+We agree so far, except I'm not sure what you mean by the &quot;quite
+possibly by default&quot; bit. Do you mean it is quite possible to share all
+class definitions by default, or that it is quite possible to consider
+all objects for illegal casts by default?
+
+A note: byte-for-byte checking is not the only alternative. If we
+implement my proposal for memory saving, classes that were loaded from
+the same version of the same archive will reuse the same class
+definition even though they are different JavaClassInstances. Any two
+classes that share the same class definition (JavaClass) are able to be
+explicitly shared. Then permission can be asked of the JVM to allow
+casts between certain pairs of JavaClassInstances.
+
+While this seems more consistent to me, assignClassLoader() seems like
+it will work too.
+
+&gt;<i>  For effiency, we need a mechanism to share class
+</I>&gt;<i> definitions while maintaining disjoint statics.  These two mechanisms
+</I>&gt;<i> could be one, where explicitly shared classes share class definitions but
+</I>&gt;<i> have disjoint statics*,
+</I>
+Agreed.
+
+&gt;<i> and the default for sharing classes between a
+</I>&gt;<i> process and its parent will be generous, with separate classloaders, for
+</I>&gt;<i> maxixum interoperability and utility.  That is, you can allow application
+</I>&gt;<i> classes to re-load on the fly by garbage collecting that process's
+</I>&gt;<i> ClassLoader on exit, and if the two processes communicate with Java
+</I>&gt;<i> objects -- e.g. via Serializable objects and a standard networking layer
+</I>&gt;<i> -- the classes for the objects will cast to each other.
+</I>
+I'm not sure I understand this paragraph. I think we've gotten to the
+point where one word can mean so many things :-)
+
+Q1:
+
+When you refer to sharing classes between a process and its parent, do
+you mean just sharing class definitions to save memory, or explicit
+sharing to allow casts? I don't think we should be generous in allowing
+casts between processes.. oh, hang on...
+
+U-Turn
+
+What we /could/ do is allow casts between any two classes that share
+the same class definition (JavaClass). No restrictions. This is safe
+because the power to cast is useless unless you have a reference to an
+object that you want to cast. The restriction should be on gaining
+access to the shared object.
+
+In my last email, I mentioned that an object that belongs to another
+process should be able to access it's own static fields, but the client
+code should not. It will instead access the static fields of its own
+process. This makes the no restrictions approach safe from the statics
+perspective as well.
+
+Q2: What is the significance of sharing classes between a process and
+its parent? I think you should be able to share classes with any other
+process. And if all classes loaded from the same version of the same
+archive share the same class definition, then this becomes possible (if
+you allow casting between any two classes that share the same class
+definition, as described above).
+
+Q3: Can you please explain the bit about an application reloading its
+classes?
+
+In summary, we still disagree on a few points:
+
+- I don't see the logic in only inheriting class definitions from the
+  parent process.
+- I prefer a more consistent (IMHO) approach to reusing class
+  definitions.
+
+But we at least agree on the general idea. Sorry for dragging this on -
+just when you thought we agreed! 
+
+Whatever we do, sharing class definitions seems crucial. Just as well we
+have the split between JavaClass and JavaClassInstance!
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000439.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000444.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#441">[ date ]</a>
+              <a href="thread.html#441">[ thread ]</a>
+              <a href="subject.html#441">[ subject ]</a>
+              <a href="author.html#441">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

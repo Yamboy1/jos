@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Admin] machine aliasing (again)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000249.html">
+   <LINK REL="Next" HREF="000251.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Admin] machine aliasing (again)</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Admin] machine aliasing (again)">tmiller@haverford.edu</A><BR>
+    <I>Sun, 7 May 2000 21:43:41 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000249.html">[JOS-Admin] machine aliasing (again)</A></li>
+        <LI> Next message: <A HREF="000251.html">[JOS-Admin] [misconception] Why?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#250">[ date ]</a>
+              <a href="thread.html#250">[ thread ]</a>
+              <a href="subject.html#250">[ subject ]</a>
+              <a href="author.html#250">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> This reminds me. I was looking at the issues with setting up ACLs within
+</I>&gt;<i> CVS and I think it's not such a good idea to make the avail file
+</I>&gt;<i> editable through CVS itself. I did figure out a way of preventing
+</I>&gt;<i> certain users from ever being deleted, but the problem is that by making
+</I>&gt;<i> it version controlled, anonymous users will be able to read the avail
+</I>&gt;<i> file. This is a security hole because it gives crackers target accounts
+</I>&gt;<i> to break into.
+</I>
+	The problem is that we don't have ssh access to the box CVS is
+running on; that's part of the reason it took so long to get ACLs working
+at all -- the perl script, with correct permissions, had to be added to
+the checkoutlist in order to show up on the server in a non-versioned
+form.  The same for avail.  (I blew each of them once and had to wait
+for the SF admins to fix it.)  It may be possible to rewrite the cvs_acls
+script to use ssh and read avail from some non-public directory at
+sfwiki.sourceforge.net, but then that account's username/passwd would be
+in the cvs_acls file, which is /also/ in the anonymous CVS.  Similar
+problems exist for any secured method, I think.
+
+	I don't think, however, that having a list of usernames available
+is that much of a concern to the SF admins; the list of developers
+(e.g. those who can log into the cvs machine in the first place, with or
+without a later ACL phase) is already public at
+
+<A HREF="https://sourceforge.net/project/memberlist.php?group_id=2376">https://sourceforge.net/project/memberlist.php?group_id=2376</A>
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000249.html">[JOS-Admin] machine aliasing (again)</A></li>
+	<LI> Next message: <A HREF="000251.html">[JOS-Admin] [misconception] Why?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#250">[ date ]</a>
+              <a href="thread.html#250">[ thread ]</a>
+              <a href="subject.html#250">[ subject ]</a>
+              <a href="author.html#250">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

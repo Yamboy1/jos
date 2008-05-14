@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] PowerController, SystemEvent and JADE</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000041.html">
+   <LINK REL="Next" HREF="000047.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] PowerController, SystemEvent and JADE</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-UI] PowerController, SystemEvent and JADE">digigod@earthling.net</A><BR>
+    <I>Tue, 20 Jul 1999 00:03:05 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000041.html">[JOS-UI] Graphics2D &amp;Screen</A></li>
+        <LI> Next message: <A HREF="000047.html">[JOS-UI] Swing peers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#42">[ date ]</a>
+              <a href="thread.html#42">[ thread ]</a>
+              <a href="subject.html#42">[ subject ]</a>
+              <a href="author.html#42">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Modern computers can be shutdown via the OS, JOS as a modern OS needs to
+support this. A PowerController class would be a singelton that
+interfaced to the kernel that lets you turn off the computer, reboot it,
+put it in sleep mode, et al. the UI would have a shutdown action that
+called the shutdownDialog that just called the PowerController. The OS
+would have to tell every process, via a SystemEvent? (or a PowerEvent?)
+to close. JADE would send a windowClosing event to all its frames, the
+various components in JOS would shutdown (and serialize if applicable)
+and then the computer would be told to shutdown
+
+since PowerController dosent know what is in JOS (some of it being
+dynamic, some of it being add ons or whatever) there should be a
+[System|Power]Event of some sort that is sent to all its componenent and
+applications (non-JOS stuff will have the legacy equiv. called by its
+parent system (an app told to exit via its process).
+
+basically the idea is PowerController is called by UI or other, it sends
+events, stuff shutdown. computer goes night-night.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000041.html">[JOS-UI] Graphics2D &amp;Screen</A></li>
+	<LI> Next message: <A HREF="000047.html">[JOS-UI] Swing peers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#42">[ date ]</a>
+              <a href="thread.html#42">[ thread ]</a>
+              <a href="subject.html#42">[ subject ]</a>
+              <a href="author.html#42">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

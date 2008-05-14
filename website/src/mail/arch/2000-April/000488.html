@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os questions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000486.html">
+   <LINK REL="Next" HREF="000489.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os questions</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] rheise.os questions">gchii@mindspring.com</A><BR>
+    <I>Thu, 20 Apr 2000 09:56:21 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000486.html">[JOS-Arch] rheise.os questions</A></li>
+        <LI> Next message: <A HREF="000489.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#488">[ date ]</a>
+              <a href="thread.html#488">[ thread ]</a>
+              <a href="subject.html#488">[ subject ]</a>
+              <a href="author.html#488">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:05 AM 4/20/00 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+&gt;<i>Consider callback methods from the AWT system. The AWT system
+</I>&gt;<i>will invoke code in your process, but the thread executing your code
+</I>&gt;<i>actually belongs to the AWT process. I'd like getCurrentProcess() to
+</I>&gt;<i>return the process that owns the code being executed in this case. Maybe
+</I>&gt;<i>it's possible to keep it generic. I'll know when I get around to looking
+</I>&gt;<i>at it.
+</I>
+I disagree. There must be two mechanisms. The getCurrentProcess() method
+returns the current process -- regardless of who owns the code. The
+getProcess() method returns the process that owns an object. While
+getCurrentProcess() probably uses getCurrentThread(), getProcess() probably
+uses getClass().getClassLoader().
+
+Consider the AWT system carefully. The AWT is part of system classes
+(java.awt.*). It is process-wide subsystem, not system-wide. It must be
+part of each bytecode process. Each bytecode process has its own
+java.awt.Toolkit. This is required to maintain the illusion that a bytecode
+process is running within its own virtual machine. Two different processes
+can have two different toolkits. Like a security manager, a toolkit is
+unique to a bytecode process.
+
+Each process must have its own AWT thread. Again, this is required to
+maintain the illusion that a bytecode process is running within its own
+virtual machine. A thread that pushes an event through a process must
+belong to that process. The getCurrentProcess() must always return the
+current process, regardless of object sharing.
+
+On the other hand, JADE is a system-wide subsystem. There may be one
+instance of JADE for each virtual console. The interaction between JADE and
+AWT is this: JADE actually paints the screen for one or more instances of
+AWT. JADE collects UI events and dispatches them to the appropriate
+process. JADE components interact with corresponding AWT components. If 100
+processes share a virtual console, there is one instance of JADE and 100
+instances of AWT.
+
+If there is more than one instance of JADE, only one instance of JADE can
+be visible at a time in full screen mode. There may be special key
+combinations or mouse events to switch between virtual consoles.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000486.html">[JOS-Arch] rheise.os questions</A></li>
+	<LI> Next message: <A HREF="000489.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#488">[ date ]</a>
+              <a href="thread.html#488">[ thread ]</a>
+              <a href="subject.html#488">[ subject ]</a>
+              <a href="author.html#488">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

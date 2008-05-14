@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java VGA driver on linux</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Matt.Albrecht%40trilogy.com">
+   
+   <LINK REL="Next" HREF="000773.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java VGA driver on linux</H1>
+    <B>Matt.Albrecht@trilogy.com</B> 
+    <A HREF="mailto:Matt.Albrecht%40trilogy.com"
+       TITLE="[JOS-Arch] Java VGA driver on linux">Matt.Albrecht@trilogy.com</A><BR>
+    <I>Fri, 30 Jun 2000 16:44:03 -0500</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000773.html">[JOS-Arch] [boot disk] byte array</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#772">[ date ]</a>
+              <a href="thread.html#772">[ thread ]</a>
+              <a href="subject.html#772">[ subject ]</a>
+              <a href="author.html#772">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;&gt;<i> &gt; Another question:
+</I>&gt;&gt;<i> &gt;
+</I>&gt;&gt;<i> &gt; I have about 3 ATI RageII (mach64) graphics cards and I would love to
+</I>&gt;&gt;<i> &gt; write some Java drivers to use these. Probably just enabling a
+</I>1024x768x16
+&gt;&gt;<i> &gt; mode would be a great achievement, but I don't really know enough
+</I>about
+&gt;&gt;<i> &gt; video hardware to do this easily.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> Somewhere there has to be information on using VESA modes.  I've looked
+</I>&gt;&gt;<i> around but haven't found any.  Most newer cards (like the mach64 series)
+</I>&gt;&gt;<i> use the VESA API, either directly or through an executable BIOS
+</I>extension.
+&gt;&gt;<i> It's definitely worth looking into if we want higher resolutions.
+</I>&gt;<i>
+</I>&gt;<i>Hmm, do many cards support this? What is the name of the standard?
+</I>
+It's called the VESA standard :-).  It stands for Video Electronics
+Standards Association.  Most modern video cards support version 1.2 (the
+latest release, which also supports protected mode calls).  Note that the
+VESA standard requires INT 0x10 calls to be made, which I'm not sure are
+supported under a protected mode machine.  Most SVGA video driver's I've
+seen just implement a switch-to-a-mode method, and everything else seems to
+be standard.
+
+I wrote a set of VESA graphics routines in C for DOS4/GW a while back (and
+I dunno if I've told this group that or not).  I'll send it to all
+interested parties.  It supports only 256 color modes, but it might be a
+good starting point.
+
+&gt;<i>
+</I>&gt;&gt;<i> Some libraries are good about having technical information like that,
+</I>but
+&gt;&gt;<i> many do not.  I was lucky enough to find a book about EGA/VGA
+</I>programming
+&gt;&gt;<i> that has tons of information about the base-level architecture of
+</I>graphics
+&gt;&gt;<i> cards.  Unfortunately, chipset-specific stuff is probably not available,
+</I>&gt;&gt;<i> unless through ATI's website.  Good luck!
+</I>&gt;<i>
+</I>&gt;<i>Well I need to get familiar with the kinds of techniques used in this type
+</I>&gt;<i>computing. So even just understanding how a plain VGA board works will
+</I>&gt;<i>help me a lot.
+</I>
+If you can find it, Addison-Wesley published a book called &quot;Programmer's
+Guide to the EGA and VGA Cards&quot;, by Richard F. Ferraro.  I've got the
+second edition, which includes info on SVGA cards.  It's pretty old, though
+(1990).
+
+Matt
+
+President Merkin Muffley: You can't fight in here, this is the War Room!
+-- Dr. Strangelove
+
+
+
+                                                                                                                   
+                    John Leuner                                                                                    
+                    &lt;<A HREF="mailto:jewel@pixie.">jewel@pixie.</A>        To:     Sean D Cribbs &lt;<A HREF="mailto:sean-cribbs@utulsa.edu">sean-cribbs@utulsa.edu</A>&gt;                            
+                    co.za&gt;               cc:     <A HREF="mailto:arch@jos.org">arch@jos.org</A>                                                      
+                    Sent by:             Subject:     Re: [JOS-Arch] Java VGA driver on linux                      
+                    <A HREF="mailto:arch-admin@jo">arch-admin@jo</A>                                                                                  
+                    s.org                                                                                          
+                                                                                                                   
+                                                                                                                   
+                    06/30/2000                                                                                     
+                    10:09 PM                                                                                       
+                                                                                                                   
+                                                                                                                   
+
+
+
+&gt;<i> &gt; Today I felt like working on some graphics stuff again, so I compiled
+</I>some
+&gt;<i> &gt; native code to allow me to run Thomas Boceks' VGA driver on Linux.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; I had to do an iopl(3) to allow the linux process to access the IO
+</I>ports.
+&gt;<i> &gt;
+</I>&gt;<i> &gt; Then I telnetted to a linux box and ran the java interpreter on there
+</I>as
+&gt;<i> &gt; root.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; The driver seems to switch the video mode, but I don't see the jos logo
+</I>as
+&gt;<i> &gt; expected (the bitblt routine should show the logo).
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; I suspect the problem may be that the linux graphics drivers are
+</I>already
+&gt;<i> &gt; running to enable the virtual text consoles. They are probably putting
+</I>&gt;<i> &gt; the card in some mode that the driver doesn't expect. Does anyone know
+</I>how
+&gt;<i> &gt; I can disable these consoles, or somehow unload the graphics driver?
+</I>&gt;<i>
+</I>&gt;<i> It's also possible that the driver just doesn't work right.  Todd et al
+</I>&gt;<i> had stated that it was incredibly slow.
+</I>
+No. I have personally tested the driver on an earlier setup (not on Linux)
+and it worked consistently. It was slow, but it was also on a 486DX100.
+
+&gt;<i> I personally am tempted to
+</I>&gt;<i> rewrite it in mostly native code, primarily for speed reasons, and also
+</I>&gt;<i> because I have sample VGA code in ASM.  This kind of defeats the purpose
+</I>&gt;<i> of a Java-based driver, but we all want performance too, right?
+</I>
+I would like to discourage you from doing that. You would just be
+rewriting what has already been done many times. We might as well just
+build an environment that supports drivers from an existing OS and use
+those.
+
+With the JIT I'm working on the runtime will be able to generate fast
+native code without hand-coding assembler. It will also allow you to code
+something in asm if it's really necessary. But writing native JNI-type
+code is really not desirable. Invoking those methods has a lot of overhead
+and it is a pain to write.
+
+&gt;<i>
+</I>&gt;<i> &gt; Another question:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; I have about 3 ATI RageII (mach64) graphics cards and I would love to
+</I>&gt;<i> &gt; write some Java drivers to use these. Probably just enabling a
+</I>1024x768x16
+&gt;<i> &gt; mode would be a great achievement, but I don't really know enough about
+</I>&gt;<i> &gt; video hardware to do this easily.
+</I>&gt;<i>
+</I>&gt;<i> Somewhere there has to be information on using VESA modes.  I've looked
+</I>&gt;<i> around but haven't found any.  Most newer cards (like the mach64 series)
+</I>&gt;<i> use the VESA API, either directly or through an executable BIOS
+</I>extension.
+&gt;<i> It's definitely worth looking into if we want higher resolutions.
+</I>
+Hmm, do many cards support this? What is the name of the standard?
+
+&gt;<i> &gt; I have the source code for the mach64 drivers from XFree86, but I need
+</I>&gt;<i> &gt; more background knowledge about how this stuff works. Can someone
+</I>&gt;<i> &gt; recommend a book or a web article that would help me out?
+</I>&gt;<i>
+</I>&gt;<i> Some libraries are good about having technical information like that, but
+</I>&gt;<i> many do not.  I was lucky enough to find a book about EGA/VGA programming
+</I>&gt;<i> that has tons of information about the base-level architecture of
+</I>graphics
+&gt;<i> cards.  Unfortunately, chipset-specific stuff is probably not available,
+</I>&gt;<i> unless through ATI's website.  Good luck!
+</I>
+Well I need to get familiar with the kinds of techniques used in this type
+computing. So even just understanding how a plain VGA board works will
+help me a lot.
+
+John
+
+
+_______________________________________________
+Arch maillist  -  <A HREF="mailto:Arch@jos.org">Arch@jos.org</A>
+<A HREF="http://jos.org/mailman/listinfo/arch">http://jos.org/mailman/listinfo/arch</A>
+
+
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000773.html">[JOS-Arch] [boot disk] byte array</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#772">[ date ]</a>
+              <a href="thread.html#772">[ thread ]</a>
+              <a href="subject.html#772">[ subject ]</a>
+              <a href="author.html#772">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

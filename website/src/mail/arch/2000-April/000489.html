@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os questions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000488.html">
+   <LINK REL="Next" HREF="000493.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os questions</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] rheise.os questions">ryan@whitewolf.com.au</A><BR>
+    <I>Fri, 21 Apr 2000 00:51:32 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000488.html">[JOS-Arch] rheise.os questions</A></li>
+        <LI> Next message: <A HREF="000493.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#489">[ date ]</a>
+              <a href="thread.html#489">[ thread ]</a>
+              <a href="subject.html#489">[ subject ]</a>
+              <a href="author.html#489">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Thu, 20 Apr 2000, Gilbert Carl Herschberger II wrote:
+
+&gt;<i> At 10:05 AM 4/20/00 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+</I>&gt;<i> &gt;Consider callback methods from the AWT system. The AWT system
+</I>&gt;<i> &gt;will invoke code in your process, but the thread executing your code
+</I>&gt;<i> &gt;actually belongs to the AWT process. I'd like getCurrentProcess() to
+</I>&gt;<i> &gt;return the process that owns the code being executed in this case. Maybe
+</I>&gt;<i> &gt;it's possible to keep it generic. I'll know when I get around to looking
+</I>&gt;<i> &gt;at it.
+</I>&gt;<i> 
+</I>&gt;<i> I disagree. There must be two mechanisms. The getCurrentProcess() method
+</I>&gt;<i> returns the current process -- regardless of who owns the code. The
+</I>&gt;<i> getProcess() method returns the process that owns an object. While
+</I>&gt;<i> getCurrentProcess() probably uses getCurrentThread(), getProcess() probably
+</I>&gt;<i> uses getClass().getClassLoader().
+</I>
+Maybe that way's better. I keep changing my mind on this so I should
+probably think about it more thoroughly.
+
+&gt;<i> Consider the AWT system carefully. The AWT is part of system classes
+</I>&gt;<i> (java.awt.*). It is process-wide subsystem, not system-wide.
+</I>
+Not necessarily. I would have thought that the standard toolkit peers
+belong to an AWT process. Peers need to collaborate with eachother, even
+if they are peers of components from different processes. Therefore, if
+the peers don't belong to the same process, there needs to be additional
+object sharing - which I'd rather avoid since it is not necessary.
+
+So, I see the functionality of AWT being split across the process
+boundary. Part of AWT will be in the application's process, and part
+(the peers) will be in the AWT process.
+
+&gt;<i> It must be
+</I>&gt;<i> part of each bytecode process. Each bytecode process has its own
+</I>&gt;<i> java.awt.Toolkit.
+</I>
+Yes, or even multiple. But I would expect the default Toolkit to
+delegate to the AWT process which is able to manage the creation of all
+peers (so they can collaborate with eachother). The AWT system in a
+standard JVM achieves this collaboration through native calls.
+
+&gt;<i> Each process must have its own AWT thread. Again, this is required to
+</I>&gt;<i> maintain the illusion that a bytecode process is running within its own
+</I>&gt;<i> virtual machine.
+</I>
+This is a good idea. Although, it's not necessary. You can achieve the
+illusion other ways, but it may make more sense to pass events over to
+the AWT thread of a process if that's where it's destined.
+
+&gt;<i> On the other hand, JADE is a system-wide subsystem. There may be one
+</I>&gt;<i> instance of JADE for each virtual console. The interaction between JADE and
+</I>&gt;<i> AWT is this: JADE actually paints the screen for one or more instances of
+</I>&gt;<i> AWT. JADE collects UI events and dispatches them to the appropriate
+</I>&gt;<i> process. JADE components interact with corresponding AWT components. If 100
+</I>&gt;<i> processes share a virtual console, there is one instance of JADE and 100
+</I>&gt;<i> instances of AWT.
+</I>
+I forgot that I'm not on the gui list so I may have missed the JADE
+discussion. But if I can give my fresh perspective, I thought JADE was a
+desktop environment that ran on top of a windowing system (ie. Toolkit).
+It sounds like you're making JADE take on responsibility that is meant
+to be handled by a Toolkit.
+
+&gt;<i> If there is more than one instance of JADE, only one instance of JADE can
+</I>&gt;<i> be visible at a time in full screen mode. There may be special key
+</I>&gt;<i> combinations or mouse events to switch between virtual consoles.
+</I>
+Here it also seems you're talking about a Toolkit. ie. there can be a
+Toolkit per virtual console (although, a single process can also use
+multiple Toolkits, as I said before).
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000488.html">[JOS-Arch] rheise.os questions</A></li>
+	<LI> Next message: <A HREF="000493.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#489">[ date ]</a>
+              <a href="thread.html#489">[ thread ]</a>
+              <a href="subject.html#489">[ subject ]</a>
+              <a href="author.html#489">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

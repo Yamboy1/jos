@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000551.html">
+   <LINK REL="Next" HREF="000554.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Wed, 3 May 2000 03:55:19 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000551.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000554.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#552">[ date ]</a>
+              <a href="thread.html#552">[ thread ]</a>
+              <a href="subject.html#552">[ subject ]</a>
+              <a href="author.html#552">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> None which are granted by the kernel. The fact that it is recorded by
+</I>&gt;<i> the kernel, though, means it can be used at the user level.
+</I>
+	I begin to see the light.
+
+&gt;<i> The kernel doesn't care how it is used. But garbage collection in the
+</I>&gt;<i> kernel would benefit from smart use of object ownership by user
+</I>&gt;<i> processes. That was my point about multiple ownership of objects. If we
+</I>&gt;<i> emulate it the way I suggested, that helps the garbage collector - it
+</I>&gt;<i> doesn't leave dead processes around in memory (besides, that's ugly,
+</I>&gt;<i> conceptually).
+</I>
+	Er -- aren't references and ownership indistinguishable from the
+POV of the garbage collector*?  Let me re-phrase the question: when is it
+beneficial to make the distinction between process-with-reference and
+process-with-ownership?  (Or, more accurately, but equivalently, when is
+it beneficial to distinguish between reference-from and
+reference-from-owner?)  If a process dies, its entire memory tree is
+pruned.  If we decide that all shared objects operate with weak
+references, this is not a problem, right?  The reference just becomes
+null.  (Having never /used/ weak references, I'm probably wrong about
+something here.)  (OTOH, weak references are a JDK1.2 thing, right?)
+
+&gt;<i> That's the nature of the system. An object is associated with one class,
+</I>&gt;<i> which is associated with one defining class loader, which is associated
+</I>&gt;<i> with one process. Therefore, objects are owned by (/associated with)
+</I>&gt;<i> processes and that is reflected in the implementation of the
+</I>&gt;<i> kernel(/JVM). Reassigning ownership of an object to another process is
+</I>&gt;<i> therefore a kernel(/JVM) primative, too.
+</I>
+	Okay, I think I understand where you're coming from here.  I tend
+to think of it as an object HasA process, rather than a process OwnsAn
+object.  This is because a process is not an object abstraction at the JVM
+level, except for the back-end to the interface.  This is done
+deliberately so that we can be absolutely certain that whatever
+correctness our single-process JVM has, the multiple-process one does
+also.  The necessary exception -- cross-process casting -- is the one
+which we've spending so much time on to ensure its theoretical
+correctness.
+
+	W.r.t. to garbage collection, that a Process OwnsAn object (or
+that an Object HasA process) doesn't seem -- that I'm seeing - to impact
+the number of live references to the object, which is what matters to a
+garbage collector.  If a process sharing an object terminates without
+using the setSomeOtherOwner() (or whatever) function, it may have good a
+reason for doing so -- the shared object may depend on its
+originating/owner process for functionality.  I don't see that the GC
+needs to worry about.
+
+
+	Quick little question session: the kernel (/decaf) already
+maintains 'ownership' (origination) information.  Is the proposal that for
+(only shared?) objects, we should be able to perform a lookup from it to
+the classloaders/processes which could reference it?  (e.g. had, at one
+point, shared it.  This does not necessarily mean it actually /does/
+reference it.)  And that there is some efficiency/elegance gain from
+maintaining such a reverse lookup?
+
+-_Quinn
+
+* I couldn't, in the time available, find the e-mail where you talked
+about GC w.r.t. ownership of processes, so you may have explained it
+there.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000551.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000554.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#552">[ date ]</a>
+              <a href="thread.html#552">[ thread ]</a>
+              <a href="subject.html#552">[ subject ]</a>
+              <a href="author.html#552">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

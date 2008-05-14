@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Critical methods</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000455.html">
+   <LINK REL="Next" HREF="000467.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Critical methods</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Critical methods">gchii@mindspring.com</A><BR>
+    <I>Wed, 12 Apr 2000 09:38:16 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000455.html">[JOS-Arch] [multiple process] Invoke-able</A></li>
+        <LI> Next message: <A HREF="000467.html">[JOS-Arch] [multiple process] Boot classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#458">[ date ]</a>
+              <a href="thread.html#458">[ thread ]</a>
+              <a href="subject.html#458">[ subject ]</a>
+              <a href="author.html#458">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Let's assume -- for the sake of discussion -- that we have a multiple
+primordial class loader in machine code (MPCL/M). And further, let's assume
+it is a class implemented in C++.
+
+A bytecode process is separate from a primordial class loader. And yet, one
+cannot exist without the other. How much of this can be written in bytecode?
+
+1. All primordial class loaders share a single heap.
+
+(1a) There will be only one mechanism to generate object references in a
+virtual machine.
+
+(1b) There will be only one garbage collection thread.
+
+(1c) There will be only one finalizer thread.
+
+(1d) Each class &quot;knows&quot; its loader through a VM-specific
+PrimordialClassLoader property and/or a ClassLoader property.
+
+(1e) Each object &quot;knows&quot; its loader through its Class property.
+
+(1f) An object can be dynamically cast from any other process to the
+current one. An incompatible class will cause a dynamic cast to fail.
+
+  Object cast( Object v );
+
+2. In machine code, a virtual machine can create a new primordial class
+loader in a sequence something like this:
+
+  void exampleA() {
+    primordialclassloader *loader = primordialclassloader();
+    :
+    delete loader;
+  }
+
+3. The process manager &quot;owns&quot; all primordial class loaders. Each instance
+of a primordial class loader implies a separate process. Each primordial
+class loader must be identified with a process object (or process ID). This
+is better:
+
+  void exampleB() {
+    primordialclassloader *loader = processmanager::createLoader();
+    int pid = loader.getProcessID();
+    :
+  }
+
+4. A well-known interface enables the JOS standard class library to use a
+primordial class loader on any JOS-compatible virtual machine.
+
+// PrimordialClassLoader.java
+package jos.jvmspecific;
+
+public abstract PrimordialClassLoader
+    extends ClassLoader {
+  public abstract int getProcessID();
+  public abstract String getName();
+  public abstract void setName( String v );
+  public abstract Process getProcess();
+}
+
+5. An instance of primordial class loader in machine code (like C++) can be
+mapped to the corresponding object in bytecode (like Java).
+
+// CustomPrimordialClassLoader.java
+package decaf.jvmspecific;
+
+public interface CustomPrimordialClassLoader 
+    implements PrimordialClassLoader {
+  private static native long createLoader( Object o );
+
+  public CustomPrimordialClassLoader() {
+    mcLoader = createLoader( this );
+  }
+  public native int getProcessID();
+  public native Process getProcess();
+  public native String getName();
+  public native void setName( String v );
+  private long mcLoader = 0;
+}
+
+6. A function in machine code enumerates all open processes.
+
+int *list process::getProcessIDList();
+for ( int i = 0; i &lt; iMax; i++ ) {
+  primordialclassloader *pcl = getProcess( list[ i ] );
+  :
+}
+
+We should remember to write a bytecode equivalent to the ps command.
+
+7. A function in machine code kills an open process:
+
+processmanager::killProcess( int pid );
+
+8. A function in machine code determines if a process is (still) running.
+
+processmanager::isProcess( int pid );
+
+9. Like a thread group, a process can be suspended and resumed.
+
+processmanager::suspend( int pid );
+processmanager::resume( int pid );
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000455.html">[JOS-Arch] [multiple process] Invoke-able</A></li>
+	<LI> Next message: <A HREF="000467.html">[JOS-Arch] [multiple process] Boot classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#458">[ date ]</a>
+              <a href="thread.html#458">[ thread ]</a>
+              <a href="subject.html#458">[ subject ]</a>
+              <a href="author.html#458">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

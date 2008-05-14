@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Smart API Distribution</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000359.html">
+   <LINK REL="Next" HREF="000362.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Smart API Distribution</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Smart API Distribution">tmiller@haverford.edu</A><BR>
+    <I>Thu, 30 Dec 1999 13:44:43 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000359.html">[JOS-Arch] Smart API Distribution</A></li>
+        <LI> Next message: <A HREF="000362.html">[JOS-Arch] Smart API Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#361">[ date ]</a>
+              <a href="thread.html#361">[ thread ]</a>
+              <a href="subject.html#361">[ subject ]</a>
+              <a href="author.html#361">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Units always use a network interface card for inter-machine communication
+</I>&gt;<i> -- just like all other serverfarms. Each unit in a serverfarm-in-a-box must
+</I>&gt;<i> be a wholy independent general purpose processor, like a PC. It never uses
+</I>&gt;<i> &quot;shared memory&quot; to communicate between processors.
+</I>
+	Ah, but why not?  If it's on the same motherboard, you can get all
+sorts of speed advantages with shared memory -- not to mention cost
+advantages.  The only requirement for it is an operating system aware of
+it, one whose virtual memory system can handle it.
+
+&gt;<i> Between these 8 machines, I would have no network cabling exposed. By
+</I>&gt;<i> optimizing such a design, I could eliminate the need for 8 separate
+</I>&gt;<i> &quot;motherboards&quot;. Optimization would combine 8 PCs on single card, while
+</I>&gt;<i> maintaining indepdendence.
+</I>
+	On the other hand, by putting them on a single card/box, you're
+creating a single point of failure for yourself -- which eliminates one of
+the advantages of server farms.  If one power supply fails, you only lose
+1/8 of your computing power.  If your in-a-box supply fails, you lose all
+of it.
+
+&gt;<i> I want a hardware architecture that frees us from the idea that speed comes
+</I>&gt;<i> from faster and faster CPUs. The Internet is proof that large scale
+</I>&gt;<i> distributed processing is possible with &quot;slow&quot; CPUs. A serverfarm-in-a-box
+</I>&gt;<i> takes the successful model of the Internet and brings it &quot;home&quot; to a small
+</I>&gt;<i> or medium sized office. Where else can hardware manufacturers go?
+</I>
+	Ah!  You're tired of waiting.  So am I.  Automatic load-balancing
+is one of those things that will produce better response time -- type in a
+command, and when the shell fork()s it, it fork()s it to another processor
+(on the same mobo, usually, to avoid network traffic when it loads,
+etc) -- freeing its processor up to return to it immediately.
+
+
+	The case where a server-farm-in-a-box is different than something
+that's being done today is where it's dedicated to a single user and is a
+cluster, not an SMP (though it may a cluster of SMPs).  Most cluster
+design today focuses on scientific/high-speed computing (e.g. get
+this(these) job(s) done ASAP, and more or less ignore the user) or
+many-&gt;one interactions (e.g. webserving).
+
+	Typically, operating systems themselves scale fairly well, though
+some can do it better than others, like any OS task.  The bottleneck is
+usually with the applications.  An IDE for example, has a trivial scaling
+in that the compiler can run on a separate processor than the the
+editor.  And you might be able to run the tool and menubars on a separate
+processor from the documents, but you reach the point of diminishing
+returns quite rapidly, as the bandwidth and latency of the processor
+interconnects offets the benefits of parallelism.  A non-trivial -- and
+perhaps non-obvious -- paralellization would be to fire off N-1 (N =
+number of processors) compiler runs, instead of doing them sequentially,
+since, aside from the headers, compiling on C/C++ file is independent of
+the rest.  Then a final job to the linking.  This, however, would require
+an effort on the part of the IDE's programmer -- the OS can't help
+here.  It's a simple example, but I think it'll get the point across.
+
+	The hardware manufacturers have good reasons for the single
+processor-single box tradition.  There are technical reasons (which I've
+outlined above) why (up to a certain point) a faster single processor is
+better than a pair of half-speed ones, especially for programs designed
+for a single processor -- and that the OS these machines will ship with
+doesn't support SMP.  (And, of course, one 700 MHz p3 has much larger
+margin than a pair of 400 MHz celerons. (700 MHz celeron != 700 MHz p3))
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000359.html">[JOS-Arch] Smart API Distribution</A></li>
+	<LI> Next message: <A HREF="000362.html">[JOS-Arch] Smart API Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#361">[ date ]</a>
+              <a href="thread.html#361">[ thread ]</a>
+              <a href="subject.html#361">[ subject ]</a>
+              <a href="author.html#361">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

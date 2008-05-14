@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Admin] cvs permissions fix</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:iainshigeoka%40yahoo.com">
+   <LINK REL="Previous"  HREF="000093.html">
+   <LINK REL="Next" HREF="000095.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Admin] cvs permissions fix</H1>
+    <B>Iain Shigeoka</B> 
+    <A HREF="mailto:iainshigeoka%40yahoo.com"
+       TITLE="[JOS-Admin] cvs permissions fix">iainshigeoka@yahoo.com</A><BR>
+    <I>Wed, 30 Jun 1999 09:42:31 -0700 (PDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000093.html">[JOS-Admin] putting wiki &amp; source server in CVS</A></li>
+        <LI> Next message: <A HREF="000095.html">[JOS-Admin] cvs permissions fix</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#94">[ date ]</a>
+              <a href="thread.html#94">[ thread ]</a>
+              <a href="subject.html#94">[ subject ]</a>
+              <a href="author.html#94">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>--- Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+&gt;<i> Iain Shigeoka wrote:
+</I>&gt;<i> 
+</I>&gt;<i> &gt; I was thinking about trying to create a central
+</I>&gt;<i> &gt; &quot;account&quot; management page/script that will allow
+</I>&gt;<i> &gt; a person to manage all account information in a
+</I>&gt;<i> &gt; single place.  Ideally choose/edit one WikiName,
+</I>&gt;<i> 
+</I>&gt;<i> I think it is important to keep cvs accounts
+</I>&gt;<i> separate from wiki accounts
+</I>&gt;<i> to keep security tight. New CVS accounts are created
+</I>&gt;<i> with the same wiki
+</I>&gt;<i> name but a different password. I have asked people
+</I>&gt;<i> to encrypted their
+</I>&gt;<i> desired passwords before sending them to me rather
+</I>&gt;<i> than just sending
+</I>&gt;<i> plain text.
+</I>
+This sounds reasonable.  See below though.
+ 
+&gt;<i> I also want to keep the number of CVS accounts to a
+</I>&gt;<i> minimum. It is
+</I>&gt;<i> typical for there to be only a few people with CVS
+</I>&gt;<i> accounts (the inner
+</I>&gt;<i> circle), while other contributers (the outer-circle)
+</I>&gt;<i> just send in
+</I>&gt;<i> patches (eg. bug fixes) to the main developers. In
+</I>&gt;<i> our case, each
+</I>&gt;<i> project leader definately has a CVS account. Other
+</I>&gt;<i> developers for that
+</I>&gt;<i> project can be given an account if they are trusted.
+</I>
+The only problem with this approach is that we really need an active
+commit administrator then.  I know that the original setup was intended
+to host the kernel and main JOS OS code.  This system works well for
+that.
+
+The new problem is we have a ton of little utilities that people write
+that should be put into CVS. The utility's author would like to be the
+&quot;commit admin&quot; for that utility.  So we would end up with the need for
+many small CVS projects managed by many accounts.  The only way around
+this is to have a few priviledged commit managers that these utility
+authors would have to go through to check files in and out of their
+utility's source.  
+
+I think that not giving an author direct control over their own source
+(for a separate small project) may be prohibitive.  Both for the author
+that does not like to have to go through an approver for their own
+code, and for the commit admin that would have to be approving commits
+to tons of projects.
+
+So I am hoping that there's an easy way (i.e. automated) to allow
+anyone to start a &quot;project&quot; which creates a separate CVS &quot;area&quot; for
+which they become the commit admin for.  They have no special access to
+any other part of the CVS, just their own.  They have the power to
+grant commit priviledges for others (to invite other trusted developers
+into the project) and to revoke them.  Is this possible?  
+
+If not, I'm not sure that the general use of CVS for JOS source (other
+than central code like the kernel) is necessarily a good idea.  If
+things go well, we should be expecting hundreds of separate &quot;OS
+support&quot; projects to pop up for everything from commandline utilities,
+to little jos desktop clocks and other desktop applets, to
+test/analysis tools.  I'm not sure that we can centrally create a
+single JOS CVS for all this without fully automating the process.
+
+We my have to have a &quot;you're on your own, just provide links to your
+source/binaries&quot; policy like linux has.  And rely on authors to find
+their own resources for version control and hosting... or hope that
+bundlers like RedHat come along to organize things...
+
+I would much prefer it, if we could, to centralize
+these facilities and provide the infrastructure for all the JOS related
+sources.
+
+&gt;<i> There may be other ways - you're welcome to think of
+</I>&gt;<i> any. Perhaps we
+</I>&gt;<i> could have two CVS servers - one for main
+</I>&gt;<i> developers, and another for
+</I>&gt;<i> untrusted developers. It would *somehow* be
+</I>&gt;<i> automatically updated to
+</I>&gt;<i> reflect changes in the main repository. I don't see
+</I>&gt;<i> this happening any
+</I>&gt;<i> time soon though :-)
+</I>
+I don't think this will work so well.  Perhaps a separate CVS for the
+kernel and one for the rest if security is a major issue...
+
+&gt;<i> Do you mean put the pretty printed file in CVS?
+</I>
+No.  Just the raw source.
+
+&gt;<i> There is no point in
+</I>&gt;<i> keeping version history of generated files. We just
+</I>&gt;<i> need to put the
+</I>&gt;<i> source files in CVS and when pretty printed files
+</I>&gt;<i> are out of date and
+</I>&gt;<i> need to be regenerated, they can just be written
+</I>&gt;<i> over.
+</I>
+Agreed.  Both the pretty printed source, and generated javadoc would be
+replaced when the raw CVS source is updated.
+
+-iain
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at <A HREF="http://mail.yahoo.com">http://mail.yahoo.com</A>
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000093.html">[JOS-Admin] putting wiki &amp; source server in CVS</A></li>
+	<LI> Next message: <A HREF="000095.html">[JOS-Admin] cvs permissions fix</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#94">[ date ]</a>
+              <a href="thread.html#94">[ thread ]</a>
+              <a href="subject.html#94">[ subject ]</a>
+              <a href="author.html#94">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

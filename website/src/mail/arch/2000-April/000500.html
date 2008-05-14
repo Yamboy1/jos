@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000498.html">
+   <LINK REL="Next" HREF="000507.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Tue, 25 Apr 2000 16:40:27 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000498.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000507.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#500">[ date ]</a>
+              <a href="thread.html#500">[ thread ]</a>
+              <a href="subject.html#500">[ subject ]</a>
+              <a href="author.html#500">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> As promised, here is my response to _Quinn's final summary. Nice,
+</I>&gt;<i> thorough summary. I only have a couple of comments:
+</I>
+	Thanks for the review.
+
+&gt;<i> Shared-object IPC might be more important from a functional perspective.
+</I>&gt;<i> rheise.os demonstrates that JavaProcess objects must be shared (although
+</I>&gt;<i> I'm sure there are hacky ways around this).
+</I>
+	D'oh!  I'd clean forgotten that we needed shared objects for
+rheise.os.  How about:
+
+&quot;The desire for multiple processes ... benefits.  Most elegant
+implentations of multiple processes requires shared-object IPC, if for
+nothing aside from the created process object.  (Strictly, the process
+object returned to the creating function could be a message-passing stub,
+like RMI.)&quot;
+
+&gt;<i> Rather than perfecting memory efficiency, then implementing IPC, we
+</I>&gt;<i> could start with incomplete implementations of each one and work from
+</I>&gt;<i> there. eg. allow IPC for &quot;kernel required&quot; classes (regardless of
+</I>&gt;<i> whether memory efficiency is implemented).
+</I>
+	Right.  I'll see how things turn out in implementation.  (It may
+be easier to do both at the same time.)
+
+&gt;<i> - I think the mechanism for (1) needs to be investigated further.
+</I>&gt;<i>   Flagging the object is one way to handle it. Another way is to simply
+</I>&gt;<i> control &quot;access&quot; to the object. A process can't ordinarily gain access to
+</I>&gt;<i> an object in another process, so there needs to be some bridge method
+</I>&gt;<i> that returns a reference to an object of another process. This method
+</I>&gt;<i> can perform access control. The difficulty in flagging is that you can't
+</I>&gt;<i> simply flag an object as shared because that won't give you access to
+</I>&gt;<i> its member variables, or to objects returned by methods on the object
+</I>&gt;<i> you do have access to. Flagging is obviously a way to make the system
+</I>&gt;<i> safer, but is it really necessary?
+</I>
+	Flagging was my suggestiong for an implementation of (1).  With a
+bridge method, once the object has been returned, how does decaf know it
+can be 'illegally' cast?  Something about that object in particular is
+different than other object -- so I suggested a flag.  Where/when that
+flag -- that something special about an object that says 'I'm shared, cast
+me illegally' -- is set is mostly an interface issue.
+
+&gt;<i> - The model of sharing here is not fully specified.
+</I>
+	Good point.  Any shared object may generate additional objects
+which must be shared.  According to the summary so far, a security check
+is necessary before objects may be shared.  Naturally, this must apply to
+objects returned by the shared object as well.  I think the same arguments
+apply here as they did before; we don't want to do this implicitly.  That
+is, by default, a shared object generates objects belonging to the
+classloader to which the constant class reference used loaded -- that is,
+when decaf goes to look for a class instance to generate an object from,
+it will (perhaps implicitly) use that classloader of the current
+thread.  I think forcing the shares to be explicit and having generated
+objects be local will take car of the cases we need to worry about.
+
+&gt;<i> &quot;Now, if the client process directly accesses static members, it will
+</I>&gt;<i> access the cloned versions that belong to its own process. However, if
+</I>&gt;<i> you call a method on an object that really belongs to another process,
+</I>&gt;<i> and that method accesses a static member, then it should access the
+</I>&gt;<i> static members of the class in the _other_process. Are there any
+</I>&gt;<i> problems in implementing that?&quot;
+</I>
+	I think it comes out implicitly in the way things are done by the
+interpreter.  The shared object's class references will be resolved in/by
+the classloader which loaded it first, because the CL of an object
+(actually, of its class definition) is never changed.  This should be an
+exact fit for the ownership semantics.  This also means, incidentally,
+that a process that exits can't be cleaned up until we're sure no shared
+object classloaders point at it.  (That is, we have to run a garbage
+collection on process exit.)
+
+	I'll think about how to add this to the summary.
+
+&gt;<i> Can you point me to these papers? Thanks.
+</I>
+	<A HREF="http://www.cs.umd.edu/~pugh/java/">http://www.cs.umd.edu/~pugh/java/</A>  has a great deal of information
+about various problems with Java, including the memory model and
+type-safety.  (esp see his paper from the ACM Java Grande conference)
+
+-_Quinn
+
+BTW, I put the corrected summary up on the wiki, MultipleJavaProcesses
+(<A HREF="http://www.metamech.com/wiki/view/Main/MultipleJavaProcesses">http://www.metamech.com/wiki/view/Main/MultipleJavaProcesses</A>), so that we
+can work on it more collaboratively, should we need to.
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000498.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000507.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#500">[ date ]</a>
+              <a href="thread.html#500">[ thread ]</a>
+              <a href="subject.html#500">[ subject ]</a>
+              <a href="author.html#500">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

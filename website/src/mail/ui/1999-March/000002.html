@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000001.html">
+   <LINK REL="Next" HREF="000003.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea">tmiller@haverford.edu</A><BR>
+    <I>Mon, 29 Mar 1999 14:29:32 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000001.html">[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</A></li>
+        <LI> Next message: <A HREF="000003.html">[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up
+ idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> So in this respect, yes, an addKeyListener() would be a good solution.  All we
+</I>&gt;<i> need then is a JOS-wide event system to manage acynch events.
+</I>
+	That's the real kicker, isn't it.  AFAIK, the event system concept
+hasn't made it into operating systems yet.  (Except maybe JavaOS
+itself; I'm checking.)  The major problem regarding
+console applications is two-fold: they aren't event based and they
+use java.lang.System.in/out/err, which hide redirects -- something
+like &quot;jsort &lt; address_book &gt; alpha_address_book&quot; where the j.l.S variables
+enscapulate file streams instead of character streams directed at the
+console.
+
+	The suggestion you make is a good one in that it moves the
+responsibility for event distribution out of the 'kernel' and into
+'user-space.'  It also, however, maintains the 'redirection' idea, which
+might not be a good thing.  In the AWT, a keylistener subscribes to a
+specific Component (i.e. its main window) as the keyspeaker; this
+implicitly takes care of event focus problems.  The major problem is the
+collision between the streams-based and the event-based models in the 
+console application, where there isn't a Component to listen to.
+
+	We must support java.lang.System.in/out/err redirects, simply to
+make 'legacy' (non-JOS-aware) java applications function -- as well as
+make the shell redirection tools usable and implementable.  The question,
+then, becomes:
+
+	We know the application is jos-aware because it wants to listen
+for KeyEvents.  Thusly:
+
+	What should the application listen to?  Itself?
+jos.system.keyboard?  Suppose the application is jos-aware; it could be
+made to inherit from jos.application, in which case the jos.application
+code could take care of the necessary event distribution.  This *does*
+remove the question one step -- it will be necessary to determine how the
+AWT handles distributing events.  Should the application listen to
+jos.system.keyboard, it (perhaps quite simply) becomes necessary for the
+shell to redirect jos.system.keyboard as needed.  A window manager, of
+course, could do the same thing.
+
+	What should the application listen to?  I think it's almost just a
+matter of peronsal preference.  It seems, to me anyway, rather odd to be
+using a streams idea for an eventspeaker, but it might be worth doing
+anyway.  On the other hand, it might be argued that a jos (console)
+application should NOT be, by default, event-based, and therefore
+inheriting a whole bunch of event-dispatching code in the general case is
+a Bad Idea.
+
+	A major factor would be: what other kinds of events might a
+console application (usually) be interested in?  timer events?
+gained-focus events?  (instead of the signal equivalent of whatever
+happens when a job is foregrounded in UNIX)  mouse events?  (would be nice
+to have some standardized interface to the mouse for console apps,
+wouldn't it?)  the joystick?  If you posit that in a fashion similar to
+emacs' x-awareness, console apps might be windowing-aware, you could even
+get Menu and Window events.*
+
+	If we believe the Event model is the Right Way To Go for all
+applications, shouldn't the event model pretty closely resemble the AWT's?
+(or your preferred event model.  I would suggest the AWT's because (a)
+it's available and (b) all java programmers should know it.)
+
+	As for difficulty of implementation, does anyone know how
+classpath.org is handling event dispatching in their AWT implementation?
+
+-_Quinn
+
+* Or, if you posit a 'transparent windowing' shell.  This is an idea
+(along with 'command-line windowing' -- more later) I've been thinking
+about on and off since the jos project began.  Basically, when one starts
+up wash (the windowing application shell), it checks and makes sure
+it's running on a graphic console. (or as an xterm-equivalent under the X
+equivalent.) If it's not, you can ignore the windowing commands.
+Basically, wash uses a text console look-alike VGA framebuffer (for
+example), which, as a basic thing, allows for customized fonts (like the
+linux virtual consoles do.)  The start-up mode would be definable, but use
+an definable-sized font, 80x25 (or definable) at some point (say centered)
+in the (black) background of the console.  Taking this a step forward, it
+would not be beyond reason to implement a command like '&amp;', say '%': instead of forking
+the process off to the background, it forks off a new 'window'.  A wash
+'window' would just be another console somewhere else on the screen;
+overlaps would be indicated with brighter or darker (etc) text. BUT, no
+graphics: wash would be just as fast as a normal shell.  wash would
+determine where the keyboard focus is based on ALT-TAB (definable) or
+equivalent shortcuts: commands like 'minimize,' 'maximize,' 'tile,'
+'cascade,' 'shade,' 'front (process-name)' would do what you might expect
+them to do.  Your sysadmin would log in and do something as follows:
+
+jos.org:~# top % $UPPER_RIGHT
+jos.org:~# front top
+jos.org:~# pine % $LOWER_LEFT
+jos.org:~# focus pine
+[now in pine's window, which is above the root window but below (probably
+ not overlapping) top's window]
+[checks his mail and notices that top is claiming the load just
+skyrocketed]
+[ALT-TAB to the root window]
+jos.org:~# kill 1344
+jos.org:~# pico /var/log/messages % $FULL_SCREEN
+[the FULL_SCREEN 'macro' auto-focuses the newly-spawned window]
+
+and so on.  If the system implements virtual consoles (like Linux) the
+become (if they're running wash) virtual desktops.
+
+	It might be fair to call the idea &quot;an all xterm window manager.&quot;
+But I would think that window managers manage more xterms than anything
+else.  (At least, *I* manage more xterms than other windows this way.)
+
+	Anyway, I think it could be a really neat demonstration.
+
+	Command-line windowing is a very simple idea: does anyone remember
+BASIC's and LOGO's mixed-modes?  Where your had four or five lines of text
+on the bottom and the graphics up top?  Wouldn't that be a better way to
+handle the way most people use window managers than xterms?  (The few
+line console, would, of course, have many, many, virtual consoles to play
+with.  On a straight memory comparison with Linux, a 5-line screen could
+have 30 virtual consoles.)  virtual consoles and virtual desktops would be
+independent of each other.  Of course, something like pine might not work
+too well on a five-line console, but that's hardly the point.
+
+	These ideas are not in their stable release form.  They no
+warranty of any kind, explicit or implied; they have not been tested for
+suitability to purpose.  Only load these ideas in a partition of your mind
+you can safely erase later; do not use these ideas for mission-critical
+applications.  They have not been approved by the FDA.  Usage of the
+ideas implies full understanding and agreement with the terms of the
+liscence agreement as described by the First Amendment.  Thank you.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000001.html">[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</A></li>
+	<LI> Next message: <A HREF="000003.html">[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up
+ idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

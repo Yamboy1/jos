@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Boot classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000458.html">
+   <LINK REL="Next" HREF="000469.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Boot classes</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Boot classes">gchii@mindspring.com</A><BR>
+    <I>Thu, 13 Apr 2000 09:20:24 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000458.html">[JOS-Arch] [multiple process] Critical methods</A></li>
+        <LI> Next message: <A HREF="000469.html">[JOS-Arch] Release of rheise.os - multiprocess Java layer for JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#467">[ date ]</a>
+              <a href="thread.html#467">[ thread ]</a>
+              <a href="subject.html#467">[ subject ]</a>
+              <a href="author.html#467">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Classes required at boot-time are &quot;boot classes&quot;. A boot class must be
+loaded before the virtual machine is able to use a custom class loader.
+
+Classes are organized into packages. Packages required at boot-time are
+&quot;boot&quot; packages. Classes should be included or excluded from boot-time at
+the package level.
+
+In general, there are three ways to think about boot classes.
+
+1. Stored in many, many files. In a classic design, boot classes are loaded
+through a primordial class loader. When a classic virtual machine is
+&quot;booted&quot; or started up, it depends on a pre-existing file sub-system.
+Originally, a CLASSPATH enabled a primordial class loader to load bytecode
+from class files.
+
+2. Stored in two files. Continuing to use a primordial class loader, a
+CLASSPATH was re-invented to include archive files (.cab, .jar and .zip).
+At first, compressed archives were not supported. Later, it was. Again,
+CLASSPATH enabled a primordial class loader to load bytecode from class
+files stored alone or in an archive. This is basically how decaf works.
+
+3. Stored in one file. A virtual machine and its boot packages can be
+stored in a single executable file. Boot packages are statically linked
+with a virtual machine, rather than dynamically linked. The two become
+inseparable.
+
+There are many reasons why I'd like to store a virtual machine and its boot
+packages in a single file. Here are a few.
+
+A. The startup sequence does not depend on a pre-existing file subsystem.
+The mechanism for loading or downloading a boot image is encapsulated by
+GRUB or Etherboot. No modules are required.
+
+B. Bytecode is binary data. For boot packages, and boot packages only,
+bytecode is a binary resource. Like icons and string tables, boot packages
+can be statically linked to an executable image.
+
+C. When bytecode is statically linked to an executable image, both Linux
+and Windows correctly treat it as read-only. A bytecode resource is never
+written to a swap file because it is always available in the original
+executable image on disk. When bytecode is translated into a class
+definition and then a class, it is not discarded. The space is never freed.
+This means that the Code attribute does not have to be copied into a
+read-write memory block.
+
+D. When bytecode is statically linked to an executable image, GRUB and
+Etherboot correctly tread it as read-only. No additional module is
+required. When bytecode is statically linked to decaf, a primordial class
+loader can always get the bytecode. It is guaranteed. No CLASSPATH is
+required for boot packages.
+
+We are again talking about the same thing in different context. Both a
+system-process and a user-process class loader should implement the same
+PrimordialClassLoader interface.
+
+A kernel class loader is a kind-of primordial class loader. A kernel class
+loader is used to load classes in the system process. It is a
+system-process class loader. It loads init.class.
+
+A user-process class loader is a kind-of primordial class loader. A
+user-process class loader is used to load classes in a user process.
+
+-----
+
+A kernel class loader might use classes.zip, bytecode resources, or some
+other method. It might depend on CLASSPATH or it might ignore it. It always
+loads a system process. It exists before a file subsystem.
+
+On the other hand, a user-process class loader may or may not depend on
+CLASSPATH. CLASSPATH exists only for backward compatibility.
+
+Here's a decaf scenario.
+
+1. A virtual machine is loaded as an executable image.
+2. The classes.zip archive is loaded as a module.
+3. A kernel class loader is used to boot-strap the system process.
+4. At least the java.lang, java.io, java.net and java.util packages are
+available in classes.zip.
+
+(Up to this point, nothing has changed.)
+
+4. The init class loads a URL-based class loader, also stored in classes.zip.
+5. The init class uses the URL-based class loader to download an
+implementation of some file subsystem.
+6. Many more class files, archives and package files become available
+through the new file subsystem.
+7. The init class launches a Java application, inside a new process, with a
+new CLASSPATH and a new primordial class loader that uses CLASSPATH.
+8. The Java application runs unaware that it is running on decaf. It is
+unaware how it runs side-by-side with other processes.
+
+A command line shell might be the second process. It could be a standard
+Java application. The shell and the system process (init) are isolated from
+each other by the process model.
+
+In turn, the command line shell can display a list of current processes,
+change the DIRECTORY, CLASSPATH and PACKAGEPATH environment variables,
+launch a new process, kill a process, redirect the output from one
+application to the input of another.
+
+-----
+
+How should they be linked? There are two good ways to do this.
+
+1. Boot packages can be stored in an archive (like classes.zip) and the
+archive concatinated to the virtual machine's executable image. A kernel
+class loader would find the archive just like it finds any binary resource.
+
+2. Boot packages can be compiled into a static library. Binary resources
+can be stored in C++ source code using a code generator. By compiling the
+C++ code and using a standard linker, boot package resources can be stored
+in a static library.
+
+Personally, I like method 2 for at least the following reason. When binary
+resources are stored in C++ source code, they become C++ classes. The C++
+class design enables an abstraction of a resource. It is no longer a raw
+binary resource from the viewpoint of all the other classes. I have been
+working on a translator. It does work. I have documented this on JOS Wiki,
+in an article called BytecodeResource.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000458.html">[JOS-Arch] [multiple process] Critical methods</A></li>
+	<LI> Next message: <A HREF="000469.html">[JOS-Arch] Release of rheise.os - multiprocess Java layer for JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#467">[ date ]</a>
+              <a href="thread.html#467">[ thread ]</a>
+              <a href="subject.html#467">[ subject ]</a>
+              <a href="author.html#467">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

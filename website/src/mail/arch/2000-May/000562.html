@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000561.html">
+   <LINK REL="Next" HREF="000564.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Wed, 3 May 2000 23:47:44 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000561.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000564.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#562">[ date ]</a>
+              <a href="thread.html#562">[ thread ]</a>
+              <a href="subject.html#562">[ subject ]</a>
+              <a href="author.html#562">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>public class SharedObject extends/* | implements */ SharedObjectAPI {
+	public void doSomethingUseful() { /* like calculate pi */ }
+	}
+
+public class jpOne extends JavaProcess {
+	public SharedObject so = null;
+
+	public void run() {
+		SharedObject so = new SharedObject();
+		jpTwo jp = new jpTwo();
+		jp.put( so );
+		so.wait();
+		so.notify();
+		this.kill();
+		} /* should die at the end of run, anyway */
+	} /* end jpOne */
+
+public class jpTwo extends JavaProcess {
+	public SharedObject so = null;
+
+	public void put( SharedObject so ) {
+		this.so = so;
+		so.notify();
+		so.wait();
+		so.doSomethingUseful();
+		}
+	} /* end jpTwo */
+
+	Admittedly, this is the pathological case, but that just makes it
+easier to consider.  jpOne generates a shared object, and as the parent of
+the jpTwo process, has implicit permission to share so with it.  It then
+waits for jpTwo to say that it has so, tells it move along, and kills
+itself.  jpTwo notifies jpOne that it has the object, and then waits for
+confirmation, after which if doesSomethingUseful() with so, the shared
+object.  However, odds are good the so's process has been killed / died
+/ lost in the woods.
+
+	What do we want to happen right now?  Can we fail
+so.doSomethingUseful() with a null pointer exception?  Is that semantically
+legal?  (Probably not.)  Is it allowed by the VM or language
+specs?  (Probably not.)  For simplicity's sake, a SharedObject doesn't
+even have any fields; it's just used as a semaphore.  (Shared references
+confuse the issue; I'm hoping we can deal with them recursively.)
+
+	At a bare minimum, it's clear that anything aside from nulling
+requires the class definition* of SharedObject -- wherever it may be
+'located' -- to remain legal.  This is assured by normal garbage
+collection; the so object in jpTwo requires a Class pointer, which in turn
+contains a pointer to its definition.  (The static values in the class are
+lost; I believe that the expectation is that a SharedObject would access
+the statics of whichever process happened to be using it at the time,
+information that would be procured from the scheduler.)  Any class
+definition contains a reference to a super class.  Bytecode references are
+purely symbolic; native references are pointers.  For native references,
+this means that the super class will always be shared.  (Since we, by
+definition, have a single copy of that pointer.  It is probably desirous
+to force the sharing of class definitions to be recursive for this matter;
+that is, all class references located in a class definition will either
+match, or a share attempted; if any of them fail, the whole share fails.  
+Otherwise, you hit type-safety snags.)  The picture for bytecode
+references is similar; if we're maintaing bytecode payloads, we must have
+the parent class's bytecode somewhere, and the two payloads can be checked
+for equality.
+
+	So the minimum is satisfied by the recursion necessary to succeed
+in the share.  (This needs to be added to the summary.)  In fact, so long
+as the originating/single-owner process remains live, the minimum is
+sufficient for proper sharing; all references are still live.
+
+	Back to the case at hand -- a hard reference to an object whose
+'owner' pointer will prevent a threadless/killed/dead process from being
+garbage collected.  I expect we agree that is Not Good.  Since the shared
+object has already met the minimum requirements -- that is, without
+references, it can't tell if it's operating in its originating process or
+not -- it is transparent to re-write the classloader pointer to point to
+jpTwo.**  So far, so good.  Referenceless shared objects work OK, because
+we can transparently rewrite the classloader reference of the shared
+object to avoid GC problems.***
+
+	All static references are stored with the class in the process's
+classloader, and exist on a per-process basis.  We have never considered
+sharing classes themselves.  So static references in shared objects will
+work just fine -- because we can rewrite the classloader reference of the
+shared object to avoid GC problems.
+
+	The problem is instance references.  Every instance reference
+which escapes must be a shared object, for the same reasons we can't just
+hand unchecked references around between processes.  I think to here is as
+far as we've discussed; at least, it's as far as I have a good idea of
+what's going on.  I believe, also, that the semantics of this care are
+fairly clear; every escaping variable must be handled in the same as an
+explicit request to share an object -- whatever that might be.
+
+	If things follow the trend, we should come to a conclusion that
+instance references in shared objects are OK, because we can
+recursively rewrite the classloader references in all of them.
+
+	All of this is in the case that the object's classloader reference
+becomes invalid, and I think that is a key way of phrasing things.  A
+process and (primordial, but that's what been under discussion)
+classloader define each other; killing a process means invalidating its
+classloader.  (Though not, necessarily, everything in it, because of
+shared objects.)  It looks like three elements will suffice for general
+object sharing:
+
+(1) Shared class definitions.  This includes parent class definitions,
+whensoever this might be checked.  (At share or access time.)  This is
+provided and run by the kernel/VM.
+
+(2) The ability to rewrite an object's classloader reference.  This is
+provided by the kernel/VM to Java.  In the above examples, there was no
+distinction made between rewriting an object's classloader reference, and
+the CL references of the class it pointed to; since the classloader of the
+class was already invalid, no harm is done by blind-writing to it.  (The
+shared class under consideration will not be GC'd because jpTwo's
+classloader has a pointer to it.)  In the general case, where both
+processes are still active, it may be necessary to have a per-object CL
+reference.  This needs more discussion.)
+
+(3) The ability to determine when a classloader reference is invalid, and
+then the ability to use (2) to correct it.
+
+-_Quinn
+
+* Here, I'm not concerned with the mechanics of definitions.  It seems
+clear to me that we will eventually hammer out the differences between
+native and bytecode representations so as to be able to use both to our
+mutual advantage, if we haven't already.
+
+** I won't go into the exact mechanism here, though clearly one that adds
+no additional references is necessary.  A list must be attatched to the
+shared object and maintained; I leave the question of how open to 'the
+floor'. :)
+
+*** Necessarily, the VM /must/ always ask for its current process rather
+than following its classloader pointer when fetching classes on the shared
+object's behalf.  Doing this for /every/ object, shared or not, will be
+too expensive; some optimization will be necessary.  (An O(1) test if
+there is more than one 'potential owner' -- e.g. accessor?)
+
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000561.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000564.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#562">[ date ]</a>
+              <a href="thread.html#562">[ thread ]</a>
+              <a href="subject.html#562">[ subject ]</a>
+              <a href="author.html#562">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

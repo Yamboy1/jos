@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000518.html">
+   <LINK REL="Next" HREF="000514.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Thu, 27 Apr 2000 14:18:54 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000518.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000514.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#511">[ date ]</a>
+              <a href="thread.html#511">[ thread ]</a>
+              <a href="subject.html#511">[ subject ]</a>
+              <a href="author.html#511">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I see, I misunderstood. Then when is an object flagged? And what is the
+</I>&gt;<i> exact definition of what it means for an object to be flagged?
+</I>
+	I just wrote some example code and realized something: the
+efficiency benefit I was considering is actually rather small, because you
+could code the instanceof/checkcast stuff to call a function to compare if
+two classes/interfaces are the same, like so:
+
+bool classEQ( dst, src ) {
+	if ( dst-&gt;classdefinition == src-&gt;classdefinition ) {
+		return true;
+		}
+	else if ( dst == src &amp;&amp; dst-&gt;classloader == src-&gt;classloader ) {
+		return true;
+		}
+	else {
+		return classEQ( dst-&gt;parentclass, src );
+		}
+	}
+
+	The only additional cost to always allowing illegal casts is the
+single if statement at the beginning, which is comparing pointers to
+classdefinitions, and is thus cheap.  (With multiple native processes, it
+would have to compare GIDs, instead, because pointers aren't unique, but
+this applies everywhere I assume they are, like the next if.)
+
+	Originally, I'd been thinking the additional cost for always
+allowing illegal casts would be high, but it's not, for two reasons: the
+class definition sharing is done at class loading, and second, because our
+OO-IPC method secures cross-process object references, we don't have to
+worry about security.
+
+	So it turns out I was, in fact, just being totally stupid.
+
+&gt;<i> On the topic of JDK 1.1.x vs. JDK 1.2, rheise.os is currently based on
+</I>&gt;<i> JDK 1.1 (which is convenient for decaf). Al &lt;<A HREF="mailto:al@outworld.org">al@outworld.org</A>&gt; pointed
+</I>&gt;<i> out to me that his registry depends on JDK 1.2, and to integrate his
+</I>&gt;<i> work with mine we will need to either move our base level support to JDK
+</I>&gt;<i> 1.2, or rewrite his registry to support JDK 1.1. I'm a bit nervous about
+</I>&gt;<i> moving to JDK 1.2 just yet, but I'm wondering whether you have a
+</I>&gt;<i> different opinion. Is JDK 1.2 realistic for you?
+</I>
+	Honestly, I haven't looked at how different (in VM terms) JDK1.2
+is from 1.1.x; I'm still not supporting inner classes, either.  I'll look
+into, hopefully sometime soon, but I'm not optimistic.  My gut feeling is
+that Sun added a great deal of native code to the 1.2 libraries to allow
+it do what it does, code that we're not going to port any time
+soon.  (and/or that classpath will have implementations of)  The JVM
+changes could very well be very minor -- I've been programming out of the
+Second Edition VM spec, which I think covers the VM for JDK1.2 -- it, at
+least, mentions it fairly often.  Even before I started re-writing decaf,
+it didn't support certain things in the spec just because I hadn't gotten
+around programming them yet.  Actually, I'm pretty sure the JVM changes
+will fairly minor, because otherwise the 1.2 jdk couldn't run 1.1 code :)
+
+&gt;<i> I must have missed it. We are talking about access to statics of shared
+</I>&gt;<i> objects, right?
+</I>
+	Right.  MultipleJavaProcesses is the wiki topic for the text 
+of the 'final summary', which seems to me like a good place to put this
+kind of consideration; I was just setting up the wiki page as a
+possibility for collaboration.
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000518.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000514.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#511">[ date ]</a>
+              <a href="thread.html#511">[ thread ]</a>
+              <a href="subject.html#511">[ subject ]</a>
+              <a href="author.html#511">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

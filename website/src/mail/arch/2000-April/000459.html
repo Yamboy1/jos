@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Compiling bytecode</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000456.html">
+   <LINK REL="Next" HREF="000455.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Compiling bytecode</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [multiple process] Compiling bytecode">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 13 Apr 2000 01:11:26 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000456.html">[JOS-Arch] [multiple process] Compiling bytecode</A></li>
+        <LI> Next message: <A HREF="000455.html">[JOS-Arch] [multiple process] Invoke-able</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#459">[ date ]</a>
+              <a href="thread.html#459">[ thread ]</a>
+              <a href="subject.html#459">[ subject ]</a>
+              <a href="author.html#459">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Tue, 11 Apr 2000, Gilbert Carl Herschberger II wrote:
+
+&gt;<i> Does a MPVM run the old MyUtility.class or the new one?
+</I>&gt;<i> 
+</I>&gt;<i> Does a MPVM always discard the static fields of the old class?
+</I>&gt;<i> 
+</I>&gt;<i> Choice is what I want. I always want to explicitely choose between running
+</I>&gt;<i> a program within the current process or running in a new process.
+</I>
+There are several ways one might want invoke a program:
+
+1. In a new process with a fresh primordial class loader. This behaves
+   the same way as a standard JVM in that it will load the latest version
+   of every class with respect to the filesystem.
+2. In a new process but with a clone of the parent process's primordial
+   class loader.
+3. In the current process with a fresh primordial class loader.
+4. In the current process with the existing class loader.
+
+The option you were talking about is option (4). However, since this
+option doesn't respect statics, option (2) might be required for some
+programs to function properly. The advantage of (4) is that it is very
+light weight.
+
+Option (3) at first glance seems to provide no benefit over (1) in that
+it requires the same amount of additional resources. The difference is
+that it releases the resources of the previous program running in the
+process. You only need to use this option if the parent process is
+waiting on your process. If you use option (1) to create a new process
+and exit, the parent process will finish waiting prematurely. It depends
+on your waiting needs.
+
+Option (2) might be useful if you want to spawn a number of processes
+running the same program, and you want to make sure that they are
+running exactly the same version of the code. If option (1) is used and
+libraries are replaced on the filesystem during the spawning process,
+the different processes won't all be running off the same version of the
+program. I expect option (1) would be the expected &quot;normal&quot; behaviour,
+but option (2) might be useful in some cases.
+
+Note: some of my comments above might only be applicable when relating
+it to my proposal for multiple Java processes. Please forgive me if
+that's the case (then again, it may not be).
+
+BTW, that proposal is now at:
+
+	<A HREF="http://www.progsoc.uts.edu.au/~rheise/jos/java_processes.txt">http://www.progsoc.uts.edu.au/~rheise/jos/java_processes.txt</A>
+
+I have implemented a prototype of this process model which has an
+architecture to support both a host implementation (running on top of a
+standard JVM - this is complete), and a native implementation (running
+inside decaf - this is incomplete). I have been using it to experiment
+with my ideas on a user model and security, documented at:
+
+	<A HREF="http://www.progsoc.uts.edu.au/~rheise/jos/jos-security.html">http://www.progsoc.uts.edu.au/~rheise/jos/jos-security.html</A>
+
+It's just something I've been using to experiment. I'll post the source
+if you're interested. I just need to add a bit more to the native
+implementation and write at least /some/ documentation :-)
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000456.html">[JOS-Arch] [multiple process] Compiling bytecode</A></li>
+	<LI> Next message: <A HREF="000455.html">[JOS-Arch] [multiple process] Invoke-able</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#459">[ date ]</a>
+              <a href="thread.html#459">[ thread ]</a>
+              <a href="subject.html#459">[ subject ]</a>
+              <a href="author.html#459">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

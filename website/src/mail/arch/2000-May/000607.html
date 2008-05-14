@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [test case] JDSK</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000603.html">
+   <LINK REL="Next" HREF="000618.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [test case] JDSK</H1>
+    <B>jewel@pixie.co.za</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Arch] [test case] JDSK">jewel@pixie.co.za</A><BR>
+    <I>Wed, 17 May 2000 22:24:23 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000603.html">[JOS-Arch] [test case] JDSK</A></li>
+        <LI> Next message: <A HREF="000618.html">[JOS-Arch] [test case] JDSK</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#607">[ date ]</a>
+              <a href="thread.html#607">[ thread ]</a>
+              <a href="subject.html#607">[ subject ]</a>
+              <a href="author.html#607">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> The Java Servlet Development Kit (JDSK) from Sun Microsystems contains a
+</I>&gt;<i> HTTP service, doesn't it? It contains a servletrunner tool to start this
+</I>&gt;<i> service. This might make a good test case for a bytecode process.
+</I>&gt;<i> 
+</I>&gt;<i> When a process is terminated, everything that it owns must be garbage
+</I>&gt;<i> collected (or discarded) -- including its open server sockets.
+</I>
+Hmm, as I remember one of the initial things about servlets that made them
+&quot;cool&quot; was the fact that you didn't need to start a new process to handle
+each request.
+
+This was the classic bottleneck in CGI implementations, where the
+process-creation time dominated the time taken to service a request.
+
+In a classic UNIX environment you need the protection that a process
+provides (because of user rights, ability to access all process memory
+etc), but with Java this falls away. 
+
+I don't think Java protects very well against a rogue servlet spawning
+many threads and consuming lots of CPU time though.
+ 
+John
+
+&gt;<i> The main thread of a servletrunner is an endless loop. It listens for a TCP
+</I>&gt;<i> connection on a server socket. When it is launched as a separate process,
+</I>&gt;<i> the kill command should be able to kill it -- even when it is performing
+</I>&gt;<i> blocking I/O. The server socket must be automatically closed when the
+</I>&gt;<i> process dies. And all open sockets owned by the process must be closed,
+</I>&gt;<i> too. Immediately after that, the servletrunner can be started again on the
+</I>&gt;<i> same server socket.
+</I>&gt;<i> 
+</I>&gt;<i> The following test code should run without error.
+</I>&gt;<i> 
+</I>&gt;<i>   public void example() {
+</I>&gt;<i>     ProcessManager manager = ProcessManager.getManager();
+</I>&gt;<i>     String cmd = &quot;java servletrunner&quot;;
+</I>&gt;<i>     ProcessDescriptor pid;
+</I>&gt;<i> 
+</I>&gt;<i>     for ( int i = 0; i &lt; 100; i++ ) {
+</I>&gt;<i>       pid = manager.createProcess( cmd );
+</I>&gt;<i>       sleep( 10000 );
+</I>&gt;<i>       manager.kill( pd );
+</I>&gt;<i>     }
+</I>&gt;<i>   }
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Arch maillist  -  <A HREF="mailto:Arch@jos.org">Arch@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/arch">http://jos.org/mailman/listinfo/arch</A>
+</I>&gt;<i> 
+</I>
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000603.html">[JOS-Arch] [test case] JDSK</A></li>
+	<LI> Next message: <A HREF="000618.html">[JOS-Arch] [test case] JDSK</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#607">[ date ]</a>
+              <a href="thread.html#607">[ thread ]</a>
+              <a href="subject.html#607">[ subject ]</a>
+              <a href="author.html#607">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

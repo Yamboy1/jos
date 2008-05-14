@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] SmartAPI - Release 1a</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000059.html">
+   <LINK REL="Next" HREF="000062.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] SmartAPI - Release 1a</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] SmartAPI - Release 1a">gchii@mindspring.com</A><BR>
+    <I>Mon, 26 Jul 1999 13:01:23 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000059.html">[JOS-Arch] StreamFactory passed URL test</A></li>
+        <LI> Next message: <A HREF="000062.html">[JOS-Arch] Downloads</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#61">[ date ]</a>
+              <a href="thread.html#61">[ thread ]</a>
+              <a href="subject.html#61">[ subject ]</a>
+              <a href="author.html#61">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I posted the first public release of the SmartAPI. It has working code for
+creating objects from a JOS-compatible URI. It also has, I think, a number
+of implementations so that you can see how primative controllers can be
+built from the API.
+
+You want a buffered StringTokenizer for an HTML file on the JOS website? No
+problem. Use this JOS-compatible URI, something like this:
+
+String uri = &quot;in:token:buffer:<A HREF="http://www.jos.org/wiki/view/main/SmartAPI";">http://www.jos.org/wiki/view/main/SmartAPI&quot;;</A>
+ObjectFactory factory = ObjectFactory.getFactory();
+StringTokenizer tokenizer = (StringTokenizer) factory.getObject( uri );
+
+You want a print stream for a file across your SMB network? Just like this.
+
+String uri = &quot;out:print:<A HREF="file://sharename/usr/local/example";">file://sharename/usr/local/example&quot;;</A>
+ObjectFactory factory = ObjectFactory.getFactory();
+PrintStream printer = (PrintStream) factory.getObject( uri );
+
+I suppose you could do it like this, too.
+
+PrintStream printer = (PrintStream) ObjectFactory.getFactory().getObject(
+    &quot;out:print:<A HREF="file://sharename/usr/local/example"">file://sharename/usr/local/example&quot;</A> );
+
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000059.html">[JOS-Arch] StreamFactory passed URL test</A></li>
+	<LI> Next message: <A HREF="000062.html">[JOS-Arch] Downloads</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#61">[ date ]</a>
+              <a href="thread.html#61">[ thread ]</a>
+              <a href="subject.html#61">[ subject ]</a>
+              <a href="author.html#61">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

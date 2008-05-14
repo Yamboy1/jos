@@ -1,0 +1,419 @@
+From iainshigeoka@yahoo.com Sat, 20 Nov 1999 13:14:53 -0600
+Date: Sat, 20 Nov 1999 13:14:53 -0600
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Admin] Re: [JOS-Arch] JOS Packages.. I'm a litte confused!
+
+On 19 Nov 99, at 7:22, Gilbert Carl Herschberger II wrote:
+
+> At 02:01 PM 11/18/99 -0600, iainshigeoka@yahoo.com wrote:
+> >Gilbert.  I snooped around in the source server area of the website. 
+> >I can get you the raw (as submitted), non-pretty printed versions of 
+> >all the source.  Should be as syntax error free as the original 
+> >author submitted it.  Sorry for not being more on the ball about 
+> >this.  If you're willing to package it up and make it available so that 
+> >people have access to the source that may be only available 
+> >through the source server, that would be wonderful.  I'm also 
+> >tempted to use that as the opportunity to take source server so 
+> >people don't try and add source or use source from it.
+> 
+> I believe that all members of the JOS Project should have direct and
+> uninhibited access to the raw, as submitted, source code. What does this
+> mean? It means that the Right Thing to do is take the source code you found
+> and put it inside an archive (such as jos1c-srcserv-1.tgz and
+> jos1c-srcserv-1.zip). Put the archive on the JOS website at
+> http://www.jos.org/download/
+
+The SourceServer contents have been put into a compressed tar 
+ball (2.7 MB) located at:
+
+http://www.jos.org/source/jos1c_srcserv.tar.Z
+
+This has also been announced on the main jos webpage.  
+Hopefully someone will integrate it into the normal distribution as 
+there is a lot of extra content in that tar ball (3 copies of every 
+source file, and the SourceServer code itself for example).  If 
+someone does, let me know.  I think I'll want to remove the tar ball 
+as well as take the SourceServer offline.
+
+-iain
+
+
+
+From iainshigeoka@yahoo.com Sat, 20 Nov 1999 13:14:53 -0600
+Date: Sat, 20 Nov 1999 13:14:53 -0600
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Admin] SourceServer (was: JOS Packages.. I'm a litte confused!)
+
+Hello,
+
+This is getting off topic for the arch list.  I'm cross posting to the 
+admin list and setting the reply-to to point there.  Please followup 
+to this only on the admin list.
+
+On 19 Nov 99, at 7:38, Gilbert Carl Herschberger II wrote:
+
+> At 02:01 PM 11/18/99 -0600, you wrote:
+
+> Imagine that new code were uploaded to CVS. After code is uploaded to CVS,
+> someone downloads it; periodically, they take a snapshot. From the
+> snapshot, both a source and binary distribution can be created. Class files
+> do not have to be pre-compiled and uploaded to CVS. Anyone can download a
+> distribution with a HTML browser, without using CVS.
+> 
+> This person could run the source code through a syntax highlighter and
+> pretty printer to create static HTML files. Static HTML files reduce the
+> burden on our web server. The static HTML files are uploaded to our
+> Internet website for everyone to browse. All of the heaving processing is
+> off-line. Tools can be debugged and improved over a long period of time.
+> 
+> 1. The HTML-formatted source code could not possibly ruin the source code,
+> like Source Server did.
+> 
+> 2. Pages of HTML-formatted source code should be linked to their
+> corresponding distribution. When you pick on class, you download the
+> product that contains the package that contains the class. You don't
+> download one class at a time.
+
+This is what I had in mind too.  :)  It's on the to-do list after getting 
+the current next gen website online.  The current next gen website 
+is about 80% of the way to beta state.  It's basically going to 
+exhibit the same functionality as the current wiki. But the big 
+unseen infrastructure addition is a fully integrated user/session 
+management foundation.  With this in place, permission issues 
+(esp. upload and edit permissions) will be much easier to address 
+for things like source repositories.
+
+> >For now, if you don't want to use CVS, then please, just make an 
+> >archive file (.tgz, .zip, or .jar) available for download.
+> 
+> Authors that do not know CVS can make their distribution available as an
+> archive. If product development is shared by many authors, a distribution
+> might be uploaded to CVS and maintained there.
+
+My experience as webmaster answering questions for JOS is that 
+most open source programmers are not comfortable with using 
+CVS.  Especially those that are writing small utilities.  (Or those 
+that want to download source for anything).  
+
+This is the reason that the SourceServer even with all its 
+shortcomings, was so popular.  No CVS tools, no new techniques 
+to learn.  Just upload your jar and SourceServer displays source for 
+that jar and that's it.  No merging, no client software, no 
+updating/commiting etc.  What's in SourceServer is the latest and 
+"canonical" version of that source.
+
+The big question is, what should be JOS' "canonical" source 
+repository?
+
+IMHO, it should be a tool like SourceServer (let's call it SSTNG for 
+SourceServer: The Next Generation) not CVS.  All JOS source 
+should be checked into SSTNG, even if that means there's also a 
+version in CVS.  The source in SSTNG basically serves as "official" 
+snapshots of the JOS source.  This simplifies things for most 
+people.
+
+CVS becomes a working repository only used by those projects 
+that require collaboration between several developers (such as the 
+kernel group) that isn't feasible to handle by more traditional (if less 
+technical) methods such as emailing diffs to a "lead" programmer.  
+CVS will still allow adventurous and bleeding-edge people to 
+anonymously get CVS source that is basically "daily build" source. 
+
+Groups that use CVS appoints a "lead" programmer that 
+periodically checks out CVS sources and inserts it into SSTNG.
+
+SSTNG only stores 1 copy of source.  If new source is checked in 
+by users with permission, it replaces the version in SSTNG.  This 
+follows the behavior of the old SourceServer and keeps things 
+simple for everyone.
+
+For record keeping purposes, every so often, someone from the 
+distribution group takes a snapshot of the entire SSTNG contents.  
+The last x number of snapshots and other "signficant" snapshots 
+can then be made available for download.
+
+Within SSTNG itself, we have functionality as per Gilbert's 
+suggestions:
+
+You upload source as "distributions".  For clarity, I'm going to call 
+them source jars.  Basically, a jar of all the source needed to build 
+a single product (the product being a java application, a library, 
+etc).  A source jar can be linked to other source jars to indicate 
+dependence on other JOS products (such as shared class library 
+jars).
+
+SSTNG handles uploads and downloads at the source jar level.  It 
+is up to the "lead" developer(s) how many source files belong to a 
+single product (and thus a single source jar).
+
+SSTNG will display source on a source file level via pretty printed 
+HTML.  
+
+Each pretty printed source file is linked to the raw source file, and 
+its associated source jar.  Anyone is free to view/download source 
+file by file via their web browser, or via the entire source jar using 
+the link to its associated sourcejar.
+
+For a project you have a "lead" developer or developers that has 
+upload permissions to SSTNG for a project.  Each project can have 
+as many source jars as they want (within reason).  If you replace 
+one of your source jars with a new one, SSTNG delete's all source 
+associated with the old jar and replaces it with the new one.  
+
+So to browse source, you first choose a project, then a source jar, 
+then navigate via package names.  This does allow for overlapping 
+package names/spaces/classes so developers should be careful of 
+package name usage.  A JOS Package name reservation system 
+is also planned at some really future date for the website...
+
+Each uploaded source jar will be exploded into individual source 
+files, pretty printed HTML versions can be auto-generated, as well 
+as javadoc'd.
+
+Anything I missed or got wrong?  Let me know.  I'm obviously not 
+working on this right now but it is a future project or my list.  If 
+anyone wants to help out, let me know.
+
+-iain
+
+
+
+From gchii@mindspring.com Wed, 24 Nov 1999 14:58:25 -0500
+Date: Wed, 24 Nov 1999 14:58:25 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Admin] Does arch archive have missing messages?
+
+Uh oh. I can't find our most recent messages on the architecture mailing
+list. While messages I sent to the list are returned to me through e-mail,
+I can't find them in the archives at http://jos.org/pipermail/arch/
+
+Inside a JOS Wiki article, I would like to put a *link* to a recent e-mail
+message in the architecture archives. I don't think its a good idea to
+copy-and-paste e-mail to JOS Wiki. That is a practice that should be
+generally discouraged.
+
+I was surprised to find none of the recent e-mails displayed in the
+archives, especially the thread called "[JOS-Arch] What is JOS?"
+
+
+
+
+From ryan@whitewolf.com.au Wed, 24 Nov 1999 21:57:47 +0000
+Date: Wed, 24 Nov 1999 21:57:47 +0000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] Does arch archive have missing messages?
+
+Gilbert Carl Herschberger II wrote:
+> 
+> Uh oh. I can't find our most recent messages on the architecture mailing
+> list. While messages I sent to the list are returned to me through e-mail,
+> I can't find them in the archives at http://jos.org/pipermail/arch/
+
+The emails are archived but the index page that links to them seems to
+be broken. The end-of-file is encountered prematurely. There is one
+"What is JOS?" message accessible from the index so you should be able
+to reach the follow-ups by clicking "next message".
+
+Clark, can you please have a look at mailman and see what the problem
+is? - Thanks.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From gchii@mindspring.com Wed, 24 Nov 1999 20:09:13 -0500
+Date: Wed, 24 Nov 1999 20:09:13 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Admin] SourceServer
+
+At 01:14 PM 11/20/99 -0600, "Iain Shigeoka" <iainshigeoka@yahoo.com> wrote:
+>My experience as webmaster answering questions for JOS is that 
+>most open source programmers are not comfortable with using 
+>CVS.  Especially those that are writing small utilities.  (Or those 
+>that want to download source for anything).
+
+This is my experience, too. As members of an open source project, we should
+develop a hassle-free policy for downloading distributions.
+
+Downloading is a far more frequent activity than uploading (or patching).
+Because of its frequency, it should be optimized for our target market to
+get in and get out with a minimum of hassle.
+
+-----
+
+Now about Source Server...
+
+I downloaded jos1c_srcserv.tar.Z. I uncompress'd it, something like this:
+
+$ uncompress jos1c_srcserv.tar.Z
+
+Uncompress created jos1c_srcserv.tar.
+
+I untar'd it, something like this:
+
+$ tar xvf jos1c_srcserv.tar *.raw
+
+I am working on the assumption that these .raw files are the original,
+unprocessed source code that members of the JOS Project uploaded to the
+Source Server.
+
+I wrote a raw package copier in Java to copy all *.raw files to *.java files.
+
+$ rawpackagecopy path=/linux/srcserv package= show=all
+
+I found that jos1c-srcserv is very different from jos1d-srcserv. There are
+different packages, different classes, different compiler errors. It's
+almost as if Source Server didn't overwrite .java files when a member tried
+to overwrite earlier code.
+
+Soon, I'll have jos1c-srcserv-2.tar.Z as a source-code only redistribution
+of jos1c-srcserv.tar.Z.
+
+-----
+
+About new source code pages...
+
+If I tar'd and compress'd HTML pages from my off-line syntax highlighter,
+could you add them to the JOS website?
+
+I was thinking of a URL, something like this:
+
+1. http://www.jos.org/browse/index.html contains a list of "products". A
+product is a collection of Java packages. A casual observer from anywhere
+on the Internet should be able to start on this page and read all of the
+JOS open source code.
+
+2. http://www.jos.org/browse/descriptions.html contains a one paragraph
+description for each package from Source Server.
+
+3. http://www.jos.org/browse/jos1c-srcserv/index.html contains a list of
+Java packages and classes from the Source Server.
+
+4. http://www.jos.org/browse/jos1c-srcserv/default.BitSet.html contains the
+syntax-highlighted code from default/BitSet.java.
+
+Is there a problem with space? How much free space is on www.jos.org?
+
+
+
+
+From gchii@mindspring.com Sat, 27 Nov 1999 16:05:52 -0500
+Date: Sat, 27 Nov 1999 16:05:52 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Admin] SourceServer
+
+At 01:46 PM 11/27/99 -0600, iainshigeoka@yahoo.com wrote:
+>Sounds like a plan.  Actually if you root the source under a 
+>directory of /source/ it will simply replace the current source server 
+>area.  Just tar everything under a root dir, and I'll put it on the server.
+
+Are you sure? Are you saying you want to *replace* the current source
+server, eliminating the the original source server from www.jos.org?
+
+If so, we should make some kind of announcement (shouldn't we?). Or, is
+this the list where such announcements are made?
+
+When I put all these HTML files in a jos1c-srcserv-2-html.tar.Z archive,
+they will be in a /source/ directory as you requested.
+
+Do you have any comments about my idea for multiple products? multiple
+versions?
+
+If there is a product index at /source/index.html, additional products can
+branch out from there.
+
+As cautious as every, I think it might be a good idea to create a prototype
+of this new part of the JOS website before committing to it on www.jos.org.
+
+
+
+
+From iainshigeoka@yahoo.com Sun, 28 Nov 1999 10:11:46 -0600
+Date: Sun, 28 Nov 1999 10:11:46 -0600
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Admin] SourceServer
+
+Date sent:      	Sat, 27 Nov 1999 16:05:52 -0500
+To:             	admin@jos.org
+From:           	Gilbert Carl Herschberger II <gchii@mindspring.com>
+Subject:        	Re: [JOS-Admin] SourceServer
+
+> At 01:46 PM 11/27/99 -0600, iainshigeoka@yahoo.com wrote:
+> >Sounds like a plan.  Actually if you root the source under a 
+> >directory of /source/ it will simply replace the current source server 
+> >area.  Just tar everything under a root dir, and I'll put it on the server.
+> 
+> Are you sure? Are you saying you want to *replace* the current source
+> server, eliminating the the original source server from www.jos.org?
+
+Yes.  It is still causing problems because it's there (and the docs 
+still say you can upload source using it).  So people try and 
+download source from it (which is in some places corrupted as you 
+have discovered).  And they try and upload source into it (which 
+shouldn't work but who knows).
+
+So the best solution seems to me to remove it from the site as 
+soon as we have an alternative way of making the source that was 
+in it available to people.
+
+We definitely need something to replace it, but in its current state, 
+it causes more trouble than its worth.
+
+> If so, we should make some kind of announcement (shouldn't we?). Or, is
+> this the list where such announcements are made?
+
+Yes, we will announce it.  I'll announce the change on the admin 
+and general lists as well as on the main web page (www.jos.org).
+
+> Do you have any comments about my idea for multiple products? multiple
+> versions?
+
+I think its a great idea.  We definitely should try and create enough 
+product distributions so that you don't have to download stuff you 
+don't want.  As far as multiple versions, I would like to make 
+historical "snapshots" available as jar's (as well as the latest 
+version of each product), and only put the html pretty printed 
+source up for the latest version of the source for each product (so 
+as to avoid confusion).
+
+> As cautious as every, I think it might be a good idea to create a prototype
+> of this new part of the JOS website before committing to it on www.jos.org.
+
+Yes.  Actually, I was planning on putting it on the www.jos.org site, 
+but just not announcing it for a while so that the core members can 
+hit it and comment before making a groupwise announcement.  
+Sorta an in-house beta.  Are you planning on including the kernel 
+sources as one of the products?
+
+-iain
+
+
+
+From mage@phobos.fachschaften.tu-muenchen.de Sun, 28 Nov 1999 23:23:18 +0100 (MET)
+Date: Sun, 28 Nov 1999 23:23:18 +0100 (MET)
+From: Max Berger mage@phobos.fachschaften.tu-muenchen.de
+Subject: [JOS-Admin] What do I do when I've forgotten a mail-list password
+
+Hi,
+
+since the games-list is very low traffic I became games admin.
+Unfortunately I've changed the password and I don't remember what new one
+I chose... Second Unfortunately that now there is actually a post on the
+list, which I can't approve. Is  there any way to "trigger" sending the
+password to the list-admin?
+
+Max Berger
+e-mail: max.berger@phobos.fs.tum.de
+
+--
+ACPI4Linux: http://phobos.fs.tum.de/acpi/ FBR-Info: http://www.fs.tum.de/FSMPI/
+Sysop: http://wwwbrauer.in.tum.de/ Worldforge: http://www.worldforge.org/  JOS:
+http://www.jos.org PGP: 9CF77B603671BB18 D5110085483230BB ftp://phobos.fs.tum.d
+e/pub/pgp/max.berger.asc Home: http://phobos.fs.tum.de/~mage/ Fillup: Some Data
+
+
+
+

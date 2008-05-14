@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Matt.Albrecht%40trilogy.com">
+   <LINK REL="Previous"  HREF="000544.html">
+   <LINK REL="Next" HREF="000546.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Matt.Albrecht@trilogy.com</B> 
+    <A HREF="mailto:Matt.Albrecht%40trilogy.com"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">Matt.Albrecht@trilogy.com</A><BR>
+    <I>Tue, 2 May 2000 09:37:06 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000544.html">[JOS-Arch] [multiple process] Stumped, again</A></li>
+        <LI> Next message: <A HREF="000546.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#545">[ date ]</a>
+              <a href="thread.html#545">[ thread ]</a>
+              <a href="subject.html#545">[ subject ]</a>
+              <a href="author.html#545">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Perhaps I'm missing something.  But, to me, aren't these the ways the
+comparison must be done?
+
+For Bytecode (bytecode A vs. bytecode B):
+   1. The bytes within the bytecode must match exactly between A and B.
+   I believe this is the only requirement.
+
+For Class Definitions (class def C vs. class def D)
+   1. Internal bytecodes of C and D must match.
+   2. The Class Definitions for their parent classes must match (superclass
+of C must match superclass of D, and all interfaces must match as well).
+
+So, if two processes E and F load the exact same bytecode for class
+&quot;MyClass&quot;, that doesn't mean that their classes match.  Process E may load
+a completely different version of the superclass than process F.  Variables
+may not match, method invocation may not be the same, and so on.
+
+True, we can still share the bytecode, but I don't believe we can acurately
+share class definitions based on whether the bytecodes are shared.
+
+&quot;If it works, it's not advanced enough.&quot;
+-Matt
+
+
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000544.html">[JOS-Arch] [multiple process] Stumped, again</A></li>
+	<LI> Next message: <A HREF="000546.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#545">[ date ]</a>
+              <a href="thread.html#545">[ thread ]</a>
+              <a href="subject.html#545">[ subject ]</a>
+              <a href="author.html#545">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

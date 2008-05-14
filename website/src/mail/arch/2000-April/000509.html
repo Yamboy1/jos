@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000508.html">
+   <LINK REL="Next" HREF="000510.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 27 Apr 2000 10:10:13 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000508.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000510.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#509">[ date ]</a>
+              <a href="thread.html#509">[ thread ]</a>
+              <a href="subject.html#509">[ subject ]</a>
+              <a href="author.html#509">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>         That is, it will always allow 'illegal' casts, because you can
+</I>&gt;<i> only ever be in a position to make them if the access control allows you.
+</I>&gt;<i> I never meant to suggest that decaf itself would handle access control,
+</I>&gt;<i> just that given access control, we could make our checks more
+</I>&gt;<i> efficient, that is, not check for illegal casts.  I'll say it again --
+</I>&gt;<i> object flagging/tagging is not necessary, it just seems like a good
+</I>&gt;<i> implementation idea.
+</I>
+I see, I misunderstood. Then when is an object flagged? And what is the
+exact definition of what it means for an object to be flagged?
+
+Whether or not an object can be shared depends on the two processes
+(class loaders) involved. An object in process A may be shared with
+process B if both processes share the same class definition for that
+class. However, process C may have a different (eg. newer) class
+definition for that class and even if the object is flagged, it may not
+be shared with this process. So, if we have a flag, its usefulness is in
+testing if the object may _not_ be shared. The opposite is that it can
+_potentially_ be shared, and the two classes must be checked to see if
+they have the same class definition to be certain that the object can be
+shared.
+
+Another point occurred to me: efficiency may not be that important since
+access to shared objects will be rare (compared with access to objects
+that are in the same process).
+
+&gt;<i> &gt; You could provide the option to share objects via weak references (JDK
+</I>&gt;<i> &gt; 1.2). In this case, references to the shared object will automatically
+</I>&gt;<i> &gt; become null when the server process exits.
+</I>&gt;<i> 
+</I>&gt;<i>         Of course, this doesn't help for jdk1.1.x apps, but again, since
+</I>&gt;<i> JOS is defining this interface, that may not be a problem.  Elegant,
+</I>&gt;<i> though.  (A pity decaf doesn't do weak references quite yet.)
+</I>
+On the topic of JDK 1.1.x vs. JDK 1.2, rheise.os is currently based on
+JDK 1.1 (which is convenient for decaf). Al &lt;<A HREF="mailto:al@outworld.org">al@outworld.org</A>&gt; pointed
+out to me that his registry depends on JDK 1.2, and to integrate his
+work with mine we will need to either move our base level support to JDK
+1.2, or rewrite his registry to support JDK 1.1. I'm a bit nervous about
+moving to JDK 1.2 just yet, but I'm wondering whether you have a
+different opinion. Is JDK 1.2 realistic for you?
+
+&gt;<i>         It /is/ on the wiki (MultipleJavaProcesses), so if you've got any
+</I>&gt;<i> good ideas, feel free to help out with the editing.
+</I>
+I must have missed it. We are talking about access to statics of shared
+objects, right?
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000508.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000510.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#509">[ date ]</a>
+              <a href="thread.html#509">[ thread ]</a>
+              <a href="subject.html#509">[ subject ]</a>
+              <a href="author.html#509">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

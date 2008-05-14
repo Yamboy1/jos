@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000174.html">
+   <LINK REL="Next" HREF="000152.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Program and ProgramContext">tmiller@haverford.edu</A><BR>
+    <I>Wed, 11 Aug 1999 16:42:26 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000174.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000152.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#147">[ date ]</a>
+              <a href="thread.html#147">[ thread ]</a>
+              <a href="subject.html#147">[ subject ]</a>
+              <a href="author.html#147">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> A result code is irrelevant for an &quot;application&quot; because it is never expected to &quot;fail&quot;.
+</I>
+	Actually, I expect grep (et al) to fail on a regular basis.  
+
+&gt;<i> It would be a bad thing if your shell launches a sub-program that calls
+</I>&gt;<i> System.exit() with a result code. Your shell would end prematurely.
+</I>
+	This is one of the things that JOS needs to take care of --
+otherwise, all legacy apps bomb.  I don't what the exact mechanism to
+prevent/properly redirect this is, but it needs to be done...
+
+&gt;<i> &gt;With the advent of Java, piping and main() arguments seem unintuitive.
+</I>&gt;<i>
+</I>&gt;<i> Sun Microsystems insists that an instance of the JVM must be created for
+</I>&gt;<i> each application. The JVM still support piping and a result code on the
+</I>&gt;<i> outside. The native OS can still redirect standard in, standard out and
+</I>&gt;<i> standard err. The result code passed to System.exit() is returned to the
+</I>&gt;<i> native OS.
+</I>
+	In our case, JOS.  (See above.)  However, I do have an argument in
+favor of pipes and redirection, aside from the obvious (they work and we
+know how to use them) -- streams are a good model for IPC.  Because JOS is
+not Unix, we can do interesting things with streams, like reflecting on
+them to find out what kind of stream it is, or asking the stream object
+what data it thinks it's carrying.
+
+&gt;<i> Further, we bring back the power of shell scripting. When the shell runs a
+</I>&gt;<i> shell script, it can return the result code of every program it runs. The
+</I>&gt;<i> shell script can handle non-zero result codes.
+</I>
+	Actually, if we're going to be writing our own (shell -- but
+something like tcl should be our first priority, one that works accross
+shells.  IIRC, there is a source-released implementation of tcl in
+java...) scripting, we might as well make it worthwhile and return result
+objects (that may or may not have &quot;unique&quot; integer identifiers)... it
+makes the difference between function and program calls narrower, which is
+a good thing for the scripter.
+
+-_Quinn
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000174.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000152.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#147">[ date ]</a>
+              <a href="thread.html#147">[ thread ]</a>
+              <a href="subject.html#147">[ subject ]</a>
+              <a href="author.html#147">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

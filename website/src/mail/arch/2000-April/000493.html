@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os questions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000489.html">
+   <LINK REL="Next" HREF="000496.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os questions</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] rheise.os questions">tmiller@haverford.edu</A><BR>
+    <I>Thu, 20 Apr 2000 15:39:52 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000489.html">[JOS-Arch] rheise.os questions</A></li>
+        <LI> Next message: <A HREF="000496.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#493">[ date ]</a>
+              <a href="thread.html#493">[ thread ]</a>
+              <a href="subject.html#493">[ subject ]</a>
+              <a href="author.html#493">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I disagree. There must be two mechanisms. The getCurrentProcess() method
+</I>&gt;<i> returns the current process -- regardless of who owns the code. The
+</I>&gt;<i> getProcess() method returns the process that owns an object. While
+</I>&gt;<i> getCurrentProcess() probably uses getCurrentThread(), getProcess() probably
+</I>&gt;<i> uses getClass().getClassLoader().
+</I>
+	I'll second this.  If we allow multiple-process objects, there
+could be code that could be running in a process other than its nominal
+owner.
+
+
+	Considering the AWT: the AWT is only an interface.  How we choose
+to implement it is completely up to us.  Current AWT implementations must
+use native peers because the windowing system, graphics libraries, etc,
+aren't written in Java.  This will not be the case for JOS.  I rather like
+the idea of translating all AWT calls into Swing calls, so that we can
+skin legacy apps -- but more importantly, we only have one library to
+write support for.  (That is, the AWT peers could be BCNI redirectors to
+Swing.)  Swing, in turn, could get its JDesktop analouge from the virtual
+console driver.
+
+	My point here is that we don't have to, and in fact, don't want,
+native peers, and that this puts a different slant on things.  JADE, in
+fact, may /be/ the toolkit.  If our toolkit code is written to always ask
+the X-server analouge process for instances of widgets (etc), than the
+number of shares is just the number of widgets, because the widgets and
+their code all reside in the process the toolkit code is using as its
+backend.
+
+	(I think that made sense.)
+
+&gt;<i> If there is more than one instance of JADE, only one instance of JADE can
+</I>&gt;<i> be visible at a time in full screen mode. There may be special key
+</I>&gt;<i> combinations or mouse events to switch between virtual consoles.
+</I>
+	There already are special key combinations to switch between
+virtual consoles :)  (ALT-Fx)
+
+-_Quinn
+
+
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000489.html">[JOS-Arch] rheise.os questions</A></li>
+	<LI> Next message: <A HREF="000496.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#493">[ date ]</a>
+              <a href="thread.html#493">[ thread ]</a>
+              <a href="subject.html#493">[ subject ]</a>
+              <a href="author.html#493">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

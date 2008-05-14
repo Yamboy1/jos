@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] TCP/IP stack ...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:R.Argentini%40student.tudelft.nl">
+   <LINK REL="Previous"  HREF="000308.html">
+   <LINK REL="Next" HREF="000310.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] TCP/IP stack ...</H1>
+    <B>Ranieri Argentini</B> 
+    <A HREF="mailto:R.Argentini%40student.tudelft.nl"
+       TITLE="[JOS-Arch] TCP/IP stack ...">R.Argentini@student.tudelft.nl</A><BR>
+    <I>Wed, 17 Nov 1999 11:48:26 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000308.html">[JOS-Arch] TCP/IP stack ...</A></li>
+        <LI> Next message: <A HREF="000310.html">[JOS-Arch] NetworkingGroup Dead?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#309">[ date ]</a>
+              <a href="thread.html#309">[ thread ]</a>
+              <a href="subject.html#309">[ subject ]</a>
+              <a href="author.html#309">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i>The first thing to do is identify what we need to get started. What
+</I>&gt;<i>exactly do we want to implement first, and how can we generate the
+</I>&gt;<i>necessary input / output to test what we're writing? 
+</I>
+First thing to do is usually to get all the eth. packets received through a
+function/method that examines them. This method decides wether they are
+handled (in case of ARP RARP or IP) or discarded, and pass them to their
+respective handlers.
+This could be implemented modularly so new protocols can be added without
+modifying the code, simply by adding another instance of a &quot;protocol&quot; class
+into a suitable structure.
+
+Next would be to get ARP and RARP working to map IPs onto MAC adresses and
+finally the IP stuff, which will be pretty hairy (think routing,
+fragmentation and reassembly, errors via ICMP etc.)
+Now we should have something semi-useable.
+Adding in UDP should be trivial at this stage, for it just a very thin
+layer on top of IP.
+The TCP is going to prove even hairier than IP, but that's for later worries :)
+
+The very important thing (as in all OO projects) is to have a good
+interface definition to the visible objects.
+Sun has defined TCP and UDP classes, i just suggest we implement those when
+we get there. There's however still a lot of room to improvise.
+
+&gt;<i>At this stage it might be a good idea to just use Linux to provide the
+</I>&gt;<i>lower networking layers, and feed the data into a Java app.
+</I>
+While this is undoubtedly a good idea, we need a couple of native methods
+to implement some serious black magic, and i'm not much of a linux device
+wizard. I'm willing to experiment though :)
+We need to make this &quot;black magic class&quot; compatible with the &quot;jos driver
+interface for block devices&quot; if such a thing exists, and then plugging it
+into the kernel should be fairly painless.
+
+Keep up the brainstorm!
+Ranieri.
+
+PS: are we expected to have garbage collection for the tcp/ip stack?
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000308.html">[JOS-Arch] TCP/IP stack ...</A></li>
+	<LI> Next message: <A HREF="000310.html">[JOS-Arch] NetworkingGroup Dead?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#309">[ date ]</a>
+              <a href="thread.html#309">[ thread ]</a>
+              <a href="subject.html#309">[ subject ]</a>
+              <a href="author.html#309">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

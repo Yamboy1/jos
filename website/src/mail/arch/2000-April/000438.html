@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000435.html">
+   <LINK REL="Next" HREF="000439.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">ryan@whitewolf.com.au</A><BR>
+    <I>Mon, 10 Apr 2000 11:56:22 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000435.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000439.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#438">[ date ]</a>
+              <a href="thread.html#438">[ thread ]</a>
+              <a href="subject.html#438">[ subject ]</a>
+              <a href="author.html#438">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; findSystemClass() isn't just called to save memory. You *must* call
+</I>&gt;<i> &gt; findSystemClass() on all the linked classes which are to be referenced
+</I>&gt;<i> &gt; by the calling code.
+</I>&gt;<i> 
+</I>&gt;<i>         If they were referenced by the calling code /before/ the call to
+</I>&gt;<i> the classloader, they've already been loaded;
+</I>
+Well, they've already been defined. You must initiate the loading of the
+class again in L2, but defer its definition to L1 using
+findSystemClass(), which will just return its cached version if it is
+already defined.
+
+&gt;<i> otherwise, this is the first
+</I>&gt;<i> time they've been loaded for the calling code, and whatever you define it
+</I>&gt;<i> as is 'right' -- although, as in your applet example, useless.
+</I>
+Not completely useless. Echidna manages to do something with the loaded
+class without ever having to cast it to a known type by using
+reflection. However, in the case of achieving RMI/CORBA-type usefulness,
+you want to be able to cast the object (potentially illegally :-)
+
+&gt;<i> &gt; You cannot cast the return value of newInstance() from
+</I>&gt;<i> &gt; Applet(L2) to Applet(L1). You must ensure that Applet in each case is
+</I>&gt;<i> &gt; the *same* class.
+</I>&gt;<i> 
+</I>&gt;<i>         Until that Applet(L2) is passed to a method (or assigned to a
+</I>&gt;<i> field) that knows about Applet(L1), we're good.  It is not required, to my
+</I>&gt;<i> understanding, that a classloader be /useful/.
+</I>
+Actually, newInstance() on the Applet(L2) class will still fail unless
+Object(L2) == Object(L1), since newInstance() returns an Object. But if
+you are only loading a class to invoke a static method on it (eg.
+main()), you don't need to call newInstance() - as in Echinda. However,
+to pass the arguments in to main() and catch its exceptions, you will
+need to have Object in common (as well as other classes). Looks like
+illegal casts are necessary to support completely independent
+namespaces.
+
+&gt;<i>         A native extension that would both allow efficient 'illegal' casts
+</I>&gt;<i> and efficient memory usage would be, then, an assignClassLoader( Class c,
+</I>&gt;<i> ClassLoader cl) method.  The JOS default custom classloader could use
+</I>&gt;<i> findSystemClass to locate the (shared) class definition, and the
+</I>&gt;<i> assignClassLoader() method to 'clone' it, marking it as a separate class
+</I>&gt;<i> (and generating its independent statics) but flagging it as identical to
+</I>&gt;<i> the system class for the 'illegal' casts.
+</I>
+Now, if the client process directly accesses static members, it will
+access the cloned versions that belong to its own process. However, if
+you call a method on an object that really belongs to another process,
+and that method accesses a static member, then it should access the
+static members of the class in the _other_process. Are there any
+problems in implementing that?
+
+There is a subtle problem with the findSystemClass/assignClassLoader
+approach, though.
+
+Let's first define what findSystemClass() does in the context of JOS. I
+personally prefer findSystemClass() to refer to the primordial class
+loader of the current process. But let's look at your model:
+
+Using findSystemClass() to locate the shared class definition implies
+that it is referring to a class loader that is an ancestor of the two
+processes wishing to share, something like the root class loader. As you
+said before, once a class loader loads a class, it is loaded forever.
+That is, once the root class loader has loaded the shared class, it is
+impossible to install and run a new version of your IPC-enabled program
+because it will continually link to an old and potentially unusable
+version of the shared class.
+
+A modification of your idea can still work though. findSystemClass() is
+one way to defer the definition of a class to another class loader. I
+could imagine a server process that corresponds to an ORB (Object
+Request Broker), and a findSharedClass(domain, class) method that defers
+loading to the ORB's class loader for the specified domain*. Once
+loaded, the class still cannot be redefined in that class loader, but
+you can then call orb.reload(domain) which will cause the ORB to replace
+its class loader for your particular domain.
+
+A note on efficient memory usage, assignClassLoader() doesn't seem to be
+a general solution to memory efficiency. It does save memory for classes
+which are being shared between two processes, but does nothing for the
+rest of the classes loaded in a process. To save memory on these
+classes, you could try the approach I outlined in an earlier email
+(share class definitions that are loaded from the same version of the
+same archive, but keep separate areas for static fields).
+
+In summary, it seems the assignClassLoader() approach will work, if it
+is used in the right way.
+
+{*} domains would correspond to the individual uses of IpC. For example,
+you could define a domain for doing IPC between the window manager and
+processes that wish to draw to a window.
+
+&gt;<i> &gt; Also, when you consider that it is a security risk to allow user defined
+</I>&gt;<i> &gt; classes to invoke native system methods (eg. you could bypass the
+</I>&gt;<i> &gt; sandbox), various system classes (eg. System) must always be loaded by
+</I>&gt;<i> &gt; the(/a) primordial class loader in order to make use of their native
+</I>&gt;<i> &gt; methods. Of course, in JOS we might have an effective primordial class
+</I>&gt;<i> &gt; loader for each process, so it's ok to reload the System class in each
+</I>&gt;<i> &gt; primordial (JOS-controlled) classloader.
+</I>&gt;<i> 
+</I>&gt;<i>         Right.  Classes which, for whatever reason, the Java code is
+</I>&gt;<i> prevented from reloading must be reloaded by the native code; and it /is/
+</I>&gt;<i> a good idea to restrict access to certain (specified) members of the (JOS)
+</I>&gt;<i> class library.  (This would probably be better cast as a security issues
+</I>&gt;<i> -- e.g. only code with an effective uid of root can call (native) method
+</I>&gt;<i> N, but security is a while off...)
+</I>
+I wrote a document on security within JOS about a year ago, but I didn't
+receive much feedback. It presents some ideas which are relevant here
+(eg. setting the effective user id):
+
+	<A HREF="http://www.progsoc.uts.edu.au/~rheise/jos/jos-security.html">http://www.progsoc.uts.edu.au/~rheise/jos/jos-security.html</A>
+
+
+&gt;<i> &gt; I suspect this won't work (see above) - at least not in a normal JVM.
+</I>&gt;<i> 
+</I>&gt;<i>         The empirical test I described in the last email generated a log
+</I>&gt;<i> of loaded class that included java.lang.System; whether or not I can
+</I>&gt;<i> redefine it for long enough to be useful is another question entirely...
+</I>
+Not in a normal JVM. In JOS, we will want to redefine all classes, and
+then be able to make use of them through native support.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000435.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000439.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#438">[ date ]</a>
+              <a href="thread.html#438">[ thread ]</a>
+              <a href="subject.html#438">[ subject ]</a>
+              <a href="author.html#438">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

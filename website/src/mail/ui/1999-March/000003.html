@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up
+ idea</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000002.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up
+ idea</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up
+ idea">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Tue, 30 Mar 1999 08:17:07 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000002.html">[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Todd,
+
+I have been working/thinking through the j.l.S.in, out, err problem as part
+of the JOSCore project.  These classes are pretty much defined as those
+required to get java.lang.* implemented on top of a multi-process VM and
+have the responsibility of interacting with the VM and the rest of the OS to
+provide services to applications in the form of the Java API.
+
+Included classes here are things like:  Process, ProcessEnvironment,
+Program, ProgramEnvironment, ClassRepository, ClassRepositoryClassLoader,
+etc.  Here, a ProgramEnvironment defines the classes and versions of classes
+(packages) that a particular application has access to, security privileges
+and restrictions, etc.  The ProcessEnvironment uses the ProgramEnvironment
+to keep track of things specific to a running process, such as instances of
+Class objects (for static variables and static synchronizations which must
+be kept seperate from process to process), the security for that process (a
+particular program may have been started in either a trusted or untrusted
+person or process, causing security needs for that running process to be
+possibly more restricted than the ProgramEnvironment defines) and things
+like j.l.System.in, out, and err.  Most of these settings are going to need
+to be set into some kind of encryped, secure system registry.
+
+Under this scheme, the ProcessEnvironement can also inherit certain traits
+from a parent, such as the in, out, and err streams.  I think that this
+scheme takes care of most, if not all, of the problems mentioned previously
+in this thread.  The top parent ProcessEnvironment can be a listenner for
+KeyEvents to create the InputStream and become a consumer of the
+OutputStream, passing it along to whatever next process should take it as an
+InputStream or putting it out to the console or log file or database, or
+whatever else.  (Where the out and err go to, and where the in come from can
+all be defined in the ProgramEnvironment for the parent Process.)
+
+Please note that not all of this came out of my brain.  Much of it was
+defined in the very early stages of the JOS project and all of that
+documentation is still available on the Wiki.  Just start at the
+ProcessGroup.
+
+Those on the UI list should also recognize here a solid foundation for JADE.
+
+Avery J. Regier
+
+
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Todd L. Miller [SMTP:<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>]
+</I>&gt;<i> Sent:	Monday, March 29, 1999 2:30 PM
+</I>&gt;<i> To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+</I>&gt;<i> Cc:	<A HREF="mailto:ui@jos.org">ui@jos.org</A>
+</I>&gt;<i> Subject:	[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up
+</I>&gt;<i> idea
+</I>&gt;<i> 
+</I>&gt;<i> &gt; So in this respect, yes, an addKeyListener() would be a good solution.
+</I>&gt;<i> All we
+</I>&gt;<i> &gt; need then is a JOS-wide event system to manage acynch events.
+</I>&gt;<i> 
+</I>&gt;<i> 	That's the real kicker, isn't it.  AFAIK, the event system concept
+</I>&gt;<i> hasn't made it into operating systems yet.  (Except maybe JavaOS
+</I>&gt;<i> itself; I'm checking.)  The major problem regarding
+</I>&gt;<i> console applications is two-fold: they aren't event based and they
+</I>&gt;<i> use java.lang.System.in/out/err, which hide redirects -- something
+</I>&gt;<i> like &quot;jsort &lt; address_book &gt; alpha_address_book&quot; where the j.l.S variables
+</I>&gt;<i> enscapulate file streams instead of character streams directed at the
+</I>&gt;<i> console.
+</I>&gt;<i> 
+</I>&gt;<i> 	The suggestion you make is a good one in that it moves the
+</I>&gt;<i> responsibility for event distribution out of the 'kernel' and into
+</I>&gt;<i> 'user-space.'  It also, however, maintains the 'redirection' idea, which
+</I>&gt;<i> might not be a good thing.  In the AWT, a keylistener subscribes to a
+</I>&gt;<i> specific Component (i.e. its main window) as the keyspeaker; this
+</I>&gt;<i> implicitly takes care of event focus problems.  The major problem is the
+</I>&gt;<i> collision between the streams-based and the event-based models in the 
+</I>&gt;<i> console application, where there isn't a Component to listen to.
+</I>&gt;<i> 
+</I>&gt;<i> 	We must support java.lang.System.in/out/err redirects, simply to
+</I>&gt;<i> make 'legacy' (non-JOS-aware) java applications function -- as well as
+</I>&gt;<i> make the shell redirection tools usable and implementable.  The question,
+</I>&gt;<i> then, becomes:
+</I>&gt;<i> 
+</I>&gt;<i> 	We know the application is jos-aware because it wants to listen
+</I>&gt;<i> for KeyEvents.  Thusly:
+</I>&gt;<i> 
+</I>&gt;<i> 	What should the application listen to?  Itself?
+</I>&gt;<i> jos.system.keyboard?  Suppose the application is jos-aware; it could be
+</I>&gt;<i> made to inherit from jos.application, in which case the jos.application
+</I>&gt;<i> code could take care of the necessary event distribution.  This *does*
+</I>&gt;<i> remove the question one step -- it will be necessary to determine how the
+</I>&gt;<i> AWT handles distributing events.  Should the application listen to
+</I>&gt;<i> jos.system.keyboard, it (perhaps quite simply) becomes necessary for the
+</I>&gt;<i> shell to redirect jos.system.keyboard as needed.  A window manager, of
+</I>&gt;<i> course, could do the same thing.
+</I>&gt;<i> 
+</I>&gt;<i> 	What should the application listen to?  I think it's almost just a
+</I>&gt;<i> matter of peronsal preference.  It seems, to me anyway, rather odd to be
+</I>&gt;<i> using a streams idea for an eventspeaker, but it might be worth doing
+</I>&gt;<i> anyway.  On the other hand, it might be argued that a jos (console)
+</I>&gt;<i> application should NOT be, by default, event-based, and therefore
+</I>&gt;<i> inheriting a whole bunch of event-dispatching code in the general case is
+</I>&gt;<i> a Bad Idea.
+</I>&gt;<i> 
+</I>&gt;<i> 	A major factor would be: what other kinds of events might a
+</I>&gt;<i> console application (usually) be interested in?  timer events?
+</I>&gt;<i> gained-focus events?  (instead of the signal equivalent of whatever
+</I>&gt;<i> happens when a job is foregrounded in UNIX)  mouse events?  (would be nice
+</I>&gt;<i> to have some standardized interface to the mouse for console apps,
+</I>&gt;<i> wouldn't it?)  the joystick?  If you posit that in a fashion similar to
+</I>&gt;<i> emacs' x-awareness, console apps might be windowing-aware, you could even
+</I>&gt;<i> get Menu and Window events.*
+</I>&gt;<i> 
+</I>&gt;<i> 	If we believe the Event model is the Right Way To Go for all
+</I>&gt;<i> applications, shouldn't the event model pretty closely resemble the AWT's?
+</I>&gt;<i> (or your preferred event model.  I would suggest the AWT's because (a)
+</I>&gt;<i> it's available and (b) all java programmers should know it.)
+</I>&gt;<i> 
+</I>&gt;<i> 	As for difficulty of implementation, does anyone know how
+</I>&gt;<i> classpath.org is handling event dispatching in their AWT implementation?
+</I>&gt;<i> 
+</I>&gt;<i> -_Quinn
+</I>&gt;<i> 
+</I>&gt;<i> * Or, if you posit a 'transparent windowing' shell.  This is an idea
+</I>&gt;<i> (along with 'command-line windowing' -- more later) I've been thinking
+</I>&gt;<i> about on and off since the jos project began.  Basically, when one starts
+</I>&gt;<i> up wash (the windowing application shell), it checks and makes sure
+</I>&gt;<i> it's running on a graphic console. (or as an xterm-equivalent under the X
+</I>&gt;<i> equivalent.) If it's not, you can ignore the windowing commands.
+</I>&gt;<i> Basically, wash uses a text console look-alike VGA framebuffer (for
+</I>&gt;<i> example), which, as a basic thing, allows for customized fonts (like the
+</I>&gt;<i> linux virtual consoles do.)  The start-up mode would be definable, but use
+</I>&gt;<i> an definable-sized font, 80x25 (or definable) at some point (say centered)
+</I>&gt;<i> in the (black) background of the console.  Taking this a step forward, it
+</I>&gt;<i> would not be beyond reason to implement a command like '&amp;', say '%':
+</I>&gt;<i> instead of forking
+</I>&gt;<i> the process off to the background, it forks off a new 'window'.  A wash
+</I>&gt;<i> 'window' would just be another console somewhere else on the screen;
+</I>&gt;<i> overlaps would be indicated with brighter or darker (etc) text. BUT, no
+</I>&gt;<i> graphics: wash would be just as fast as a normal shell.  wash would
+</I>&gt;<i> determine where the keyboard focus is based on ALT-TAB (definable) or
+</I>&gt;<i> equivalent shortcuts: commands like 'minimize,' 'maximize,' 'tile,'
+</I>&gt;<i> 'cascade,' 'shade,' 'front (process-name)' would do what you might expect
+</I>&gt;<i> them to do.  Your sysadmin would log in and do something as follows:
+</I>&gt;<i> 
+</I>&gt;<i> jos.org:~# top % $UPPER_RIGHT
+</I>&gt;<i> jos.org:~# front top
+</I>&gt;<i> jos.org:~# pine % $LOWER_LEFT
+</I>&gt;<i> jos.org:~# focus pine
+</I>&gt;<i> [now in pine's window, which is above the root window but below (probably
+</I>&gt;<i>  not overlapping) top's window]
+</I>&gt;<i> [checks his mail and notices that top is claiming the load just
+</I>&gt;<i> skyrocketed]
+</I>&gt;<i> [ALT-TAB to the root window]
+</I>&gt;<i> jos.org:~# kill 1344
+</I>&gt;<i> jos.org:~# pico /var/log/messages % $FULL_SCREEN
+</I>&gt;<i> [the FULL_SCREEN 'macro' auto-focuses the newly-spawned window]
+</I>&gt;<i> 
+</I>&gt;<i> and so on.  If the system implements virtual consoles (like Linux) the
+</I>&gt;<i> become (if they're running wash) virtual desktops.
+</I>&gt;<i> 
+</I>&gt;<i> 	It might be fair to call the idea &quot;an all xterm window manager.&quot;
+</I>&gt;<i> But I would think that window managers manage more xterms than anything
+</I>&gt;<i> else.  (At least, *I* manage more xterms than other windows this way.)
+</I>&gt;<i> 
+</I>&gt;<i> 	Anyway, I think it could be a really neat demonstration.
+</I>&gt;<i> 
+</I>&gt;<i> 	Command-line windowing is a very simple idea: does anyone remember
+</I>&gt;<i> BASIC's and LOGO's mixed-modes?  Where your had four or five lines of text
+</I>&gt;<i> on the bottom and the graphics up top?  Wouldn't that be a better way to
+</I>&gt;<i> handle the way most people use window managers than xterms?  (The few
+</I>&gt;<i> line console, would, of course, have many, many, virtual consoles to play
+</I>&gt;<i> with.  On a straight memory comparison with Linux, a 5-line screen could
+</I>&gt;<i> have 30 virtual consoles.)  virtual consoles and virtual desktops would be
+</I>&gt;<i> independent of each other.  Of course, something like pine might not work
+</I>&gt;<i> too well on a five-line console, but that's hardly the point.
+</I>&gt;<i> 
+</I>&gt;<i> 	These ideas are not in their stable release form.  They no
+</I>&gt;<i> warranty of any kind, explicit or implied; they have not been tested for
+</I>&gt;<i> suitability to purpose.  Only load these ideas in a partition of your mind
+</I>&gt;<i> you can safely erase later; do not use these ideas for mission-critical
+</I>&gt;<i> applications.  They have not been approved by the FDA.  Usage of the
+</I>&gt;<i> ideas implies full understanding and agreement with the terms of the
+</I>&gt;<i> liscence agreement as described by the First Amendment.  Thank you.
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> UI maillist  -  <A HREF="mailto:UI@jos.org">UI@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/ui">http://jos.org/mailman/listinfo/ui</A>
+</I>
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000002.html">[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

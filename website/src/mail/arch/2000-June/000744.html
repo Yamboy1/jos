@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java-Linux</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000740.html">
+   <LINK REL="Next" HREF="000742.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java-Linux</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Arch] Java-Linux">jewel@pixie.co.za</A><BR>
+    <I>Mon, 19 Jun 2000 13:46:31 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000740.html">[JOS-Arch] Java-Linux</A></li>
+        <LI> Next message: <A HREF="000742.html">[JOS-Arch] JOSCore and JOSExtensions (fwd)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#744">[ date ]</a>
+              <a href="thread.html#744">[ thread ]</a>
+              <a href="subject.html#744">[ subject ]</a>
+              <a href="author.html#744">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I agree.  Especially with a goal of minimal native code, you really only
+</I>&gt;<i> need a very small subset of even C functionality.  So if you choose the
+</I>&gt;<i> subset carefully, writing a C-&gt;assembly-&gt;exe. code tool chain in java
+</I>&gt;<i> should be relatively simple... which means self-hosting JOS development
+</I>&gt;<i> would be more practical.
+</I>
+Yes, although the VM is probably more complex than the native code used
+for the libraries.
+ 
+&gt;<i> &gt; Currently I'm writing little &quot;routines&quot; and &quot;fragments&quot; of assembly as I
+</I>&gt;<i> &gt; implement my JIT. Sometimes however I need to call back into native C
+</I>&gt;<i> &gt; code to access some structures and stuff.
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; I hope to replace this by allowing the assembler to &quot;understand&quot; a C
+</I>&gt;<i> &gt; structure and access it's members in a macro-like fashion.
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; If there was object inheritance and stuff happening there it would make
+</I>&gt;<i> &gt; life very much more complicated.
+</I>&gt;<i> 
+</I>&gt;<i> Yes.  I have been reading the &quot;developing your own 32-bit os&quot; book by
+</I>&gt;<i> burgess and he developed his own simple assembler and C compiler.
+</I>
+The book sounds interesting, I'll try find out more about that.
+
+&gt;<i> The
+</I>&gt;<i> nice  thing in his design is because he controlled the c subset, he was
+</I>&gt;<i> able to make a nice c -&gt; assembly compiler.  Then an all purpose
+</I>&gt;<i> assembler/linker takes care of all machine code production.  it seemed to
+</I>&gt;<i> be a much easier design to implement, and seemed much more &quot;hackable&quot; for
+</I>&gt;<i> getting kernel stuff done. 
+</I>
+I'm sure. I don't understand the ELF format and how the linker / loaders
+work, and this makes a lot of kernel stuff seem more mystical than it
+should be.
+
+&gt;<i> Beyond kernel writing, you should be using
+</I>&gt;<i> java so even the C capabilties is really more like producing a assembly
+</I>&gt;<i> macro compiler on steroids rather than a full on C implementation...
+</I>
+Yip, ideally I also want the JIT to &quot;inline&quot; methods which access hardware
+directly. So for example a dummy routine to write to an I/O port gets
+replaced by the JIT with the asm instructions to do the action. This will
+probably result in much less overhead than the JNI model and will allow
+the native code to be better optimised in the context of the Java code.
+
+John
+
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000740.html">[JOS-Arch] Java-Linux</A></li>
+	<LI> Next message: <A HREF="000742.html">[JOS-Arch] JOSCore and JOSExtensions (fwd)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#744">[ date ]</a>
+              <a href="thread.html#744">[ thread ]</a>
+              <a href="subject.html#744">[ subject ]</a>
+              <a href="author.html#744">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Static fields/object sharing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:scribbs%40ens.utulsa.edu">
+   <LINK REL="Previous"  HREF="000672.html">
+   <LINK REL="Next" HREF="000679.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Static fields/object sharing</H1>
+    <B>Sean D Cribbs</B> 
+    <A HREF="mailto:scribbs%40ens.utulsa.edu"
+       TITLE="[JOS-Arch] Static fields/object sharing">scribbs@ens.utulsa.edu</A><BR>
+    <I>Thu, 25 May 2000 10:48:27 -0500 (CDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000672.html">[JOS-Arch] [class types] Proposal</A></li>
+        <LI> Next message: <A HREF="000679.html">[JOS-Arch] Approaches to Object Sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#677">[ date ]</a>
+              <a href="thread.html#677">[ thread ]</a>
+              <a href="subject.html#677">[ subject ]</a>
+              <a href="author.html#677">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hey guys,
+
+I've followed some of your discussion on sharing objects and the
+implications of static fields.  For perspective, one might look at
+Serialization, which is, in a way, a method of sharing
+objects.  Serialization disregards all static and transient fields of an
+object.  This prevents the serialized object from changing the static
+fields of other instances when it is deserialized.  So shared objects
+could basically have their static fields dependent on the current
+process.  This essentially treats shared objects as deserialized objects.
+
+How one gets an instance of a shared object is another story. IMO, the
+most elegant way is through an object broker of some kind (whether an ORB
+or subscription of some kind).  That way, the broker could manage the
+sharing and synchronization problems. The broker could exist outside of
+&quot;processes&quot; per se, and could be accessed through JNDI or some other
+interface.  I don't know if these last comments apply, they're just some
+random speculation on my part.  Since I am not intimately familiar with
+the kernel and VM, I cannot make a precise judgement.
+
+------------------------------------
+Sean Cribbs &lt;<A HREF="mailto:sean-cribbs@utulsa.edu">sean-cribbs@utulsa.edu</A>&gt;
+Computer Science and Mathematics
+University of Tulsa
+------------------------------------
+
+
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000672.html">[JOS-Arch] [class types] Proposal</A></li>
+	<LI> Next message: <A HREF="000679.html">[JOS-Arch] Approaches to Object Sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#677">[ date ]</a>
+              <a href="thread.html#677">[ thread ]</a>
+              <a href="subject.html#677">[ subject ]</a>
+              <a href="author.html#677">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

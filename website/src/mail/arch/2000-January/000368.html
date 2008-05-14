@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] run:main: sub-scheme</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000367.html">
+   <LINK REL="Next" HREF="000369.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] run:main: sub-scheme</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] run:main: sub-scheme">gchii@mindspring.com</A><BR>
+    <I>Tue, 04 Jan 2000 21:13:21 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000367.html">[JOS-Arch] Alt Packages - Status</A></li>
+        <LI> Next message: <A HREF="000369.html">[JOS-Arch] Jeps 0.001e doesn't compile!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#368">[ date ]</a>
+              <a href="thread.html#368">[ thread ]</a>
+              <a href="subject.html#368">[ subject ]</a>
+              <a href="author.html#368">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Within Smart API, the run:main: sub-scheme corresponds to the main()
+method. Of course, a main() method is a public static void main( String[] )
+method.
+
+The MainProgramController implements a run:main: sub-scheme. In a clever
+twist, this controller uses run:program: to invoke MainProgram. In turn,
+MainProgram uses practical reflection to invoke any class which implements
+a main() method.
+
+Unfortunately, this was not working correctly in Distribution 5 of Smart
+API - Release 2a. It is fixed for the next distribution.
+
+-----
+
+For example, the CommandLineBrowser class implements a main() method. To
+start the CommandLineBrowser, use the following URI:
+
+run:main:org.jos.gchii.commandlinebrowser1a.CommandLineBrowser
+
+The java tool equivalent is:
+
+java org.jos.gchii.commandlinebrowser1a.CommandLineBrowser
+
+-----
+
+To pass parameters (arguments) to main(), a URI uses a syntax like this:
+
+run:main:org.jos.gchii.browser1b.UniversalBrowser?<A HREF="http://www.jos.org/">http://www.jos.org/</A>
+
+The java tool equivalent is:
+
+java org.jos.gchii.browser1b.UniversalBrowser <A HREF="http://www.jos.org/">http://www.jos.org/</A>
+
+-----
+
+The experimental command-line browser uses AWT components for its virtual
+console, which the virtual console is under construction. I would like to
+use a command-line browser on Linux and across a TELNET connection. I would
+like to use a command-line browser like I use an MS-DOS Box on Windows 95.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000367.html">[JOS-Arch] Alt Packages - Status</A></li>
+	<LI> Next message: <A HREF="000369.html">[JOS-Arch] Jeps 0.001e doesn't compile!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#368">[ date ]</a>
+              <a href="thread.html#368">[ thread ]</a>
+              <a href="subject.html#368">[ subject ]</a>
+              <a href="author.html#368">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

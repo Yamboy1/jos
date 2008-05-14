@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000675.html">
+   <LINK REL="Next" HREF="000673.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 25 May 2000 09:56:50 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000675.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000673.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#676">[ date ]</a>
+              <a href="thread.html#676">[ thread ]</a>
+              <a href="subject.html#676">[ subject ]</a>
+              <a href="author.html#676">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; Can you explain this? I thought that a non-static method call across
+</I>&gt;<i> &gt; class definitions would be resolved differently depending on the
+</I>&gt;<i> &gt; particular class of that class definition. (I admit, I'm getting to the
+</I>&gt;<i> &gt; limits of what I think I know about JVMs)
+</I>&gt;<i> 
+</I>&gt;<i>         The only thing different between classes sharing class definitions
+</I>&gt;<i> is their statics; the method code remains in exactly the same place.  If a
+</I>&gt;<i> class definition A has a call to method M in class B, the method offset
+</I>&gt;<i> will be the same every time it's called (the rationale behind the _quick
+</I>&gt;<i> opcodes, IIRC).  The only difference is if class B doesn't share a
+</I>&gt;<i> definitions everywhere class A shares definitions -- that is, if class B
+</I>&gt;<i> is class B' in some other process.
+</I>
+That was my point, actually. Have we already assumed that class
+definition networks are shared?
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000675.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000673.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#676">[ date ]</a>
+              <a href="thread.html#676">[ thread ]</a>
+              <a href="subject.html#676">[ subject ]</a>
+              <a href="author.html#676">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

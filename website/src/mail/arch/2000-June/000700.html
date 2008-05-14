@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Static fields/object sharing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   
+   <LINK REL="Next" HREF="000702.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Static fields/object sharing</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Static fields/object sharing">gchii@mindspring.com</A><BR>
+    <I>Thu, 01 Jun 2000 12:08:07 -0400</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000702.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#700">[ date ]</a>
+              <a href="thread.html#700">[ thread ]</a>
+              <a href="subject.html#700">[ subject ]</a>
+              <a href="author.html#700">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 06:43 PM 5/30/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>	From the programmers P.O.V., I must disagree entirely.  I would
+</I>&gt;<i>find it much easier to share an object than write de/serialization methods
+</I>&gt;<i>for it.  If I'm making good use of OOP, I'm working with objects, not
+</I>&gt;<i>data.
+</I>
+&gt;<i>From an application programmers point of view, what I said is entirely
+</I>backward. But of course I'm speaking from the system programmer's point of
+view. We are building an operating system. I am working on this project as
+a system programmer most of the time.
+
+In order to maintain the illusion of shared objects for an application
+programmer's point of view, a system programmer has to a lot of work. For a
+system programmer, providing data sharing is relatively straight forward
+and easy. Data sharing can be as simple as direct shared memory. While
+that's easy for a system programmer to implement, it is &quot;hard&quot; for an
+application programmer to use.
+
+On the other hand, providing object sharing is complex. Interactions
+between shared objects are often subtle and nonintuitive. Look at the
+complexity of implementing a CORBA or RMI service. While that's difficult
+for a system programmer to implement, it is &quot;easy&quot; for an application
+programmer to use.
+
+I've been talking from a system programmer's point of view on this mailing
+list for as long as I can remember. This is a discussion about the
+architecture of an operating system, isn't it? I am speaking as a system
+programmer and always expect others to speak from the same point of view.
+
+Let me clarify. When I speak of a &quot;proxy&quot;, I prefer implicit proxies from
+the application programmer's point of view. I resort to explicit proxies
+when writing an implementation of a subsystem. This always reminds me of
+the FileInputStream and FileDescriptor object. On one hand, FileInputStream
+is a implicit proxy for a foreign file input stream. Its fd property is a
+FileDescriptor. In turn, a FileDescriptor object is an implicit proxy for a
+foreign file handle. Its handle property is an explicit proxy. The real
+file input stream is never owned by a virtual machine.
+
+Likewise, it seems to me that a new bytecode proxy could handle the
+standard in, out and err streams this way:
+
+  public abstract void setStandardStreamHandles(
+      int in,
+      int out,
+      int err );
+
+Unfortunately, most implementations of java.lang.System /assume/ the
+handles for standard in, out and err streams are always 0, 1 and 2. These
+handles are provided automatically in a foreign machine code process.
+Handles are turned into FileDescriptors. In turn, FileDescriptors are
+turned into FileInputStream and FileOutputStream. If handles were passed as
+formal parameters, we would be one step closer to a bytecode process.
+
+Notice that is it far more complex to pass standard streams like this
+
+  public abstract void setStandardStreams(
+      FileDescriptor in,
+      FileDescriptor out,
+      FileDescriptor err );
+
+or
+
+  public abstract void setStandardStreams(
+      FileInputStream in,
+      FileOutputStream out,
+      FileOutputStream err );
+
+When given a handle, a subroutine can create a new FileDescriptor and
+FileInputStream, like this:
+
+  public setStandardInHandle( int v ) {
+    in = new FileInputStream( FileDescriptor( v ) );
+  }
+
+When given a handle, a subroutine can create a new FileDescriptor and
+FileOutputStream, like this:
+
+  public setStandardOutHandle( int v ) {
+    out = new FileOutputStream( FileDescriptor( v ) );
+  }
+  public setStandardErrHandle( int v ) {
+    err = new FileOutputStream( FileDescriptor( v ) );
+  }
+
+This highlights the simplicity of passing handles between subsystems. The
+interface only depends on a primative. It does not depend on a particular
+plug-in version of java.io. The assignment of in, out and err is often
+delayed. It takes a while for the system classes to load and static fields
+to be assigned. A primative is easier to preserve through such a delay.
+
+If files, devices and other system objects are assumed to be shared, we
+have just come back to the original theme of sharing objects. We open an
+shared object, use it and close it.
+
+HANDLE open( const char *name );
+void sendMessage( HANDLE v, const char *msg );
+void close( HANDLE );
+
+The system must keep track of which bytecode process has opened which
+shared objects. Inside the open() subroutine, a shared object is added to a
+process-specific open-object list. When a process is terminated, all shared
+objects in this list are closed automatically by the operating system.
+
+  forEach( HANDLE, close );
+
+What is the &quot;name&quot; of a shared object? Each shared object is a digital
+resource. It should follow the rules for uniform resource identifier.
+
+In turn, a generic shared object proxy can be written in bytecode. It would
+look something like this:
+
+public final class SharedObject {
+  public SharedObject( String name ) {
+    handle = open( name );
+  }
+  public void sendMessage( String msg ) {
+    sendMessage( handle, msg );
+  }
+  public void close() {
+    close( handle );
+  }
+  public int handle;
+}
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000702.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#700">[ date ]</a>
+              <a href="thread.html#700">[ thread ]</a>
+              <a href="subject.html#700">[ subject ]</a>
+              <a href="author.html#700">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

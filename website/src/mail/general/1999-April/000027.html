@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS] Command Line idea</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000020.html">
+   <LINK REL="Next" HREF="000034.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS] Command Line idea</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS] Command Line idea">al@outworld.org</A><BR>
+    <I>Thu, 22 Apr 1999 21:53:50 +0300</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000020.html">[JOS] O'Reilly editorial on Java OS's</A></li>
+        <LI> Next message: <A HREF="000034.html">[JOS] Command Line idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#27">[ date ]</a>
+              <a href="thread.html#27">[ thread ]</a>
+              <a href="subject.html#27">[ subject ]</a>
+              <a href="author.html#27">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Greetings.
+
+I had an idea as to how to implement commands in the command line
+interface of JOS. Why not have a centric registry with all the available
+commands, and then use this registry to map the command function to a
+specific class that implements org.jos.command.Command or something?
+
+Example:
+
+CD=org.jos.command.commands.CD
+MKDIR=org.jos.command.commands.MKDIR
+
+etc.?
+
+The command interface could be:
+
+public void processCommand(CommandLineSession session, String command,
+String[] parameters);
+
+and CommandLineSession can give access to the IN and OUT of the session
+(screen, port, server, etc.) and other things, like current directory,
+command history list, etc.
+
+This way, users can implement their own commands, possibly download
+remote registries of commands on the fly, or write their own commands
+without the need to reimplement the entire command line sub system of
+JOS. Even native commands can then be added by distributors, for
+example, a server machine may want to have commands for direct access to
+the fan and cooling system, or the UPS; the admin won't have to open a
+special program to send the commands.
+
+What do you think?
+
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+___________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: <A HREF="http://www.outworld.org/people/al/">http://www.outworld.org/people/al/</A> ]  [<A HREF="mailto:spambait@outworld.net">spambait@outworld.net</A>]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000020.html">[JOS] O'Reilly editorial on Java OS's</A></li>
+	<LI> Next message: <A HREF="000034.html">[JOS] Command Line idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#27">[ date ]</a>
+              <a href="thread.html#27">[ thread ]</a>
+              <a href="subject.html#27">[ subject ]</a>
+              <a href="author.html#27">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

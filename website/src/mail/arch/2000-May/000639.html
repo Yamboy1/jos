@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000634.html">
+   <LINK REL="Next" HREF="000646.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs">tmiller@haverford.edu</A><BR>
+    <I>Fri, 19 May 2000 12:56:47 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000634.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+        <LI> Next message: <A HREF="000646.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#639">[ date ]</a>
+              <a href="thread.html#639">[ thread ]</a>
+              <a href="subject.html#639">[ subject ]</a>
+              <a href="author.html#639">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Exactly. It has proven to be unworkable.
+</I>
+	Must have missed that proof; could you run it by me again?
+
+&gt;<i> All classes have static fields.
+</I>
+	The only static fields that are of any import are the Java ones
+-- the JVM can manage the others on its own -- and it's trivial to write a
+class without static fields.  java.lang.Object, AFAIK, does not have
+statics, so subclassing it is not a problem.
+
+&gt;<i> With what we know so far, it might be possible to share objects across
+</I>&gt;<i> custom class loaders (with limitations).
+</I>
+	From what we know, sharing objects across custom class loaders
+breaks the specification horribly, which is why Ryan and I required that
+any such sharing take place between primordial loaders.  A custom
+classloader will /never/ have the same class as any other classloader,
+because its classloader property will always be different; using only
+primordial loaders allows us the fiction that all primordial loaders are
+the same, more or less.  If I create two custom classloaders that don't
+use findSystemClass() to fetch a particular class, then that particular
+class must have its own statics in each classloader.  Furthermore, objects
+of that type can't be shared between the classloaders because their
+class's classloader property is different.
+
+	That is, what makes object sharing across processes possible is
+that an object's class definition may be safely shared between those
+processes, and that is only because the each primordial classloader looks
+like the /only/ primordial classloader to each process.  We have been
+trying to decide what the proper thing to do with the /class itself/ of
+each shared object -- the shell around a class definition containing the
+statics.  (As an object is a shell around the class containing its
+instance variables.)  Sharing a class in this case does not appear to
+break the spec, again because we're dealing with the primordial
+loader(s) -- there's no way an application could tell from whence the
+class of its object came -- unless we allow it.  Ryan thinks the proper
+thing to do is for a shared object to retain its originator's statics; I
+have given one contention the other way, and have a second -- transparency
+-- which could be negated by the need for a specific sharing API.  (That
+is, if we're not being transparent there, perhaps we don't need to be
+elsewhere, as well.)
+
+	One way of looking at the question -- 
+
+/* previous use of type SO up here, to
+   make sure the class is loaded */
+a = getSharedObjectOfTypeSO();
+b = new SO();
+
+a.setSOStaticD( 3 );
+b.setSOStaticD( 4 );
+
+if ( a.getSOStaticD() == b.getSOStaticD() ) {
+	println( &quot;Shared classes.&quot; );
+	} else
+	println( &quot;Unshared classes.&quot; );
+	}
+/* end code fragment */
+
+	In a normal virtual machine, which it is our job to emulate, what
+happens?  It will return &quot;Shared classes.&quot;, unless gSOOTSO() uses a custom
+classloader to redefine SO.  If it does that, I'm not actually sure what
+will happen -- if it's something useful, then this is probably the
+behaviour we want to go with for true SharedObjects.
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000634.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+	<LI> Next message: <A HREF="000646.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#639">[ date ]</a>
+              <a href="thread.html#639">[ thread ]</a>
+              <a href="subject.html#639">[ subject ]</a>
+              <a href="author.html#639">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

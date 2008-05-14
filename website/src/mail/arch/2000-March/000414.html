@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [Asynchronous I/O] Service</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000413.html">
+   <LINK REL="Next" HREF="000415.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [Asynchronous I/O] Service</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [Asynchronous I/O] Service">gchii@mindspring.com</A><BR>
+    <I>Mon, 27 Mar 2000 11:53:02 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000413.html">[JOS-Arch] [Smart API 2a] Release 8</A></li>
+        <LI> Next message: <A HREF="000415.html">[JOS-Arch] Asynchronous I/O Service and JEPS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#414">[ date ]</a>
+              <a href="thread.html#414">[ thread ]</a>
+              <a href="subject.html#414">[ subject ]</a>
+              <a href="author.html#414">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Using the latest technique on asynchronous I/O, I wrote a generic service
+interface. Also, I wrote a corresponding service controller for the Smart API.
+
+How easy is it to build a multiple-threaded TCP service? Just extend the
+BaseServiceProgram and define your own onSocket() method. Here is a base
+service program:
+
+public abstract class BaseServiceProgram
+    extends BaseConsoleProgram
+    implements ServiceListener {
+  public BaseServiceProgram() {
+  }
+  public void run() {
+    int port = getIntValue( &quot;port&quot; );
+    int count = getIntValue( &quot;count&quot; );
+    URI uri = new URI( &quot;x-service:&quot; +
+        &quot;?port=&quot; + port +
+        &quot;&amp;count=&quot; + count
+        );
+    Service s = (Service) uri.getObject();
+    if ( s == null ) {
+      println( &quot;service resource is missing.&quot; );
+      setResultCode( 2 );
+      return;
+    }
+    s.setListener( this );
+    s.run();
+  }
+}
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000413.html">[JOS-Arch] [Smart API 2a] Release 8</A></li>
+	<LI> Next message: <A HREF="000415.html">[JOS-Arch] Asynchronous I/O Service and JEPS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#414">[ date ]</a>
+              <a href="thread.html#414">[ thread ]</a>
+              <a href="subject.html#414">[ subject ]</a>
+              <a href="author.html#414">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

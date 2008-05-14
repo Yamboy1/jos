@@ -1,0 +1,1206 @@
+From ryan@whitewolf.com.au Mon, 28 Jun 1999 14:44:54 +1000
+Date: Mon, 28 Jun 1999 14:44:54 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] cvs permissions fix
+
+_quinn (or whoever owns the cvs process by the time you read this),
+
+I have created a new startup script called pserver-new which should fix
+some file permission problems. Unfortunately I can't restart the server
+when the existing process is owned by someone else (maybe we could do
+this with sudo - Helmut?)
+
+The problem occurs if you create new files or directories. If your umask
+isn't set properly, the correct permissions are only granted to the user
+under which the cvs process is running. They are not granted to the
+whole jos group which is a problem if someone else in the jos group
+tries to restart the server (with the wrong umask).
+
+The new script tries to set the umask for you.
+
+Could you (or whoever owns the cvs process) please test if the new
+script solves the problem? Thanks.
+
+
+
+$ find . -exec ls -ld '{}' \; | grep '.---'
+-rw-rwx---   1 clark    jos          443 Feb 15 07:01 ./CVSROOT/passwd
+-r--rwx---   1 clark    jos          312 Dec 11  1998 ./test/bar,v
+-r--------   1 _quinn   jos          182 Jun 11 08:42 ./test/hoho,v
+
+passwd can be left the way it is. The other two files should be
+chmod'ed. I guess to:
+
+-r--r--r--
+
+ie. chmod 444 filename
+
+
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From tmiller@haverford.edu Mon, 28 Jun 1999 07:34:34 -0400 (EDT)
+Date: Mon, 28 Jun 1999 07:34:34 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Admin] cvs permissions fix
+
+> I have created a new startup script called pserver-new which should fix
+> some file permission problems. Unfortunately I can't restart the server
+> when the existing process is owned by someone else (maybe we could do
+> this with sudo - Helmut?)
+
+	Well, we can't use the new start-up file because cvs chokes on
+--allow-root when a remote user tries to do anything. 
+
+-_Quinn
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 28 Jun 1999 08:09:14 -0700 (PDT)
+Date: Mon, 28 Jun 1999 08:09:14 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Admin] cvs permissions fix
+
+Hello all.
+
+Who is "in charge" of CVS?  I'm starting to get
+questions and requests concerning CVS that I need
+to forward to the correct person.  I could really use
+a list of all the JOS resources and who is the
+point of contact for each... It should be in the 
+Wiki (which I can setup).
+
+Of primary importance, is anyone in charge of, or interested in being
+in charge of SourceServer?  I don't
+think parts of it works any more (i.e. adding new 
+source).  Probably due to the change of environment 
+that happened a few months ago which temporarily 
+disabled RCS on the wiki (that has been fixed).  
+Ideally, we could use the PrettyPrinting code to modify 
+the webcvs.cgi interface and not have two separate 
+(redundant?) source repositories.
+
+-iain (jos webmaster)
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at http://mail.yahoo.com
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 28 Jun 1999 09:36:46 -0700 (PDT)
+Date: Mon, 28 Jun 1999 09:36:46 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Admin] WikiWeb upgrades... testers wanted
+
+Hello everyone,
+
+I've upgraded the wiki to use the new version of Wiki
+(twiki) developed by Peter Thoeny (based on Markus's 
+JosWiki).
+
+I'd like people to test the installation and see if
+everything works.  Notice that this is running on
+the same wiki documents as the normal wiki so making
+changes in either one affects the other... be careful.
+
+Basically all you need to do is to substitute "twiki"
+for "wiki" in a url to use the new twiki engine.  So
+
+http://jos.org/wiki/view/main/WebOverhaul
+becomes
+http://jos.org/twiki/view/main/WebOverhaul
+
+This will let you see the same pages, rendered with
+the new engine.
+
+If you want to see the new features of the twiki
+substitute Main for main in the url's so as above:
+
+http://jos.org/twiki/view/main/WebOverhaul
+becomes
+http://jos.org/twiki/view/Main/WebOverhaul
+
+We get RCS integration back into wiki, searching,
+indexing, referenced-by and stricter wiki markups.  
+Notice that the stricter markups will not render
+"_italic_." or "_italic _" the way the way the old
+wiki did (italicizing it).  Instead you have to do
+"_italic_ ." to get the same behavior.  This allows
+us to use regular _'s where we want by simply not
+"sticking" them to words and leaving blanks around.
+
+There is also some category/topic features of the
+new Wiki which I have not exposed yet.  To learn
+more about the wiki in particular use:
+
+http://jos.org/twiki/view/Wiki
+
+If you have questions or comments, send them to 
+admin@jos.org or directly to me webmaster@jos.org.
+
+-iain (jos webmaster)
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at http://mail.yahoo.com
+
+
+
+
+From tmiller@haverford.edu Mon, 28 Jun 1999 17:00:43 -0400 (EDT)
+Date: Mon, 28 Jun 1999 17:00:43 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Admin] cvs permissions fix
+
+> Who is "in charge" of CVS?  I'm starting to get
+> questions and requests concerning CVS that I need
+> to forward to the correct person.  I could really use
+> a list of all the JOS resources and who is the
+> point of contact for each... It should be in the 
+> Wiki (which I can setup).
+
+	AFAIK, no one's "in charge" of the CVS, and John Morrison and I
+asked for a "sourcemaster" volunterr to take care of running it for us a
+while back, with no result.  However, myself, Ryan, John, and Robert
+Fitzsimmons (I believe) all have accounts on the jos.org server, so any of
+the four of us should be able to handle things.
+
+-_Quinn
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Mon, 28 Jun 1999 16:17:19 -0500
+Date: Mon, 28 Jun 1999 16:17:19 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Admin] twiki bug report
+
+On the 'sort' page, if it returns any page names that do not follow normal
+wiki conventions, they are not linked as they should be.
+
+For instance, the following pages don't have proper links:
+JOSDesign
+JOSPLDiscussion 
+JOSystem 
+1998Q2 
+Constitution 
+VMGroup 
+list 
+org.jos.core 
+org.jos.server.HttpDaemon 
+
+Regards,
+Avery J. Regier
+
+
+> -----Original Message-----
+> From:	Iain Shigeoka [SMTP:iainshigeoka@yahoo.com]
+> Sent:	Monday, June 28, 1999 12:37 PM
+> To:	admin@jos.org; general@jos.org
+> Subject:	[JOS-Admin] WikiWeb upgrades... testers wanted
+> 
+> Hello everyone,
+> 
+> I've upgraded the wiki to use the new version of Wiki
+> (twiki) developed by Peter Thoeny (based on Markus's 
+> JosWiki).
+> 
+> I'd like people to test the installation and see if
+> everything works.  Notice that this is running on
+> the same wiki documents as the normal wiki so making
+> changes in either one affects the other... be careful.
+> 
+> Basically all you need to do is to substitute "twiki"
+> for "wiki" in a url to use the new twiki engine.  So
+> 
+> http://jos.org/wiki/view/main/WebOverhaul
+> becomes
+> http://jos.org/twiki/view/main/WebOverhaul
+> 
+> This will let you see the same pages, rendered with
+> the new engine.
+> 
+> If you want to see the new features of the twiki
+> substitute Main for main in the url's so as above:
+> 
+> http://jos.org/twiki/view/main/WebOverhaul
+> becomes
+> http://jos.org/twiki/view/Main/WebOverhaul
+> 
+> We get RCS integration back into wiki, searching,
+> indexing, referenced-by and stricter wiki markups.  
+> Notice that the stricter markups will not render
+> "_italic_." or "_italic _" the way the way the old
+> wiki did (italicizing it).  Instead you have to do
+> "_italic_ ." to get the same behavior.  This allows
+> us to use regular _'s where we want by simply not
+> "sticking" them to words and leaving blanks around.
+> 
+> There is also some category/topic features of the
+> new Wiki which I have not exposed yet.  To learn
+> more about the wiki in particular use:
+> 
+> http://jos.org/twiki/view/Wiki
+> 
+> If you have questions or comments, send them to 
+> admin@jos.org or directly to me webmaster@jos.org.
+> 
+> -iain (jos webmaster)
+> _________________________________________________________
+> Do You Yahoo!?
+> Get your free @yahoo.com address at http://mail.yahoo.com
+> 
+> 
+> _______________________________________________
+> Admin maillist  -  Admin@jos.org
+> http://jos.org/mailman/listinfo/admin
+
+
+
+From ryan@whitewolf.com.au Tue, 29 Jun 1999 10:10:30 +1000
+Date: Tue, 29 Jun 1999 10:10:30 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] cvs permissions fix
+
+"Todd L. Miller" wrote:
+> 
+> > I have created a new startup script called pserver-new which should fix
+> > some file permission problems. Unfortunately I can't restart the server
+> > when the existing process is owned by someone else (maybe we could do
+> > this with sudo - Helmut?)
+> 
+>         Well, we can't use the new start-up file because cvs chokes on
+> --allow-root when a remote user tries to do anything.
+
+You can remove that option. cvs 1.9 seems not to support that. I have
+been testing cvs 1.10 and I think we might move over to it soonish.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From ryan@whitewolf.com.au Tue, 29 Jun 1999 11:14:34 +1000
+Date: Tue, 29 Jun 1999 11:14:34 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] cvs permissions fix
+
+Iain Shigeoka wrote:
+
+> Who is "in charge" of CVS?  I'm starting to get
+> questions and requests concerning CVS that I need
+> to forward to the correct person.  I could really use
+> a list of all the JOS resources and who is the
+> point of contact for each... It should be in the
+> Wiki (which I can setup).
+
+CVS admin requests should be sent to this list. As Todd L. Miller
+pointed out, many of us are able to fix most problems so posting to this
+list will get the fastest response.
+
+However, I would be what you would call the "cvs admin guy" - if you
+need to know.
+
+..
+
+For those who don't know (!!) about a year ago I proposed and installed
+(in cooperation with Borko) the JOS CVS server initially for kernel
+development. He's disappeared off the JOS scene so I'm the only person
+left with cvs administration experience. JM/_Quinn and Robert
+Fitzsimmons pretty much handle their own modules these days while I
+handle general cvs administration tasks including:
+
+- cvs configuration and maintenance
+- creation of top-level modules and any modules under jos/* (including
+account creation for new developers under those modules)
+
+Since jm and _quinn are using cvs a lot now we should work out how not
+to step on eachother's toes. For example, we don't want two people
+editing the same configuration file at the same time.
+
+> Of primary importance, is anyone in charge of, or interested in being
+> in charge of SourceServer?
+
+I think Thomas Winzig wrote that. I'm not sure who took over. Does
+anyone here know **anything** about SourceServer? (Clark?)
+
+I would like to know one thing about it ...
+
+Some people have proposed that everything in SourceServer be moved
+across to CVS. To do this I need to know how to access plain source
+files from SourceServer. I don't think it is feasible to move everything
+across in one go - we would need to chase up each individual developer
+and create accounts for them. I'd rather create the appropriate
+directories in jos/library as developers are ready to move across.
+
+> Ideally, we could use the PrettyPrinting code to modify
+> the webcvs.cgi interface and not have two separate
+> (redundant?) source repositories.
+
+This is something I have been working on. The latest version of
+PrettyPrinter does hyperlinking but I still have a few bugs to iron out.
+After that I can integrate it into cvsweb.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From ryan@whitewolf.com.au Tue, 29 Jun 1999 13:40:17 +1000
+Date: Tue, 29 Jun 1999 13:40:17 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] cvs permissions fix
+
+"Todd L. Miller" wrote:
+
+>         AFAIK, no one's "in charge" of the CVS, and John Morrison and I
+> asked for a "sourcemaster" volunterr to take care of running it for us a
+> while back, with no result.
+
+I did reply to that. I don't know whether you don't remember, or whether
+this is a hint that you're not happy with my service, but here's what
+happened.
+
+At the time jm sent his email to the list complaining that CVS was not
+working, I had just left for a two week vacation. I read his email from
+an Internet Cafe and explained the situation. jos.org had just moved to
+a new machine shortly before I had to leave - in fact the night before I
+was up until 4:00am replicating the old cvs environment on the new
+machine. I finally got it working and nodded off. When jm complained
+that his remote client wasn't working, I explained (from a distant
+Internet Cafe) that the cron job wasn't working properly and where to
+find the pserver script. On the old machine, Borko and I would patrol
+cvs day and night from opposite sides of the globe but Borko was never
+given an account on the new machine and so he couldn't handle things
+while I was away. He still does not have an account and he has now left
+the jos project (as far as anyone can tell).
+
+As for that cron job, that's still a mystery. Of course a script in
+/etc/rc.d would be better. From memory Helmut had something against
+that. Debugging cron jobs is pretty time consuming, especially over my
+slow link but maybe I'll have another look at it.
+
+Back to your comment: "no one's in charge", you seemed quite happy to
+assume responsibility for the JJOS module so I was happy to have one
+less thing to do. I haven't really touched the JJOS module since it was
+created. If you want someone else to be in charge of managing JJOS,
+that's fine. Administering cvs itself requires another level of
+expertise. If you want someone else to take over from that too, that's
+also fine. I'll stop when you find someone else.
+
+(I haven't had time to proof read - if I've pissed anyone off, sorry!)
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From tmiller@haverford.edu Mon, 28 Jun 1999 23:08:14 -0400 (EDT)
+Date: Mon, 28 Jun 1999 23:08:14 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Admin] cvs permissions fix
+
+> I did reply to that. I don't know whether you don't remember, or whether
+> this is a hint that you're not happy with my service, but here's what
+> happened.
+
+	Honestly, I had forgotten, probably since we haven't had any
+problems with the CVS server!  My apologies.
+
+> Back to your comment: "no one's in charge", you seemed quite happy to
+> assume responsibility for the JJOS module so I was happy to have one
+> less thing to do. I haven't really touched the JJOS module since it was
+> created. If you want someone else to be in charge of managing JJOS,
+> that's fine. Administering cvs itself requires another level of
+> expertise.
+
+	The problem is that I don't have *either* level of expertise.  I
+really don't know the full capabilities of CVS, and in part that's
+because we haven't needed it -- a remote RCS usage has sufficed for us
+so far.  As I noted above, since I haven't noticed any problems with CVS,
+you're doing a good job administering it.  And I believe the original
+question about "who's in charge" was directed at the tree as a whole,
+not the individual modules, although I lost that point writing the email.
+At any rate, given the amount of work I'm doing to administer the module,
+it could just as easily be said that anyone with an account on the jos.org
+server is administering the JJOS module :)  Again, my apologies for 
+my hastily-written and ill-considered previous reply.
+
+	On the other hand, do you have any good references for CVS module
+maintainers?  I imagine I'll like a break from coding up throws pretty
+soon.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Mon, 28 Jun 1999 23:14:47 -0400 (EDT)
+Date: Mon, 28 Jun 1999 23:14:47 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Admin] cvs permissions fix
+
+> You can remove that option. cvs 1.9 seems not to support that. I have
+> been testing cvs 1.10 and I think we might move over to it soonish.
+
+	Okay, removed the option and moved the current pserver to
+pserver-old, and the modified pserver-new to pserver, and restarted it.
+Hope this works.
+
+-_Quinn
+
+
+
+
+From jm@mak.com Tue, 29 Jun 1999 08:25:28 -0400
+Date: Tue, 29 Jun 1999 08:25:28 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Admin] Alternative approach to "memory" classes...
+
+Hi All;
+
+Sorry for the wide distribution, but I am interested in hearing your
+thoughts on the following, JOS-wide, and (unfortunately) related
+issues...
+
+Issue #1:
+
+Just bought the "Inside JavaOS" book.  Haven't had time to read the
+whole thing (you know how it is).  JavaOS has a quite different (and
+much more comprehensive) approach to memory classes than any of the ones
+I wrote about in my recent message to the kernel list (those of you who
+aren't on the kernel list can check the archives if you're really
+interested, but I really need your inputs on Issue #2...)
+
+Seems they have opaque (to Java, anyways) address32 and address64
+classes.  They also have "address range" classes, DMA address space
+classes, and even (seems to me) I/O space classes (as a 16-bit address
+space).  I haven't exactly figured out and/or read far enough to know
+if/how they handle the *contents* of addresses as unsigned quantities,
+although I'm sure they can handle it also via opaque classes.  Finally,
+they even seem to have an approach to handling physical<->virtual
+mapping machinery.
+
+So, I guess this comes down to either of two options (please excuse the
+hyperbole):
+
+(1) inventing our own, unique, simplistic, must-be-upgraded-later
+approach, which will be expedient in the short term, but will never be
+able to use JavaOS drivers/software, and will be much harder for us to
+get consensus upon (e.g., agreeing upon driver, system, OS, and "kernel"
+APIs), or
+
+(2) implementing something as close as is humanly possible to the JavaOS
+API(s), which will be more work in the short term, but maybe less in the
+long term, and which will obviate the consensus-building group-grope
+problem we currently have, which makes it much harder to get anything
+done that involves more than one person...
+
+Basically, option (1) is the "let's re-invent the wheel" approach, and
+(2) is the time-honored, Open Source "chase the tail-lights" approach. 
+As much as I like designing my own APIs (of course, they would be far
+superior to and more aesthetically pleasing than the JavaOS ones --
+*N-O-T*), I'm kind of leaning towards option (2).  I mean, hell, we're
+not redesigning the Java language, the bytecodes, or the java.* classes,
+so...
+
+Issue #2:
+
+Are there any legal ramifications of cloning the JavaOS APIs?  Is
+anybody in a position to find out?  If there are issues, I'd sure like
+to know about them right now so that we can do option (1) instead...
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From tmiller@haverford.edu Tue, 29 Jun 1999 09:24:25 -0400 (EDT)
+Date: Tue, 29 Jun 1999 09:24:25 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Admin] Alternative approach to "memory" classes...
+
+> Issue #2:
+> 
+> Are there any legal ramifications of cloning the JavaOS APIs?  Is
+> anybody in a position to find out?  If there are issues, I'd sure like
+> to know about them right now so that we can do option (1) instead...
+
+	Paired with this issue: does anyone know what the
+kind of redistribution of the JavaOS drivers is allowed?  I would guess
+that individual manufacturers don't particularly care, but Sun might have
+something against letting the drivers it ships with JavaOS spread to the
+four routers of the internet.
+
+	As for the legal ramifications of cloning the JavaOS APIs, we'll
+be engaged in an even more time-honored approach than Open Source
+"tail-light chasing" -- reverse engineering!
+
+-_Quinn
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 29 Jun 1999 08:55:47 -0700 (PDT)
+Date: Tue, 29 Jun 1999 08:55:47 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Admin] cvs permissions fix
+
+--- Ryan Heise <ryan@whitewolf.com.au> wrote:
+> Iain Shigeoka wrote:
+> 
+> > Who is "in charge" of CVS?  I'm starting to get
+> 
+> CVS admin requests should be sent to this list. As
+> 
+> However, I would be what you would call the "cvs
+> admin guy" - if you
+> need to know.
+
+OK. Despite our excellent community process, its nice
+in some situations to be able to point to someone when 
+told "Take me to your leader!".  :)  
+
+> handle general cvs administration tasks including:
+> 
+> - cvs configuration and maintenance
+> - creation of top-level modules and any modules
+> under jos/* (including
+> account creation for new developers under those
+> modules)
+
+OK.  Could you (Ryan) please contact kevinr@spin.com.mx
+KevenRaul.  He's writing the CommandLineUtilities
+and wants to put them into the CVS and use that
+for development.  I've Cc'd him so he may contact
+you...
+
+Also, speaking of adding/maintaining CVS accounts,
+how hard would it be to automate the process?  I think
+we're "scaring" away developers because there are so
+many things you need to do to get started.  First 
+you need a WikiName and password, then you need to
+add yourself to the MemberList, and join the right
+mailing lists, and then get a separate CVS account.
+I was thinking about trying to create a central
+"account" management page/script that will allow
+a person to manage all account information in a
+single place.  Ideally choose/edit one WikiName,
+account info, and password, set some check marks, and everything is
+configured.  CVS commit access would have 
+to be "approved" by module "owners" for pre-existing
+CVS modules, but creating new modules (following
+certain rules) should be easy/automatic.  Do you
+think this is possible?
+
+> > Of primary importance, is anyone in charge of, or
+> interested in being
+> > in charge of SourceServer?
+> 
+> I think Thomas Winzig wrote that. I'm not sure who
+> took over. Does
+> anyone here know **anything** about SourceServer?
+> (Clark?)
+
+I hope someone does!  At present it appears broken.
+It can read files but can't add any.  
+ 
+> I would like to know one thing about it ...
+> 
+> Some people have proposed that everything in
+> SourceServer be moved
+> across to CVS. 
+
+I'm one of the more vocal in this group.  It's 
+confusing where to put source and why.  Once again, 
+a finger pointing problem.  When asked, "Where do I 
+put my source I want to contribute to JOS", I'd like 
+to have one place to point...
+
+> To do this I need to know how to
+> access plain source
+> files from SourceServer. I don't think it is
+> feasible to move everything
+> across in one go - we would need to chase up each
+> individual developer
+> and create accounts for them. I'd rather create the
+> appropriate
+> directories in jos/library as developers are ready
+> to move across.
+
+All the source is in the /source dir of the jos.org
+account.  The dir structure is arranged per package
+name I believe.  There is a raw (as submitted java
+source), java source (pretty printed), and html version 
+of each file.  If we could move them over to CVS,
+it may be best to do so (just to remove the confusion
+of having two source repositories, with no correlation
+between what's in which).  I propose simply putting
+them in the CVS (the pretty printed version of the
+source) with only the CVS admin having commit access
+to them.  Then as the authors start contributing,
+they can be granted commit access.  Since SourceServer
+has been broken since, I believe March 1999, and I
+have only had one person ask why its broken, I don't
+think the source in the SourceServer is currently
+under active development (or if it is, its being
+developed outside of JOS).
+
+> > Ideally, we could use the PrettyPrinting code to
+> modify
+> > the webcvs.cgi interface and not have two separate
+> > (redundant?) source repositories.
+> 
+> This is something I have been working on. The latest
+> version of
+> PrettyPrinter does hyperlinking but I still have a
+> few bugs to iron out.
+> After that I can integrate it into cvsweb.
+
+Very cool.  Let me know when that's done so I can
+announce it on the front page.  I also would like to 
+modify the HowToSubmitSoftware and related pages if you 
+think that we can move 100% of JOS source to CVS.
+Basically, when SourceServer is fully "replaced".
+
+-iain (self-appointed jos webmaster)
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at http://mail.yahoo.com
+
+
+
+
+From clark.evans@manhattanproject.com Tue, 29 Jun 1999 12:20:35 -0400
+Date: Tue, 29 Jun 1999 12:20:35 -0400
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] cvs permissions fix
+
+Iain Shigeoka wrote:
+> OK.  Could you (Ryan) please contact kevinr@spin.com.mx
+> KevenRaul.  He's writing the CommandLineUtilities
+> and wants to put them into the CVS and use that
+> for development.  I've Cc'd him so he may contact
+> you...
+> 
+> Also, speaking of adding/maintaining CVS accounts,
+> how hard would it be to automate the process?  I think
+> we're "scaring" away developers because there are so
+> many things you need to do to get started.  First
+> you need a WikiName and password, then you need to
+> add yourself to the MemberList, and join the right
+> mailing lists, and then get a separate CVS account.
+> I was thinking about trying to create a central
+> "account" management page/script that will allow
+> a person to manage all account information in a
+> single place.  Ideally choose/edit one WikiName,
+> account info, and password, set some check marks, and everything is
+> configured.  CVS commit access would have
+> to be "approved" by module "owners" for pre-existing
+> CVS modules, but creating new modules (following
+> certain rules) should be easy/automatic.  Do you
+> think this is possible?
+
+This would be cool.  I don't have a ton of time
+to toss at it, but I think it would be very useful.
+
+> > anyone here know **anything** about SourceServer?
+> > (Clark?)
+> 
+> I hope someone does!  At present it appears broken.
+> It can read files but can't add any.
+
+As I understood, we were moving to CVS.  It would
+be cool to have some of the SourceServer features
+on top of CVS though... this could be a nice
+"JavaCVS" project and would be welcome to the
+Java development community.
+
+It could also do things like automagically
+run JavaDocs and such.
+
+> > I would like to know one thing about it ...
+> >
+> > Some people have proposed that everything in
+> > SourceServer be moved
+> > across to CVS.
+> 
+> I'm one of the more vocal in this group.  It's
+> confusing where to put source and why.  Once again,
+> a finger pointing problem.  When asked, "Where do I
+> put my source I want to contribute to JOS", I'd like
+> to have one place to point...
+
+CVS
+
+Altough a nice submission process would 
+be cool.  Did we install webcvs.cgi?
+
+It would be cool to have some way
+to have submissions be approved by
+someone who is a "committer".
+
+A patch queue would be slick too,
+many projects, like PostgreSQL
+could use something like that.
+
+> > > Ideally, we could use the PrettyPrinting code to
+> > modify
+> > > the webcvs.cgi interface and not have two separate
+> > > (redundant?) source repositories.
+> >
+> > This is something I have been working on. The latest
+> > version of
+> > PrettyPrinter does hyperlinking but I still have a
+> > few bugs to iron out.
+> > After that I can integrate it into cvsweb.
+> 
+> Very cool.  Let me know when that's done so I can
+> announce it on the front page.  I also would like to
+> modify the HowToSubmitSoftware and related pages if you
+> think that we can move 100% of JOS source to CVS.
+> Basically, when SourceServer is fully "replaced".
+
+Perfect.
+
+;) Clark
+
+
+
+From DearWebby@webby.com Tue, 29 Jun 1999 10:28:45 -0700
+Date: Tue, 29 Jun 1999 10:28:45 -0700
+From: Dear Webby DearWebby@webby.com
+Subject: [JOS-Admin] Alternative approach to "memory" classes...
+
+At 05:25 AM 6/29/99 , John Morrison wrote:
+>Issue #2:
+>
+>Are there any legal ramifications of cloning the JavaOS APIs?  Is
+>anybody in a position to find out?  If there are issues, I'd sure like
+>to know about them right now so that we can do option (1) instead...
+>-jm
+>==== John Morrison
+
+Yes, whenever SUN is involved, watch out! Their lawyers sue their own
+fathers for using their name, just to piss them off. Unlike M$ who goes out
+of their way to foster community spirit and will do anything to get you to
+use their stuff, with SUN you better count on their lawyers hassling you
+and trying to chase you to the M$ camp.
+
+Unless you have it in writing PRECISELY how much can be cloned in the
+interest of standardization, you better stick to clean room procedure all
+the way and re-invent the wheel. 
+
+
+DearWebby
+(Helmut)
+
+The Cardmaster's MidSummer Madness World Championship is under way
+You can now vote at
+
+http://cards.webby.com
+----------------------------------------------------------------------------
+------
+Webby, Inc  Web Marketing and high traffic web hosting
+Internet postcards and other effective marketing software
+
+
+
+From ryan@whitewolf.com.au Wed, 30 Jun 1999 10:56:56 +1000
+Date: Wed, 30 Jun 1999 10:56:56 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] cvs permissions fix
+
+"Todd L. Miller" wrote:
+
+> And I believe the original
+> question about "who's in charge" was directed at the tree as a whole,
+> not the individual modules, although I lost that point writing the email.
+> At any rate, given the amount of work I'm doing to administer the module,
+> it could just as easily be said that anyone with an account on the jos.org
+> server is administering the JJOS module :)  Again, my apologies for
+> my hastily-written and ill-considered previous reply.
+
+No worries. I faulted in trying to read your thoughts (I'm not very good
+at doing that). 
+
+>         On the other hand, do you have any good references for CVS module
+> maintainers?  I imagine I'll like a break from coding up throws pretty
+> soon.
+
+There isn't really any documentation on this because each cvs project is
+set up differently. With the way it's set up on jos.org you just need to
+know how to create new accounts and grant them permissions (which you
+already know how to do). If I change the way it works I will let you
+know.
+
+If you read any documentation, you should read a CVS user manual which
+describes all the features you might use as a CVS developer. This is
+something that all CVS developers should read. You can read
+documentation comes with the cvs 1.10 distribution (I haven't checked
+1.9). If you don't have it, you can get it from http://www.cyclic.com/ .
+There are also several CVS reference manuals on the web in HTML format.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From ryan@whitewolf.com.au Wed, 30 Jun 1999 11:42:49 +1000
+Date: Wed, 30 Jun 1999 11:42:49 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] cvs permissions fix
+
+Iain Shigeoka wrote:
+
+> OK.  Could you (Ryan) please contact kevinr@spin.com.mx
+> KevenRaul.  He's writing the CommandLineUtilities
+> and wants to put them into the CVS and use that
+> for development.  I've Cc'd him so he may contact
+> you...
+
+Ok, I'll contact him.
+
+> Also, speaking of adding/maintaining CVS accounts,
+> how hard would it be to automate the process? I think
+> we're "scaring" away developers because there are so
+> many things you need to do to get started.  First
+> you need a WikiName and password, then you need to
+> add yourself to the MemberList, and join the right
+> mailing lists, and then get a separate CVS account.
+> I was thinking about trying to create a central
+> "account" management page/script that will allow
+> a person to manage all account information in a
+> single place.  Ideally choose/edit one WikiName,
+> account info, and password, set some check marks, and
+> everything is configured.
+
+I think it is important to keep cvs accounts separate from wiki accounts
+to keep security tight. New CVS accounts are created with the same wiki
+name but a different password. I have asked people to encrypted their
+desired passwords before sending them to me rather than just sending
+plain text.
+
+I also want to keep the number of CVS accounts to a minimum. It is
+typical for there to be only a few people with CVS accounts (the inner
+circle), while other contributers (the outer-circle) just send in
+patches (eg. bug fixes) to the main developers. In our case, each
+project leader definately has a CVS account. Other developers for that
+project can be given an account if they are trusted.
+
+There may be other ways - you're welcome to think of any. Perhaps we
+could have two CVS servers - one for main developers, and another for
+untrusted developers. It would *somehow* be automatically updated to
+reflect changes in the main repository. I don't see this happening any
+time soon though :-)
+
+> CVS commit access would have
+> to be "approved" by module "owners" for pre-existing
+> CVS modules, but creating new modules (following
+> certain rules) should be easy/automatic.  Do you
+> think this is possible?
+
+It might be useful to have some commandline tools to assist with the
+administration process. If we have a web interface, any actions the user
+wishes to do are postponed until a CVS admin approves the action (via
+the commandline).
+
+> All the source is in the /source dir of the jos.org
+> account.
+
+Thanks.
+
+> I propose simply putting
+> them in the CVS (the pretty printed version of the
+> source) with only the CVS admin having commit access
+> to them.
+
+Do you mean put the pretty printed file in CVS? There is no point in
+keeping version history of generated files. We just need to put the
+source files in CVS and when pretty printed files are out of date and
+need to be regenerated, they can just be written over.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From ryan@whitewolf.com.au Wed, 30 Jun 1999 11:55:02 +1000
+Date: Wed, 30 Jun 1999 11:55:02 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] cvs permissions fix
+
+Clark Evans wrote:
+
+> As I understood, we were moving to CVS.  It would
+> be cool to have some of the SourceServer features
+> on top of CVS though... this could be a nice
+> "JavaCVS" project and would be welcome to the
+> Java development community.
+> 
+> It could also do things like automagically
+> run JavaDocs and such.
+
+It is possible (but difficult) to merge the javadoc and PrettyPrinter
+output so that source code is pretty printed and the method headers are
+displayed in html format. For now, automatically generating javadoc is a
+good idea. It may even encourage Java developers to write comments :-)
+
+> Altough a nice submission process would
+> be cool.  Did we install webcvs.cgi?
+
+I installed cvsweb.cgi. It's perl so it is easy to modify. Were you
+thinking of submitting changes to source code through cvsweb.cgi?
+
+> It would be cool to have some way
+> to have submissions be approved by
+> someone who is a "committer".
+
+If we did allow people to submit code through cvsweb.cgi we would need
+something like a committer or reviewer.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From RegierAveryJ@JDCORP.deere.com Wed, 30 Jun 1999 07:36:38 -0500
+Date: Wed, 30 Jun 1999 07:36:38 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Admin] putting wiki & source server in CVS
+
+I just had an idea.  Could we put the source for the wiki/twiki and the
+Source Server, the pretty printer and any other such tools that we have in
+our CVS repository?  Right now it is quite difficult to find the source for
+the tools that make our site work.
+
+Regards,
+Avery J. Regier
+
+
+
+
+From iainshigeoka@yahoo.com Wed, 30 Jun 1999 09:23:26 -0700 (PDT)
+Date: Wed, 30 Jun 1999 09:23:26 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Admin] putting wiki & source server in CVS
+
+--- Regier Avery J <RegierAveryJ@JDCORP.deere.com> wrote:
+> I just had an idea.  Could we put the source for the
+> wiki/twiki and the
+> Source Server, the pretty printer and any other such
+> tools that we have in
+> our CVS repository?  Right now it is quite difficult
+> to find the source for
+> the tools that make our site work.
+
+I'm working on convincing Peter Thoeny (TWiki developer) to make JOS's
+CVS our central repository for
+the source.  I suppose we can always put our version
+in there (but it would be better to have the main
+repository on our CVS server).
+
+As far as pretty printer, it would be a great idea IMHO.  I think it
+would depend on what Ryan (or any other volunteers) are going to do
+with integrating it into the cvsweb.cgi script.  If he/they are going
+to do that, it would be better to just put cvsweb.cgi into the source
+server and start integrating the java pretty printer.. probably as a
+separate perl module.  Then the pretty printing functionality can be
+used by others for whatever...
+
+-iain
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at http://mail.yahoo.com
+
+
+
+
+From iainshigeoka@yahoo.com Wed, 30 Jun 1999 09:42:31 -0700 (PDT)
+Date: Wed, 30 Jun 1999 09:42:31 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Admin] cvs permissions fix
+
+--- Ryan Heise <ryan@whitewolf.com.au> wrote:
+> Iain Shigeoka wrote:
+> 
+> > I was thinking about trying to create a central
+> > "account" management page/script that will allow
+> > a person to manage all account information in a
+> > single place.  Ideally choose/edit one WikiName,
+> 
+> I think it is important to keep cvs accounts
+> separate from wiki accounts
+> to keep security tight. New CVS accounts are created
+> with the same wiki
+> name but a different password. I have asked people
+> to encrypted their
+> desired passwords before sending them to me rather
+> than just sending
+> plain text.
+
+This sounds reasonable.  See below though.
+ 
+> I also want to keep the number of CVS accounts to a
+> minimum. It is
+> typical for there to be only a few people with CVS
+> accounts (the inner
+> circle), while other contributers (the outer-circle)
+> just send in
+> patches (eg. bug fixes) to the main developers. In
+> our case, each
+> project leader definately has a CVS account. Other
+> developers for that
+> project can be given an account if they are trusted.
+
+The only problem with this approach is that we really need an active
+commit administrator then.  I know that the original setup was intended
+to host the kernel and main JOS OS code.  This system works well for
+that.
+
+The new problem is we have a ton of little utilities that people write
+that should be put into CVS. The utility's author would like to be the
+"commit admin" for that utility.  So we would end up with the need for
+many small CVS projects managed by many accounts.  The only way around
+this is to have a few priviledged commit managers that these utility
+authors would have to go through to check files in and out of their
+utility's source.  
+
+I think that not giving an author direct control over their own source
+(for a separate small project) may be prohibitive.  Both for the author
+that does not like to have to go through an approver for their own
+code, and for the commit admin that would have to be approving commits
+to tons of projects.
+
+So I am hoping that there's an easy way (i.e. automated) to allow
+anyone to start a "project" which creates a separate CVS "area" for
+which they become the commit admin for.  They have no special access to
+any other part of the CVS, just their own.  They have the power to
+grant commit priviledges for others (to invite other trusted developers
+into the project) and to revoke them.  Is this possible?  
+
+If not, I'm not sure that the general use of CVS for JOS source (other
+than central code like the kernel) is necessarily a good idea.  If
+things go well, we should be expecting hundreds of separate "OS
+support" projects to pop up for everything from commandline utilities,
+to little jos desktop clocks and other desktop applets, to
+test/analysis tools.  I'm not sure that we can centrally create a
+single JOS CVS for all this without fully automating the process.
+
+We my have to have a "you're on your own, just provide links to your
+source/binaries" policy like linux has.  And rely on authors to find
+their own resources for version control and hosting... or hope that
+bundlers like RedHat come along to organize things...
+
+I would much prefer it, if we could, to centralize
+these facilities and provide the infrastructure for all the JOS related
+sources.
+
+> There may be other ways - you're welcome to think of
+> any. Perhaps we
+> could have two CVS servers - one for main
+> developers, and another for
+> untrusted developers. It would *somehow* be
+> automatically updated to
+> reflect changes in the main repository. I don't see
+> this happening any
+> time soon though :-)
+
+I don't think this will work so well.  Perhaps a separate CVS for the
+kernel and one for the rest if security is a major issue...
+
+> Do you mean put the pretty printed file in CVS?
+
+No.  Just the raw source.
+
+> There is no point in
+> keeping version history of generated files. We just
+> need to put the
+> source files in CVS and when pretty printed files
+> are out of date and
+> need to be regenerated, they can just be written
+> over.
+
+Agreed.  Both the pretty printed source, and generated javadoc would be
+replaced when the raw CVS source is updated.
+
+-iain
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at http://mail.yahoo.com
+
+
+
+
+From clark.evans@manhattanproject.com Wed, 30 Jun 1999 12:57:59 -0400
+Date: Wed, 30 Jun 1999 12:57:59 -0400
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] cvs permissions fix
+
+Iain Shigeoka wrote:
+> 
+> --- Ryan Heise <ryan@whitewolf.com.au> wrote:
+> > Iain Shigeoka wrote:
+> >   
+> >    stuff about keeping wiki and cvs different due
+> >    to security concerns...
+> 
+> This sounds reasonable.  See below though.
+> 
+
+I'd actually like the Wiki security increased a 
+bit and the Wiki put under CVS. 
+
+> > I also want to keep the number of CVS accounts to a
+> > minimum.   <snip/>
+>
+> <snip/>
+>
+> The new problem is we have a ton of little utilities that people write
+> that should be put into CVS. The utility's author would like to be the
+> "commit admin" for that utility.  So we would end up with the need for
+> many small CVS projects managed by many accounts.   
+>
+> <snip/>
+> 
+> So I am hoping that there's an easy way (i.e. automated) to allow
+> anyone to start a "project" which creates a separate CVS "area" for
+> which they become the commit admin for.  They have no special access to
+> any other part of the CVS, just their own.  They have the power to
+> grant commit priviledges for others (to invite other trusted developers
+> into the project) and to revoke them.  Is this possible?
+
+This is a great idea.  You need the same thing for the Wiki too...
+
+Every open source project needs something like this.
+
+;) Clark
+
+
+

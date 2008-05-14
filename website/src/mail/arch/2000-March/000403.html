@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Future Smart API</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000402.html">
+   <LINK REL="Next" HREF="000404.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Future Smart API</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Future Smart API">gchii@mindspring.com</A><BR>
+    <I>Mon, 06 Mar 2000 11:40:53 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000402.html">[JOS-Arch] WebSource 3a - Release 2</A></li>
+        <LI> Next message: <A HREF="000404.html">[JOS-Arch] Release 3 of WebSource 3a</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#403">[ date ]</a>
+              <a href="thread.html#403">[ thread ]</a>
+              <a href="subject.html#403">[ subject ]</a>
+              <a href="author.html#403">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I have a habit of using the Smart API in all my programs. Recently, I
+designed a custom controller for the Smart API. I assumed that I could use
+the org.jos.smartapi2a.URI class in the constructor of my custom
+controller. Imagine my surprise. I had accidentally disabled the entire
+subsystem. I exposed a design flaw.
+
+The default factory is configured within its constructor. The code inside
+URI looks something like this:
+
+  public Controller getController() {
+    if ( controller == null ) {
+      controller = new Factory();
+    }
+    return controller;
+  }
+
+There seems to be recursion when a controller's constructor tries to create
+a URI. The first instance of URI finds controller == null. The second
+instance of URI also finds controller == null because controller = new
+Factory() has not returned yet.
+
+The construction of a top-level Factory and its configuration should be
+separate. The code should be more like this:
+
+  public Controller getController() {
+    if ( controller == null ) {
+      controller = Factory();
+      ((Factory) controller).init();
+    }
+    return controller;
+  }
+
+The first instance of URI would create a top-level factory. All other
+instances would get the factory as it is has been configured so far.
+Therefore, it would possible for other plug-ins to use the Smart API to
+configure themselves within their constructor.
+
+With registry links, it is possible for the system-wide configuration to
+link in configuration information for plug-ins. The old getRegistry()
+method expects only a registry object. The new getRegistry() method should
+expect a registry or registry link. It should be rewritten something like
+this:
+
+  public Registry getRegistry( String n ) {
+    Object o = getObject( n );
+    if ( o instanceof String ) {
+      String scheme = SchemeTool.getTool().getScheme( (String) o );
+      if ( scheme.equals( &quot;x-registry:&quot; ) ) {
+        URI uri = new URI( s );
+        o = uri.getObject();
+      }
+    }
+    if ( !( o instanceof Registry ) ) {
+      return null;
+    }
+    return (Registry);
+  }
+
+To link one registry to another, use setString() of the first registry to
+save the link to the second. To use a registry link, use getRegistry() of
+the first registry to load the second.
+
+  public void example() {
+    URI uri = new URI( &quot;x-registry:new:&quot; );
+    Registry r = (Registry) uri.getObject();
+    r.setString( &quot;user&quot;, &quot;x-registry:ini:file:user.ini&quot; );
+    Registry user = r.getRegistry( &quot;user&quot; );
+    :
+  }
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000402.html">[JOS-Arch] WebSource 3a - Release 2</A></li>
+	<LI> Next message: <A HREF="000404.html">[JOS-Arch] Release 3 of WebSource 3a</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#403">[ date ]</a>
+              <a href="thread.html#403">[ thread ]</a>
+              <a href="subject.html#403">[ subject ]</a>
+              <a href="author.html#403">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

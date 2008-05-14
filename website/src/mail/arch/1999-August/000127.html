@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] About Generic Driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000126.html">
+   <LINK REL="Next" HREF="000128.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] About Generic Driver</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] About Generic Driver">digigod@earthling.net</A><BR>
+    <I>Sat, 07 Aug 1999 18:00:50 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000126.html">[JOS-Arch] About Generic Driver</A></li>
+        <LI> Next message: <A HREF="000128.html">[JOS-Arch] About Generic Driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#127">[ date ]</a>
+              <a href="thread.html#127">[ thread ]</a>
+              <a href="subject.html#127">[ subject ]</a>
+              <a href="author.html#127">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Matt Albrecht wrote:
+&gt;<i> I divided the idea of a Driver into two pieces: a Device and a Driver.  The
+</I>&gt;<i> Device knows how to configure the actual physical/virtual device, while the
+</I>&gt;<i> Driver interfaces with the actual device to accomplish something.
+</I>
+so JOS would know the ScannerDevice but the manufacturer would need to
+provide a ScannerDriver
+ 
+&gt;<i> I had each of these be Serializable for easy storing and restoring of the
+</I>&gt;<i> system.  The Device interface would need to have a bean to control its
+</I>&gt;<i> setup.  The Driver's methods can be discovered by reflection, or more
+</I>&gt;<i> appropriately, a set of common abstract driver types should be defined which
+</I>&gt;<i> are subclassed by the specific device writers, allowing for
+</I>&gt;<i> pre-implementation of common functionality, and faster development time.
+</I>
+reflection is good, but something like BeanInfo would be faster (of
+course we need to do both)
+ 
+&gt;<i> For instance, I pegged the video driver type to have a change mode method,
+</I>&gt;<i> and a method to collect the java.awt.GraphicsContext for the different modes
+</I>&gt;<i> (we may need a special method/context class for returning text modes).
+</I>
+it should be vetoable by the OS(|UI).
+
+firstly its GraphicsConfiguration that your thinking of, and it should
+be able to describe text mode (after reviewing the source)
+
+&gt;<i> package jos.platform.device;
+</I>&gt;<i> 
+</I>&gt;<i> import jos.platform.hardwareResource.PrimaryHardwareManager;
+</I>&gt;<i> import jos.platform.driver.Driver;
+</I>&gt;<i> 
+</I>&gt;<i> /**
+</I>&gt;<i>  * Generic interface for a Device.  It handles the initial
+</I>&gt;<i>  * discovery and setup of the actual device.
+</I>&gt;<i>  *
+</I>&gt;<i>  * @version 1.0
+</I>&gt;<i>  * @author  Matt Albrecht
+</I>&gt;<i>  */
+</I>&gt;<i> public interface Device extends java.io.Serializable
+</I>&gt;<i> {
+</I>&gt;<i>    public Driver [] searchAndSetup( PrimaryHardwareManager phm );
+</I>&gt;<i>    public String getName();
+</I>&gt;<i> }
+</I>
+whats the PrimaryHardwareManager (and why's it primary? shouldnt it be
+static HardwareManager PrimaryHardwareManager; in the HM class? with a
+getPrimaryHardwareManager()?)
+
+is name its device name? or its HRF name? (getHRName() also if its the
+former), how about a getDescription() so a DeviceManager (config app)
+can give some info.
+
+what about some state info, like isLoaded(), isActive() or hasDriver()?
+
+maybe a driver should plug into a device (setDriver(Driver d)) or can
+there be more than one driver at a time?
+
+&gt;<i> package jos.platform.driver;
+</I>&gt;<i> 
+</I>&gt;<i> /**
+</I>&gt;<i>  * The Driver interface to a physical/virtual device.
+</I>&gt;<i>  */
+</I>&gt;<i> public interface Driver extends java.io.Serializable
+</I>&gt;<i> {
+</I>&gt;<i>   public String getName();
+</I>&gt;<i> }
+</I>
+the same goes for this with the getDescription() and all... 
+
+speaking of descriptions, whats this a driver for? how about: Device
+getDevice()
+
+some state info for this would be good too, like hasControlOfDevice()
+
+You should also have an abstract DeviceAdaptor and DriverAdaptor for
+faster impl.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000126.html">[JOS-Arch] About Generic Driver</A></li>
+	<LI> Next message: <A HREF="000128.html">[JOS-Arch] About Generic Driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#127">[ date ]</a>
+              <a href="thread.html#127">[ thread ]</a>
+              <a href="subject.html#127">[ subject ]</a>
+              <a href="author.html#127">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

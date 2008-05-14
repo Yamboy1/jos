@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Console for Program</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000189.html">
+   <LINK REL="Next" HREF="000190.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Console for Program</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Console for Program">digigod@earthling.net</A><BR>
+    <I>Mon, 16 Aug 1999 11:11:03 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000189.html">[JOS-Arch] Console for Program</A></li>
+        <LI> Next message: <A HREF="000190.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#192">[ date ]</a>
+              <a href="thread.html#192">[ thread ]</a>
+              <a href="subject.html#192">[ subject ]</a>
+              <a href="author.html#192">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> I think DigiGod's design has a &quot;Arguments&quot; object as a separate class. I
+</I>&gt;<i> think that's better. I find that I'm using &quot;ProgramContext&quot; elsewhere, when
+</I>&gt;<i> I should be using something like &quot;Arguments&quot;. These constructors from
+</I>&gt;<i> ProgramContext should be supported by Arguments:
+</I>&gt;<i> 
+</I>&gt;<i>   public Arguments() {
+</I>&gt;<i>   :
+</I>&gt;<i>   }
+</I>&gt;<i>   public Arguments( String query_string ) {
+</I>&gt;<i>   :
+</I>&gt;<i>   }
+</I>&gt;<i>   public Arguments( String[] args ) {
+</I>&gt;<i>   :
+</I>&gt;<i>   }
+</I>
+I use an empty constructor and an abstract parse(String args[]) m'self
+ 
+&gt;<i> At 11:45 PM 8/15/99 -0700, DigiGod Q Frasché &lt;<A HREF="mailto:digigod@earthling.net">digigod@earthling.net</A>&gt; wrote:
+</I>&gt;<i> &gt;in Application I created an ApplicationContext class (seperate from the
+</I>&gt;<i> &gt;Arguments class) that definese these methods:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;public abstract void print(String)
+</I>&gt;<i> &gt;public abstract void println(String)
+</I>&gt;<i> &gt;public abstract void printerr(String)
+</I>&gt;<i> &gt;public abstract String readln()
+</I>&gt;<i> 
+</I>&gt;<i> I understand you called this collection of methods an &quot;ApplicationContext&quot;.
+</I>&gt;<i> In the model I've been developing, I might call this a &quot;SimpleTerminal&quot;.
+</I>&gt;<i> 
+</I>&gt;<i> public interface SimpleTerminal {
+</I>&gt;<i>   public void print( String v );
+</I>&gt;<i>   public void println( String v );
+</I>&gt;<i>   public void printerr( String v );
+</I>&gt;<i>   public String readln();
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> A more complex &quot;Terminal&quot; would be able to read/write bytes:
+</I>&gt;<i> 
+</I>&gt;<i> public interface Terminal {
+</I>&gt;<i>   public int read();
+</I>&gt;<i>   public void write( int v );
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> I want Program and ProgramContext to full support the telnetd service. You
+</I>&gt;<i> should be able to log on to a machine and run any program. The telnetd
+</I>&gt;<i> service provides a connection between a program and a &quot;remote&quot; terminal.
+</I>&gt;<i> The input to a program comes from a remove terminal. Output from a program
+</I>&gt;<i> goes to a remote terminal.
+</I>&gt;<i> 
+</I>&gt;<i> I want to connect to a program using a terminal or terminal emulator. I
+</I>&gt;<i> expect to use a TCP/IP socket to read/write bytes to a program. This is
+</I>&gt;<i> similar to pipes and redirection, too.
+</I>&gt;<i> 
+</I>&gt;<i> I can't put my finger on it. I think there's a strong relationship between
+</I>&gt;<i> ProgramContext and Terminal. It's as if ProgramContext extends Terminal.
+</I>&gt;<i> 
+</I>&gt;<i> And then, there is a strong relationship between ProgramContext and
+</I>&gt;<i> Arguments. It's as if ProgramContext extends Arguments, too.
+</I>
+Id say in your case its more like the programContext HAS-A Arguments
+ 
+&gt;<i> I think it's too much to have both a ProgramContext and an
+</I>&gt;<i> ApplicationContext. There should be one context object (if possible) to
+</I>&gt;<i> make it easier for any class to implement the Program/Application interface.
+</I>
+well, we'll see where that goes... we're both still working on them,
+that often leads to sponteaneus divergence so we should keep them
+seperate till we get a better idea of what/how...
+ 
+&gt;<i> I have been thinking of &quot;BaseApplication&quot; as an abstract class.
+</I>&gt;<i> BaseApplication implements Program and uses ProgramContext.
+</I>
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000189.html">[JOS-Arch] Console for Program</A></li>
+	<LI> Next message: <A HREF="000190.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#192">[ date ]</a>
+              <a href="thread.html#192">[ thread ]</a>
+              <a href="subject.html#192">[ subject ]</a>
+              <a href="author.html#192">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

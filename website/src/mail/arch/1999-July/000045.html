@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] RE: [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000043.html">
+   <LINK REL="Next" HREF="000047.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] RE: [JOS-UI] peer-ui mappings</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Arch] RE: [JOS-UI] peer-ui mappings">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Fri, 23 Jul 1999 16:07:35 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000043.html">[JOS-Arch] Re: [JOS-Kernel] About Graphics Device</A></li>
+        <LI> Next message: <A HREF="000047.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#45">[ date ]</a>
+              <a href="thread.html#45">[ thread ]</a>
+              <a href="subject.html#45">[ subject ]</a>
+              <a href="author.html#45">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	DigiGod Q Frasché [SMTP:<A HREF="mailto:digigod@earthling.net">digigod@earthling.net</A>]
+</I>&gt;<i> Sent:	Thursday, July 22, 1999 6:16 PM
+</I>&gt;<i> To:	Regier Avery J
+</I>&gt;<i> Cc:	<A HREF="mailto:arch@jos.org">arch@jos.org</A>
+</I>&gt;<i> Subject:	Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+</I>&gt;<i> 
+</I>&gt;<i> Regier Avery J wrote:
+</I>&gt;<i> &gt;       ** We modify the java.awt.Toolkit class to integrate with the
+</I>&gt;<i> &gt; SmartRegistry and return the proper Toolkit for the situation.
+</I>&gt;<i> 
+</I>&gt;<i> well a platform only needs one Toolkit, so it would just return the
+</I>&gt;<i> JOSToolkit
+</I>&gt;<i> 
+</I>Not necessarily.  I envision the possibility of there being many toolkits
+available just as there are many X window manager available.   Each shell
+(which extends off of JADE) may implement the Toolkit differently.  I
+personally think it is a mistake to embed the Toolkit into JADE.  I had
+envisioned JADE as being flexible enough to be the base both TUI's and
+GUI's.  Most TUI's won't have a Toolkit at all.  There will be some GUI's
+which don't want to use Swing as their peers.  We need to give the shell
+writers the flexibility to do whatever they please. 
+
+&gt;<i> &gt; 
+</I>&gt;<i> &gt; In the meantime, there are some things that can be worked on:
+</I>&gt;<i> &gt;    * In order for JOS to be secure, we REALLY need an airtight secure
+</I>&gt;<i> &gt; SmartRegistry.  It must be encrypted and we need to figure out what
+</I>&gt;<i> kinds of
+</I>&gt;<i> &gt; protections it will need from the rest of the system to ensure that it
+</I>&gt;<i> is
+</I>&gt;<i> &gt; too expensive to hack to be worth it.
+</I>&gt;<i> 
+</I>&gt;<i> I dont know if the registry needs to be encrypted, other then slowing
+</I>&gt;<i> things down shouldnt it just be &quot;read-only&quot; to everyone who isnt a
+</I>&gt;<i> superuser (maybe even then being &quot;read/write-with-password&quot;)?
+</I>&gt;<i> 
+</I>I'm thinking that the Registry is the prime opportunity for hackers to get
+around the security model we implement.  We require a Registry for
+configurability, but it will also have to contain settings that directly
+specify security.  For instance, if we set in the Registry as a default that
+applets may only take up to 30% of the CPU and 1/4 of the System's RAM, and
+we didn't secure the Registry such that those settings cannot be changed by
+hostile applets, we have failed.  If the system administrator sets the
+settings such that a user 'guest' may only access certain files, and the
+guest is able to get in and hack the registry to give himself more
+permissions, then we have failed.  One way to ensure that the registry is
+only changed by those with permissions to change it, is to encrypt it.  Not
+just that, but make sure the decryption routines are secure as well.
+
+&gt;<i> That should be part of the core JOS security system is what I think Im
+</I>&gt;<i> saying
+</I>They are all tied together and dependent on one another.  One hole and the
+whole thing is useless.  The registry is part of the security system.
+
+&gt;<i> &gt;    * I need to find time to continue to work on org.jos.core.* and
+</I>&gt;<i> defining
+</I>&gt;<i> &gt; the process model from the view of the JOS API.  This process model will
+</I>&gt;<i> &gt; need to be used by JADE so that shells can be implemented correctly.
+</I>&gt;<i> &gt; Integrating org.jos.core.* with your SmartRegistry I think is the
+</I>&gt;<i> critical
+</I>&gt;<i> &gt; step to ensuring that we can make JOS future-ready.  Care to work
+</I>&gt;<i> together
+</I>&gt;<i> &gt; on this?
+</I>&gt;<i> 
+</I>&gt;<i> inter-process communication would be nice for JADE too, how are you
+</I>&gt;<i> planning on implementing this (out of curiosity)?
+</I>&gt;<i> 
+</I>&gt;<i> Cheers,
+</I>&gt;<i> DigiGod
+</I>&gt;<i> _________________________
+</I>&gt;<i> 
+</I>Glad you asked!  I'm not really sure!  Right now the system I'm playing with
+is that it is all controlled via the shell.  For instance any process can
+also be a parent process.  It can spawn other processes.  If the parent
+process decides that it is willing to share {x} static data with the child,
+it may.  If the parent spawns two processes, and gives both permissions to
+its statics, then WALAH!  IPC.  Shells are the parent process for most every
+application in the system.  The shell would check the registry to determine
+what static class data, if any should be shared with that process.  The data
+may not come from the registry, but also could come from user commands, be
+they GUI in nature or text commands.  If a GUI shell spawns a text command
+shell, then it is possible that an app launched from the GUI and an app
+launched from the command shell can do IPC.  This is a simple explanation of
+a tough problem, but from JADE's point of view I'm hoping that it will be
+just that simple.  It is not so simple from the kernel/JVM point of view.
+This complicates the memory and process management tasks a lot.  Figuring
+all of this out is really what the org.jos.core.* project is all about.
+This is also why I want JADE to be more generic.  Its job is to make all of
+this process stuff easy as pie for shells.  All shells should really have to
+worry about is human interaction.  JADE takes care of interacting with the
+system, as this is what must be consistent across all shells, otherwise our
+users would go batty trying to keep it all straight.  
+
+The definition of a process must be consistent accross all shells.  You
+start and stop and kill processes with the same API into the jvm+kernel.  A
+process whether started from a TUI or GUI is defined the same way for
+security and configuration in the registry.  JADE should make it simple to
+pull all of that information together so that when a user clicks on an icon
+for Netscape, the shell just says to JADE, &quot;JADE.getProgram(&quot;Netscape&quot;,
+&quot;Avery&quot;).createProcess();&quot; and it all just works.
+
+Regards, 
+Avery J. Regier
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000043.html">[JOS-Arch] Re: [JOS-Kernel] About Graphics Device</A></li>
+	<LI> Next message: <A HREF="000047.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#45">[ date ]</a>
+              <a href="thread.html#45">[ thread ]</a>
+              <a href="subject.html#45">[ subject ]</a>
+              <a href="author.html#45">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] multiple processor architecture</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000290.html">
+   <LINK REL="Next" HREF="000295.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] multiple processor architecture</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] multiple processor architecture">tmiller@haverford.edu</A><BR>
+    <I>Tue, 16 Nov 1999 01:32:39 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000290.html">[JOS-Arch] multiple processor architecture</A></li>
+        <LI> Next message: <A HREF="000295.html">[JOS-Arch] multiple processor architecture</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#291">[ date ]</a>
+              <a href="thread.html#291">[ thread ]</a>
+              <a href="subject.html#291">[ subject ]</a>
+              <a href="author.html#291">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Here! Here! I hear a lot of discussion about a native kernel. JOS
+</I>&gt;<i> architecture does not require a native kernel.
+</I>
+	This is a dangerous misconception.  Maintaining compatibility with
+extant JVMs below the application level is a great way to cripple JOS's
+potential.  It's an operating system -- its job is to provide hardware
+services to its applications.  Restricting these services to those can be
+provided only on a conventional JVM reduces JOS to a none-too-useful
+operating enviroment.  That is, it won't be doing anything that's not
+already possible under conventional JVM, and the design limits inherent in
+the JVM are difficult at best to circumvent, and in many cases well-nigh
+impossible without its source code -- which defeats the point of
+maintaining compatibility with extant JVMs!
+
+	If JOS is to run as a process (or processes) on some other O/S,
+how can it possibly provide the stability, speed, or services of its full
+potential?  (Windows will crash on its own and kill JOS for us.  Ditto the
+Macintosh; Linux doesn't crash as it is, so JOS would only slow your UI
+down if you're using it.)  Java is already slow, even with the latest and
+greatest of JIT or dynamic compilers.  A large portion of that sloth comes
+from making native calls to actually get the work done (that is, JNI has
+an enourmous overhead).  The native kernel / native JVM combination
+doesn't suffer from this problem -- for instance, graphics (will) NEVER
+make a native call, because the kernel provides java with a MappedArray
+(tentative name) where the initial byte is at a given address (0xb0000)
+and doesn't move; the bytecode assigning a value to an offset in that
+array writes directly to the relevant physical location. (The VGA frame
+buffer -- other architectures, obviously, differ.)  How does dynamic
+device handling work if there's some host O/S to fight for control of the
+hardware?
+
+	If I sit down at an NT box running your vision of JOS, what makes
+JOS worthwhile compared to running an X client on that NT box?  To
+maintain the same desktop accross your multiple computers, you need a
+network anyway.  What makes it different than VNC, or pcAnywhere?  If JOS
+runs locally, what makes it superior to daul-booting into some other
+operating system better suited to your needs?  Running apps in different
+windows?  To interoperate, JOS would need large native libraries, which
+would seem to ruin the point.  If you're really hard up for running Word
+97 in one window and some (java-only, remember!) application in another,
+why not convert your extra boxes (Mac, Linux, Win9x, IIRC from your
+example) into an X server and install the java binary there -- it'll run
+much faster on the remote machine.
+	Both Corel and Sun tried and failed to port major office suites to
+straight-up normal Java; I don't think people will be attracted to JOS on
+the strength of its applications if they're limited in the same ways that
+prevented Sun and Corel from selling their ports.  Now, you may say, but
+Sun gave up on JavaOS for Business, too, why should we still work on JOS?
+Sun targeted JavaOS/B at thin clients, which we all know to have flopped
+horribly.  I believe the last effort at a truly object-oriented operating
+system were the LispMachines, or possibly some of the Smalltalk systems,
+both of which were designed by programmers for programmers, not for
+desktops used by Joe White-Collar.
+	There is definitely a place for JOS, a robust and reasonably
+efficient OS designed in the spirit of the realization that the best
+server OSes do not make the best client OSes.  Much of what KDE and GNOME
+are trying to do in C and C++ with KParts and CORBA and the like are
+facilities that exist in remarkable power and simplicity in Java already;
+ditto technologies like OLE and DCOM from the Windows side of things. With
+windows comes unreliability; with Linux comes an enourmous complexity and
+a design philosophy for power users that prevents things as intuitive as
+the delete and backspace keys working in a uniform way from happening
+without user intervention and (with each new application) maintenance, and
+other things that are so archaic as to be idiotic.  (Pick your favorite;
+among mine is the static /dev directory, which was fine idea before the
+time when you could add and remove hardware as the system was running.)
+
+	It makes good sense to write code now that runs on extant JVMs,
+because a lot of the services and applications (daemons, etc) that will be
+distributed with JOS only need to access a particular other set of
+services (aka JOSSystem, I believe), and these can be faked to debug the
+code you're writing -- which means you don't have to sit idle if you can't
+help us over in kernel land.  However, don't let your ambitions be bound
+by the limitations of current JVMs and OSes; we can do better.  That's
+kind of the point.
+
+-_Quinn
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000290.html">[JOS-Arch] multiple processor architecture</A></li>
+	<LI> Next message: <A HREF="000295.html">[JOS-Arch] multiple processor architecture</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#291">[ date ]</a>
+              <a href="thread.html#291">[ thread ]</a>
+              <a href="subject.html#291">[ subject ]</a>
+              <a href="author.html#291">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

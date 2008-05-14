@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000424.html">
+   <LINK REL="Next" HREF="000426.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">tmiller@haverford.edu</A><BR>
+    <I>Fri, 7 Apr 2000 02:06:49 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000424.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000426.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#425">[ date ]</a>
+              <a href="thread.html#425">[ thread ]</a>
+              <a href="subject.html#425">[ subject ]</a>
+              <a href="author.html#425">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Question: Starting with an instance of java.lang.Class, is there an easy
+</I>&gt;<i> way to get its original bytecode?
+</I>
+	Not that I'm aware of, though this could probably be added w/o too
+much difficulty.
+
+&gt;<i> Question: Why is the access &quot;private&quot; for java.lang.Runtime's only
+</I>&gt;<i> constructor? How does a virtual machine extend it without rewriting it from
+</I>&gt;<i> scratch?
+</I>
+	AFAIK, because the native code is not bound by privacy
+restrictions.  To my understanding, classpath uses native code in several
+places exclusively to get around Sun's poort choices in classes like this
+one.
+ 
+&gt;<i> Question: Why is java.lang.Object and java.lang.Class stored inside rt.jar?
+</I>&gt;<i> These classes should be stored in the machine code for a virtual machine,
+</I>&gt;<i> shouldn't they?
+</I>
+	The compiler needs access to j.l.O and j.l.C, and this removes
+(some) class library version dependencies from the compiler.
+
+&gt;<i> Question: Isn't it possible to literally translate bytecode from a class
+</I>&gt;<i> file into a C++ program? A few class files could be compiled directly into
+</I>&gt;<i> the jJOS/decaf executable image, with no classes.zip file required.
+</I>
+	Yes.  My approach is (will be) that as long as I'm implementing a
+native class anyway, I may as well just write the C++ class for it and
+save myself some trouble.
+
+
+	Processes /are/ very simple, but you must bear in mind that not
+every request for a static goes through a classloader.  If application Q
+spawns a new process R, R will inherit all of Q's /already loaded/ class
+definitions unless specific actions are taken by the native code to
+prevent this from happening.  Sun had the native code cache class
+definitions -- instead of always passing class use requests to a
+classloader -- for several reasons, including efficiency; this is one of
+its effects.  (Another reason would include the boot-strapping problem;
+beginning with say, a request for j.l.o -- the (java) classloader needs
+j.l.o to function, along with several other classes.  Therefore, the
+primordial class loader must supply them /before/ the classloader is
+called the first time.  (Presumably, for the command-line main-function
+containing class.)  (BTW -- decaf doesn't support class loaders at all
+right now, which is one reason we need real classlib support.)  Allowing
+the classloader to then redefine j.l.o opens any number of gaping security
+and consistency holes.)
+
+	But basically, yes, the idea is to alter the classloader and class
+definition caching in such a fashion so as to prevent data sharing via
+statics; this will probably be best implemented with support from the
+class library's classloader.
+
+
+	As an aside -- the issue of memory architecture.  Virtual memory
+(and hence paging) seems like a Good Idea.  However, there is a certain
+benefit to having all the (possibly multiple /native) JVMs share a single
+address space (provided the memory allocator is aware of this!) -- IPC
+becomes blazingly fast, because there's no copy (unless explicitly
+programmed) or memory-space-switch involved.  The risk, of course, is
+two-fold: (a) decaf makes a bad pointer and scribbles on another JVM's
+data.  This is not something I'm terribly worried about (and could
+actually be written in to a memory-protection scheme*) because if decaf
+scribbles on random memory, it'll nuke itself during single-process
+testing anyway.  (b) the same, but with native code we didn't
+write.  (e.g. is not known to be 'perfect' anyway)  This requires a
+separate address space for safety reasons (e.g. it's not 'kernel' code, so
+sandbox it); but since JNI is the IPC for native code, the additional
+overhead of copying things around won't be terribly noticeable.  (I
+think/hope; I'll have to check the docs again to see what kind of
+checking we'd need to do, if any, on objects share with native code.)  The
+main reason for multiple native processes is not separate address spaces,
+I think, but pre-emptive multi-tasking...
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000424.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000426.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#425">[ date ]</a>
+              <a href="thread.html#425">[ thread ]</a>
+              <a href="subject.html#425">[ subject ]</a>
+              <a href="author.html#425">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

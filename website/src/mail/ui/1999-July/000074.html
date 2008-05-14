@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] ScreenSaver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000073.html">
+   <LINK REL="Next" HREF="000075.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] ScreenSaver</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-UI] ScreenSaver">digigod@earthling.net</A><BR>
+    <I>Mon, 26 Jul 1999 12:25:34 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000073.html">[JOS-UI] ScreenSaver</A></li>
+        <LI> Next message: <A HREF="000075.html">[JOS-UI] ScreenSaver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Sean Cribbs wrote:
+&gt;<i> Point taken (re: JADE/GC).  The reason why I thought the screen saver
+</I>&gt;<i> should be a bean is so that it could be imbedded in an application or
+</I>&gt;<i> taskbar and invoked at will.  Perhaps this is not such a great idea.
+</I>&gt;<i> Maybe instead, we can have a bean that provides that functionality, but
+</I>&gt;<i> not necessarily the screen saver be one.  A well defined interface is
+</I>&gt;<i> good enough for me!
+</I>
+A bean to run the screensaver would be nice I guess, although Id think
+the AWT thread for JADE after detecting X minutes of 0-activity tells
+JADE to run the scrensaver (if ones set) at which point it handles all
+that. a bean would just be an animation using the screensaver as the
+painter... hmm, in windows you have that little monitor where you see
+the screensaver running in the config dialog I could make a bean that
+could be used in our screensaver config pane... (and as the runner for
+the testbox (below))
+
+JADE would give the screensaver the entire screen after telling the
+other apps to take a rest (not sure how but it would have to do it so
+they couldnt paint anymore, possibly take a snap shot of the screen for
+the saver to use and set the GC the apps use to an offscreen buffer so
+they could continue updating while the screensaver is running...) and
+the AWTThread's output would be entirely for JADE and on any activity
+the screensaver is shutdown and everythings set back to normal
+
+&gt;<i> Do you mean you have a taskbar in development, or that you were going to
+</I>&gt;<i> test the screen saver?
+</I>
+I mean Im going to make a testbox for the screensaver (I'd have done it
+by now but I was working on something else).
+
+as far as a taskbar goes thats a bit of a tricky subject, I mean a) we'd
+need a way of knowing what tasks there are b) it cant be the only way to
+do it (some UI's might not have one) c) what constitutes a TaskBar? do
+we include a clock/systemtray thing or is that separate (it should be)?
+how do we show the association, beancontext?
+
+we'll need to discuss the general idea of how JADE is going to handle
+&quot;standard&quot; components for the TGUI first
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000073.html">[JOS-UI] ScreenSaver</A></li>
+	<LI> Next message: <A HREF="000075.html">[JOS-UI] ScreenSaver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

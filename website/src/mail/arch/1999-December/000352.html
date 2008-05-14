@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Classpath Project</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000351.html">
+   <LINK REL="Next" HREF="000355.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Classpath Project</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Classpath Project">gchii@mindspring.com</A><BR>
+    <I>Mon, 27 Dec 1999 16:41:42 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000351.html">[JOS-Arch] JOBOP Sales Representative</A></li>
+        <LI> Next message: <A HREF="000355.html">[JOS-Arch] Classpath Project</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#352">[ date ]</a>
+              <a href="thread.html#352">[ thread ]</a>
+              <a href="subject.html#352">[ subject ]</a>
+              <a href="author.html#352">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I believe that most of the source code from the Classpath Project can be
+salvaged. A program can be written to change the namespace of all those
+classes to what it should be (and should have been). The C++ code is
+greatly affected because java_awt_peer_gjt..() would become
+org_classpath_peer_gjt..().
+
+And yet, most of the translation is one-for-one. In theory, it can be
+mapped and automated. If the Classpath Project is unwilling or unable to do
+this, the JOS Project should do it. Everything in JOS hinges on a cleanroom
+implementation of the Java class libraries.
+
+We might not be able to wait for Classpath to provide something appropriate
+for JOS. We need to contact their organizers and let them know how much
+we're counting on perfect compatibility with Java 2 Platform.
+
+If the download from CVS is a preview of the things to come, we cannot
+reach the Java 2 Platform based on Classpath. Classpath needs to change
+their direction or we need to come up with anotehr plan. I analysed
+anonymous Java source code from the Classpath Project
+&lt;URL:<A HREF="http://www.classpath.org/">http://www.classpath.org/</A>&gt;.
+
+1. Contributors are using java.* packages for their own personal extension
+to the Java class libraries. While they have good ideas about the strengths
+and weaknesses of Sun Microsystems' API, they cross the line when adding
+and subtracting whimsically from the specification.
+
+2. Contributors have expressed their contempt for the deprecated methods
+and have not implemented them in Java 2 Platform. While I sympathize, I
+cannot agreed.
+
+3. I expected to find code in the org.classpath namespace. Instead of using
+the org.classpath namespace, contributors have put their code inside java.*
+or the default package.
+
+4. Much of the effort cannot be reused in an off-the-shelf virtual machine
+from Sun Microsystems or others.
+
+5. The Classpath Project has not solved the puzzle of JVM-specific classes
+or native methods. Instead, they have added JVM-specific classes to the
+java.* namespace.
+
+Here is my proposal. We need a liason between JOS and Classpath. In order
+for us to reuse the software created by the Classpath Project, it must be
+perfectly compatible with the Java specification or it must not be added to
+the java.* namespace.
+
+A. It is perfectly legal -- it breaks no technical rule -- if contributors
+create class libraries that do not match the Java specification. If so,
+they use their own namespace, like this:
+
+org.classpath.applet
+org.classpath.awt
+org.classpath.awt.peer
+org.classpath.awt.peer.gtk
+org.classpath.io
+org.classpath.lang
+org.classpath.net
+org.classpath.util
+
+B. JOS and Classpath Projects must work together in a methodical and
+positive manner so that JOS might benefit from Classpath. The JOS Project
+should be able to share the Bytecode Native Interface (BCNI) and build
+perfectly compatible Java class libraries from the functionality found in
+Classpath.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000351.html">[JOS-Arch] JOBOP Sales Representative</A></li>
+	<LI> Next message: <A HREF="000355.html">[JOS-Arch] Classpath Project</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#352">[ date ]</a>
+              <a href="thread.html#352">[ thread ]</a>
+              <a href="subject.html#352">[ subject ]</a>
+              <a href="author.html#352">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

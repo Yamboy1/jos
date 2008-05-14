@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] screensaver update</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000072.html">
+   <LINK REL="Next" HREF="000087.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] screensaver update</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-UI] screensaver update">digigod@earthling.net</A><BR>
+    <I>Mon, 26 Jul 1999 23:27:03 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000072.html">[JOS-UI] Re: [JOS-Kernel] Etherboot</A></li>
+        <LI> Next message: <A HREF="000087.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#81">[ date ]</a>
+              <a href="thread.html#81">[ thread ]</a>
+              <a href="subject.html#81">[ subject ]</a>
+              <a href="author.html#81">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ive been working on the SSDK (ScreenSaverDevelopmentKit) as I worked on
+it I realized I had to make some changes to ScreenSaver (better now then
+later) but anyway it consists of:
+
+ScreenSaver                       (abstract)
+ScreenSaverUser                   (interface)
+SwingScreenSaverUser
+PreviewScreenSaver
+PreviewScreenSaver.PreviewWindow
+JADEScreenSaverConfigurationPanel (name-may-change)
+
+ScreenSaver is the class ScreenSaver's extends from, all they need to
+implement is init and paint, but it can greatly extend its
+functionality.
+
+ScreenSaverUser is an interface defining a class that uses a
+screensaver, it has one method void setScreenSaver(ScreenSaver ss); both
+SwingScreenSaverUser and PreviewScreenSaver implement it.
+
+SwingScreenSaverUser is a JComponent that renders the ScreenSaver in its
+graphics (needs work)
+
+PreviewScreenSaver is an app that previews a ScreenSaver in a full
+screen window (its inner class)
+
+JADEScreenSaverConfigurationPanel is a JPanel that has a list of
+screensavers to select from, it uses a small SwingScreenSaverUser to
+show a basic idea of it and has a preview button that opens a
+PreviewScreenSaver (as it is designed so it doesnt have to run as an app
+only)
+
+the SSDK cant be considered &quot;done&quot; until I have a strong registry to
+implement the list of available screensavers, it also needs it to make
+the configuration persist (Id rather not have it persist then do a
+workaround to un workaround later) 
+
+the JADEScreenSaverConfigurationPanel needs a way to tell Jade to use
+this screensaver after x minutes, I assume it will also eventually
+extend something else like PropertyPage (something else Im working on)
+
+I will only consider this version .5 until I get the registry and then
+only .9, having the screensaver being set makes it version 1
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000072.html">[JOS-UI] Re: [JOS-Kernel] Etherboot</A></li>
+	<LI> Next message: <A HREF="000087.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#81">[ date ]</a>
+              <a href="thread.html#81">[ thread ]</a>
+              <a href="subject.html#81">[ subject ]</a>
+              <a href="author.html#81">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

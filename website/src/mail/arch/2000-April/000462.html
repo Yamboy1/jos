@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000461.html">
+   <LINK REL="Next" HREF="000463.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">tmiller@haverford.edu</A><BR>
+    <I>Thu, 13 Apr 2000 01:57:54 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000461.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000463.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#462">[ date ]</a>
+              <a href="thread.html#462">[ thread ]</a>
+              <a href="subject.html#462">[ subject ]</a>
+              <a href="author.html#462">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	(Boy, is this late!)
+
+	OK, just to make sure I got your proposal straight: we have
+multiple native primordial classloaders to generate our disjoint
+classloaders for multiple processes.  ONLY a NPC may attempt to optimize
+memory by sharing a class definition, and ONLY with another NPC, and ONLY
+if that class definition is the same, which you propose to decide based on
+the archive age and location.  Furthermore, casts between different
+classloaders are allowed ONLY if (a) the process has asked for and
+recieved permission to directly access objects of another process and
+(b) that object's class was loaded by a primordial classloader, AND its
+definition shared with the accessor's primordial class loader.
+
+	I checked Serializable and RMI, and RMI is built on Serializable,
+which requires that the de-serialization method handle an excess or a
+shortage of fields without throwing an exception.  (And that the class to
+which you're de-serializing supports a no-argument constructor, presumably
+so that it's in a consistent state if the de-serializer can't do anything
+useful with it.)  This means that all legacy IPC with objects will be
+handled correctly and automatically.
+
+	That is, the only time we intend to allow illegal casts is in the
+special case of shared memory, which, existing outside the scope of the
+JVM spec, means we can do whatever we want with it.  Our interface to
+sharing memory* will necessarily be native, so we can check /when the
+object is shared/ if the class definitions in the primordial loaders
+(which means they /can't change/) are the same, and allow the share to
+take place.  (Naturally, we have to recursively check interfaces and
+superclasses.)  This means the interpreter does /not/ have to check
+references to an object of a given type as being that given type except
+during casts.  (That is, the overhead is marginal, because you only check
+for illegal-but-allowed casts during an instanceof operation, which
+already takes a 'long' time.)
+
+	So far, so good.  In fact, the VM spec specifically allows the
+primordial class loader to be /anything/, going on to say that it usually
+loads pre-compiled code from the local filesystem.  So here's the
+question: when, if at all, will an application want to use direct object
+sharing on a class not located on the local filesystem (by the NPC)?  
+Naturally, we can just say never, because the application has to be
+specifically written for /our/ shared memory, but we don't want to blindly
+impose limitations on JOS.  Let's look at the question another way,
+because I'm having a hard time coming up with a good answer: what, if
+anything, do we lose by disallowing non-primordial class sharing?  Let's
+look at it slowly.  The objective of threading is to share memory between
+processes, basically.  So why would separate processes need or want to
+share memory?  You never /need/ to share objects, because anything you can
+program with shared memory, you can likewise program with message-passing.  
+(And vice-versa, actually.)  So you must want to share objects for
+efficiency -- but if the two process are pieces of the same program, why
+aren't they threads?  The only reasonable answer is efficiency between
+separate programs.  (If you can't handle converting statics into variables
+on a thread, I'm not sure I want you programming my O/S :)  Seriously, I
+can't think of a reason why a single program would /require/ multiple
+processes if threads were available.)
+
+	So we're down to the case of efficient communication between
+separate programs for when we're looking at when we're allowing illegal
+casts, and the question is if separate programs should expect that
+custom class-loaded classes be present in other processes.  I think it's
+reasonable to say that no programmer would expect his custom class-loaded
+classes to cast to someone elses.  (This is not an /exact/ reversal of my
+prior position. :))
+
+
+	*phew*  In short, it seems reasonable to adopt Ryan's proposal
+... for a conventional native primordial classloader.  Gilbert's previous
+emails offer the intriguing possibility that one could allow Java code to
+be the primordial classloader.  Oh, before I go any further -- something
+rather important just dawned on me.
+
+
+	There is NOT necessarily a conflict between a bytecode cache and
+Ryan's proposal.  There are two types of 'bytecode' cache, I think: the
+first is to cache the whole class, and the second to cache method
+bytecode.  I'll address the second one first.  A (shared or not) class
+definition (JavaClass) includes a pointer to a MethodList, which in turns
+retains pointers to blocks of bytecodes which specific methods execute.  
+These bytecode blocks are the only blocks of the classfile which decaf
+actually saves -- everything else is converted into an internal form more
+amenable to manipulation and (hopefully!) efficiency.  This internal form
+-- which is the class definition Ryan and I are now agreeing on how to
+share -- replaces the class file bytes.  Now, any shared class
+automatically shares its method bytecode, which is the only part of the
+classfile bytecode decaf bothers to save.  However, non-shared classes do
+/not/ share their method code or class definitions, even if they happen
+to be identical.
+
+	Summary: my code, as amended by Ryan's proposal for multiple
+processes, already does almost everything a bytecode cache would do.  The
+interesting case is sharing bytecode or class definitions between classes
+which happen to be identical even if they're not shared.  How could this
+be done?  (It may, in practice, depending on the number of custom
+clasloaders, not turn out to be useful.)  Every classloader, custom or
+not, must eventually call defineClass() on an array bytecode in order to a
+Classb object back.  Suppose we insert the bytecode cache there?  (If this
+is what you had in mind, Gilbert, my apologies.)  All the bytecode that
+passes through defineClass() is intern'd along with the class definition
+generated by it, indexed by classname+classloader.  Every time
+defineClass() is called (which, requiring a name, won't be horribly
+inefficient), the bytecode is checked against the intern'd bytecode.  If
+they differ, another entry is added.  If they're the same, the intern'd
+class definition (pointer) is returned, and it's used.  Because this only
+affects /where the definition is/ (and, in turn, where the bytecode
+definition is), it won't change the way the classloader maintains its
+tables for checking casts**.  That is, since a classloader caches and
+maintains in its name/loader pair tables JavaClassInstances, not
+JavaClasses, everything will behave appropriately -- there will still be a
+separate entry for separate classloaders.  This cache does NOT remove the
+disk access (etc) required to find/generate the bytecode, but it does cut
+down on memory footprint, assuming the classfile size is small relative to
+the internal representation size * number of duplicates (== number of
+custom classloaders); naturally, if this turns out to be inefficient, we
+can do something similar for method code only.  (Where the internal rep
+and bytecode are identical, so any non-duplication is saving.) Caching the
+disk access (etc) is the responsibility of the loader or its
+filesystem/URI/compiler/etc.
+
+	
+	Returning back to the topic (remember what it was?  I was just
+about to tell you about Gilbert's interesting proposal), it seems like we
+could implement the primordial classloader in java -- perhaps as a URI
+loader -- if, and only if -- it could guarantee correct sharing as Ryan
+defined it.  (That is, completely transparent to a custom classloader.)  
+That sharing could be none, it could time/location based, or it could be
+based on a bytecode cache, so long as the cache maintained coherency
+against its source.  (Which may well require it to be a space-only saving
+cache!)  The interpreter, frankly, doesn't give a damn.  The primordial
+classloader just has to be able to (correctly) hand it JavaClassInstances
+upon request.  (And throw the flag in a JavaObject if it's a candidate for
+'illegal' casting.**)
+
+-_Quinn
+
+* Where memory and object/field references are isomorphic in Java, which
+is why disjoint classloaders are equivalent to processes, which are
+defined by separate memory spaces.
+
+** decaf doesn't cache name/loader pairs right now, but it needs to.  I
+think, in general, that name/loader pairs can be stuffed into the
+ClassLoader class and maintained in calls to defineClass() and imMelting()
+calls generated by the garbage collector.  Throwing the &quot;potential illegal
+cast&quot; flag in JavaObject changes the cast-checking algorithm to ignore the
+second field during its comparisons.
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000461.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000463.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#462">[ date ]</a>
+              <a href="thread.html#462">[ thread ]</a>
+              <a href="subject.html#462">[ subject ]</a>
+              <a href="author.html#462">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

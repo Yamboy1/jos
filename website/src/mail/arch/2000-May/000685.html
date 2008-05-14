@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [object sharing] Proof</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000682.html">
+   <LINK REL="Next" HREF="000687.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [object sharing] Proof</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [object sharing] Proof">gchii@mindspring.com</A><BR>
+    <I>Fri, 26 May 2000 12:05:24 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000682.html">[JOS-Arch] [JOS Wiki] Articles</A></li>
+        <LI> Next message: <A HREF="000687.html">[JOS-Arch] processes &amp; properties vs behaviors</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#685">[ date ]</a>
+              <a href="thread.html#685">[ thread ]</a>
+              <a href="subject.html#685">[ subject ]</a>
+              <a href="author.html#685">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The state of an object is data, separate from its behavior. The state of an
+object can be modified. A class is required to modify the behavior of an
+object. An object cannot modify its own behavior.
+
+If O1 is the state of an object, it is not possible for O1 to act upon O1.
+Another object is always required. Therefore, if O2 -&gt; O1 then O2 != O1.
+
+The state of an object has a structure. The structure is compatible with
+(1) one class or (2) more than one class. If state structure is compatible
+with one class, state cannot be modified safely by any other class. If
+state structure is compatible with more than one class, the number of
+compatible classes is limited. In general, most classes are not compatible
+with an object. An object has far more incompatible classes than compatible
+classes. Incompatible classes are likely to corrupt the state of an object.
+
+If O1 is the state of an object, C1 and C2 are classes, and C1 is the only
+compatible class, then C2 -&gt; 01 is likely to corrupt the state of O1.
+
+If O1 is the state of an object and C1 is an unknown class, then C1 -&gt; O1
+is likely to corrupt the state of O1.
+
+When the state structure of an object is compatible with more than one
+class, we can use this to copy an object from one platform to another.
+
+If O1 is the state of an object and both C1 and C2 are known to be
+compatible with O1, then C1 -&gt; O1, C2 -&gt; O1.
+
+If O1 is the state of an object and only C1 is known to be compatible with
+O1, then C2 -&gt; O1 if an only if C1 ~= C2.
+
+C1 and C2 are known to be equivalent if C1 and C2 implement the same
+interface. C2 implements the same interface as C1 if C2 extends C1. C2 also
+implements the same interface as C1 if both C1 and C2 extend C3.
+
+-----
+
+In Java, C1 and C2 are known to be equivalent if the bytecode for C1 and C2
+are identical, equal or equivalent. If C1.bc == C2.bc, their bytecode is
+identical. If C1.bc.equals( C1.bc ) but C1.bc != C2.bc, their bytecode is
+equal, not identical. (It is a little more difficult to measure equivalence
+in bytecode and nearly impossible in machine code.)
+
+Therefore, objects can be safely shared safely across custom class loaders,
+and should be. If C1 and C2 are unknown classes, CL1 and CL2 are custom
+class loaders, if C1 and C2 are loaded by CL1 and CL2 respectively, then C1
+and C2 are known to be equivalent if their bytecode is identical, equal or
+equivalent. Since C1 -&gt; O1 is safe and C2 -&gt; O1 is safe, an object O1 can
+be safely shared by two class loaders. In this case, the class loader is
+irrelevant.
+
+In an applet viewer which runs each applet through a custom class loader,
+applets share system classes. This proof shows that applets can safely
+share custom classes.
+
+In a servlet runner which runs each servlet through a custom class loader,
+servlets shared system classes. This proof shows that servlets can safely
+share custom classes.
+
+On the other hand, the purpose of creating multiple primordial class
+loaders is to prevent the sharing of any objects between independent
+processes. If O1 and O2 are objects, C1 and C2 are their respective
+classes, P1 and P2 are bytecode processes, if O1 and O2 are owned by P1 and
+P2 respectively, then neither C1 -&gt; O2 nor C2 -&gt; 01 is safe -- even if C1
+and C2 are known to be equivalent.
+
+In an MPCL-compatible virtual machine which runs each process through a
+primordial class loader, processes do not share system classes. This proof
+shows that processes can safely share neither system nor custom classes.
+
+-----
+
+Any bytecode process can copy a primative value to any other bytecode
+process. Primative types in Java are sharable across all virtual machines
+and all bytecode processes because the machine code &quot;classes&quot; for primative
+types are known to be compatible. When object state is broken down into
+primative values, an object can be copied from one bytecode process to
+another in a mechanism much like serialization. Within a vm, this would be
+superfast.
+
+Since a message is always a collection of primative types and any call to a
+method can be converted into a message, an object in one process can invoke
+a method in another process by simple message passing. Any user process
+passes a message to the system process. In turn, the system process passes
+a message to any user process. And that is how object state is shared.
+
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000682.html">[JOS-Arch] [JOS Wiki] Articles</A></li>
+	<LI> Next message: <A HREF="000687.html">[JOS-Arch] processes &amp; properties vs behaviors</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#685">[ date ]</a>
+              <a href="thread.html#685">[ thread ]</a>
+              <a href="subject.html#685">[ subject ]</a>
+              <a href="author.html#685">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

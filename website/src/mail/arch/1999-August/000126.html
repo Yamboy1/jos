@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] About Generic Driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000125.html">
+   <LINK REL="Next" HREF="000127.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] About Generic Driver</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Arch] About Generic Driver">onewith1@flash.net</A><BR>
+    <I>Sat, 7 Aug 1999 15:21:25 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000125.html">[JOS-Arch] About Generic Driver</A></li>
+        <LI> Next message: <A HREF="000127.html">[JOS-Arch] About Generic Driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#126">[ date ]</a>
+              <a href="thread.html#126">[ thread ]</a>
+              <a href="subject.html#126">[ subject ]</a>
+              <a href="author.html#126">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Here was my first cut:
+
+I divided the idea of a Driver into two pieces: a Device and a Driver.  The
+Device knows how to configure the actual physical/virtual device, while the
+Driver interfaces with the actual device to accomplish something.
+
+I had each of these be Serializable for easy storing and restoring of the
+system.  The Device interface would need to have a bean to control its
+setup.  The Driver's methods can be discovered by reflection, or more
+appropriately, a set of common abstract driver types should be defined which
+are subclassed by the specific device writers, allowing for
+pre-implementation of common functionality, and faster development time.
+
+For instance, I pegged the video driver type to have a change mode method,
+and a method to collect the java.awt.GraphicsContext for the different modes
+(we may need a special method/context class for returning text modes).
+
+------------
+
+package jos.platform.device;
+
+
+import jos.platform.hardwareResource.PrimaryHardwareManager;
+import jos.platform.driver.Driver;
+
+
+/**
+ * Generic interface for a Device.  It handles the initial
+ * discovery and setup of the actual device.
+ *
+ * @version 1.0
+ * @author  Matt Albrecht
+ */
+public interface Device extends java.io.Serializable
+{
+   public Driver [] searchAndSetup( PrimaryHardwareManager phm );
+   public String getName();
+}
+
+
+--------------
+
+package jos.platform.driver;
+
+/**
+ * The Driver interface to a physical/virtual device.
+ */
+public interface Driver extends java.io.Serializable
+{
+  public String getName();
+}
+
+
+-Matt
+
+
+-----Original Message-----
+From: Hilary Cheng &lt;<A HREF="mailto:hilarycheng@usa.net">hilarycheng@usa.net</A>&gt;
+To: <A HREF="mailto:arch@jos.org">arch@jos.org</A> &lt;<A HREF="mailto:arch@jos.org">arch@jos.org</A>&gt;
+Date: Friday, August 06, 1999 11:21 PM
+Subject: [JOS-Arch] About Generic Driver
+
+
+&gt;<i>Hi,
+</I>&gt;<i>
+</I>&gt;<i>    I would like to ask, is there any Generic Driver interface has been
+</I>&gt;<i>defined ?
+</I>&gt;<i>    Since I would like to build driver based on Thomas VGA Driver.
+</I>&gt;<i>
+</I>&gt;<i>Regards,
+</I>&gt;<i>
+</I>&gt;<i>Hilary
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>_______________________________________________
+</I>&gt;<i>Arch maillist  -  <A HREF="mailto:Arch@jos.org">Arch@jos.org</A>
+</I>&gt;<i><A HREF="http://jos.org/mailman/listinfo/arch">http://jos.org/mailman/listinfo/arch</A>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000125.html">[JOS-Arch] About Generic Driver</A></li>
+	<LI> Next message: <A HREF="000127.html">[JOS-Arch] About Generic Driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#126">[ date ]</a>
+              <a href="thread.html#126">[ thread ]</a>
+              <a href="subject.html#126">[ subject ]</a>
+              <a href="author.html#126">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

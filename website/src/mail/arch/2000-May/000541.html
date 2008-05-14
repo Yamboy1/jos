@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000540.html">
+   <LINK REL="Next" HREF="000551.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Mon, 1 May 2000 23:50:29 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000540.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000551.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#541">[ date ]</a>
+              <a href="thread.html#541">[ thread ]</a>
+              <a href="subject.html#541">[ subject ]</a>
+              <a href="author.html#541">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> What this means is, it sort of does matter which process owns the
+</I>&gt;<i> object, because this reference will stop the real owner of the process
+</I>&gt;<i> from being garbage collected if it drops out of the distributed system.
+</I>
+	OK.  I see why the process which originated object might want to
+maintain a reference to the shared object; I don't see that this reference
+needs to be any different than any other kind, or have tha distinction
+maintained by the kernel.  (Or, necessarily, that having provided a shared
+object, it should necessarily persist once it drops out of the disributed
+system.)
+
+&gt;<i> It seems like this is the primitive for doing all sorts of stuff related
+</I>&gt;<i> to do object ownership. For example, to emulate multiple owners of an
+</I>&gt;<i> object, ownership of the object can be re-assigned to an independent
+</I>&gt;<i> master process: the(/a) shared object broker.
+</I>
+	I'm still stuck on the idea of ownership over here.  All I
+(still) see a need for is object references.  Even if we were to
+implement finer-grained security than by-process, what special priviliges
+does the object/process from which the shared object under consideration
+came (the 'owner') have, as a matter of kernel-level policy?
+
+&gt;<i> So some methods on the object can be called by process A, some methods
+</I>&gt;<i> can be called by process B, and some can be called by both.
+</I>
+	This is very true.  It is not, however, something that the kernel
+needs to concern itself with -- because it's written into the shared
+object itself.
+
+	All your points are good, but the connection to ownership
+continues to elude me.  Why is 'ownership' a kernel-level primitive?
+
+-_Quinn
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000540.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000551.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#541">[ date ]</a>
+              <a href="thread.html#541">[ thread ]</a>
+              <a href="subject.html#541">[ subject ]</a>
+              <a href="author.html#541">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

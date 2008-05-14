@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Re: MVC</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000077.html">
+   <LINK REL="Next" HREF="000082.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Re: MVC</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-UI] Re: MVC">digigod@earthling.net</A><BR>
+    <I>Mon, 26 Jul 1999 22:47:55 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000077.html">[JOS-UI] MVC ((was Re: [JOS-UI] ScreenSaver))</A></li>
+        <LI> Next message: <A HREF="000082.html">[JOS-UI] ScreenSaver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#78">[ date ]</a>
+              <a href="thread.html#78">[ thread ]</a>
+              <a href="subject.html#78">[ subject ]</a>
+              <a href="author.html#78">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ryan Heise wrote:
+&gt;<i> This issue can be easily solved using a Model/View/Controller model. We
+</I>&gt;<i> explored MVC in some detail about a year ago on this list. The idea of a
+</I>&gt;<i> process manager matches the concept of a &quot;model&quot;, while the taskbar is
+</I>&gt;<i> an example of a &quot;view&quot;. You may have already been aware of the
+</I>&gt;<i> similarity, but speaking in terms of MVC will probably lead to a clearer
+</I>&gt;<i> design.
+</I>&gt;<i> 
+</I>&gt;<i> For those who missed the discussion way back then, I think we decided on
+</I>&gt;<i> a combination of Java Beans and MVC, where model beans maintained data
+</I>&gt;<i> structures such as process lists and window lists, while view beans
+</I>&gt;<i> implemented displays or user interfaces of those data structures.
+</I>&gt;<i> 
+</I>&gt;<i> For example, there may be a view that displays the list of open windows
+</I>&gt;<i> - the user could click on a window item to raise that window on the
+</I>&gt;<i> desktop (yes, like that significant component of the taskbar). There
+</I>&gt;<i> could be another &quot;view&quot; of the same window list &quot;model&quot; that shows your
+</I>&gt;<i> miniature virtual desktops. This view would mirror the exact window
+</I>&gt;<i> positions of each window on a smaller scale but allow you to select
+</I>&gt;<i> windows in the same way as the taskbar. The most interesting view is
+</I>&gt;<i> actually the window manager itself. It should also be a view of the
+</I>&gt;<i> window list.
+</I>
+we also decided that virtual windows would be handled by a special JADE
+PUI that allows other UI's to plug into it (I know what your saying but
+I wanted to remind us)
+
+say the DesktopScreen (extends Screen extends OutputDevice?) has an
+inner class WindowManager which does all that nasty window overlap code
+(gracefully, of course) this would be the 'M', the TaskbarWidget
+(TaskbarController?) would be the 'C' and whatever component implements
+that would be the 'V'
+ 
+&gt;<i> &quot;Window list&quot; is not necessarily the best way to divide the model space
+</I>&gt;<i> but it is enough to demonstrate the concept.
+</I>&gt;<i> 
+</I>&gt;<i> &gt; the answer is all the
+</I>&gt;<i> &gt; desktop widgets must be designed via interface.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; public interface Taskbar extends DesktopWidget {
+</I>&gt;<i> &gt;  //bla bla bla
+</I>&gt;<i> &gt; }
+</I>&gt;<i> 
+</I>&gt;<i> This corresponds to a view. I have no objection to the term &quot;widget&quot;,
+</I>&gt;<i> but you should also think up a term that corresponds to &quot;model&quot;. I know
+</I>&gt;<i> I haven't mentioned &quot;controller&quot; yet. Typically a controller is
+</I>&gt;<i> responsible for handling a use case in a system. Swing uses a modified
+</I>&gt;<i> MVC model where the controller is combined with the view. The argument
+</I>&gt;<i> is that creating a separate controller class for everything can be an
+</I>&gt;<i> overkill. This is probably the way to go unless we can foresee a
+</I>&gt;<i> specific need to have controllers separate.
+</I>
+so we leave the M up to the OS/JADE to be reperesented as best they can
+and put the VC into the widgets (or whatever)?
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000077.html">[JOS-UI] MVC ((was Re: [JOS-UI] ScreenSaver))</A></li>
+	<LI> Next message: <A HREF="000082.html">[JOS-UI] ScreenSaver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#78">[ date ]</a>
+              <a href="thread.html#78">[ thread ]</a>
+              <a href="subject.html#78">[ subject ]</a>
+              <a href="author.html#78">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

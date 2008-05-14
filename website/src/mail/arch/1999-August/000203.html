@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] GSI</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000200.html">
+   <LINK REL="Next" HREF="000215.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] GSI</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] GSI">tmiller@haverford.edu</A><BR>
+    <I>Thu, 19 Aug 1999 17:20:24 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000200.html">[JOS-Arch] GSI</A></li>
+        <LI> Next message: <A HREF="000215.html">[JOS-Arch] GSI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#203">[ date ]</a>
+              <a href="thread.html#203">[ thread ]</a>
+              <a href="subject.html#203">[ subject ]</a>
+              <a href="author.html#203">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> we have the ScriptLoader thats like a ClassLoader for scripts, should we
+</I>&gt;<i> have a SCRIPTPATH?
+</I>
+	If necessary.  I can't shake the feeling that There Ought To Be A
+Better Way, though.
+
+&gt;<i> an Object can be Scriptable if it has a ScriptInfo getScriptInfo(), but
+</I>&gt;<i> what goes in ScriptInfo? (I'd just use BeanInfo but its to different)
+</I>
+	If I'm scripting an object, I'm either writing intra-program
+(IRC scripts) or inter-program (shell scripts).	 Typically, intra-program
+scripts are event-fired (in the form of well-defined &quot;callbacks&quot; to the
+scripts), and inter-program scripts are more like standard sequential
+programming, thought there are plenty of exceptions.  Since we can embed
+sequential programs in event-fired ones, event-fired scripts should be the
+norm.  Therefore, getScriptInfo() should return the events that the
+Scriptable Object will generate.
+
+&gt;<i> we have Script, how do we allow interaction generically? and its
+</I>&gt;<i> top-level inner class Element, we have an element what do we do with it?
+</I>&gt;<i> (goes with genric interaction above)
+</I>
+	I'd imagine the non-script-interperting classes can safely ignore
+(or should be able to safely ignore) the components of a script.  As for
+generic interactions, as above, I'd suggest that the code simply fire
+events to a ScriptCollection, which would in turn handle distributing thos
+events to the proper Scripts for handling; last (or first), it could
+return that event to the program, so a default behavior could be included.
+In the shell-script case, the only event would be script_begin (or
+whatever).
+
+&gt;<i> ScriptLoader is asked to load a script, it finds the appropriate child
+</I>&gt;<i> (ie LuaScriptLoader for a lua script) and calls load (returning a Script
+</I>&gt;<i> object cast up from, using my previous example, a LuaScript). Gilbert,
+</I>&gt;<i> how could your SmartFactory be used here?
+</I>
+	Wouldn't ScriptLoader /be/ a SmartFactory?
+
+&gt;<i> Our program now has a Script, to run it calls execute(). is there a
+</I>&gt;<i> better way? how does it interact with the script when its executing?
+</I>&gt;<i> what happens when its done? if we call execute() again what happens,
+</I>&gt;<i> what should?
+</I>
+	See above -- execute() is a bad idea, for the problems you've
+mentioned.  Interacting with the script would be responding to events it
+generates, as moderated by the ScriptCollection (or whatever) and/or the
+scripts themselves.  If you fire off two script_begin events, the behavior
+should be the scripts choice: it can ignore it, spawn a new thread, queue
+it up, etc...
+
+&gt;<i> what if we have two seperate implementations from different authours,
+</I>&gt;<i> how do we determine which to use? 
+</I>
+	The SmartRegistry?  I think we can safely punt on this one for
+now, because it's more a UI decision than an archictecture choice.
+
+&gt;<i> how do we tell what type of script a file is? MIME? attributes builtin
+</I>&gt;<i> to the fs? a per directtoy DB containg info the files (I like it,
+</I>&gt;<i> cross-fs. doesnt Jigsaw do this?)?
+</I>
+	Again, I'm tempted to punt on the problem for now.  I think
+whatever method is chosen could be safely enscapulated accross fs's --
+those don't have per-file attributes of the necessary kind get
+per-directory DBs or MIME or a central registry, depending.
+
+&gt;<i> in langauges already written-for/ported-to Java work? are there
+</I>&gt;<i> languages you can think of that wouldnt work in this GSI?
+</I>
+	JaCL (tcl interperter in java) is the one I'm most familiar with,
+and it's not as nearly advanced as what I'm proposing here.  (BTW: the
+event-based system would be translated by the respective Script objects to
+whatever is most appropriate to the source language; shell script, for
+instance, would get signals instead of events (which means most events
+would be ignored), or (possibly) only if the event name matched a method
+name, etc...
+
+-_Quinn
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000200.html">[JOS-Arch] GSI</A></li>
+	<LI> Next message: <A HREF="000215.html">[JOS-Arch] GSI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#203">[ date ]</a>
+              <a href="thread.html#203">[ thread ]</a>
+              <a href="subject.html#203">[ subject ]</a>
+              <a href="author.html#203">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

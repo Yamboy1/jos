@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [redirection] Request for program</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000067.html">
+   <LINK REL="Next" HREF="000070.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [redirection] Request for program</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [redirection] Request for program">gchii@mindspring.com</A><BR>
+    <I>Mon, 21 Aug 2000 17:49:51 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000067.html">[JOS-Apps] [Smart API] x-device: scheme</A></li>
+        <LI> Next message: <A HREF="000070.html">[JOS-Apps] [program] Runtime options</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#69">[ date ]</a>
+              <a href="thread.html#69">[ thread ]</a>
+              <a href="subject.html#69">[ subject ]</a>
+              <a href="author.html#69">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I need a program. This program would be invoked from the Universal Browser
+when the standard output (&quot;&gt;&quot;) redirection symbol is used. When given a
+uniform resource location, this program would output the URL to a given file.
+
+Therefore, there are two parameters to this program: source and target.
+
+public class RedirectOutputProgram
+    extends BaseConsoleProgram {
+  public void run() {
+    println( &quot;RedirectOutputProgram (1a)&quot; );
+
+    String source = getValue( &quot;source&quot; );
+    println( &quot;  source='&quot; + source + &quot;'&quot; );
+
+    String target = getValue( &quot;target&quot; );
+    println( &quot;  target='&quot; + target + &quot;'&quot; );
+    :
+  }
+}
+
+The target would be used to open an output stream, wouldn't it? The out:
+scheme already provides a long list of output stream choices. The target
+could be modified by this program to always create a print stream, like this:
+
+  target = &quot;out:print:&quot; + target;
+
+Once the target output stream is open, the output stream must be converted
+into a console when a source is a console program.
+
+  if ( p instanceof ConsoleProgram ) {
+    ((ConsoleProgram) p).setConsole( new OutputStreamConsole( output ) );
+  }
+
+Then, the source is invoked.
+
+If the standard output redirection symbol were part of a location in the
+Universal Browser, it would invoke the RedirectOutputProgram with
+parameters. For example, the following location stores an HTML page on the
+Internet in a local file called demo.html:
+
+<A HREF="http://www.jos.org/">http://www.jos.org/</A> &gt; file:demo.html
+
+The file: scheme could be assumed, giving an equivalent but shorter location:
+
+<A HREF="http://www.jos.org/">http://www.jos.org/</A> &gt; demo.html
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000067.html">[JOS-Apps] [Smart API] x-device: scheme</A></li>
+	<LI> Next message: <A HREF="000070.html">[JOS-Apps] [program] Runtime options</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#69">[ date ]</a>
+              <a href="thread.html#69">[ thread ]</a>
+              <a href="subject.html#69">[ subject ]</a>
+              <a href="author.html#69">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

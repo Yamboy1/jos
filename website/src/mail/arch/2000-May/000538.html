@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os-0.1.3 released.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000530.html">
+   <LINK REL="Next" HREF="000535.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os-0.1.3 released.</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] rheise.os-0.1.3 released.">ryan@whitewolf.com.au</A><BR>
+    <I>Tue, 02 May 2000 13:24:19 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000530.html">[JOS-Arch] rheise.os-0.1.3 released.</A></li>
+        <LI> Next message: <A HREF="000535.html">[JOS-Arch] [multiple process] Stumped, again</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#538">[ date ]</a>
+              <a href="thread.html#538">[ thread ]</a>
+              <a href="subject.html#538">[ subject ]</a>
+              <a href="author.html#538">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> 
+</I>&gt;<i> At 01:12 AM 5/1/00 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+</I>&gt;<i> &gt;All implementation specific classes have been moved out of the main
+</I>&gt;<i> &gt;public packages and into rheise.os.impl. So, for example,
+</I>&gt;<i> &gt;rheise.os.process only contains classes that application developers
+</I>&gt;<i> &gt;might wish to use. This is similar to how java.* only contains classes
+</I>&gt;<i> &gt;application developers might use, and sun.* contains their private
+</I>&gt;<i> &gt;implementation classes.
+</I>&gt;<i> 
+</I>&gt;<i> At the right time, implementation should be separated from its interface.
+</I>
+That was actually the goal of this release. I was trying to remove all
+implementation specific stuff out of the public API package. What's left
+in the public API package is only the classes that JOS programs might
+interact with (where rheise.os is a proposal for the JOS
+process/security/user APIs).
+
+My current implementations of this API are currently included in the
+rheise.os package for convenience, but I would like them moved into
+somewhere private.
+
+Would you care to take a look in the public API packages of rheise.os
+and tell me what you think? See if my separation is actually what you
+want?
+
+&gt;<i> Also, it is a good idea to give different package names to different
+</I>&gt;<i> versions of a framework/API.
+</I>
+Agreed. SwingToolkit will remain as rheise.swingtoolkit, while
+java.awt.peer will remain as that.
+
+However, the core APIs such as process/user/security APIs need to be in
+jos.* or org.jos.*, wherever we decide. For example, take a look in the
+rheise.os.process.* package. It contains classes I'd imagine would go on
+jos.process.*. This package defines the set of methods used to create
+processes, query processes, destroy running processes and so on. So, JOS
+programs might have direct references to jos.process.JavaProcess
+objects(*), just like current java programs have direct references to
+java.lang.Thread objects. If you compare those two classes, you will
+find they are similar in style, except rather than passing off
+implementation specific stuff to native methods, I pass my stuff off to
+the &quot;impl&quot; objects.
+
+(*) Note that JavaProcess is castable to java.lang.Process which is a
+nice compatibility feature. This also explains why it is a class, not an
+interface (although there are other reasons).
+
+&gt;<i> &gt;I would imagine that if rheise.os.* is renamed to jos.*, we could have
+</I>&gt;<i> &gt;jos.process.ProcessManager, and
+</I>&gt;<i> &gt;org.jos.process.host.HostProcessManagerImpl. This implies that
+</I>&gt;<i> &gt;application developers should never use the org.jos package. I realise
+</I>&gt;<i> &gt;that the JOS project has already agreed on the exact opposite, but this
+</I>&gt;<i> &gt;seems to make more sense to me so I thought I'd raise the issue again.
+</I>&gt;<i> 
+</I>&gt;<i> Yes, we have agreed to the opposite for very good reason.
+</I>&gt;<i> 
+</I>&gt;<i> An interface is used by applications. Applications are unconcerned (or
+</I>&gt;<i> should be) about the implementation. The well-known interface to the
+</I>&gt;<i> framework/API should be used by other applications, so it must go in
+</I>&gt;<i> org.jos.*.
+</I>
+That's not actually a reason to choose org.jos.* over jos.*. What I
+meant was that (from memory) it was decided that jos.* would contain
+implementation specific classes, while org.jos would contain public API
+stuff. I think the reverse is probably nicer. Rationale:
+
+The public core API of java goes under java.* which is nice and concise.
+Sun recommend that any software developer release their software
+products under package names that match their reverse dns name. In the
+case of JOS, this means org.jos. java.* is the exception to this rule
+because it is the core of the Java system.
+
+We are developing an operating system, and our core could exempt from
+the same rule. Meaning, rather than having to use the longer package
+name &quot;org.jos&quot; we could put our core stuff in jos.*.
+
+This leaves org.jos for additional software that we, the JOS
+organisation, write. This could include collaborative software projects
+that JOS members work on, but which are not considered part of the core
+operating system. This could also include our own implementations of the
+JOS process APIs (etc.), although Sun have (conveniently) broken the
+rules again with this, and in a way that is difficult for us to mimic.
+They have java.* for the core, com.sun.* for software they write to work
+with java.*, and sun.* which is a private package for software they
+never intend to release the source to (and there's also javax.*). We
+want something like sun.* to put our implementations of the public JOS
+APIs.
+
+So, they have:
+
+	java.* - core (the Java product)
+	sun.*  - private (prefixed with company name)
+	com.sun.* - public software (this time following their own package
+naming guidlines)
+
+As you can see, we can't generate all three the same way because our
+product name is the same as our organisation name. So, I thought maybe
+we could just put sun.* type stuff into org.jos.
+
+&gt;<i> Your personal implementation of the framework/API is rheise.os,
+</I>&gt;<i> and should be. There is no good reason to change it, now or ever.
+</I>
+I'm not sure I understand you, because you are telling me what rheise.os
+is when I should be telling you what it is. rheise.os a set of core
+classes that provide an interface to managing processes, users and
+security. This package includes implementations of those core classes,
+but while rheise.os remains fixed, different implementations may be
+plugged in. The existing implementations are just implementations that
+rheise.os includes in its release.
+
+Given what rheise.os *is*, I was initially offended by your claim that
+rheise.os, as it is, is just one implementation of some other
+hypothetical API, and that there is no good reason to change it, now or
+ever. I hope that is not what you mean! :-)
+
+If you mean that the host implementation included with my rheise.os
+package should be renamed to rheise.os, and the current rheise.os be
+renamed to something else, I'm with you. However, I don't want implied
+ownership over rheise.impl.process.host.*, I'd rather it be a
+collaborative effort without my name on it - something like
+org.jos.impl.process.host.* that the JOS project can distribute to users
+wanting to run JOS In a host environment.
+
+&gt;<i> A factory should link a framework/API to a specific implementation. A
+</I>&gt;<i> factory and only a factory should always provide an implementation of a
+</I>&gt;<i> process manager. A process manager should implement the getProcess()
+</I>&gt;<i> method. The process manager implementation should not contain static
+</I>&gt;<i> methods. If static methods are provided, they must use the factory and
+</I>&gt;<i> dispatch requests to the real process manager.
+</I>
+If you look at the current design, The public APIs are frontends to
+implementations which are generated by factories. In my first version,
+the only way I could think of to support factories was to make
+ProcessManager an object returned by a factory, meaning it couldn't be
+used via static methods (which is inconvenient). In the latest release,
+I have solved that problem (still using factories) and I feel the
+interface is much nicer.
+
+Rather than calling:
+
+	ProcessManager processMgr = ProcessManager.get();
+	JavaProcess process = processMgr.getCurrentProcess()
+
+You call:
+
+	JavaProcess process = ProcessManager.getCurrentProcess();
+
+Sort of like the way Thread.currentThread() is a static method which is
+much more convenient than having to first obtain a ThreadManager object.
+There is only really one thread manager in the system, just like there
+is only one ProcessManager, so the fact that the ProcessManager you're
+using is created through a factory should be totally hidden.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000530.html">[JOS-Arch] rheise.os-0.1.3 released.</A></li>
+	<LI> Next message: <A HREF="000535.html">[JOS-Arch] [multiple process] Stumped, again</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#538">[ date ]</a>
+              <a href="thread.html#538">[ thread ]</a>
+              <a href="subject.html#538">[ subject ]</a>
+              <a href="author.html#538">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

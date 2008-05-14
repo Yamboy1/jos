@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Reflection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000223.html">
+   <LINK REL="Next" HREF="000225.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Reflection</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Reflection">gchii@mindspring.com</A><BR>
+    <I>Mon, 13 Sep 1999 11:30:47 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000223.html">[JOS-Arch] Open Architecture</A></li>
+        <LI> Next message: <A HREF="000225.html">[JOS-Arch] Reflection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#224">[ date ]</a>
+              <a href="thread.html#224">[ thread ]</a>
+              <a href="subject.html#224">[ subject ]</a>
+              <a href="author.html#224">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Reflect on this:
+
+public class SystemExit() {
+  static() {
+    System.exit();
+  }
+}
+
+What happens when your code reflects this class?
+
+Class c = Class.forName( &quot;SystemExit&quot; );
+Method[] c.getMethods();
+
+Your program ends somewhere within the call to Class.forName(). So, how can
+you reflect the methods of such a class?
+
+Have you ever wondered why the Java compiler never invokes a static method
+when it loads a class? It is because the Java compiler uses a better
+reflection API. Here is what reflection *should* do:
+
+1. Reflect without side-effects.
+
+Reflection should be reflection-only. It must not assume the purpose of
+reflection is invocation. It must not invoke the static method of a class.
+
+2. Reflect any bytecode.
+
+Reflection should be limitless. It must not assume the target of reflection
+is limited to the platform of the current JVM.
+
+In other words, the right kind of reflection package should be able to
+reflect the Java 0 and 1 Platforms using a Java 2 Platform JVM. And
+likewise, the same package -- without modification -- should be able to
+reflect the Java 2 Platform using a Java 0 Platform JVM.
+
+How not to do it
+Expanding the responsibilities of java.lang.Class is bad, very bad.
+Attaching reflection to the java.lang.Class class limits reflection to a
+platform equal to your JVM. The java.lang.Class object has nothing to do
+with static reflection.
+
+When java.lang.Class is used for reflection, the static() method is invoked
+while building the Class object. It executes bytecode that should not be
+executed for the sake of pure reflection.
+
+How must bytecode can you write inside of a static() method?
+
+There is no limit. There is nothing inherent in the static() method from
+loading a huge application. You can write a class-specific routine,
+following the recommended use of the static() method. Or, you can launch a
+thousand sub-programs.
+
+Inside the JVM, the static() method must be invoked just like every other
+method. It has the potential to be very large. Before, the static() method
+is called, the JVM must update the class object itself to show that the
+static() method has been called, so that it cannot be called again for that
+instance of a class object.
+
+The static() method must have its own stack frame, just like every other
+method. In a multiple thread environment, a static() method is able to
+create and start other threads. It must not block other threads. The JVM
+cannot afford to wait. It must continue to task-switch while the static()
+method is running.
+
+The static() method is *always* synchronized, preventing two or more
+threads from using the static() method at the same time. You write:
+
+static() {
+  System.out.println( &quot;Hello, World!&quot; );
+}
+
+and the compiler writes:
+
+public static synchronized static() {
+  System.out.println( &quot;Hello, World!&quot; );
+}
+
+[1] public because the JVM must invoke it.
+[2] static because it invoked without an instance of the class.
+[3] synchronized because it must be invoked once, and only once, as
+promised by the JVM.
+
+When does the JVM invoke this method()? It is a matter of semantics. The
+JVM usually invokes the static method as an instance of java.lang.Class is
+constructed. It must be invoked at some time after a class is resolved and
+before any other method is invoked.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000223.html">[JOS-Arch] Open Architecture</A></li>
+	<LI> Next message: <A HREF="000225.html">[JOS-Arch] Reflection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#224">[ date ]</a>
+              <a href="thread.html#224">[ thread ]</a>
+              <a href="subject.html#224">[ subject ]</a>
+              <a href="author.html#224">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

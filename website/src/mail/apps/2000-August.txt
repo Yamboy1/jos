@@ -1,0 +1,1587 @@
+From gchii@mindspring.com Wed, 02 Aug 2000 15:14:53 -0400
+Date: Wed, 02 Aug 2000 15:14:53 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [JOS Technical Edition] Release 1g
+
+A new release of the JOS Technical Edition is now available. To see the
+limited on-line edition, follow this link:
+
+http://www.jos.org/redist
+
+To request this product on CD-ROM, send me a private e-mail.
+
+
+
+
+
+From gchii@mindspring.com Fri, 04 Aug 2000 17:38:30 -0400
+Date: Fri, 04 Aug 2000 17:38:30 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bootdisk] Formatting a floppy
+
+There seem to be two Linux commands to format a floppy disk.
+
+1. mkfs.minix /dev/fd0
+
+This "installs" the minix filesystem on the floppy. It does its work quickly.
+
+2. fdformat /dev/fd0
+
+This formats a floppy disk.
+
+Do I have to format a floppy before installing GRUB?
+
+
+
+
+
+From gchii@mindspring.com Fri, 04 Aug 2000 19:56:14 -0400
+Date: Fri, 04 Aug 2000 19:56:14 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bulkmake] Release 2
+
+Release 2 of BulkMake(tm) 2a is available for immediate download. It
+provides three package-oriented tools: copier, compiler and archive. It is
+open-source and free-license software.
+
+For more information, see the following articles on JOS Wiki:
+
+http://www.metamech.com/wiki/view/Main/BulkMake
+http://www.metamech.com/wiki/view/Main/DownloadBulkMake
+
+
+
+
+
+From jewel@pixie.co.za Fri, 04 Aug 2000 03:47:38 -0200 (GMT+2)
+Date: Fri, 04 Aug 2000 03:47:38 -0200 (GMT+2)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Apps] [bootdisk] Formatting a floppy
+
+> There seem to be two Linux commands to format a floppy disk.
+> 
+> 1. mkfs.minix /dev/fd0
+> 
+> This "installs" the minix filesystem on the floppy. It does its work quickly.
+
+Usually you don't want to use a minix filesystem, but rather FAT or ext2.
+
+If you do:
+
+ls /sbin/mkfs*
+
+you will see something like:
+
+/sbin/mkfs  /sbin/mkfs.ext2  /sbin/mkfs.minix  /sbin/mkfs.msdos
+
+They work the same way as the minix mkfs.
+ 
+> 2. fdformat /dev/fd0
+> 
+> This formats a floppy disk.
+
+The previous commands install a filesystem on the floppy disk (mkfs = make
+filesystem), formatting is the equivalent of a low-level disk format.
+ 
+> Do I have to format a floppy before installing GRUB?
+
+No. 
+
+I recommend you install GRUB like this:
+
+First get
+
+ftp://alpha.gnu.org/gnu/grub/grub-0.5.95.tar.gz
+
+then unpack it,
+
+$ tar xzf grub-0.5.95.tar.gz
+
+$ cd grub-0.5.95
+
+configure it
+
+$ ./configure
+
+make it
+
+$ make
+
+and then install it as the root user
+
+# make install
+
+It should put some files in /usr/local/share/grub/i386-pc/ . 
+
+Now to read the installation documentation:
+
+info -f docs/grub.info
+
+Go to the section *Installation, it tells you to copy the 'stage1',
+'stage2' and '*stage1_5' files to the /boot/grub directory. (Note that if
+you have a separate boot partition, this will be the /boot/boot/grub
+directory).
+
+Next choose *Installing GRUB on a floppy
+
+
+Install GRUB on the floppy:
+
+# cd /boot/grub (or /boot/boot/grub)
+# dd if=stage1 of=/dev/fd0 bs=512 count=1
+# dd if=stage2 of=/dev/fd0 bs=512 seek=1
+
+If there are no errors you will have a bootable GRUB floppy. If there are
+any errors, use a new floppy.
+
+When you boot with the floppy you will see a GRUB prompt. Here is how I
+boot Linux on my machine:
+
+> root=(hd0,0)      -- set the current filesystem to be the first
+partition on the first hard disk (in this case my /boot partition)
+
+> kernel=/vmlinuz root=/dev/hda5       -- tell grub what kernel to load
+and what options to pass
+
+> boot
+
+Once you've entered the root=xxx command, you can use TAB completion like
+in BASH, it's very useful for finding the kernel you want to boot.
+
+Grub will also search the filesystems for you if you don't know what
+partition to use:
+
+> find /vmlinuz
+ (hd0,0)
+
+I suppose you could also do something like:
+
+> find /myhomedir/jos/josimage
+
+
+
+
+
+
+Well, I hope that helps, feel free to ask any questions.
+
+
+John Leuner
+
+
+
+
+
+From gchii@mindspring.com Mon, 07 Aug 2000 16:32:49 -0400
+Date: Mon, 07 Aug 2000 16:32:49 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bulkmake] Version 2b
+
+BulkMake compiles Java source code without an explicit project file.
+Release 1 of BulkMake Version 2b is available for immediate download. This
+version contains an interactive configuration program (called setup) to
+install an external java tool and an external jar tool. For more
+information, see also the following articles on JOS Wiki:
+
+http://www.metamech.com/wiki/view/Main/BulkMake
+http://www.metamech.com/wiki/view/Main/DownloadBulkMake
+
+
+
+
+
+From gchii@mindspring.com Mon, 07 Aug 2000 17:22:55 -0400
+Date: Mon, 07 Aug 2000 17:22:55 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [GRUB] Install from source
+
+GRUB can be installed from a source code distribution. For more
+information, see also the following article on JOS Wiki:
+
+http://www.metamech.com/wiki/view/Main/GRUBInstallFromSource
+
+
+
+
+
+From gchii@mindspring.com Tue, 08 Aug 2000 13:05:11 -0400
+Date: Tue, 08 Aug 2000 13:05:11 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [dd] Opening /dev/fd0 on Linux
+
+Is there a pure Java replacement for the dd command?
+
+buf1 and buf2 are loaded from the stage1 and stage2 files, respectively.
+
+Should the following code work properly on Linux?
+
+  public void example1() {
+    byte[] buf1 = loadStage1();
+    byte[] buf2 = loadStage2();
+
+    OutputStream output = FileOutputStream( "/dev/fd0" );
+    output.write( buf1 );
+    output.write( buf2 );
+    output.close();
+  }
+
+Result: this floppy is not bootable. It seems as if this implementation of
+FileOutputStream does not seek to the beginning of the floppy disk.
+
+  public void example2() {
+    byte[] buf1 = loadStage1();
+    byte[] buf2 = loadStage2();
+
+    RandomAccessFile output = RandomAccessFile( "/dev/fd0" );
+    output.seek( 0L );
+    output.write( buf1 );
+    output.write( buf2 );
+    output.close();
+  }
+
+Outside of Java, this works with the same files:
+
+dd if=stage1 of=/dev/fd0 bs=512 count=1
+dd if=stage2 of=/dev/fd0 bs=512 seek=1
+
+How does the dd command work? It copies stage1 and stage2 to the floppy.
+
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 08 Aug 2000 16:56:56 -0500
+Date: Tue, 08 Aug 2000 16:56:56 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Apps] [dd] Opening /dev/fd0 on Linux
+
+At 01:05 PM 8/8/00 -0400, Gilbert Carl Herschberger II wrote:
+>Is there a pure Java replacement for the dd command?
+
+No.  It needs low level access to the disk that would require native 
+code.  You must have at least one native code call to do this.  You may be 
+able to do this with dd on unix and rawwrite on windows using a system 
+command though.
+
+>Should the following code work properly on Linux?
+
+No.  You can't get to the master boot records this way.
+
+-iain
+
+
+
+
+
+From jewel@pixie.co.za Tue, 08 Aug 2000 06:59:35 -0200 (GMT+2)
+Date: Tue, 08 Aug 2000 06:59:35 -0200 (GMT+2)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Apps] [dd] Opening /dev/fd0 on Linux
+
+Are you running the java program as root?
+
+How many bytes does each write() write?
+
+John Leuner
+
+On Tue, 8 Aug 2000, Gilbert Carl Herschberger II wrote:
+
+> Is there a pure Java replacement for the dd command?
+> 
+>     output.write( buf1 );
+>     output.write( buf2 );
+> 
+> dd if=stage1 of=/dev/fd0 bs=512 count=1
+> dd if=stage2 of=/dev/fd0 bs=512 seek=1
+> 
+
+John Leuner
+
+
+
+
+
+
+From gchii@mindspring.com Wed, 09 Aug 2000 13:19:04 -0400
+Date: Wed, 09 Aug 2000 13:19:04 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [dd] Opening /dev/fd0 on Linux
+
+I can create an Etherboot boot disk with the cat command. I assume I can
+create a GRUB boot disk with the cat command, too. And if cat is capable of
+creating a boot disk, an OutputStream should be.
+
+When I use an OutputStream, bytes are written to the floppy. But the floppy
+won't boot. The boot sector does not contain the required data. I am logged
+in as root.
+
+I should be verifying the output to the floppy disk. The cmp command is new
+to me. Thanks to Peter Schuller. I'll use it to verify a GRUB boot disk
+that works and then the boot disk created by my Java program.
+
+# cmp /dev/fd0 stage1
+
+If I create grub.image, like this:
+
+# cat stage1 stage2 > grub.image
+
+then I should be able to do something like this:
+
+# cat grub.image /dev/fd0
+# cmp /dev/fd0 grub.image
+
+I've re-written BootDiskProgram to read from /dev/fd0 after writing. If the
+method writes /and/ verifies, this would mean -- oops! -- there has been a
+bug inside loadStage1() or loadStage2() all along.
+
+
+
+
+
+From gchii@mindspring.com Wed, 09 Aug 2000 13:26:20 -0400
+Date: Wed, 09 Aug 2000 13:26:20 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bulkmake] New release 2b-2
+
+Release 2 of BulkMake(tm) 2b is available for immediate download.
+BulkMake(tm) is package oriented and copies, compiles and archives large
+Java programs. For more information, see also the following articles on JOS
+Wiki.
+
+http://www.metamech.com/wiki/view/Main/BulkMake
+http://www.metamech.com/wiki/view/Main/DownloadBulkMake
+
+This release fixes a bug in PackageArchiveProgram 2a, which mistakenly
+limited an archive to the first 20 directories. My research has shown that
+this bug has been in PackageArchive since version 1a. In versions 1a and
+1b, it limited an archive to the first 100 files.
+
+This bug only affected the archive program. The copier and compiler were
+not affected.
+
+
+
+
+
+From gchii@mindspring.com Wed, 09 Aug 2000 13:29:06 -0400
+Date: Wed, 09 Aug 2000 13:29:06 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bootdisk] New release 2
+
+Release 2 of BootDisk 1a is available for immediate download. This
+AWT-based application creates a boot disk from a drop-down list of boot
+images. For more information, see also the following articles on JOS Wiki:
+
+http://www.metamech.com/wiki/view/Main/BootDisk
+http://www.metamech.com/wiki/view/Main/DownloadBootDisk
+
+In this release, the BootDiskProgram verifies the boot disk image after
+writing it to a floppy.
+
+
+
+
+
+From gchii@mindspring.com Thu, 10 Aug 2000 12:01:14 -0400
+Date: Thu, 10 Aug 2000 12:01:14 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bootdisk] Platform-independence
+
+BootDisk is not a UNIX(r)-specific program. BootDisk is written in pure
+bytecode so that it can be as platform-independent as it can. But
+platform-independence can only be taken so far. BootDisk does not require
+that every step in the process be written in bytecode. Anyone can create a
+boot disk manually, with well-written documentation.
+
+I have two goals:
+
+1. Fully automate BootDisk on Linux.
+2. Fully automate BootDisk on Windows.
+
+I have been leaning toward a more platform-independent model for BootDisk.
+It is partially documented on JOS Wiki. BootDisk can separate out the
+platform-independent part:
+
+1. selecting a boot method
+
+The drop-down box of boot method is the same, no matter which operating
+system you use to create a boot disk. The list of boot methods is expected
+to grow.
+
+2. writing a boot image
+
+If the platform-independent part /always/ writes a boot image to a
+well-known file, regardless of platform, it can invoke a platform-dependent
+part to write the file to the floppy.
+
+Here is where the platform-dependent part starts. Once a well-known file
+contains a boot image, each platform needs a way to write the image to a
+floppy. A pure Java program can detect the operating system, using the
+os.name system property and invoke an appropriate command.
+
+What if the well-known boot image is called "bootdisk.dat"? Each platform
+would implement a way to copy "bootdisk.dat" to a floppy disk.
+
+On Linux, the dd or cat command should work. The BootDisk application might
+invoke this external command:
+
+cat bootdisk.dat > /dev/fd0
+
+On Windows, the rawrite command should work. The BootDisk application might
+invoke this external command:
+
+rawrite bootdisk.dat A:
+
+On other platforms, other commands might be needed. I'm sure the Mac has a
+program that can copy a boot image to a floppy. That will have to be
+determined by the Mac's user.
+
+
+
+
+
+From gchii@mindspring.com Thu, 10 Aug 2000 12:02:39 -0400
+Date: Thu, 10 Aug 2000 12:02:39 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bootdisk] For Linux
+
+My first goal is to fully automate BootDisk on Linux(r), and therefore
+UNIX(r). I thought BootDisk could use the java.io.OutputStream class to
+write directly to the floppy; but, it can't. The OutputStream class seems
+to skips over the first sector of a floppy, even when opening /dev/fd0.
+BootDisk writes and verifies the boot image; but the data isn't written to
+the first sector.
+
+Option A: Using dd. This is known to work properly.
+
+dd if=stage1 of=/dev/fd0 bs=512 count=1
+dd if=stage2 of=/dev/fd0 bs=512 seek=1
+cmp bootdisk.dat /dev/fd0
+
+Option B: Using dd and cat. This is also known to work properly.
+
+dd if=stage1 of=bootdisk.dat bs=512 count=1
+dd if=stage2 of=bootdisk.dat bs=512 seek=1
+cat bootdisk.dat /dev/fd0
+cmp bootdisk.dat /dev/fd0
+
+Option C: Using cat. And this is know to work properly.
+
+cat stage1 stage2 > bootdisk.dat
+cat bootdisk.dat /dev/fd0
+cmp bootdisk.dat /dev/fd0
+
+If cat can write bootdisk.dat to /dev/fd0, why can't java.io.OutputStream?
+
+
+
+
+
+From gchii@mindspring.com Thu, 10 Aug 2000 12:02:51 -0400
+Date: Thu, 10 Aug 2000 12:02:51 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bootdisk] For Windows
+
+My second goal is to fully automate BootDisk on Windows. If rawrite.exe is
+distributed with it or made available as a plug-in, BootDisk can creates a
+boot disk even on Windows. Unfortunately, I personally have lost my copy of
+rawrite.exe and can't seem to find it or its author.
+
+
+
+
+
+From gchii@mindspring.com Thu, 10 Aug 2000 12:09:44 -0400
+Date: Thu, 10 Aug 2000 12:09:44 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [cmp] Request for application
+
+The cmp command is available on Linux. Is there an application like cmp
+written in Java? I would like to compare versions 1c and 1d of Source
+Server. While I know for sure that they are different, I have been unable
+to identify specific differences.
+
+
+
+
+
+From gchii@mindspring.com Thu, 10 Aug 2000 12:49:52 -0400
+Date: Thu, 10 Aug 2000 12:49:52 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bootdisk] For Windows
+
+At 12:02 PM 8/10/00 -0400, I wrote:
+>My second goal is to fully automate BootDisk on Windows. If rawrite.exe is
+>distributed with it or made available as a plug-in, BootDisk can creates a
+>boot disk even on Windows. Unfortunately, I personally have lost my copy of
+>rawrite.exe and can't seem to find it or its author.
+
+Thanks to a helpful hint from John Leuner, I found my copy of rawrite.exe.
+I copied it to the current directory. I used the following command and it
+only displayed an error message. It copied nothing to a floppy.
+
+> rawrite.exe bootdisk.dat a:
+
+After some experimentation, this copied the boot image to a floppy:
+
+> rawrite.exe BOOTDISK.DAT A:
+
+
+
+
+
+From gchii@mindspring.com Thu, 10 Aug 2000 15:53:15 -0400
+Date: Thu, 10 Aug 2000 15:53:15 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bootdisk] New release 3
+
+Release 3 of BootDisk 1a is now available. BootDisk is a pure Java
+application that helps you create a boot disk for Etherboot and GRUB. It
+has been tested and works on both Linux and Windows. For more information,
+see also the following articles on JOS Wiki:
+
+http://www.metamech.com/wiki/view/Main/BootDisk
+http://www.metamech.com/wiki/view/Main/DownloadBootDisk
+
+On Linux, the OutputStream class works like cat after all. Thanks for all
+your help. This release fixes two bugs and completes the Windows/rawrite
+feature.
+
+Bug 1. Doh! Inside EtherbootBootDisk and GrubBootDisk, I got the arguments
+to System.arraycopy() backward. It is changed from
+
+System.arraycopy( payload, 0, stage1, 0, stage1.length );
+System.arraycopy( payload, stage1.length, stage1, 0, stage2.length );
+
+to
+
+System.arraycopy( stage1, 0, payload, 0, stage1.length );
+System.arraycopy( stage2, 0, payload, stage1.length, stage2.length );
+
+-----
+
+Bug 2. Inside BasePayload, I changed the conversion of an integer to byte.
+It was:
+
+byte b = (byte) x;
+
+Now it is
+byte b;
+if ( x < 128 ) {
+  b = (byte) x;
+}
+else {
+  b = (byte) ( x - 256 );
+}
+
+-----
+
+Windows feature is complete. Creating a boot disk is fully automated. The
+rawrite.exe is distributed with the runtime edition. The $BDWIN.BAT file is
+not distributed; BootDisk creates and invokes it. It took a while to figure
+out how to invoke rawrite.exe from within a Java Virtual Machine on Windows
+95. It seems that rawrite.exe is a 16-bit program. It cannot be invoked
+directly from java.lang.Runtime.
+
+Instead, BootDisk creates $BDWIN.BAT with the following command line:
+
+rawrite.exe BOOTDISK.DAT %1
+
+and invokes it with the following command:
+
+start /m /w $BDWIN.BAT A:
+or
+start /m /w $BDWIN.BAT B:
+
+All the output from rawrite.exe is displayed on the BootDisk console. This
+works on Windows 95/98/2000. The start.exe program may be missing from
+Windows NT.
+
+
+
+
+
+From gchii@mindspring.com Thu, 10 Aug 2000 16:40:59 -0400
+Date: Thu, 10 Aug 2000 16:40:59 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [dd] Opening /dev/fd0 on Linux
+
+At 07:56 PM 8/8/00 +0200, "Peter Schuller" <peter.schuller@infidyne.com>
+wrote:
+>AFAIK, yes. As you may be aware, one can write a Linux boot floppy with the
+>"cat" command. AFAIK, cat doesn't do any explicit seeking before writing
+>data as far as I've been able to tell (but I've only sifted through the
+>source code).
+
+You're right. The FileOutputStream class works just like cat.
+
+>What happens if you do "cmp /dev/fd0 stage1"...?
+
+When I compared stage1 with /dev/fd0, they were not even close. There was a
+bug in loadStage1() that gave me a zero-filled array instead of the
+contents of the stage1 file. A similar bug was inside loadStage2().
+
+The key to solving this puzzle was the cmp command. That command made it
+was obvious that BulkMake wasn't writing what I thought it was. Then, I ran
+this:
+
+cat /dev/fd0 | more
+
+The first bytes on floppy were blank. I searched backward through the code
+until I found this:
+
+byte[] payload = new byte[ stage1.length ];
+System.arraycopy( payload, 0, stage1, 0, stage1.length );
+
+which mistakenly copies bytes the wrong direction. I changed it to
+
+System.arraycopy( stage1, 0, payload, 0, stage1.length );
+
+and it works!
+
+
+
+
+
+From a.vanefferen@mediacom4.nl Thu, 10 Aug 2000 23:50:07 +0200
+Date: Thu, 10 Aug 2000 23:50:07 +0200
+From: Arjen van Efferen a.vanefferen@mediacom4.nl
+Subject: [JOS-Apps] [bootdisk] New release 3
+
+Release 3 cannot be downloaded from these pages. I get a 404-error.
+Files don't exist
+
+http://www.metamech.com/wiki/view/Main/BootDisk
+http://www.metamech.com/wiki/view/Main/DownloadBootDisk
+
+-- Arjen van Efferen
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 10 Aug 2000 16:54:59 -0500
+Date: Thu, 10 Aug 2000 16:54:59 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Apps] [bootdisk] Platform-independence
+
+At 12:01 PM 8/10/00 -0400, Gilbert Carl Herschberger II wrote:
+>BootDisk is not a UNIX(r)-specific program. BootDisk is written in pure
+>bytecode so that it can be as platform-independent as it can. But
+>platform-independence can only be taken so far. BootDisk does not require
+>that every step in the process be written in bytecode. Anyone can create a
+>boot disk manually, with well-written documentation.
+
+I agree.  I would be more reluctant to label BootDisk "pure java" 
+though.  The program itself may be but its proper functioning relies on 
+system calls which I think pulls the whole app out of the "pure java" 
+realm.  If you use the term "pure java" I think most readers would expect 
+that running it on any java compliant platform should yield the same results...
+
+>I have two goals:
+>
+>1. Fully automate BootDisk on Linux.
+>2. Fully automate BootDisk on Windows.
+
+This is a very reasonable and good thing to do.
+
+-iain
+
+
+
+
+
+From gchii@mindspring.com Fri, 11 Aug 2000 14:08:13 -0400
+Date: Fri, 11 Aug 2000 14:08:13 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bootdisk] Platform-independence
+
+BootDisk is not a UNIX(r)-specific program. BootDisk is written in pure
+bytecode so that it can be as platform-independent as it can.
+
+At 04:54 PM 8/10/00 -0500, Iain Shigeoka <iainshigeoka@yahoo.com> wrote:
+>I agree.  I would be more reluctant to label BootDisk "pure java" 
+>though.  The program itself may be but its proper functioning relies on 
+>system calls which I think pulls the whole app out of the "pure java" 
+>realm.  If you use the term "pure java" I think most readers would expect 
+>that running it on any java compliant platform should yield the same
+>results...
+
+In the fine print, "100% Pure Java" includes applications with machine
+code, called through Java Native Interface and java.lang.Runtime. All "100%
+Pure Java" applications must be certified as such by Sun Microsystems. None
+of my products are certified as "100% Pure Java". I have no intention of
+working toward such certification.
+
+The certification mark is defined, specified and documented by Sun
+Microsystems. I believe their definition is misleading and has little
+value. A "100% Pure Java" application is certified on only the most popular
+operating systems. An application either works on an operating system or it
+doesn't. No one can certify that an application works on all operating
+systems, past, present and future. No one can certify that an application
+works on all virtual machines, past, present and future. Sun's definition
+changes when they release a new JDK. Applications once certified are no
+longer compliant.
+
+Instead of "100% Pure Java", I like to use "pure bytecode". I neither
+assume you're running the latest Java Virtual Machine nor assume that
+you're using the Java programming language.
+
+Instead of "100% Pure Java", I like to use open-source and free-license
+approach. If BootDisk doesn't work on your operating system, you have an
+opportunity to re-compile it from modified source so that it does.
+
+>This is a very reasonable and good thing to do.
+
+As soon as JJOS has a way to write a boot disk image, BootDisk should be
+ported to JJOS. I try to focus on one operating system at a time. Even Java
+applications must be ported to work on multiple operating systems.
+
+If someone has more information on creating a boot disk with other
+operating systems, like Mac OS, this application could run on more than
+Linux and Windows.
+
+If someone has more information on other boot disk options, they could be
+added to the drop-down list.
+
+With the HTTP path option, the Boot Disk application can be installed on a
+website, always giving its users access to the latest boot disk images
+without upgrading. (Java Web Start is not required.)
+
+
+
+
+
+From gchii@mindspring.com Mon, 14 Aug 2000 08:12:59 -0400
+Date: Mon, 14 Aug 2000 08:12:59 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [jni] Defining system class?
+
+The DefineClass() method is part of the Java Native Interface (JNI). It
+enables a machine code program to define classes. Here is its prototype:
+
+  jclass DefineClass(
+      JNIEnv *env,
+      const char *name,
+      jobject loader,
+      const jbyte *buf,
+      jsize bufLen
+      );
+
+The loader parameter is a class loader. Each class must be associated with
+a primordial or custom class loader. A primordial class loader is part of a
+virtual machine. A class is loaded by the primordial class loader is a
+"system" class. For system classes, the class loader property is null.
+
+How does a JNI program define a system class?
+
+The following code throws a memory exception. It is called before the first
+method is invoked.
+
+  const char *cn = "org/jos/demo/Demo";
+  rc_Bytecode *bc = getBytecode( cn );
+  DefineClass( env, cn, NULL, bc->getPayload(), bc->getSize() );
+
+Is this an error in the implementation of one virtual machine? Or, is
+definition of system classes not supported by JNI?
+
+-----
+
+Learning about the JNI is one goal of the ERIC Project. The eric tool is
+able to launch an external virtual machine using the Invocation API, an
+important part of JNI.
+
+In theory, the eric tool could be a single, self-contained file. The eric
+tool mistakenly fails when the external org.jos.gchii.eric1c.jar file is
+missing. With eric 1c release 2, the bytecode for the eric tool is inside
+the org.jos.gchii.eric1c package. The org.jos.gchii.eric1c package has been
+imported into a C++ library called rceric1c.lib. This C++ library has been
+linked statically to the eric tool. But it doesn't work.
+
+The eric1c package contains a custom class loader. If one class loader
+cannot be defined without another, this is a circular reference which
+cannot be resolved.
+
+Why can't system classes be defined directly? System classes can be defined
+indirectly. Machine code can define any CLASSPATH, implying the load of any
+system class through the primordial class loader.
+
+Is there a JNI method to install an alternative primordial class loader?
+
+
+
+
+
+From gchii@mindspring.com Mon, 14 Aug 2000 12:19:12 -0400
+Date: Mon, 14 Aug 2000 12:19:12 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [jni] Registering native methods
+
+The Java Native Interface (JNI) provides a method to bind machine code to
+native methods. Here is its prototype:
+
+  jint RegisterNatives(
+      JNIEnv *env,
+      jclass clazz,
+      const JNINativeMethod *methods,
+      jint nMethods
+      );
+
+In order to bind machine code to native methods, this mechanism requires an
+instance of java.lang.Class. Within the internal structure of a class,
+there is a native method property. Typically, a class has no native methods
+so the native method property is null (or NULL). A class with native
+methods must have a non-null native method property.
+
+Unfortunately, native methods cannot be bound prior to the loading and
+defining of a class. There should be another mechanism to bind machine code
+to native methods for system classes. The name of a system class must be
+unique and its class loader must be null. The prototype might look
+something like this:
+
+  jint RegisterSystemNatives(
+      JNIEnv *env,
+      const char *cn;
+      const JNINativeMethod *methods,
+      jint nMethods
+      );
+
+Like decaf, all native methods could be bound prior to loading the first
+byte of bytecode. When a system class is loaded, it can lookup its
+registered methods in the system natives list.
+
+
+
+
+
+From gchii@mindspring.com Thu, 17 Aug 2000 07:49:41 -0400
+Date: Thu, 17 Aug 2000 07:49:41 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [eric] Linux programming question
+
+For now, I am implementing the eric tool as an execuable program, so that I
+can learn more about executable programs on Linux. The eric tool is not a
+shell script.
+
+Here is my Linux programming question:
+
+At runtime, how does a C program determine where it is stored?
+
+Usually, the executable is /not/ in the current directory. I understand
+that argv[ 0 ] on Linux contains the short name of the program, but not the
+fully qualified name. I'm not sure if this is because the program is loaded
+through PATH.
+
+Here is an example:
+
+$ cd ~/eric1c
+$ ls
+eric
+eric.conf
+$ cd /usr/local/share
+$ eric
+
+argv[ 0 ] is equal to "eric". But I'd like to call some function which
+returns "~/eric1c/eric", so that the eric tool can load "~/eric1c/eric.conf".
+
+The eric tool needs to open eric.conf, which is always stored in the same
+directory with the eric tool. When renamed, the eric tool must find a
+matching configuration file. I'd like the eric tool to /always/ find itself
+and its configuration, no matter what it is named.
+
+$ cd ~/minisrv1a
+$ cp ~/eric1c/eric* minisrv*
+$ ls
+minisrv
+minisrv.conf
+$ cd /usr/local/share
+$ minisrv
+
+argv[ 0 ] is equal to "minisrv". But I'd like to call the same function as
+before. This time it is expected to return "~/minisrv1a/minisrv", so that
+the eric tool can load "~/minisrv1a/minisrv.conf".
+
+I couldn't find a standard C library function that does this. Any suggestions?
+
+-----
+
+If your experienced in C/C++ on another platform and interested in how to
+start programming for Linux, I might recommend a book called "Linux
+Programmer's Reference" by Richard Petersen, Osborne/McGraw Hill. The first
+section of the book is about shell scripts and nothing but shell scripts.
+It also contains brief information on shared libraries, make and other
+programming tools.
+
+
+
+
+
+From gchii@mindspring.com Fri, 18 Aug 2000 10:15:29 -0400
+Date: Fri, 18 Aug 2000 10:15:29 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bulkmake] Release 3
+
+Release 3 of BulkMake(tm) 2b is available for immediate download. For more
+information, see also the following articles on JOS Wiki:
+
+http://www.metamech.com/wiki/view/Main/BulkMake
+
+BulkMake
+DownloadBulkMake
+PackageArchive
+
+In this release, the package archive tool was upgraded from version 2a to
+2b. The new version implements a "patch mode" so that an incremental
+archive can be created. Source code or bytecode which has changed (since
+the full archive) are added to archive-patch.zip and archive-src-patch.zip.
+
+And there's more.
+
+1. The new version of this tool uses a reusable AbstractProgram from
+gchii.library.abstractprogram1a instead of its own.
+
+2. The new version uses the StringList class in org.jos.gchii.find2a
+instead of managing two string lists inside the PackageArchiveProgram class.
+
+3. The new version uses an experimental FileTool and FileLastModifiedTool.
+Both tools do not use asynchonous I/O and always read a single directory.
+The FileTool class returns all files which have a specific suffix. The
+FileLastModifiedTool class returns all files which have a last modified
+time greater than a given time /and/ have a specific suffix.
+
+4. The new version uses an experimental supplement to
+java.io.FilenameFilter, so that filename filters can be daisy-chained to
+support multiple independent filters. (The FilenameFilter interface does
+not support chaining.) The FileLastModifiedTool uses something like the
+following chain:
+
+  public void example( String suffix, Date d ) {
+    FilenameFilter filter =
+        new LastModifiedFilter( d.getTime(),
+        new SuffixFilter( suffix,
+        new FileFilter() ) );
+
+    File f = new File( "." );
+    String[] list = f.list( filter );
+  }
+
+5. And this version implements the DirectoryListener interface for a more
+package-oriented design, rather than the FileListener interface.
+
+
+
+
+
+From gchii@mindspring.com Fri, 18 Aug 2000 10:28:31 -0400
+Date: Fri, 18 Aug 2000 10:28:31 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] Purpose of this mailing list?
+
+It gives me great satisfaction when a release is complete and can be made
+available to others. An  announcement seems to be the last step in the
+cycle. By an announcement, others can find out about the release as soon as
+it is available. By posting a link to a JOS Wiki article or other URL,
+anyone interested in a release can find out more.
+
+Is it appropriate to post announcements on this list? Or rather, would it
+be more appropriate to announce applications on a general "announce"
+mailing list?
+
+-----
+
+At the other end of the spectrum, I have a long list of applications that I
+would like to use. Sometimes it gets frustrating when I need an application
+and can't find it. Others might suggest an application when I describe the
+kind of application I need. By posting a request for an application, anyone
+that has seen a similar problem might suggest an application that works for
+them.
+
+Is it appropriate to post a request for application on this list? Or
+rather, should this also be posted to a general "announce" mailing list?
+
+
+
+
+
+From gchii@mindspring.com Fri, 18 Aug 2000 10:59:20 -0400
+Date: Fri, 18 Aug 2000 10:59:20 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [smartapi] Release 10 planned
+
+I have been working toward a new release of the Smart API 2a. It will
+include a bug fix to the Smart Frame package. If everything goes according
+to plan, the new release will include the Smart ERIC package. It may also
+include a new version of the x-registry:new: controller.
+
+
+
+
+
+From gchii@mindspring.com Fri, 18 Aug 2000 11:06:21 -0400
+Date: Fri, 18 Aug 2000 11:06:21 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [data registry] x-registry:new: subscheme
+
+The x-registry: scheme always returns an instance of Registry (or null).
+The x-registry:new: subscheme creates a new data registry in memory, not
+from pre-existing a local or remote file. It has not always been obvious
+why new: is part of the x-registry: scheme. The need for the new: subscheme
+has been questioned because its design was incomplete.
+
+It is important to understand the purpose of the x-registry:new: subscheme.
+A new data registry is empty. It has no keys and no values. Interactively,
+a new, empty data registry can be created by typing in the following location:
+
+x-registry:new:
+
+>From within a method written in the Java programming language, it is easy
+to create a new data registry:
+
+  public void example() {
+    Registry r = new BasicRegistry();
+    :
+  }
+
+Here is the rest of the story. It should have been possible to create a new
+data registry with default keys and values. With the second version of the
+new: subscheme, a query string will be supported. The new data registry
+will not be empty. It will have keys and values from a query string.
+Interactively, a new data registry can be created with default keys and
+values by typing in the following location:
+
+x-registry:new:?name1&value1&name2&value2&name3&value3
+
+>From within a method, the following is an equivalent method:
+
+  public void example() {
+    Registry r = createRegistry();
+    :
+  }
+  protected Registry createRegistry() {
+    Registry r = new BasicRegistry();
+    r.setString( "name1", "value1" );
+    r.setString( "name2", "value2" );
+    r.setString( "name3", "value3" );
+    return r;
+  }
+
+Often in application programming, a custom configuration should be based on
+a factory default. When a factory default can be implemented as a uniform
+resource identifier, no external resource is required. It cannot get lost.
+The factory default cannot be changed without recompiling the code.
+
+-----
+
+This might be applied to a new instance of java.util.Properties, in a
+fictional properties: scheme like this:
+
+properties:new:?name1=value1&name2=value2&name3=value3
+
+
+
+
+
+From gchii@mindspring.com Fri, 18 Aug 2000 11:16:09 -0400
+Date: Fri, 18 Aug 2000 11:16:09 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [eric] Smart ERIC package
+
+The Smart ERIC package implements the eric: scheme and run:eric: subscheme.
+It should be available soon in distribution 10 of Smart API 2a.
+
+The name of the package is org.jos.gchii.smarteric1a. The default
+configuration of the Smart API object factory has been changed to
+dynamically load the EricFactory class. The default configuration of the
+Smart API program factory has been changed to dynamically load the
+RunEricController class.
+
+For more information, see also the SmartEricProtocol article on JOS Wiki.
+
+http://www.metamech.com/wiki/view/Main/SmartEricProtocol
+
+-----
+
+The eric: scheme always returns an instance of EricShortcut (or null). By
+using the eric:new: subscheme, a shortcut can be created from a query
+string. Here is an extreme example:
+
+eric:new:?debug=true&path=somepath&shell=someshell&location=somelocation
+
+A shortcut can be stored in any data registry-compatible file. By using the
+eric: scheme, a shortcut can be loaded from disk. Here is a local example:
+
+eric:desktop.eric
+or
+eric:file:desktop.eric
+
+Here is a remote example:
+
+eric:http://www.mindspring.com/~gchii/eric/desktop.eric
+
+-----
+
+The run:eric: subscheme is used to create a new process. The new process
+runs in its own address space. The new process has its own primordial class
+loader, threads and garbage collector.
+
+The run:eric: subscheme always returns an instance of Program (or null).
+The run:eric: subscheme uses the eric: scheme to get a shortcut and do
+whatever it takes to invoke it. For a foreign operating system, such as
+Linux or Windows, it specifically returns an instance of
+org.jos.gchii.osprogram1a.OSProgram. For an MPCL-compatible virtual
+machine, it is expected to return a new bytecode process. Here is a local
+example:
+
+run:eric:desktop.eric
+or
+run:eric:file:desktop.eric
+
+Here is a remote example:
+
+run:eric:http://www.mindspring.com/~gchii/eric/desktop.eric
+
+
+
+
+
+From gchii@mindspring.com Fri, 18 Aug 2000 11:39:07 -0400
+Date: Fri, 18 Aug 2000 11:39:07 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [Smart API] x-device: scheme
+
+It might be possible to implement an experimental device: scheme that works
+on the Linux operating system, since devices are available through its file
+subsystem. The x-device: scheme is something like the following:
+
+public interface Device {
+  public abstract InputStream getInputStream()
+      throws IOException;
+  public abstract OutputStream getOuputStream()
+      throws IOException;
+}
+
+The x-device: scheme always returns an instance of Device (or null). Here
+is an location that would return a floppy disk device:
+
+x-device:floppydisk:?drive=0
+
+Here is an example location that would return a hard disk device:
+
+x-device:harddisk:?drive=0&partition=0
+
+Unlike an earlier discussion, limited resources are not controlled by the
+operating system. Creating an instance of Device does not lock the device
+for the exclusive use of a process. Rather, the locking is left up to the
+implementation of a particular device. Typically, the getInputStream() and
+getOutputStream() methods handle locking implicitly. If a device is
+"in-use", these methods throw an IOException.
+
+For Linux, this scheme can be supported by creating a generic
+implementation of Device, something like this:
+
+public class GenericDevice
+    implements Device {
+  public GenericDevice( String v ) {
+    name = v;
+  }
+  public InputStream getInputStream() {
+    return new FileInputStream( name );
+  }
+  public OutputStream getOutputStream() {
+    return new FileOutputStream( name );
+  }
+  private String name;
+}
+
+-----
+
+For compatibility, it is possible to implement a parallel subscheme, where
+both subschemes work at the same time. Here is a location that returns a
+floppy disk device:
+
+x-device:fd0
+
+This location would be translated into x-device:floppydisk:?drive=0
+
+Here is a location that returns a hard disk device:
+
+x-device:hda0
+
+This location would be translated into x-device:harddisk:?drive=0&partition=0
+
+-----
+
+An operating system does not have to make devices available through its
+file subsystem. In fact, a file subsystem could be written on top of the
+x-device: scheme. For these operating systems, such as JOS, an application
+could be written in a more platform-independent way:
+
+  public void example() {
+    URI uri = new URI( "x-device:floppydrive:?drive=0" );
+    Device d = (Device) uri.getObject();
+    if ( d == null ) {
+      // device is not yet supported
+      return;
+    }
+
+    InputStream input;
+    try {
+      input = d.getInputStream();
+    }
+    catch ( IOException e ) {
+      // device is being used by another process
+    }
+
+    OutputStream output;
+    try {
+      output = d.getOutputStream();
+    }
+    catch ( IOException e ) {
+      // device is being used by another process
+    }
+  }
+
+A suitable implementation of Device must be created for other operating
+systems and other devices. This might involve custom classes on JOS or
+might involve machine code on Windows. Even a network interface card could
+be read from and written to by streams.
+
+
+
+
+
+From iainshigeoka@yahoo.com Sat, 19 Aug 2000 13:38:22 -0500
+Date: Sat, 19 Aug 2000 13:38:22 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Apps] Purpose of this mailing list?
+
+At 10:28 AM 8/18/00 -0400, Gilbert Carl Herschberger II wrote:
+
+>Is it appropriate to post announcements on this list? Or rather, would it
+>be more appropriate to announce applications on a general "announce"
+>mailing list?
+
+I'd keep the announcements here for now (and in the wiki of course).
+
+>At the other end of the spectrum, I have a long list of applications that I
+>would like to use. Sometimes it gets frustrating when I need an application
+>and can't find it. Others might suggest an application when I describe the
+>kind of application I need. By posting a request for an application, anyone
+>that has seen a similar problem might suggest an application that works for
+>them.
+
+Yes.  I want to create a java software directory (like a yahoo directory 
+but for java software) as part of the new jos website.  Gamelan was 
+supposed to be this I guess but it seems to be mostly out of date.
+
+>Is it appropriate to post a request for application on this list? Or
+>rather, should this also be posted to a general "announce" mailing list?
+
+You should ask it here if its an application request.  And in general 
+otherwise.
+
+-iain
+
+
+
+
+
+From gchii@mindspring.com Mon, 21 Aug 2000 17:49:51 -0400
+Date: Mon, 21 Aug 2000 17:49:51 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [redirection] Request for program
+
+I need a program. This program would be invoked from the Universal Browser
+when the standard output (">") redirection symbol is used. When given a
+uniform resource location, this program would output the URL to a given file.
+
+Therefore, there are two parameters to this program: source and target.
+
+public class RedirectOutputProgram
+    extends BaseConsoleProgram {
+  public void run() {
+    println( "RedirectOutputProgram (1a)" );
+
+    String source = getValue( "source" );
+    println( "  source='" + source + "'" );
+
+    String target = getValue( "target" );
+    println( "  target='" + target + "'" );
+    :
+  }
+}
+
+The target would be used to open an output stream, wouldn't it? The out:
+scheme already provides a long list of output stream choices. The target
+could be modified by this program to always create a print stream, like this:
+
+  target = "out:print:" + target;
+
+Once the target output stream is open, the output stream must be converted
+into a console when a source is a console program.
+
+  if ( p instanceof ConsoleProgram ) {
+    ((ConsoleProgram) p).setConsole( new OutputStreamConsole( output ) );
+  }
+
+Then, the source is invoked.
+
+If the standard output redirection symbol were part of a location in the
+Universal Browser, it would invoke the RedirectOutputProgram with
+parameters. For example, the following location stores an HTML page on the
+Internet in a local file called demo.html:
+
+http://www.jos.org/ > file:demo.html
+
+The file: scheme could be assumed, giving an equivalent but shorter location:
+
+http://www.jos.org/ > demo.html
+
+
+
+
+
+From gchii@mindspring.com Mon, 21 Aug 2000 18:12:15 -0400
+Date: Mon, 21 Aug 2000 18:12:15 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [program] Runtime options
+
+Together, the Smart API and Subprogram API provide a simple mechanism to
+describe the target program in a string, a uniform resource identifier. A
+string is easily passed on the command line to a java tool. A string is
+easily passed from client to server, from server to server. A string is
+easily stored in a log file or message queue. A string is easily stored in
+a desktop or shortcut file. Additional options, such as custom class loader
+and primordial class loader, can easily be supported in a uniform resource
+identifier. These are good reasons to use a "primative" string instead of
+an instance of some elaborate Java class.
+
+The Subprogram API is found in the org.jos.program2a package. By default,
+programs share a single class loader. When the same program is invoked
+multiple times, desireable things happen:
+
+- its classes are reused (loads very fast);
+- its static fields are available across invocations;
+- objects can be easily shared across multiple programs.
+
+A custom class loader is an option, too. When a program is invoked with a
+new class loader, desireable things happen:
+
+- its classes are loaded again (they may have changed)
+- its static fields are reset with each invocation;
+- objects can be shared across multiple programs.
+
+With an MPCL-compatible virtual machine, a new primordial class loader is
+an option. When a program is invoked this way, desirable things happen:
+
+- establish custom java.class.path (CLASSPATH);
+- "system" classes are loaded again (they may have changed);
+- static fields of system classes are reset;
+- its classes are loaded again;
+- its static fields are reset;
+- objects must be shared through normal IPC.
+
+A bytecode process is an option, too. When a program is invoked this way,
+desirable things happen:
+
+- creates a new process ID;
+- logon with another user account;
+- all files are closed automatically at exit;
+- establish custom java.class.path (CLASSPATH);
+- system classes are loaded again;
+- static fields of system classes are reset;
+- its classes are loaded again;
+- its static fields are reset;
+- objects must be shared through normal IPC.
+
+
+
+
+
+From gchii@mindspring.com Thu, 24 Aug 2000 19:48:36 -0400
+Date: Thu, 24 Aug 2000 19:48:36 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [Smart API] Release 10
+
+Release 10 of Smart API 2a is available for immediate download. (This
+weekend, I might update the DownloadSmartAPI article in JOS Wiki.)
+
+http://www.jos.org/redist/mirror/jos1g/jos1g-smartapi2a-10.zip
+http://www.jos.org/redist/mirror/jos1g/jos1g-smartapi2a-10-src.tgz
+http://www.jos.org/redist/mirror/jos1g/jos1g-smartapi2a-10-src.zip
+http://www.jos.org/redist/mirror/jos1g/jos1g-smartapi2a-10-tx.zip
+
+It includes Text Search utility at
+
+run:program:org.jos.gchii.textsearch1a.TextSearch
+
+See also TextSearch article on JOS Wiki.
+
+-----
+
+
+It includes a new registry factory, for a location like this:
+
+x-registry:new:?name1=value1&name2=value2&name3=value3
+
+It includes the smartdevice1a package for a location like this:
+
+x-device:floppydisk?drive=0
+x-device:harddisk?drive=0&partition=0
+
+It includes the smarteric1a package for locations like these:
+
+eric:new:location=x-frame:java.awt.Button
+run:eric:file:desktop.eric
+run:eric:http://www.jos.org/demo/demo.eric
+
+It fixes the smartframe1a package for locations like these:
+
+x-frame:java.awt.Button
+x-frame:java.awt.Checkbox
+x-frame:java.awt.Label
+x-frame:java.awt.Panel
+x-frame:java.awt.TextField
+x-frame:java.awt.TextArea
+
+It replaces release 9 of version 2a. Both versions 1a and 1b have not yet
+been re-released.
+
+
+
+
+
+From gchii@mindspring.com Fri, 25 Aug 2000 11:31:06 -0400
+Date: Fri, 25 Aug 2000 11:31:06 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [Smart API] Release 10
+
+Release 10 of Smart API 2a is available for immediate download. For more
+information, see also the following article on JOS Wiki:
+
+http://www.jos.org/wiki/view/Main/DownloadSmartAPI
+
+
+
+
+
+From gchii@mindspring.com Fri, 25 Aug 2000 11:33:05 -0400
+Date: Fri, 25 Aug 2000 11:33:05 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [JOS Technical Edition] Update
+
+The on-line version of JOS Technical Edition 1g has been updated. It now
+includes the most recent versions of BulkMake 2a/2b and Smart API 2a. The
+full package index has been updated, too. For more information, see also
+
+http://www.jos.org/redist
+
+
+
+
+
+From gchii@mindspring.com Fri, 25 Aug 2000 14:01:16 -0400
+Date: Fri, 25 Aug 2000 14:01:16 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [cmp] Compare text files
+
+Based on the design of TextSearch, it should be possible to compare text
+files in any two directory trees. The basic process might look something
+like this:
+
+1. Open file "A" and file "B".
+
+If file "A" or file "B" is missing, files are different. Print a message
+and exit.
+
+2. Read one line from file "A" and one line from file "B".
+
+IF both A.line and B.line are null, the files have identical content. Print
+a message and exit.
+
+IF A.line is null, the files are different because file "A" has fewer lines
+than "B". Print a message and exit.
+
+IF B.line is null, the files are different because file "B" has fewer lines
+than "A". Print a message and exit.
+
+IF A.line is not equal to B.line, the files are different. Print a message
+and exit.
+
+Otherwise, continue with step 2.
+
+The compare program would search for files with the same name in a
+different directory. The location of a compare program could be something
+like this:
+
+run:program:org.jos.gchii.textcompare1a.TextCompareProgram
+    ?directory1=somedirectory
+    &directory2=someotherdirectory
+    &pattern=*.txt
+    &show=all
+
+The TextCompare utility could have the following fields
+
+Directory 1:
+Directory 2:
+Pattern:
+Show:
+
+When a file is in directory 1 but not directory 2, a message is printed.
+But what about the other way around? A file in directory 2 that is not in
+directory 1 would be ignored.
+
+A directory comparison utility that looks at names, not content would also
+be useful in the Source Server clean-up project.
+
+
+
+
+
+From idstewart@softhome.net Sun, 27 Aug 2000 21:54:41 -0400 (EDT)
+Date: Sun, 27 Aug 2000 21:54:41 -0400 (EDT)
+From: idstewart@softhome.net idstewart@softhome.net
+Subject: [JOS-Apps] [cmp] Compare text files
+
+On Fri Aug 25 14:01:16 2000 Gilbert Carl Herschberger II wrote:
+> 
+> Based on the design of TextSearch, it should be possible to compare text
+> files in any two directory trees. 
+
+A port of GNU Diff would do this and much more, perhaps with a graphical 
+front-end for added value.  Have toyed with such an idea, but the source
+is such a cluttered mess, I never got beyond the planning phase.
+
+
+Ian
+
+
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 28 Aug 2000 09:32:23 -0500
+Date: Mon, 28 Aug 2000 09:32:23 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Apps] [cmp] Compare text files
+
+At 09:54 PM 8/27/00 -0400, idstewart@softhome.net wrote:
+>On Fri Aug 25 14:01:16 2000 Gilbert Carl Herschberger II wrote:
+> >
+> > Based on the design of TextSearch, it should be possible to compare text
+> > files in any two directory trees.
+>
+>A port of GNU Diff would do this and much more, perhaps with a graphical
+>front-end for added value.  Have toyed with such an idea, but the source
+>is such a cluttered mess, I never got beyond the planning phase.
+
+I have also thought about a java port of diff and stumbled at the same 
+point!  ;)  With a java diff though, you can do all sorts of other useful 
+things like RCS/CVS/etc so easily....  *sigh*
+
+-iain
+
+
+
+
+

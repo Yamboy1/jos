@@ -1,0 +1,493 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000444.html">
+   <LINK REL="Next" HREF="000452.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">ryan@whitewolf.com.au</A><BR>
+    <I>Tue, 11 Apr 2000 14:35:48 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000444.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000452.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#449">[ date ]</a>
+              <a href="thread.html#449">[ thread ]</a>
+              <a href="subject.html#449">[ subject ]</a>
+              <a href="author.html#449">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Note: This is a very long email. You'd best read it all the way through
+before attempting to reply :-)
+
+&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i> &gt; &gt; I proposed a mechanism where only class definitions that are
+</I>&gt;<i> &gt; &gt; explicitly shared -- quite possibly by default -- are considered the
+</I>&gt;<i> &gt; &gt; same for 'illegal' casts
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; We agree so far, except I'm not sure what you mean by the &quot;quite
+</I>&gt;<i> &gt; possibly by default&quot; bit. Do you mean it is quite possible to share all
+</I>&gt;<i> &gt; class definitions by default, or that it is quite possible to consider
+</I>&gt;<i> &gt; all objects for illegal casts by default?
+</I>&gt;<i> 
+</I>&gt;<i>         We /have/ to consider all objects for illegal casts by default for
+</I>&gt;<i> this to work transparently.  Whether or not all class definitions are
+</I>&gt;<i> shared by default is a design decision -- I was suggesting we should,
+</I>
+Ok, so the &quot;quite possibly by default&quot; bit refers to what came before
+it. Of course, standard English usage :-)
+
+So, in the case where all class definitions are shared by default, it
+follows from the remainder of your original sentence that all objects
+&quot;are considered the same for 'illegal' casts&quot;. 
+
+In this case (where you share all class definitions), our ideas are very
+similar. The difference is that I don't believe it makes any sense to
+just reuse the class definitions of the parent process. You need another
+mechanism to ensure that classes in a child process can share their
+class definitions with the parent process. In fact, since there's
+nothing special about the parent-child relationship in this context, the
+purpose of the mechanism is to ensure that classes in process A can
+share their class definitions with process B, where process A and
+process B are any two arbitrary processes.
+
+Before you object, I would like to explain the feasibility of
+implementing such a mechanism. Also, I hope to clear up some other
+misunderstandings later on in this email, and include a complete(ish)
+specification of my proposal. Please bare with me.
+
+But first, consider this real-life scenario: a command-line session:
+
+$ vi README
+-- here, it turns out to be safe to reuse class definitions from the
+parent process (in this case, the shell)
+
+$ export CLASSPATH=/new/versions/of/some/libraries:etc:etc:
+-- you see where I'm going
+
+$ vi README
+-- ok, it is no longer valid to reuse the same class definitions since
+we are now loading classes from a different location. Only classes that
+are being loaded from the same archive may be shared. The new CLASSPATH
+may specify some archives to be the same as they were before. In this
+case, only classes loaded from those archives may be shared with
+processes invoked under the old CLASSPATH.
+
+You see, in order to implement _correct_ sharing of class definitions,
+you *need* a mechanism to determine that classes were loaded from the
+same archive (more specifically, the same version of the same archive).
+
+- What happens if you try to cut corners?
+
+Ok, we definately want to share class definitions in order to save
+memory. But what happens if we use an unintelligent algorithm for
+deciding to share a class? Old classes may get linked into your
+application causing NoSuchMethodErrors and such (or class verifier
+exceptions).
+
+Any solution for saving memory should not impact on the external
+behaviour of the system. The fatal flaw in cutting corners here is that
+it does change the external behaviour. Whenever you reuse a class from
+the parent process, you are potentially linking in a class that the
+_user_ did not intend to use. If the class has been updated on disk
+since the parent shell was started and the user executes a new command,
+the new version of the class should be used - the class definition
+should not be reused from the parent process. Similarly, if the user
+changes their CLASSPATH to pickup libraries from a new location, the
+class definitions should not be incorrectly shared.
+
+Here's another scenario. Suppose you are developing a text editor called
+&quot;vi&quot;. &quot;vi&quot; is installed on your system in a standard system directory
+and your default CLASSPATH is set to pick it up from there. Obviously,
+if you run 10 instances of &quot;vi&quot;, from the same binary, they should all
+share the same class definitions to save memory. But, if you decide to
+do some more development work on a separate copy of vi, you might change
+your CLASSPATH to pick up vi from your own classes directory:
+
+- scenario:
+
+1. The programmer opens up a number of source files, each in a different
+instance of &quot;vi&quot;. The default CLASSPATH is used so the system version of
+vi is used.
+
+2. In a separate shell window, the programmer types:
+
+$ export CLASSPATH=&quot;~/projects/vi/classes:$CLASSPATH&quot;
+$ javac -d ~/projects/vi/classes *.java
+$ vi Test.java
+-- test the new version of vi - iterative recompilation and testing.
+
+Here, and in the generic sense, determing whether or not to share a
+class has nothing to do with the parent/child process relationship. They
+are orthogonal. So, how do you know to share class definitions for all
+the instances of &quot;vi&quot;, but not for the developer's version? Another
+interesting example is a multi-user system in which one user decides
+they want to run a later version of &quot;vi&quot;, so they download it and set
+their CLASSPATH appropriately. How do you know when to share and when
+not to share class definitions. I believe I have proposed the most
+consistent solution that maps more closely to reality.
+
+Now, I would like to clear up any misunderstandings and then hint at
+some possible ways of implementing this if we decide to do it.
+
+There was some concern that my proposal would affect external behaviour
+regarding user defined class loaders. It won't. My proposal (I believe)
+is in complete compliance with the JVM spec apart from the ability to
+explicitly share object references between processes - which is our
+mutual goal. The complete proposal that follows should clear up any
+misunderstandings. It is easier to grasp if you can read it all as a
+whole, rather than in little pieces here and there.
+
+== Proposal for multiple processes in a single JVM ==
+
+= Definition of Terms
+
+- Class : a runtime class associated with a particular class loader
+- Class definition : the runtime implementation of a class
+...
+
+= The basic model
+
+Each process will have its own primordial class loader. As in a single
+process JVM, the primordial class loader will have a copy of
+java.lang.Object, and any other system and library classes that are
+directly referenced by the main class of the program being executed.
+Each primordial class loader will appear to work exactly like it would
+in a single process JVM.
+
+The running program may use a custom class loader to load classes from
+any source (eg. on-the-fly, filesystem, or network). These custom class
+loaders will behave exactly as they do in a normal JVM (after all, they
+are user defined).
+
+Each process has associated with it System properties which include the
+CLASSPATH value for the process. A process's primordial class loader
+will always load classes which represent class files found in its
+CLASSPATH.
+
+= Memory optimisations
+
+Since the primordial class loaders are owned by the system, they can be
+trusted to perform certain memory optimisations transparently.
+Particularly, sharing class definitions that have already been loaded. A
+requirement is that any memory optimisations performed do not change the
+external behaviour of the primordial class loaders.
+
+As has been stated, a process's primordial class loader will always load
+classes which *represent* class files found in its CLASSPATH. The memory
+optimisations proposed here are to determine if there is already a class
+definition in memory that *represents* a class from the archive in the
+process's CLASSPATH. To achieve this, the JVM needs to be able to label
+the version of each loaded class, and efficiently determine the version
+of classes on the filesystem. If they differ, the class definition
+cannot be reused.
+
+One way to implement this is to use the pathname and file modification
+dates as the version information. I believe Solaris does a similar
+optimisation - ie, if you run 100 instances of 'vi', it will share the
+executable code in memory. And if you run your own version of vi, it
+will allocate a new memory space for your executable code.
+
+= Sharing objects between processes
+
+It is desirable to share objects between processes to provide a more
+efficient mechanism for RMI-type functionality. However, to support
+this, we must go against the JVM spec. The goal here is to make
+everything work exactly the same as a real JVM, but with the added
+ability to share particular objects between processes. No objects will
+be shared by default (in which case this is exactly the same as a real
+JVM), but permission may be granted to share particular objects.
+
+This proposal states that casts between any two classes that share the
+same class definition are granted by the JVM. The power to perform
+illegal casts such as this is useless unless you have actually been
+granted permission to obtain a reference to an object of another
+process.
+
+It is important to understand that the only case in which two classes
+share the same class definition is where one class belongs to one
+process and the other class belongs to a different process. You cannot
+have a class loaded by a user defined class loader sharing a class
+definition with a class loaded by the primordial class loader because
+only the(a) primordial class loader can perform the optimisation that
+links both classes to the same class definition. Only the(a) primordial
+class loader can be trusted to perform such memory optimisations. In
+other words, only classes defined by a primordial class loader can reuse
+the definition from another primordial class loader. 
+
+This is important because it means that standard illegal casts between
+class loaders in a single process will still be handled correctly.
+
+====== end of proposal =======
+
+Sorry for the length, but I feel that my proposal was not completely
+understood. I don't want to say that &quot;this is the way it should be
+done&quot;, but I think my proposal should at least be considered as an
+alternative. And to be considered, it needs to be understood.
+
+In the rest of this email, I will address each of the comments people
+made:
+
+
+&gt;<i> &gt; A note: byte-for-byte checking is not the only alternative. If we
+</I>&gt;<i> &gt; implement my proposal for memory saving, classes that were loaded from
+</I>&gt;<i> &gt; the same version of the same archive will reuse the same class
+</I>&gt;<i> &gt; definition even though they are different JavaClassInstances.
+</I>&gt;<i> 
+</I>&gt;<i>         See Gilbert's reply on why this won't work.
+</I>
+See my reply on why this WILL work :-)
+
+Don't worry, I will get around to addressing Gilbert's email with a
+little more detail.
+
+&gt;<i> &gt; While this seems more consistent to me, assignClassLoader() seems like
+</I>&gt;<i> &gt; it will work too.
+</I>&gt;<i> 
+</I>&gt;<i>         We need assignClassLoader() for the reasons Gilbert outlined; the
+</I>&gt;<i> JVM spec explicitly allows for classloaders that generate bytecode
+</I>&gt;<i> on-the-fly.
+</I>
+I believe I have addressed this in my proposal. User defined class
+loaders will work exactly the same as they do in a normal JVM. Object
+sharing is only allowed for classes defined by primordial class loaders.
+
+&gt;<i> &gt; What we /could/ do is allow casts between any two classes that share
+</I>&gt;<i> &gt; the same class definition (JavaClass). No restrictions. This is safe
+</I>&gt;<i> &gt; because the power to cast is useless unless you have a reference to an
+</I>&gt;<i> &gt; object that you want to cast. The restriction should be on gaining
+</I>&gt;<i> &gt; access to the shared object.
+</I>&gt;<i> 
+</I>&gt;<i>         If we /don't/ allow this by default, then the application must
+</I>&gt;<i> specifically request casting power in some fashion, which is something I
+</I>&gt;<i> think we want to avoid.
+</I>
+True, so we do want to allow such casts to be unrestricted. However, I'm
+all in favour of requiring permission to gain access to a shared object,
+by some means (as opposed to gaining permission to actually perform a
+cast). This is because if the mechanism is there to allow one process to
+obtain a reference to a shared object, then any other process can also
+obtain a reference even if they are not supposed to. Therefore we need
+some means by which only authorised processes can access certain shared
+objects. There are probably a few ways of doing this.
+
+&gt;<i> &gt; In my last email, I mentioned that an object that belongs to another
+</I>&gt;<i> &gt; process should be able to access it's own static fields, but the client
+</I>&gt;<i> &gt; code should not. It will instead access the static fields of its own
+</I>&gt;<i> &gt; process. This makes the no restrictions approach safe from the statics
+</I>&gt;<i> &gt; perspective as well.
+</I>&gt;<i> 
+</I>&gt;<i>         Exactly.  To be a separate process, the child must not have access
+</I>&gt;<i> to anything in the namespace of the parent.
+</I>
+Not that there's anything special about the parent ;-) A process must
+not have access to anything in the namespace of any other process.
+
+&gt;<i>  The exact implementation of
+</I>&gt;<i> direct IPC we can leave for later.  (e.g. what happens you pass a class
+</I>&gt;<i> reference to a different process?  Since normal java doesn't allow this,
+</I>&gt;<i> we can also disallow it.  Etc.  This is near to mixing system policy and
+</I>&gt;<i> design decisions.)
+</I>
+Do you mean passing instances of java.lang.Class? Yeah, that's
+interesting. I get the feeling there's something special about the Class
+object. If you use a custom class loader to load a class in a different
+name space, it is still an instance of java.lang.Class in the _current_
+namespace - or perhaps that's just because it needs something to
+represent the class with in this namespace.
+
+&gt;<i> &gt; Q2: What is the significance of sharing classes between a process and
+</I>&gt;<i> &gt; its parent? I think you should be able to share classes with any other
+</I>&gt;<i> &gt; process. And if all classes loaded from the same version of the same
+</I>&gt;<i> &gt; archive share the same class definition, then this becomes possible (if
+</I>&gt;<i> &gt; you allow casting between any two classes that share the same class
+</I>&gt;<i> &gt; definition, as described above).
+</I>&gt;<i> 
+</I>&gt;<i>         You can; the signifigance of process/parent is that I understood
+</I>&gt;<i> that to be the most common way for multi-process applications to be
+</I>&gt;<i> written, and is a case where a default of sharing makes semantic sense.
+</I>
+I think that's historic. Many multi-process applications of that
+structure were written in that way because of lack of threads. Even with
+thread support on UNIX, many people still find it easier to spawn child
+processes because they don't know how to use the threads API.
+
+True multi-process systems where each component interacts with eachother
+to achieve a result  tend not to be based on parent child relationships.
+They are all equally important components that use a lookup service to
+find the other process (RPC), or a lookup service to find an object in
+another process (CORBA and RMI).
+
+In the example of programs needing to do IPC to draw to windows owned by
+the window manager, there is no parent-child relationship. The window
+manager can be shut down and restarted, just the same as programs which
+try to interact with it. It's a horizontal relationship.
+
+&gt;<i> What we must avoid is separate processes NOT getting the chance to
+</I>&gt;<i> load classes and use them from their own classloaders, e.g. their own
+</I>&gt;<i> classpaths -- this is necessary for development, so I can, for instance,
+</I>&gt;<i> work on a daemon's source and test it while the production version is
+</I>&gt;<i> running, or work on an editor in that editor, etc.  See below.
+</I>
+I address the same requirement in my proposal, I chose to have this
+handled by the primordial class loaders in a generic fashion.
+
+One of the points you disagreed with me on was that determining whether
+or not to reuse a class definition based on what version of the class
+was being read (ie. what CLASSPATH is being used) would not work, as per
+Gilbert's email. It seems to me that it does work and it is required
+when you take the CLASSPATH into account.
+
+&gt;<i> &gt; Q3: Can you please explain the bit about an application reloading its
+</I>&gt;<i> &gt; classes?
+</I>&gt;<i> 
+</I>&gt;<i>         Sure.  Class devEnviroment, immediately on its main() function
+</I>&gt;<i> being called, creates a new classloader, CL.  Reading from the command
+</I>&gt;<i> line, it decides to run main() of class developingClass.  It gets
+</I>&gt;<i> developingClass from CL, and spawns a thread to execute
+</I>&gt;<i> it in its own classloader.  When the thread terminates -- or the user
+</I>&gt;<i> interrupts -- devEnviroment garbage-collects CL so that the next run of
+</I>&gt;<i> developingClass is re-loaded from scratch, in case it's changed.
+</I>
+I see what you're talking about now. In my proposal, this is handled
+generically by the primordial class loader which always works off its
+CLASSPATH.
+
+Gilbert Carl Herschberger II wrote:
+&gt;<i> 
+</I>&gt;<i> At 02:19 AM 4/9/00 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+</I>&gt;<i> &gt;As for memory saving, a solution might be:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;- share classes which are loaded from the same version of the same
+</I>&gt;<i> &gt;  archive
+</I>&gt;<i> 
+</I>&gt;<i> I don't like this solution for two reasons.
+</I>&gt;<i> 
+</I>&gt;<i> 1. Two custom class loaders can read the same version of the same archive.
+</I>&gt;<i> They will produce different types. Each custom class loader would have to
+</I>&gt;<i> communicate with all others.
+</I>
+I intentionally opted to disallow class sharing between custom class
+loaders since there can be no guarantee that te classes are compatible
+for the purposes of IPC. Yes, a class defined by a custom class loader
+will end up having a different non-compatible type, but that doesn't
+stop you from defining the class using your primordial class loader, in
+which case the system will allow you to participate in object sharing.
+
+&gt;<i> 2. Two different archives can store the same class file. Even if a class
+</I>&gt;<i> file comes from two different archives, an optimized virtual machine should
+</I>&gt;<i> keep one instance.
+</I>
+I disagree. There is no guarantee that the same class file in each
+archive is the same byte-for-byte (unless you do a byte-for-byte
+comparason, which is unrealistic). If you share the class definitions in
+this case, you can start running into incompatibility problems
+(NoSuchMethodError), or Security problems (eg. you think you've loaded a
+particular class, but the system has just gone and reused a different
+class definition that does something different - something potentially
+bad).
+
+&gt;<i> &gt;Note that we will effectively have a primordial classloader for every
+</I>&gt;<i> &gt;process, each under the control of the JVM. Since nearly every class
+</I>&gt;<i> &gt;will be loaded by one of these classloaders, the JVM can check if they
+</I>&gt;<i> &gt;are coming from the same archive.
+</I>&gt;<i> 
+</I>&gt;<i> The JVM cannot easily check if a class is coming from the same archive.
+</I>&gt;<i> Most of the problem comes from an archive with two or more &quot;names&quot;. On my
+</I>&gt;<i> computer, each of these names refer to copies of one archive.
+</I>&gt;<i> 
+</I>&gt;<i>   ~/eric/org.jos.gchii.eric1c.jar
+</I>&gt;<i>   /home/Gilbert/eric/org.jos.gchii.eric1c.jar
+</I>&gt;<i>   C:\BORLAND\lib\org.jos.gchii.eric1c.jar
+</I>&gt;<i>   M:\eric1b-4\org.jos.gchii.eric1c.jar
+</I>&gt;<i>   M:\eric1b-4\limited\org.jos.gchii.eric1c.jar
+</I>&gt;<i>   V:\eric1b\org.jos.gchii.eric1c.jar
+</I>
+It is easy to check if it is coming from the same archive. The class
+loader loops through each archive in the classpath and stops when it
+finds the class. The archive at which it stops is the archive that the
+class came from. In addition to identifying the archive by path, you
+also need to check the date (or some other versioning information) to
+ensure that someone hasn't replaced that archive with a different one
+potentially containing different versions of the classes.
+
+(An idea, instead of using the path as part of the identifier, maybe you
+could use a file id instead - an id that tracks the file wherever it
+moves. Yes, it's unrealistic for now, but I imagine filesystems in the
+future will export a kind of unique id for files. eg. filesystems with
+built in version control. That's another thread :-)
+
+&gt;<i> Remember, the puzzle is not to identify unique archives, but unique content
+</I>&gt;<i> of class files.
+</I>
+Do you agree that isolating the archive that it came from at least
+achieves the required level of correctness? I see little benefit in
+comparing the actual content of each class file. Checking path and
+modification date of a class file or jar file guarantees that the system
+will never make the mistake of reusing the class definition for
+incompatible versions of the same class. If you simply run &quot;touch
+/usr/lib/vi.jar&quot; which changes the modification date of the archive but
+doesn't actually change the contents, then my system will not share old
+class definitions that are already loaded with any new vi processes that
+are started. You might say that this is wasted opportunity for saving
+memory, but I think it's a good tradeoff considering that modification
+dates usually reflect changes to the content, and byte-for-byte checking
+is very expensive.
+
+&gt;<i> &gt;- always maintain separate statics for different classloaders
+</I>&gt;<i> 
+</I>&gt;<i> It is an option, not a requirement. The Java Virtual Machine specification
+</I>&gt;<i> does not require separate statics for different class loaders. It
+</I>&gt;<i> rightfully puts the decision in the hands of the custom class loader. A
+</I>&gt;<i> virtual machine must support the option of separate statics for each
+</I>&gt;<i> instance of a custom class loader.
+</I>
+It's not an option of the JVM. A class defined by one class loader must
+have separate statics from the same class defined in a different class
+loader. Perhaps you misunderstood what I was saying. I was referring to
+leaving the static part of a class associated with the class loader (as
+per the jvm spec), but detaching the definition part so that it can be
+reused in other class loaders. This is the same concept that _quinn
+actually invented a while ago. I'm just reusing it.
+
+====
+
+Once again, sorry for making this such a long email but I'm just trying
+to give you a level of understanding that allows you to treat this as a
+valid alternative. I don't want to make up your minds.
+
+Thanks for your time :-)
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000444.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000452.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#449">[ date ]</a>
+              <a href="thread.html#449">[ thread ]</a>
+              <a href="subject.html#449">[ subject ]</a>
+              <a href="author.html#449">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

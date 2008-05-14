@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000452.html">
+   <LINK REL="Next" HREF="000462.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 13 Apr 2000 14:46:36 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000452.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000462.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#461">[ date ]</a>
+              <a href="thread.html#461">[ thread ]</a>
+              <a href="subject.html#461">[ subject ]</a>
+              <a href="author.html#461">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> &gt;A process's primordial class loader will always load classes which
+</I>&gt;<i> &gt;represent class files found in its CLASSPATH.
+</I>&gt;<i> 
+</I>&gt;<i> A conventional primordial class loader uses CLASSPATH. CLASSPATH depends on
+</I>&gt;<i> a file subsystem. In the startup sequence, the primordial class loader must
+</I>&gt;<i> be available /before/ the file subsystem is installed.
+</I>
+Yes, you are right to point out the bootstrapping problem. However, I
+would solve it in a different way.
+
+Rather than claiming that the primordial class loader must be available
+before the filesystem is installed, I would claim that the
+&quot;KernelClassLoder&quot; must be available before the file subsystem is
+installed. In this case, the specification of the primordial class
+loaders in my proposal remains valid.
+
+The KernelClassLoader operates above all processes and is the first
+class loader in the system to be created. That implies that the kernel
+itself is not a process. Rather than using the CLASSPATH technique of
+the primordial class loaders to load classes, it will read the required
+classes from some known position (or positions) on the disk. When the
+boot loader is installed, the physical location of the classes.zip (and
+perhaps a separate kernel.zip) is recorded so it knows where to load
+them from. (Also, the position of the native kernel code also needs to
+be stored with the boot loader, and the position of required native
+libraries (if they are separate libraries) need to be stored too.)
+
+It occurs to me that any class loaded by a primordial class loader
+should always share its class definition with the corresponding class in
+the KernelClassLoader, if it exists there. This overrides the other form
+of class definition sharing effectively whenever a &quot;kernel required&quot;
+class is loaded. I believe this is a constraint for a correctly
+functioning system:
+
+&quot;kernel required classes&quot; can be defined as the set of classes that must
+remain the same from system boot to shut down. At least in the context
+of the primordial class loaders and the kernel class loader. This
+includes classes such as java.lang.Object and java.lang.System. The
+thinking behind this is that critical classes such as these should
+behave consistently thoughout all system class loaders so that they may
+trust each other. Note that in a standard JVM, you are allowed to
+redefine the system classes before you start a new process. But then it
+follows that processes such as these may not trust each other in the
+same way that I'm proposing here.
+
+I wouldn't say this idea is fully fleshed out, so feel free to point out
+any holes.
+
+&gt;<i> The ERIC Project proves that CLASSPATH is not required. Its custom class
+</I>&gt;<i> loader never uses CLASSPATH. It uses a &quot;package&quot; path. It loads classes
+</I>&gt;<i> from the local file subsystem. It downloads bytecode from an HTTP service.
+</I>&gt;<i> It downloads package files. It could download .jars. It could download
+</I>&gt;<i> .class files.
+</I>
+True, CLASSPATH is only one way of loading classes. It is the standard
+way because it can be supported on each of the current host platforms
+for standard JVMs, and the Java spec seems to cater for the lowest
+common denominator.
+
+I can imagine there will be places where we will want to abandon
+sticking to the lowest common denominator. This may be one of them. One
+case where we definately want to abandon the lowest common denominator
+is adding support for file permissions (through the use of ACLs). I
+present some ideas on this at:
+
+	<A HREF="http://www.progsoc.uts.edu.au/~rheise/jos/jos-security.html">http://www.progsoc.uts.edu.au/~rheise/jos/jos-security.html</A>
+
+&gt;<i> Absolutely. I am strongly recommending a byte-by-byte comparision on each
+</I>&gt;<i> class file. The machine code version of memncmp() is not expensive when
+</I>&gt;<i> compared to the large quanitity of wasted resources cause by duplication of
+</I>&gt;<i> bytecode.
+</I>
+How about when compared to my proposal for class definition reuse? I
+agree that they are both two valid alternatives. It's just a matter of
+working out the tradeoff.
+
+&gt;<i> 1. This optimization would help all class loaders across the board. It
+</I>&gt;<i> would help our own primordial class loader and all user-defined custom
+</I>&gt;<i> class loaders.
+</I>
+Here's part of the tradeoff. If we do it your way, we do get to save a
+little more space. It depends whether it is worth it for the slower
+speed of byte-for-byte comparisons.
+
+&gt;<i> An application could easily determine if it was running in
+</I>&gt;<i> a multiple process virtual machine:
+</I>&gt;<i> 
+</I>&gt;<i>   public void example() {
+</I>&gt;<i>     if ( System.getClass().getClassLoader() == null ) {
+</I>&gt;<i>       println( &quot;Running in a conventional virtual machine.&quot; );
+</I>&gt;<i>     }
+</I>&gt;<i> 
+</I>&gt;<i>     println( &quot;Running in an alternative virtual machine.&quot; );
+</I>&gt;<i>   }
+</I>
+If this is the case, we may be in violation of the spec. An alternative
+is to test whether we are running within JOS by testing for the
+existence of a JOS specific class or simply by checking for a certain
+system property.
+
+&gt;<i>   public Process getCurrentProcess() {
+</I>&gt;<i>     Object o = this;
+</I>&gt;<i>     for (;;) {
+</I>&gt;<i>       ClassLoader loader = o.getClassLoader();
+</I>&gt;<i>       if ( loader instanceof PrimordialClassLoader ) {
+</I>&gt;<i>         return ((PrimordialClassLoader) loader).getProcess();
+</I>&gt;<i>       }
+</I>&gt;<i>       o = loader;
+</I>&gt;<i>     }
+</I>&gt;<i>   }
+</I>
+Excellent. I never thought of it that way. This actually solves a
+problem I have with the &quot;host&quot; implementation in my prototype. I am
+currently using the same algorithm as Echidna which is to determine the
+current process from the current ThreadGroup which doesn't work properly
+with AWT threads. It's a &quot;host&quot; specific problem, though, and this
+method would work quite well in the &quot;native&quot; implementation.
+
+It's interesting, though: both algorithms might actually be useful in
+different situations because they can actually return different results.
+The class loader based algorithm returns the process that owns a
+particular class. Usually classes you have a reference to belong to your
+process, but not always. The thread based algorithm will return the
+current process of the controlling thread. If a thread starts operating
+on objects in another process, this algorithm will return the process
+that the thread belongs to rather than the process the object belongs
+to.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000452.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000462.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#461">[ date ]</a>
+              <a href="thread.html#461">[ thread ]</a>
+              <a href="subject.html#461">[ subject ]</a>
+              <a href="author.html#461">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

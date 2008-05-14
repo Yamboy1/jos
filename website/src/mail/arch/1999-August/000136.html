@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] About Generic Driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000134.html">
+   <LINK REL="Next" HREF="000138.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] About Generic Driver</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Arch] About Generic Driver">onewith1@flash.net</A><BR>
+    <I>Mon, 9 Aug 1999 20:02:04 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000134.html">[JOS-Arch] About Generic Driver</A></li>
+        <LI> Next message: <A HREF="000138.html">[JOS-Arch] About Generic Driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#136">[ date ]</a>
+              <a href="thread.html#136">[ thread ]</a>
+              <a href="subject.html#136">[ subject ]</a>
+              <a href="author.html#136">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is a big cut-n-paste job responding to lots of good ideas brought
+forward.
+
+
+_Quinn wrote:
+&gt;<i>Has there been any consideration given to using the JavaOS for
+</I>&gt;<i>Business APIs?  We can always change them later, if we discover they don't
+</I>&gt;<i>work, but it saves us a tremendous amount of design time now if you want
+</I>&gt;<i>to get started on generic drivers...
+</I>
+JavaOS had good ideas in the way of structuring their device drivers so they
+hung off of base drivers, but I recall that when I looked over them about a
+year ago, something about them just didn't click well with me.  Maybe I'm
+just too jaded (no pun intended) and I prefer to reinvent the wheel.
+
+
+Hilary Cheng wrote:
+&gt;<i>   Writing a good Generic Driver Model in i386-pc is very hard. IMO, I
+</I>would
+&gt;<i>better to keep
+</I>&gt;<i>all the drivers as simple as they can. We can divided PC Device in two
+</I>catalogs.
+&gt;<i>
+</I>&gt;<i>1. Stream and Event Type Driver ( Keyboard, HD, Floppy, etc )
+</I>&gt;<i>2. Non-Stream Type Driver ( Graphics Adaptor )
+</I>&gt;<i>
+</I>&gt;<i>Since HD can have event from DMA Processor. Keyboard and Mouse also can &gt;be
+</I>a stream.
+&gt;<i>So I would like to join these into same group. For Graphics Adaptor, it is
+</I>a
+&gt;<i>Memory/IO/IRQ Device. But it would not be a stream type driver.
+</I>
+So, then the absolute Generic Device is a non-stream, then an immediate (or
+close to immediate) subclass would be Stream Device and Event Device?  Works
+for me.
+
+&gt;<i>For those isLoaded(), hasDriver() methods, these methods should be put it
+</I>into a
+&gt;<i>Generic Device Manager to control how many instances should be keep. If we
+</I>put
+&gt;<i>these things to driver and let them to control it, it would be little bit
+</I>dangerous.
+
+hasDriver() *may* be appropriate for many devices (like HardDrive device - I
+wouldn't like multiple drivers, unaware of each other, messing around at
+low-level at the same time, but I don't care how many drivers listen to the
+MouseDevice).  isLoaded(), I feel, may be a reiterative method: if the
+Driver can find the device, it has been loaded.  Or maybe I'm not seeing
+something with this.  I dunno.
+
+&gt;<i>For autodetection mechianism, should we put it into generic driver spec. ?
+</I>it
+&gt;<i>depends.
+</I>
+Auto-detection is a crazy thing.  Plug-n-play, USB, and many other &quot;smart&quot;
+bus devices are easily detected.  But we don't want to load every known
+plug-n-play device or driver into memory just to find out that we have a
+&quot;PCI Bridge&quot; device.  This kind of detection needs to be oriented to the
+&quot;PCIDevice&quot;, which, although this Device can't be directly implemented in a
+Driver as it has no real use outside detection, is solely responsible for
+checking the PCI bus for devices, and telling the system of their existence.
+This is where the Device Tree comes into effect.  JavaOS and Windoze 9x have
+this tree, although they implement it far differently.
+
+For devices which are not inherently auto-detectable, like legacy ISA cards,
+parallel port daisy-chain attachments, and so on, we *do* need to load every
+device into memory to check for its existence.  More practically, we can
+load a virtual device (similar to our PCIDevice above) which is aware of
+many of the devices which can be attached to itself, and it handles the
+detection, or loads another device to do more detection.  As a last resort,
+we can have the user as a kind of device to manually tell the system that a
+device exists.
+
+All in all, I believe that the detection and setup should be done at the
+device level.  That was my initial intention in creating this separation
+between the driver and the device.
+
+
+DigiGod wrote:
+&gt;<i>my only xprnc with device drivers is MS-DOS (and an article I read on
+</I>&gt;<i>OS/2 dd's but I dont remember any of it), there you either have a
+</I>&gt;<i>charecter device (a kbd) or a block device (a serial port). In Java both
+</I>&gt;<i>would be streams, I think we should do that, leave it to the driver to
+</I>&gt;<i>generate the events.
+</I>
+See Hilary's response above.
+
+&gt;&gt;<i> &gt;whats the PrimaryHardwareManager (and why's it primary? shouldnt it be
+</I>&gt;&gt;<i> &gt;static HardwareManager PrimaryHardwareManager; in the HM class? with a
+</I>&gt;&gt;<i> &gt;getPrimaryHardwareManager()?)
+</I>&gt;<i>
+</I>&lt;snip&gt;
+&gt;<i>
+</I>&gt;<i>I cant think of how to word what I want to say so Im going to give you
+</I>&gt;<i>this awkardly abbriviated class instead:
+</I>&gt;<i>
+</I>&lt;snip&gt;
+&gt;<i>
+</I>&gt;<i>I dont know if thats what you mean in the way I think or not. agh, I
+</I>&gt;<i>dont know what I just said
+</I>
+Ok.  Last time.  This is your class.  This is your class on JOS.  Any
+questions?  But seriously, here's snippets from my old code for a clearer
+statement, followed by an overview of the design:
+
+*** WARNING *** The following text has extremely long class names.
+
+
+/**
+ * &lt;P&gt;Manages all hardware managers for a particular bus.  Each
+ * HardwareRequest is assumed to be sent for a particular
+ * HardwareResourceManager, so that a request
+ * does not mix different kinds of resources together.  This may be changed
+later
+ * on if a need (or want) arises, but for now it is the easiest way to do
+things.
+ *
+ * @author    Matt Albrecht
+ * @version   1.0
+ */
+public class PrimaryHardwareManager extends HardwareResourceManager;
+
+/**
+ * &lt;P&gt;Allocates and deallocates hardware resources for a specific type of
+ * resource.  Checks if the resource allocation requests request already
+allocated
+ *  resources :-)   (it's a pseudo-palendrome)
+ *
+ * &lt;P&gt;A unique &quot;type&quot; name needs to created, under the name _typeName:
+ * &lt;PRE&gt;
+ *       public final static String _typeName = &quot;MyUniqueTypeName&quot;
+ * &lt;/PRE&gt;
+ * Usually, this is the same as the class name.
+ *
+ * @author    Matt Albrecht
+ * @version   1.0
+ */
+public abstract class HardwareResourceManager;
+
+
+In this model, a &quot;HardwareResourceRequest&quot; is sent to the
+PrimaryHardwareResourceManager (to which every known specific
+HardwareResourceManager has registered itself with, or more accurately, the
+PrimaryHardwareResourceManager has registered all known
+HardwareResourceManagers to itself).  A request consists of a set of
+&quot;HardwareResourceSetting&quot;s dedicated for a specific HardwareResourceManager
+(like IOAddressHardwareResourceSetting is intended for
+IOAddressHardwareResourceManager).  The PrimaryHardwareResourceManager
+routes the request to the specific HardwareResourceManager, which analyzes
+the request, and allocates the best fit HardwareResourceSetting (if there is
+one), and creates a HardwareResourceInterface based on that setting for the
+Driver to use.  This interface has the native code ties.
+
+Is it any wonder no one volunteered to use it?
+
+&lt;snip&gt;
+
+&gt;&gt;<i> &gt;maybe a driver should plug into a device (setDriver(Driver d)) or can
+</I>&gt;&gt;<i> &gt;there be more than one driver at a time?
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> I was pondering the other direction: MyDriver.setDevice( Device d ) so
+</I>that
+&gt;&gt;<i> multiple drivers can use a single device.  Here's where Device.veto()
+</I>would
+&gt;&gt;<i> come in handy, to prevent its use.  This would allow real-time upgrades
+</I>to a
+&gt;&gt;<i> better Driver.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> &lt;snip Driver.java&gt;
+</I>&gt;&gt;<i> &gt;the same goes for this with the getDescription() and all...
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> getDescription would be a human-readable string to indicate the operation
+</I>of
+&gt;&gt;<i> the Driver.  We could use this method as well in the Device.
+</I>&gt;<i>
+</I>&gt;<i>you should have a getDescription() and a getHRName(), if you make a tree
+</I>&gt;<i>of all of them you need getHRName for the name on the tree node, PNP6000
+</I>&gt;<i>(or whatever) will hardly make sense to the average person.
+</I>&gt;<i>
+</I>&gt;<i>or better yet getName() is the HR one and you have a
+</I>&gt;<i>get[Device|Driver]Name() for the ID
+</I>
+Great.  After typing those enormous class names above, I'll believe
+anything.  But really, that sounds like the way to go.
+
+&gt;<i>this is one of the things I love about Java, I am absolutely clueless
+</I>&gt;<i>when it comes to devices and their drivers but I can still help out
+</I>
+Hey, this is a better kibitz turnout than when I first coded the beast.
+Keep up the flames!
+
+-Matt
+
+
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000134.html">[JOS-Arch] About Generic Driver</A></li>
+	<LI> Next message: <A HREF="000138.html">[JOS-Arch] About Generic Driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#136">[ date ]</a>
+              <a href="thread.html#136">[ thread ]</a>
+              <a href="subject.html#136">[ subject ]</a>
+              <a href="author.html#136">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

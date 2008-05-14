@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os questions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000479.html">
+   <LINK REL="Next" HREF="000492.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os questions</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] rheise.os questions">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 20 Apr 2000 12:05:02 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000479.html">[JOS-Arch] rheise.os questions</A></li>
+        <LI> Next message: <A HREF="000492.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#487">[ date ]</a>
+              <a href="thread.html#487">[ thread ]</a>
+              <a href="subject.html#487">[ subject ]</a>
+              <a href="author.html#487">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>         Actually, if the java.lang.System classes have separate statics,
+</I>&gt;<i> you ought to be able to initialize them by calling setIn/Out/Err;
+</I>&gt;<i> everything else ought to be taken care of by the (default) static
+</I>&gt;<i> initializers.  (That is, ideally, we don't need to change classpath's (or
+</I>&gt;<i> whoever's) System class at all, and the process support doesn't have to
+</I>&gt;<i> touch System unless it wants to.)  We'll see how it goes.
+</I>
+The idea was that setIn() is for user programs (it checks the security
+manager), and a special init() method would only be executed by JOS and
+it would just set the attribute values directly.
+
+I see your point that calling setIn() saves us from modifying classpath.
+Maybe there is a third option, though:
+
+It seems to make sense for the static initializer to handle it all, as
+it does in classpath. It calls on FileDescriptor.in to initialise
+System.in and it could do a similar thing for system properties (and the
+security manager in some cases). We just need to set up those data
+sources before System is initialised. This should be quite easy in the
+nativ implementation (through native methods), although a bit tricky for
+host (which I think I'll leave as it is). I wouldn't mind at all if
+someone else did the native version :-)
+
+&gt;<i>         Most of the support, I believe, will be telling it not to call
+</I>&gt;<i> library functions we don't provide in its native code. :)  (Seriously, if
+</I>&gt;<i> you download the classpath distro, take a look at the vm/ subdirectory,
+</I>&gt;<i> where they stick the VM-specific bits.  There isn't a whole lot in there,
+</I>&gt;<i> nicely enough.)
+</I>
+I expect there will (need to) be some VM-specific stuff for initialising
+FileDescriptor.in.
+
+&gt;<i> &gt; Notice that if we do this, we are demonstrating the first use of
+</I>&gt;<i> &gt; inter-process object sharing. The calling process needs a reference to
+</I>&gt;<i> &gt; the process it is creating, and the program running in the new process
+</I>&gt;<i> &gt; will need to be able to reference itself too.
+</I>&gt;<i> 
+</I>&gt;<i>         In general, we want the calling process to have a reference to the
+</I>&gt;<i> spawned process, and spawned process obviously needs to reference itself.
+</I>&gt;<i> The question we must address is where the class definition of that
+</I>&gt;<i> reference should reside.
+</I>
+I am thinking that the class definition resides in a cache separate from
+all processes. Only actual java.lang.Class-es reside in a place
+associated with a particular process. (see below for a further analysis
+of class definition caches)
+
+&gt;<i>  Since this OO-IPC referencing will need
+</I>&gt;<i> 'illegal' casts, the obvious answer is that the JavaProcess class needs to
+</I>&gt;<i> be shared between the primordial loaders of each process.
+</I>
+Do you mean the JavaProcess class _definition_ needs to be shared?
+(because an alternative way is to actually share the Class). I also came
+to this conclusion in this post:
+
+	<A HREF="http://jos.org/pipermail/arch/2000-April/000461.html">http://jos.org/pipermail/arch/2000-April/000461.html</A>
+
+&quot;It occurs to me that any class loaded by a primordial class loader
+should always share its class definition with the corresponding class in
+the KernelClassLoader, if it exists there. This overrides the other form
+of class definition sharing effectively whenever a &quot;kernel required&quot;
+class is loaded. I believe this is a constraint for a correctly
+functioning system&quot;
+
+Of course, the KernelClassLoader is just a concept. It is not
+necessarily a tangible thing.
+
+We can identify two class definition caches:
+
+- one that is shared between all primordial class loaders
+- one that is owned by the kernelClassLoader (or just &quot;kernel&quot;)
+
+When a ProcessClassLoader loads a class (eg. when findSystemClass() is
+called in a process), it should check the kernel's class cache first
+(this will include JavaProcess) to ensure that class definitions that
+*must* be reused conistently are reused. If the class is not in that
+cache, the cache for primordial class loaders is used.
+
+&gt;<i> Every
+</I>&gt;<i> JavaProcess has a private reference to its classloader, which could be
+</I>&gt;<i> used on behalf of the calling process to set whatever statics need to be
+</I>&gt;<i> set.  (e.g. SystemObjects.)
+</I>&gt;<i> 
+</I>&gt;<i>         Currently, the host code always sets a custom classloader because
+</I>&gt;<i> that's the only way to generate (more-or-less) disjoint classloaders.  On
+</I>&gt;<i> the native side, that is not the case -- an empty classloader can be
+</I>&gt;<i> generated by the decaf code.  (In fact, at some point, must be.)  My
+</I>&gt;<i> question, then, is -- does constructProcess() (I think!) ever /need/ to
+</I>&gt;<i> set a classloader?  Since the native code must already generate an empty
+</I>&gt;<i> primordial classloader for the new process, does the JOS code ever need to
+</I>&gt;<i> worry about setting the classloader of the new process?  (That is,
+</I>&gt;<i> JavaProcess's private ProcessClassLoader reference would be a reference to
+</I>&gt;<i> a native PCL, generated by the native call to createProcess().  (And
+</I>&gt;<i> possibly changed to a straight ClassLoader reference.))
+</I>
+So, what you're saying is JavaProcess will still have a reference to a
+ProcessClassLoader, just that the the class loader constructed in the
+nativ version will be generated natively by decaf?
+
+That's fine by me. I'm not sure what the advantages of making
+NativeProcessClassLoader natively generated are, but feel free to do it
+that way if it's easier. I will try to get the Java implementation of
+NativeProcessClassLoader working so that it might be useful in the
+future.
+
+BTW, if it is implemented in Java, that doesn't mean getClassLoader()
+won't return null for classes loaded by a primordial class loader.
+Class.getClassLoader() can simply state:
+
+ClassLoader getClassLoader()
+	{
+	if (classLoader instanceof ProcessClassLoader)
+		return null;
+	return classLoader;
+	}
+
+If we do this, Processmanager.getOwningProcess() needs to be changed too
+since it checks if the return value of getClassLoader() is an instance
+of ProcessClassLoader. That shouldn't be too difficult to fix.
+
+&gt;<i> A method in
+</I>&gt;<i> JavaProcess could be used to set static variables or call static methods
+</I>&gt;<i> on its classloader, i.e.:
+</I>&gt;<i> 
+</I>&gt;<i> myChild.setStaticField( &quot;myRandomStaticClass&quot;, &quot;myRandomStaticField&quot;,
+</I>&gt;<i>         myRandomSharedObject );
+</I>&gt;<i> Object args[1]; args[0] = myPipedInputStream;
+</I>&gt;<i> myChild.staticFunction( &quot;java/lang/System&quot;, &quot;setIn&quot;, args );
+</I>
+Whatever we use to achieve this, it would be nice if it were generic (at
+the JavaProcess level). So, it is important that even if a process's
+class loader is natively generated, there is still a reference to it.
+
+In this case, setStaticField and staticFunction can still be useful as
+convenience methods.
+
+&gt;<i>         Right.  I meant this question in the opposite order -- what does
+</I>&gt;<i> decaf need to do before we can rename rheise.os, which entails getting the
+</I>&gt;<i> nativ bit working correctly.  Something that decaf needs to do is handle
+</I>&gt;<i> native calls correctly.
+</I>
+If you are going to use rheise.os from decaf, it would seem easier to do
+the renaming before you get started. Also, the sooner this stabilises
+the sooner I can put it in CVS.
+
+&gt;<i> &gt; Likewise with decaf, which is like Jupiter to my Pluto :-)
+</I>&gt;<i> 
+</I>&gt;<i>         I believe we've found the codenames for our milestone releases. :)
+</I>
+Yes! Excellent idea :-)
+
+PS. I have read your Final Summary, but I need to catch up on some sleep
+before I look at it in more detail - that'll probably be tomorrow.
+sorry!
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000479.html">[JOS-Arch] rheise.os questions</A></li>
+	<LI> Next message: <A HREF="000492.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#487">[ date ]</a>
+              <a href="thread.html#487">[ thread ]</a>
+              <a href="subject.html#487">[ subject ]</a>
+              <a href="author.html#487">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

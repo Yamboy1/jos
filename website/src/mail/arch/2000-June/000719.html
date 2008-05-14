@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] JOSCore and JOSExtensions (fwd)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000716.html">
+   <LINK REL="Next" HREF="000720.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] JOSCore and JOSExtensions (fwd)</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] JOSCore and JOSExtensions (fwd)">gchii@mindspring.com</A><BR>
+    <I>Mon, 05 Jun 2000 19:18:07 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000716.html">[JOS-Arch] [interface] Better design?</A></li>
+        <LI> Next message: <A HREF="000720.html">[JOS-Arch] [bulkmake] Release 1</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#719">[ date ]</a>
+              <a href="thread.html#719">[ thread ]</a>
+              <a href="subject.html#719">[ subject ]</a>
+              <a href="author.html#719">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:18 AM 6/3/00 +0000, Claudio Clemens
+&lt;<A HREF="mailto:clemens@informatik.tu-muenchen.de">clemens@informatik.tu-muenchen.de</A>&gt; wrote:
+&gt;<i>I was thinking about JOSystem. If JOSCOre is the bare mininum (what is the
+</I>&gt;<i>bare minimum?), it should offer some base services, like Filesystem,
+</I>&gt;<i>Process management, maybe also some memory management (OK, there's no
+</I>&gt;<i>virtual memory now).
+</I>
+JOSCore is probably a issue of distribution, rather than namespace. How
+much must be distributed in order to say that it is JOS? or JOS-compatible?
+
+Very little is absolutely required. A file subsystem is not required. A
+protocol stack is not required. Process management is not required. A
+kernel and virtual machine, linked together statically, might be a
+JOS-compatible operating system.
+
+JOS is a computer operating system, not limited to a IBM PC-compatible
+computer. Why? Because JOS is so scaleable that, at the small end, it can
+fit in ROM on an embedded or consumer device. It can fit inside a IDE, SCSI
+or CD-ROM drive. It can fit inside a 104-key keyboard, a monitor or mouse.
+It can fit in a cell phone. It can fit inside ISA, PCI or PCMCIA card. JOS
+can be small enough that an entire TCP/IP protocol stack can be implemented
+/inside/ of a network interface card. The smallest JOS enables programmers
+to write their smallest devices in a processor-independent way.
+
+1. None of these consumer devices need a file subsystem.
+
+2. JOS is ROM-able; classes that are used in a specific application should
+be added to a ROM image.
+
+JOS is so scaleable that, at the big end, it can fit inside a personal
+computer, mini-computer, mainframe or supercomputer. It can fit inside a
+server farm or computer cluster.
+
+JOSystem is a kernel and virtual machine. A virtual machine on the low end
+is functionally equivalent to a virtual machine on the high end. Of course,
+a virtual machine on the high end might have greater optimization and
+virtual memory management.
+
+&gt;<i>Does JOSCore needs the Java API, or the JAva API needs JOSCore?
+</I>
+JOSCore does not depend on the Java API; Java API does not depend JOSCore.
+JOSCore is a concern when distributing JOSystem. We encourage you to
+distribute only the packages an application uses. When an application
+requires the entire Java 2 standard class library, distribute the entire
+Java 2 standard class library. You might put the entire Java API and
+JOSCore into your distribution. When your application requires only a few
+packages from the Java 0 standard class library, distribute only the
+packages it uses. You might put java.lang, java.util and java.io and
+JOSCore into your distribution.
+
+I wish I had concrete examples to use. It might be easier to understand
+with examples taken from experience. JOS is going to be a little confusing
+and uncertain until someone implements a consumer device. Except, I don't
+know of any consumer device that uses the JOS architecture.
+
+&gt;<i>I mean how can you program JOSCore in Java, if you can't use the API?
+</I>
+A team of programmers have been working on JOS for a few years. They write
+programs using off-the-shelf virtual machines from a variety of vendors. In
+the experimental programs that have been written, programmers use
+everything from the Java API. These experimental programs are not yet
+concerned with the real cost to a consumer device of using a class from an
+non-essential API.
+
+If you have a project with a a 34MB ROM image and 32MB or 64MB ROMs, you
+might like to know if you could eliminate any non-essential classes from
+your ROM image. If you find a package that you really do not have to
+include, you can remove it and ship with 32MB ROMs. (Assuming 32MB ROMs are
+less expensive than 64MB ROMs.)
+
+&gt;<i>Can you produce bytecode without the Java API?
+</I>
+When you write your own virtual machine, you can do anything. In theory,
+you /can/ produce bytecode without the Java API. The Java API is not
+required at &quot;compile-time&quot;. Bytecode can be assembled with a Java assembler
+like Jasmin.
+
+In theory, you can create more special-case objects like java.lang.Object.
+In the Alt Package project, I've been working on alt.lang.Object as a new
+anchor for alternative packages. If I write a virtual machine, it does not
+have to be compatible with the Java Virtual Machine Specification.
+
+In practice, this is a research project. It helps clarify what can and
+cannot be done in a Java Virtual Machine. When you write a Java Virtual
+Machine, you must follow one of the Java Virtual Machine Specifications.
+
+The JOS Project aims to implement the Java Virtual Machine Specification as
+much as possible. We want to build a host for standard Java applications.
+We must extend the specification where it does not provide for things we
+need, like a bytecode native interface and multiple primordial class
+loaders. Being practical, we would like very much to extend the
+specification a little as possible.
+
+&gt;<i>It's just a little confusing...
+</I>
+Yes, it is confusing. JOSystem and JOSBox should be revisited in the
+architecture discussion.
+
+&gt;<i>So you also don't need JOSExtensions (they are superfulous). But what
+</I>&gt;<i>could be in Extensions? Maybe a web server? Or is such an application
+</I>&gt;<i>running on top of the Java API, as a user program?
+</I>
+JOS extensions might include a file subsystem, protocol stack, process
+manager and things like these. Likely, a web server is an application, not
+an extension. A device manager might be an extension, too.
+
+&gt;<i>And JOSCore is not org.jos.core.*, but org.jos.core.* is in JOSCore, isn't
+</I>&gt;<i>it? Can a service run on JOSCore (just bytecode) w/o the Java API?
+</I>
+No, JOSCore is not org.jos.core. It is unfortunate that two completely
+different things were accidentally given similar names. For a while, I
+mistakenly thought they were the same. They sound the same, don't they?
+
+JOSCore is not limited to a single package. Meanwhile, org.jos.core
+namespace should not be reused.
+
+&gt;<i>Why do you compare the JOSCore (or org.jos.core.*) to sun.* or
+</I>&gt;<i>netscape.*. I thing these are just some libraries, writen as JNI,to serve
+</I>&gt;<i>the Java API of Sun / Netscape. But they are writen in C / C++, and are
+</I>&gt;<i>native code, not bytecode. How do you thing, you can create something in
+</I>&gt;<i>bytecode to serve the JOS Java API? Or better, I can thing of JOSCore
+</I>&gt;<i>being in bytecode, but _HOW_ do you create this bytecode (tell me a java
+</I>&gt;<i>program to produce bytecode without using a 
+</I>&gt;<i>
+</I>&gt;<i>class yzx {
+</I>&gt;<i>} 
+</I>&gt;<i>
+</I>&gt;<i>statment. Since Class is a subclass of Object, and Object is defined in
+</I>&gt;<i>the Java API, how can you program the JOSCore without the java API?
+</I>
+Today, I am working on the assumption that java.lang, java.util, java.io
+and java.net are statically linked to a virtual machine. Instead of adding
+these boot packages to an archive file, such as classes.zip or rt.jar, they
+are part of the virtual machine executable image.
+
+The rest of the JOS/Java API is a radically different matter. From this I
+mean that I split the Java standard class libraries into two parts: boot
+and system packages. Boot packages depend on the virtual machine. The JOS
+platform API depends on boot packages. JOS applications depend on JOS API
+and boot packages. The Java standard class library depends on JOS API and
+boot packages. Java applications depend on the Java standard class library.
+
+Since boot packages includes java.lang, there doesn't seem to be a problem.
+
+Sun Microsystems' definition of &quot;core&quot; packages does not coincide with
+mine. Sun puts a lot of unnecessary stuff in the &quot;core&quot; packages. They have
+turned Java 2 into an exclusively server-side platform.
+
+Even something as popular as a file subsystem is unnecessary on a consumer
+device. A file subsystem is optional. If a file subsystem is implemented in
+a JOS machine, it must be compatible with the JOS Platform API. If it is
+not implemented, it does not have to be (re)distributed.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000716.html">[JOS-Arch] [interface] Better design?</A></li>
+	<LI> Next message: <A HREF="000720.html">[JOS-Arch] [bulkmake] Release 1</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#719">[ date ]</a>
+              <a href="thread.html#719">[ thread ]</a>
+              <a href="subject.html#719">[ subject ]</a>
+              <a href="author.html#719">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

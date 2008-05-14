@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Good article on JVM's</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:mgangelen%40quintop.nl">
+   <LINK REL="Previous"  HREF="000410.html">
+   <LINK REL="Next" HREF="000412.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Good article on JVM's</H1>
+    <B>mgangelen@quintop.nl</B> 
+    <A HREF="mailto:mgangelen%40quintop.nl"
+       TITLE="[JOS-Arch] Good article on JVM's">mgangelen@quintop.nl</A><BR>
+    <I>Thu, 16 Mar 2000 11:43:29 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000410.html">[JOS-Arch] Binary distribution for booting via GRUB</A></li>
+        <LI> Next message: <A HREF="000412.html">[JOS-Arch] [WebSource] Release 4</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#411">[ date ]</a>
+              <a href="thread.html#411">[ thread ]</a>
+              <a href="subject.html#411">[ subject ]</a>
+              <a href="author.html#411">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi there,
+
+I found a really interesting article discribing the inner workings of
+japaleno, a JVM written in JAVA, for JAVA.
+The programmers follow an approach that is appealing to me. They have
+written the main JVM in JAVA...
+
+<A HREF="http://www-4.ibm.com/software/developer/library/jalapeno/index.html">http://www-4.ibm.com/software/developer/library/jalapeno/index.html</A>
+
+To be short, they are dong the following:
+On startup, a classic VM (lets call it VM1) is loaded, which loads the main
+VM ( VM2 ). Both VM's are written in JAVA, but VM1 has been compiled to
+static machinecode, and is not really optimized.
+VM1 doesn't need to be oprimized, cause the only job it must do is to load
+and invoke VM2. VM2 has a very optimized JIT: it takes bytecodes and
+transformes them into machinecode.
+The last thing isn't really surprising, but it is if you consider that VM2
+is written in JAVA it is.
+
+IBM claims that the entire source of the VM's contains only 1000 lines of C
+code. It's that small because the only thing they need to program in C are
+the glue-functions to IO, memory and interrrupts. All the other things
+suchs as thread-switching, memory-management and synchronisation are
+written in JAVA.
+
+There are also some other interesting issues addressed in this article,
+such as how they prevent normal users from executing privileged code,
+locking and parallel-garbage-collecting.
+
+I think that this approach should also be interesting to JOS: write the VM
+in JAVA insteadof C++...
+
+Just some thoughts.
+
+Fushion.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000410.html">[JOS-Arch] Binary distribution for booting via GRUB</A></li>
+	<LI> Next message: <A HREF="000412.html">[JOS-Arch] [WebSource] Release 4</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#411">[ date ]</a>
+              <a href="thread.html#411">[ thread ]</a>
+              <a href="subject.html#411">[ subject ]</a>
+              <a href="author.html#411">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000620.html">
+   <LINK REL="Next" HREF="000601.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">ryan@whitewolf.com.au</A><BR>
+    <I>Fri, 19 May 2000 12:18:39 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000620.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000601.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#622">[ date ]</a>
+              <a href="thread.html#622">[ thread ]</a>
+              <a href="subject.html#622">[ subject ]</a>
+              <a href="author.html#622">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>         Looking at it from the least-suprise principle, which code do we
+</I>&gt;<i> want to be the least suprised?  The (potentially legacy) code that doesn't
+</I>&gt;<i> know it's using a shared object, or the shared object code itself?  I
+</I>&gt;<i> would think the former; if the latter really needs a static from its
+</I>&gt;<i> original/owning process, it can always copy it off.  Your thoughts run
+</I>&gt;<i> counter to this -- why?
+</I>
+Because I would be least surprised the other way.
+
+My claim is that when an object attempts to access its statics, it
+expects to access the statics through object-&gt;class-&gt;statics.
+
+Since an object only has one -&gt;class, it also strikes me as the easiest
+way to implement it. I think you agreed to that once:
+
+	<A HREF="http://jos.org/pipermail/arch/2000-April/000500.html">http://jos.org/pipermail/arch/2000-April/000500.html</A>
+
+In the general case, I am proposing:
+
+&quot;Static references are resolved via the class loader of the caller.&quot;
+
+That actually sounds very close to something I read in the spec, so it
+should create the least surprise. It seems to extend very well to the
+shared object case, too.
+
+If we exclude the possibility of shared objects, resolving statics via
+the class loader of the caller makes complete sense in that it is how
+the spec defines the expected behaviour. When we introduce shared
+objects, the only difference is that an object may be seen through two
+different classes with the same name (different classes but the same
+class definition). Let's look at an example:
+
+class SharedObject
+	{
+	static int stat;
+	}
+
+Process A creates one of these objects through its own class loader. It
+now has the SharedObject class loaded, and an instance of that class.
+
+Process B obtains a reference to this object by casting it to its own
+version of the SharedObject class. The dynamic type of the object is
+still the class loaded in Process A (this is determined by the hard link
+object-&gt;class).
+
+We both agree that if Process B accesses SharedObject.stat, it will
+resolve to its own version of the SharedObject class and therefore
+access the statics of its own process. And of course, if Process A
+accesses SharedObject.stat, it will also resolve /its/ own version of
+the SharedObject class and therefore its own statics. That is a given
+because that is what the spec says.
+
+But if the shared object itself tries to access its own statics, how do
+you define &quot;its own statics&quot;? My guess is that an object will only
+behave correctly if it is what it thinks it is. What an object is, is
+made up of the instance, and the class that defined it. When a routine
+in the object is purely non-static, it will always behave correctly. But
+if the routine involves statics, the routine will have half worked and
+half not, assuming that Process B is calling the routine on the shared
+object of Process A. It will *think* it has updated the necessary
+statics and put itself into a consistent state, but when things return
+to normal and process A tries to do stuff with the object, it will find
+that it is not in a consistent state (process B has interfered). Process
+A will find that the object has changed state without the statics also
+changing state, while the programmer could have sworn that it was
+programmed to always keep the static and instance variables consistent
+with eachother.
+
+In short, an object would be very surprised indeed if when trying to
+access its own statics, it actually accessed the statics of a completely
+different class to which it has no association.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000620.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000601.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#622">[ date ]</a>
+              <a href="thread.html#622">[ thread ]</a>
+              <a href="subject.html#622">[ subject ]</a>
+              <a href="author.html#622">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

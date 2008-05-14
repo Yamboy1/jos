@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Re: [JOS-Arch] Getting started on AWT</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:sean-cribbs%40utulsa.edu">
+   
+   <LINK REL="Next" HREF="000127.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Re: [JOS-Arch] Getting started on AWT</H1>
+    <B>Sean D Cribbs</B> 
+    <A HREF="mailto:sean-cribbs%40utulsa.edu"
+       TITLE="[JOS-UI] Re: [JOS-Arch] Getting started on AWT">sean-cribbs@utulsa.edu</A><BR>
+    <I>Mon, 19 Jun 2000 11:05:24 -0500 (CDT)</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000127.html">[JOS-UI] Re: [JOS-Arch] Getting started on AWT</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#126">[ date ]</a>
+              <a href="thread.html#126">[ thread ]</a>
+              <a href="subject.html#126">[ subject ]</a>
+              <a href="author.html#126">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>
+&gt;<i> Another good reason to build on Java2D is its support of the Graphic Driver
+</I>&gt;<i> classes.  It has already established a class model for graphics drivers and
+</I>&gt;<i> multiple display modes.  I did a tad bit of work on this when decaf was in
+</I>&gt;<i> its infancy (before case statements were supported!).  This is a good
+</I>&gt;<i> starting point.  We may not need to support *everything* Java2D has to
+</I>&gt;<i> start with, though.  Alpha colors in 16-bit VGA mode are a little
+</I>&gt;<i> rediculous :-)
+</I>
+Does Java2D have primitives implemented?  What I mean is, given a
+primitive graphics command, can it produce a raster format?  This would be
+a great help in implementing the Graphics class.  For now, I'd like to
+keep everything 1.1-compliant, and the footprint small, so if Java2D is
+big, we may have to leave it out.  Once our VM &amp; class library are
+approaching 1.2 compliancy, we could fully integrate it.  If Java2D
+doesn't provide the vector-to-raster translation though, I may be looking
+for someone who is geometrically/graphically inclined to help implement
+primitives.
+
+Here's my current plan for the VGA AWT:
+1) Make a bare-bones implementation of the toolkit and a simple peer
+(Canvas or the like) and graphics contexts. Draw some random primitives on
+the screen.
+2) Implement off-screen images.(a lot bigger task than it sounds) Draw
+onto an image, then blit it on the screen.
+
+Others to follow (in no particular order):
+* Implement some raster fonts, draw onto a component.
+* Implement other simple components, e.g. Button.
+* Implement windows (frames, dialogs, etc).
+* Implement the rest of the AWT!!
+
+Anyone who is interested please feel free to help.  At this point, I'm not
+too picky about clean implementation, as long as it's readable and
+understandable.  However, efficiency is a must - we know the VGA driver is
+slow, so we have to keep our code to a minimum.
+
+Sean
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000127.html">[JOS-UI] Re: [JOS-Arch] Getting started on AWT</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#126">[ date ]</a>
+              <a href="thread.html#126">[ thread ]</a>
+              <a href="subject.html#126">[ subject ]</a>
+              <a href="author.html#126">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

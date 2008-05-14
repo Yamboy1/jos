@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Widgets</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000093.html">
+   <LINK REL="Next" HREF="000095.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Widgets</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-UI] Widgets">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 29 Jul 1999 14:13:38 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000093.html">[JOS-UI] Widgets</A></li>
+        <LI> Next message: <A HREF="000095.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#94">[ date ]</a>
+              <a href="thread.html#94">[ thread ]</a>
+              <a href="subject.html#94">[ subject ]</a>
+              <a href="author.html#94">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>DigiGod Q Frasché wrote:
+&gt;<i> 
+</I>&gt;<i> Ryan Heise wrote:
+</I>&gt;<i> &gt; Again, removeToolbarWidget() is very similar to disposeWindow(). For the
+</I>&gt;<i> &gt; same reason, I believe it should be a method on the model (and
+</I>&gt;<i> &gt; controller). I think you will find that some widgets (including
+</I>&gt;<i> &gt; DesktopWidget) will need to define /some/ public methods to handle
+</I>&gt;<i> &gt; direct interactions between views (widgets). I have found this
+</I>&gt;<i> &gt; unavoidable, but those methods are subordinate to the methods provided
+</I>&gt;<i> &gt; by the model (and controller). They would be needed, for example, to
+</I>&gt;<i> &gt; allow a ToolbarWidget component to be added (in AWT terms) to its
+</I>&gt;<i> &gt; Container. This is a direct view &lt;-&gt; view interaction that requires
+</I>&gt;<i> &gt; public widget methods.
+</I>&gt;<i> 
+</I>&gt;<i> we could have a very abstract model, it doesnt even need to be aware of
+</I>&gt;<i> the components its using, we could represent them as Rectangles to it.
+</I>&gt;<i> all it would have is a view rectangle (the screen) and a stack of
+</I>&gt;<i> rectangles that it was in charge of z-ordering and the like. the
+</I>&gt;<i> controller would handle conversion between windows and rectangles and
+</I>&gt;<i> the view (DesktopScreen) would render accordingly.
+</I>&gt;<i> 
+</I>&gt;<i> this could be reused by many things, even a UI that doesnt use AWT or
+</I>&gt;<i> Swing to do windowing (for whatever reason).
+</I>
+I don't quite see the usefulness of this. For example, when you
+implement the Swing or AWT widgets, they will handle rectangles and
+z-ordering in their own way.
+
+If you were suggesting the idea in response to my observation that there
+needs to be some view &lt;-&gt; view interactions, are you trying to eliminate
+these interactions? I think when you get around to implementing your
+Swing widgets, you will find that the most sensible thing to do is to
+have direct view &lt;-&gt; view interactions when they are needed. For
+example, when a JComponent needs to be graphically added to a JPanel.
+Just keep in mind that these view &lt;-&gt; view methods are internal
+implementation methods, and the real methods to add a ToolbarWidget to a
+DesktopWidget are in the controller and model classes.
+
+&gt;<i> &gt; There is probably very little you can decide about the view interfaces
+</I>&gt;<i> &gt; at this point in time. When you start to consider how the controllers
+</I>&gt;<i> &gt; and models come in to play, your design will probably change completely.
+</I>&gt;<i> &gt; I definately think it is easier to start designing from the model end.
+</I>&gt;<i> &gt; Even then, your design will change a bit when you start to consider how
+</I>&gt;<i> &gt; the view fits into the picture. But at least when you get there, you
+</I>&gt;<i> &gt; will have already thought about the foundations of your MVC system.
+</I>&gt;<i> 
+</I>&gt;<i> you may be right, but we could at least get a basic idea of what we need
+</I>&gt;<i> to put them in, but more importantly (and Ive tried to stress this) of
+</I>&gt;<i> which ones to include that list I gave was far from complete, and some
+</I>&gt;<i> of them should have different, more appropriate, names.
+</I>
+That's reasonable. Ok,
+
+PagerWidget - control for virtual desktops
+MenuWidget - for example, you could dock a start menu to the
+TaskBarWidget.
+
+I'm thinking we should call it a system menu, not a start menu.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000093.html">[JOS-UI] Widgets</A></li>
+	<LI> Next message: <A HREF="000095.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#94">[ date ]</a>
+              <a href="thread.html#94">[ thread ]</a>
+              <a href="subject.html#94">[ subject ]</a>
+              <a href="author.html#94">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

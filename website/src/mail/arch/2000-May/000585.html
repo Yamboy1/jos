@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [bytecode resource] Status report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000582.html">
+   <LINK REL="Next" HREF="000586.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [bytecode resource] Status report</H1>
+    <B>jewel@pixie.co.za</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Arch] [bytecode resource] Status report">jewel@pixie.co.za</A><BR>
+    <I>Mon, 15 May 2000 19:18:48 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000582.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+        <LI> Next message: <A HREF="000586.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#585">[ date ]</a>
+              <a href="thread.html#585">[ thread ]</a>
+              <a href="subject.html#585">[ subject ]</a>
+              <a href="author.html#585">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Mon, 15 May 2000, Gilbert Carl Herschberger II wrote:
+&gt;<i> At 11:39 PM 5/14/00 -0200, &quot;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&quot; &lt;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&gt; wrote:
+</I>&gt;<i> &gt;Forgive me for asking (I haven't been following the list closely), but why
+</I>&gt;<i> &gt;do you want to do this?
+</I>&gt;<i> 
+</I>&gt;<i> Treating bytecode as a C/C++ resource puts the raw data from a .class file
+</I>&gt;<i> into the DATA segment. It stores bytecode in the same file with a virtual
+</I>&gt;<i> machine.
+</I>&gt;<i> 
+</I>&gt;<i> I am working toward a primordial class loader that enables a virtual
+</I>&gt;<i> machine and its vm-specific classes to be statically linked into a single
+</I>&gt;<i> executable image. A single executable image is easier to boot and easier to
+</I>&gt;<i> make ROM-able.
+</I>
+Ok, so you are only planning to put vm-specific classes in this image? 
+ 
+&gt;<i> A primordial class loader must load vm-specific classes. It is one of the
+</I>&gt;<i> implementation details outlined in the Java Virtual Machine Specification.
+</I>&gt;<i> Each virtual machine must implement some kind of primordial class loader.
+</I>&gt;<i> 
+</I>&gt;<i> IBM's JDK 1.1.6 on OS/400 is a good example of how it should work. This
+</I>&gt;<i> virtual machine always knows how to load its vm-specific classes. It never
+</I>&gt;<i> puts the standard class library on CLASSPATH. It simplifies the launch of a
+</I>&gt;<i> Java application. 
+</I>
+Ok, there is a big difference between the vm-specific classes and the
+class library. The class library (including swing, database extensions etc
+etc) could run into multiple megabytes, in which case it would definitely
+not belong in that image. 
+
+&gt;<i>Compared to other virtual machines, it is more difficult
+</I>&gt;<i> to get CLASSPATH wrong. Its primordial class loader won't allow you to load
+</I>&gt;<i> the wrong vm-specific classes. It is neither necessary nor desirable to
+</I>&gt;<i> store a virtual machine and its vm-specific classes in separate files. It
+</I>&gt;<i> is certainly not desireable to load vm-specific classes through CLASSPATH.
+</I>
+I agree with you. The only problem is that you are wasting some space. You
+are keeping the bytecode in the image (which is loaded into memory), and
+then you are going to build the internal class structure (which will have
+a copy of the bytecode again, and the results of resolving the constant
+pool). The intial raw class data is going to stay in memory &quot;forever&quot; but
+it is only needed for a short period of time (at startup).
+
+&gt;<i> In addition, an executable image is always read-only. There is a critical
+</I>&gt;<i> advantage in letting a virtual memory manager know what is read-only versus
+</I>&gt;<i> read-write. Bytecode is read-only, too. 
+</I>
+I don't see where this is really an advantage. Once you you've loaded,
+linked and resolved a class you don't need the bytecode anymore. You can
+flag the actual method code to be interpreted as read-only anyway.
+
+&gt;<i> Using bytecode as a resource in
+</I>&gt;<i> DATA segment reduces the footprint of a virtual machine at runtime.
+</I>
+This doesn't follow.
+
+I'm assuming the whole image gets loaded into memory before execution, and
+also stays there until parts get paged out. In this case it makes sense to
+have the image as small as possible.
+
+&gt;<i> If that were not enough, it is possible to reduce the size of a virtual
+</I>&gt;<i> machine further. This enables a file subsystem to be written in bytecode
+</I>&gt;<i> and then used to load the rest of the standard class library -- as needed
+</I>&gt;<i> -- from a local storage device. Elsewhere, the rest of the standard class
+</I>&gt;<i> library can be downloaded -- as needed -- across a network.
+</I>
+This is a very elegant approach. Writing the file-system reader in Java
+(as opposed to C/C++) and having it available immediately on startup. 
+
+Another way of doing this would be to compile that file-system reader to
+native-code (assuming you have the tools to do this), and then just
+firing off that to load whatever is needed from disk to get the VM going.
+
+John Leuner
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000582.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+	<LI> Next message: <A HREF="000586.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#585">[ date ]</a>
+              <a href="thread.html#585">[ thread ]</a>
+              <a href="subject.html#585">[ subject ]</a>
+              <a href="author.html#585">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

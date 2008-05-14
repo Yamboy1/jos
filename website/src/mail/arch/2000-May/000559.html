@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [bytecode resource] Status Report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000560.html">
+   <LINK REL="Next" HREF="000563.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [bytecode resource] Status Report</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [bytecode resource] Status Report">gchii@mindspring.com</A><BR>
+    <I>Wed, 03 May 2000 18:41:26 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000560.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000563.html">[JOS-Arch] [JDK 1.2] Bad news</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#559">[ date ]</a>
+              <a href="thread.html#559">[ thread ]</a>
+              <a href="subject.html#559">[ subject ]</a>
+              <a href="author.html#559">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I have been working on a new version of a Java application that generates
+C/C++ code for bytecode resources. On the one hand, it is a round-about way
+to link binary data to an executable. On the other, it encapsulates raw
+bytecode into a rc_Bytecode class. The rc_Bytecode class is intended to be
+a vm-independent C++ class to extract data from raw bytecode.
+
+The major change from my previous version is this: a factory is always
+responsible for creating an implementation of the rc_Bytecode interface (a
+pure virtual class). This means that the implementation of rc_Bytecode can
+change from one vm to the next; or, rc_BasicBytecode can be extended to be
+more vm-specific.
+
+The factory method (in straight C) is this:
+
+rc_Bytecode *rc_CreateBytecode( const void *payload, size_t size );
+
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000560.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000563.html">[JOS-Arch] [JDK 1.2] Bad news</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#559">[ date ]</a>
+              <a href="thread.html#559">[ thread ]</a>
+              <a href="subject.html#559">[ subject ]</a>
+              <a href="author.html#559">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

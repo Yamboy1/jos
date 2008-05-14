@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] JOS Security Model</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000026.html">
+   <LINK REL="Next" HREF="000028.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] JOS Security Model</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] JOS Security Model">ryan@whitewolf.com.au</A><BR>
+    <I>Sat, 19 Jun 1999 18:50:27 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000026.html">[JOS-Arch] Re: JOS registry</A></li>
+        <LI> Next message: <A HREF="000028.html">[JOS-Arch] Requirements</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#27">[ date ]</a>
+              <a href="thread.html#27">[ thread ]</a>
+              <a href="subject.html#27">[ subject ]</a>
+              <a href="author.html#27">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Al wrote:
+
+&gt;<i> Just a question... When you say that users and groups have different
+</I>&gt;<i> security access to objects, such as files or sockets, this means that
+</I>&gt;<i> each user can inherit access from his group, except if the user himself
+</I>&gt;<i> is denied something from the group, right?
+</I>
+Yes. Permissions granted to a user always override permissions granted
+by groups to which that user belongs.
+
+If a group is denied permission X but a particular user in that group is
+granted permission X, the result is that the user is granted the
+permission.
+
+Conversely, if a user is denied permission X, but a group to which that
+user belongs grants the same permission, the user will still be denied
+permission X.
+
+Of course, if a user is neither granted nor denied permission X, but a
+group to which the user belongs is granted the permission, the user will
+be granted that permission.
+
+The algorithm is:
+
+granted permissions = (u1 + (g1 - u2)) - (u2 + (g2 - u1))
+
+where:
+
+u1 = permissions granted to user
+u2 = permissions denied to user
+g1 = permissions granted to groups containing user
+g2 = permissions denied to groups containing user
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000026.html">[JOS-Arch] Re: JOS registry</A></li>
+	<LI> Next message: <A HREF="000028.html">[JOS-Arch] Requirements</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#27">[ date ]</a>
+              <a href="thread.html#27">[ thread ]</a>
+              <a href="subject.html#27">[ subject ]</a>
+              <a href="author.html#27">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

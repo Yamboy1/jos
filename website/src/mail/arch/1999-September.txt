@@ -1,0 +1,1331 @@
+From gchii@mindspring.com Tue, 07 Sep 1999 19:49:30 -0400
+Date: Tue, 07 Sep 1999 19:49:30 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Open Architecture
+
+When you build a free Java-based operating system, like JOS, should its
+architecture be open or closed?
+
+An "open" architecture is one where *anyone* can build compatible plug-ins.
+A "closed" architecture is where only a priviledged few can build plug-ins.
+
+But, it goes beyond that. A fully "open" architecture is one where *anyone*
+can propose a change to the architecture, where multiple, concurrent
+architectures are encouraged, where alternatives abound. A "closed"
+architecture is where only a priviledged few can design the architecture
+and decide what's allowed and what's not.
+
+
+
+
+From ryan@whitewolf.com.au Wed, 08 Sep 1999 05:38:15 +0000
+Date: Wed, 08 Sep 1999 05:38:15 +0000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] Open Architecture
+
+I have moved this thread to mailto:biz@jos.org (this is a project
+organisation/licensing issue rather than system design issue).
+
+My comments are below. (NOTE: please remove arch from the CC field
+before replying)
+
+Gilbert Carl Herschberger II wrote:
+> 
+> When you build a free Java-based operating system, like JOS, should its
+> architecture be open or closed?
+> 
+> An "open" architecture is one where *anyone* can build compatible plug-ins.
+> A "closed" architecture is where only a priviledged few can build plug-ins.
+> 
+> But, it goes beyond that. A fully "open" architecture is one where *anyone*
+> can propose a change to the architecture, where multiple, concurrent
+> architectures are encouraged, where alternatives abound. A "closed"
+> architecture is where only a priviledged few can design the architecture
+> and decide what's allowed and what's not.
+
+I would feel more comfortable working on a project knowing that anyone
+has the right to to implement their ideas, even if it leads to forking.
+Any restrictions we put in place are likely to get in the way of
+progress. I would like to see jos.org as just one possible organisation
+for developing jos, while allowing for alternate organisations that
+prefer to go different directions.
+
+-- 
+Ryan Heise (arch@jos.org list administrator)
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From gchii@mindspring.com Mon, 13 Sep 1999 11:30:47 -0400
+Date: Mon, 13 Sep 1999 11:30:47 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Reflection
+
+Reflect on this:
+
+public class SystemExit() {
+  static() {
+    System.exit();
+  }
+}
+
+What happens when your code reflects this class?
+
+Class c = Class.forName( "SystemExit" );
+Method[] c.getMethods();
+
+Your program ends somewhere within the call to Class.forName(). So, how can
+you reflect the methods of such a class?
+
+Have you ever wondered why the Java compiler never invokes a static method
+when it loads a class? It is because the Java compiler uses a better
+reflection API. Here is what reflection *should* do:
+
+1. Reflect without side-effects.
+
+Reflection should be reflection-only. It must not assume the purpose of
+reflection is invocation. It must not invoke the static method of a class.
+
+2. Reflect any bytecode.
+
+Reflection should be limitless. It must not assume the target of reflection
+is limited to the platform of the current JVM.
+
+In other words, the right kind of reflection package should be able to
+reflect the Java 0 and 1 Platforms using a Java 2 Platform JVM. And
+likewise, the same package -- without modification -- should be able to
+reflect the Java 2 Platform using a Java 0 Platform JVM.
+
+How not to do it
+Expanding the responsibilities of java.lang.Class is bad, very bad.
+Attaching reflection to the java.lang.Class class limits reflection to a
+platform equal to your JVM. The java.lang.Class object has nothing to do
+with static reflection.
+
+When java.lang.Class is used for reflection, the static() method is invoked
+while building the Class object. It executes bytecode that should not be
+executed for the sake of pure reflection.
+
+How must bytecode can you write inside of a static() method?
+
+There is no limit. There is nothing inherent in the static() method from
+loading a huge application. You can write a class-specific routine,
+following the recommended use of the static() method. Or, you can launch a
+thousand sub-programs.
+
+Inside the JVM, the static() method must be invoked just like every other
+method. It has the potential to be very large. Before, the static() method
+is called, the JVM must update the class object itself to show that the
+static() method has been called, so that it cannot be called again for that
+instance of a class object.
+
+The static() method must have its own stack frame, just like every other
+method. In a multiple thread environment, a static() method is able to
+create and start other threads. It must not block other threads. The JVM
+cannot afford to wait. It must continue to task-switch while the static()
+method is running.
+
+The static() method is *always* synchronized, preventing two or more
+threads from using the static() method at the same time. You write:
+
+static() {
+  System.out.println( "Hello, World!" );
+}
+
+and the compiler writes:
+
+public static synchronized static() {
+  System.out.println( "Hello, World!" );
+}
+
+[1] public because the JVM must invoke it.
+[2] static because it invoked without an instance of the class.
+[3] synchronized because it must be invoked once, and only once, as
+promised by the JVM.
+
+When does the JVM invoke this method()? It is a matter of semantics. The
+JVM usually invokes the static method as an instance of java.lang.Class is
+constructed. It must be invoked at some time after a class is resolved and
+before any other method is invoked.
+
+
+
+
+From digigod@earthling.net Mon, 13 Sep 1999 13:21:00 -0700
+Date: Mon, 13 Sep 1999 13:21:00 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] Reflection
+
+Gilbert Carl Herschberger II wrote:
+> Reflect on this:
+> 
+> public class SystemExit() {
+>   static() {
+>     System.exit();
+>   }
+> }
+> 
+> What happens when your code reflects this class?
+> 
+> Class c = Class.forName( "SystemExit" );
+> Method[] c.getMethods();
+> 
+> Your program ends somewhere within the call to Class.forName(). So, how can
+> you reflect the methods of such a class?
+
+by denying the System.exit() call.
+ 
+> Have you ever wondered why the Java compiler never invokes a static method
+> when it loads a class? It is because the Java compiler uses a better
+> reflection API. Here is what reflection *should* do:
+
+it does invoke anything, it loads the other classes to get bindings.
+ 
+> 1. Reflect without side-effects.
+> 
+> Reflection should be reflection-only. It must not assume the purpose of
+> reflection is invocation. It must not invoke the static method of a class.
+> 
+> 2. Reflect any bytecode.
+> 
+> Reflection should be limitless. It must not assume the target of reflection
+> is limited to the platform of the current JVM.
+> 
+> In other words, the right kind of reflection package should be able to
+> reflect the Java 0 and 1 Platforms using a Java 2 Platform JVM. And
+> likewise, the same package -- without modification -- should be able to
+> reflect the Java 2 Platform using a Java 0 Platform JVM.
+
+I like the reflection API, I think it does it right (more or less). I
+think what your describing is something slightly different and just as
+useful/important.
+ 
+> How not to do it
+> Expanding the responsibilities of java.lang.Class is bad, very bad.
+> Attaching reflection to the java.lang.Class class limits reflection to a
+> platform equal to your JVM. The java.lang.Class object has nothing to do
+> with static reflection.
+>
+> When java.lang.Class is used for reflection, the static() method is invoked
+> while building the Class object. It executes bytecode that should not be
+> executed for the sake of pure reflection.
+
+thats because its not pure reflection, its useful reflection. but as I
+said above pure reflection has its place too.
+
+> How must bytecode can you write inside of a static() method?
+> 
+> There is no limit. There is nothing inherent in the static() method from
+> loading a huge application. You can write a class-specific routine,
+> following the recommended use of the static() method. Or, you can launch a
+> thousand sub-programs.
+> 
+> Inside the JVM, the static() method must be invoked just like every other
+> method. It has the potential to be very large. Before, the static() method
+> is called, the JVM must update the class object itself to show that the
+> static() method has been called, so that it cannot be called again for that
+> instance of a class object.
+> 
+> The static() method must have its own stack frame, just like every other
+> method. In a multiple thread environment, a static() method is able to
+> create and start other threads. It must not block other threads. The JVM
+> cannot afford to wait. It must continue to task-switch while the static()
+> method is running.
+
+its a class constructor, people misuse object constructors all the time
+too.
+ 
+> The static() method is *always* synchronized, preventing two or more
+> threads from using the static() method at the same time. You write:
+> 
+> static() {
+>   System.out.println( "Hello, World!" );
+> }
+> 
+> and the compiler writes:
+> 
+> public static synchronized static() {
+>   System.out.println( "Hello, World!" );
+> }
+> 
+> [1] public because the JVM must invoke it.
+> [2] static because it invoked without an instance of the class.
+> [3] synchronized because it must be invoked once, and only once, as
+> promised by the JVM.
+
+its not a method like any other, you dont even use (). technically its a
+static initializer /block/ only the JVM can call it, just like its
+brethen the object constructors.
+ 
+> When does the JVM invoke this method()? It is a matter of semantics. The
+> JVM usually invokes the static method as an instance of java.lang.Class is
+> constructed. It must be invoked at some time after a class is resolved and
+> before any other method is invoked.
+
+I think it should be invoked when the class is resolved, you've given a
+clear argument for a pure-reflection API but not for altering the
+behavior of <clinit>.
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From gchii@mindspring.com Tue, 14 Sep 1999 14:42:44 -0400
+Date: Tue, 14 Sep 1999 14:42:44 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] =?iso-8859-1?Q?Jos=E9(tm)_for_Windows(tm)_-_Release_1a?=
+
+Realign Software is proud to announce José(tm) for Windows(tm), a special
+edition version of José(tm) customized for the Microsoft(r) Windows(tm)
+sub-operating system. José(tm) runs Apple, Linux(r), Solaris, OS/2, OS/400,
+UNIX(tm), and Windows(tm), too.
+
+- This is a run-time distribution; it contains no source code. Take it for
+a test drive.
+
+- This is free-license software.
+
+- This is a special edition customized for Windows(tm).
+
+We will continue to bring José(tm) technology to the JOS(tm) platform. As a
+JOS programmer, you might notice that José(tm) uses a custom class manager,
+package files, the SmartAPI, the SmartRegistry, the ConsoleStudio. It
+includes the Master Editor, Master Compiler, Applet Browser and Plain-Text
+Browser.
+
+As a Java programmers, you might be surprised by what's missing. It has no
+.class or .jar files! Each package is stored in package file in order to
+achieve from extreme software reuse.
+
+It might be the easiest Windows(tm) software you've ever had to install.
+You unzip it and run the josewin.exe program. That's all there is to it. It
+is self-contained. The josewin.exe program uses the Java Native Interface
+to launch a JVM. It is an end-user program and uses the Java Runtime
+Environment (JRE), not a JDK/JSK.
+
+It might be the easiest Windows(tm) software you've ever had to un-install.
+When you're done, you delete it.
+
+
+
+
+From gchii@mindspring.com Tue, 14 Sep 1999 14:52:32 -0400
+Date: Tue, 14 Sep 1999 14:52:32 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] =?iso-8859-1?Q?Jos=E9(tm)_for_Windows(tm)_-_Release_1a_(with?= URL)
+ =?iso-8859-1?Q?Jos=E9(tm)_for_Windows(tm)_-_Release_1a_(with?= URL)
+
+Realign Software is (again) proud to announce José(tm) for Windows(tm), a
+special edition version of José(tm) customized for the Microsoft(r)
+Windows(tm) sub-operating system. José(tm) runs Apple, Linux(r), Solaris,
+OS/2, OS/400, UNIX(tm), and Windows(tm), too.
+
+- This is a run-time distribution; it contains no source code. It is a
+non-technical, end-user distribution.
+
+- This is a special edition customized for Windows(tm). It is free-license
+software. Even the JRE for Windows is available from JavaSoft at no
+addition cost.
+
+- It is available on the Internet. Unzip this file and run the josewin.exe
+program.
+
+<URL:http://www.realignsoft.com/jpkg/josewin1a.zip>
+
+- It is available on CD-ROM. It runs directly off of CD-ROM without
+installation of anything but the JRE. Installation is nothing more than
+copying files from CD-ROM to your local drive. This is a perfect
+distribution for one-use or occasional-use software.
+
+We will continue to bring José(tm) technology to the JOS(tm) platform. As a
+JOS programmer, you might notice that José(tm) uses a custom class manager,
+package files, the SmartAPI, the SmartRegistry, the ConsoleStudio. It
+includes the Master Editor, Master Compiler, Applet Browser and Plain-Text
+Browser.
+
+As a Java programmers, you might be surprised by what's missing. It has no
+.class or .jar files! Each Java(tm) package is stored in package file in
+order to achieve from extreme software reuse.
+
+Take it for a test drive. Check it out. See if you like it. You don't have
+to edit your CLASSPATH or reboot your computer.
+
+- It might be the easiest Windows(tm) software you've ever had to install.
+You unzip it and run the josewin.exe program. That's all there is to it. It
+is self-contained. The josewin.exe program uses the Java Native Interface
+to launch a JVM. It is an end-user program and uses the Java Runtime
+Environment (JRE), not a JDK/JSK.
+
+- It might be the easiest Windows(tm) software you've ever had to
+un-install. When you're done, you delete it.
+
+
+
+
+From gchii@mindspring.com Tue, 14 Sep 1999 15:28:48 -0400
+Date: Tue, 14 Sep 1999 15:28:48 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Project Update
+
+JOS is a free Java-based operating system. The emphasis is
+
+- based upon Java(tm),
+- built on top of Java(tm),
+- with Java(tm) as its foundation.
+
+Are we building a foundation *for* Java(tm) or building upon Java(tm) as
+the foundation? It seems to me that the mechanism to let people use the
+software is a higher priority right now than the software itself. Content
+is worthless without a mechanism to deliver it.
+
+1. Build JOS(tm) on Java(tm)
+
+How do you take JOS for a test drive? Use an existing sub-operating system
+kernel. You can use a kernel from Linux(r) or Windows(tm). You can use an
+existing Java(tm) Runtime Environment. By default, that's what everybody is
+doing.
+
+Encourage lots of programmers to build the parts of the operating system we
+need, using Java(tm), the programming language, and Java(tm), the class
+libraries, and Java(tm), the virtual machine.
+
+2. Build Java(tm) on JOS(tm)???
+
+You might use assembler, C, and/or C++ to build a foundation for Java(tm).
+Such a sub-operating system would provide a specialized environment for a
+specialized JVM.
+
+If JOS(tm) is based upon Java(tm), Java(tm) can't be based on JOS(tm). That
+would be a recursive dependency. We don't want a new sub-operating system,
+a new JVM, and then new class libraries and applications on top of that.
+
+If the JOS project is going to build a Java-based operating system, it
+doesn't need to build a new sub-operating system, at least not on the first
+day. A special-interest group within the JOS Project could pursue the new
+sub-operating system. That should not be the focus of the JOS Project.
+
+
+
+
+From tmiller@haverford.edu Tue, 14 Sep 1999 18:15:21 -0400 (EDT)
+Date: Tue, 14 Sep 1999 18:15:21 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Project Update
+
+	JOS is, of course, an operating system.  We intend to write as
+much of that operating system as is practicable in Java.  Certain aspects
+of any operating system must be specific to the machine on which it is
+running.  Sun's Java Virtual Machine is not a machine on which an
+operating system can run.  Therefore, we must build our own.  John
+Morrison (jJOS) and myself (decaf) believe that the best approach is to
+write our own kernel and VM (although not class library) from scratch.
+Other proposals include variants based on the Flux OS Toolkit, etc.  I
+rejected the idea of a modification to an existing open-source JVM (i.e.
+Kaffe) because I felt my resources would be better used in creation and
+not modification; there does not appear to be either a benefit in
+time-to-product or functionality.  I have found it a pleasure to work with
+John's kernel (jJOS), and have no desire to port decaf to a different one.
+
+
+	If you are interested in writing Java device drivers, or C/C++
+kernel or JVM code, please join up on the kernel@jos.org mailing list;
+there's always plenty to do.  If you're not (and I can't fault you!), feel
+free to develop aspects of JOS on conventional JVMs; you will, however,
+be forced to emulate in several key areas, doing the kind of work I would
+imagine someone uninterested in kernel/driver/JVM work would find boring.
+If you're interested in testing jJOS/decaf out, the source is in the
+'JJOS' module of our CVS server, and you can send question to the kernel
+list...
+
+-_Quinn
+
+
+
+
+From digigod@earthling.net Tue, 14 Sep 1999 17:30:14 -0700
+Date: Tue, 14 Sep 1999 17:30:14 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] =?iso-8859-1?Q?Jos=E9?=(tm) for Windows(tm) - Release 1a (
+ with URL)=?iso-8859-1?Q?Jos=E9?=(tm) for Windows(tm) - Release 1a (with
+ URL)
+
+Gilbert Carl Herschberger II wrote:
+> Realign Software is (again) proud to announce José(tm) for Windows(tm), a
+> special edition version of José(tm) customized for the Microsoft(r)
+> Windows(tm) sub-operating system. José(tm) runs Apple, Linux(r), Solaris,
+> OS/2, OS/400, UNIX(tm), and Windows(tm), too.
+> 
+> - This is a run-time distribution; it contains no source code. It is a
+> non-technical, end-user distribution.
+> 
+> - This is a special edition customized for Windows(tm). It is free-license
+> software. Even the JRE for Windows is available from JavaSoft at no
+> addition cost.
+> 
+> - It is available on the Internet. Unzip this file and run the josewin.exe
+> program.
+> 
+> <URL:http://www.realignsoft.com/jpkg/josewin1a.zip>
+> 
+> - It is available on CD-ROM. It runs directly off of CD-ROM without
+> installation of anything but the JRE. Installation is nothing more than
+> copying files from CD-ROM to your local drive. This is a perfect
+> distribution for one-use or occasional-use software.
+> 
+> We will continue to bring José(tm) technology to the JOS(tm) platform. As a
+> JOS programmer, you might notice that José(tm) uses a custom class manager,
+> package files, the SmartAPI, the SmartRegistry, the ConsoleStudio. It
+> includes the Master Editor, Master Compiler, Applet Browser and Plain-Text
+> Browser.
+> 
+> As a Java programmers, you might be surprised by what's missing. It has no
+> .class or .jar files! Each Java(tm) package is stored in package file in
+> order to achieve from extreme software reuse.
+> 
+> Take it for a test drive. Check it out. See if you like it. You don't have
+> to edit your CLASSPATH or reboot your computer.
+> 
+> - It might be the easiest Windows(tm) software you've ever had to install.
+> You unzip it and run the josewin.exe program. That's all there is to it. It
+> is self-contained. The josewin.exe program uses the Java Native Interface
+> to launch a JVM. It is an end-user program and uses the Java Runtime
+> Environment (JRE), not a JDK/JSK.
+> 
+> - It might be the easiest Windows(tm) software you've ever had to
+> un-install. When you're done, you delete it.
+
+Well, great. Im downloading it now, but is this really the best place
+for this? I think the general list or, more appropriately, the JavaLobby
+is your Forum for this.
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From digigod@earthling.net Tue, 14 Sep 1999 17:47:54 -0700
+Date: Tue, 14 Sep 1999 17:47:54 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] Project Update
+
+"Todd L. Miller" wrote:
+>         JOS is, of course, an operating system.  We intend to write as
+> much of that operating system as is practicable in Java.  Certain aspects
+> of any operating system must be specific to the machine on which it is
+> running.  Sun's Java Virtual Machine is not a machine on which an
+> operating system can run.  Therefore, we must build our own.  John
+> Morrison (jJOS) and myself (decaf) believe that the best approach is to
+> write our own kernel and VM (although not class library) from scratch.
+> Other proposals include variants based on the Flux OS Toolkit, etc.  I
+> rejected the idea of a modification to an existing open-source JVM (i.e.
+> Kaffe) because I felt my resources would be better used in creation and
+> not modification; there does not appear to be either a benefit in
+> time-to-product or functionality.  I have found it a pleasure to work with
+> John's kernel (jJOS), and have no desire to port decaf to a different one.
+
+I see JOS as being defined into three layers: JOSBox, JOSystem,
+Applications (including JADE).
+
+JOSBox is the virtual hardware that is the kernel and VM and all that,
+once we get that for one architecture we can port it to others without
+changing anything else about JOS. It would also be possible to make a
+JOS "emulator" that is a kernel's, special, VM/quasiOS that runs on
+another OS which would run the same JOS as everything else... The
+purpose of the JOSBox is to load JOSystem.
+
+JOSystem is the "real" OS, consisting of a Java "kernel" that loads
+drivers and resources and communicates with the hardware using the
+JOSBox proxy/abstraction, its purpose is to load the Applications.
+
+the Applications are why we have the OS, JADE is a special application
+(a JOS-specific application) that communicates the wants of the user to
+the OS via oddly colored boxes and icons that look like tissue boxes. it
+translates the user input into commands for the OS.
+
+Separating JOS like this gives it maximum flexibility, by making the UI
+an application not part of the OS it makes JOS easy to put on a robot
+(you'd need a JOSBox for the microprocessor and an application that had
+the program for the robot for that to work mind you). Also, say company
+X makes a new type of computer using a new design that makes it
+impossible to use other OSes like windows, they code a JOSBox and all
+the sudden they have a full OS and everybody's favorite apps already
+running. If you have windows but use Java apps alot you could load JOS
+with a windows "emulating" JOSBox and you could use JADE alongside
+windows (and if you get rid of windows all you need to download is the
+kernel's JOSBox...)
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From tmiller@haverford.edu Tue, 14 Sep 1999 22:56:07 -0400 (EDT)
+Date: Tue, 14 Sep 1999 22:56:07 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Project Update
+
+> I see JOS as being defined into three layers: JOSBox, JOSystem,
+> Applications (including JADE).
+
+	Right.  As it stands JOSBox is the JavaOS for Business hardware
+APIs (or will be, for jJOS/decaf), and JOSSystem is undefined, pending
+design decisions. The JOSBox can't be emulated by a conventional JVM
+without some heavy-duty coding, an effort I believe would be much better
+spent implementing the JOSBox on hardware (i.e. jJOS/decaf).  The
+applications -- including JADE -- could be programmed on a conventional
+JVM if you emulated JOSSystem, which is possible, albeit as difficult, if
+not more so, than emulating the JOSBox. (Although this approach would
+probably entail less manipulation of the VM itself.)  I don't particularly
+object to this approach, except that we haven't defined a JOSSystem
+(though the exercise of trying to write JADE on Sun's class-library would
+probably point out exactly what was missing...) -- which could cause
+masssive lossage if we define it differently than it was emulated or if we
+define it in some way compromise way so we don't lose the extant body of
+work; again, if you are interested in JOSBox/JOSSytem -level coding, it
+seems to me to be a good idea to set to work on that now, instead.
+
+	It seems to me, Gilbert, like the architecture group might define
+the upper edge of JOSSystem (what abstractions should every JOSBox have?)
+and JADE (what will our equivalent of the X libraries look like? Should
+they look more like the KDE/GNOME libaries?  (Sun's canonical class
+library being the equivalent of glibc.))
+
+-_Quinn
+
+
+
+
+
+From digigod@earthling.net Tue, 14 Sep 1999 20:08:01 -0700
+Date: Tue, 14 Sep 1999 20:08:01 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] Project Update
+
+"Todd L. Miller" wrote:
+>         Right.  As it stands JOSBox is the JavaOS for Business hardware
+> APIs (or will be, for jJOS/decaf), and JOSSystem is undefined, pending
+> design decisions. The JOSBox can't be emulated by a conventional JVM
+> without some heavy-duty coding, an effort I believe would be much better
+> spent implementing the JOSBox on hardware (i.e. jJOS/decaf).  The
+> applications -- including JADE -- could be programmed on a conventional
+> JVM if you emulated JOSSystem, which is possible, albeit as difficult, if
+> not more so, than emulating the JOSBox. (Although this approach would
+> probably entail less manipulation of the VM itself.)  I don't particularly
+> object to this approach, except that we haven't defined a JOSSystem
+> (though the exercise of trying to write JADE on Sun's class-library would
+> probably point out exactly what was missing...) -- which could cause
+> masssive lossage if we define it differently than it was emulated or if we
+> define it in some way compromise way so we don't lose the extant body of
+> work; again, if you are interested in JOSBox/JOSSytem -level coding, it
+> seems to me to be a good idea to set to work on that now, instead.
+> 
+>         It seems to me, Gilbert, like the architecture group might define
+> the upper edge of JOSSystem (what abstractions should every JOSBox have?)
+> and JADE (what will our equivalent of the X libraries look like? Should
+> they look more like the KDE/GNOME libaries?  (Sun's canonical class
+> library being the equivalent of glibc.))
+
+Well, like I said, to run JADE on Windows you'd need a special VM that's
+a JOSBox sans kernel, with the "abstractions every JOSBox should have"
+on top of that would be the standard JOSystem running JADE; you'd have
+all three layers but the bottom half of the first layer would be resting
+on another OS. I don't think it would be possible to run JOSystem on a
+"plain" VM as, I assume, it shall need special hooks for things like
+creating another VM and communication with other VM's (that will
+probably involve equal coding in the JOSBox and JOSystem to work and
+probably involve TCP/IP sockets...).
+
+I remember defining a general outline for JOSystem on the Wiki, I think
+under JOSystem...
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From gchii@mindspring.com Wed, 15 Sep 1999 15:43:57 -0400
+Date: Wed, 15 Sep 1999 15:43:57 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] =?iso-8859-1?Q?Re:_[JOS-Arch]_Jos=E9(tm)_for_Windows(tm)_-_?=
+ Release 1a (with URL)
+ Release 1a (with URL)
+
+At 05:30 PM 9/14/99 -0700, DigiGod Q Frasché <digigod@earthling.net> wrote:
+>Well, great. Im downloading it now, but is this really the best place
+>for this? I think the general list or, more appropriately, the JavaLobby
+>is your Forum for this.
+
+Downstream, José(tm) and JOS(tm) should merge. José(tm) has a strong
+architecture for extreme reuse. I would like everyone on the archecture
+group to experience first hand the architecture of José(tm) so that JOS(tm)
+can borrow it, as appropriate.
+
+Everyone should agree that JOS(tm) has three layers. Everyone should agree
+to at least three layers, even while we might not agree on their names.
+Every classic operating system has had three layers. We should take comfort
+from the fact we're not doing anything new here.
+
+These layers are fuzzy, abstract and flexible, and should be. Software is
+software. It has been and will always be a matter of convention to put
+software in different layers.
+
+Layer 1: kernel -or- JOSBox -or- sub-operating system
+The kernel and JOSBox are the same. They are the parts of a complete system
+that are below the machine interface. In classic architecture, this layer
+is known as the "hardware" layer.
+
+Java, the virtual machine, depends on a sub-operating system. JOSBox,
+Linux(r) and Windows(tm) are suitable sub-operating systems, with device
+drivers.
+
+Layer 2: Java API -or- JOS class libraries
+The virtual machine goes hand in hand with the Java class libraries. This
+layer turns a sub-operating system into the Java platform.
+
+Layer 3: Applications
+Operating system applications are applications, too. All of the programs
+that come with the operating system are written on top of layer 2. A device
+driver may or may not be an application, depending on where/when it is
+plugged into Layer 1.
+
+These layers might be recognized by the instruction set(s) used:
+
+Layer 1 - machine code
+Layer 2 - mixture of bytecode and machine code (for native methods)
+Layer 3 - bytecode
+
+With precision, Layer 1 is markedly machine code from any programming
+language. Remember that even Java, the programming language, can be
+compiled directly into machine code.
+
+With precision, Layer 3 is markedly bytecode from any programming language
+that can produce Java-compatible bytecode. Remember that Java, the
+programming language, is not the only programming language that produces
+bytecode.
+
+As much of the system that can be expressed in bytecode should be expressed
+in bytecode. When thousands of programs need to copy (download) a file, the
+bytecode for the copy-one-file class should be shared, not stored once for
+each program. In RAM, the copy-one-file class should exist once, not once
+for each class loader.
+
+How should JOS bytecode be stored? I believe that it must be stored in
+package files in order to achieve software reuse. That's an architecture
+question, isn't it?
+
+
+
+
+From gchii@mindspring.com Wed, 15 Sep 1999 15:47:45 -0400
+Date: Wed, 15 Sep 1999 15:47:45 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] =?iso-8859-1?Q?Re:_[JOS-Arch]_Jos=E9(tm)_for_Windows(tm)_-_?=
+ Release 1a (with URL)
+ Release 1a (with URL)
+
+At 05:30 PM 9/14/99 -0700, DigiGod Q Frasché <digigod@earthling.net> wrote:
+>Well, great. Im downloading it now, but is this really the best place
+>for this? I think the general list or, more appropriately, the JavaLobby
+>is your Forum for this.
+
+Downstream, José(tm) and JOS(tm) should merge. José(tm) has a strong
+architecture for extreme reuse. I would like everyone on the archecture
+group to experience first hand the architecture of José(tm) so that JOS(tm)
+can borrow it, as appropriate.
+
+Everyone should agree that JOS(tm) has three layers. Everyone should agree
+to at least three layers, even while we might not agree on their names.
+Every classic operating system has had three layers. We should take comfort
+from the fact we're not doing anything new here.
+
+These layers are fuzzy, abstract and flexible, and should be. Software is
+software. It has been and will always be a matter of convention to put
+software in different layers.
+
+Layer 1: kernel -or- JOSBox -or- sub-operating system
+The kernel and JOSBox are the same. They are the parts of a complete system
+that are below the machine interface. In classic architecture, this layer
+is known as the "hardware" layer.
+
+Java, the virtual machine, depends on a sub-operating system. JOSBox,
+Linux(r) and Windows(tm) are suitable sub-operating systems, with device
+drivers.
+
+Layer 2: Java API -or- JOS class libraries
+The virtual machine goes hand in hand with the Java class libraries. This
+layer turns a sub-operating system into the Java platform.
+
+Layer 3: Applications
+Operating system applications are applications, too. All of the programs
+that come with the operating system are written on top of layer 2. A device
+driver may or may not be an application, depending on where/when it is
+plugged into Layer 1.
+
+These layers might be recognized by the instruction set(s) used:
+
+Layer 1 - machine code
+Layer 2 - mixture of bytecode and machine code (for native methods)
+Layer 3 - bytecode
+
+With precision, Layer 1 is markedly machine code from any programming
+language. Remember that even Java, the programming language, can be
+compiled directly into machine code.
+
+With precision, Layer 3 is markedly bytecode from any programming language
+that can produce Java-compatible bytecode. Remember that Java, the
+programming language, is not the only programming language that produces
+bytecode.
+
+As much of the system that can be expressed in bytecode should be expressed
+in bytecode. When thousands of programs need to copy (download) a file, the
+bytecode for the copy-one-file class should be shared, not stored once for
+each program. In RAM, the copy-one-file class should exist once, not once
+for each class loader.
+
+How should JOS bytecode be stored? I believe that it must be stored in
+package files in order to achieve software reuse. That's an architecture
+question, isn't it?
+
+
+
+
+From onewith1@flash.net Wed, 15 Sep 1999 19:32:43 -0500
+Date: Wed, 15 Sep 1999 19:32:43 -0500
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Arch] JOSSystem
+
+[Warning: super long.  Required for reading: 4 shots espresso = 32 cups of
+coffee]
+
+I'm currently unsure about where discussions about JOSSystem are placed, so
+I'll post this to both kernel and arch in the hopes that someone knows.
+
+I've recently been rekindling my interest in Jini, and in doing so I've been
+rolling around a Jini-based OS in my head.  Don't know if we want to go that
+way (full dedication to a single technology), so here it is for your
+edification.  At least if I'm going in the wrong direction, someone can stop
+me before I go insane.
+
+First off, if we are to implement a multi-process JVM for JOS, there is a
+dire need for shared objectspace between processes (there may not be much of
+an argument against this, but here it is anyway). This could be as simple as
+a single static hashtable which is shared, or all the way up to a
+full-featured registry or Jini name server, and possibly into a whole shared
+memory API.  But whatever we do, we need to have shared memory between
+processes.  Here's why:
+
+If we want to have Java device drivers, we need a way to share access to
+them.  If we cannot share access between device drivers, then we have no way
+of restricting threads from interfering with driver access.  I don't know
+about you, but I wouldn't want two independent file systems trying to write
+files to my harddrive at the same time - can you say "reformat your
+harddrive"?
+
+An early wiki message suggested that JOS use the TCP/IP protocol stack for
+communication to drivers via RMI.  Note: implied in the statement is a
+/shared/ protocol stack.
+
+I suggest, at least at first, that we have a single, static, shared object
+which every process can see.  Perhaps something like a registry (see below).
+Note that any object registered to this shared object should becomes shared
+across the processes.
+
+Ok, onto my JOSSystem idea:
+=======================
+
+Jini offers Java applications a unified method of discovering all known
+devices  (technically, "services") on a network (or a stand-alone PC).  Not
+only that, but it includes a unified method to interact with all discovered
+devices.
+
+I say, let's code all our device drivers to that standard.  But wait -
+doesn't Jini require a network?  But at boot time, JOS doesn't have a
+network yet, Matt!
+
+The current Jini specification talks about a network (and thus RMI) as the
+underlying "bare iron" for a djinn (Jini network).  However, if I read the
+small print right, using datagram broadcast for discovery, and RMI for
+across-the-wire communication, is only the /default/ implementation.  I
+believe that we can still be Jini compliant by making a non-network Jini
+network (or is that doublethink?).
+
+If we place the localized Jini lookup service in a well-defined location
+(say, the base shared object in JOS, or an parameter in the localized
+discovery method), then localized discovery is done by calling the local
+lookup service directly, without the need for a network.  Likewise for
+finding a localized Jini service.  Calling a Jini service would then be a
+direct Java call, without the need for RMI.
+
+We could create a specific localized Jini service which connects the local
+Jini lookuped devices to a real djinn.
+
+This way, all our PC (non-Jini ready) devices register themselves to the
+local Jini lookup service at boot time (really, post boot, pre shell
+startup, so we're left with device discovery in the middle, or rather
+JOSSystem boot!).  Then any application or service that requires a service,
+finds one in the localized djinn.
+
+To help with security, we should create access levels in our local djinn.
+Only services that we declaire public can be seen outside the djinn
+protection.  After all, we don't want anyone on the internet to have access
+to our PC_CLOCK device, and what could be done with a PCI_BRIDGE device?
+
+We can chain local djinns together in the common fashion of a device tree.
+This way, we can have specialized local djinns that only detect a certain
+type of device.
+
+Yeah, Matt, that all sounds good and hunky-doory.  But how do we load the
+definitions for what localized djinns to load?  We want JOS to be
+configurable, which implies a configuration file, but at the time JOSSystem
+loads, we don't have a storage access driver!  Sounds like the
+chicken-and-the-egg problem.  How do you plan to overcome that one, Mr.
+Smartypants?
+
+I'm somewhat stumped on that one.  I've been thinking about several ideas.
+One is a "basic local djinn" which is passed to JOSSystem from the JOS-box.
+This is about what JavaOS for Business did.  That way, though, we might have
+to recompile the JOS-box for different configurations, so that the JOSSystem
+has the basic I/O capabilities for loading the robust Java services over the
+default ones.  This is also good for JOS for Embedded Devices (tm), which
+wouldn't need this kind of configuration time, and would just pass up the
+djinn from flash memory (or whatever).
+
+Any comments? Flames?  Abuses?  All are welcome!
+
+-Matt
+
+
+
+
+From digigod@earthling.net Fri, 17 Sep 1999 19:02:11 -0700
+Date: Fri, 17 Sep 1999 19:02:11 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] JOSSystem (-S)
+
+> I'm currently unsure about where discussions about JOSSystem are placed, so
+> I'll post this to both kernel and arch in the hopes that someone knows.
+
+its actually JOSystem (we're just accentuating the System to
+differentiate it from the other layers...), I've been saying it "Joe
+System".
+
+I don't know how applicable this is, but I was at the MIT "Parallel and
+Distributed OS" (or PDOS) page and they were talking about a new design,
+called exokernel. its a good idea and its flexible like we need, but I
+don't know how well it would translate to a VM based OS, unless we used
+it on JOSystem which is, basically, "the kernel on the kernel", or the
+virtual kernel. I think we could get flexibility and speed by using a
+nanokernel for the JOSBox and an exokernel for JOSystem. of course I
+don't much of such things, so I encourage you to see the site
+http://www.pdos.lcs.mit.edu/exo/ and goto
+http://www.pdos.lcs.mit.edu/PDOS-papers.html for more (to much, in fact)
+information. at the very least we can use their neat file system...
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From onewith1@flash.net Sat, 18 Sep 1999 11:42:10 -0500
+Date: Sat, 18 Sep 1999 11:42:10 -0500
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Arch] Re: [JOS-Kernel] JOSSystem
+
+I know it's bad form to reply to your own message, but I had a chance to
+think more about this design, and I feel that I can better describe my
+design philosophy now, with respect to JOS-Box, JOSystem, and Applications.
+I'm fully aware of how poor my first-cut (and twelfth-cut) explainations can
+be, so I'll try again.
+
+
+I wrote:
+> I'm trying to switch this design philosophy.  This design views all
+services
+> and devices as remote.  There is a central local service which is used to
+> access all other services - whether they are remote or local.
+
+The JOS-Box layer contains only the bare-bones device drivers to get it
+going.  These are generally hard-coded into the kernel (such as simple text
+mode for displaying the Red-Screen-Of-Death, and a basic file system
+reader).
+
+The JOSystem layer creates the localized Jini lookup service for which
+local, non-Jini devices on the PC register themselves.  This should probably
+done as so:
+   1) A set of localized lookup services are created (in JavaOS for Business
+architecture, these would be the "bus" objects).  These would be things like
+"ISA Bus", "SCSI Bus", "HotWire Bus", and so on.
+   2) Each localized lookup service then goes about detecting all devices
+that it has knowledge about.  This can include detecting a single device,
+running a set of plug-ins to detect a particular device, or starting up
+another localized lookup service.
+
+All of these lookup services are in a hierarchial view, where the top-level
+lookup is in charge of publication to the PC of all usable devices.
+Optionally, another lookup service can be loaded on top of that one to
+broadcast to the network all known devices (the lookup proxy).
+
+The Architecture layer uses the standard Jini mechanisms to discover devices
+on the network.  Commonly, the lookup service used is the top-level
+localized lookup service.  This top-level service should determine if the
+request for a device is from the local host or a remote host.  If from a
+local host, then the local Jini proxy (i.e. the actual device driver) is
+given to the application to increase the speed of access.
+
+Hopefully, this clears things up a bit about the design in my brain.
+Please, ask questions, and punch as many holes in it as you can.  If there's
+some critical error or wrong assumption I'm making, then let's iron it out
+or throw out the whole Jini idea.
+
+-Matt
+
+
+
+
+From digigod@earthling.net Sun, 19 Sep 1999 15:18:20 -0700
+Date: Sun, 19 Sep 1999 15:18:20 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] Re: [JOS-Arch] =?iso-8859-1?Q?Jos=E9?=(tm) for Windows(tm)
+ - Release 1a (with URL)Release 1a (with URL)
+
+Gilbert Carl Herschberger II wrote:
+> These layers are fuzzy, abstract and flexible, and should be. Software is
+> software. It has been and will always be a matter of convention to put
+> software in different layers.
+> 
+> Layer 1: kernel -or- JOSBox -or- sub-operating system
+> The kernel and JOSBox are the same. They are the parts of a complete system
+> that are below the machine interface. In classic architecture, this layer
+> is known as the "hardware" layer.
+> 
+> Java, the virtual machine, depends on a sub-operating system. JOSBox,
+> Linux(r) and Windows(tm) are suitable sub-operating systems, with device
+> drivers.
+
+When I talk about the JOSBox I think of the kernel and the VM, the
+JOSBox is a kind of emulator for Java. as far as JOSystem is concerned
+its running on pure hardware. I know that's impossible as the two layers
+are going to need many hooks between them, Id like to keep all the
+machine code in JOSBox, even if that means putting some bytecode in it.
+ 
+> Layer 2: Java API -or- JOS class libraries
+> The virtual machine goes hand in hand with the Java class libraries. This
+> layer turns a sub-operating system into the Java platform.
+
+I think you misunderstand me, the class libraries and API's have nothing
+to do with this. this layer is the real OS, an all Java "pseudo" kernel
+that the JOSBox invocates, the Java device drivers the process managers
+and the like. This is the OS in the classic sense, but it needs a
+quasiOS in the JOSBox to work...
+ 
+> Layer 3: Applications
+> Operating system applications are applications, too. All of the programs
+> that come with the operating system are written on top of layer 2. A device
+> driver may or may not be an application, depending on where/when it is
+> plugged into Layer 1.
+
+if its part of the OS and its not native its Layer 2. layer 3 isn't the
+OS, but what the OS does; JADE is an application because its not part of
+the OS, it does no operating what it does do is allow the user to run
+applications easily and modify the OS easily. most of layer 3 should be
+unaware of JOS.
+ 
+> These layers might be recognized by the instruction set(s) used:
+> 
+> Layer 1 - machine code
+> Layer 2 - mixture of bytecode and machine code (for native methods)
+> Layer 3 - bytecode
+
+Id like to keep as much native code as possible in layer 1.
+ 
+> With precision, Layer 1 is markedly machine code from any programming
+> language. Remember that even Java, the programming language, can be
+> compiled directly into machine code.
+
+good point.
+ 
+> With precision, Layer 3 is markedly bytecode from any programming language
+> that can produce Java-compatible bytecode. Remember that Java, the
+> programming language, is not the only programming language that produces
+> bytecode.
+> 
+> As much of the system that can be expressed in bytecode should be expressed
+> in bytecode. When thousands of programs need to copy (download) a file, the
+> bytecode for the copy-one-file class should be shared, not stored once for
+> each program. In RAM, the copy-one-file class should exist once, not once
+> for each class loader.
+
+like we have a shared memory that each VM thinks is its own?
+ 
+> How should JOS bytecode be stored? I believe that it must be stored in
+> package files in order to achieve software reuse. That's an architecture
+> question, isn't it?
+
+we need to support the .class file, but Id like the libraries in
+.package files.
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From digigod@earthling.net Sun, 26 Sep 1999 18:23:15 -0700
+Date: Sun, 26 Sep 1999 18:23:15 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] GSI update
+
+after reading a JavaWorld article about a similar framework I spent
+sometime working on GSI. I came to the conclusion that it was up to the
+scripting engine not the interface (GSI) to do Java-to-script (and vice
+versa) communication. So GSI will be complete as soon as I add event
+support and get ScriptLoader working. Which brings me to the biggest
+class/problem: the ScriptLoader. it takes a script from an input and
+creates an, appropriate, Script object for an app to interact with. does
+anyone have any ideas on the structure of that? any additons/comments on
+anything else? fire away.
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From gchii@mindspring.com Mon, 27 Sep 1999 09:22:18 -0400
+Date: Mon, 27 Sep 1999 09:22:18 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] GSI update
+
+At 06:23 PM 9/26/99 -0700, DigiGod Q Frasché <digigod@earthling.net> wrote:
+>after reading a JavaWorld article about a similar framework I spent
+>sometime working on GSI. I came to the conclusion that it was up to the
+>scripting engine not the interface (GSI) to do Java-to-script (and vice
+>versa) communication. So GSI will be complete as soon as I add event
+>support and get ScriptLoader working. Which brings me to the biggest
+>class/problem: the ScriptLoader. it takes a script from an input and
+>creates an, appropriate, Script object for an app to interact with. does
+>anyone have any ideas on the structure of that? any additons/comments on
+>anything else? fire away.
+
+José includes the Master Compiler. It is a translator/interpreter/compiler
+based on a plug-in translator architecture. Last year, I have wrote about
+30+ plug-ins for the Master Compiler, like ISQL and webfile.
+
+Source code is a digital resource if it is stored somewhere. The Master
+Compiler reads source code. It converts all source code into a SourceCode
+object. The SourceCode object is passed to a plug-in translator. The
+plug-in is run and must throw a CompilerException if it cannot complete the
+request.
+
+The SourceCode object has a source URL property and lines property. The
+lines property is a container for lines of code. Each line of code has a
+text property and an original line number property. The text property
+contains the text of the source code. The line number property is important
+for symbolic debugging. The original line number is retained even while
+source code is passed from one pre-processor to another.
+
+In this architecture, source code is not passed by default as an input
+stream. A SourceCode object has a getLineNumberInputStream() method for
+those plug-ins that prefer the input stream format.
+
+The role of the Master Compiler itself is to select a plug-in. For
+automatic plug-in selection, the name of a plug-in must be stored in the
+source code. The plug-in selection statement is a translator directive, and
+looks like this:
+
+#class-name
+
+The class with a given class-name must implement a plug-in interface.
+
+The Master Compiler is the first pre-processor, so it is the only component
+which has to deal with a source code URI. It uses the smart object factory
+to obtain an input stream. Source code can be stored on a local or remote
+machine. In other words, you can run a script directly off an HTTP service.
+
+
+
+
+From digigod@earthling.net Mon, 27 Sep 1999 14:08:36 -0700
+Date: Mon, 27 Sep 1999 14:08:36 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] GSI update
+
+Gilbert Carl Herschberger II wrote:
+> José includes the Master Compiler. It is a translator/interpreter/compiler
+> based on a plug-in translator architecture. Last year, I have wrote about
+> 30+ plug-ins for the Master Compiler, like ISQL and webfile.
+> 
+> Source code is a digital resource if it is stored somewhere. The Master
+> Compiler reads source code. It converts all source code into a SourceCode
+> object. The SourceCode object is passed to a plug-in translator. The
+> plug-in is run and must throw a CompilerException if it cannot complete the
+> request.
+> 
+> The SourceCode object has a source URL property and lines property. The
+> lines property is a container for lines of code. Each line of code has a
+> text property and an original line number property. The text property
+> contains the text of the source code. The line number property is important
+> for symbolic debugging. The original line number is retained even while
+> source code is passed from one pre-processor to another.
+> 
+> In this architecture, source code is not passed by default as an input
+> stream. A SourceCode object has a getLineNumberInputStream() method for
+> those plug-ins that prefer the input stream format.
+> 
+> The role of the Master Compiler itself is to select a plug-in. For
+> automatic plug-in selection, the name of a plug-in must be stored in the
+> source code. The plug-in selection statement is a translator directive, and
+> looks like this:
+> 
+> #class-name
+> 
+> The class with a given class-name must implement a plug-in interface.
+
+Id like a way to do it without having to affect the file in question,
+what if every file had a "secret" XML file that held such information in
+it?
+ 
+> The Master Compiler is the first pre-processor, so it is the only component
+> which has to deal with a source code URI. It uses the smart object factory
+> to obtain an input stream. Source code can be stored on a local or remote
+> machine. In other words, you can run a script directly off an HTTP service.
+
+GSI is only a little "cap" placed on top of a Scripting language so an
+app can run a script from any GSI-enabled language. Master Compiler
+sounds like something different (maybe it could have a GSI though...)
+for one thing Im defining "script" as both text-based and compiled
+byte-code (some languages let you use both, even).
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+

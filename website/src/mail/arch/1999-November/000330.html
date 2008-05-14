@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: [JOS] What is JOS?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000319.html">
+   <LINK REL="Next" HREF="000344.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: [JOS] What is JOS?</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Arch] Re: [JOS] What is JOS?">onewith1@flash.net</A><BR>
+    <I>Thu, 18 Nov 1999 20:20:02 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000319.html">[JOS-Arch] What is JOS?</A></li>
+        <LI> Next message: <A HREF="000344.html">[JOS-Arch] What is JOS?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#330">[ date ]</a>
+              <a href="thread.html#330">[ thread ]</a>
+              <a href="subject.html#330">[ subject ]</a>
+              <a href="author.html#330">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I've started a discussion on this under Wiki JOSArchitectureDiscussion, to
+have a better visual area for discussion.  Of course, we can always further
+the discussion here.
+
+Like, what I do below :-)
+
+&lt;<A HREF="mailto:digigod@earthling.net">digigod@earthling.net</A>&gt; wrote:
+
+&gt;<i> The JOSBox is the computer were writing this OS for, in a sense. It is the
+</I>virtual hardware the JOSystem &quot;kernel&quot; is running on, if someone made this
+into real hardware a modified JOSystem would run JOS on it directly. It is
+the true kernel and the JVM. A JOSBox application could be made sans kernel,
+this is how you could run JOS on a non-JOS machine; the JOSystem would
+require extra features the JOSBox supplies to run so just running it on &quot;any
+old VM&quot; would be painful, a special JOSBox would be the way to go. The main
+benifit of this I see is not in having a showcase for JOS but in having a
+multi-process java environment running on ones computer, allowing (with
+minor modification) to let the OS &quot;launch&quot; Java apps into this
+environment/quasiOS cutting down on memory and start time (people would get
+to tour JOS then get to keep a powerful tool like that). I think we should
+get a kernel/VM JOSBox up then modify it to be an &quot;emulator&quot; JOSBox later
+on, just my opinion though.
+
+This quickly brings to my mind the question: so the APIs that are in charge
+of letting Java code interact with &quot;virtual hardware&quot; in JOSBox or JOSystem,
+or is this just a symantic argument?
+
+The drivers and devices in JOSExtentions need to be able to be JOSBox
+dependent, i.e. a Mac JOSBox will have different low-level drivers than a
+TRS-80 JOSBox. However, hopefully we can make our drivers above this
+low-level compatible across the system, such as File System and RAM Disk,
+and hence put these drivers truly under the JOSExtentions category. So do
+these box-dependent drivers actually belong in JOSBox, not the extentions?
+
+I wouldn't like to think so.  Since the JOSBox is intended to be absolutely
+minimal, my TRS-80 won't need low-level network drivers, but my Crey will.
+Perhaps a JOSBoxExtentions package to cover this category?
+
+
+&gt;<i>
+</I>&gt;<i> JVM incompatabilities might be solved with the exokernel design. Exokernel
+</I>is basically a blank slate of a kernel that allows libraries to be plugged
+into it to provide optimal hardware use (and, of course, having a default
+library for legacy apps). Whats this have to do with JVM's!? Good question,
+say we have most of the stuff that makes a JVM and then have little
+libraries filling the rest in, in a release compatiable manner. That is, we
+have XVM (exo-VM) with a JDK 1.0 library, a 1.1 lib and a 1.2 lib. I don't
+know how well that would work, but its worth a thought.
+
+This may be pushing a moot point, but the way I read it was Exokernels put
+the kernel into extention packages. This way, the HttpServer package can
+optimize its networking pipeline, which may be different from the
+MediaServer's networking pipeline.  It puts all the weight of the kernel
+APIs into the dynamically loadable executable.  But perhaps this /is/ what
+you are refering to...
+
+&gt;<i>
+</I>&gt;<i> Cheers,
+</I>&gt;<i> DigiGod
+</I>
+-Matt
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000319.html">[JOS-Arch] What is JOS?</A></li>
+	<LI> Next message: <A HREF="000344.html">[JOS-Arch] What is JOS?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#330">[ date ]</a>
+              <a href="thread.html#330">[ thread ]</a>
+              <a href="subject.html#330">[ subject ]</a>
+              <a href="author.html#330">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

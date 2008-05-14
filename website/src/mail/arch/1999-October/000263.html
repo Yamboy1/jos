@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] JOS NC vs. PC</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000262.html">
+   <LINK REL="Next" HREF="000264.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] JOS NC vs. PC</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] JOS NC vs. PC">gchii@mindspring.com</A><BR>
+    <I>Tue, 26 Oct 1999 07:28:19 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000262.html">[JOS-Arch] JOS NC vs. PC</A></li>
+        <LI> Next message: <A HREF="000264.html">[JOS-Arch] JOS NC vs. PC</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#263">[ date ]</a>
+              <a href="thread.html#263">[ thread ]</a>
+              <a href="subject.html#263">[ subject ]</a>
+              <a href="author.html#263">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 01:59 PM 10/25/99 -0400, <A HREF="mailto:digigod@earthling.net">digigod@earthling.net</A> wrote:
+&gt;<i>it could also be &quot;test-drive&quot; mode on the JOS CD, try before you install.
+</I>&gt;<i>as I mentioned previously all this needs is a special JOSBox and &quot;wrapper&quot;
+</I>&gt;<i>drivers.
+</I>
+For me, personally, this is one of the most compelling reasons to build a
+new operating system. I have been in pursuit of a goal of &quot;No installation
+required.&quot; Here is what that means:
+
+Your OS must include Java runtime environment(s). Either you upgrade your
+OS to Java-ready by installing a JRE, or you purchase a Java-ready OS.
+
+Once you have a JRE, you do not need to explicitely install any other
+application. Just like applets are downloaded on-demand from a network
+service, your applications can be downloaded on-demand from diskette,
+CD-ROM, ZIP disk or across the network.
+
+Bytecode is relatively compact. When JOS has a bytecode cache, only the
+most recently used bytecode will be stored locally.
+
+After working with an NC version of JOS, I find that the application
+service is critical to the future of JOS. An application service works like
+this:
+
+GET &lt;package-name&gt; PACKAGE/1e
+[DATE:&lt;date&gt;]
+
+When a client-side bytecode cache needs a package, it downloads a package
+from an application service. The protocol between bytecode cache and
+application service looks familiar because it follows HTTP.
+
+1. An application service should download a package and only a package. It
+should never download more than one package. It should never download one
+class at a time.
+
+2. A bytecode cache needs an optional download. When a package stored in a
+cache is up-to-date, there is no need to download it again.
+
+A custom class loader uses a bytecode cache. When a JVM requests a class
+from any package, the custom class loader goes first to a local cache to
+find all classes in a package. If the package is up-to-date, it is used. If
+not, the bytecode cache downloads a package from an application service and
+stores it &quot;locally&quot;.
+
+A bytecode cache might use a RAM disk for storing its package files. In the
+case of a network computer (NC), the cache is discarded when the computer
+is reset (re-booted).
+
+A bytecode cache might use a hard disk for storing its package files. When
+configured, the cache might be limited to a certain amount of space on the
+drive or a certain percentage of space.
+
+When a custom class loader uses a bytecode cache consistently, it does not
+matter where the original bytecode is stored. Even when original bytecode
+is stored in an archive, the application service provides package files.
+
+One bytecode cache can be chained to another. You can set aside a bytecode
+cache on the network that collects bytecode from the Internet. Like a
+firewall, the bytecode cache must deny any request for untrusted packages.
+
+By combining a few of these mechanisms, the boot image for JOS can be
+small. The boot image loads the JVM and a custom class loader. Through the
+custom class loader, it loads the init class. Even the init class can be
+downloaded through the bytecode cache mechanism. Bytecode becomes stored
+virtually. With this assumption, there is no explicite installation required.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000262.html">[JOS-Arch] JOS NC vs. PC</A></li>
+	<LI> Next message: <A HREF="000264.html">[JOS-Arch] JOS NC vs. PC</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#263">[ date ]</a>
+              <a href="thread.html#263">[ thread ]</a>
+              <a href="subject.html#263">[ subject ]</a>
+              <a href="author.html#263">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

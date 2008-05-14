@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Platform API</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000334.html">
+   <LINK REL="Next" HREF="000339.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Platform API</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Platform API">gchii@mindspring.com</A><BR>
+    <I>Fri, 19 Nov 1999 13:31:33 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000334.html">[JOS-Arch] Platform API</A></li>
+        <LI> Next message: <A HREF="000339.html">[JOS-Arch] Platform API</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#335">[ date ]</a>
+              <a href="thread.html#335">[ thread ]</a>
+              <a href="subject.html#335">[ subject ]</a>
+              <a href="author.html#335">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>To follow up on the &quot;module&quot; environment, it is quite possible for any JVM
+to be a &quot;module&quot; running in this environment. The Ultimate JOS should be
+able to load all three Java platforms as JOSBox &quot;modules&quot;.
+
+One or more JVM &quot;modules&quot; is selected from all the JVM &quot;modules&quot; installed
+on a machine during kernel/module configuration. I think at least one JVM
+&quot;module&quot; is required. In turn, the JVM &quot;modules&quot; would be able to share THE
+memory manager &quot;module&quot; that gives the kernel the ability to allocate and
+free virtual memory. All JVM &quot;modules&quot; might also share a bytecode cache.
+
+From the domain point of view, only one JVM can be the &quot;primary&quot; domain,
+where all of the bytecode &quot;device drivers&quot; live. The primary domain asks
+the kernel to create new instances of secondary domains for additional
+users (in a multiple user OS) and additional &quot;processes&quot; (in a multiple
+process OS).
+
+If you have no reason to ever use the Java 0 Platform, you don't need the
+Java 0 &quot;module&quot; installed in your JOSBox (or JOS machine). But for those
+that do, they can install the Java 0 &quot;module&quot; in the JOSBox and enjoy Java
+0 applications.
+
+If you're not ready to use the Java 3 Platform, you don't need the Java 3
+&quot;module&quot; installed in your JOSBox. But for those hearty souls that live on
+the bleeding edge, they can install a Java 3 &quot;module&quot; and enjoy their Java
+3 applications.
+
+I believe this is where a lot of the simplicity of JOS architecture is
+found. There are only a few &quot;modules&quot; necessary when most of the operating
+system is written with bytecode.
+
+How do we create &quot;modules&quot;? Anybody that can create a shared library for
+Linux or dynamic link library for Windows can create a &quot;module&quot; for JOS.
+The &quot;module&quot; is called by bytecode. The &quot;module&quot; itself contains no bytecode.
+
+Inside a JVM, loadLibrary() would call create_module_instance(). The
+bytecode would use an instance handle for a &quot;module&quot; running in the JOSBox.
+Only the kernel would use load_module() to load and initialize a module.
+Once the bytecode has a module instance, it would use it like it might use
+a shared library. When we create a bytecode/native code interface that's
+fast, you would see great improvements over the performance of Java 1 and 2.
+
+It is natural. It would strongly encourage JOS programmers to write
+bytecode for everything.
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000334.html">[JOS-Arch] Platform API</A></li>
+	<LI> Next message: <A HREF="000339.html">[JOS-Arch] Platform API</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#335">[ date ]</a>
+              <a href="thread.html#335">[ thread ]</a>
+              <a href="subject.html#335">[ subject ]</a>
+              <a href="author.html#335">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

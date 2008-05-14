@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] TCP/IP stack ...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:George.Marrows%40Smallworld.co.uk">
+   <LINK REL="Previous"  HREF="000311.html">
+   <LINK REL="Next" HREF="000316.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] TCP/IP stack ...</H1>
+    <B>George.Marrows@Smallworld.co.uk</B> 
+    <A HREF="mailto:George.Marrows%40Smallworld.co.uk"
+       TITLE="[JOS-Arch] TCP/IP stack ...">George.Marrows@Smallworld.co.uk</A><BR>
+    <I>Wed, 17 Nov 1999 17:17:22 -0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000311.html">[JOS-Arch] TCP/IP stack.</A></li>
+        <LI> Next message: <A HREF="000316.html">[JOS-Arch] JOS Packages.. I'm a litte confused!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#313">[ date ]</a>
+              <a href="thread.html#313">[ thread ]</a>
+              <a href="subject.html#313">[ subject ]</a>
+              <a href="author.html#313">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Ranieri --
+
+&gt;<i> PS: are we expected to have garbage collection for the tcp/ip stack?
+</I>
+jjos/decaf already has functioning Java (and C++ for that matter) garbage
+collection in place - though it is admittedly not very sophisticated.
+Anything you write in Java for jjos/decaf gets this automatically.
+
+Is that what you meant, or were you referring to some tcp/ip specific
+meaning of the phrase I'm completely unaware of?
+
+-- George
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Ranieri Argentini [SMTP:<A HREF="mailto:R.Argentini@student.tudelft.nl">R.Argentini@student.tudelft.nl</A>]
+</I>&gt;<i> Sent:	Wednesday, November 17, 1999 10:48
+</I>&gt;<i> To:	John Leuner; Vijay Raghavan
+</I>&gt;<i> Cc:	<A HREF="mailto:arch@jos.org">arch@jos.org</A>
+</I>&gt;<i> Subject:	Re: [JOS-Arch] TCP/IP stack ...
+</I>&gt;<i> 
+</I>&gt;<i> &gt;The first thing to do is identify what we need to get started. What
+</I>&gt;<i> &gt;exactly do we want to implement first, and how can we generate the
+</I>&gt;<i> &gt;necessary input / output to test what we're writing? 
+</I>&gt;<i> 
+</I>&gt;<i> First thing to do is usually to get all the eth. packets received through
+</I>&gt;<i> a
+</I>&gt;<i> function/method that examines them. This method decides wether they are
+</I>&gt;<i> handled (in case of ARP RARP or IP) or discarded, and pass them to their
+</I>&gt;<i> respective handlers.
+</I>&gt;<i> This could be implemented modularly so new protocols can be added without
+</I>&gt;<i> modifying the code, simply by adding another instance of a &quot;protocol&quot;
+</I>&gt;<i> class
+</I>&gt;<i> into a suitable structure.
+</I>&gt;<i> 
+</I>&gt;<i> Next would be to get ARP and RARP working to map IPs onto MAC adresses and
+</I>&gt;<i> finally the IP stuff, which will be pretty hairy (think routing,
+</I>&gt;<i> fragmentation and reassembly, errors via ICMP etc.)
+</I>&gt;<i> Now we should have something semi-useable.
+</I>&gt;<i> Adding in UDP should be trivial at this stage, for it just a very thin
+</I>&gt;<i> layer on top of IP.
+</I>&gt;<i> The TCP is going to prove even hairier than IP, but that's for later
+</I>&gt;<i> worries :)
+</I>&gt;<i> 
+</I>&gt;<i> The very important thing (as in all OO projects) is to have a good
+</I>&gt;<i> interface definition to the visible objects.
+</I>&gt;<i> Sun has defined TCP and UDP classes, i just suggest we implement those
+</I>&gt;<i> when
+</I>&gt;<i> we get there. There's however still a lot of room to improvise.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;At this stage it might be a good idea to just use Linux to provide the
+</I>&gt;<i> &gt;lower networking layers, and feed the data into a Java app.
+</I>&gt;<i> 
+</I>&gt;<i> While this is undoubtedly a good idea, we need a couple of native methods
+</I>&gt;<i> to implement some serious black magic, and i'm not much of a linux device
+</I>&gt;<i> wizard. I'm willing to experiment though :)
+</I>&gt;<i> We need to make this &quot;black magic class&quot; compatible with the &quot;jos driver
+</I>&gt;<i> interface for block devices&quot; if such a thing exists, and then plugging it
+</I>&gt;<i> into the kernel should be fairly painless.
+</I>&gt;<i> 
+</I>&gt;<i> Keep up the brainstorm!
+</I>&gt;<i> Ranieri.
+</I>&gt;<i> 
+</I>&gt;<i> PS: are we expected to have garbage collection for the tcp/ip stack?
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Arch maillist  -  <A HREF="mailto:Arch@jos.org">Arch@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/arch">http://jos.org/mailman/listinfo/arch</A>
+</I>
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000311.html">[JOS-Arch] TCP/IP stack.</A></li>
+	<LI> Next message: <A HREF="000316.html">[JOS-Arch] JOS Packages.. I'm a litte confused!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#313">[ date ]</a>
+              <a href="thread.html#313">[ thread ]</a>
+              <a href="subject.html#313">[ subject ]</a>
+              <a href="author.html#313">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [eric] Package file cache</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000030.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [eric] Package file cache</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [eric] Package file cache">gchii@mindspring.com</A><BR>
+    <I>Wed, 28 Jun 2000 12:15:23 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000030.html">[JOS-Apps] [boot disk] Installation?</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#31">[ date ]</a>
+              <a href="thread.html#31">[ thread ]</a>
+              <a href="subject.html#31">[ subject ]</a>
+              <a href="author.html#31">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The ERIC Project has been very good to me. It enables me to install my
+application bytecode on a central HTTP service and run a Java application
+on any machine on the 'net. While there is a place for a package cache, the
+eric tool does not yet cache package files automatically.
+
+Here is what I've been thinking. I could upgrade the deric tool to write a
+package file catalog. The deric tool already creates package files. It
+automatically detects when class files in a package are &quot;newer&quot; than the
+package file. It only makes the package files that need to be made.
+
+If the deric tool automatically maintained a package file catalog and the
+package file catalog was distributed along with those packages, it would be
+possible to automatically refresh a package file cache.
+
+[packages]
+package-name-1=serial-number-1
+package-name-2=serial-number-2
+package-name-3=serial-number-3
+
+I was thinking of something compatible with the data registry from the
+Smart API. Each package file is assigned a serial number by the deric tool.
+The erica tool downloads the package file catalog and compares it to a
+local copy of the catalog. If serial numbers are different, erica downloads
+the package file from the HTTP service. The erica tool copies package files
+from one path to another.
+
+The eric tool could /always/ load package files from the local package file
+cache. The erica tool could be configured for &quot;silent&quot; operation or &quot;ask
+before refreshing&quot;.
+
+This mechanism would work with jars, too. A new tool could &quot;scan&quot; a
+directory and automatically detect new jars. It would maintain a jar
+catalog in a file compatible with the data registry. Like erica, a
+client-side tool could automatically download new jars when their serial
+number has changed.
+
+I have been working to use the network to distribute Java applications and
+servlets, not just applets and agents. It is a good idea whose time has come.
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000030.html">[JOS-Apps] [boot disk] Installation?</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#31">[ date ]</a>
+              <a href="thread.html#31">[ thread ]</a>
+              <a href="subject.html#31">[ subject ]</a>
+              <a href="author.html#31">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

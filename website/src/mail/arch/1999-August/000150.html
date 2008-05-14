@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000148.html">
+   <LINK REL="Next" HREF="000156.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Program and ProgramContext">digigod@earthling.net</A><BR>
+    <I>Wed, 11 Aug 1999 20:54:16 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000148.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000156.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#150">[ date ]</a>
+              <a href="thread.html#150">[ thread ]</a>
+              <a href="subject.html#150">[ subject ]</a>
+              <a href="author.html#150">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> &gt;&gt; While the &quot;Java applet&quot; is a strong model for a program, an &quot;application&quot;
+</I>&gt;<i> &gt;&gt; is not. What is wrong with static main()? Since a static method cannot be
+</I>&gt;<i> &gt;&gt; inherited, an application cannot inherit the main() behavior of its
+</I>&gt;<i> &gt;&gt; superclass.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;static methods are inherited, to test it I made these three files:
+</I>&gt;<i> 
+</I>&gt;<i> &lt;snip&gt;
+</I>&gt;<i> 
+</I>&gt;<i> &gt;and test3 inherited its main method and didnt need one of its own
+</I>&gt;<i> 
+</I>&gt;<i> Thanks. Your examples prove the point I was trying to make. I must clarify
+</I>&gt;<i> what I said about &quot;inheriting&quot; static methods. I mean to say that &quot;static
+</I>&gt;<i> main()&quot; does not provide the behavior you might expect.
+</I>&gt;<i> 
+</I>&gt;<i> When you type java test3 on the command line, you might expect it to run
+</I>&gt;<i> test3; but, it doesn't. It runs test1. test1 should have been able to
+</I>&gt;<i> insist that test2 and test3 override its static main().
+</I>&gt;<i> 
+</I>&gt;<i> By the way, test3 becomes only an &quot;alias&quot; for test1.
+</I>
+how is this different from standard inheritance? java calls
+test3.main(args) since it doesnt have one it uses the one in test1.
+needles to say Im somewhat confused
+ 
+&gt;<i> &gt;arguably, you could do this currently if you dont mind creating another
+</I>&gt;<i> &gt;JVM
+</I>&gt;<i> 
+</I>&gt;<i> I don't want another JVM as much as I want a new OS. I don't want another
+</I>&gt;<i> JVM as much as I want a multiple-JVM java tool.
+</I>
+when I said that I mean create another process...
+ 
+&gt;<i> &gt;&gt; Since applications, applets, servlets and aglets are different kinds of
+</I>&gt;<i> &gt;&gt; &quot;programs&quot;, it becomes possible to unify all programs under a program API.
+</I>&gt;<i> &gt;&gt; A program browser would provide a host environment for running (and
+</I>&gt;<i> &gt;&gt; debugging!) all kinds of programs.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;this would only be internal, right? I mean you have the program
+</I>&gt;<i> &gt;interface then you have an ApplicationProgram that runs a java app as a
+</I>&gt;<i> &gt;program or a ServletProgram, so that all programs can be handled the
+</I>&gt;<i> &gt;same way internally; and still allow for the prospect of someone making
+</I>&gt;<i> &gt;his app a program or use programs as plugins or whatever...
+</I>&gt;<i> 
+</I>&gt;<i> Internal? No, I don't think so. All &quot;programs&quot; can be handled the same way.
+</I>&gt;<i> 
+</I>&gt;<i> ApplicationProgram? That's exactly right. Using the reflection API, a
+</I>&gt;<i> single implementation of Program is ApplicationProgram. It can run any
+</I>&gt;<i> traditional Java &quot;application&quot; that declares a public static main( String[]
+</I>&gt;<i> ) method.
+</I>&gt;<i> 
+</I>&gt;<i> Using the strong servlet model, we need an implementation of Program called
+</I>&gt;<i> ServletProgram, so that all servlets are automatically compatible with
+</I>&gt;<i> Program and ProgramContext.
+</I>&gt;<i> 
+</I>&gt;<i> For application programmers that want to implement Program directly, they
+</I>&gt;<i> can quickly build programs with full support for inheritence.
+</I>
+we should also have a ProgramRunner application for non-JOS systems...
+(hell, maybe it could even be used in JOS)
+ 
+&gt;<i> &gt;&gt; It would be a bad thing if your shell launches a sub-program that calls
+</I>&gt;<i> &gt;&gt; System.exit() with a result code. Your shell would end prematurely.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;The Security manager would deny that request in a properly designed
+</I>&gt;<i> &gt;shell, or it would simply run the app in its own process
+</I>&gt;<i> 
+</I>&gt;<i> Programs, with their own ProgramContext, do not have to be sandboxed. The
+</I>&gt;<i> security manager should not get in the way. Neither an &quot;application&quot; nor
+</I>&gt;<i> &quot;program&quot; should run inside a sandbox. When you write a program, you should
+</I>&gt;<i> not call System.exit() unless you want to close the shell.
+</I>&gt;<i>
+</I>&gt;<i> &gt;&gt; It would be a bad thing for your servlet to call System.exit() with a
+</I>&gt;<i> &gt;&gt; result code. It would end the servlet enviroment prematurely. Servlets are
+</I>&gt;<i> &gt;&gt; expected to use an &quot;honor system&quot; among serlet programmers, instead of a
+</I>&gt;<i> &gt;&gt; security system.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;I was under the impression that servlets were sandboxed when it came to
+</I>&gt;<i> &gt;stuff like that
+</I>&gt;<i> 
+</I>&gt;<i> Servlets work because they were not sandboxed. Servlets run just like a
+</I>&gt;<i> Java application. Your servlet has access to JDBC, ODBC, sockets, threads,
+</I>&gt;<i> class loaders--you name it.
+</I>&gt;<i> 
+</I>&gt;<i> I very much prefer to run my servlets on the client-side. The servletrunner
+</I>&gt;<i> tool runs on all clients with no problem. That sure makes it easier to
+</I>&gt;<i> distribute the processing load of a large distributed application.
+</I>
+ok, this is &quot;askin' for a hurtin'&quot; as they say, you dont need to be
+sandboxed to deny somenone access to something; thats why we have
+permissions. I mean say Im running a site that offers people free
+webspace and the abillity to make their own servlets (why arent there
+any!?) I want to be able for people to install their own servlets
+without them being able to close the whole webserver on a whim, so I
+tell the security manager just to end that servlet if it calls
+System.exit(), in a shell you could probably get the exit code and
+return it as an int to the shell...
+
+&gt;<i> &gt;but it would support legacy by saying &quot;oh, this is an Applet that doesnt
+</I>&gt;<i> &gt;implemtn Program, Ill use the AppletProgram class to proxy and load
+</I>&gt;<i> &gt;it...&quot;
+</I>&gt;<i> 
+</I>&gt;<i> Exactly! Program and ProgramContext is just a start. It provides a way to
+</I>&gt;<i> make JOS backward- and forward-compatible.
+</I>
+hey, a few emulators and we'll run everything! :)
+ 
+&gt;<i> &gt;package digigod.apps;
+</I>&gt;<i> &gt;public abstract class Application {
+</I>&gt;<i> &gt;}
+</I>&gt;<i> 
+</I>&gt;<i> There is a difference between your Application and mine. My Application is
+</I>&gt;<i> an interface, not abstract class. It must be an interface because any class
+</I>&gt;<i> can act like an application. Any class can implement my Application
+</I>&gt;<i> interface, even an applet or Java Bean. It looks something like this:
+</I>&gt;<i> 
+</I>&gt;<i> public interface Application
+</I>&gt;<i>     extends Runnable {
+</I>&gt;<i>   public Console getConsole();
+</I>&gt;<i>   public void setConsole( Console v );
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> That's it. Since an &quot;application&quot; is expected to never fail, there is no
+</I>&gt;<i> result code. Since my &quot;applications&quot; never expect parameters, no parameters
+</I>&gt;<i> are passed. There is no equivalent application context.
+</I>&gt;<i> 
+</I>&gt;<i> This interface has served me very well. I type in the name of an
+</I>&gt;<i> application and my application browser runs it. There is a little more to
+</I>&gt;<i> my Application interface because I have a Console interface that's
+</I>&gt;<i> preferrable to standard out:
+</I>&gt;<i> 
+</I>&gt;<i> public interface Console {
+</I>&gt;<i>   public void println( String v );
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> I have developed many implementations of Console over time. An application
+</I>&gt;<i> is not expected to set its own console; the application environment
+</I>&gt;<i> provides one.
+</I>
+My Application class is just a way to make it easier to program the
+&quot;standard java app&quot;, I was assuming it could work with your program
+interface...
+
+public abstract class ApplicationProgram extends Application implements
+Program {...}
+
+then:
+
+public abstract class JOSApplication extends ApplicationProgram {...}
+
+when you use my class your class IS-A Application, with your interface
+it IS-A program. it can also be both.
+
+you use my class when your making an application, when it IS-A
+application and nothing else; it might HAS-A JFrame or whatever, but it
+IS-A application. I think all the sub-components of an application
+should also be applications. like the image format converter dialog in a
+paint program should run stand-alone just as well, with java this is
+easy, slap on a main() with your program interface this is easier.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000148.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000156.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#150">[ date ]</a>
+              <a href="thread.html#150">[ thread ]</a>
+              <a href="subject.html#150">[ subject ]</a>
+              <a href="author.html#150">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

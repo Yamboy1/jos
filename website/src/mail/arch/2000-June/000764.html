@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [boot disk] byte array</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:iainshigeoka%40yahoo.com">
+   <LINK REL="Previous"  HREF="000765.html">
+   <LINK REL="Next" HREF="000766.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [boot disk] byte array</H1>
+    <B>Iain Shigeoka</B> 
+    <A HREF="mailto:iainshigeoka%40yahoo.com"
+       TITLE="[JOS-Arch] [boot disk] byte array">iainshigeoka@yahoo.com</A><BR>
+    <I>Tue, 27 Jun 2000 16:06:52 -0700 (PDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000765.html">[JOS-Arch] Java VGA driver on linux</A></li>
+        <LI> Next message: <A HREF="000766.html">[JOS-Arch] [boot disk] byte array</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#764">[ date ]</a>
+              <a href="thread.html#764">[ thread ]</a>
+              <a href="subject.html#764">[ subject ]</a>
+              <a href="author.html#764">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>--- Gilbert Carl Herschberger II &lt;<A HREF="mailto:gchii@mindspring.com">gchii@mindspring.com</A>&gt; wrote:
+&gt;<i> Today, I was surprised and disappointed by my Java compiler. My Java
+</I>&gt;<i> compiler stores a byte array as individual 4-byte integers in codepool.
+</I>
+Yup.  It's not meant for embedded resources.  Instead, keep your resources
+outside of the class and have the class read it in during startup.  There
+are ways to cobble your way around the problem (I think) but its really
+not worth it.  Is there a reason not to just put the raw resource in the
+jar?
+
+&gt;<i> Within the Java programming language, I cannot create a custom class
+</I>&gt;<i> attribute, can I? I might like to store a byte array in a class
+</I>&gt;<i> attribute
+</I>&gt;<i> instead of codepool. There isn't a syntax or keyword for that. I don't
+</I>&gt;<i> want
+</I>&gt;<i> to write my own Java compiler.
+</I>
+Nope.  You can jam the data into a constant String for the class or hack
+the raw class file.
+
+&gt;<i> I am writing a Java application to create boot diskettes for Etherboot
+</I>&gt;<i> and
+</I>&gt;<i> GRUB. With point and click, it can create a boot diskette. For
+</I>&gt;<i> Etherboot, I
+</I>&gt;<i> downloaded tools.tgz from the JOS Project. For GRUB, I downloaded
+</I>&gt;<i> jos-grub-boot.tar.gz from the JOS Binary Distribution page. By using
+</I>&gt;<i> strings, I have reduced a 50KB resource to a 100KB class file.
+</I>
+The tool should be separate from the data.  You can distribute them
+together in the same jar but it doesn't seem to make much sense to compile
+it into the tool itself.
+
+Won't you also need native methods to implement the actual disk writing
+(rawwrite)?
+
+-iain
+
+__________________________________________________
+Do You Yahoo!?
+Get Yahoo! Mail - Free email you can access from anywhere!
+<A HREF="http://mail.yahoo.com/">http://mail.yahoo.com/</A>
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000765.html">[JOS-Arch] Java VGA driver on linux</A></li>
+	<LI> Next message: <A HREF="000766.html">[JOS-Arch] [boot disk] byte array</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#764">[ date ]</a>
+              <a href="thread.html#764">[ thread ]</a>
+              <a href="subject.html#764">[ subject ]</a>
+              <a href="author.html#764">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

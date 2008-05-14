@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000628.html">
+   <LINK REL="Next" HREF="000636.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs">tmiller@haverford.edu</A><BR>
+    <I>Fri, 19 May 2000 10:21:11 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000628.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+        <LI> Next message: <A HREF="000636.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#632">[ date ]</a>
+              <a href="thread.html#632">[ thread ]</a>
+              <a href="subject.html#632">[ subject ]</a>
+              <a href="author.html#632">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> (_Quinn, how do things look from down in the JVM trenches? You'd
+</I>&gt;<i> probably have the best idea of how this inlining problem can be solved.)
+</I>
+	Quite honestly, I haven't looked at optimizations at all.  This
+particular problem, however strikes me in two ways -- first, how often
+will we be trying to inline method calls across processes?  (That is, how
+much of a worry is this going to be?  We may just be able to ignore it
+without much of a penalty.)  Second, having symbolic references mismatch
+across processes will not be a problem if a a shared object does lookups
+in the executing process's classloader; the JVM will throw a LinkError
+(IIRC) if/when the shared class tries to do something it can't because the
+calling process is improperly set up.
+
+	OTOH, you've made good points about where the statics for a shared
+object's method ought to be.  One question I do have, though, looking at
+this from a UNIXy point of view.  I share two things -- a memory location
+(my static variable) and a function pointer (the method in question).  The
+function referenced by the pointer reads and writes from that global
+variable.  At no time should two simultaneous executions of the function
+find different things in that global variable -- it being shared, they're
+reading/writing to the same place.  (With the obvious caveats about
+synchronity.)  At no time should the two different processes be able to
+execute a read on that memory location and get a different value.  (Again,
+with the obvious caveats about synchronity.)  This would suggest to me
+that we need, in fact, to share the statics of a class (only) when an
+object of that type is shared.  If this proves to be unworkable, we may be
+forced to restrict shared objects to those whose classes (and parents) do
+not have statics.
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000628.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+	<LI> Next message: <A HREF="000636.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#632">[ date ]</a>
+              <a href="thread.html#632">[ thread ]</a>
+              <a href="subject.html#632">[ subject ]</a>
+              <a href="author.html#632">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

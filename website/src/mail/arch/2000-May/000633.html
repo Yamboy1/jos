@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [subprogram] Definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000629.html">
+   <LINK REL="Next" HREF="000635.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [subprogram] Definition</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [subprogram] Definition">ryan@whitewolf.com.au</A><BR>
+    <I>Sat, 20 May 2000 00:23:43 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000629.html">[JOS-Arch] [subprogram] Definition</A></li>
+        <LI> Next message: <A HREF="000635.html">[JOS-Arch] [subprogram] Definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#633">[ date ]</a>
+              <a href="thread.html#633">[ thread ]</a>
+              <a href="subject.html#633">[ subject ]</a>
+              <a href="author.html#633">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> Both a subprogram and process API are necessary.
+</I>
+A process API is necessary, yes.
+Your subprogram API is useful, but not necessary*.
+
+Don't get me wrong, I have nothing against people using your subprogram
+API, but I hope you see why I decided not to implement it in rheise.os.
+It is only designed to contain things which are necessary from an
+operating system's point of view. On top of the operating system, there
+may be other libraries like your subprogram API. Is your subprogram API
+really an operating system facility? I didn't think so. It's a library
+that certain application developers will choose to use.
+
+(*) it cannot be argued that it is necessary because there are always
+alternatives. And alternatives are good.
+
+&gt;<i> Many kinds of subprograms are already possible.
+</I>
+The existing set of embedded program APIs will do me just fine. So,
+maybe a better way to say what you're saying is &quot;Hey, I'm developing a
+subprogram API, I hope some of you find it useful in your application
+development.&quot;
+
+rather than saying that we should use it and it's necessary (and that I
+should give you the functionality in rheise.os, otherwise you can't use
+it! By the way, do I get an apology for that remark, or do you still
+maintain that rheise.os is a dead-end project?)
+
+&gt;<i> If you want to write a custom program for the JOS Project, you should write
+</I>&gt;<i> it as a subprogram, not a Java application. A Java application is only for
+</I>&gt;<i> backward compatibility. Compatibility with the Java application model is
+</I>&gt;<i> only for programs that others have already written and continue to write.
+</I>
+If you want to replace the well established main() method, I think we'll
+need a vote. The main reason I chose not to use your program API is that
+it doesn't reuse existing standards (ie. main()) when you could have
+implemented all of that functionality using existing standards. If you
+did so, it would be possible to run any existing application as a
+subprogram, without the need of a wrapper class.
+
+&gt;<i> Many applications, like javac, can be run successfully as a subprogram. No
+</I>&gt;<i> bytecode process is needed.
+</I>
+That is true. If you know what you're doing you can be sure in some
+cases that it won't matter if you reuse the class loader of the parent.
+Not that it's entirely elegant to be executing legacy applications
+counter to the way they were intended. What I was trying to say in my
+last email was that a new and improved javac tool could be written that
+could be used in this way naturally. That is, rather than writing javac
+as a program, it could be written as a library, and there could be a
+simple javac program that interfaces to that library if you wish to run
+it as a program. Otherwise, your application can invoke methods on the
+library directly (which is reusing the class loader just as you're
+reusing the class loader - only this time, it was intended to be used
+that way).
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000629.html">[JOS-Arch] [subprogram] Definition</A></li>
+	<LI> Next message: <A HREF="000635.html">[JOS-Arch] [subprogram] Definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#633">[ date ]</a>
+              <a href="thread.html#633">[ thread ]</a>
+              <a href="subject.html#633">[ subject ]</a>
+              <a href="author.html#633">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

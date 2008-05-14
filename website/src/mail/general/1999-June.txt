@@ -1,0 +1,581 @@
+From al@outworld.org Sun, 06 Jun 1999 12:21:12 +0300
+Date: Sun, 06 Jun 1999 12:21:12 +0300
+From: Al al@outworld.org
+Subject: [JOS] Concerning the registry...
+
+Greetings,
+
+
+Although I have posted about the registry before, and nobody replied or
+looked at the source code, I am posting again, because I made several
+big changes (new features). Maybe this time a few people will look into
+it...
+
+The registry is an inverted tree, which uses binary search for
+insertion, addition and deletion. It supports unlimited number of
+entries (leafs) and directories (nodes), utilizing the LinkedList class
+(which I wrote for JOS a year ago).
+
+I implemented merging support, and made it implementation neutral. That
+is, no matter how the interfaces and abstract classes for the registry
+are implemented, the merging can occur between different implementations
+of the registry API.
+
+Finally, I made it RMI. There is a new class, called RegistryServer that
+starts an RMI server for the registry. I have tested it and it seems to
+work find (and fast). Since this is my first serious RMI application, I
+would appreciate if any RMI gurus out there could test it and comment.
+
+I have not posted it on the CVS or the source server because I have not
+written the license for JOS in the files yet. You can find a copy of the
+source code, the binaries and the skel/stubs at the following URL:
+
+[http://www.outworld.org/temp/working/jos/Registry.jar]
+Just unjar it.
+
+Thanks in advance, everyone!
+
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/] [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+
+From robfitz@geocities.com Mon, 7 Jun 1999 12:43:08 -0500
+Date: Mon, 7 Jun 1999 12:43:08 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS] IRC Meeting - June 1999
+
+Hi everybody
+
+Here are some notes of mine for this meeting, I would recommend that 
+you read the log as well.
+
+The following people were at this meeting:
+RobertFitz - Robert Fitzsimons, kernel developer
+gchii - Gilbert Herschberger, architect
+EvilOne - Sascha Salevsky, not involved, but this will change
+Shigeoka - Iain Shigeoka, jos webmaster
+
+The first item on the agenda was the constitution.  I mainly brought 
+this up, to decide if we were still going to have a vote on this in 
+July (?).  We talked a little on how the vote should happen (vote-
+info mailing list), what is a jos member, and what should happen 
+after the vote is passed, ie vote for license.  Join the biz mailing 
+list to talk more about this.
+
+The next item on the agenda was the site infrastructure.  We 
+discussed that the wiki web needs to be updated (Markus?).  We also 
+talked about removing the SourceSever and just using the CVS Server.  
+There also needs to be a centrally database of wikinames, passwords, 
+etc, so all you have to do is change one password and you wiki 
+password and cvs password are changed.  Does any body want to work on 
+this?  Also does any body want to be the faq maintainer?
+
+The next item on the agenda was the kernel.  We talked about the 
+kernel interface i'm working on, and the jos-linux host.  Any body 
+interested in work with me on the kernel interface should join the 
+arch mailing list.
+
+The next item on the agenda was applications and utilities.  We are 
+planing on setting up a ApplicationSummary page like the 
+KernelSummary page, Iain will be posting a message to the appropriate 
+mailing list to get the information for this page.
+
+There was one other item on the list about AspectJ, but we were 
+unable to discuss it because we didn't know enough about it.
+
+I would recommend that everybody should read the log, a lot more was 
+discussed then I can put in this email.  As for joining the mail list 
+checkout <URL:http://jos.org/mailman/listinfo/>.
+
+The next meeting will be on Sunday 11th of July 1999, at 17:00 UTC, 
+on your local Undernet IRC server in the #jos channel.  The meeting 
+should have been on the 4th of July, but how many people would be 
+able to turn up ;).
+
+The log for this meeting are available at 
+<URL:http://jos.org/~robfitz/jos-19990606.zip> (15 kb), and the logs 
+for previous meetings are available at 
+<URL:http://jos.org/wiki/view/main/Logs>.
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+
+
+From al@outworld.org Tue, 08 Jun 1999 11:47:58 +0300
+Date: Tue, 08 Jun 1999 11:47:58 +0300
+From: Al al@outworld.org
+Subject: [JOS] Re: [JOS-Arch] Re: [JOS] Concerning the registry...
+
+Ryan Heise wrote:
+
+> Speaking of registries, could you please explain how they would be used?
+> When an application is installed, does it put entries in a global system
+> registry? If so, how do you ensure that those entries are deleted when I
+> remove the software from my system? (for instances, if I just delete the
+> sofware directory)
+
+
+My implementation of a registry has nothing to do with the JOS system's
+behaviour overall. That is, I am not supplying an
+installation/deinstallation API with the registry, I am just making a
+distributed (RMI), OO registry, that looks a lot like an inverted tree
+file system, and can do things like move, replace, merge, retain, link,
+update from remote, etc..
+
+The registry is under org.jos.registry (I also made a Wiki page!) and
+can be used by any application. If the JOS system decides to use a
+central registry (instead of a temp directory), then applications
+written for JOS will probably be able to write to a global registry. The
+good thing with the registry is that it runs as a server, and it also
+has replication capabilities (working on them now), which means that it
+assists in the development of a truly distributed JOS system.
+
+I've also included a lot of functionality in the addressing mechanism of
+the registry. That is, to access an entry, you do something like this:
+
+Address address = new Address("//dir/dir/dir/entry");
+
+This address object though could have a URI pointing to a specific RMI
+registry on any system, so functions like:
+
+registry.copy(local_address, remote_address)
+
+would have the registry copy entries from a registry in any part of the
+world...
+
+I will also start working on the security of the registry, which will
+work in a way similar to Java's security overall - that is, a CodeBase
+object is the group, a Class is the user, etc.
+
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/] [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+From RegierAveryJ@JDCORP.deere.com Tue, 8 Jun 1999 08:55:01 -0500
+Date: Tue, 8 Jun 1999 08:55:01 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS] Reminder: Register to Vote!
+
+All,
+
+I want to remind everyone that the upcoming vote on our proposed
+Constitution is less than a month away!  Remember that in order for you to
+be an eligable voter you must subscribe to the vote-info@jos.org mail list.
+So far only 29 people have registered to vote.  I have found it interesting
+that some of our most active developers have not found the time to register
+themselves to vote.  
+
+You can register to vote at http://jos.org/mailman/listinfo/vote-info
+Links to the proposed Constitution and PolicyBook are on the wiki at:
+http://jos.org/wiki/view/main/Constitution  Please go there and look it
+over.  There were a few misconceptions about it at the IRC meeting, and it
+would do everyone good to read and understand it and its immediate purpose.
+Please also look at the FAQ that we have put together which should answer
+most of your questions about the proposal.  If you have any further
+concerns, please sign up to the biz@jos.org mail list and discuss them!
+
+In order for the vote to take place, I need a volunteer to be a neutral vote
+administrator as defined by section 4.3 of the proposed Constitution.  For
+this vote, the vote administrator needs to be willing and able to do the
+following things:
+*  Join the biz@jos.org mailing list where voting issues will be discussed.
+*  Take votes via email for 20 days.
+*  Tabulate the votes in the manner prescribed by the Constitution and
+advertise the results of the vote within three days of the end of voting.
+*  Be willing to be scrutinized as to whether or not you are neutral in this
+vote.
+
+Also, I suggest that the administrator for this vote be someone who:
+*  Has not been greatly involved in the defining and wording of the
+Constitution.  This rules out myself, Matt Caswell, and Scott Miller.
+*  Someone who has been involved in the project for at least a year.
+
+Thanks!
+Avery J. Regier
+ajregier@earthlink.net
+
+
+
+From robfitz@geocities.com Tue, 8 Jun 1999 23:06:14 -0500
+Date: Tue, 8 Jun 1999 23:06:14 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS] Open Source Writers Group
+
+Hello everybody
+
+This was posted to Slashdot today:
+
+The Open Source Writers Group (OSWG) is a project started to help 
+writers find OS projects for which they can volunteer, and to help OS 
+projects find the writers they need. Writers and editors who are 
+willing and able to volunteer their efforts similarly find it 
+difficult to identify OS projects that need them. This indicates a 
+communications gap that must be addressed. The OSWG project has been 
+created to help fill that gap.  
+
+Here home page is <URL:http://www.linuxchix.org/techwriters/>.
+
+Does anybody have a problem with us making a request for help?
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+
+
+From al@outworld.org Wed, 09 Jun 1999 13:17:01 +0300
+Date: Wed, 09 Jun 1999 13:17:01 +0300
+From: Al al@outworld.org
+Subject: [JOS] Open Source Writers Group
+
+Robert Fitzsimons wrote:
+
+> This was posted to Slashdot today:
+> <snip>
+> Here home page is <URL:http://www.linuxchix.org/techwriters/>.
+> 
+> Does anybody have a problem with us making a request for help?
+
+Not a problem really, just a concern... JOS appears to have so many
+members, and it is true that many work behind the scenes (I myself, for
+instance), but there are so many people in the members lists who have
+not yet posted a single thing on the lists, the wiki, the CVS or the
+source server.
+
+Maybe, by asking for help, we should make it clear that we really have
+little code, and that we want people with extensive knowledge to help us
+build the *basis* of JOS, its foundations. We need people the know not
+only how to make a kernel and a JVM, but also integrate everything
+together.
+
+I think this point should be stressed out, just that.
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/] [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+From robfitz@geocities.com Thu, 10 Jun 1999 19:58:37 -0500
+Date: Thu, 10 Jun 1999 19:58:37 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS] Any volunteers?
+
+Hello everybody
+
+I'm currently working on writing the Kernel Interface, which is a 
+platform independent interface/api between the kernel and the rest of 
+the system.
+
+Now the problem i'm having is that i've had very little feedback on 
+what i'm doing.  This could be because i'm going in the right 
+direction, or i'm going in the completely wrong direction (and nobody 
+wants to tell me).  Also even thought English is my first language, 
+writing in it's one of my talents (for example this email has taken 
+me more then an hour to write so far).  So this means i'm spending a 
+lot more time writing, which would be better spent programing, which 
+i'm better at.
+
+So what I need is a group of people who can help by giving me 
+feedback or by writing some parts of the documentation for or with 
+me.  You don't need to be a kernel expert (i'm not) to help, it's 
+just common sense.
+
+So any volunteers?
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Fri, 11 Jun 1999 14:33:04 -0500
+Date: Fri, 11 Jun 1999 14:33:04 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS] Going to JavaOne?
+
+Hi all,
+
+Am I really the only one in this organization going to JavaOne next week?
+If anyone else will be there, I would like to get together like I did with a
+few people last year.
+
+Thanks!
+Avery J. Regier
+
+
+
+
+
+From digigod@earthling.net Tue, 08 Jun 1999 22:33:18 -0700
+Date: Tue, 08 Jun 1999 22:33:18 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS] Open Source Writers Group
+
+Robert Fitzsimons wrote:
+> Here home page is <URL:http://www.linuxchix.org/techwriters/>.
+> 
+> Does anybody have a problem with us making a request for help?
+I looked at their site and can see no reason we shouldn't and plenty of reasons we should (like the quote: "free as in both 'free speech' and 'free beer'").
+
+It has my vote.
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+	"Why should I press the start button to turn my computer 
+         off?" -Windows, go fig.
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From shigeoka@ukans.edu Mon, 14 Jun 1999 10:46:43 -0500
+Date: Mon, 14 Jun 1999 10:46:43 -0500
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS] MemberListQZ crash!!!
+
+Hello everyone,
+
+Bad news from the wiki.  The MemberListQZ page got wiped out.  I have 
+restored the page from version control but that version was last updated 
+on February 21, 1999.  If you made changes to the MemberListQZ since 
+then, your changes were lost.  Please add them again.
+
+Apparently either no one has edited MemberListQZ since February 
+21st, or version control has not been working for the Wiki since then.  I 
+know the web interface to RCS'ed wiki pages has been missing for a 
+while but I was still under the impression that the pages were being 
+version controlled.  I am investigating things.  My first impresion is that 
+wiki version control stopped working in March of this year.
+
+For now, please edit with care.  I've made a backup of wiki files today 
+but this form of manual backup will not last long (I'm very forgetful).  
+Hopefully, I can get the Wiki RCS working again soon.
+
+-iain
+
+
+
+
+From shigeoka@ukans.edu Mon, 14 Jun 1999 11:01:10 -0500
+Date: Mon, 14 Jun 1999 11:01:10 -0500
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS] Wiki version control restored
+
+Hello everyone,
+
+I believe I have version control working again for the Wiki.  Let me know 
+if you notice any unusual wiki behavior.  I'm going to leave the Web 
+interface to the Wiki unavailable until the next generation wiki is 
+completed (unless someone has a good reason why it needs to be 
+restored ASAP).
+
+-iain shigeoka (webmaster@jos.org)
+
+
+
+
+From robfitz@geocities.com Thu, 17 Jun 1999 15:27:10 -0500
+Date: Thu, 17 Jun 1999 15:27:10 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS] Any volunteers?
+
+Hello everybody
+
+I've been very quite since I sent my previous message, the main 
+reason for this was to see what type of response I would get.
+
+I did get a number of responses, and I would like to thank all those 
+that volunteered to help.
+
+I would recommend that anybody who wants to help me with the Kernel 
+Interface should join the kernel mailing list at 
+<URL:http://jos.org/mailman/listinfo/kernel>.  I will be starting the 
+discussion soon, you'd better join now ;).  You can also look at the 
+source so far of Kernel Interface at 
+<URL:http://www.jos.org/cvsweb.cgi/jos/interfaces/kernel/>.
+
+The interface at the moment consists of a set of undocumented C 
+header files.  My plan is to discuss each header file, make changes, 
+and add documentation.  We also need to write an interface document 
+which will describe the kernel interface from the point of view of 
+the kernel implementer and the jvm implementer.
+
+Also, before I said the kernel interface would be discussed on the 
+arch mailing list, but this isn't what the mailing list is for, so I 
+will be using the kernel mailing list, sorry, (Iain, could you change 
+the home page to reflect this?).
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 28 Jun 1999 09:36:46 -0700 (PDT)
+Date: Mon, 28 Jun 1999 09:36:46 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] WikiWeb upgrades... testers wanted
+
+Hello everyone,
+
+I've upgraded the wiki to use the new version of Wiki
+(twiki) developed by Peter Thoeny (based on Markus's 
+JosWiki).
+
+I'd like people to test the installation and see if
+everything works.  Notice that this is running on
+the same wiki documents as the normal wiki so making
+changes in either one affects the other... be careful.
+
+Basically all you need to do is to substitute "twiki"
+for "wiki" in a url to use the new twiki engine.  So
+
+http://jos.org/wiki/view/main/WebOverhaul
+becomes
+http://jos.org/twiki/view/main/WebOverhaul
+
+This will let you see the same pages, rendered with
+the new engine.
+
+If you want to see the new features of the twiki
+substitute Main for main in the url's so as above:
+
+http://jos.org/twiki/view/main/WebOverhaul
+becomes
+http://jos.org/twiki/view/Main/WebOverhaul
+
+We get RCS integration back into wiki, searching,
+indexing, referenced-by and stricter wiki markups.  
+Notice that the stricter markups will not render
+"_italic_." or "_italic _" the way the way the old
+wiki did (italicizing it).  Instead you have to do
+"_italic_ ." to get the same behavior.  This allows
+us to use regular _'s where we want by simply not
+"sticking" them to words and leaving blanks around.
+
+There is also some category/topic features of the
+new Wiki which I have not exposed yet.  To learn
+more about the wiki in particular use:
+
+http://jos.org/twiki/view/Wiki
+
+If you have questions or comments, send them to 
+admin@jos.org or directly to me webmaster@jos.org.
+
+-iain (jos webmaster)
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at http://mail.yahoo.com
+
+
+
+
+From scode@scode.ddns.org Mon, 28 Jun 1999 22:15:10 +0200
+Date: Mon, 28 Jun 1999 22:15:10 +0200
+From: scode@scode.ddns.org scode@scode.ddns.org
+Subject: [JOS] Packages
+
+--kbCYTQG2MZjuOjyn
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I've written a menubar/toolbar/etc builder for Swing ("ActionManager" on the
+Wiki), and am about upload it to the CVS.
+
+But before I do; which package would you guys find appropriate? At the mome=
+nt
+I've got in org.jos.util.resources.gui.actionmanager. Does that sound good?
+
+--=20
+/ Peter Schuller
+
+---
+PGP userID: 0x5584BD98 or 'Peter Schuller <scode@scode.ddns.org>'
+E-Mail: scode@scode.ddns.org Web: http://hem.passagen.se/petersch
+Help create a free Java based operating system - www.jos.org.
+
+
+
+--kbCYTQG2MZjuOjyn
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: PGPfreeware 5.0i for non-commercial use
+MessageID: EPi0cxfL+O6VTafOShAdLXYaxDJrdIGa
+
+iQA/AwUBN3fXzcBfJ1FVhL2YEQK1KwCfQuapGtN0wwd+VZLugmh+k7I5PQMAniFx
+6qJEQrBNgOkYvHdiUhR9yn5B
+=L6Ss
+-----END PGP SIGNATURE-----
+
+--kbCYTQG2MZjuOjyn--
+
+
+
+From digigod@earthling.net Mon, 28 Jun 1999 15:18:31 -0700
+Date: Mon, 28 Jun 1999 15:18:31 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS] Packages
+
+scode@scode.ddns.org wrote:
+> I've written a menubar/toolbar/etc builder for Swing ("ActionManager" on the
+> Wiki), and am about upload it to the CVS.
+> 
+> But before I do; which package would you guys find appropriate? At the moment
+> I've got in org.jos.util.resources.gui.actionmanager. Does that sound good?
+
+I dont remember where but somewhere it was mentioned that we put our stuff in org.jos.experimental.wikiname.package untill its been tested and everybody decides to put it in a more "official" place,
+of course org.jos.experimental.peterschuller.util.resources.gui.actionmanager is quite long I can see how it would help in the long run and have hence, myself, adherred to it.
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+	"Why should I press the start button to turn my computer 
+         off?" -Windows, go fig.
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+

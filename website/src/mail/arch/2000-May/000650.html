@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:donaldp%40mad.scientist.com">
+   <LINK REL="Previous"  HREF="000643.html">
+   <LINK REL="Next" HREF="000658.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Peter Donald</B> 
+    <A HREF="mailto:donaldp%40mad.scientist.com"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">donaldp@mad.scientist.com</A><BR>
+    <I>Sun, 21 May 2000 20:38:11 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000643.html">[JOS-Arch] [static property] Runtime</A></li>
+        <LI> Next message: <A HREF="000658.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#650">[ date ]</a>
+              <a href="thread.html#650">[ thread ]</a>
+              <a href="subject.html#650">[ subject ]</a>
+              <a href="author.html#650">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi,
+
+&gt;&gt;<i> What exactly will the two java.lang.Class objects be sharing?
+</I>&gt;<i>
+</I>&gt;<i>	A java.lang.Class object, from the native side, is a collection of
+</I>&gt;<i>static variables and method definitions, the constant pool, etc -- the
+</I>&gt;<i>vast majority of the bulk of the .class file.  Everything but the static
+</I>&gt;<i>variables can be shared across java.lang.Class objects.
+</I>
+Here's my current thoughts on sharability of JIT generated code,
+specifically inlining.
+
+A method (P) from class (Q) can be inlined if Q is in same archive (R)
+(where archive is a JAR/Zip/War/cab file) and the package Q resides in is
+&quot;sealed&quot; (as in from the Jar specification). Anytime a R is changed and a
+process is using it, an extra copy must be maintained. Else corruption
+could occur by mistakenly loading a class from &quot;new&quot; archive that was
+supposed to loaded from &quot;old&quot; archive. 
+
+This still leaves a large number of methods not inlined that should be (ie
+most of Math.* and String.*). So interpackage inlining could be made
+available if;
+* it is part of base java install. ie java.* or javax.* 
+* the calling code's archive (S) specified a dependancy on R (as per the
+Jar standard) either directly or indirectly (via depending on another
+archive that depends on S)
+
+Interpackage inlining means the new process has to use the same archive and
+dependent archives if they want to use cached copy.
+
+While the above approach is fairly course it should get most regular apps
+that use standard jars/libraries. It will however bite for applications
+that keep .class files on filesystem so there may need to be extra steps
+taken in this case ???
+
+Thoughts ?
+
+Cheers,
+
+Pete
+
+*------------------------------------------------------*
+|<i> &quot;Nearly all men can stand adversity, but if you want |
+</I>|<i> to test a man's character, give him power.&quot;          |
+</I>|<i>       -Abraham Lincoln                               |
+</I>*------------------------------------------------------*
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000643.html">[JOS-Arch] [static property] Runtime</A></li>
+	<LI> Next message: <A HREF="000658.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#650">[ date ]</a>
+              <a href="thread.html#650">[ thread ]</a>
+              <a href="subject.html#650">[ subject ]</a>
+              <a href="author.html#650">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

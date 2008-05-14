@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000000.html">
+   <LINK REL="Next" HREF="000002.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea">onewith1@flash.net</A><BR>
+    <I>Sat, 27 Mar 1999 22:09:12 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000000.html">[JOS-UI] [Fwd: New Working Mail Lists...]</A></li>
+        <LI> Next message: <A HREF="000002.html">[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1">[ date ]</a>
+              <a href="thread.html#1">[ thread ]</a>
+              <a href="subject.html#1">[ subject ]</a>
+              <a href="author.html#1">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>[I'm passing this onto the UI guys since it kind of involves them, too]
+
+As I was saying in my other message, buried deep:
+
+I've been giving this some serious consideration.  And here's what I've come
+up with:
+
+Have jos.System.keyboard be a system-wide variable implemented the same way
+that java.lang.System.in is - in order to change it, you need to call a
+special function, which will have security checks to see if the app doing the
+call has the right security.  The window manager would replace this with its
+own keyboard class, so that it can handle the appropriate focus control.  It
+would also add new functions, for say application registration of system-wide
+KeyEvent checking.  The original keyboard class would post KeyEvents to all
+the manager's &quot;system-wide listeners&quot;, one of which would be the &quot;focus&quot;
+listener, which passes the key event on to the current application for
+reading, with possible translation if the app requested it.
+
+So in this respect, yes, an addKeyListener() would be a good solution.  All we
+need then is a JOS-wide event system to manage acynch events.
+
+-Matt
+
+
+&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>         How about jos.system.keyboard as a KeyEvent dispatcher (i.e.
+</I>&gt;<i> jos.system.keyboard.addKeyListener() will do what you'd expect) fed by
+</I>&gt;<i> whatever we end up naming the keyboard Driver (or Interperter,
+</I>&gt;<i> depending*) from Albrecht's code, and feeding whatever happens to sign up,
+</I>&gt;<i> i.e. a shell.  Naturally, since the shell will be signing up as (or be
+</I>&gt;<i> signed up as) a KeyListener, one would expect that the telnet daemon would
+</I>&gt;<i> also generate the appropriate KeyEvents, except from its network
+</I>&gt;<i> connection.
+</I>&gt;<i>
+</I>&gt;<i> -_Quinn
+</I>&gt;<i>
+</I>&gt;<i> * This depends on whether or not you think that jos.system.keyboard should
+</I>&gt;<i> distribute key events (AWT or not) of raw scan-codes or of
+</I>&gt;<i> some-degree-translated scancodes.  I would argue, as a matter of
+</I>&gt;<i> abstraction, that jos.system.keyboard should distribute KeyEvents of
+</I>&gt;<i> translated scancodes, up to the point where they are VK_* (or equivalent)
+</I>&gt;<i> events, but not beyond, i.e. a keyboard interperter would be (should be?)
+</I>&gt;<i> used to handle things like upper and lower case, control and alt key
+</I>&gt;<i> commands, key concatenation (i.e. ctrl-e-' to make the accented e
+</I>&gt;<i> character, etc), and the works.  I suppose one could call this an abstract
+</I>&gt;<i> raw feeding into an abstract cooker, which in turn would feed the shell.
+</I>&gt;<i> Things that need finer-grained input or do odd things to the keyboard
+</I>&gt;<i> (i.e. games) would sign up as KeyListeners on jos.system.keyboard instead
+</I>&gt;<i> of using the default keyboard interperter(s).
+</I>&gt;<i>
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>
+-Matt
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000000.html">[JOS-UI] [Fwd: New Working Mail Lists...]</A></li>
+	<LI> Next message: <A HREF="000002.html">[JOS-UI] Re: [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1">[ date ]</a>
+              <a href="thread.html#1">[ thread ]</a>
+              <a href="subject.html#1">[ subject ]</a>
+              <a href="author.html#1">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000562.html">
+   <LINK REL="Next" HREF="000556.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Mon, 8 May 2000 10:38:29 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000562.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000556.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#564">[ date ]</a>
+              <a href="thread.html#564">[ thread ]</a>
+              <a href="subject.html#564">[ subject ]</a>
+              <a href="author.html#564">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>5 days later...
+
+(sorry)
+
+On Wed, 3 May 2000, Todd L. Miller wrote:
+
+&gt;<i> 	At a bare minimum, it's clear that anything aside from nulling
+</I>&gt;<i> requires the class definition* of SharedObject -- wherever it may be
+</I>&gt;<i> 'located' -- to remain legal.  This is assured by normal garbage
+</I>&gt;<i> collection; the so object in jpTwo requires a Class pointer, which in turn
+</I>&gt;<i> contains a pointer to its definition.
+</I>
+Understood.
+
+&gt;<i> (The static values in the class are
+</I>&gt;<i> lost; I believe that the expectation is that a SharedObject would access
+</I>&gt;<i> the statics of whichever process happened to be using it at the time,
+</I>&gt;<i> information that would be procured from the scheduler.)
+</I>
+At this point we disagree. I believe that:
+
+- static values won't be lost until the class they are associated with
+  is garbage collected.
+- the expectation is that a SharedObject would internally access the
+  statics associated with the object's class.
+
+I think we need to do it right so it works in complex cases. In the
+windowing system, shared objects may be as complex as swing components.
+Those objects may work with the rest of the swing system via statics, so
+it is important that the shared objects which communicate with the rest
+of the window manager (via statics) actually communicate with the rest
+of the window manager - not with the uninitialised statics in the
+calling process.
+
+&gt;<i> Any class
+</I>&gt;<i> definition contains a reference to a super class.  Bytecode references are
+</I>&gt;<i> purely symbolic; native references are pointers.  For native references,
+</I>&gt;<i> this means that the super class will always be shared.
+</I>
+Great, so this does solve the problem of incompatible superclasses (ie.
+to share class definitions, we must share the superclass' class
+definitions).
+
+&gt;<i> Otherwise, you hit type-safety snags.)  The picture for bytecode
+</I>&gt;<i> references is similar; if we're maintaing bytecode payloads, we must have
+</I>&gt;<i> the parent class's bytecode somewhere, and the two payloads can be checked
+</I>&gt;<i> for equality.
+</I>
+I think the bytecode cache can ignore the superclasses - it saves
+memory. It is when class definitions are formed or reused from the cache
+that the superclass constraint must apply. The two caches are separate
+so they can have different rules depending on their requirements.
+
+&gt;<i> 	Back to the case at hand -- a hard reference to an object whose
+</I>&gt;<i> 'owner' pointer will prevent a threadless/killed/dead process from being
+</I>&gt;<i> garbage collected.  I expect we agree that is Not Good.  Since the shared
+</I>&gt;<i> object has already met the minimum requirements -- that is, without
+</I>&gt;<i> references, it can't tell if it's operating in its originating process or
+</I>&gt;<i> not -- it is transparent to re-write the classloader pointer to point to
+</I>&gt;<i> jpTwo.**  So far, so good.  Referenceless shared objects work OK, because
+</I>&gt;<i> we can transparently rewrite the classloader reference of the shared
+</I>&gt;<i> object to avoid GC problems.***
+</I>
+As I've said, we disagree here. I think an object needs to know which
+process it's running in. I don't see why it is a &quot;minimum requirement&quot;
+that an object not know what process it's running in. This is not
+necessary to rewrite the class loader reference, and if we do it, I
+believe the system won't work correctly.
+
+&gt;<i> 	The problem is instance references.  Every instance reference
+</I>&gt;<i> which escapes must be a shared object,
+</I>
+Or as I see it, every instance reference which escapes is, by
+definition, a shared object. Is that the way you see it?
+
+&gt;<i> 	All of this is in the case that the object's classloader reference
+</I>&gt;<i> becomes invalid, and I think that is a key way of phrasing things.  A
+</I>&gt;<i> process and (primordial, but that's what been under discussion)
+</I>&gt;<i> classloader define each other; killing a process means invalidating its
+</I>&gt;<i> classloader.  (Though not, necessarily, everything in it, because of
+</I>&gt;<i> shared objects.)
+</I>
+Note that if we have thread-less processes (as I discussed in a previous
+email), the class loader should not be invalidated. We have two options:
+
+1. Invalidate the class loader only for &quot;normal&quot; processes once they
+die (your suggestion), ie. when they have no more threads running.
+Thread-less processes, however, would not have their class loaders
+invalidated in this case.
+
+2. Handle it generically: never invalidate the class loader. Allow it to
+operate until it is garbage collected.
+
+At this point I don't know which way is best but I thought I'd point out
+that (1) is not the only way.
+
+If your goal is to make something &quot;very bad&quot; happen when the owner of a
+shared object dies, then (1) can achieve part of that goal, but it won't
+have any affect unless the shared object tries to load a new class.
+Maybe the answer is to invalidate the process rather than invalidate the
+class loader. Invalidating the class loader prevents you from loading
+classes, but invalidating the process (however that is implemented)
+stops anything in that process from working. I have no idea how to
+implement this though, and maybe we can just forget about it and go with
+(2) alone.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000562.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000556.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#564">[ date ]</a>
+              <a href="thread.html#564">[ thread ]</a>
+              <a href="subject.html#564">[ subject ]</a>
+              <a href="author.html#564">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

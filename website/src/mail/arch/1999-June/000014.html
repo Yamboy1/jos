@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: [JOS] Concerning the registry...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000013.html">
+   <LINK REL="Next" HREF="000015.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: [JOS] Concerning the registry...</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Re: [JOS] Concerning the registry...">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 10 Jun 1999 15:24:18 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000013.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+        <LI> Next message: <A HREF="000015.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#14">[ date ]</a>
+              <a href="thread.html#14">[ thread ]</a>
+              <a href="subject.html#14">[ subject ]</a>
+              <a href="author.html#14">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i>         I don't see any roadblocks to extending Socket to use
+</I>&gt;<i> shared-memory IPC; IIRC, Socket uses a SocketFactory to generate
+</I>&gt;<i> SocketImpl's, one of which could be SharedMemorySocketImpl; and (again,
+</I>&gt;<i> IIRC), RMI uses Sockets for its communications, so the Right Thing would
+</I>&gt;<i> happen automagically.
+</I>
+With CORBA it is possible in some cases to use direct object-to-object
+communication within the same address space ie. without using Sockets
+(if the ORB supports it). I don't know if RMI has the flexibility to
+support this but if someone ever writes a clone of RMI, it should be
+possible to add this functionality without changing RMI's public API.
+
+This is more efficient than writing a SocketImpl, because a SocketImpl
+still must serialize objects and method invocations, then de-serialize
+them for each invocation. Having a SharedMemorySocketImpl may still be
+useful though. And, of course, it's not like we will have a free RMI
+clone to hack any time soon...
+
+&gt;<i> As an aside, it looks like decaf will be
+</I>&gt;<i> implementing shared memory as an IPC primitive and writing a
+</I>&gt;<i> message-passing interface on top of it -- one that would use the extended
+</I>&gt;<i> Socket so as to be blissfully ignorant of what's Really Going On.  Both
+</I>&gt;<i> facilities would (probably) be available to user-space programs, though
+</I>&gt;<i> I'd recommend message-passing in most cases because everything would be
+</I>&gt;<i> gauranteed to happen the Right Way -- where shared-memory IPC is just
+</I>&gt;<i> asking for the programmer to do Bad Things w.r.t. locks.
+</I>
+I suspect that the JOS window manager will need an efficient IPC
+mechanism, preferably shared memory. This is because a window will have
+a reference to its parent window which may be in a separate process. It
+will be hard to work out a safe way to implement this.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000013.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+	<LI> Next message: <A HREF="000015.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#14">[ date ]</a>
+              <a href="thread.html#14">[ thread ]</a>
+              <a href="subject.html#14">[ subject ]</a>
+              <a href="author.html#14">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

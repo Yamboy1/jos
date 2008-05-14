@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000495.html">
+   <LINK REL="Next" HREF="000498.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Wed, 19 Apr 2000 02:46:31 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000495.html">[JOS-Arch] rheise.os questions</A></li>
+        <LI> Next message: <A HREF="000498.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#477">[ date ]</a>
+              <a href="thread.html#477">[ thread ]</a>
+              <a href="subject.html#477">[ subject ]</a>
+              <a href="author.html#477">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	[BTW, the footnotes aren't numbered correctly because I though of
+them out-of-order.]
+
+	Processes can be defined as two or more threads with disjoint
+memory spaces, where each group of threads (ThreadGroup or not) which
+shares a memory space constituting a process.  Because Java lacks
+pointers, disjoint namespaces are sufficient to ensure disjoint memory
+spaces.  (So long as object references are not shared between the threads
+we wish to distinguish as separate processes.)  Java namespaces are
+managed by classloaders; therefore, disjoint classloaders generate
+processes.
+
+	While Java lacks pointers, and is therefore that much less
+vulnerable to the class of potential problems usually cited as motiviation
+for establishing (conventional, native) processes in (conventional,
+native-code-oriented) operating systems, the single-process assumptions
+made in the Java class libraries and virtual machine spec lend us ample
+reason to desire multiple Java processes.  (Where my desire is to pass the
+'ultimate test': piping the output of one legacy program into the input of
+another.)  The desire for multiple Java processes in a single JVM stems
+from two sources: first, the JJOS kernel's current lack of multiple native
+processes (that is, we can't take the 'easy way out' and run multiple
+instances of decaf); second, the potential space efficiency benefits.  A
+more secondary concern is the handling of shared-object IPC.
+
+	The insight of disjoint classloaders generating processes combined
+with an examination of the JVM spec leads to the realization that we must
+'clarify' it to allow more than a single primordial classloader******.  A
+Java application can not (and must not) be able to distinguish between
+running in its own (conventional) JVM and in its own primordial
+classloader.  That is, the from the application's point of view, a JVM is
+comprised of the statics in the classes returned by findSystemClass().  
+This clarification, then, gives us multiple processes in a single JVM, but
+quite inefficiently (sp?).  Efficiency is gained by sharing class
+definitions***, which are the portions of class invariant under writes to
+static variables.  (From the implementation standpoint, a class definition
+is the everything in the native representation of class that isn't the
+value of the statics.)  This sharing of class definitions -- that is,
+/not/ reloading the whole class library for each process -- must be done
+very carefully to ensure two things: type-safety* and transparency.  
+(That is, legacy applications must behave identically in decaf with
+multiple processes as in decaf with a single process.)
+
+	A share may be attempted if and only if****
+
+(1) The class definitions involved are identical.  This may be determined
+	in an implementation-dependent manner. ******  Likewise,
+	implementations would determine when to check for class definition
+	shares based on their criteria for equality.
+
+(2) The classloader which is defining the class is a (native)** primordial
+	class loader, and the cached class definition under consideration
+	for sharing was also loaded/defined by a (native)** primordial
+	class loader.
+
+	These conditions have two sources; the source for rule one is
+rather obvious.  The source for rule two is the requirement that legacy
+programs which utilize custom classloaders must operate properly; that is,
+custom classloaders do not expect to share definitions unless they
+explicitly arrange for it, and it appears to be impossible to assure the
+correctness of any implicit sharing we may arrange.
+
+
+	With processes and an object-oriented language, the natural
+extension is object-oriented IPC.  Message-based OO-IPC is already handled
+by the class libraries and conventional JVM spec.  (See my earlier mail
+about Serializable and RMI.)  Shared-memory (shared-object) OO-IPC
+requires special handling by the JVM.  Without a spec, we (JOS) may define
+our own.  The key realization for shared-memory OO-IPC is that the
+classloaders, being disjoint, do not share classes, and thus, the object
+can not be cast from one process to another.  We solve this by allowing
+'illegal' cast operations as follows:
+
+(1) The security system must OK the object share.  This allows us to flag
+	the object as shared for efficiency.
+(2) The object's class definition must be shared between the two
+	processes.  (Implying it was loaded by a (native)** primordial
+	classloader.)
+
+
+	Furthermore, we must assure that native methods are accessible
+from any classloader which would 'normally' (e.g. in another JVM
+process) have access.  Currently, as JJOS/decaf has one library and one
+revision of it loadable at a time, we don't need to worry about
+this; everyone's native calls resolve the same way.  Later, it seems that
+a model more-or-less identical to the one above described for sharing
+class definitions would be applicable to native methods; in fact, in may
+be possible to fold the location (e.g. instance of loaded library for this
+classloader) into the class definition, and have everything work out
+auto-magically.  (I'll need to read up more on libraries for this.)
+
+-_Quinn
+
+* Amusingly enough, Java isn't type-safe anyway.  I don't have the
+(academic) citations handy, unfortunately.  Likewise, Java's memory model
+-- which I'm mostly ignoring, in part because of this -- is horribly
+broken.  Bill Pugh, who's written some papers about it, seems to hold the
+opinion (based on my second-hand information) that Sun's VM implementation
+has a memory model which makes sense but doesn't follow the spec...
+
+** Gilbert has some very interesting ideas about Java primordial
+classloaders that I must admit I'm avoiding because they'd confuse things
+(or me, anyway!) immensely before I get the processes thing nailed down.
+
+*** A later refinement (like the above footnote) may be gained by
+utilising a bytecode cache; see other emails for my thoughts on that.  
+Like the previous footnote, I'm ignoring a perfectly good idea because it
+might confuse me.
+
+**** The phrase &quot;if and only if&quot; means I'm suggesting that when these
+conditions are met, you /must/ share the definition.
+
+***** Ryan suggests classfile/archive location and modification
+date.  Gilbert suggested integration with the bytecode cache, and a
+straight call to memcmp(); I've commented on both of these
+before.  However, it occured to me that location &amp; date could utilise URIs
+instead of filenames, which would allow the primordial (java or
+otherwise) classloaders to do more interesting things and still share
+class definitions; one would expect the classloaders which implement
+remote URIs to use a bytecode cache.
+
+****** Ryan's rheise.os package demonstrating that a very large chunk of
+the functionality can be duplicated with smoke &amp; mirrors rather than
+native support. :)
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000495.html">[JOS-Arch] rheise.os questions</A></li>
+	<LI> Next message: <A HREF="000498.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#477">[ date ]</a>
+              <a href="thread.html#477">[ thread ]</a>
+              <a href="subject.html#477">[ subject ]</a>
+              <a href="author.html#477">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

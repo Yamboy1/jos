@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS] JDK incompatibility solutions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:brill.pappin%40jmonkey.com">
+   <LINK REL="Previous"  HREF="000132.html">
+   <LINK REL="Next" HREF="000133.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS] JDK incompatibility solutions</H1>
+    <B>Brill Pappin</B> 
+    <A HREF="mailto:brill.pappin%40jmonkey.com"
+       TITLE="[JOS] JDK incompatibility solutions">brill.pappin@jmonkey.com</A><BR>
+    <I>Tue, 16 Nov 1999 10:18:47 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000132.html">[JOS] JDK incompatibility solutions</A></li>
+        <LI> Next message: <A HREF="000133.html">[JOS] JDK incompatibility solutions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#135">[ date ]</a>
+              <a href="thread.html#135">[ thread ]</a>
+              <a href="subject.html#135">[ subject ]</a>
+              <a href="author.html#135">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>----- Original Message -----
+From: Max Gilead &lt;<A HREF="mailto:gilead@linart.pl">gilead@linart.pl</A>&gt;
+To: JOS General group &lt;<A HREF="mailto:general@jos.org">general@jos.org</A>&gt;
+Sent: Friday, November 12, 1999 6:16 PM
+Subject: [JOS] JDK incompatibility solutions
+[...]
+&gt;<i> 2. JDK for JOS (much better solution)
+</I>&gt;<i> Some people think that JOS should mimic JDK. I think it should not (at
+</I>&gt;<i> least not its core). I think that JOS core should provide VM to run
+</I>&gt;<i> bytecode and its own hardwired system classes (jos.org.* and below?) -
+</I>&gt;<i> that's all. This way it would be possible to run applications compiled
+</I>&gt;<i> for different JDKs (even ancient ones) without any problems. Which JDK
+</I>&gt;<i> to run under could be choosen from some property panel or detected at
+</I>&gt;<i> runtime(?).
+</I>
+
+I afrad I don't agree here... I think the JOS should be as close to the
+standard implementation as possible...
+It just means that *anything* would run on it, including 1.1 &amp; 1.2 code.
+
+This also makes it much simpler for the guys writing the kernel... in this
+case, all they have to do is provide the basic windowing systems, and hook
+the AWT components into their peers. With a model like this, we then have
+the OS... and anyone can implement an environment that works for them...
+needless to say, JOS would come with one or two default environments, but
+would wouldn't need to use them.
+This also means that the kernel guys can focus on making the native side as
+fast and stable as posible, and not have to worry about the L&amp;F of the rest
+of the thing.
+
+All it has to do, is boot to a basic graphical environment... once done, the
+rest of the system can take any form it wishes.
+
+&gt;<i> Incompatibility problem can be breaked into two smaller problems:
+</I>[...]
+&gt;<i> Easy enough, I think. And very flexible. If user doesn't want to run any
+</I>&gt;<i> older applications, he does not install compatibility libraries. But he
+</I>&gt;<i> may do so at any time.
+</I>
+So why not allow the choice to the application. Let each application choose
+a namespace (sandbox?), and allow the system to be configured, so that an
+application can be set to run in a 1.1 VM, or a 1.2 VM... in that case, it
+will require a little creativity on the part of the kernel people... but its
+doable i think.
+Obviously it would be best is the OS and its applications ran in the same
+VM... that would make maximum usage of memory, and runtime performance...
+however, I can see instance where running in separate VMs would be
+beneficial... i.e. for stability (separation of process)...
+Anyway, this is fancy stuff... that can be dreamed up later... you would
+need a special VM Factory that could create the different VMs, but still
+allow the applications to access one another (as in the instance of
+Singleton classes, such as a file system, or security manager).
+
+Personally, all I want right now, is a working kernel, with the JVM
+implemented... once I get my hands on that, we can start on the rest of the
+system.
+
+
+- Brill Pappin
+  www.jmonkey.com
+
+  The sooner you fall behind,
+  the more time you will have
+  to catch up.&quot;
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000132.html">[JOS] JDK incompatibility solutions</A></li>
+	<LI> Next message: <A HREF="000133.html">[JOS] JDK incompatibility solutions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#135">[ date ]</a>
+              <a href="thread.html#135">[ thread ]</a>
+              <a href="subject.html#135">[ subject ]</a>
+              <a href="author.html#135">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

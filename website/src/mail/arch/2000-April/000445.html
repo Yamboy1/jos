@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000442.html">
+   <LINK REL="Next" HREF="000448.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">tmiller@haverford.edu</A><BR>
+    <I>Mon, 10 Apr 2000 13:53:16 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000442.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000448.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#445">[ date ]</a>
+              <a href="thread.html#445">[ thread ]</a>
+              <a href="subject.html#445">[ subject ]</a>
+              <a href="author.html#445">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> &gt;- always maintain separate statics for different classloaders
+</I>
+&gt;<i> It is an option, not a requirement. The Java Virtual Machine specification
+</I>&gt;<i> does not require separate statics for different class loaders. It
+</I>&gt;<i> rightfully puts the decision in the hands of the custom class loader. A
+</I>&gt;<i> virtual machine must support the option of separate statics for each
+</I>&gt;<i> instance of a custom class loader.
+</I>
+	No, it doesn't.  Our requirement for maintaining statics is the
+same as a conventional JVM, with the exception that classloaders /in
+different processes/, by definition, can't share statics.  (Otherwise,
+they're not separate processes.)  In fact, if a class already /has/
+statics, a conventional-JVM classloader /must/ define its own version of
+the class to get different statics!
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000442.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000448.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#445">[ date ]</a>
+              <a href="thread.html#445">[ thread ]</a>
+              <a href="subject.html#445">[ subject ]</a>
+              <a href="author.html#445">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

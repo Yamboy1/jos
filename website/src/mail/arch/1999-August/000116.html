@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Proposing archive: protocol</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000115.html">
+   <LINK REL="Next" HREF="000114.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Proposing archive: protocol</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Proposing archive: protocol">digigod@earthling.net</A><BR>
+    <I>Thu, 05 Aug 1999 21:24:25 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000115.html">[JOS-Arch] Proposing archive: protocol</A></li>
+        <LI> Next message: <A HREF="000114.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#116">[ date ]</a>
+              <a href="thread.html#116">[ thread ]</a>
+              <a href="subject.html#116">[ subject ]</a>
+              <a href="author.html#116">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Al wrote:
+&gt;<i> hex:zip:<A HREF="ftp://ftpusername:ftpuserpassword@ftp.server.org/">ftp://ftpusername:ftpuserpassword@ftp.server.org/</A>
+</I>&gt;<i> pub/images.zip?username=jeeves&amp;password=cafebabe
+</I>&gt;<i> |gzip:/jeeves/surfing.gzip?username=foo&amp;password=bar
+</I>&gt;<i> |jpeg:image:/cool/image1.jpg?width=100&amp;height=50
+</I>
+I think we've officially destroyed any chance of it being human
+interpratable, at least
+ 
+&gt;<i> Or maybe the internal protocol handlers should be followed by a double
+</I>&gt;<i> slash (//)?
+</I>&gt;<i> 
+</I>&gt;<i> Maybe then the original zip: should be omitted and added *after* the
+</I>&gt;<i> server specification? Remember, this URI won't be sent to the ftp server
+</I>&gt;<i> to confuse it, it will be used by the internal system content handlers.
+</I>&gt;<i> 
+</I>&gt;<i> &gt; From RFC 2396, the verticle bar (|) is considered an &quot;unwise&quot;
+</I>&gt;<i> &gt; character. We're supposed to be careful not to think about JOS as an
+</I>&gt;<i> &gt; island. JOS will interact with all other operating systems. How can we
+</I>&gt;<i> &gt; limit URIs to internal use only?
+</I>&gt;<i> 
+</I>&gt;<i> I'm not quite sure, but if we need something not yet implemented, should
+</I>&gt;<i> we not implement it?
+</I>&gt;<i> 
+</I>&gt;<i> &gt; Hey, what about this:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; uri-pipe := uri &quot;&gt;&gt;&quot; uri &quot;&gt;&gt;&quot; uri
+</I>&gt;<i> 
+</I>&gt;<i> I would *strongly* suggest using single characters for delimiters. We
+</I>&gt;<i> can use the backslash maybe (\)? Or the $ sign? Or the ! sign which is
+</I>&gt;<i> already used in JAR files? Or the ~ sign? I think # should be left for
+</I>&gt;<i> anchors, since we do want URIs to point to XML/HTML documents.
+</I>
+\ is already used, $ doesnt seem right, ! is off. # is for a fragment,
+an anchor is how HTML handles a fragment. an archive could handle the
+fragment as specifing a file 
+
+archive:big.jar#/boring/stuff/no/one/uses/afile.txt
+ 
+&gt;<i> &gt; I suppose it is possible for an FTP service to extract the latest.zip,
+</I>&gt;<i> &gt; then extract foo.jpg and return only foo.jpg to the client agent.
+</I>&gt;<i> 
+</I>&gt;<i> This could be very easily achieved as follows:
+</I>&gt;<i> 
+</I>&gt;<i> <A HREF="ftp://jeeves:cafebabe@ftp.server.org/pub/archives/images.zip!/jeeves/">ftp://jeeves:cafebabe@ftp.server.org/pub/archives/images.zip!/jeeves/</A>
+</I>&gt;<i> surfing/image1.jpg
+</I>
+in the scheme I suggested in this and other e-mails it would be:
+
+archive:<A HREF="ftp://jeeves:cafebabe$ftp.server.org/pub/archives/images.zip#/jeeves/surfing/image1.jpg">ftp://jeeves:cafebabe$ftp.server.org/pub/archives/images.zip#/jeeves/surfing/image1.jpg</A>
+
+its procesed as 
+ftp:.../images.zip
+which is passed to
+archive:&lt;the zip&gt;#.../image1.jpg
+which returns the file
+
+for the archive in an archive situation it would be:
+
+archive:archive:<A HREF="ftp://jeeves:cafebabe$ftp.server.org/pub/archives/images.zip#/extras/pics.zip#/jeeves/surfing/image1.jpg">ftp://jeeves:cafebabe$ftp.server.org/pub/archives/images.zip#/extras/pics.zip#/jeeves/surfing/image1.jpg</A>
+
+<A HREF="ftp://.../images.zip">ftp://.../images.zip</A> is passed to
+archive:&lt;zip&gt;#extras/pics.zip which is sent to
+archive:&lt;zip&gt;#...image1.zip
+
+and to force the jpeg to be shown in hex:
+
+mime:archive:archive:<A HREF="ftp://jeeves:cafebabe$ftp.server.org/pub/archives/images.zip#/extras/pics.zip#/jeeves/surfing/image1.jpg?media=application&format=octet-stream">ftp://jeeves:cafebabe$ftp.server.org/pub/archives/images.zip#/extras/pics.zip#/jeeves/surfing/image1.jpg?media=application&amp;format=octet-stream</A>
+
+this is the same as above but it adds the extra recursion:
+
+mime:&lt;file&gt;?media=application&amp;format=octet-stream
+
+which forces the file to be ID'ed as application/octet-stream for
+purposes of viewing
+ 
+&gt;<i> The client can query the server to find out if the server can perform
+</I>&gt;<i> such an operation, and if it cannot, then the client should do it (just
+</I>&gt;<i> as it is done currently in JAR files).
+</I>
+agreed.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000115.html">[JOS-Arch] Proposing archive: protocol</A></li>
+	<LI> Next message: <A HREF="000114.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#116">[ date ]</a>
+              <a href="thread.html#116">[ thread ]</a>
+              <a href="subject.html#116">[ subject ]</a>
+              <a href="author.html#116">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

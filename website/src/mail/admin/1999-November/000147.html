@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Admin] SourceServer (was: JOS Packages.. I'm a litte confused!)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:iainshigeoka%40yahoo.com">
+   
+   <LINK REL="Next" HREF="000150.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Admin] SourceServer (was: JOS Packages.. I'm a litte confused!)</H1>
+    <B>Iain Shigeoka</B> 
+    <A HREF="mailto:iainshigeoka%40yahoo.com"
+       TITLE="[JOS-Admin] SourceServer (was: JOS Packages.. I'm a litte confused!)">iainshigeoka@yahoo.com</A><BR>
+    <I>Sat, 20 Nov 1999 13:14:53 -0600</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000150.html">[JOS-Admin] SourceServer</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#147">[ date ]</a>
+              <a href="thread.html#147">[ thread ]</a>
+              <a href="subject.html#147">[ subject ]</a>
+              <a href="author.html#147">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello,
+
+This is getting off topic for the arch list.  I'm cross posting to the 
+admin list and setting the reply-to to point there.  Please followup 
+to this only on the admin list.
+
+On 19 Nov 99, at 7:38, Gilbert Carl Herschberger II wrote:
+
+&gt;<i> At 02:01 PM 11/18/99 -0600, you wrote:
+</I>
+&gt;<i> Imagine that new code were uploaded to CVS. After code is uploaded to CVS,
+</I>&gt;<i> someone downloads it; periodically, they take a snapshot. From the
+</I>&gt;<i> snapshot, both a source and binary distribution can be created. Class files
+</I>&gt;<i> do not have to be pre-compiled and uploaded to CVS. Anyone can download a
+</I>&gt;<i> distribution with a HTML browser, without using CVS.
+</I>&gt;<i> 
+</I>&gt;<i> This person could run the source code through a syntax highlighter and
+</I>&gt;<i> pretty printer to create static HTML files. Static HTML files reduce the
+</I>&gt;<i> burden on our web server. The static HTML files are uploaded to our
+</I>&gt;<i> Internet website for everyone to browse. All of the heaving processing is
+</I>&gt;<i> off-line. Tools can be debugged and improved over a long period of time.
+</I>&gt;<i> 
+</I>&gt;<i> 1. The HTML-formatted source code could not possibly ruin the source code,
+</I>&gt;<i> like Source Server did.
+</I>&gt;<i> 
+</I>&gt;<i> 2. Pages of HTML-formatted source code should be linked to their
+</I>&gt;<i> corresponding distribution. When you pick on class, you download the
+</I>&gt;<i> product that contains the package that contains the class. You don't
+</I>&gt;<i> download one class at a time.
+</I>
+This is what I had in mind too.  :)  It's on the to-do list after getting 
+the current next gen website online.  The current next gen website 
+is about 80% of the way to beta state.  It's basically going to 
+exhibit the same functionality as the current wiki. But the big 
+unseen infrastructure addition is a fully integrated user/session 
+management foundation.  With this in place, permission issues 
+(esp. upload and edit permissions) will be much easier to address 
+for things like source repositories.
+
+&gt;<i> &gt;For now, if you don't want to use CVS, then please, just make an 
+</I>&gt;<i> &gt;archive file (.tgz, .zip, or .jar) available for download.
+</I>&gt;<i> 
+</I>&gt;<i> Authors that do not know CVS can make their distribution available as an
+</I>&gt;<i> archive. If product development is shared by many authors, a distribution
+</I>&gt;<i> might be uploaded to CVS and maintained there.
+</I>
+My experience as webmaster answering questions for JOS is that 
+most open source programmers are not comfortable with using 
+CVS.  Especially those that are writing small utilities.  (Or those 
+that want to download source for anything).  
+
+This is the reason that the SourceServer even with all its 
+shortcomings, was so popular.  No CVS tools, no new techniques 
+to learn.  Just upload your jar and SourceServer displays source for 
+that jar and that's it.  No merging, no client software, no 
+updating/commiting etc.  What's in SourceServer is the latest and 
+&quot;canonical&quot; version of that source.
+
+The big question is, what should be JOS' &quot;canonical&quot; source 
+repository?
+
+IMHO, it should be a tool like SourceServer (let's call it SSTNG for 
+SourceServer: The Next Generation) not CVS.  All JOS source 
+should be checked into SSTNG, even if that means there's also a 
+version in CVS.  The source in SSTNG basically serves as &quot;official&quot; 
+snapshots of the JOS source.  This simplifies things for most 
+people.
+
+CVS becomes a working repository only used by those projects 
+that require collaboration between several developers (such as the 
+kernel group) that isn't feasible to handle by more traditional (if less 
+technical) methods such as emailing diffs to a &quot;lead&quot; programmer.  
+CVS will still allow adventurous and bleeding-edge people to 
+anonymously get CVS source that is basically &quot;daily build&quot; source. 
+
+Groups that use CVS appoints a &quot;lead&quot; programmer that 
+periodically checks out CVS sources and inserts it into SSTNG.
+
+SSTNG only stores 1 copy of source.  If new source is checked in 
+by users with permission, it replaces the version in SSTNG.  This 
+follows the behavior of the old SourceServer and keeps things 
+simple for everyone.
+
+For record keeping purposes, every so often, someone from the 
+distribution group takes a snapshot of the entire SSTNG contents.  
+The last x number of snapshots and other &quot;signficant&quot; snapshots 
+can then be made available for download.
+
+Within SSTNG itself, we have functionality as per Gilbert's 
+suggestions:
+
+You upload source as &quot;distributions&quot;.  For clarity, I'm going to call 
+them source jars.  Basically, a jar of all the source needed to build 
+a single product (the product being a java application, a library, 
+etc).  A source jar can be linked to other source jars to indicate 
+dependence on other JOS products (such as shared class library 
+jars).
+
+SSTNG handles uploads and downloads at the source jar level.  It 
+is up to the &quot;lead&quot; developer(s) how many source files belong to a 
+single product (and thus a single source jar).
+
+SSTNG will display source on a source file level via pretty printed 
+HTML.  
+
+Each pretty printed source file is linked to the raw source file, and 
+its associated source jar.  Anyone is free to view/download source 
+file by file via their web browser, or via the entire source jar using 
+the link to its associated sourcejar.
+
+For a project you have a &quot;lead&quot; developer or developers that has 
+upload permissions to SSTNG for a project.  Each project can have 
+as many source jars as they want (within reason).  If you replace 
+one of your source jars with a new one, SSTNG delete's all source 
+associated with the old jar and replaces it with the new one.  
+
+So to browse source, you first choose a project, then a source jar, 
+then navigate via package names.  This does allow for overlapping 
+package names/spaces/classes so developers should be careful of 
+package name usage.  A JOS Package name reservation system 
+is also planned at some really future date for the website...
+
+Each uploaded source jar will be exploded into individual source 
+files, pretty printed HTML versions can be auto-generated, as well 
+as javadoc'd.
+
+Anything I missed or got wrong?  Let me know.  I'm obviously not 
+working on this right now but it is a future project or my list.  If 
+anyone wants to help out, let me know.
+
+-iain
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000150.html">[JOS-Admin] SourceServer</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#147">[ date ]</a>
+              <a href="thread.html#147">[ thread ]</a>
+              <a href="subject.html#147">[ subject ]</a>
+              <a href="author.html#147">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [data registry] x-registry:new: subscheme</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000064.html">
+   <LINK REL="Next" HREF="000066.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [data registry] x-registry:new: subscheme</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [data registry] x-registry:new: subscheme">gchii@mindspring.com</A><BR>
+    <I>Fri, 18 Aug 2000 11:06:21 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000064.html">[JOS-Apps] [smartapi] Release 10 planned</A></li>
+        <LI> Next message: <A HREF="000066.html">[JOS-Apps] [eric] Smart ERIC package</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#65">[ date ]</a>
+              <a href="thread.html#65">[ thread ]</a>
+              <a href="subject.html#65">[ subject ]</a>
+              <a href="author.html#65">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The x-registry: scheme always returns an instance of Registry (or null).
+The x-registry:new: subscheme creates a new data registry in memory, not
+from pre-existing a local or remote file. It has not always been obvious
+why new: is part of the x-registry: scheme. The need for the new: subscheme
+has been questioned because its design was incomplete.
+
+It is important to understand the purpose of the x-registry:new: subscheme.
+A new data registry is empty. It has no keys and no values. Interactively,
+a new, empty data registry can be created by typing in the following location:
+
+x-registry:new:
+
+&gt;<i>From within a method written in the Java programming language, it is easy
+</I>to create a new data registry:
+
+  public void example() {
+    Registry r = new BasicRegistry();
+    :
+  }
+
+Here is the rest of the story. It should have been possible to create a new
+data registry with default keys and values. With the second version of the
+new: subscheme, a query string will be supported. The new data registry
+will not be empty. It will have keys and values from a query string.
+Interactively, a new data registry can be created with default keys and
+values by typing in the following location:
+
+x-registry:new:?name1&amp;value1&amp;name2&amp;value2&amp;name3&amp;value3
+
+&gt;<i>From within a method, the following is an equivalent method:
+</I>
+  public void example() {
+    Registry r = createRegistry();
+    :
+  }
+  protected Registry createRegistry() {
+    Registry r = new BasicRegistry();
+    r.setString( &quot;name1&quot;, &quot;value1&quot; );
+    r.setString( &quot;name2&quot;, &quot;value2&quot; );
+    r.setString( &quot;name3&quot;, &quot;value3&quot; );
+    return r;
+  }
+
+Often in application programming, a custom configuration should be based on
+a factory default. When a factory default can be implemented as a uniform
+resource identifier, no external resource is required. It cannot get lost.
+The factory default cannot be changed without recompiling the code.
+
+-----
+
+This might be applied to a new instance of java.util.Properties, in a
+fictional properties: scheme like this:
+
+properties:new:?name1=value1&amp;name2=value2&amp;name3=value3
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000064.html">[JOS-Apps] [smartapi] Release 10 planned</A></li>
+	<LI> Next message: <A HREF="000066.html">[JOS-Apps] [eric] Smart ERIC package</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#65">[ date ]</a>
+              <a href="thread.html#65">[ thread ]</a>
+              <a href="subject.html#65">[ subject ]</a>
+              <a href="author.html#65">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

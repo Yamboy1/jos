@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: JOS registry</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000025.html">
+   <LINK REL="Next" HREF="000027.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: JOS registry</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS-Arch] Re: JOS registry">al@outworld.org</A><BR>
+    <I>Sat, 19 Jun 1999 10:22:01 +0300</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000025.html">[JOS-Arch] Java Compatible</A></li>
+        <LI> Next message: <A HREF="000027.html">[JOS-Arch] JOS Security Model</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#26">[ date ]</a>
+              <a href="thread.html#26">[ thread ]</a>
+              <a href="subject.html#26">[ subject ]</a>
+              <a href="author.html#26">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I took the liberty of posting this to <A HREF="mailto:arch@jos.org">arch@jos.org</A> too.
+
+Gilbert Carl Herschberger II wrote:
+
+&gt;<i> I have tried to make it clear that a registry API doesn't include an
+</I>&gt;<i> implementation of a registry interface.
+</I>
+I know, I have done the same thing with my registry, just that I added
+an implementation (Impl classes) and an interface (RegistryServer) which
+do not affect the registry API at all (they could be missing from the
+classpath and nothing would go wrong if using just the registry).
+
+&gt;<i> In a few places, I made a point to demonstrate that a registry does
+</I>&gt;<i> not have to be stored at all.
+</I>
+True, my registry is simply an OO structure. Unless you ask for it,
+through the server, to be saved to a file (written to a Stream), it
+remains transient. My registry also has the ability to hold
+non-serializable or transient items, so all nodes and leafs in the
+registry tree have the methods:
+
+isValid();
+isSerializable();
+
+&gt;<i> I also made a point to demonstrate that a registry, when stored, may
+</I>&gt;<i> be stored by another process (like a registry service), another
+</I>&gt;<i> machine (like a registry server).
+</I>
+This is done. Of course, it is accomplished only via RMI, which is
+something to debate about...
+
+&gt;<i> When a registry needs to be stored, it can be stored in a wide variety
+</I>&gt;<i> of different file formats, from .conf to XML.
+</I>
+There was an idea of having Transformation algorithms as an API in JOS.
+This way, you feed the engine bytes, and it transforms it to another
+format, such as XML. This API is not ready yet, so up to now I have only
+added a method in the registry like this:
+
+toXMLString();
+
+which really returns a String object, not an XML Document (still waiting
+for Sun's official implementation of XML in javax.xml.*) and cannot
+interpret XML registries yet.
+
+&gt;<i> &gt;Also, I would not suggest the usage of primitive types.
+</I>&gt;<i> 
+</I>&gt;<i> Without primative types, Java would not have been possible. In theory,
+</I>&gt;<i> Java should have made everything an object. Without primative types, a
+</I>&gt;<i> registry is not possible. The kinds of things programmers already
+</I>&gt;<i> store in registries are primative types. They are not objects. Adding
+</I>&gt;<i> objects at this level of the API creates a needless redundency.
+</I>
+True, but I think the overhead for creating Float and Blob objects less
+compared to the amount of processing required to handle different data
+types. Up to now, the registry only recognizes type Object, which is
+precisely what List, Vector, Hashtable, etc. accept...
+
+&gt;<i> Maybe what you want is an object store. You must be talking about a
+</I>&gt;<i> high level registry. But a high level registry isn't a registry at
+</I>&gt;<i> all. That would be...an object store.
+</I>
+OK :)
+
+Basically, I am making an inverted tree that stores objects, and can
+manipulate these objects by retrieving them, replacing them, replicating
+them, etc.
+
+&gt;<i> &gt;That ONLY JOS-specific applications can use these classes.
+</I>&gt;<i> 
+</I>&gt;<i> How is it that 100% Pure Java classes created by the JOS Project will
+</I>&gt;<i> only work in the JOS JVM? Certainly, you've been running your registry
+</I>&gt;<i> in a non-JOS JVM.
+</I>
+No, no, no... I mean that if every object in the Java API is changed to
+be a registry, then this is not a 100% Java API.
+
+I am running the registry in JDK 1.2 final.
+
+&gt;<i> JOS-specific applications might be expected to use the registry API.
+</I>&gt;<i> In fact, it might be a built-in part of the Process object where JOS
+</I>&gt;<i> applications live.
+</I>
+Or, more simply, could just be an RMI server. But true, having a method
+like this would be useful:
+
+JOSSystem.getRegistry();
+
+&gt;<i> The JOS Project is pioneering some of the APIs that may become the
+</I>&gt;<i> next generation of industry standards. If the JOS registry API is
+</I>&gt;<i> really, really great, it won't take much for Sun Microsystems to
+</I>&gt;<i> provide a registry API as a built-in part of Java 3 or 4.
+</I>
+Let's cross our fingers then! :)
+
+&gt;<i> My own motivation for working on the registry API is because I need to
+</I>&gt;<i> use it now. I have current products held up because they have no
+</I>&gt;<i> registry. I am enthusiastic about shipping a registry compatible with
+</I>&gt;<i> the JOS Registry API along with each product I build. A product suite
+</I>&gt;<i> only has to install a registry once. All of the products are able to
+</I>&gt;<i> share the same registry through a well-known API.
+</I>
+Well, since sharing is a keyword, security must be implemented first...
+
+&gt;<i> My products run on some machines where there is no TCP/IP stack. They
+</I>&gt;<i> have no network at all. This is why RMI and CORBA are not an option. I
+</I>&gt;<i> just want a registry, and that's all.
+</I>
+The org.jos.registry.RegistryServer class extends UnicastRemoteObject
+and implements org.jos.registry.Server that extends java.rmi.Remote.
+
+You can simply create a local RegistryServer class and use it, without
+binding through an RMI registry. If your server and client is in the
+same process, you won't need network at all.
+
+&gt;<i> I have downloaded the Registry.jar. Isn't a jar just like a zip file?
+</I>&gt;<i> I might be able to unzip it, right?
+</I>
+Yup, Jar files use the ZIP inflator plus they add a cute manifest file.
+
+
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+___________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: <A HREF="http://www.outworld.org/people/al/]">http://www.outworld.org/people/al/]</A> [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000025.html">[JOS-Arch] Java Compatible</A></li>
+	<LI> Next message: <A HREF="000027.html">[JOS-Arch] JOS Security Model</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#26">[ date ]</a>
+              <a href="thread.html#26">[ thread ]</a>
+              <a href="subject.html#26">[ subject ]</a>
+              <a href="author.html#26">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

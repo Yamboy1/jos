@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] ScreenSaver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:scribbs%40ida.org">
+   <LINK REL="Previous"  HREF="000068.html">
+   <LINK REL="Next" HREF="000071.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] ScreenSaver</H1>
+    <B>Sean Cribbs</B> 
+    <A HREF="mailto:scribbs%40ida.org"
+       TITLE="[JOS-UI] ScreenSaver">scribbs@ida.org</A><BR>
+    <I>Fri, 23 Jul 1999 09:13:04 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000068.html">[JOS-UI] ScreenSaver</A></li>
+        <LI> Next message: <A HREF="000071.html">[JOS-UI] ScreenSaver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#69">[ date ]</a>
+              <a href="thread.html#69">[ thread ]</a>
+              <a href="subject.html#69">[ subject ]</a>
+              <a href="author.html#69">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> 
+</I>&gt;<i> //////////////////////
+</I>&gt;<i> package digigod.jade.saver;
+</I>&gt;<i> 
+</I>&gt;<i> import java.awt.*;
+</I>&gt;<i> 
+</I>&gt;<i> public abstract class ScreenSaver implements Runnable {
+</I>&gt;<i>  private Graphics2D g;
+</I>&gt;<i> 
+</I>&gt;<i>  public boolean isCongigurable() {
+</I>&gt;<i>   return false;
+</I>&gt;<i>  }
+</I>&gt;<i> 
+</I>&gt;<i>  public void showConfigurationDialog() {
+</I>&gt;<i>   return;
+</I>&gt;<i>  }
+</I>&gt;<i> 
+</I>&gt;<i>  public String getDescription() {
+</I>&gt;<i>   return &quot;A ScreenSaver&quot;;
+</I>&gt;<i>  }
+</I>&gt;<i> 
+</I>&gt;<i>  public Toolkit getDefaultToolkit() { //convience method
+</I>&gt;<i>   return Toolkit.getDefaultToolkit();
+</I>&gt;<i>  }
+</I>&gt;<i> 
+</I>&gt;<i>  public void init(Graphics2D g2d) {
+</I>&gt;<i>   g = g2d;
+</I>&gt;<i>  }
+</I>&gt;<i> 
+</I>&gt;<i>  public Graphics2D getGraphics() {
+</I>&gt;<i>   return g;
+</I>&gt;<i>  }
+</I>&gt;<i> 
+</I>&gt;<i>  public abstract void run();
+</I>&gt;<i> 
+</I>&gt;<i>  public void dispose() {
+</I>&gt;<i>   g.dispose();
+</I>&gt;<i>  }
+</I>&gt;<i> }
+</I>&gt;<i> //////////////////////
+</I>&gt;<i> 
+</I>
+Looks good! So JADE is responsible for initializing the graphics
+context? (It appears that way.)  I'm not incredibly familiar with
+JavaBeans, but maybe we should make the screen saver a bean, so that it
+is easily configurable and could be embedded into applications or the
+desktop environment.  There should probably be an option for double
+buffering, too.
+
+Maybe something we can work on soon is a taskbar/bean container widget
+for the UI.  That would be fun and we could test it right away (I like
+things I can get a good grip on!)
+
+I think I'll follow your footsteps and name the tookit-peer package
+seancribbs.jade.core. =Þ
+
+Later,
+
+Sean Cribbs
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000068.html">[JOS-UI] ScreenSaver</A></li>
+	<LI> Next message: <A HREF="000071.html">[JOS-UI] ScreenSaver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#69">[ date ]</a>
+              <a href="thread.html#69">[ thread ]</a>
+              <a href="subject.html#69">[ subject ]</a>
+              <a href="author.html#69">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

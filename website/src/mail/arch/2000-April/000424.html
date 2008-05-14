@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000423.html">
+   <LINK REL="Next" HREF="000425.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">gchii@mindspring.com</A><BR>
+    <I>Thu, 06 Apr 2000 19:16:39 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000423.html">[JOS-Arch] URL cache</A></li>
+        <LI> Next message: <A HREF="000425.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#424">[ date ]</a>
+              <a href="thread.html#424">[ thread ]</a>
+              <a href="subject.html#424">[ subject ]</a>
+              <a href="author.html#424">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I have been working on the problem of multiple process in a single Java
+Virtual Machine. I found that a class loader does not become part of an
+object's type unless the class loader defines the class. A class loader is
+not part of the type if the class loader uses findSystemClass(). This could
+be significant.
+
+Imagine I have a custom class loader that can read rt.jar and classes.zip.
+It looks at the CLASSPATH property of java.lang.System.
+
+Theory: When a request for a new java.lang.System class is passed to the
+custom class loader, the custom class loader can ignore findSystemClass()
+and use defineClass() to define a new instance of the java.lang.System class.
+
+A few good things happen. There is a new instance of System.in, System.out
+and System.err. The custom class loader becomes part of the new type of
+java.lang.System. Throw this into a thread and you almost have a process.
+
+Question: Starting with an instance of java.lang.Class, is there an easy
+way to get its original bytecode?
+
+When asked for &quot;java.lang.System&quot;, a custom class loader could do something
+like this:
+
+  Class c = System.getClass();
+  defineClass( c.getBytecode() );
+
+When asked for &quot;java.lang.Runtime&quot;, a custom class loader could do this:
+
+  Class c = Runtime.getClass()
+  defineClass( c.getBytecode() );
+
+Or rather
+
+  Class c = Runtime.getRuntime().getClass();
+  defineClass( c.getBytecode() );
+
+Question: Why is the access &quot;private&quot; for java.lang.Runtime's only
+constructor? How does a virtual machine extend it without rewriting it from
+scratch?
+
+Question: Why is java.lang.Object and java.lang.Class stored inside rt.jar?
+These classes should be stored in the machine code for a virtual machine,
+shouldn't they?
+
+Question: Isn't it possible to literally translate bytecode from a class
+file into a C++ program? A few class files could be compiled directly into
+the jJOS/decaf executable image, with no classes.zip file required.
+
+class java_lang {
+  const char *bcSystem = { 0xCA, 0xFE, 0xBA, 0xBE .. };
+  const char *bcObject = { 0xCA, 0xFE, 0xBA, 0xBE .. };
+  const char *bcClass = { 0xCA, 0xFE, 0xBA, 0xBE .. };
+  const char *bcThread = { 0xCA, 0xFE, 0xBA, 0xBE .. };
+  const char *bcThreadGroup = { 0xCA, 0xFE, 0xBA, 0xBE .. };
+:<i>
+</I>};
+
+A class file might be a &quot;resource&quot; from the machine code viewpoint. Like an
+icon or string table, a resource can be linked to an executable image.
+
+A virtual machine, like decaf, could provide a BCNI interface for the
+pre-defined classes, like this:
+
+public interface PredefinedBytecode {
+  public byte[] getData();
+}
+
+A URI would return the predefined bytecode to a custom class loader:
+
+URI uri = new URI( &quot;device:intern:java.lang.System&quot; );
+PredefinedBytecode bc = (PredefinedBytecode) uri.getObject();
+
+Class c = defineClass( bc.getData() );
+
+-----
+
+Or the entire predefined bycode object could be encapsulated like this:
+
+public interface PredefinedBytecodeManager {
+  public byte[] getData( String cn );
+}
+
+URI uri = new URI( &quot;device:bytecode:&quot; );
+PredefinedBytecodeManager manager =
+    (PredefinedBytecodeManager) uri.getObject();
+
+Class c = defineClass( manager.getData( &quot;java.lang.System&quot; ) );
+
+Any binary file can be translated into a C++ program by converting each
+octet to a hexidecimal literal. Or, it can be translated into a literal string.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000423.html">[JOS-Arch] URL cache</A></li>
+	<LI> Next message: <A HREF="000425.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#424">[ date ]</a>
+              <a href="thread.html#424">[ thread ]</a>
+              <a href="subject.html#424">[ subject ]</a>
+              <a href="author.html#424">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

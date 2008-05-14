@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Platform API</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000333.html">
+   <LINK REL="Next" HREF="000335.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Platform API</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Platform API">gchii@mindspring.com</A><BR>
+    <I>Fri, 19 Nov 1999 13:12:39 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000333.html">[JOS-Arch] Smart API Distribution Update</A></li>
+        <LI> Next message: <A HREF="000335.html">[JOS-Arch] Platform API</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#334">[ date ]</a>
+              <a href="thread.html#334">[ thread ]</a>
+              <a href="subject.html#334">[ subject ]</a>
+              <a href="author.html#334">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Question: Is it possible that we are talking about two different device
+driver environments?
+
+There are these things, written in native code, that must plug deeply into
+the JOSBox. Can't we call them &quot;modules&quot;? If I remember right, these are
+called &quot;modules&quot; in Linux. You can plug Linux modules into the kernel, so
+that you don't have to recompile the kernel each time your configuration
+changes.
+
+Ultimate JOS must have a &quot;module&quot; environment for kernel plug-ins. This
+part of the definition of a JOSBox. For all those JOSBox plug-ins, the
+executable code would be native to a processor. This is just like a shared
+library (or dynamic link library) in a classic Java virtual machine. I know
+we want to get away from shared libraries as much as possible; but, kernel
+modules need to run in native code.
+
+These aren't &quot;device drivers&quot; in the typical sense; and yet, they are used
+to help device drivers use the hardware. I think &quot;JOSBoxExtensions&quot; would
+be a bad name for these things.
+
+On the other hand, &quot;device drivers&quot; are supposed to be written in pure
+bytecode. Device drivers are plugged into the class loader and device
+architecture. Many different device drivers should share modules written in
+native code. While modules might be dependent on CPU and platform, device
+drivers should not.
+
+Let's look at dial-up networking as a device driver. It uses the serial
+port. It presents an interface that makes it look like a network card. It
+uses and is used by the TCP/IP stack.
+
+It is possible to write dial-up networking in pure bytecode. In fact, you
+could almost write dial-up networking using the javax.comm.* package. In
+turn, the TCP/IP stack might use a network card. The physical network card
+won't talk to pure bytecode without the help of an network &quot;module&quot; running
+inside the JOSBox. A network module is not required for every machine; but,
+if it exists it must plug into the &quot;module&quot; environment provided by the
+JOSBox.
+
+When a &quot;module&quot; environment is provided by the JOSBox, programmers can
+write all kinds of modules to run on JOS, just like they write shared
+libraries to run inside a JVM.
+
+The interface between the JVM and the kernel should be simple. The JVM
+should be able to &quot;discover&quot; any module that's plugged into the JOSBox. The
+way the JVM sees the &quot;module&quot; environment of the JOSBox is entirely
+different than the way a &quot;module&quot; sees the &quot;module&quot; environment. &quot;Modules&quot;
+live inside the environment. The JVM uses the &quot;module&quot; environment.
+
+In this scenario, C/C++ programmers and Java programmers must work
+together. While C/C++ programmers should write ethernet access as a JOSBox
+module, Java programmers could write a TCP/IP stack that uses ethernet
+access. Of course, the bytecode that implements TCP/IP wouldn't work on a
+JOSBox without the ethernet module running. While the C/C++ code must
+change from one JOSBox to the next, the bytecode doesn't have to.
+
+When we take this one step farther, a stable version of Ultimate JOS would
+not implement &quot;loadLibrary()&quot; like any other JVM. For JOS and only JOS, the
+&quot;loadLibrary()&quot; method would search for a pre-loaded module already running
+inside the environment. Maybe it could dynamically load it if it doesn't
+already exist. Maybe not.
+
+It means that you could configure your JOSBox at boot-time for all of the
+modules it is allowed to use. Like Linux, these modules are never
+loaded/unloaded except at boot-time.
+
+It means that you could have all shared librarys (or &quot;modules&quot;) configured
+to meet the needs of a specific machine. When the OS is configured, you
+decide which shared libraries you want to use.
+
+When all of the device drivers and all of the applications are written in
+bytecode anyway, what difference does it make? Since Ultimate JOS won't be
+compatible with shared libraries from Linux or dynamic link libraries from
+Windows, JOS shared libraries must implement whatever interface we decide
+when they run on Ultimate JOS.
+
+These &quot;modules&quot; can be source-code compatible with shared libraries from
+Linux and dynamic link libraries from Windows.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000333.html">[JOS-Arch] Smart API Distribution Update</A></li>
+	<LI> Next message: <A HREF="000335.html">[JOS-Arch] Platform API</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#334">[ date ]</a>
+              <a href="thread.html#334">[ thread ]</a>
+              <a href="subject.html#334">[ subject ]</a>
+              <a href="author.html#334">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

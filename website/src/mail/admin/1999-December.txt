@@ -1,0 +1,646 @@
+From gchii@mindspring.com Wed, 01 Dec 1999 08:32:13 -0500
+Date: Wed, 01 Dec 1999 08:32:13 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Admin] SourceServer
+
+At 10:11 AM 11/28/99 -0600, "Iain Shigeoka" <iainshigeoka@yahoo.com> wrote:
+>We definitely need something to replace it [Source Server], but in its
+>current state, it causes more trouble than its worth.
+
+For additional information, see also JOSDistribution1c and
+JOSDistribution1d pages on JOS Wiki.
+
+I have uploaded static HTML pages (Source-Doc) for these "products":
+
+Source Server
+JJVM
+Smart API - Release 1a
+Smart API - Release 1b
+Smart API - Release 2a
+
+I do not have an appropriate product-level index. Each "product" has an
+index.html file. Source code within a product is cross-linked, as when one
+class uses another. HTML pages are stored in a single directory for each
+product and do not require Java-like directory tree.
+
+>I think its a great idea.  We definitely should try and create enough 
+>product distributions so that you don't have to download stuff you 
+>don't want.  As far as multiple versions, I would like to make 
+>historical "snapshots" available as jar's (as well as the latest 
+>version of each product), and only put the html pretty printed 
+>source up for the latest version of the source for each product (so 
+>as to avoid confusion).
+
+I agree, mostly. The latest source code should be pretty printed to HTML
+pages and browse-able on-line. Previous releases should be download-able
+and reviewed off-line.
+
+Should we always use jars? I use jars exclusively for .class files, so all
+jars can be added to classpath. When I see a jar file, I think run-time
+code. I use zips and "tar balls" for .java and other files.
+
+>Yes.  Actually, I was planning on putting it on the www.jos.org site, 
+>but just not announcing it for a while so that the core members can 
+>hit it and comment before making a groupwise announcement.  
+>Sorta an in-house beta.  Are you planning on including the kernel 
+>sources as one of the products?
+
+Using Source-Doc, the index for each product is automatically generated.
+With additional suggestions for its design, the index.html file could
+easily be replaced -- without uploading all of the pretty printed HTML pages.
+
+The product index is currently undefined. It will be /source/index.html.
+The product index should provide the following links:
+
+Source Server 1c - srcserv1c/index.html
+JJVM - jjvm/index.html
+Smart API 1a = smartapi1a/index.html
+Smart API 1b = smartapi1b/index.html
+Smart API 2a = smartapi2a/index.html
+
+I have been considering the "short description" for a product index. The
+product index would be simpler if, in a three column format, it listed the
+name of a product, a *link* to product description, a *link* to pretty
+printed HTML pages.
+
+Shouldn't product description really be a link to some JOS Wiki page? It
+would open up the product description (and review) to any author on JOS
+Wiki, not just the author of the product index. The product description
+page might provide a *link* to "download now".
+
+The product index might have a single link to a DownloadJOS page.
+
+
+
+
+From iainshigeoka@yahoo.com Wed, 1 Dec 1999 13:08:14 -0600
+Date: Wed, 1 Dec 1999 13:08:14 -0600
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Admin] SourceServer
+
+On 1 Dec 99, at 8:32, Gilbert Carl Herschberger II wrote:
+
+> Should we always use jars? I use jars exclusively for .class files, so all
+> jars can be added to classpath. When I see a jar file, I think run-time
+> code. I use zips and "tar balls" for .java and other files.
+
+I like jars simply because everyone with java (I hope that's a 
+reasonable min requirement for JOS members) should have access 
+to jar/unjar capabilities.  Since zip is jar (or more accurately jar is 
+zip) I suppose we can use zip for source and jar for binaries.  
+
+However, I think its better to come up with a naming convention 
+and stick with using the .jar extension for all archives.  It _feels_ 
+like a better solution.
+
+> Shouldn't product description really be a link to some JOS Wiki page? It
+> would open up the product description (and review) to any author on JOS
+> Wiki, not just the author of the product index. The product description
+> page might provide a *link* to "download now".
+
+I think both should be present.  A link to a wiki page AND an 
+optional separate product discription that would go with the 
+distribution.  The separate product description (if used) would hold 
+"canonical" information that should not be changed without the 
+source project itself being changed (even if only to change the 
+product description).  I would imagine this type of information might 
+include copyright and license notification (especially now since we 
+don't have a standard JOS source license), credits, references, etc.
+
+-iain
+
+
+
+From iainshigeoka@yahoo.com Mon, 20 Dec 1999 10:17:51 -0800
+Date: Mon, 20 Dec 1999 10:17:51 -0800
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Admin] Re: [JOS-Kernel] Free JVM released on SourceForge
+
+Hello all,
+
+First, I'm moving this discussion over to the admin list.  Please 
+direct your followups there.
+
+On 19 Dec 99, at 18:42, John Leuner wrote:
+
+> >     I got a news from Other Mailing List. It seems that there is a web site providing
+> > a management solution for open source software. its web site is 
+> > http://www.sourceforge.com.
+
+> I've had a good look at it, it's excellent. I have released my JVM,
+
+> They provide mailing lists, web space, FTP space, management of multiple
+> developers etc etc.
+
+I think it looks really nice too.  There are many things that still 
+need to be worked on (that's why its still a 0.x release) but there's 
+a lot of power already in place, and many promising developments 
+on the way.  Definitely something we should keep our eyes on.  
+For JOS, I see two potential stumbling blocks. 
+
+First, we'll need to get the wiki ported in order to move the entire 
+site over to sourceforge.  We certainly can just host what 
+sourceforge offers (CVS, ftp, etc) at sourceforge and keep the wiki 
+on a separate server.  However, linking everything together with a 
+single user id would make it worth it to port.  The main impediment 
+to this right now is sourceforge is very new, and they haven't 
+designed a way for us to access the session and user login 
+information from sourceforge accounts yet.  It's on their "to do" list 
+though.  I've been following the discussion and will try and stay up 
+to date on this feature.
+
+Second, sourceforge is designed to host a group of single product 
+projects.  We actually should try setting up a separate sourceforge 
+system for jos, where the projects in the JOSSourceForge are all 
+related to JOS.  This should be possible when sourceforge 
+releases their source (which, from the discussions on their site, 
+should be "real soon now").  
+
+The advantages being, a nice, tight integration of JOS and its 
+applications.  The disadvantages being we have to setup and 
+maintain a sourceforge clone.  I like this solution best though as 
+we can perhaps do some fund raising with such a site (advertizing 
+or becoming amazon.com resellers) to help offset some of the 
+costs JOS members are currently shouldering.
+
+The alternative is porting wiki to work in sourceforge, and using 
+sourceforge as hosted at valinux.  This way, va linux shoulders the 
+costs and pain of setting up and maintaining the site.  We then let 
+all the jos projects basically splinter and form their own little 
+sourceforge projects and then do something like a web ring to link 
+them all under the JOS "umbrella".  A lot less work and will get 
+things done sooner rather than later.  It seems like an "ugly" 
+solution though.
+
+Are there other alternatives I'm not seeing?  
+
+Oh, and this is not to say sourceforge is THE solution, but we 
+basically have to do something like a SourceForge on our own (the 
+self hosting option) or try and use someone else's free/inexpensive 
+service (the "use SourceForge" option).  There are other services 
+like SourceForge out there... but none that I've seen so far that look 
+as promising.
+
+I was working on my own version of a site like SourceForge for the 
+next version of the JOS website, but now that I've seen what 
+SourceForge does (which is almost exactly what I had in mind 
+anyhow) I'm thinking that one way or the other, we might as well 
+use SourceForge (either on our own site or using their service).  
+Opinions?
+
+-iain
+
+
+
+
+From clark.evans@manhattanproject.com Mon, 20 Dec 1999 03:56:43 -0500 (EST)
+Date: Mon, 20 Dec 1999 03:56:43 -0500 (EST)
+From: Clark C. Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] Re: [JOS-Kernel] Free JVM released on SourceForge
+
+I have a box with pretty decent DSL; I just don't 
+have time to move the Wiki to it; cauchy.clarkevans.com
+You need secure crt or datafellow's product to 
+connect using ssh; let me know if you need 
+a password.  The cvs can also be moved over;
+or mabye sourceforge should be used for this...
+
+Ahh.  It looks like wiki.jos.org is hooked 
+up to 209.9.30.67 ... hmm ... I know I told
+Helmut that this is the new address; but alas,
+II've moved the server to 209.9.30.66 instead.
+Hmm.  
+
+Clark 
+
+On Mon, 20 Dec 1999, Iain Shigeoka wrote:
+
+> Date: Mon, 20 Dec 1999 10:17:51 -0800
+> From: Iain Shigeoka <iainshigeoka@yahoo.com>
+> Reply-To: admin@jos.org
+> To: John Leuner <jewel@pixie.co.za>
+> Cc: kernel@jos.org, admin@jos.org
+> Subject: [JOS-Admin] Re: [JOS-Kernel] Free JVM released on SourceForge
+> 
+> Hello all,
+> 
+> First, I'm moving this discussion over to the admin list.  Please 
+> direct your followups there.
+> 
+> On 19 Dec 99, at 18:42, John Leuner wrote:
+> 
+> > >     I got a news from Other Mailing List. It seems that there is a web site providing
+> > > a management solution for open source software. its web site is 
+> > > http://www.sourceforge.com.
+> 
+> > I've had a good look at it, it's excellent. I have released my JVM,
+> 
+> > They provide mailing lists, web space, FTP space, management of multiple
+> > developers etc etc.
+> 
+> I think it looks really nice too.  There are many things that still 
+> need to be worked on (that's why its still a 0.x release) but there's 
+> a lot of power already in place, and many promising developments 
+> on the way.  Definitely something we should keep our eyes on.  
+> For JOS, I see two potential stumbling blocks. 
+> 
+> First, we'll need to get the wiki ported in order to move the entire 
+> site over to sourceforge.  We certainly can just host what 
+> sourceforge offers (CVS, ftp, etc) at sourceforge and keep the wiki 
+> on a separate server.  However, linking everything together with a 
+> single user id would make it worth it to port.  The main impediment 
+> to this right now is sourceforge is very new, and they haven't 
+> designed a way for us to access the session and user login 
+> information from sourceforge accounts yet.  It's on their "to do" list 
+> though.  I've been following the discussion and will try and stay up 
+> to date on this feature.
+> 
+> Second, sourceforge is designed to host a group of single product 
+> projects.  We actually should try setting up a separate sourceforge 
+> system for jos, where the projects in the JOSSourceForge are all 
+> related to JOS.  This should be possible when sourceforge 
+> releases their source (which, from the discussions on their site, 
+> should be "real soon now").  
+> 
+> The advantages being, a nice, tight integration of JOS and its 
+> applications.  The disadvantages being we have to setup and 
+> maintain a sourceforge clone.  I like this solution best though as 
+> we can perhaps do some fund raising with such a site (advertizing 
+> or becoming amazon.com resellers) to help offset some of the 
+> costs JOS members are currently shouldering.
+> 
+> The alternative is porting wiki to work in sourceforge, and using 
+> sourceforge as hosted at valinux.  This way, va linux shoulders the 
+> costs and pain of setting up and maintaining the site.  We then let 
+> all the jos projects basically splinter and form their own little 
+> sourceforge projects and then do something like a web ring to link 
+> them all under the JOS "umbrella".  A lot less work and will get 
+> things done sooner rather than later.  It seems like an "ugly" 
+> solution though.
+> 
+> Are there other alternatives I'm not seeing?  
+> 
+> Oh, and this is not to say sourceforge is THE solution, but we 
+> basically have to do something like a SourceForge on our own (the 
+> self hosting option) or try and use someone else's free/inexpensive 
+> service (the "use SourceForge" option).  There are other services 
+> like SourceForge out there... but none that I've seen so far that look 
+> as promising.
+> 
+> I was working on my own version of a site like SourceForge for the 
+> next version of the JOS website, but now that I've seen what 
+> SourceForge does (which is almost exactly what I had in mind 
+> anyhow) I'm thinking that one way or the other, we might as well 
+> use SourceForge (either on our own site or using their service).  
+> Opinions?
+> 
+> -iain
+> 
+> 
+> _______________________________________________
+> Admin maillist  -  Admin@jos.org
+> http://jos.org/mailman/listinfo/admin
+> 
+
+
+
+
+From tmiller@haverford.edu Mon, 20 Dec 1999 16:12:34 -0500 (EST)
+Date: Mon, 20 Dec 1999 16:12:34 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Admin] Re: [JOS-Kernel] Free JVM released on SourceForge
+
+> Opinions?
+
+	From here in the trenches, I approve of whatever makes your job
+easier :)  I don't particularly care where I have to point my CVS, and
+since it stores logins, I'm not too concerned with its uid/passwd being
+different than my wiki account...
+
+-_Quinn
+
+
+
+
+From DearWebby@webby.com Mon, 20 Dec 1999 13:16:57 -0800
+Date: Mon, 20 Dec 1999 13:16:57 -0800
+From: DearWebby DearWebby@webby.com
+Subject: [JOS-Admin] Re: [JOS-Kernel] Free JVM released on
+ SourceForge
+
+Hi Clark
+do you want the DNS for wiki.jos.org to be changed or are you handling the 
+IP numbers there ?
+Helmut
+
+At 12:56 AM 12/20/99 , Clark C. Evans wrote:
+
+>I have a box with pretty decent DSL; I just don't
+>have time to move the Wiki to it; cauchy.clarkevans.com
+>You need secure crt or datafellow's product to
+>connect using ssh; let me know if you need
+>a password.  The cvs can also be moved over;
+>or mabye sourceforge should be used for this...
+>
+>Ahh.  It looks like wiki.jos.org is hooked
+>up to 209.9.30.67 ... hmm ... I know I told
+>Helmut that this is the new address; but alas,
+>II've moved the server to 209.9.30.66 instead.
+>Hmm.
+>
+>Clark
+>
+>On Mon, 20 Dec 1999, Iain Shigeoka wrote:
+>
+> > Date: Mon, 20 Dec 1999 10:17:51 -0800
+> > From: Iain Shigeoka <iainshigeoka@yahoo.com>
+> > Reply-To: admin@jos.org
+> > To: John Leuner <jewel@pixie.co.za>
+> > Cc: kernel@jos.org, admin@jos.org
+> > Subject: [JOS-Admin] Re: [JOS-Kernel] Free JVM released on SourceForge
+> >
+> > Hello all,
+> >
+> > First, I'm moving this discussion over to the admin list.  Please
+> > direct your followups there.
+> >
+> > On 19 Dec 99, at 18:42, John Leuner wrote:
+> >
+> > > >     I got a news from Other Mailing List. It seems that there is a 
+> web site providing
+> > > > a management solution for open source software. its web site is
+> > > > http://www.sourceforge.com.
+> >
+> > > I've had a good look at it, it's excellent. I have released my JVM,
+> >
+> > > They provide mailing lists, web space, FTP space, management of multiple
+> > > developers etc etc.
+> >
+> > I think it looks really nice too.  There are many things that still
+> > need to be worked on (that's why its still a 0.x release) but there's
+> > a lot of power already in place, and many promising developments
+> > on the way.  Definitely something we should keep our eyes on.
+> > For JOS, I see two potential stumbling blocks.
+> >
+> > First, we'll need to get the wiki ported in order to move the entire
+> > site over to sourceforge.  We certainly can just host what
+> > sourceforge offers (CVS, ftp, etc) at sourceforge and keep the wiki
+> > on a separate server.  However, linking everything together with a
+> > single user id would make it worth it to port.  The main impediment
+> > to this right now is sourceforge is very new, and they haven't
+> > designed a way for us to access the session and user login
+> > information from sourceforge accounts yet.  It's on their "to do" list
+> > though.  I've been following the discussion and will try and stay up
+> > to date on this feature.
+> >
+> > Second, sourceforge is designed to host a group of single product
+> > projects.  We actually should try setting up a separate sourceforge
+> > system for jos, where the projects in the JOSSourceForge are all
+> > related to JOS.  This should be possible when sourceforge
+> > releases their source (which, from the discussions on their site,
+> > should be "real soon now").
+> >
+> > The advantages being, a nice, tight integration of JOS and its
+> > applications.  The disadvantages being we have to setup and
+> > maintain a sourceforge clone.  I like this solution best though as
+> > we can perhaps do some fund raising with such a site (advertizing
+> > or becoming amazon.com resellers) to help offset some of the
+> > costs JOS members are currently shouldering.
+> >
+> > The alternative is porting wiki to work in sourceforge, and using
+> > sourceforge as hosted at valinux.  This way, va linux shoulders the
+> > costs and pain of setting up and maintaining the site.  We then let
+> > all the jos projects basically splinter and form their own little
+> > sourceforge projects and then do something like a web ring to link
+> > them all under the JOS "umbrella".  A lot less work and will get
+> > things done sooner rather than later.  It seems like an "ugly"
+> > solution though.
+> >
+> > Are there other alternatives I'm not seeing?
+> >
+> > Oh, and this is not to say sourceforge is THE solution, but we
+> > basically have to do something like a SourceForge on our own (the
+> > self hosting option) or try and use someone else's free/inexpensive
+> > service (the "use SourceForge" option).  There are other services
+> > like SourceForge out there... but none that I've seen so far that look
+> > as promising.
+> >
+> > I was working on my own version of a site like SourceForge for the
+> > next version of the JOS website, but now that I've seen what
+> > SourceForge does (which is almost exactly what I had in mind
+> > anyhow) I'm thinking that one way or the other, we might as well
+> > use SourceForge (either on our own site or using their service).
+> > Opinions?
+> >
+> > -iain
+> >
+> >
+> > _______________________________________________
+> > Admin maillist  -  Admin@jos.org
+> > http://jos.org/mailman/listinfo/admin
+> >
+>
+>
+>_______________________________________________
+>Admin maillist  -  Admin@jos.org
+>http://jos.org/mailman/listinfo/admin
+
+Dear Webby
+Helmut Morscher, President of Webby, Inc
+High traffic marketing at it's best. Have Fun and the people will come !
+
+
+
+From clark.evans@manhattanproject.com Mon, 20 Dec 1999 05:02:58 -0500 (EST)
+Date: Mon, 20 Dec 1999 05:02:58 -0500 (EST)
+From: Clark C. Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] Re: [JOS-Kernel] Free JVM released on  SourceForge
+
+Helmut,
+
+It'd be easier if you changed the DNS on your
+side... it would save a good headache.
+
+	wiki.jos.org => 209.0.30.66
+Best,
+
+Clark
+
+On Mon, 20 Dec 1999, DearWebby wrote:
+
+> Date: Mon, 20 Dec 1999 13:16:57 -0800
+> From: DearWebby <DearWebby@webby.com>
+> To: Clark C. Evans <clark.evans@manhattanproject.com>, admin@jos.org
+> Subject: Re: [JOS-Admin] Re: [JOS-Kernel] Free JVM released on  SourceForge
+> 
+> Hi Clark
+> do you want the DNS for wiki.jos.org to be changed or are you handling the 
+> IP numbers there ?
+> Helmut
+> 
+> At 12:56 AM 12/20/99 , Clark C. Evans wrote:
+> 
+> >I have a box with pretty decent DSL; I just don't
+> >have time to move the Wiki to it; cauchy.clarkevans.com
+> >You need secure crt or datafellow's product to
+> >connect using ssh; let me know if you need
+> >a password.  The cvs can also be moved over;
+> >or mabye sourceforge should be used for this...
+> >
+> >Ahh.  It looks like wiki.jos.org is hooked
+> >up to 209.9.30.67 ... hmm ... I know I told
+> >Helmut that this is the new address; but alas,
+> >II've moved the server to 209.9.30.66 instead.
+> >Hmm.
+> >
+> >Clark
+> >
+> >On Mon, 20 Dec 1999, Iain Shigeoka wrote:
+> >
+> > > Date: Mon, 20 Dec 1999 10:17:51 -0800
+> > > From: Iain Shigeoka <iainshigeoka@yahoo.com>
+> > > Reply-To: admin@jos.org
+> > > To: John Leuner <jewel@pixie.co.za>
+> > > Cc: kernel@jos.org, admin@jos.org
+> > > Subject: [JOS-Admin] Re: [JOS-Kernel] Free JVM released on SourceForge
+> > >
+> > > Hello all,
+> > >
+> > > First, I'm moving this discussion over to the admin list.  Please
+> > > direct your followups there.
+> > >
+> > > On 19 Dec 99, at 18:42, John Leuner wrote:
+> > >
+> > > > >     I got a news from Other Mailing List. It seems that there is a 
+> > web site providing
+> > > > > a management solution for open source software. its web site is
+> > > > > http://www.sourceforge.com.
+> > >
+> > > > I've had a good look at it, it's excellent. I have released my JVM,
+> > >
+> > > > They provide mailing lists, web space, FTP space, management of multiple
+> > > > developers etc etc.
+> > >
+> > > I think it looks really nice too.  There are many things that still
+> > > need to be worked on (that's why its still a 0.x release) but there's
+> > > a lot of power already in place, and many promising developments
+> > > on the way.  Definitely something we should keep our eyes on.
+> > > For JOS, I see two potential stumbling blocks.
+> > >
+> > > First, we'll need to get the wiki ported in order to move the entire
+> > > site over to sourceforge.  We certainly can just host what
+> > > sourceforge offers (CVS, ftp, etc) at sourceforge and keep the wiki
+> > > on a separate server.  However, linking everything together with a
+> > > single user id would make it worth it to port.  The main impediment
+> > > to this right now is sourceforge is very new, and they haven't
+> > > designed a way for us to access the session and user login
+> > > information from sourceforge accounts yet.  It's on their "to do" list
+> > > though.  I've been following the discussion and will try and stay up
+> > > to date on this feature.
+> > >
+> > > Second, sourceforge is designed to host a group of single product
+> > > projects.  We actually should try setting up a separate sourceforge
+> > > system for jos, where the projects in the JOSSourceForge are all
+> > > related to JOS.  This should be possible when sourceforge
+> > > releases their source (which, from the discussions on their site,
+> > > should be "real soon now").
+> > >
+> > > The advantages being, a nice, tight integration of JOS and its
+> > > applications.  The disadvantages being we have to setup and
+> > > maintain a sourceforge clone.  I like this solution best though as
+> > > we can perhaps do some fund raising with such a site (advertizing
+> > > or becoming amazon.com resellers) to help offset some of the
+> > > costs JOS members are currently shouldering.
+> > >
+> > > The alternative is porting wiki to work in sourceforge, and using
+> > > sourceforge as hosted at valinux.  This way, va linux shoulders the
+> > > costs and pain of setting up and maintaining the site.  We then let
+> > > all the jos projects basically splinter and form their own little
+> > > sourceforge projects and then do something like a web ring to link
+> > > them all under the JOS "umbrella".  A lot less work and will get
+> > > things done sooner rather than later.  It seems like an "ugly"
+> > > solution though.
+> > >
+> > > Are there other alternatives I'm not seeing?
+> > >
+> > > Oh, and this is not to say sourceforge is THE solution, but we
+> > > basically have to do something like a SourceForge on our own (the
+> > > self hosting option) or try and use someone else's free/inexpensive
+> > > service (the "use SourceForge" option).  There are other services
+> > > like SourceForge out there... but none that I've seen so far that look
+> > > as promising.
+> > >
+> > > I was working on my own version of a site like SourceForge for the
+> > > next version of the JOS website, but now that I've seen what
+> > > SourceForge does (which is almost exactly what I had in mind
+> > > anyhow) I'm thinking that one way or the other, we might as well
+> > > use SourceForge (either on our own site or using their service).
+> > > Opinions?
+> > >
+> > > -iain
+> > >
+> > >
+> > > _______________________________________________
+> > > Admin maillist  -  Admin@jos.org
+> > > http://jos.org/mailman/listinfo/admin
+> > >
+> >
+> >
+> >_______________________________________________
+> >Admin maillist  -  Admin@jos.org
+> >http://jos.org/mailman/listinfo/admin
+> 
+> Dear Webby
+> Helmut Morscher, President of Webby, Inc
+> High traffic marketing at it's best. Have Fun and the people will come !
+> 
+
+
+
+
+From tmiller@haverford.edu Mon, 20 Dec 1999 16:12:34 -0500 (EST)
+Date: Mon, 20 Dec 1999 16:12:34 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Admin] Re: [JOS-Kernel] Free JVM released on SourceForge
+
+> Opinions?
+
+	From here in the trenches, I approve of whatever makes your job
+easier :)  I don't particularly care where I have to point my CVS, and
+since it stores logins, I'm not too concerned with its uid/passwd being
+different than my wiki account...
+
+-_Quinn
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 21 Dec 1999 09:51:39 -0800
+Date: Tue, 21 Dec 1999 09:51:39 -0800
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Admin] Re: [JOS-Kernel] Free JVM released on SourceForge
+
+On 20 Dec 99, at 16:12, Todd L. Miller wrote:
+
+> > Opinions?
+> 
+> 	From here in the trenches, I approve of whatever makes your job
+> easier :)  I don't particularly care where I have to point my CVS, and
+> since it stores logins, I'm not too concerned with its uid/passwd being
+> different than my wiki account...
+
+Cool.  I'm leaning towards waiting and hosting our own clone of 
+SourceForge when the source is released (perhaps as late as 
+February, they're thinking of releasing it at LinuxWorld).
+
+How many projects would you estimate JOS has in CVS right 
+now?  How many developers would you estimate have CVS commit 
+accounts right now?  How many for the jjos and decaf stuff?  This 
+is just to get a feel for the size of the site.
+
+Thanks.
+
+-iain
+
+
+

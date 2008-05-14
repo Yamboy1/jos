@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Alt Packages</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000365.html">
+   <LINK REL="Next" HREF="000367.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Alt Packages</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Alt Packages">gchii@mindspring.com</A><BR>
+    <I>Mon, 03 Jan 2000 10:51:09 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000365.html">[JOS-Arch] MILESTONE! Jeps 0.001e Runs Javasoft Tutorial UDP Server!!</A></li>
+        <LI> Next message: <A HREF="000367.html">[JOS-Arch] Alt Packages</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#366">[ date ]</a>
+              <a href="thread.html#366">[ thread ]</a>
+              <a href="subject.html#366">[ subject ]</a>
+              <a href="author.html#366">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 05:46 PM 1/1/00 -0500, <A HREF="mailto:digigod@earthling.net">digigod@earthling.net</A> wrote:
+&gt;<i>wouldn't alt.awt.peer.2 make more sense?
+</I>
+There are at least three products called &quot;AWT&quot;. It is most difficult to
+undo this kind of mistake. I would like to think of them as &quot;AWT for Java 0
+Platform&quot;, &quot;AWT for Java 1 Platform&quot; and &quot;AWT for Java 2 Platform&quot;.
+
+Why do I think about &quot;peer&quot; as a subpackage of &quot;alt.awt2&quot;? Because each
+implementation of &quot;peer&quot; is closely associated with a specific
+implementation of &quot;AWT&quot;. Since each AWT has a different number of packages,
+my proposal is this:
+
+AWT for Java 0 Platform:
+alt.awt0=java.awt
+alt.awt0.image=java.awt.image
+alt.awt0.peer=java.awt.peer
+
+AWT for Java 1 Platform:
+alt.awt1=java.awt
+alt.awt1.datatransfer=java.awt.datatransfer
+alt.awt1.event=java.awt.event
+alt.awt1.image=java.awt.image
+alt.awt1.peer=java.awt.peer
+alt.awt1.print=java.awt.print
+
+AWT for Java 2 Platform:
+alt.awt2=java.awt
+alt.awt2.datatransfer=java.awt.datatransfer
+alt.awt2.event=java.awt.event
+alt.awt2.image=java.awt.image
+alt.awt2.peer=java.awt.peer
+alt.awt2.print=java.awt.print
+:<i>
+</I>etc.
+
+The alt.* packages are not intended to fix all namespace mistakes. You are
+correct. &quot;alt.awt2.peer&quot; does not make sense to enlightened folks. If we
+were dealing with a brand new design, I might have used something like this:
+
+alt.datatransfer2=java.awt.datatransfer
+alt.event2=java.awt.event
+alt.image2=java.awt.image
+alt.peer2=java.awt.peer
+alt.print2=java.awt.print
+
+Event-driven programs, for example, are not the exclusive domain of visual
+applications. We know this from the event-driven device drivers for JOS.
+Therefore, the event package should not have been tied exclusively to the AWT.
+
+The print package is obviously non-visual (right?). Since AWT components
+can be used for printing, AWT has itself become something where visual is
+optional.
+
+-----
+
+Like you said earlier, we can't use &quot;2&quot; as a package name. And why not?
+Because a javac tool refuses to compile any package in a directory called
+&quot;2&quot;. I tried to compile a package called &quot;2&quot; to see what might happen. It
+did not work at all. Package names, like other identifiers, must start with
+a letter (A-Z, a-z) or an underscore.
+
+My most-recently-used platform-map.ini file looks something like this:
+
+[java2-map]
+alt.applet2=java.applet
+alt.awt2=java.awt
+alt.awt2.datatransfer=java.awt.datatransfer
+alt.awt2.event=java.awt.event
+alt.awt2.image=java.awt.image
+alt.awt2.peer=java.awt.peer
+alt.awt2.print=java.awt.print
+alt.beans2=java.beans
+alt.beans2.beancontext=java.beans.beancontext
+alt.beans2.editors=java.beans.editors
+alt.beans2.info=java.beans.info
+alt.io2=java.io
+alt.io2.decode=java.io.decode
+alt.io2.encode=java.io.encode
+alt.lang2=java.lang
+alt.lang2.ref=java.lang.ref
+alt.lang2.reflect=java.lang.reflect
+alt.locale2=java.locale
+alt.math2=java.math
+alt.net2=java.net
+alt.security2=java.security
+alt.security2.acl=java.security.acl
+alt.security2.cert=java.security.cert
+alt.security2.der=java.security.der
+alt.security2.interfaces=java.security.interfaces
+alt.security2.provider=java.security.provider
+alt.security2.spec=java.security.spec
+alt.security2.util=java.security.util
+alt.sql2=java.sql
+alt.text2=java.text
+alt.util2=java.util
+
+-----
+
+These classes seems to be part of the core:
+
+java.lang.Object
+java.lang.Class
+java.lang.ClassLoader
+java.lang.Throwable
+java.lang.Exception
+java.lang.RuntimeException
+
+java.lang.String is part of the core because it is a final class. And yet,
+it has changed in incompatible ways from one platform to the next.
+
+We must not confuse &quot;important&quot; with &quot;necessary&quot;. How do we determine if a
+class is part of the core or not? Is it possible to run a virtual machine
+without it.
+
+There is nothing inherent in a virtual machine that requires a network. The
+java.net.* package is not required by a virtual machine; it is not part of
+the true core. Just as a command line (CL) program might never use
+java.awt, many programs might never use java.net. The java.net package is
+important to us as network application programmers. It is not important to
+a stand-alone application.
+
+Let me put it another way. Sun Microsystems could have easily implemented a
+network package in javax.net and distributed it with every Java Virtual
+Machine. A program that needs Sun Microsystems' network package could have
+used javax.net.
+
+We can implement network packages in alt.net0, alt.net1 and alt.net2 and
+distribute these packages with every virtual machine. Any program that
+needs network support can use alt.net0, alt.net1 and alt.net2.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000365.html">[JOS-Arch] MILESTONE! Jeps 0.001e Runs Javasoft Tutorial UDP Server!!</A></li>
+	<LI> Next message: <A HREF="000367.html">[JOS-Arch] Alt Packages</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#366">[ date ]</a>
+              <a href="thread.html#366">[ thread ]</a>
+              <a href="subject.html#366">[ subject ]</a>
+              <a href="author.html#366">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

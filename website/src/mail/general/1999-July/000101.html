@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS] Design</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000100.html">
+   <LINK REL="Next" HREF="000102.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS] Design</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS] Design">digigod@earthling.net</A><BR>
+    <I>Tue, 20 Jul 1999 22:09:42 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000100.html">[JOS] PowerController, SystemEvent and JADE</A></li>
+        <LI> Next message: <A HREF="000102.html">[JOS] Re: [JOS-Kernel] Etherboot</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#101">[ date ]</a>
+              <a href="thread.html#101">[ thread ]</a>
+              <a href="subject.html#101">[ subject ]</a>
+              <a href="author.html#101">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Its somewhat well agreed that we should split the design of the overall
+OS into several sections:
+
+JOSBox--JOSystem--Apps(including JADE) 
+
+JOSBox is the virtual hardware, it consists of the real hardware, the
+picokernel, and the JVM; its where all the native code is. A &quot;windows
+JOSBox&quot; or a &quot;linux JOSBox&quot; can be made so JOS can be run on top of
+another OS without having to modifiy it.
+
+JOSystem is of two parts, JOSCore which is the absolute minimum required
+for (and can be thought of a second, all java, kernel) JOS to be JOS
+(including the generic extension mechanism for...) JOSExtensions which
+will be grafted to JOS at runtime via JOSCore and will consist of things
+that arent part of minimum JOS, but will include very common things too
+(ie a file system). JOSCore holds process and security managers and via
+its configuration metamechanism loads one predefined process only at
+startup, the default for this being JADE (which the user can then launch
+more apps from...)
+ 
+Apps are what people use the OS for, the UI is an app. JADE is the UI,
+it lets people run and interact with apps, it provides everything needed
+for various types of UI's, like an AWT Toolkit for a GUI. JADE handles
+the various process cycles of Apps so non-JOS apps dont have to worry
+about it (or more importantly, be aware of).
+
+Given that, we need to design the basic structure for these various
+sections. we cant really do anything until we have a basic design, a
+basic idea of what to do.  We should discuss what we need/want on our
+various levels of expertise until we get a basic design to build off of
+(JOS starts, it loads this which looks like that and then...)
+
+lets get a crackin'
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000100.html">[JOS] PowerController, SystemEvent and JADE</A></li>
+	<LI> Next message: <A HREF="000102.html">[JOS] Re: [JOS-Kernel] Etherboot</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#101">[ date ]</a>
+              <a href="thread.html#101">[ thread ]</a>
+              <a href="subject.html#101">[ subject ]</a>
+              <a href="author.html#101">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

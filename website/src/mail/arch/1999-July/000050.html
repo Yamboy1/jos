@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000047.html">
+   <LINK REL="Next" HREF="000051.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings">gchii@mindspring.com</A><BR>
+    <I>Sat, 24 Jul 1999 11:15:10 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000047.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000051.html">[JOS-Arch] Process Stuff, formally:Re: [JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE:
+ [JOS-UI] peer-ui mappings
+ [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#50">[ date ]</a>
+              <a href="thread.html#50">[ thread ]</a>
+              <a href="subject.html#50">[ subject ]</a>
+              <a href="author.html#50">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:46 PM 7/23/99 -0700, DigiGod Q Frasché &lt;<A HREF="mailto:digigod@earthling.net">digigod@earthling.net</A>&gt; wrote:
+&gt;<i>Regier Avery J wrote:
+</I>&gt;&gt;<i> The definition of a process must be consistent accross all shells.  You
+</I>&gt;&gt;<i> start and stop and kill processes with the same API into the jvm+kernel.  A
+</I>&gt;&gt;<i> process whether started from a TUI or GUI is defined the same way for
+</I>&gt;&gt;<i> security and configuration in the registry.  JADE should make it simple to
+</I>&gt;&gt;<i> pull all of that information together so that when a user clicks on an icon
+</I>&gt;&gt;<i> for Netscape, the shell just says to JADE, &quot;JADE.getProgram(&quot;Netscape&quot;,
+</I>&gt;&gt;<i> &quot;Avery&quot;).createProcess();&quot; and it all just works.
+</I>&gt;<i>
+</I>&gt;<i>I imagine this getProgram method to be incredibly complex and Im sure as
+</I>&gt;<i>hell not writing it, but Id like it.
+</I>&gt;<i>
+</I>&gt;<i>before Gilbert brings it up though it should except a URI as the program
+</I>
+:<i>)
+</I>
+But wait! This reminds me of something else that's important, too.
+
+It really should be that easy. When we pass &quot;Navigator&quot; to
+JADE.getProgram(), it should be able to look up the full URI. Imagine that
+a program name has no scheme, no path, no query, no fragment. The
+getProgram() method should look it up in a short list of well-known program
+names. That's what short-cuts are for.
+
+It may be that our system has a system short-cut path and a user-specific
+short-cut path. Short-cut &quot;files&quot; we talked about would look like a
+registry, too. If we put the full program URI in a short-cut file, like
+Navigator.app, we use the name of the short-cut to load a program.
+
+When you do not have a short-cut for a program, you can still run it.
+That's when you would supply the full program URI.
+
+I still think the PATH concept is a good idea. We might list each resource
+where short-cuts are stored similar to the classic PATH. In other words,
+when we pass a program name as an ordinary string to JADE.getProgram(), we
+should be able to abbreviate.
+
+These load-and-go mechanisms are in all of the classic operating systems.
+These are Runtime and Process classes, part of the standard API. This
+discussion should make it clear that a shell is not responsible for
+short-cuts. JADE.getProgram() is a system function that must be available
+for all shells _and_ all JOS applications, applets, servlets etc.
+
+And what about the monitoring of a child process? Should createProcess()
+also run (start) a process and return it's int result code? The result code
+is set by System.exit(). It should be passed back to the parent process (if
+the parent is interested).
+
+getProgram()/createProcess() is incredibly complex. It is important. It
+defines the fundamental mechanism of an operating system: to load custom
+programs. It gets a little easier if we break it down.
+
+--inside getProgram()
+1. Handle short-cuts. Translate a program name for a program URI. Since one
+short-cut can make reference to another, repeat if necessary. If there's a
+circular reference, throw an exception.
+2. Verify the program URI. If it is a malformed URI, throw an exception.
+3. Get the class for a program. If the class cannot be found, throw an
+exception.
+4. Verify the class implements the right interface (it can be run() in a
+separate process). If a class doesn't implement the right interface, throw
+an exception.
+5. Verify user parameter. If the user is not authorized to use this
+program, throw an exception.
+6. Get an object from the class. If the object cannot be created, throw an
+exception. A custom program must define a default constructor, right?
+
+At this point, a separate process has not been created yet. (No harm done.)
+
+--inside Program.createProcess().
+1. Create a Process object so that a parent process can monitor the status
+of a child process.
+2. Create process environment for the child process. If a process
+environment cannot be created, throw an exception. It is the process
+environment that must store command-line parameters, not a program.
+3. Configure the program object with its process environment.
+4. Start the program. It runs in a separate thread, right?
+
+--inside custom-program.run();
+1. A base program provides a getProcessEnvironment() method. The process
+environment maintains the standard input stream, standard output stream,
+standard error stream. The process environment provides all the command
+line parameters. ProcessEnvironment sounds a lot like java.lang.System to me.
+
+JADE.getProgram() should return a Program object:
+public Program JADE.getProgram( String program, String user );
+
+and Program.createProcess() should return a java.lang.Process object:
+public Process Program.createProcess();
+
+While we're on the topic of process environment, I've been doing a little
+research. A multiple process JVM may need multiple instances of
+java.lang.System. According to the semantics of the static keyword, you can
+have one instance of java.lang.System for each class loader; but, single
+process JVMs won't allow it. When you have multiple instances of System,
+you don't have to take great pains to handle System.exit(). This is THE
+difference between a multiple process JVM and a single process JVM. A new
+instance of a class loader must be created during getProgram() inside step 3.
+
+There should be a special JOS-only JVM function to get a new
+PrimordialClassLoader object. There should be a new instance of
+PrimordialClassLoader for each process. Here is where we can reduce the
+demand for RAM with our multiple process JVM: Each instance of
+PrimordialClassLoader shares all system classes...except for a short list,
+like java.lang.System.
+
+I'm not sure how...but I think java.lang.System.getClassLoader() must
+return the process-specific class loader, while
+java.lang.Object.getClassLoader() can still return null.
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000047.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000051.html">[JOS-Arch] Process Stuff, formally:Re: [JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE:
+ [JOS-UI] peer-ui mappings
+ [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#50">[ date ]</a>
+              <a href="thread.html#50">[ thread ]</a>
+              <a href="subject.html#50">[ subject ]</a>
+              <a href="author.html#50">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

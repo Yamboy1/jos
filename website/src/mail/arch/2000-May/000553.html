@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000550.html">
+   <LINK REL="Next" HREF="000548.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 3 May 2000 23:11:03 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000550.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000548.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#553">[ date ]</a>
+              <a href="thread.html#553">[ thread ]</a>
+              <a href="subject.html#553">[ subject ]</a>
+              <a href="author.html#553">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Tue, 2 May 2000 <A HREF="mailto:Matt.Albrecht@trilogy.com">Matt.Albrecht@trilogy.com</A> wrote:
+
+&gt;<i> Perhaps I'm missing something.  But, to me, aren't these the ways the
+</I>&gt;<i> comparison must be done?
+</I>&gt;<i> 
+</I>&gt;<i> For Bytecode (bytecode A vs. bytecode B):
+</I>&gt;<i>    1. The bytes within the bytecode must match exactly between A and B.
+</I>&gt;<i>    I believe this is the only requirement.
+</I>&gt;<i> 
+</I>&gt;<i> For Class Definitions (class def C vs. class def D)
+</I>&gt;<i>    1. Internal bytecodes of C and D must match.
+</I>&gt;<i>    2. The Class Definitions for their parent classes must match (superclass
+</I>&gt;<i> of C must match superclass of D, and all interfaces must match as well).
+</I>
+Excellent point about superclasses (more on this down below).
+
+The bytecode vs. class definition discussion we have been having refers
+to the two proposals that have been made for saving memory and at the
+same time, allowing safe object sharing between processes for efficient
+IPC. The terms are badly named, leading to confusion.
+
+- class definition: apparently refers to my proposal to share class
+  definitions between java.lang.Class'es with the same name that were
+  loaded from the same version of the same archive (through a primordial
+  class loader), and to allow illegal casts between any two classes that
+  share the same class definition (thus giving us inter-process object
+  sharing). This proposal was published at:
+
+  <A HREF="http://www.progsoc.uts.edu.au/~rheise/jos/java_processes.txt">http://www.progsoc.uts.edu.au/~rheise/jos/java_processes.txt</A>
+
+- bytecode: apparently refers to Gilbert's proposal to share class
+  definitions between java.lang.Class'es whenever their bytecodes
+  exactly match. This, for example, picks up the opportunity to share
+  class definitions when the two classes were loaded from two completely
+  different archives (eg. in two different users' home directories) but
+  are still exactly the same when compared byte for byte. Thus it squeezes
+  even more memory out of the system, but at the expense of a less
+  efficient algorithm (comparing byte for byte is much slower than
+  comparing file location and modification date)
+
+  The same semantics for illegal casts applies here, with the
+  clarification that, since Gilbert's proposal allows byte comparison of
+  classes loaded by custom class loaders, illegal casts are only allowed
+  for the subset of classes that are loaded by primordial class loaders.
+
+So, your point about requiring the line(s) of superclasses(*) to also
+share class definitions with the line(s) of superclasses in the other
+process applies to illegal casts in both styles of class definition
+sharing.
+
+Requiring superclasses to share class definitions for illegal casts to
+work is clearly the most correct way to handle it. But as _Quinn pointed
+out, things might work out by themselves anyway. If they do, we can save
+ourselves from having to do a more expensive check to allow illegal
+casts.
+
+To answer _Quinn's question, what happens if we don't verify the
+compatibility of superclasses? The calling process is only able to
+access the subset of inhehrited methods it knows about (ignoring
+reflection for the moment). In addition, if it tries to call a method it
+thinks is there but is not, it should throw a NoSuchMethodError(**). The
+object, defined by its class and superclasses is really owned by the
+other process so there is no doubt what methods can be called on it and
+what methods cannot. The same goes for fields.
+
+The behaviour is similar to what I proposed for access to static members
+of shared objects. The client process accesses only what it sees, but
+internal method calls inside the shared object will see through the eyes
+of the owning process.
+
+Whether or not we verify all superclasses before permitting an illegal
+cast, it will very rarely be the case that the superclasses are not
+compatible (the inheritance chain would have to go through a number of
+different archives). The difference is what error we get when it does
+happen: NoSuchMethodError or ClassCastException. That, and a
+NoSuchMethodError might never be thrown if the method is never called.
+This can be considered a good thing or a bad thing.
+
+(*) This is to imply Java does have multiple inheritence but only one
+superclass may be a class. The rest must be interfaces.
+
+(**) The same error you get when you find yourself running your program
+against the wrong version of a library.
+
+{{ BTW, for some reason, <A HREF="mailto:admin@jos.org">admin@jos.org</A> was being CC'd on this thread.
+I've removed that CC on this reply }}
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000550.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000548.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#553">[ date ]</a>
+              <a href="thread.html#553">[ thread ]</a>
+              <a href="subject.html#553">[ subject ]</a>
+              <a href="author.html#553">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

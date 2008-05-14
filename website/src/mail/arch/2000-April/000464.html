@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000463.html">
+   <LINK REL="Next" HREF="000465.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">tmiller@haverford.edu</A><BR>
+    <I>Thu, 13 Apr 2000 02:56:10 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000463.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000465.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#464">[ date ]</a>
+              <a href="thread.html#464">[ thread ]</a>
+              <a href="subject.html#464">[ subject ]</a>
+              <a href="author.html#464">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> However, the KernelClassLoader proposed in one of my recent emails would
+</I>&gt;<i> have to be native, now that I think about it. Or maybe not. hmm...
+</I>&gt;<i> Anyway, it would be a big plus to be able to use Java to implement the
+</I>&gt;<i> primordial class loader's responsibilities, particularly class
+</I>&gt;<i> definition sharing and reading classes from the CLASSPATH.
+</I>
+	OK -- /I/ think doing it natively will be easier, if for no other
+reason than we'll be /sure/ that the problems with it aren't in the
+Java/native interface we'd be simultaneously debugging.  OTOH, it is a
+design goal to have as much Java as possible, and it will be possible to
+have a Java primordial classloader once we dispense with the
+bootstrap.  And yes, the boostrap will have to be native.  I happen to
+disagree with your implementation; both current boot mechanisms provide a
+way -- that we don't have to maintain! -- to load the classfile into RAM
+somewhere, and the ramdisk code is well set up already.  We load stuff
+with the current code (more or less) until we can hand off to the Java
+loader.  That loader, in turn, is responsible for bootstrapping a
+filesystem; it will be handed the ramdisk pointer and free that RAM once
+it has successfully loaded classes from the filesystem.  (and/or we/it
+could mount the ramdisk as a fs until it mounts the real one, and then
+unmount, which would free it for us.  whatever.)
+
+-_Quinn
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000463.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000465.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#464">[ date ]</a>
+              <a href="thread.html#464">[ thread ]</a>
+              <a href="subject.html#464">[ subject ]</a>
+              <a href="author.html#464">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

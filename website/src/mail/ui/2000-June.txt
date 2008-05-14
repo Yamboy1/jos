@@ -1,0 +1,232 @@
+From sean-cribbs@utulsa.edu Mon, 19 Jun 2000 11:05:24 -0500 (CDT)
+Date: Mon, 19 Jun 2000 11:05:24 -0500 (CDT)
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-UI] Re: [JOS-Arch] Getting started on AWT
+
+
+> Another good reason to build on Java2D is its support of the Graphic Driver
+> classes.  It has already established a class model for graphics drivers and
+> multiple display modes.  I did a tad bit of work on this when decaf was in
+> its infancy (before case statements were supported!).  This is a good
+> starting point.  We may not need to support *everything* Java2D has to
+> start with, though.  Alpha colors in 16-bit VGA mode are a little
+> rediculous :-)
+
+Does Java2D have primitives implemented?  What I mean is, given a
+primitive graphics command, can it produce a raster format?  This would be
+a great help in implementing the Graphics class.  For now, I'd like to
+keep everything 1.1-compliant, and the footprint small, so if Java2D is
+big, we may have to leave it out.  Once our VM & class library are
+approaching 1.2 compliancy, we could fully integrate it.  If Java2D
+doesn't provide the vector-to-raster translation though, I may be looking
+for someone who is geometrically/graphically inclined to help implement
+primitives.
+
+Here's my current plan for the VGA AWT:
+1) Make a bare-bones implementation of the toolkit and a simple peer
+(Canvas or the like) and graphics contexts. Draw some random primitives on
+the screen.
+2) Implement off-screen images.(a lot bigger task than it sounds) Draw
+onto an image, then blit it on the screen.
+
+Others to follow (in no particular order):
+* Implement some raster fonts, draw onto a component.
+* Implement other simple components, e.g. Button.
+* Implement windows (frames, dialogs, etc).
+* Implement the rest of the AWT!!
+
+Anyone who is interested please feel free to help.  At this point, I'm not
+too picky about clean implementation, as long as it's readable and
+understandable.  However, efficiency is a must - we know the VGA driver is
+slow, so we have to keep our code to a minimum.
+
+Sean
+
+
+
+
+
+From Matt.Albrecht@trilogy.com Mon, 19 Jun 2000 17:17:24 -0500
+Date: Mon, 19 Jun 2000 17:17:24 -0500
+From: Matt.Albrecht@trilogy.com Matt.Albrecht@trilogy.com
+Subject: [JOS-UI] Re: [JOS-Arch] Getting started on AWT
+
+Sean Cribbs wrote:
+>Does Java2D have primitives implemented?
+
+>From my brief glances it doesn't appear that Java2D has the primitives
+implemented.  These aren't difficult to add, though.  /Computer Graphics:
+Principles and Practice, 2nd ed/ (J.D. Foley) has very detailed information
+about all the different kinds of graphics algorithms.  Also, Michael
+Abrash's /Zen of Graphics Programming/ is a great source for optimized
+graphics on the x86 platform (it is also in his compilation work /Graphics
+Programming Black Book/).  I wrote a graphics library in C a long while
+back, but it was for VESA SVGA modes using 256 colors.  It's technique was
+to have an in-memory buffer which was later copied to the screen.  I can
+e-mail it to you if you want to see how the basic algorithms worked.
+
+>For now, I'd like to
+>keep everything 1.1-compliant, and the footprint small, so if Java2D is
+>big, we may have to leave it out.  Once our VM & class library are
+>approaching 1.2 compliancy, we could fully integrate it.  If Java2D
+>doesn't provide the vector-to-raster translation though, I may be looking
+>for someone who is geometrically/graphically inclined to help implement
+>primitives.
+
+I think it would help us in the long run to follow the Java2D architecture
+for the underlying graphics.  Of course, we would only need to support the
+functionality that JDK 1.1 supports initially.  This would cut down on a
+lot of code overhead, and graphics techniques that are a bit of a headache.
+
+
+Matt
+
+Colonel Edwards: This is the most fantastic story I've ever heard.
+Jeff Trent: And every word of it's true, too.
+Colonel Edwards: That's the fantastic part of it.
+-- Plan 9 From Outer Space
+
+
+
+
+
+
+
+
+From sean-cribbs@utulsa.edu Tue, 20 Jun 2000 08:51:09 -0500 (CDT)
+Date: Tue, 20 Jun 2000 08:51:09 -0500 (CDT)
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-UI] standardVGA driver
+
+Is anyone familiar enough with the standardVGA class to write in a read()
+function for it?  I'd like to be able to read an array of pixels from the
+screen and return it in an int[].  I thought it might be as simple as
+mapping the vga memory range to a byte array, then reading from the array,
+but after looking at the class, I think it might be more complex than
+that.  Anyone have an idea?
+
+--------------------------------------
+ Sean Cribbs <sean-cribbs@utulsa.edu>
+ Computer Science
+ University of Tulsa class of 2001
+--------------------------------------
+
+
+
+
+
+From sean-cribbs@utulsa.edu Tue, 27 Jun 2000 13:35:05 -0500 (CDT)
+Date: Tue, 27 Jun 2000 13:35:05 -0500 (CDT)
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-UI] Re: OrgJosPlaf
+
+> Sean,
+> 
+> I would like to help with your JOS plaf project. What is the first step?
+> 
+> Samer Kanjo
+> ________________________________________________________________________
+> Get Your Private, Free E-mail from MSN Hotmail at http://www.hotmail.com
+> 
+> 
+I haven't worked on that in a while! It's good to hear that someone is
+still interested.  First, if you're not familiar already, study Sun's PL&F
+standard for Swing (com.sun.java.swing.plaf if you're 1.1,
+javax.swing.plaf if you're 1.2+).  Then we need to come up with a design:
+standard conventions, fonts, colors, icons, etc.  Or we could come up with
+a theme interface, similar to the one that the "Metal" look and feel has.
+If you're an artist or artistically inclined, then you've found the right
+project on JOS!  The goal is to make a L&F that looks and works in ways
+that combines the best of our favorite OS's and maybe some features that
+are missing.  The nice thing about this, is you'll be able to use this L&F
+on your current Java applications, and not worry about waiting around for
+JOS to have a stable release.  Ultimately, the L&F will be part of JOS.
+
+Does this answer your question? (it probably raises more, too!)
+
+Sean
+
+
+
+
+
+From sean-cribbs@utulsa.edu Tue, 27 Jun 2000 14:15:29 -0500 (CDT)
+Date: Tue, 27 Jun 2000 14:15:29 -0500 (CDT)
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-UI] Re: OrgJosPlaf (fwd)
+
+> Sean,
+> 
+> I am already familiar with Swing and its design. I was thinking of something 
+> skin based (like NeoPlanet and WinAmp) and cool looking like the Mac OS X 
+> Aqua interface or Stardock's Object Desktop for Windows 2000.
+> 
+> I could start working on a design.
+> 
+> Does this plaf need to be based on Swing? The one thing I don't like about 
+> Swing is its deep object hierarchy (for backward compatibility) and its poor 
+> performance (which supposedly has been improved in JDK 1.3). I was more 
+> impressed by the design of IFC. Simple, clean, and fast.
+> 
+> What do you think?
+> 
+
+That's excellent.  In fact, there had been discussion of making the PLAF a
+lower-level function, i.e. plugging them into the AWT-peer level.  This
+will allow users to pick the look of their favorite L&F in all apps, not
+just Swing ones.  Ryan Heise had created something called SwingToolkit
+that used Swing components to replace AWT peers (but ultimately it relied
+on native Component peers and bridged the native toolkit).  I dabbled in
+something like that myself, but found it too resource intensive.  If we
+can develop an interface for L&F's at the peer level, we can allow anyone
+with any graphics hardware and applications to use the L&F's.
+"Skinnability" (technical term :) is an ultimate goal of mine too.
+
+I personally haven't seen the IFC design, but anything would be more
+lightweight than Swing :).  Ultimately, for compatibility reasons, we
+should port our new L&F to Swing -- this also allows non-JOS users to try
+out our L&F.
+
+Sean
+
+
+
+
+
+
+From sean-cribbs@utulsa.edu Tue, 27 Jun 2000 20:16:31 -0500 (CDT)
+Date: Tue, 27 Jun 2000 20:16:31 -0500 (CDT)
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-UI] RE: OrgJosPlaf
+
+> Making the plaf a lower level function is an interesting idea but 
+> how would 
+> that affect all applications? If an application is built on Swing, for 
+> instance, how would any intervention at the AWT peer level change 
+> the look 
+> of the Swing components, since Swing uses peers as a resource for
+drawing 
+> and some events? I do believe this kind of intervention would 
+> affect all AWT 
+> based applications.
+
+The intervention at the AWT Peer level would only affect Swing in ways
+that AWT does on a normal system, i.e. Window and Frame would be affected.
+However, as I said in my previous message, we could design our L&F so that
+it is easily ported to (or from) Swing, in which case we could make Swing
+apps look the similar to AWT-based ones and vice versa.
+
+> 
+> I do have many other questions but I need to nail down my 
+> thoughts first. I 
+> have written this email over and over. I will need to write you later.
+
+Keep them coming!  It's been a long time since anyone has really discussed
+UI on the JOS project.
+
+Sean 
+
+
+
+
+

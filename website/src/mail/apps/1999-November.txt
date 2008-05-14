@@ -1,0 +1,553 @@
+From arrowood@uswest.net Sat, 27 Nov 1999 06:42:57 -0800
+Date: Sat, 27 Nov 1999 06:42:57 -0800
+From: Ray Arrowood arrowood@uswest.net
+Subject: [JOS-Apps] BDD-BOT Java app
+
+--------------9B6DB6D4D301D4FEF9B677CC
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hello Mr. Evans et al,
+
+I know nothing about Java programming, but I'm smart enough
+to know that java is the wave of the future. ;-) I have been
+doing some research on Java lately and I happened to find
+this pure java search "spider" which also has a web server
+written with it. Ironically, I found your JOS site today
+also, and noticed in the main directory that you needed a
+JOS application.
+
+                                     "100% pure JOS
+applications- need one"
+
+Well,.. here you go! *L*
+
+I copied the important parts of the site where I found it
+below (I'm sure most of the info is old hat to you guys),
+but you might want to check out this guys site too. It
+appears it be a really well designed search engine. Speaking
+of search engines,.. you might want to consider making a
+search engine a top priority application since it could help
+you "mine" the web for other useful information. I'd look at
+this way,. if you could only have one tool,.. what would it
+be? A spoon or a fork,.. or a knife that could help you make
+the other tools like a spoon and a fork?
+
+My expertise is in biological science and I want to mine the
+web's biological databases, but I want to do it with a pure
+java server system because it will support the genetic
+algorithem, which is the most advanced and best for data
+mining. I'll be happy to share the information I've gathered
+on different data mining techniques if you want to develop
+the extensions for the search engine.
+
+Sincerely
+
+Ray
+
+
+
+===========================================================================
+
+BDDBot http://www.sonnenreich.com/bddbot/ is a web robot,
+search engine, and web server written entirely in Java(TM)
+While not as heavy duty as other free search engines such as
+ht://Dig, the BDDBot offers the following advantages:
+
+Its simplicity makes it a good learning tool for how search
+engines work.
+
+Its simplicity also makes it easily expandable. You can very
+easily expand it so that it can
+index document types besides HTML and plain text. You can
+also very easily expand it so
+that it can crawl using different protocols (e.g., gopher,
+wais) by using the standard Java
+method for adding protocols.
+
+It comes with its own built in web server - we don't know of
+any other free search engine
+out there that does this. If you do, please let us know.
+
+It's completely free, ala the GNU Public License. ht://Dig
+is the only other free search
+engine we know of that's under the GPL.
+
+It's written in Java, which provides several advantages in
+and of itself. Because it's written
+in Java:
+
+The BDDBot can run on any machine that has a stable Java
+Virtual Machine
+
+It is in an easy to understand and powerful language.
+
+It is object oriented for even greater extensibility.
+
+It's very small - just over 100K including source code,
+binaries, and configuration
+files at last count.
+
+Its indexes are very small. They are on the order of 10% of
+the size of the text on your site
+even though they index every single alphanumeric word.
+
+==================================================================
+
+Setting Up the BDDBot
+
+After you have downloaded the latest BDDBot distribution
+from the BDDBot home page, the first
+thing you will need to do is change the email address of the
+administrative contact. Open the file
+"EnginePrefs.java" (in the bdd/search subdirectory) and find
+the line that reads
+
+String email_address = "nobody@nowhere.edu"; //
+administrator's email address
+
+and change nobody@nowhere.edu to your email address.
+
+Now you need to recompile the "EnginePrefs.java" file so
+that the change takes effect. You can
+recompile it using the following command in UNIX/Linux
+
+javac bdd/search/EnginePrefs.java
+
+or the following command in Windows
+
+javac bdd\search\EnginePrefs.java
+
+Now you need to tell the BDDBot where it should crawl. Look
+in the "searchdb" directory that
+was created when you unzipped the original file and open up
+the file called "urls.txt". This file is
+where you should list all of the starting URLs for the
+crawler. You should list each URL on a line
+by itself. A line beginning with a pound sign (#) is
+considered a comment and is ignored. Blank
+lines are also ignored. The BDDBot will recursively crawl
+the URLs listed here.
+
+The other file that you will need to edit is the "rules.txt"
+file. This file specifies which URLs the
+robot should and shouldn't crawl. A line that is in the form
+
+include http://gsd.mit.edu/
+
+will cause all URLs that start with "http://gsd.mit.edu/" to
+be included. Similarly, to exclude URLs,
+use the keyword "exclude" instead of "include". Blank lines
+and lines starting with "#" are ignored.
+
+When an URL is checked against the inclusion/exclusion rules
+the exclusion rules are checked first
+and if the URL matches an exclusion rule it is not included.
+If an URL is not covered by either rule
+it is not included, unless it is a "file://" URL in which
+case it is included by default.
+
+==================================================================
+
+This sections describes the optional configurations that you
+can make to BDDBot.
+
+Creating a Search Page
+
+The built in web server that is part of the BDDBot is a very
+stripped down web server and as
+such it only outputs the results to a search query. You will
+need to create a search page yourself
+to start the initial search since the search engine does not
+output a default search page (although
+you could add some code to the QueryConnection class so that
+it does have an initial search
+page).
+
+Don't worry though, building a search page is very easy.
+Simply create a page that looks like what
+you want the search page to look like and add the following
+HTML to the body of the page:
+
+<form action="http://your.server.name:8001/query"
+method=GET>
+<input type="text" name="words" value="" size=45>
+<input type="submit" value="Search">
+</form>
+
+You should change "your.server.name" to the name of the
+machine that you're running the
+BDDBot on and you should change 8001 to the port number you
+are using if you have changed
+the port number.
+
+Configuring the BDDBot's Search Output
+
+You can easily configure the look and feel of the search
+output using three HTML files, which are
+all in the "searchdb" directory. The first two files are
+called "header.html" and "footer.html". As
+their names imply, the web server respectively outputs them
+immediately before and immediately
+after the results.
+
+The other file that you may want to customize is the file
+called "notfound.html". Whenever a search
+query returns no results at all, the file "notfound.html" is
+what is output. You can design this just
+like any other HTML file since it will be output in its
+entirety and by itself.
+
+You may be wondering how to put images on the results pages
+since the custom built web server
+can only output the three files listed above. You can have
+images on your page simply by putting
+them on another web server and then referring to them with
+their absolute URL inside of the
+results pages. The same method can be applied to sounds,
+Java applets, and other objects.
+
+Configuring Other Aspects of the BDDBot
+
+If you want to configure more than just the search output
+you will need to alter the code for the
+BDDBot yourself (hey, that's what it's there for). Most
+things that you might want to configure
+which are actually easily configurable can be found in the
+"EnginePrefs.java" class in the
+"bdd/search" directory. You should have already configured
+one aspect of this file by setting the
+administrative email address to your own email address.
+
+Another important parameter in this file that you might want
+to configure is the TCP port for the
+custom web server. The default port for the web server is
+8001, but if you are already running
+something on this port you will want to select an unused
+port.
+
+After making your desired changes you should recompile the
+EnginePrefs class with the following
+command in UNIX/Linux
+
+javac bdd/search/EnginePrefs.java
+
+and the following command in Windows
+
+javac bdd\search\EnginePrefs.java
+
+==================================================================
+
+Running the BDDBot
+
+For your convenience there are two ways to start the BDDBot.
+You can start the BDDBot using
+a graphical interface, which makes for very intuitive
+interaction. You can also start the individual
+components from the command line, which means that you can
+start the BDDBot remotely via a
+telnet session, through cron for scheduled crawling, or
+through a cgi interface.
+
+Please note that you should never run more than one Crawler
+at the same time because the
+Crawler needs exclusive access to a particular temporary
+directory ("searchtmp").
+
+Graphical Monitor
+
+The easiest method to use in order to run the BDDBot is to
+use the graphical interface method.
+You can start the graphical interface with the command
+
+java bdd.search.Monitor
+
+This will pop up a window that looks like figure 2 (in the
+book), which will allow you to control
+the BDDBot. It will also start up the stand alone web server
+for search queries, although you
+won't have any visual queues for this.
+
+Once you have started the monitor, the top list allows you
+to watch queries that are made to the
+custom web server. Only the most recent 200 or so queries
+are shown (older queries are
+removed so that the list doesn't explode).
+
+Unchecking the check boxes will temporarily turn keep the
+lists from growing.
+
+The bottom two lists show the URLs that have been indexed
+and the URLs that produced errors
+when indexing was attempted.
+
+The buttons clear their respective lists.
+
+The button labeled "Start Crawler" causes the crawler to
+re-index your site using the file called
+"urls.txt" in your "searchdb" directory.
+
+Command Line
+
+The alternative method to control the BDDBot is from the
+command line. This method does not
+provide logging and it's not as easy as the graphical
+monitor, but it can be run without any
+windowing system (e.g., in case you're in a telnet session)
+and the web server can be set up to
+start at system start up and the crawler can be scheduled
+via cron.
+
+To start the web server
+
+java bdd.search.query.QueryWebServer
+
+To start the crawler
+
+java bdd.search.spider.Crawler starting-urls
+
+where you should replace starting-urls with the name of the
+file that contains the starting URLs
+(this will probably be "searchdb/urls.txt" or
+"searchdb\urls.txt).
+
+
+
+--------------9B6DB6D4D301D4FEF9B677CC
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+Hello Mr. Evans et al,
+<p>I know nothing about Java programming, but I'm smart enough to know
+that java is the wave of the future. ;-) I have been doing some research
+on Java lately and I happened to find this pure java search "spider" which
+also has a web server written with it. Ironically, I found your JOS site
+today also, and noticed in the main directory that you needed a JOS application.
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"100% pure JOS applications- need one"
+<p>Well,.. here you go! *L*
+<p>I copied the important parts of the site where I found it below (I'm
+sure most of the info is old hat to you guys), but you might want to check
+out this guys site too. It appears it be a really well designed search
+engine. Speaking of search engines,.. you might want to consider making
+a search engine a top priority application since it could help you "mine"
+the web for other useful information. I'd look at this way,. if you could
+only have one tool,.. what would it be? A spoon or a fork,.. or a knife
+that could help you make the other tools like a spoon and a fork?
+<p>My expertise is in biological science and I want to mine the web's biological
+databases, but I want to do it with a pure java server system because it
+will support the genetic algorithem, which is the most advanced and best
+for data mining. I'll be happy to share the information I've gathered on
+different data mining techniques if you want to develop&nbsp; the extensions
+for the search engine.
+<p>Sincerely
+<p>Ray
+<br>&nbsp;
+<br>&nbsp;
+<p>===========================================================================
+<p>BDDBot <a href="http://www.sonnenreich.com/bddbot/">http://www.sonnenreich.com/bddbot/</a>
+is a web robot, search engine, and web server written entirely in Java(TM)
+While not as heavy duty as other free search engines such as ht://Dig,
+the BDDBot offers the following advantages:
+<p>Its simplicity makes it a good learning tool for how search engines
+work.
+<p><b>Its simplicity also makes it easily expandable.</b> You can very
+easily expand it so that it can
+<br>index document types besides HTML and plain text. You can also very
+easily expand it so
+<br>that it can crawl using different protocols (e.g., gopher, wais) by
+using the standard Java
+<br>method for adding protocols.
+<p><b>It comes with its own built in web server</b> - we don't know of
+any other free search engine
+<br>out there that does this. If you do, please let us know.
+<p>It's completely free, ala the GNU Public License. ht://Dig is the only
+other free search
+<br>engine we know of that's under the GPL.
+<p><b>It's written in Java</b>, which provides several advantages in and
+of itself. Because it's written
+<br>in Java:
+<p>The BDDBot can run on any machine that has a stable Java Virtual Machine
+<p>It is in an easy to understand and powerful language.
+<p><b>It is object oriented</b> for even greater extensibility.
+<p><b>It's very small</b> - just over 100K including source code, binaries,
+and configuration
+<br>files at last count.
+<p>Its indexes are very small. They are on the order of 10% of the size
+of the text on your site
+<br><b>even though they index every single alphanumeric word.</b>
+<p>==================================================================
+<p>Setting Up the BDDBot
+<p>After you have downloaded the latest BDDBot distribution from the BDDBot
+home page, the first
+<br>thing you will need to do is change the email address of the administrative
+contact. Open the file
+<br>"EnginePrefs.java" (in the bdd/search subdirectory) and find the line
+that reads
+<p>String email_address = "nobody@nowhere.edu"; // administrator's email
+address
+<p>and change nobody@nowhere.edu to your email address.
+<p>Now you need to recompile the "EnginePrefs.java" file so that the change
+takes effect. You can
+<br>recompile it using the following command in UNIX/Linux
+<p>javac bdd/search/EnginePrefs.java
+<p>or the following command in Windows
+<p>javac bdd\search\EnginePrefs.java
+<p>Now you need to tell the BDDBot where it should crawl. Look in the "searchdb"
+directory that
+<br>was created when you unzipped the original file and open up the file
+called "urls.txt". This file is
+<br>where you should list all of the starting URLs for the crawler. You
+should list each URL on a line
+<br>by itself. A line beginning with a pound sign (#) is considered a comment
+and is ignored. Blank
+<br>lines are also ignored. The BDDBot will recursively crawl the URLs
+listed here.
+<p>The other file that you will need to edit is the "rules.txt" file. This
+file specifies which URLs the
+<br>robot should and shouldn't crawl. A line that is in the form
+<p>include <a href="http://gsd.mit.edu/">http://gsd.mit.edu/</a>
+<p>will cause all URLs that start with "<a href="http://gsd.mit.edu/">http://gsd.mit.edu/</a>"
+to be included. Similarly, to exclude URLs,
+<br>use the keyword "exclude" instead of "include". Blank lines and lines
+starting with "#" are ignored.
+<p>When an URL is checked against the inclusion/exclusion rules the exclusion
+rules are checked first
+<br>and if the URL matches an exclusion rule it is not included. If an
+URL is not covered by either rule
+<br>it is not included, unless it is a "<a href="file://">file://</a>"
+URL in which case it is included by default.
+<p>==================================================================
+<p>This sections describes the optional configurations that you can make
+to BDDBot.
+<p>Creating a Search Page
+<p>The built in web server that is part of the BDDBot is a very stripped
+down web server and as
+<br>such it only outputs the results to a search query. You will need to
+create a search page yourself
+<br>to start the initial search since the search engine does not output
+a default search page (although
+<br>you could add some code to the QueryConnection class so that it does
+have an initial search
+<br>page).
+<p>Don't worry though, building a search page is very easy. Simply create
+a page that looks like what
+<br>you want the search page to look like and add the following HTML to
+the body of the page:
+<p>&lt;form action="<a href="http://your.server.name:8001/query">http://your.server.name:8001/query</a>"
+method=GET>
+<br>&lt;input type="text" name="words" value="" size=45>
+<br>&lt;input type="submit" value="Search">
+<br>&lt;/form>
+<p>You should change "your.server.name" to the name of the machine that
+you're running the
+<br>BDDBot on and you should change 8001 to the port number you are using
+if you have changed
+<br>the port number.
+<p>Configuring the BDDBot's Search Output
+<p>You can easily configure the look and feel of the search output using
+three HTML files, which are
+<br>all in the "searchdb" directory. The first two files are called "header.html"
+and "footer.html". As
+<br>their names imply, the web server respectively outputs them immediately
+before and immediately
+<br>after the results.
+<p>The other file that you may want to customize is the file called "notfound.html".
+Whenever a search
+<br>query returns no results at all, the file "notfound.html" is what is
+output. You can design this just
+<br>like any other HTML file since it will be output in its entirety and
+by itself.
+<p>You may be wondering how to put images on the results pages since the
+custom built web server
+<br>can only output the three files listed above. You can have images on
+your page simply by putting
+<br>them on another web server and then referring to them with their absolute
+URL inside of the
+<br>results pages. The same method can be applied to sounds, Java applets,
+and other objects.
+<p>Configuring Other Aspects of the BDDBot
+<p>If you want to configure more than just the search output you will need
+to alter the code for the
+<br>BDDBot yourself (hey, that's what it's there for). Most things that
+you might want to configure
+<br>which are actually easily configurable can be found in the "EnginePrefs.java"
+class in the
+<br>"bdd/search" directory. You should have already configured one aspect
+of this file by setting the
+<br>administrative email address to your own email address.
+<p>Another important parameter in this file that you might want to configure
+is the TCP port for the
+<br>custom web server. The default port for the web server is 8001, but
+if you are already running
+<br>something on this port you will want to select an unused port.
+<p>After making your desired changes you should recompile the EnginePrefs
+class with the following
+<br>command in UNIX/Linux
+<p>javac bdd/search/EnginePrefs.java
+<p>and the following command in Windows
+<p>javac bdd\search\EnginePrefs.java
+<p>==================================================================
+<p>Running the BDDBot
+<p>For your convenience there are two ways to start the BDDBot. You can
+start the BDDBot using
+<br>a graphical interface, which makes for very intuitive interaction.
+You can also start the individual
+<br>components from the command line, which means that you can start the
+BDDBot remotely via a
+<br>telnet session, through cron for scheduled crawling, or through a cgi
+interface.
+<p>Please note that you should never run more than one Crawler at the same
+time because the
+<br>Crawler needs exclusive access to a particular temporary directory
+("searchtmp").
+<p>Graphical Monitor
+<p>The easiest method to use in order to run the BDDBot is to use the graphical
+interface method.
+<br>You can start the graphical interface with the command
+<p>java bdd.search.Monitor
+<p>This will pop up a window that looks like figure 2 (in the book), which
+will allow you to control
+<br>the BDDBot. It will also start up the stand alone web server for search
+queries, although you
+<br>won't have any visual queues for this.
+<p>Once you have started the monitor, the top list allows you to watch
+queries that are made to the
+<br>custom web server. Only the most recent 200 or so queries are shown
+(older queries are
+<br>removed so that the list doesn't explode).
+<p>Unchecking the check boxes will temporarily turn keep the lists from
+growing.
+<p>The bottom two lists show the URLs that have been indexed and the URLs
+that produced errors
+<br>when indexing was attempted.
+<p>The buttons clear their respective lists.
+<p>The button labeled "Start Crawler" causes the crawler to re-index your
+site using the file called
+<br>"urls.txt" in your "searchdb" directory.
+<p>Command Line
+<p>The alternative method to control the BDDBot is from the command line.
+This method does not
+<br>provide logging and it's not as easy as the graphical monitor, but
+it can be run without any
+<br>windowing system (e.g., in case you're in a telnet session) and the
+web server can be set up to
+<br>start at system start up and the crawler can be scheduled via cron.
+<p>To start the web server
+<p>java bdd.search.query.QueryWebServer
+<p>To start the crawler
+<p>java bdd.search.spider.Crawler starting-urls
+<p>where you should replace starting-urls with the name of the file that
+contains the starting URLs
+<br>(this will probably be "searchdb/urls.txt" or "searchdb\urls.txt).
+<blockquote>&nbsp;</blockquote>
+</html>
+
+--------------9B6DB6D4D301D4FEF9B677CC--
+
+
+
+
+

@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Widgets</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000081.html">
+   <LINK REL="Next" HREF="000088.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Widgets</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-UI] Widgets">digigod@earthling.net</A><BR>
+    <I>Tue, 27 Jul 1999 19:49:12 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000081.html">[JOS-UI] screensaver update</A></li>
+        <LI> Next message: <A HREF="000088.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#87">[ date ]</a>
+              <a href="thread.html#87">[ thread ]</a>
+              <a href="subject.html#87">[ subject ]</a>
+              <a href="author.html#87">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I use widget in a broad sense not tied to either the AWT or Swing.
+
+JADE's widgets should be defined in this broad sense, hence we should
+define them first as interfaces create a default set using swing then
+extends that to create the &quot;JOS Standard GUI&quot; widgets.
+
+here's all the widgets I can think of
+
+Widget
+ |
+ +-DesktopWidget
+ |
+ +-ClockWidget
+ |
+ +-DockWidget
+ |
+ +-TaskbarWidget
+ |
+ +-ToolbarWidget
+ |
+ +-PropertyPageWidget
+
+Widget is the super interface (it doesnt even have to define any
+methods).
+
+DesktopWidget represents the actual desktop and has methods for moving
+windows around, adding widgets (like a taskbar) and the like. I see the
+class DesktopScreen (extends Screen implements DesktopWidget) being the
+default desktop, as extensible and flexible as possible, and using the
+default AWT/Swing component model. it would be rare that a different
+Desktop would be used (except in the case of no Desktop or a text
+desktop for a TUI)
+
+ClockWidget is the system clock with date and time, better name? anyone?
+
+DockWidget is a systemtrayish beandock like we talked about, it accepts
+classes implementing Dockable
+
+TaskbarWidget is the taskbar
+
+ToolbarWidget is a toolbar for the desktop, with docking (&amp;locking) to
+the sides
+
+PropertyPageWidget is like a &quot;control panel&quot; (in windows it would
+encapsulate all the tabs accesed via Properties... in a context menu)
+this would most likely be implemented as TabbedPanes but it shouldnt be
+required to use it (1 tab looks silly, and if you have enough to create
+two rows of panes you should use a JList holding the titles instead)
+
+the standard windows9x taskbar would be implemented via a JWindow that
+implements ToolbarWidget and TaskbarWidget (or more likely extends
+SimpleToolbarWidget (our swing generic implementation) and implements
+TaskbarWidget) and would contain a button/menu for the start menu, the
+system tray would be a JPanel that implements ClockWidget and DockWidget
+(rhyming unintentional)
+
+The mac pulldown menu thing (I dont remember what its called) would be a
+JMenuBar implementing ToolbarWidget (so it could plater itself on to the
+desktop like that, it would return false for hideable and draggable (or
+not implement those interfaces?))
+
+the discussion to follow should include A) what widgets to include (and
+what to name them) and B) what methods to put in them and how it would
+be supported in JADE.
+
+everything else (providing the &quot;SimpleXXXWidget&quot;'s) can wait until we
+have this framework setup
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000081.html">[JOS-UI] screensaver update</A></li>
+	<LI> Next message: <A HREF="000088.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#87">[ date ]</a>
+              <a href="thread.html#87">[ thread ]</a>
+              <a href="subject.html#87">[ subject ]</a>
+              <a href="author.html#87">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

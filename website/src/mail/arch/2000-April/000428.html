@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000440.html">
+   <LINK REL="Next" HREF="000431.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">gchii@mindspring.com</A><BR>
+    <I>Fri, 07 Apr 2000 21:53:46 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000440.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000431.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#428">[ date ]</a>
+              <a href="thread.html#428">[ thread ]</a>
+              <a href="subject.html#428">[ subject ]</a>
+              <a href="author.html#428">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 02:40 AM 4/7/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>OTOH, something like the following would also be nice:
+</I>&gt;<i>
+</I>&gt;<i>	/* myRunnableClass does something useful */
+</I>&gt;<i>	Thread t = new Thread( new myRunnableClass() );
+</I>&gt;<i>	/* Starts a clean process and loads t as its single
+</I>&gt;<i>	   thread.  No data sharing, unless myRunnableClass()'s
+</I>&gt;<i>	   constructor references something. */
+</I>&gt;<i>	jos.system.process.startNewProcess( t );
+</I>&gt;<i>	/* remove the temptation to fiddle with the other process;
+</I>&gt;<i>	   could this be done by startNewProcess?  (may need
+</I>&gt;<i>	   a native call) */
+</I>&gt;<i>	t = null;
+</I>
+Personally, I prefer the standard way of creating a new process in Java.
+
+  public void example() {
+    Runtime.getRuntime().exec( ... );
+  }
+
+1. It needs no native calls.
+
+2. Most Java applications do not become JOS-specific.
+
+3. Killing a process also removes all custom classes owned by the process.
+
+4. It enables inter-process communication through I/O streams.
+
+5. The exec() method has nothing better to do when there is no foreign
+operating system. When bytecode is the native executable format, the exec()
+method creates a process from bytecode. In its simplest form, a &quot;command
+line&quot; would be the name of any runnable class:
+
+  public void example() {
+    Runtime.getRuntime().exec( &quot;myRunnableClass&quot; );
+  }
+
+The exec() method for JOS should always run a process in a separate thread.
+
+  public Process exec( String cmd ) {
+    Runnable r;
+    try {
+      r = (Runnable) Class.forName( cmd ).newInstance();
+    }
+    catch( Throwable e ) {
+      return null;
+    }
+
+    Thread t = new Thread( r );
+    t.start();
+    return new BytecodeProcess( t );
+  }
+
+Of course, this is a gross oversimplification. A real implementation of
+exec() would determine if a class implements the Runnable interface before
+creating a new instance. It should always create a new class loader, too.
+While the thread and the runnable class are created with the new class
+loader, the instance of java.lang.Process must be created by the parent's
+class loader.
+
+In its simplest form, Runtime.exec() method could invoke startNewProcess()
+with the name of a runnable class.
+
+  public Process exec( String v ) {
+    return jos.system.process.startNewProcess( v );
+  }
+
+6. The &quot;environment&quot; for the new process comes from the system properties
+of its parent. A parent can create a different environment for its child.
+For example, a parent can run a child process with a different CLASSPATH.
+
+What is a command line shell? A shell enables you to edit a line of text
+and pass it to the exec() method.
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000440.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000431.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#428">[ date ]</a>
+              <a href="thread.html#428">[ thread ]</a>
+              <a href="subject.html#428">[ subject ]</a>
+              <a href="author.html#428">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [boot disk] Installation?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   
+   <LINK REL="Next" HREF="000031.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [boot disk] Installation?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [boot disk] Installation?">gchii@mindspring.com</A><BR>
+    <I>Wed, 28 Jun 2000 12:03:33 -0400</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000031.html">[JOS-Apps] [eric] Package file cache</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#30">[ date ]</a>
+              <a href="thread.html#30">[ thread ]</a>
+              <a href="subject.html#30">[ subject ]</a>
+              <a href="author.html#30">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>A Java Development Kit (JDK) and Java Runtime Environment (JRE) is
+distributed with SuSE Linux 6.0. It cannot use compressed archives. This
+presents a problem when distributing a Java application for use on this
+popular platform.
+
+Boot Disk, for example, has a runtime edition. The idea behind a runtime
+edition is to install it without recompiling. How should it be distributed
+to those with and without compressed archives?
+
+I am distributing compressed archives. For those with &quot;older&quot; versions of
+the JDK or JRE, it should be something like this:
+
+mkdir rejar
+cd rejar
+jar xvf bootdisk1a.jar
+jar cv0f bootdisk1a.jar *.class
+
+Once again, this gives us different &quot;platforms&quot; within the Java family of
+platforms. A classic Internet distribution includes &quot;platform&quot; in the name
+of an archive. Should I distribute a different archive for each &quot;platform&quot;?
+
+Boot Disk is not a classic Java application. It does not implement a static
+main() method. Rather, it is a subprogram. Start the Universal Browser,
+which is part of Smart API, and use the Universal Browser to start
+BootDisk, BootDiskProgram, EtherbootProgram and/or GrubProgram. Universal
+Browser implements a static main() method.
+
+I haven't yet figured out how to distribute a non-visual shell. Until then,
+the Universal Browser is the easiest mechanism for me. With the Universal
+Browser, you can start any of the hundreds of subprograms in the Smart API.
+The interface between your foreign operating system and the subprogram
+environment is simple. You can set it up once and forget it.
+
+// browser1b for Linux
+java -classpath $CLASSPATH org.jos.gchii.browser1b.UniversalBrowser
+
+I am unfamiliar with shell scripts on Linux. I am trying to learn. If I
+want to pass a location to the UniversalBrowser, how do I do that? Here is
+the equivalent in a batch file from Microsoft DOS:
+
+// browser1b.bat for MS-DOS
+set CP=%CLASSPATH%;.
+java -classpath %CP% org.jos.gchii.browser1b.UniversalBrowser %1
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000031.html">[JOS-Apps] [eric] Package file cache</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#30">[ date ]</a>
+              <a href="thread.html#30">[ thread ]</a>
+              <a href="subject.html#30">[ subject ]</a>
+              <a href="author.html#30">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

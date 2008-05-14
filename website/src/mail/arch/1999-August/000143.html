@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000141.html">
+   <LINK REL="Next" HREF="000145.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Program and ProgramContext">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 11 Aug 1999 16:53:59 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000141.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000145.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#143">[ date ]</a>
+              <a href="thread.html#143">[ thread ]</a>
+              <a href="subject.html#143">[ subject ]</a>
+              <a href="author.html#143">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> 
+</I>&gt;<i> What is a program? Any object can act like a program. Here is the Program
+</I>&gt;<i> interface:
+</I>&gt;<i> 
+</I>&gt;<i> public interface Program
+</I>&gt;<i>     extends Runnable {
+</I>&gt;<i>   public void setProgramContext( ProgramContext v );
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> What is a program context?
+</I>
+Actually, can you tell me the context of your definition? I always
+thought of a program as something with a main() method.
+
+&gt;<i> First, the host environment must be able to pass
+</I>&gt;<i> &quot;parameters&quot; to a program. A program is free to ignore all parameters.
+</I>&gt;<i> Second, a program must be able to pass a result code to the host
+</I>&gt;<i> environment. All of the processing in the program is summed up in a single
+</I>&gt;<i> integer, a result code.
+</I>&gt;<i> 
+</I>&gt;<i> public interface ProgramContext {
+</I>&gt;<i>   public void getParameter( int index );
+</I>&gt;<i>   public void getValue( String key );
+</I>&gt;<i>   public Enumeration getParameters();
+</I>&gt;<i>   public void setResultCode( int v );
+</I>&gt;<i> }
+</I>
+Now, my program (with it's main method n'all), can:
+
+1. get parameters from the argument list of the main() method.
+2. get environment parameters from System.getProperties()
+3. exit with a result code using System.exit(code)
+
+&gt;<i> A program is not a process. It does not have its own System.in, System.out,
+</I>&gt;<i> and System.err. It is a well-defined interface.
+</I>
+Ok, I think this suggests (a lot of guess work here) that the use of
+this Program interface is where a program wants to interact with a
+number of other programs to achieve a goal, all in a single process
+(optional). Here are my thoughts:
+
+The concept of the main() method (and therefore, your Program interface
+too) is very primitive. If you would like to achieve a higher goal by
+linking together several programs, the main/run() method is a very
+limiting solution to the problem. UNIX is about as good as it gets (UNIX
+consists of lots of little programs cooperating with eachother by
+calling eachother's main() methods. The shell orchestrates this with
+pipes and redirection symbols. With the advent of Java, piping and
+main() arguments seem unintuitive. Instead we could have JavaBeans
+interacting with eachother.
+
+Given JavaBeans and (standard) programs, do we really need a third
+option?
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000141.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000145.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#143">[ date ]</a>
+              <a href="thread.html#143">[ thread ]</a>
+              <a href="subject.html#143">[ subject ]</a>
+              <a href="author.html#143">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Smart API Distribution</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000356.html">
+   <LINK REL="Next" HREF="000359.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Smart API Distribution</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Smart API Distribution">tmiller@haverford.edu</A><BR>
+    <I>Wed, 29 Dec 1999 15:22:26 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000356.html">[JOS-Arch] Smart API Distribution</A></li>
+        <LI> Next message: <A HREF="000359.html">[JOS-Arch] Smart API Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#357">[ date ]</a>
+              <a href="thread.html#357">[ thread ]</a>
+              <a href="subject.html#357">[ subject ]</a>
+              <a href="author.html#357">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> If you've got a server farm, you need a new operating system. ... You
+</I>&gt;<i> simply cannot run a traditional operating system efficiently on a server farm.
+</I>
+	I'll agree to that.
+
+&gt;<i> Yes, you should be able to group them arbitrary ways. I would prefer a
+</I>&gt;<i> classic approach to grouping, like agent and cluster technology. Java
+</I>&gt;<i> agents are the first to be platform-independent enough to roam from one
+</I>&gt;<i> machine to the next.
+</I>
+	Agents -- to my understanding -- normally run only on the machine
+where they were started, for the reason that migrating an agent to run on
+some other machine is the same problem as migrating code, which hadn't
+been solved when agents were designed.  Moving an agent from processor to
+processor, as to gain the best performance, should be the responibility of
+the operating system, and not the agent.  The exact mechanism for grouping
+them -- some variety of clustering technology -- was not what I was
+addressing.  Most clustering solutions today are not so dynamic as the one
+that would be required to make efficient use out of a 256-processor server
+farm.
+
+&gt;<i> After forming a reply, I wonder if your definition of &quot;parallel&quot; processing
+</I>&gt;<i> is the same as mine. Parallel processing is where one program is running,
+</I>&gt;<i> with only one &quot;thread of control&quot;, and parts of the program are
+</I>&gt;<i> automatically divided among more than one processor on a motherboard. A
+</I>&gt;<i> network is not part of this kind of parallel processing.
+</I>
+	Parallel processing takes many forms.  Strictly speaking, we're
+looking at concurrent processing, that is, processing where parts of the
+work (calculations) of the program are time/order independent of the
+others.  (Concurrency may or may not be exploited in a strictly parallel
+fashion depending on the available hardware.)  In general, the best
+performance is gained from explicit concurrency -- using systems such as
+PVM or MPI to explicitly code the parallel portions of a
+program.  Performance will also benefit from heavy threading and light
+synchronization, where different threads can execute simultaneously on
+different processors.  Parallelism such as you describe is typically the
+least efficient, where the hardware (or, for fork()ing programs, the
+OS) has to decide how to parallelize the program.
+
+	Parallel processing typically has two hardware forms: symmetric
+multi-processing and clusters.  SMP is N processors per motherboard,
+tightly linked (e.g. very high bandwith interconnects), typically sharing
+the same RAM.  Clustering can use SMP boxes/mobos, or single processor
+boxes/mobos, and combine them with slower interconnects, typically
+off-the-shelf networking like 100baseT ethernet.  Naturally, SMP performs
+better for tightly-coupled processing (where alot of data is shared) and
+clustering is more efficient for loosely-coupled processing (where almost
+no data is shared).  The <A HREF="mailto:seti@home">seti@home</A> and rc5-crack attempts are good
+examples of clustered computing.
+
+	They are not, however, distributed computing in the sense that I
+understand it, because both report their results back to a single 'master'
+node that then hands work units back out.  Distributed processing is more
+like the IRC network, a large group of peers each doing what needs to be
+done locally to generate a global effect -- that is, distributed systems
+do NOT have a single 'master' node.
+
+
+	A server-farm-in-a-box, according to your description, will be an
+16-way cluster of 16-way SMPs.  The way you seem to want to do things, you
+want to maintain all 256 of those processors as separate machines -- to
+me, that just seems like a great deal of extra work.
+
+&gt;<i> I cannot justify automatic load-balancing across all 256 processors.
+</I>
+	Why not?  It's free (almost) in the operating system / daemons
+running on those processors.  It makes /your/ life that much simpler,
+because you don't have to worry about balancing the load by hand.  If you
+want, you'd be able to exclude certain processors/motherboards from the
+'processing pool' and manage them manually -- presumambly to dedicate them
+to web serving, or file serving, etc.  But when userA logs in, it doesn't
+matter which of the other processors userA's jobs run on, so why bother to
+decide by hand when the load-balancing daemons/kernels ask each other
+whose not busy.  It results in better performance for everyone using the
+farm.  If you have a large processing job that you /know/ is tightly
+bound, you can dedicate a motherboard and its processors to the job,
+setting it to realease that group to the pool when the job is done.  For a
+more loosely-coupled job, you might want to specify that it uses no more
+than two processors per motherboard.
+
+&gt;<i> In general, people must choose to set up specific services on specific
+</I>&gt;<i> machines.
+</I>
+	That used to be true; it no longer is, and that's the idea behind
+most clustering technologies.  N machines can 'hide' behind one
+net-address and split the work up amonst themselves.  There's no reason to
+not to treat net-addresses as logical addresses, rather than physically
+correspsonding to a particular machine.
+
+	The key need for one-console to many-machines will not be
+communicating with those machines.  (Right now, I'm managing 8 machines
+250 miles away without any problems at all, with one
+keyboard/mouse/monitor.  I'm using xterms, because I'm hooking up over a
+modem, but if I were on something faster, I could run X programs remotely
+just as easily.)  The problem will be making efficient use of those
+machines.  (Even right now, with one-to-one the primary mode, the vast
+majority of processing power on the average desktop goes to waste waiting
+for the user to do something; for example, this particular machine is
+spending 55% of its time cranking <A HREF="mailto:seti@home">seti@home</A>, and 30% of its time running
+desktop animations.  Only 15% of it is concerned with anything that I'm
+doing.)  Historically, the most common mode of interaction was many
+consoles to one machine, so one typically didn't have cycles to
+burn.  The shift to one-to-one was not terribly worrisome, because the
+single machines behind the single consoles weren't powerful or connected
+enought to be worthwhile.  They are now -- as the rc5 crack/<A HREF="mailto:seti@home">seti@home</A>
+groups and other similar ones -- have shown.
+
+	The situation only gets worse as the ratio of consoles (users) to
+machines rises.  For servers, if the limiting resource is bandwidth, then
+it's a true shame to let all those extra cycles go to waste -- and if it's
+an interactive server (i.e. shell account), then you need load-balancing
+to any kind of reasonable performance.  If the limiting resource is CPU
+time, it's even /more/ important that the limited resources at hand are
+used most efficiently -- which, IMHO, would point to an automated system.
+
+-_Quinn
+	
+
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000356.html">[JOS-Arch] Smart API Distribution</A></li>
+	<LI> Next message: <A HREF="000359.html">[JOS-Arch] Smart API Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#357">[ date ]</a>
+              <a href="thread.html#357">[ thread ]</a>
+              <a href="subject.html#357">[ subject ]</a>
+              <a href="author.html#357">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

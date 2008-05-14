@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000547.html">
+   <LINK REL="Next" HREF="000553.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">tmiller@haverford.edu</A><BR>
+    <I>Tue, 2 May 2000 20:47:31 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000547.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000553.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#550">[ date ]</a>
+              <a href="thread.html#550">[ thread ]</a>
+              <a href="subject.html#550">[ subject ]</a>
+              <a href="author.html#550">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Wait! I thought a class definition has no static fields. If it has no
+</I>&gt;<i> static fields, it has no link to any superclass. A class definition only
+</I>&gt;<i> knows the name of its superclass, not the class definition of its superclass.
+</I>&gt;<i> 
+</I>&gt;<i> Otherwise, both a class definition and a class would be the same thing.
+</I>
+	No.  The link to a superclass is not a static field; it's an index
+into the constant pool, defined in the class file specification*. The
+security/type violation occurs as follows.  I compile two classes, A and
+B.  A and B are the same, and use reflection to access their fields,
+except that A subclasses C, and B subclasses D.  Clearly, classes A and B
+are not the same -- suppose C were Thread and D were ClassLoader.  Classes
+A and B could be /identical/, save for the 'extends' clause; failed
+reflections could be caught and ignored.  Now I load A and B into the VM
+and want to share their class definitions.  Obviously, there's a
+problem.  If A 'wins' the share, B becomes a Thread subclass, instead of a
+ClassLoader subclass.  And vice-versa.
+
+	However, we don't need to worry about this.  Parent classes, as
+I've noted, are explicitly embedded in the classfile.  Therefore, only
+classes whose parents share a symbolic name will have identical
+classfiles.  The question to ask, then, is: what happens when process one
+loads A and C, C is recompiled, and process two loads B and C'?  If B
+still works with C' (suppose you only changed a method body), A will work
+with it also.  However, is allowing A and B to cast to each other (or to
+C, actually) still OK?  If I try share an object whose parent class in my
+process is out of date,	should it go through?  I would think, for ease of
+upgrading, the answer should be yes -- but if we use recursion to attempt
+an 'illegal' cast between the parent classes, the answer would be no.  Any
+thoughts?
+ 
+-_Quinn
+
+* That is, the set of things immutable under the setstatic() bytecode
+includes the parent of the class.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000547.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000553.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#550">[ date ]</a>
+              <a href="thread.html#550">[ thread ]</a>
+              <a href="subject.html#550">[ subject ]</a>
+              <a href="author.html#550">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

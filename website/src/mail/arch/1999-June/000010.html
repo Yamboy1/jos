@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: [JOS] Concerning the registry...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000009.html">
+   <LINK REL="Next" HREF="000011.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: [JOS] Concerning the registry...</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Re: [JOS] Concerning the registry...">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 09 Jun 1999 11:08:48 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000009.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+        <LI> Next message: <A HREF="000011.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#10">[ date ]</a>
+              <a href="thread.html#10">[ thread ]</a>
+              <a href="subject.html#10">[ subject ]</a>
+              <a href="author.html#10">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Al wrote:
+&gt;<i> 
+</I>&gt;<i> Ryan Heise wrote:
+</I>&gt;<i> 
+</I>&gt;<i> &gt; Speaking of registries, could you please explain how they would be used?
+</I>&gt;<i> 
+</I>&gt;<i> My implementation of a registry has nothing to do with the JOS system's
+</I>&gt;<i> behaviour overall.
+</I>
+I understand how the registry itself works, but I do not know the
+typical ways in which JOS can make use of a registry. Hopefully people
+can make suggestions here on the arch list.
+
+As a UNIX user, I am not familiar with the Windows registry. But I can
+see a similarity between the registry and UNIX dot-rc files (which store
+user preferences for applications). I do see the advantage in having a
+more organised system of storing per user preferences - perhaps each
+user can have their own &quot;application preferences&quot; registry.
+
+&gt;<i> If the JOS system decides to use a
+</I>&gt;<i> central registry (instead of a temp directory), then applications
+</I>&gt;<i> written for JOS will probably be able to write to a global registry.
+</I>
+Do you have an ideas of what might be stored in the global registry? In
+a multi-user environment, can every user write anywhere in the registry,
+or will you use ACLs to restrict this?
+
+&gt;<i> The
+</I>&gt;<i> good thing with the registry is that it runs as a server, and it also
+</I>&gt;<i> has replication capabilities (working on them now), which means that it
+</I>&gt;<i> assists in the development of a truly distributed JOS system.
+</I>
+Replication would be very useful for maintaining network configuration
+across all computers in a network. However, network configuration data
+is a broad category that could be partitioned into data managed by
+individual network services. If for security reasons, it is desirable to
+run these network services under different user spaces (unlike UNIX
+where many services run as root), it may also be desirable to have a
+different registry for each network service, and then you would have to
+replicate each registry individually. Is it possible to group these
+registries into one replication operation?
+
+There may be more elegant was to achieve the same result.
+
+Another point is that if the registry runs as a server, does each user
+have to run their own server for their &quot;application preferences&quot;
+registry? Or does one server manage all the registries on the system?
+The second approach would put less load on the system but raises more
+security issues... which brings us to:
+
+&gt;<i> I will also start working on the security of the registry, which will
+</I>&gt;<i> work in a way similar to Java's security overall - that is, a CodeBase
+</I>&gt;<i> object is the group, a Class is the user, etc.
+</I>
+If you look in java.security.* and java.security.acl.* there are
+concepts such as users, groups and ACLs. I just spent the weekend
+writing implementations of these interfaces and sketching out a user
+model and security model for JOS. This came about because my ftp server
+(org.jos.services.ftp.server) and Peter Schuller's pop server
+(org.jos.services.pop.server) require a user model to support user
+accounts, user authentication and user authorization. These are
+available from CVS in the jos/library module.
+
+The security classes have not been checked in yet, and I will start a
+discussion about various design issues before I commit them to CVS.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000009.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+	<LI> Next message: <A HREF="000011.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#10">[ date ]</a>
+              <a href="thread.html#10">[ thread ]</a>
+              <a href="subject.html#10">[ subject ]</a>
+              <a href="author.html#10">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

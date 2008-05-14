@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000516.html">
+   <LINK REL="Next" HREF="000511.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Fri, 28 Apr 2000 13:58:36 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000516.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000511.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#518">[ date ]</a>
+              <a href="thread.html#518">[ thread ]</a>
+              <a href="subject.html#518">[ subject ]</a>
+              <a href="author.html#518">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	w.r.t. to the ownership of JavaProcess objects, it has occured to
+me that we could do things the UNIX way.  getJavaProcess() does not return
+the process object used by the VM, but an object wrapping a pid with
+whatever functions we feel are appropriate.  With the process identified
+with a by-value variable (e.g. the pid), we don't have to worry about who
+owns what; we just return the pid by-value, or create a new pid wrapper
+every time getJavaProcess() is called.  (&quot;Those who forget UNIX are doomed
+to re-write it, poorly.&quot;)  UNIX uses the magic-number principle for
+(AFAIK) every object (a socket, a file, a process, etc) for everything
+returned to userspace by the kernel.  With this in hand, we can code
+multiple java processes without having to decide if/how we handle the
+general case of shared objects.  This is, BTW, an adaptation of Gilbert's
+proxy idea, where don't have to concern ourselves with any problems or
+limitations which may arise in the general case.
+
+-_Quinn
+
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000516.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000511.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#518">[ date ]</a>
+              <a href="thread.html#518">[ thread ]</a>
+              <a href="subject.html#518">[ subject ]</a>
+              <a href="author.html#518">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

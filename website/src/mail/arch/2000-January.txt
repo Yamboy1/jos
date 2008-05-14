@@ -1,0 +1,1768 @@
+From gchii@mindspring.com Sat, 01 Jan 2000 10:49:27 -0500
+Date: Sat, 01 Jan 2000 10:49:27 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Alt Packages
+
+Here is a summary of the "alt" packages procedure, one step at a time.
+
+1. Download source code from the classpath project. Connect to their CVS
+using the anonymous name and password. Instructions are found on their
+website <URL:http://www.classpath.org/>
+
+2. Write a program to copy source code from classpath to alt, modifying
+package and import statements along the way:
+
+java.applet -> alt.applet.2
+java.awt -> alt.awt.2
+java.awt.image -> alt.awt.2.image
+java.awt.peer -> alt.awt.2.peer
+java.awt.peer.gtk -> org.classpath.gtkpeer.2
+java.bean -> alt.bean.2
+java.io -> alt.io.2
+java.lang -> alt.lang.2
+java.math -> alt.math.2
+java.net -> alt.net.2
+java.sql -> alt.sql.2
+java.util -> alt.util.2
+
+3. Create a project file (or use bulkmake).
+
+4. Compile all source code into .class files.
+
+
+
+
+From R.Argentini@student.tudelft.nl Sun, 02 Jan 2000 17:05:43 +0100
+Date: Sun, 02 Jan 2000 17:05:43 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Arch] New JEPS TcpIp stack version 0.001c
+
+I have a new version of the stack up that sort of replies to pings
+(ICMP_ECHO_RQ).
+You can get it at the same place as always: http://villa28.cs.kpn.cx/jos/
+
+More information on the wiki topic "JEPS".
+
+RanieriArgentini
+
+
+
+From R.Argentini@student.tudelft.nl Mon, 03 Jan 2000 19:17:25 +0100
+Date: Mon, 03 Jan 2000 19:17:25 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Arch] MILESTONE! Jeps 0.001e Runs Javasoft Tutorial UDP Server!!
+
+Hello all!
+
+It is with great pleasure that i announce to all of you on the arch and
+kernel lists that my stab at an IP Stack in Java finally actually does
+something. As most of you probably already know UDP is a very simple
+protocol built on top of IP, that provides little extra features besided
+port numbers and being accessible from userspace. It was therefore not
+extremely difficult to implement rudimental UDP into JEPS once i had IP and
+ICMP sort of working.
+
+Next i started implementing clones of selected methods of some java.net
+classes in order to get sample programs to run on JEPS, and to my surprise
+it worked rather well.
+
+Incorporated into release 0.001e of JEPS is the example UDP server program
+"QuoteServer"
+(http://java.sun.com/docs/books/tutorial/networking/datagrams/clientServer.h
+tml) that replies to UDP packets on a certain port with a quote extracted
+from a file, or the current time if this file is unavailable. The
+QuoteServerThread class has been modified only slightly to fit into JEPS
+and works, as far as have been able to tell, perfectly. 
+I urge you all to give it a little more perusal :)
+
+You can get the JEPS Stack's latest version from
+http://villa28.cs.kpn.cx/jos/ as usual, or refer to the TCPIPStack and JEPS
+topics on the WIKI-web.
+
+Ranieri Argentini
+
+
+
+
+
+From gchii@mindspring.com Mon, 03 Jan 2000 10:51:09 -0500
+Date: Mon, 03 Jan 2000 10:51:09 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Alt Packages
+
+At 05:46 PM 1/1/00 -0500, digigod@earthling.net wrote:
+>wouldn't alt.awt.peer.2 make more sense?
+
+There are at least three products called "AWT". It is most difficult to
+undo this kind of mistake. I would like to think of them as "AWT for Java 0
+Platform", "AWT for Java 1 Platform" and "AWT for Java 2 Platform".
+
+Why do I think about "peer" as a subpackage of "alt.awt2"? Because each
+implementation of "peer" is closely associated with a specific
+implementation of "AWT". Since each AWT has a different number of packages,
+my proposal is this:
+
+AWT for Java 0 Platform:
+alt.awt0=java.awt
+alt.awt0.image=java.awt.image
+alt.awt0.peer=java.awt.peer
+
+AWT for Java 1 Platform:
+alt.awt1=java.awt
+alt.awt1.datatransfer=java.awt.datatransfer
+alt.awt1.event=java.awt.event
+alt.awt1.image=java.awt.image
+alt.awt1.peer=java.awt.peer
+alt.awt1.print=java.awt.print
+
+AWT for Java 2 Platform:
+alt.awt2=java.awt
+alt.awt2.datatransfer=java.awt.datatransfer
+alt.awt2.event=java.awt.event
+alt.awt2.image=java.awt.image
+alt.awt2.peer=java.awt.peer
+alt.awt2.print=java.awt.print
+:
+etc.
+
+The alt.* packages are not intended to fix all namespace mistakes. You are
+correct. "alt.awt2.peer" does not make sense to enlightened folks. If we
+were dealing with a brand new design, I might have used something like this:
+
+alt.datatransfer2=java.awt.datatransfer
+alt.event2=java.awt.event
+alt.image2=java.awt.image
+alt.peer2=java.awt.peer
+alt.print2=java.awt.print
+
+Event-driven programs, for example, are not the exclusive domain of visual
+applications. We know this from the event-driven device drivers for JOS.
+Therefore, the event package should not have been tied exclusively to the AWT.
+
+The print package is obviously non-visual (right?). Since AWT components
+can be used for printing, AWT has itself become something where visual is
+optional.
+
+-----
+
+Like you said earlier, we can't use "2" as a package name. And why not?
+Because a javac tool refuses to compile any package in a directory called
+"2". I tried to compile a package called "2" to see what might happen. It
+did not work at all. Package names, like other identifiers, must start with
+a letter (A-Z, a-z) or an underscore.
+
+My most-recently-used platform-map.ini file looks something like this:
+
+[java2-map]
+alt.applet2=java.applet
+alt.awt2=java.awt
+alt.awt2.datatransfer=java.awt.datatransfer
+alt.awt2.event=java.awt.event
+alt.awt2.image=java.awt.image
+alt.awt2.peer=java.awt.peer
+alt.awt2.print=java.awt.print
+alt.beans2=java.beans
+alt.beans2.beancontext=java.beans.beancontext
+alt.beans2.editors=java.beans.editors
+alt.beans2.info=java.beans.info
+alt.io2=java.io
+alt.io2.decode=java.io.decode
+alt.io2.encode=java.io.encode
+alt.lang2=java.lang
+alt.lang2.ref=java.lang.ref
+alt.lang2.reflect=java.lang.reflect
+alt.locale2=java.locale
+alt.math2=java.math
+alt.net2=java.net
+alt.security2=java.security
+alt.security2.acl=java.security.acl
+alt.security2.cert=java.security.cert
+alt.security2.der=java.security.der
+alt.security2.interfaces=java.security.interfaces
+alt.security2.provider=java.security.provider
+alt.security2.spec=java.security.spec
+alt.security2.util=java.security.util
+alt.sql2=java.sql
+alt.text2=java.text
+alt.util2=java.util
+
+-----
+
+These classes seems to be part of the core:
+
+java.lang.Object
+java.lang.Class
+java.lang.ClassLoader
+java.lang.Throwable
+java.lang.Exception
+java.lang.RuntimeException
+
+java.lang.String is part of the core because it is a final class. And yet,
+it has changed in incompatible ways from one platform to the next.
+
+We must not confuse "important" with "necessary". How do we determine if a
+class is part of the core or not? Is it possible to run a virtual machine
+without it.
+
+There is nothing inherent in a virtual machine that requires a network. The
+java.net.* package is not required by a virtual machine; it is not part of
+the true core. Just as a command line (CL) program might never use
+java.awt, many programs might never use java.net. The java.net package is
+important to us as network application programmers. It is not important to
+a stand-alone application.
+
+Let me put it another way. Sun Microsystems could have easily implemented a
+network package in javax.net and distributed it with every Java Virtual
+Machine. A program that needs Sun Microsystems' network package could have
+used javax.net.
+
+We can implement network packages in alt.net0, alt.net1 and alt.net2 and
+distribute these packages with every virtual machine. Any program that
+needs network support can use alt.net0, alt.net1 and alt.net2.
+
+
+
+
+From gchii@mindspring.com Tue, 04 Jan 2000 11:14:32 -0500
+Date: Tue, 04 Jan 2000 11:14:32 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Alt Packages
+
+At 12:24 AM 1/4/00 -0500, digigod@earthling.net wrote:
+>why not just:
+>alt.java0.*
+>alt.java1.*
+>alt.java2.*?
+
+A version-less virtual machine is a direct consequence of the "run
+anywhere" dream. An alternative namespace is a direct consequence of a
+version-less virtual machine.
+
+Many problems in the Java platform today are a direct consequence of
+incompatible "platforms", or vm versioning. True platform independence
+comes from perfect backward compatibility. Unfortunately, the java.* and
+javax.* namespace have been misused. The javax.* namespace has been
+mistakenly used two completely different purposes.
+
+Sun Microsystems had the perfect opportunity. If Sun Microsystems did the
+right thing, this conversation would not be required. They could have
+created a version-less virtual machine. They could have kept javax.* for
+its original purpose (as their personal alternative namespace) instead of
+mangling it for standard extensions to the Java class libraries.
+
+1. An alternative namespace is necessary to develop classes that are
+(eventually) copied to the java.* namespace. This is alt.*.
+
+2. Another namespace must be reserved and managed for the development of
+industry-standard mostly-bytecode extensions to the core Java libraries.
+This is javax.*.
+
+Package names are critical to the success of the alternative namespace.
+While I hoped Sun Microsystems would embrace javax.* as the alternative
+namespace for Java class libraries, they have rejected it in practice.
+While Sun Microsystems promised write once and run anywhere, the ability to
+write and run a Java 0 Platform application has been seriously undermined
+by Sun since the introduction of JDK 1.1.0.
+
+I do not want anyone to think that the alternative namespace is controlled,
+managed, implemented or designed by Sun Microsystems. "java0" looks too
+much like "javax". A generalization of "java0", "java1" and "java2" would
+be java[n] (or java[x]).
+
+I am trying to put distance between our alternative and a specification
+dictated by Sun Microsystems. By calling it alt.awt2, it should be less
+likely to get our classes confused with packages from Sun Microsystems.
+
+ - Our alternative namespace is a mechanism, an approach, a procedure, in
+which we can build and test classes for a bytecode virtual machine. It is a
+stepping stone. Through the experience of the alternative namespace, we can
+methodically prove the strengths and weakness of both bytecode technology
+in general and bytecode storage in package-sized units.
+
+ - Our alternative namespace is neither a direct implementation of the Java
+Language Specification nor Java Virtual Machine specification. It is a
+means to an end.
+
+ - Our alternative namespace is not "Java", does not contain "Java", and
+should not be confused with a Java "standard" library.
+
+Each alternative package is a stand-alone and fully functional class
+library. It can be used as-is, fully compatible with an off-the-shelf Java
+Virtual Machine. Down the road, we might use it as the basis for a clone of
+the Java standard library.
+
+-----
+
+Package names are critical to the adoption of class libraries by other
+programmers. Demand for "pure" Java includes the mistaken idea that a Java
+application must depend only on classes in the java.* namespace.
+
+When programmers know that all these packages are built and endorsed by Sun
+Microsystems, they are reassured when a package is part of the java.*
+namespace. They are generally uncomfortable with an application that
+depends on class libraries that are "non-standard", or outside the java.*
+namespace.
+
+It is unfortunate and cruel for Java programmers to suffer the effects of
+three incompatible implementations of the java.* namespace. "Run anywhere"
+is a direct victim of three incompatible implementations of java.*. Sun
+promised compatibility.
+
+By strict interpretation of the package-naming convension, our alternative
+class libraries should be called:
+
+org.jos.alt.platform[n]
+
+where java.awt corresponds to
+
+org.jos.alt.platform0.awt,
+org.jos.alt.platform1.awt, and
+org.jos.alt.platform2.awt
+
+In an attempt to make the alternative namespace "bigger" than the JOS
+Project, java.awt corresponds to
+
+alt.platform0.awt,
+alt.platform1.awt, and
+alt.platform2.awt
+
+It was my desire to develop different packages side-by-side. By further
+reduction, java.awt corresponds to
+
+alt.awt0,
+alt.awt1, and
+alt.awt2
+
+Optimally, I would prefer to use a standard pre-processor to compile
+alternative packages into the alt.* namespace. In other words, the
+single-source for all three versions of the AWT would be found in
+
+./common/alt/awt
+
+and three passes of the compiler, one for each platform, would produce
+these three packages:
+
+alt.awt0,
+alt.awt1, and
+alt.awt2
+
+-----
+
+>we should use [package].v[x-x-x] for tech versions and [package].d[x[y]] for
+>distribution versions; but what I said above for alt.*.
+
+In general, I would develop a product with its own name and independent
+version numbers.
+
+And yet, "AWT 1.0" should not be our first version of three AWT clones.
+Many programmers would prefer a direct association between the name of the
+clone and its original implementation. Since one versions of the AWT has
+been developed for each Java "platform", it is consistent to say "AWT for
+Java 0 Platform", "AWT for Java 1 Platform" and "AWT for Java 2 Platform".
+The logical package name for our completely finished, tested and
+distributed clone of "AWT for the Java 0 Platform" should be:
+
+ - alt.awt0
+ - alt.awt.v0
+ - alt.awt.platform0, or
+ - alt.platform0.awt
+
+A physical package name is actually implemented. A physical package name
+for "AWT for the Java 0 Platform" prototype might be:
+
+gchii.awt0a-1
+
+or
+
+digigod.awt.v0.d1
+
+The name of a prototype is non-essencial. Only the name of the target,
+production package is a matter of compromise and cooperation. As a
+programmer, you must be willing (and able) to use a package name before you
+compile it into your programs.
+
+While I am willing to use three different versions of the Abstract
+Windowing Toolkit, I am unable. The Java Virtual Machine specification
+won't let me because they are all called by the same physical package name.
+
+While I am able to use JFC/Swing when it is called com.sun.swing or
+java.awt.swing, I am unwilling. I am working to invoke an identical
+mostly-bytecode application on all three Java platforms. I want all of the
+benefits of a "run anywhere" environment. I want the dream of "run
+anywhere" to come true.
+
+-----
+
+We must repeatedly attempt to implement "AWT for the Java 0 Platform",
+causing multiple, concurrent distributions, until it's good enough, or we
+get it "right". And yet, we do not want to recompile every application that
+uses "AWT for the Java 0 Platform" after each distribution. While the
+implementation might change, the API/framework must remain stable.
+
+Selecting one distribution among many is what classpath is for. A
+distribution is only a snapshot. Adding "distribution" to a package name
+would require a programmer to rename all classes and recompile all
+applications that depend on those classes with each distribution.
+
+When you put distribution in a package name, you have gone too far. I have
+never used "distribution" in a package name. I am unable (and unwilling) to
+use two different distributions of a package simultaneously in a virtual
+machine.
+
+A "version" or "prototype" of a package is different. I can use two
+versions of a package simultaneously in a virtual machine. Instead of a
+secret namespace, I use a "release" (or version[prototype]) in a package name.
+
+I created at least five distributions of the Smart API - Release 2a
+product. The critical package is called org.jos.smartapi2a in every case.
+The API/framework has remained stable. Following my own Smart API Proposal,
+all public classes, public and protected methods, public fields cannot be
+altered without changing a physical package name. I can independently
+improve the Smart API subsystem without recompiling any application that
+depends on it.
+
+Even the name of the archive is smartapi2a.jar in every case. I can
+"upgrade" to a new smartapi2a.jar without changing any shell script that
+depends on it.
+
+
+
+
+From gchii@mindspring.com Tue, 04 Jan 2000 11:45:36 -0500
+Date: Tue, 04 Jan 2000 11:45:36 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Alt Packages - Status
+
+What we call a class is important, critical when the alternative packages
+are used in mostly-bytecode applications. Once a package has been used in
+an application, we should not rename it.
+
+I am also concerned with creating classes that work. My attempt to copy
+source code from the Classpath Project in bulk has not been successful. I
+was hoping that 90-95% of the code would compile and run. I hoped to add
+all the classes and then remove the classes that gave me trouble. This is
+taking far too long.
+
+Today, I am taking a different approach. I'm going to add one class at a
+time. In other words, I am going to approach this as if I wrote each class
+by hand. Starting with a short list of classes from the Java 0 Platform, I
+am adding them to the alt.* namespace along with brand new test programs.
+
+Like extreme programming, all classes will be compiled without error each
+day. Classes that have been compiled can be tested and used.
+
+Where I might have used a class in java.util, I'll start using a class from
+alt.platform0.util, alt.platform1.util, alt.platform2.util whenever I can.
+
+Question: Why should I implement all three?
+
+alt.util0.Enumeration,
+alt.util1.Enumeration, and
+alt.util2.Enumeration
+
+Answer: The alt.* packages are future oriented. It is possible that each of
+these classes might have different methods and fields. While Enumeration is
+identical for the first three Java platforms, there is no guarantee that
+Java 3, 4 and 5 Platforms will even implement a class called Enumeration.
+Who knows what its methods and fields will be?
+
+
+
+
+From gchii@mindspring.com Tue, 04 Jan 2000 21:13:21 -0500
+Date: Tue, 04 Jan 2000 21:13:21 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] run:main: sub-scheme
+
+Within Smart API, the run:main: sub-scheme corresponds to the main()
+method. Of course, a main() method is a public static void main( String[] )
+method.
+
+The MainProgramController implements a run:main: sub-scheme. In a clever
+twist, this controller uses run:program: to invoke MainProgram. In turn,
+MainProgram uses practical reflection to invoke any class which implements
+a main() method.
+
+Unfortunately, this was not working correctly in Distribution 5 of Smart
+API - Release 2a. It is fixed for the next distribution.
+
+-----
+
+For example, the CommandLineBrowser class implements a main() method. To
+start the CommandLineBrowser, use the following URI:
+
+run:main:org.jos.gchii.commandlinebrowser1a.CommandLineBrowser
+
+The java tool equivalent is:
+
+java org.jos.gchii.commandlinebrowser1a.CommandLineBrowser
+
+-----
+
+To pass parameters (arguments) to main(), a URI uses a syntax like this:
+
+run:main:org.jos.gchii.browser1b.UniversalBrowser?http://www.jos.org/
+
+The java tool equivalent is:
+
+java org.jos.gchii.browser1b.UniversalBrowser http://www.jos.org/
+
+-----
+
+The experimental command-line browser uses AWT components for its virtual
+console, which the virtual console is under construction. I would like to
+use a command-line browser on Linux and across a TELNET connection. I would
+like to use a command-line browser like I use an MS-DOS Box on Windows 95.
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Wed, 5 Jan 2000 10:47:01 +0100
+Date: Wed, 5 Jan 2000 10:47:01 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Arch] Jeps 0.001e doesn't compile!
+
+Hi all,
+I've downloaded Jeps 0.0001e and I've tryed to compile it but I got some errors!
+In particular, the jos.platform.driver.Device was not found. By looking into
+JJOS/common/bytecode/jos/platform/driver I've found it empty! What's happened ?
+Is it my CVS image damaged or has the classes been removed from CVS server ?
+
+Any suggestion ?
+
+Cheers,
+Corrado
+
+On Wed, 05 Jan 2000, you wrote:
+> 
+> Hello all!
+> 
+> It is with great pleasure that i announce to all of you on the arch and
+> kernel lists that my stab at an IP Stack in Java finally actually does
+> something. As most of you probably already know UDP is a very simple
+> protocol built on top of IP, that provides little extra features besided
+> port numbers and being accessible from userspace. It was therefore not
+> extremely difficult to implement rudimental UDP into JEPS once i had IP and
+> ICMP sort of working.
+> 
+> Next i started implementing clones of selected methods of some java.net
+> classes in order to get sample programs to run on JEPS, and to my surprise
+> it worked rather well.
+> 
+> Incorporated into release 0.001e of JEPS is the example UDP server program
+> "QuoteServer"
+> (http://java.sun.com/docs/books/tutorial/networking/datagrams/clientServer.h
+> tml) that replies to UDP packets on a certain port with a quote extracted
+> from a file, or the current time if this file is unavailable. The
+> QuoteServerThread class has been modified only slightly to fit into JEPS
+> and works, as far as have been able to tell, perfectly. 
+> I urge you all to give it a little more perusal :)
+> 
+> You can get the JEPS Stack's latest version from
+> http://villa28.cs.kpn.cx/jos/ as usual, or refer to the TCPIPStack and JEPS
+> topics on the WIKI-web.
+> 
+> Ranieri Argentini
+> 
+> 
+> 
+> _______________________________________________
+> Arch maillist  -  Arch@jos.org
+> http://jos.org/mailman/listinfo/arch
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Wed, 5 Jan 2000 08:21:46 -0500 (EST)
+Date: Wed, 5 Jan 2000 08:21:46 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Jeps 0.001e doesn't compile!
+
+> I've downloaded Jeps 0.0001e and I've tryed to compile it but I got some errors!
+> In particular, the jos.platform.driver.Device was not found. By looking into
+> JJOS/common/bytecode/jos/platform/driver I've found it empty! What's happened ?
+> Is it my CVS image damaged or has the classes been removed from CVS server ?
+
+	All of the platform/driver code has been moved to arch/*/bytecode
+to allow for architecture-specific code; cvs update will need the create
+directory and purge empty options to make things synch up right.  (-p -D
+or -P -d, I forget which.)
+
+-_Quinn
+
+
+
+
+
+From gchii@mindspring.com Wed, 05 Jan 2000 11:17:55 -0500
+Date: Wed, 05 Jan 2000 11:17:55 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Coming Soon: Smart API - Release 2a - Distribution 6
+
+Distribution 6 of Smart API - Release 2a is coming soon. It is part of JOS
+Distribution 1e.
+
+Get ready to take the Universal Browser for another test drive. With the OS
+program controller, it puts "Universal" back in the Universal Browser. It
+is nothing short of spectacular!
+
+The Program Browser can run all these kinds of programs:
+
+Java applications (run:main:)
+JOS Programs (run:program:)
+José Programs (run:jose:)
+native OS programs (run:os:)
+
+Here is how you get native OS programs in a mostly-bytecode shell.
+
+1. The Universal Browser uses the Program Browser.
+2. The Program Browser uses the Smart API.
+3. The Smart API uses the all-new OSProgramController class.
+4. The OSProgramController class converts run:os:somecommand to
+run:program:org.jos.gchii.osprogram1a.OSProgram?cmd=somecommand
+5. The OSProgram class uses java.lang.Process to start a native program and
+redirect its output to a console.
+
+-----
+
+Run Java tools:
+
+java tool - run:os:java someclass
+javah tool - run:os:javah -jni someclass
+jar tool - run:os:jar cvf somejar somefile
+javadoc tool - run:os:javadoc -classpath somedirectory somepackage
+
+-----
+
+Run eric tool - run:os:eric
+Run miniserver tool - run:os:minisrv
+
+-----
+
+About Windows(tm)
+
+The run:os: subscheme is a prefix to a Windows(tm) command line. The
+standard output is redirected to the browser's console.
+
+Windows Explorer - run:os:explorer
+Notepad - run:os:notepad
+Registry Editor - run:os:regedit
+Telnet - run:os:telnet
+HTML Browser - run:os:start index.html
+batch files - run:os:start somefile.bat
+
+-----
+
+About Linux(r)
+
+The run:os: subscheme is a prefix to a Linux(r) command line. The standard
+output is redirected to the browser's console.
+
+ls - run:os:ls
+tar - run:os:tar -xvzf somearchive.tgz
+cat - run:os:cat somefile
+find - run:os:find -name somefile
+
+-----
+
+The run: scheme is not just interactive. Embed it in your mostly-bytecode
+applications to run other programs.
+
+ - Redirect output to a file.
+ - Run other programs within a script (batch mode).
+ - Run other programs, including CGI scripts, from within a Java servlet.
+
+-----
+
+About desktop
+
+Create a custom desktop with buttons for your favorite commands. The
+Desktop Browser supports all kinds of schemes, including the new run:os:
+scheme. Create a desktop file with links to both bytecode and native OS
+programs.
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Wed, 5 Jan 2000 20:06:14 +0100
+Date: Wed, 5 Jan 2000 20:06:14 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Arch] More Trouble with jeps!
+
+Hi all, Hi Ranieri,
+I've put in the right directory the Device.java provided by Hilary and the java
+part compiles well. However I have some problems with the native part
+(EtherHostDriver.c). In particular, as I'm using linux 5.3 (mandrake), it seems
+to not recognize the struct sockaddr_ll and the constant PACKET_HOST. Ranieri,
+any suggestion ? Have you used the sample code provided by Stevens (in
+Internetworking with TCP/IP) to open a socket in raw mode ?
+
+Bye,
+  Corrado.
+
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From R.Argentini@student.tudelft.nl Thu, 06 Jan 2000 16:11:33 +0100
+Date: Thu, 06 Jan 2000 16:11:33 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Arch] More Trouble with jeps!
+
+>I've put in the right directory the Device.java provided by Hilary and the
+java
+>part compiles well. However I have some problems with the native part
+>(EtherHostDriver.c). 
+
+I should start out by saying that this hardly surprises me as i throwed the
+native part together fairly rapidly in order to get onto the "real stuff" :\
+As far as i know using the PF_PACKET socket and derived structs is the
+reccomended mode to obtain a raw socket connection on linux as of kernel
+2.2.xx. Some of the additional tricks i pull may need glibc 2.1 though. I
+thought that these were widespread enough that they could be assumed, at
+least in a developer community.
+If i rely on something else i'm not aware of, please someone tell me :)
+
+I know there is an older way to open sockets for raw data exchange that
+goes like this:
+
+fd=socket(AF_INET, SOCK_PACKET, htons(ETH_P_ALL));
+
+instead of
+
+packet_socket = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+
+but all the documentation on my machine suggested it was way better to use
+the newer interface. If this is a problem to many of you i suppose i could
+implement them both with a compiler directive of sorts.
+
+The offending part of code (sockaddr_ll etc.) binds the socket to a
+particular network device. I presume there should also be a
+backward-compatible way of doing that, but i would need to do more
+research. I presume it would entail using "sockaddr" instead of the
+link-level specific "sockaddr_ll".
+I fear that making a "general" unix ethhost.c would entail using libpcap
+and libnet to capture and transmit raw frames.
+
+>Ranieri, any suggestion ? 
+
+Unfortunately not right now. What are your kernel and glibc versions?
+
+>Have you used the sample code provided by Stevens (in
+>Internetworking with TCP/IP) to open a socket in raw mode ?
+
+Hmm, no. I only own volume two of the series and in this volume he uses a
+phantomatical write() function that communicates with some sort of a driver.
+Would you mind posting the relevant portion of that code? It might be
+interesting ..
+If the code is too big or anything just say so and i'll get my lazy butt
+down to the library :)
+
+Ranieri.
+
+PS: Did anyone else (besides me) get this to work? Or am i just writing
+code that will only compile on my machine? I'm using a mostly unaltered
+slackware7 with 2.2.10 and a blackdown.org 1.1.xx java sdk. Come on! I know
+that at least 13 of you have the latest version! :)
+
+
+
+
+
+From Corrado.Santoro@iit.unict.it Thu, 6 Jan 2000 16:42:36 +0100 (GMT+0100)
+Date: Thu, 6 Jan 2000 16:42:36 +0100 (GMT+0100)
+From: csanto Corrado.Santoro@iit.unict.it
+Subject: [JOS-Arch] More Trouble with jeps!
+
+On Thu, 6 Jan 2000, Ranieri Argentini wrote:
+> 
+> fd=socket(AF_INET, SOCK_PACKET, htons(ETH_P_ALL));
+> 
+> instead of
+> 
+> packet_socket = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+> 
+> but all the documentation on my machine suggested it was way better to use
+> the newer interface. If this is a problem to many of you i suppose i could
+> implement them both with a compiler directive of sorts.
+You're right, but someone (like me) could have an old version of linux,
+thus i think the code should be patched including a compiler directive (i
+have kernel 2.0.36 and glibc2.0). Anyway, tomorrow i'll try to apply the
+patch you provided in opening socket.
+> 
+> The offending part of code (sockaddr_ll etc.) binds the socket to a
+> particular network device. I presume there should also be a
+> backward-compatible way of doing that, but i would need to do more
+> research. I presume it would entail using "sockaddr" instead of the
+> link-level specific "sockaddr_ll".
+> I fear that making a "general" unix ethhost.c would entail using libpcap
+> and libnet to capture and transmit raw frames.
+> 
+.. no,no... not a "general unix" ethhost.c but, at least, a "general
+linux" one! I think that looking the source code of "tcpdump" or "sniffer"
+could help us!
+
+Cheers,
+	Corrado
+
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+
+From R.Argentini@student.tudelft.nl Thu, 06 Jan 2000 23:31:16 +0100
+Date: Thu, 06 Jan 2000 23:31:16 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Arch] More Trouble with jeps!
+
+>> but all the documentation on my machine suggested it was way better to use
+>> the newer interface. If this is a problem to many of you i suppose i could
+>> implement them both with a compiler directive of sorts.
+>You're right, but someone (like me) could have an old version of linux,
+>thus i think the code should be patched including a compiler directive (i
+>have kernel 2.0.36 and glibc2.0). Anyway, tomorrow i'll try to apply the
+>patch you provided in opening socket.
+
+The code snippet was not supposed to be a proper "patch", just an example
+of code coded "the old way". Personally i'm not sure wether supporting a
+kernel that is not even supported by Alan Cox anymore (he passed the tree
+off to a volounteer that will make the 2.0.38 patch and then it's done) is
+a wise decision, especially with 2.4.XX just around the corner (at least,
+that's what Linus keeps saying on the kernel mailing list. I know better
+than to believe him of course :)
+Either way at the moment i do not have neither a 2.0.XX kernel nor glibc
+2.0 handy, but if you get it working on your system i would be willing to
+integrate it in the codebase.
+
+All this code will get killed when we integrate into the native build
+anyway, so it actually hardly matters :)
+
+>> I fear that making a "general" unix ethhost.c would entail using libpcap
+>> and libnet to capture and transmit raw frames.
+>.. no,no... not a "general unix" ethhost.c but, at least, a "general
+>linux" one! I think that looking the source code of "tcpdump" or "sniffer"
+>could help us!
+
+I based my code on that of a sniffer found in one of the phrack issues
+(www.phrack.net). 
+BTW, i hopped by the library today but Internetworking w/ TCP/IP Vol 1 was
+already loaned out :(
+
+Ranieri.
+
+
+
+
+
+From tmiller@haverford.edu Thu, 6 Jan 2000 17:45:08 -0500 (EST)
+Date: Thu, 6 Jan 2000 17:45:08 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] More Trouble with jeps!
+
+> PS: Did anyone else (besides me) get this to work? Or am i just writing
+> code that will only compile on my machine? I'm using a mostly unaltered
+> slackware7 with 2.2.10 and a blackdown.org 1.1.xx java sdk. Come on! I know
+> that at least 13 of you have the latest version! :)
+
+	I'll try to look at this today -- and I'm also using a mostly
+stock Slack 7, so things ought to work okay.
+
+-_Quinn
+
+
+
+
+From R.Argentini@student.tudelft.nl Tue, 11 Jan 2000 10:35:15 +0100
+Date: Tue, 11 Jan 2000 10:35:15 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Arch] JEPS and the Kernels.
+
+>4. How the JEPS integrates and communicates with the kernels.
+
+Since it's the second time today i get this question fired upon me, i fear
+i have to apologise for the lacking documentation.
+At this point in time, JEPS runs as a JAVA application on top of Linux
+directly. It does not run in any of the kernels. It DOES need one of the
+interfaces from the JJOS kernel (driver.java), because i thought at the
+time this would make later integration easier. In fact this only seems to
+make things needlessly more complicated. In fact, if it bothers you just
+delete the "extends jos.arch.driver" (or something) line in the appropriate
+file, it will not impact anything else in JEPS.
+
+Again, i'd like to apologise to all for the lack of clarity in this matter.
+Perhaps its time to redo JEPS docs :)
+
+BTW: Work upon JEPS continues. Yesterday i have actually gotten the thing
+to route packets according to a configurable route table, including
+gateways, default route etc.
+JEPS cannot act as a gateway yet, and it probably will be a while cause my
+current network topology does not allow me to test it other than with a
+"dummy" (fake) network. This is not in violation of any RFC (in fact,
+packet forwarding is optional and must default to OFF) just look at win9x!
+The two big features left to implement in the IP layer are
+fragmenting/reassembly and multicasting. They are both required by RFC 1122
+iirc.
+
+
+
+
+
+From theguys@bigwhat.com Tue, 11 Jan 2000 09:21:37 -0500 (EST)
+Date: Tue, 11 Jan 2000 09:21:37 -0500 (EST)
+From: theguys@bigwhat.com theguys@bigwhat.com
+Subject: [JOS-Arch] Your link has been added
+
+Thank you for adding your site to the BigWhat.com search engine. The web's coolest, and ONLY INDEPENDENT, AND 100% USER EDITABLE SEARCH ENGINE located at:
+http://www.bigwhat.com
+THAT'S RIGHT, FINALLY YOU CONTROL YOUR OWN LISTING IN A SEARCH ENGINE!
+
+MAKE SURE YOU KEEP THIS EMAIL SOMEPLACE SAFE!
+It contains your site ID for your site's listing in the search engine and YOU CAN CHANGE YOUR OWN LISTING ANY TIME YOU WANT by visting
+http://www.bigwhat.com
+and clicking "Update URL"
+
+If you own other sites, feel free to index them as well by visiting
+http://www.bigwhat.com
+and clicking on "Add URL"
+
+--------------------------------------------------
+PLEASE KEEP THIS INFORMATION, YOU WILL NEED IT TO MODIFY YOUR
+LISTING!
+For Your Records, your listing at bigwhat.com is as follows:
+--------------------------------------------------
+   Site ID     : 947600634
+   Site Name   : JOS - A Free Java Based Operating System
+   Site Addr   : http://www.jos.org/  
+   Category    : General
+   Sub Category: 
+   Description : JOS - A Free Java Based Operating System A Free Java? Based Operating System Home Go: Organization Getting Started About JOS The JOS Charter Constitution Policy Book The Goal Getting Involved Member List FAQ News Press Info Products Getting Started JOS Applications Utilities Games Source Development
+   Search Terms: jos,,java,,project,,system,,getting,,operating,,list,,started,,available,,november,,webmaster,,visit,,download,,page,,mailing,,free,,want,,based,,api,,about,,org,,utilities,,source,,lists,,status,,constitution,,games,,applications,,involved,,info,,news,,get,,kernel,,now,,sponsor,,tar,,announcement,,code,,members,,many,,international,,site,,josdistribution1d,,initial,,smart,,support,,wiki,,web,,changes,,events
+--------------------------------------------------
+
+Should you need to change your listing at any time....MAKE SURE YOU KEEP
+THIS EMAIL! It contains your site ID for your site listing in the search
+engine and you can change your listing any time you want to by visting
+
+http://www.bigwhat.com
+
+and entering your Site ID number (shown above)
+
+One of the free things we have to offer you, in addition to your free listing, is a chance to have your site voted on by your visitors, to be considered one of the Top 25 listings in its category, 
+General :: . 
+Not only will you get listed,
+but you'll have the opportunity to get TONS of extra traffic because you'll get a top listing under the Top 25 sites in your category!
+
+Simply place the following HTML code on your home page to begin the voting process:
+
+<center>
+<A HREF="http://www.bigwhat.com/cgi-bin/jsearch/vote.cgi?ID=947600634"><IMG SRC="http://www.bigwhat.com/images/top50.jpg" BORDER="0"></A><br>Vote
+For This Site!
+</center>
+
+Note, we may contact you to check on the success of your listing with us, as well as to let you know of opportunities which can help your
+web based business or site grow, so keep an eye out for all the great things to come!
+
+The BigWhat.com Search Engine Team!
+theguys@bigwhat.com
+Silicon Digital Industries Inc.
+941-792-7942 
+Customer Service Office 10am to 5pm EST
+
+
+
+
+From tmiller@haverford.edu Tue, 11 Jan 2000 11:59:38 -0500 (EST)
+Date: Tue, 11 Jan 2000 11:59:38 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] (no subject)
+
+> Can somebody on the JOS site please direct me to any documentation regarding
+> the architecture of the JOS ???
+
+	There is none (that I know of), except that mailing list archives
+(maybe) and the source.
+
+> 1. Architecture of the JVM Ivery briefly will also do).
+
+	Subject to change.
+
+> 2. The kernel , what it is based on , Linux, etc.
+
+	We have two builds right now, one running as a normal application
+under linux, and the other using the jJOS kernel (in the source).
+
+> 3. What interfaces are available to the kernel.
+
+	jos.system.machine is about it for now, though the native code can
+do whatever it wants.  (e.g. call kernel functions)
+
+-_Quinn
+
+
+
+
+From R.Argentini@student.tudelft.nl Sat, 15 Jan 2000 14:29:55 +0100
+Date: Sat, 15 Jan 2000 14:29:55 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Arch] New JEPS release, multiple interfaces and routing.
+
+I just put up the current JEPS code.
+
+It includes a number of improvements in the IP and ARP category as well as
+incipient error signalling through exceptions (really needed that!). Please
+check it out :)
+Plans for the immidiate future are mainly fragmentation and reassembly as
+they are a fundamental part of the IP protocol.
+
+I suppose i could move JEPS development onto the CVS in order to be able to
+share access with ppl on a more dynamic basis. What do you guys think? How
+would i go about in doing this?
+
+How's the progress on native ne2000 drivers coming along? Is anyone
+bothering with it yet?
+If we get them even half working i'm willing to try the port, just to see
+if it works.
+
+I have a good feeling about this .. It might not end up to be the fastest
+stack in the block, but  i think we are going to be able to make it
+compliant to all the internet host requirements eventually.
+
+Ranieri Argentini
+
+
+
+From bmark@crosswinds.net Mon, 17 Jan 2000 02:13:04
+Date: Mon, 17 Jan 2000 02:13:04
+From: bmark@crosswinds.net bmark@crosswinds.net
+Subject: [JOS-Arch] laser printer toner advertisement
+
+
+
+
+
+BENCHMARK SUPPLY
+7540 BRIDGEGATE COURT
+ATLANTA GA 30350
+
+***LASER PRINTER TONER CARTRIDGES***
+***FAX AND COPIER TONER***
+
+WE ACCEPT GOVERNMENT, SCHOOL & UNIVERSITY PURCHASE ORDERS
+JUST LEAVE YOUR PO # WITH CORRECT BILLING & SHIPPING ADDRESS
+
+ 
+   CHECK OUT OUR NEW CARTRIDGE PRICES :
+ 
+
+APPLE 
+ 
+  LASER WRITER  PRO 600 OR 16/600         $69
+  LASER WRITER SELECT 300,310.360         $69
+  LASER WRITER 300, 320                   $54 
+  LASER WRITER LS,NT,2NTX,2F,2G & 2SC     $54 
+  LASER WRITER 12/640                     $79 
+
+HEWLETT PACKARD 
+
+  LASERJET SERIES 2,3 & 3D (95A)          $49 
+  LASERJET SERIES  2P AND 3P (75A)        $54 
+  LASERJET SERIES 3SI AND 4SI (91A)       $75 
+  LASERJET SERIES 4L AND 4P               $49 
+  LASERJET SERIES 4, 4M, 5, 5M, 4+ (98A)  $59 
+  LASERJET SERIES 4000 HIGH YIELD  (27X)  $99 
+  LASERJET SERIES 4V                      $95 
+  LASERJET SERIES 5SI , 8000              $95 
+  LASERJET SERIES 5L AND 6L               $49 
+  LASERJET SERIES 5P, 5MP, 6P, 6MP        $59 
+  LASERJET SERIES 5000 (29A)             $135
+  LASERJET SERIES 1100 (92A)              $49 
+  LASERJET SERIES 2100 (96A)              $89
+  LASERJET SERIES 8100 (82X)		 $145
+
+
+HP LASERFAX 
+
+  LASERFAX 500, 700, FX1,                 $59 
+  LASERFAX 5000, 7000, FX2,               $59 
+  LASERFAX  FX3                           $69 
+  LASERFAX  FX4                           $79 
+ 
+
+LEXMARK 
+
+  OPTRA  4019, 4029  HIGH YIELD          $135 
+  OPTRA R, 4039, 4049 HIGH YIELD         $135 
+  OPTRA S 4059 HIGH YIELD                $135 
+  OPTRA E                                 $59 
+  OPTRA  N                               $115 
+ 
+
+EPSON 
+
+  EPL-7000, 8000                         $105 
+  EPL-1000, 1500                         $105 
+ 
+
+CANON 
+
+  LBP-430                                 $49 
+  LBP-460, 465                            $59 
+  LBP-8 II                                $54 
+  LBP-LX                                  $54 
+  LBP-MX                                  $95 
+  LBP-AX                                  $49 
+  LBP-EX                                  $59 
+  LBP-SX                                  $49 
+  LBP-BX                                  $95 
+  LBP-PX                                  $49 
+  LBP-WX                                  $95 
+  LBP-VX                                  $59 
+  CANON FAX L700 THRU L790 FX1            $59 
+  CANONFAX L5000 L70000  FX2              $59 
+ 
+
+CANON COPIERS 
+
+  PC 20, 25 ETC....                       $89 
+  PC 3, 6RE, 7, 11  (A30)                 $69 
+  PC 320 THRU 780  (E40)                  $89 
+ 
+
+NEC 
+
+  SERIES 2 LASER MODEL 90,95             $105
+
+
+PLEASE NOTE:
+
+1) ALL OUR CARTRIDGES ARE GENUINE OEM CARTRIDGES.
+2) WE DO NOT SEND OUT CATALOGS OR PRICE LISTS 
+3) WE DO NOT FAX QUOTES OR PRICE LISTS.  
+4) WE DO NOT SELL TO RESELLERS OR BUY FROM DISTRIBUTERS
+5) WE DO NOT CARRY: BROTHER-MINOLTA-KYOSERA-PANASONIC PRODUCTS
+6) WE DO NOT CARRY: XEROX-FUJITSU-OKIDATA OR SHARP PRODUCTS
+7) WE DO NOT CARRY ANY COLOR PRINTER SUPPLIES    
+8) WE DO NOT CARRY DESKJET/INKJET OR BUBBLEJET SUPPLIES
+9) WE DO NOT BUY FROM OR SELL TO RECYCLERS OR REMANUFACTURERS
+
+   
+               
+
+****OUR  ORDER LINE IS 770-399-0953 ****
+
+****OUR CUSTOMER SERVICE  LINE IS 800-586-0540****
+****OUR E-MAIL REMOVAL AND COMPLAINT LINE IS 888-494-8597****
+
+****PLACE YOUR ORDER AS FOLLOWS**** :
+
+BY PHONE   770-399-0953 
+
+BY FAX:    770-698-9700 
+BY MAIL:   BENCHMARK PRINT SUPPLY
+           7540 BRIDGEGATE COURT
+,          ATLANTA GA 30350
+
+MAKE SURE YOU INCLUDE THE FOLLOWING INFORMATION IN YOUR ORDER: 
+
+             1)  YOUR PHONE NUMBER 
+             2)  COMPANY NAME 
+             3)  SHIPPING ADDRESS 
+             4)  YOUR NAME 
+             5)  ITEMS NEEDED WITH QUANTITIES 
+             6)  METHOD OF PAYMENT. (COD OR CREDIT CARD) 
+             7)  CREDIT CARD NUMBER WITH EXPIRATION DATE 
+
+ 
+1) WE SHIP UPS GROUND. ADD $4.5 FOR SHIPPING AND HANDLING.
+2) COD CHECK ORDERS ADD $3.5 TO YOUR SHIPPING COST.
+2) WE ACCEPT ALL MAJOR CREDIT CARD OR "COD" ORDERS.
+3) OUR STANDARD MERCHANDISE REFUND POLICY IS NET 30 DAYS
+4) OUR STANDARD MERCHANDISE REPLCAMENT POLICY IS NET 90 DAYS. 
+
+
+NOTE NUMBER (1): 
+
+PLEASE DO NOT CALL OUR ORDER LINE TO REMOVE YOUR E-MAIL 
+ADDRESS OR COMPLAIN. OUR ORDER LINE IS NOT SETUP TO FORWARD 
+YOUR E-MAIL ADDRESS REMOVAL REQUESTS OR PROCESS YOUR 
+COMPLAINTS..IT WOULD BE A WASTED PHONE CALL.YOUR ADDRESS 
+WOULD NOT BE REMOVED AND YOUR COMPLAINTS WOULD NOT BE 
+HANDLED.PLEASE CALL OUR TOLL FREE E-MAIL REMOVAL AND 
+COMPLAINT LINE TO DO THAT.
+
+NOTE NUMBER (2):
+
+OUR E-MAIL RETURN ADDRESS IS NOT SETUP TO ANSWER ANY 
+QUESTIONS YOU MIGHT HAVE REGARDING OUR PRODUCTS. OUR E-MAIL 
+RETURN ADDRESS IS ALSO NOT SETUP TO TAKE ANY ORDERS AT 
+THIS TIME. PLEASE CALL THE ORDER LINE TO PLACE YOUR ORDER
+ OR HAVE ANY QUESTIONS ANSWERED. OTHERWISE PLEASE CALL OUR 
+CUSTOMER SERCICE LINE.
+
+
+
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+
+From kmahan@xmission.com Sun, 16 Jan 2000 14:49:21 -0700 (MST)
+Date: Sun, 16 Jan 2000 14:49:21 -0700 (MST)
+From: Kurt Mahan kmahan@xmission.com
+Subject: [JOS-Arch] laser printer toner advertisement (fwd)
+
+Nice to see he finally made it from the gnu lists over to here.  *sigh*
+
+I've made sure the company I work for will never buy from anybody that
+appears to be remotely related to this guy.  Seems only fair.  Hopefully
+others do the same thing.
+
+Spamming works -- just not in the way the spammers had hoped for.
+
+Kurt
+
+
+
+Forwarded message:
+> From arch-admin@jos.org Sun Jan 16 11:24:38 2000
+> Envelope-to: kmahan@xmission.com
+> From: <bmark@crosswinds.net>
+> To: <arch@jos.org>
+> Date: Mon, 17 Jan 2000 02:13:04
+> Message-Id: <577.595586.324341@>
+> Subject: [JOS-Arch] laser printer toner advertisement
+> Mime-Version: 1.0
+> Content-Type: text/plain; charset="us-ascii"
+> Content-Transfer-Encoding: 7bit
+> Sender: arch-admin@jos.org
+> Errors-To: arch-admin@jos.org
+> X-Mailman-Version: 1.0b11
+> Precedence: bulk
+> List-Id: JOS architecture discussion list <arch.jos.org>
+> X-BeenThere: arch@jos.org
+> 
+> 
+> 
+> 
+> 
+> 
+> BENCHMARK SUPPLY
+> 7540 BRIDGEGATE COURT
+> ATLANTA GA 30350
+> 
+> ***LASER PRINTER TONER CARTRIDGES***
+> ***FAX AND COPIER TONER***
+
+[...SNIP...]
+
+
+
+From theguys@bigwhat.com Tue, 18 Jan 2000 15:41:43 -0500 (EST)
+Date: Tue, 18 Jan 2000 15:41:43 -0500 (EST)
+From: theguys@bigwhat.com theguys@bigwhat.com
+Subject: [JOS-Arch] Your link has been added
+
+Thank you for adding your site to the BigWhat.com search engine. The web's coolest, and ONLY INDEPENDENT, AND 100% USER EDITABLE SEARCH ENGINE located at:
+http://www.bigwhat.com
+THAT'S RIGHT, FINALLY YOU CONTROL YOUR OWN LISTING IN A SEARCH ENGINE!
+
+MAKE SURE YOU KEEP THIS EMAIL SOMEPLACE SAFE!
+It contains your site ID for your site's listing in the search engine and YOU CAN CHANGE YOUR OWN LISTING ANY TIME YOU WANT by visting
+http://www.bigwhat.com
+and clicking "Update URL"
+
+If you own other sites, feel free to index them as well by visiting
+http://www.bigwhat.com
+and clicking on "Add URL"
+
+--------------------------------------------------
+PLEASE KEEP THIS INFORMATION, YOU WILL NEED IT TO MODIFY YOUR
+LISTING!
+For Your Records, your listing at bigwhat.com is as follows:
+--------------------------------------------------
+   Site ID     : 948228108
+   Site Name   : JOS - A Free Java Based Operating System
+   Site Addr   : http://jos.org/  
+   Category    : General
+   Sub Category: 
+   Description : JOS - A Free Java Based Operating System A Free Java? Based Operating System Home Go: Organization Getting Started About JOS The JOS Charter Constitution Policy Book The Goal Getting Involved Member List FAQ News Press Info Products Getting Started JOS Applications Utilities Games Source Development
+   Search Terms: jos, java, project, system, getting, operating, list, started, available, november, webmaster, visit, download, page, mailing, free, want, based, api, about, org, utilities, source, lists, status, constitution, games, applications, involved, info, news, get, kernel, now, sponsor, tar, announcement, code, members, many, international, site, josdistribution1d, initial, smart, support, wiki, web, changes, events
+--------------------------------------------------
+
+Should you need to change your listing at any time....MAKE SURE YOU KEEP
+THIS EMAIL! It contains your site ID for your site listing in the search
+engine and you can change your listing any time you want to by visting
+
+http://www.bigwhat.com
+
+and entering your Site ID number (shown above)
+Once you have entered the site ID number, our system will generate a passcode for you and send
+it to the SAME EMAIL ADDRESS THIS EMAIL ARRIVED AT!
+
+One of the free things we have to offer you, in addition to your free listing, is a chance to have your site voted on by your visitors, to be considered one of the Top 25 listings in the search engine!
+
+Not only will you get listed,
+but you'll have the opportunity to get TONS of extra traffic because you'll get a top listing under the Top 25 sites!
+
+Simply place the following HTML code on your home page to begin the voting process:
+
+<center>
+<A HREF="http://www.bigwhat.com/cgi-bin/jsearch/vote.cgi?ID=948228108"><IMG SRC="http://www.bigwhat.com/images/top50.jpg" BORDER="0"></A><br>Vote
+For This Site!
+</center>
+
+Note, we may contact you to check on the success of your listing with us, as well as to let you know of opportunities which can help your
+web based business or site grow, so keep an eye out for all the great things to come!
+
+The BigWhat.com Search Engine Team!
+theguys@bigwhat.com
+Silicon Digital Industries Inc.
+941-792-7942 
+Customer Service Office 10am to 5pm EST
+
+
+
+
+From gchii@mindspring.com Tue, 18 Jan 2000 17:11:06 -0500
+Date: Tue, 18 Jan 2000 17:11:06 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Missing documentation
+
+Let's take a look at JOS architecture from a wish-list point of view.
+
+What is it we wish to have documented?
+
+There is a big difference between (1) having no documentation, and (2)
+having great documentation we can all enthusiastically agree with. Here is
+an example. I believe that JOS is more than just a project to build
+jJOS/decaf.
+
+Assertion 1. JOS is an independent operating system; it does not depend on
+another operating system for its functionality. It is not MS-DOS, Linux,
+OS/2, MS-Windows, nor UNIX.
+
+Do you agree? If not, why not?
+
+
+
+
+From gchii@mindspring.com Tue, 18 Jan 2000 17:18:53 -0500
+Date: Tue, 18 Jan 2000 17:18:53 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Smart API Example
+
+I just wrote a program to grab .class files from rt.jar. The byte: scheme
+converts any InputStream to a byte[]. The zip: scheme treats the embedded
+URI as a ZIP file. Here's the basic idea:
+
+URI uri = new URI( "in:byte:zip:[file:rt.jar]/java/lang/Class.class" );
+byte[] buf = (byte[]) uri.getObject();
+if ( buf == null ) {
+  return;
+}
+:
+
+How many lines of code would this take without the Smart API?
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Wed, 19 Jan 2000 09:29:33 +0100
+Date: Wed, 19 Jan 2000 09:29:33 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Arch] Missing documentation
+
+On Tue, 18 Jan 2000, Gilbert Carl Herschberger II wrote:
+> Let's take a look at JOS architecture from a wish-list point of view.
+> 
+> What is it we wish to have documented?
+I think a first step is the description of the architecture, the core Java
+classes and their hierarchy, what is native and not.
+
+> 
+> Assertion 1. JOS is an independent operating system; it does not depend on
+> another operating system for its functionality. It is not MS-DOS, Linux,
+> OS/2, MS-Windows, nor UNIX.
+> 
+> Do you agree? If not, why not?
+> 
+Completeley YES!
+
+Cheers
+Corrado.
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Wed, 19 Jan 2000 16:22:02 -0500 (EST)
+Date: Wed, 19 Jan 2000 16:22:02 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Missing documentation
+
+> Assertion 1. JOS is an independent operating system; it does not depend on
+> another operating system for its functionality. It is not MS-DOS, Linux,
+> OS/2, MS-Windows, nor UNIX.
+
+	Agreed.  How about this?
+
+Assertion 2. JOS is a Java(TM)-based operating system.  Therefore, JOS
+is written in Java wherever possible, and its native executable format is
+the Java class file.
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Wed, 19 Jan 2000 18:53:22 -0500
+Date: Wed, 19 Jan 2000 18:53:22 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Missing documentation
+
+At 04:22 PM 1/19/00 -0500, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>Assertion 2. JOS is a Java(TM)-based operating system.  Therefore, JOS
+>is written in Java wherever possible, and its native executable format is
+>the Java class file.
+
+Ugh. You jumped right into the frying pan. How about this?
+
+Assertion 2. The native executable format for JOS is the class file, as
+documented in the Java(tm) Virtual Machine Specification(s).
+
+JOS is an operating system for executing class files. Since this is the
+native executable format, executable programs and shared libraries are
+distributed as class files.
+
+Premise 2a. Java, the programming language, is not required by JOS. JOS
+runs any class file created by any programming language.
+
+Premise 2b. Java, the standard class libraries, is not required by JOS.
+
+Premise 2c. Java(tm) programs run on top of JOS. JOS does not run on top of
+Java(tm) Platform. JOS is not based upon Java(tm), but executes Java(tm)
+class files.
+
+Assertion 3. JOS is fully independent of the tools necessary to create it.
+
+In other words, we allow ourselves to skip over the development of a javac
+tool that runs on JOS. JOS itself can be created on Linux (or a foreign
+operating system).
+
+
+
+
+From tmiller@haverford.edu Wed, 19 Jan 2000 19:42:48 -0500 (EST)
+Date: Wed, 19 Jan 2000 19:42:48 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Missing documentation
+
+	Okay, I see your point.  I'll paraphrase your three premises to
+verify that I understand them.  (And, possibly, make things more concise
+without loss of clarity.)
+
+> Assertion 2. The native executable format for JOS is the class file, as
+> documented in the Java(tm) Virtual Machine Specification(s).
+
+	Therefore, JOS is language-agnostic, requiring neither the
+Java(tm) language, nor the Java(tm) class libraries.  That is, the
+Java(tm) platform runs on top of JOS.
+
+	Could we then add (or perhaps it's implicit in the above?):
+
+	Given that JOS is language-agnostic, it, and the libraries with
+which it is distributed, are not limited to or by the capabilites of the
+Java(tm) platform.
+
+> Assertion 3. JOS is fully independent of the tools necessary to create it.
+
+	Agreed.
+
+-_Quinn
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Thu, 20 Jan 2000 09:51:08 +0100
+Date: Thu, 20 Jan 2000 09:51:08 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Arch] Todd, here you are!!
+
+Hi Todd,
+You've disappeared for some days! I'm happy that you've returned :))
+What's up with JOS-w/curses ? Have you downloaded my patched version of JOS
+which runs a curses application ? What are your remarks ?
+
+... and... to anyone in the list....
+I've seen several downloads of "JOS-w-curses.tgz". Have you tested it ? Does it
+run ? What are your remarks ?
+
+Bye,
+	Corrado.
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Thu, 20 Jan 2000 11:56:07 -0500 (EST)
+Date: Thu, 20 Jan 2000 11:56:07 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Todd, here you are!!
+
+> You've disappeared for some days! I'm happy that you've returned :))
+> What's up with JOS-w/curses ? Have you downloaded my patched version of JOS
+> which runs a curses application ? What are your remarks ?
+
+	I disappeared because I accidentally blew my hard drive away on
+Saturday.  I need the URL for your patch again, because I lost all my old
+emails (that, and the URL for jeps).
+
+-_Quinn
+
+
+
+
+From hellocom@smip.net Fri, 21 Jan 2000 02:56:46
+Date: Fri, 21 Jan 2000 02:56:46
+From: hellocom@smip.net hellocom@smip.net
+Subject: [JOS-Arch] Save 50-80% on International Calls and Win $500 in Free phone calls!!!
+
+For more information email us: sayhello@altavistausa.com
+
+Save up to 80% on your INTERNATIONAL long distance phone bill.  
+
+Join our easy-to-use callback service today for FREE. There are no monthly minimums, surcharges 
+or set-up fees, just low flat rates 24 hours, everyday.
+
+Visit our website: http://hometown.aol.com/callhello/ and win $500 in FREE phone calls.    
+
+Email: sayhello@altavistausa.com
+http://hometown.aol.com/callhello/
+
+Sample our LOW rate chart below.  To determine the rates add cost of country you are calling FROM 
+to cost of country you are calling TO.  Complete rate list available on our website. Prices are 
+per minute in USD.  
+
+Algeria                  0.31
+Australia                0.08
+Austria                  0.12
+Azerbaijan               0.42
+Bahamas                  0.18
+Bahrain                  0.41
+Bangladesh               0.60
+Bangladesh  Dhaka        0.49
+Belgium                  0.08
+Brazil                   0.28
+Canada                   0.06
+Chile                    0.15
+China                    0.32
+Colombia                 0.25
+Cyprus                   0.28
+Denmark                  0.08
+Djibouti                 0.69
+Dominican Rep.           0.17
+Egypt                    0.59
+Ethiopia                 0.95
+Finland                  0.11
+France                   0.07
+Georgia                  0.46
+Germany                  0.06
+Greece                   0.25
+Hong  Kong               0.07
+Hungary                  0.23
+India                    0.69
+India New Delhi          0.66
+India-Bomba              0.54
+India-Madras             0.62
+India-Bangalore          0.54
+Indonesia                0.35
+Iran                     0.58
+Iraq                     0.68
+Ireland                  0.09
+Israel                   0.13
+Italy                    0.11
+Japan                    0.09
+Japan-Tokyo              0.08
+Jordan                   0.43
+Kazakhstan               0.49
+Kenya                    0.60
+Kuwait                   0.54
+Kyrgyzstan               0.57
+Lebanon                  0.38
+Liberia                  0.43
+Libya                    0.32
+Malaysia                 0.22
+Malta                    0.17
+Mauritania               0.66
+Mexico                   0.15
+Morocco                  0.42
+Nepal                    0.83
+Netherlands              0.07
+New  Zealand             0.09
+Nigeria                  0.69
+Norway                   0.11
+Oman                     0.47
+Pakistan                 0.58
+Pakistan\Karachi         0.56
+Philippines              0.26
+Poland                   0.25
+Qatar                    0.46
+Romania                  0.37
+Russia                   0.31
+Russia-Moscow            0.12
+Russia-St.Petersberg     0.22
+Saudi  Arabia            0.62
+Singapore  Rep.          0.15
+Somalia                  0.68
+South  Africa            0.34
+South Korea              0.12
+Spain                    0.11
+Sri  Lanka               0.74
+Sudan                    0.43
+Sweden                   0.05
+Switzerland              0.09
+Syria                    0.51
+Taiwan                   0.14
+Tajikistan               0.46
+Tanzania                 0.42
+Thailand                 0.35
+Thailand bangkok         0.29
+Tunisia                  0.42
+Turkey                   0.31
+Turkmenistan             0.54
+Ukraine                  0.29
+United  Arab Emirates    0.30
+United Kingdom           0.05
+USA                      0.05
+Yemen                    0.63
+
+Hello Corp
+Hello Building
+434 Sunrise Highway
+West Islip N.Y. 11795
+Tel: 516-321-1204
+Fax: 516-321-1758
+Email: sayhello@altavistausa.com
+http://hometown.aol.com/callhello/
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+
+From gchii@mindspring.com Sat, 22 Jan 2000 23:46:41 -0500
+Date: Sat, 22 Jan 2000 23:46:41 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Announcing JOS Distribution 1e
+
+The first installment of JOS Distribution 1e is now available. More
+information is available in the JOSDistribution1e article on JOS Wiki.
+
+
+
+

@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [dd] Opening /dev/fd0 on Linux</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000054.html">
+   <LINK REL="Next" HREF="000056.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [dd] Opening /dev/fd0 on Linux</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [dd] Opening /dev/fd0 on Linux">gchii@mindspring.com</A><BR>
+    <I>Thu, 10 Aug 2000 16:40:59 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000054.html">[JOS-Apps] [bootdisk] New release 3</A></li>
+        <LI> Next message: <A HREF="000056.html">[JOS-Apps] [bootdisk] New release 3</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#55">[ date ]</a>
+              <a href="thread.html#55">[ thread ]</a>
+              <a href="subject.html#55">[ subject ]</a>
+              <a href="author.html#55">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 07:56 PM 8/8/00 +0200, &quot;Peter Schuller&quot; &lt;<A HREF="mailto:peter.schuller@infidyne.com">peter.schuller@infidyne.com</A>&gt;
+wrote:
+&gt;<i>AFAIK, yes. As you may be aware, one can write a Linux boot floppy with the
+</I>&gt;<i>&quot;cat&quot; command. AFAIK, cat doesn't do any explicit seeking before writing
+</I>&gt;<i>data as far as I've been able to tell (but I've only sifted through the
+</I>&gt;<i>source code).
+</I>
+You're right. The FileOutputStream class works just like cat.
+
+&gt;<i>What happens if you do &quot;cmp /dev/fd0 stage1&quot;...?
+</I>
+When I compared stage1 with /dev/fd0, they were not even close. There was a
+bug in loadStage1() that gave me a zero-filled array instead of the
+contents of the stage1 file. A similar bug was inside loadStage2().
+
+The key to solving this puzzle was the cmp command. That command made it
+was obvious that BulkMake wasn't writing what I thought it was. Then, I ran
+this:
+
+cat /dev/fd0 | more
+
+The first bytes on floppy were blank. I searched backward through the code
+until I found this:
+
+byte[] payload = new byte[ stage1.length ];
+System.arraycopy( payload, 0, stage1, 0, stage1.length );
+
+which mistakenly copies bytes the wrong direction. I changed it to
+
+System.arraycopy( stage1, 0, payload, 0, stage1.length );
+
+and it works!
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000054.html">[JOS-Apps] [bootdisk] New release 3</A></li>
+	<LI> Next message: <A HREF="000056.html">[JOS-Apps] [bootdisk] New release 3</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#55">[ date ]</a>
+              <a href="thread.html#55">[ thread ]</a>
+              <a href="subject.html#55">[ subject ]</a>
+              <a href="author.html#55">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

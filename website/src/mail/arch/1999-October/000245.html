@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Migration</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000244.html">
+   <LINK REL="Next" HREF="000246.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Migration</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Migration">digigod@earthling.net</A><BR>
+    <I>Mon, 04 Oct 1999 15:15:55 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000244.html">[JOS-Arch] Migration</A></li>
+        <LI> Next message: <A HREF="000246.html">[JOS-Arch] Request for low-level memory layout</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#245">[ date ]</a>
+              <a href="thread.html#245">[ thread ]</a>
+              <a href="subject.html#245">[ subject ]</a>
+              <a href="author.html#245">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> 
+</I>&gt;<i> After working with the URI class for a while, it seems to me than the URI
+</I>&gt;<i> class is the *only* class that needs to be well-known. Even the smart
+</I>&gt;<i> object factory and smart stream factories are plug-ins.
+</I>&gt;<i> 
+</I>&gt;<i> So, I think the entire scope of the Smart API package might be something
+</I>&gt;<i> like this:
+</I>&gt;<i> 
+</I>&gt;<i> org.jos.smartapi2a.URI
+</I>&gt;<i> org.jos.smartapi2a.Controller
+</I>&gt;<i> org.jos.smartapi2a.ObjectController
+</I>&gt;<i> org.jos.smartapi2a.BaseController (or AbstractController)
+</I>&gt;<i> org.jos.smartapi2a.SmartFactory
+</I>&gt;<i> 
+</I>&gt;<i> And furthermore, the URI class can be reduced to something like this:
+</I>&gt;<i> 
+</I>&gt;<i> public class URI {
+</I>&gt;<i>   public static Controller getFactory() {
+</I>&gt;<i>     if ( factory == null ) {
+</I>&gt;<i>       return ObjectFactory.getFactory();
+</I>&gt;<i>     }
+</I>&gt;<i>     return factory;
+</I>&gt;<i>   }
+</I>&gt;<i>   public static void setFactory( Controller v ) {
+</I>&gt;<i>     if ( factory == null ) {
+</I>&gt;<i>       factory = v;
+</I>&gt;<i>     }
+</I>&gt;<i>   }
+</I>&gt;<i>   private static Controller factory = null;
+</I>&gt;<i>   public URI( String v ) {
+</I>&gt;<i>     uriSpec = v;
+</I>&gt;<i>   }
+</I>&gt;<i>   public boolean acceptsURI() {
+</I>&gt;<i>     factory.acceptsURI( uriSpec );
+</I>&gt;<i>   }
+</I>&gt;<i>   public Object getObject() {
+</I>&gt;<i>     getFactory().getObject( uriSpec );
+</I>&gt;<i>   }
+</I>&gt;<i>   private String uriSpec;
+</I>&gt;<i> }
+</I>
+you should add a URI-&gt;URL converter method and vice versa.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000244.html">[JOS-Arch] Migration</A></li>
+	<LI> Next message: <A HREF="000246.html">[JOS-Arch] Request for low-level memory layout</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#245">[ date ]</a>
+              <a href="thread.html#245">[ thread ]</a>
+              <a href="subject.html#245">[ subject ]</a>
+              <a href="author.html#245">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

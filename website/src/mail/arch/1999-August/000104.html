@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Proposing archive: protocol</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000124.html">
+   <LINK REL="Next" HREF="000106.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Proposing archive: protocol</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Proposing archive: protocol">gchii@mindspring.com</A><BR>
+    <I>Thu, 05 Aug 1999 10:26:58 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000124.html">[JOS-Arch] Proposing archive: protocol</A></li>
+        <LI> Next message: <A HREF="000106.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#104">[ date ]</a>
+              <a href="thread.html#104">[ thread ]</a>
+              <a href="subject.html#104">[ subject ]</a>
+              <a href="author.html#104">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 12:59 PM 8/5/99 +0300, you wrote:
+&gt;<i>The following scheme could be useful; it uses the pipe (|) to
+</I>&gt;<i>distinguish between embedded resources. An example would be this:
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i><A HREF="ftp://database.server.net/archives/images/contents.jar">ftp://database.server.net/archives/images/contents.jar</A> | /update/latest.zip
+</I>&gt;<i> | /acquired/foo.jpg ?username=jeeves&amp;password=cafebabe
+</I>
+Note: I added spaces for clarity.
+
+The URI and command line are based on the same mechanism. The &quot;pipe&quot; model
+comes from a command line. While a command line is platform-dependent
+(usually), a URI is platform-independent.
+
+The ftp: scheme is a very good example. Remind me again, though. I am a
+little rusty with ftp. Doesn't ftp: expect name and password parameters? In
+the example above, &quot;?username=jeeves&amp;password=cafebabe&quot; would be part of
+ftp: scheme. I'll just move the parameters to ftp: forward:
+
+<A HREF="ftp://database.server.net/archives/images/contents.jar">ftp://database.server.net/archives/images/contents.jar</A>
+?username=jeeves&amp;password=cafebabe |/update/latest.zip |/acquired/foo.jpg
+
+&gt;<i>The above URI would authenticate with the FTP protocol and open the
+</I>&gt;<i>foo.jpg image in the latest.zip archive in the contents.jar archive in
+</I>&gt;<i>the specified directory of the specific server.
+</I>
+As long as latest.zip is not password protected, it will work. I am
+concerned with what happens when latest.zip *is* password protected. Still
+using pipes, this URI would become:
+
+<A HREF="ftp://database.server.net/archives/images/contents.jar">ftp://database.server.net/archives/images/contents.jar</A>
+?username=jeeves&amp;password=cafebabe |/update/latest.zip ?password=jos
+|<i>/acquired/foo.jpg
+</I>
+&gt;<i>Using installed MIME types, or possibly extensions, the software can
+</I>&gt;<i>automatically decode (ZIP, JAR and JPG here for examples are required).
+</I>
+Let's talk a little about MIME types. MIME types only hint at a default
+decoding and presentation. It isn't absolute; it is only a clue.
+Explicitely adding the protocol should produce the same results.
+
+<A HREF="ftp://database.server.net/archives/images/contents.jar">ftp://database.server.net/archives/images/contents.jar</A> ?
+username=jeeves&amp;password=cafebabe | archive:zip:/update/latest.zip |
+image:jpeg:/acquired/foo.jpg
+
+Imagine, though, that I have made up my mind and really want to see the
+contents of an JPEG file in hexidecimal notation. I want the default MIME
+type to be *ignored*. My decision should be reflected in the URI. Maybe it
+should be like this:
+
+<A HREF="ftp://database.server.net/archives/images/contents.jar">ftp://database.server.net/archives/images/contents.jar</A>
+?username=jeeves&amp;password=cafebabe | archive:zip:/update/latest.zip |
+file:hex:/acquired/foo.jpg
+
+Sure, if there is a table of default MIME types, I may be able to imply
+decoding with file extensions. But our URI architecture must be able to
+support explicit choices.
+
+&gt;<i>I don't believe that the pipe is reserved in URI's up to now, so maybe
+</I>&gt;<i>we could use it, at least JOS internally?
+</I>
+Sometimes, I wonder how we're going to succeed with any of this. The URI is
+supposed to be a global, platform-independent model. Current URIs are
+monolythic and short-sighted. We *need* to do things with URIs in JOS that
+none of the other operating systems can do (yet and maybe ever). We are out
+in front. We are on the bleeding edge.
+
+From RFC 2396, the verticle bar (|) is considered an &quot;unwise&quot; character.
+We're supposed to be careful not to think about JOS as an island. JOS will
+interact with all other operating systems. How can we limit URIs to
+internal use only?
+
+uri-pipe := uri &quot;|&quot; uri &quot;|&quot; uri
+
+uri := scheme &quot;:&quot; path [ &quot;?&quot; query ] [ &quot;#&quot; fragment ]
+
+Decoding a uri-pipe must be performed first, prior to decoding an
+individual uri inside a pipe. Each uri inside a uri-pipe may have query
+part and fragment part. The final MIME type of the uri-pipe is the MIME
+type of the last uri inside the pipe.
+
+This is almost right. But it means that all URIs that already use the
+pipe--even though its an unwise character--will not be compatible with the
+uri-pipe. Incompatibility with all those existing URIs is bad, very bad.
+
+The problem would be solved if we choose another &quot;symbol&quot; for the pipe.
+Hey, what about this:
+
+uri-pipe := uri &quot;&gt;&gt;&quot; uri &quot;&gt;&gt;&quot; uri
+
+Oh, and another thing. A client agent must know *immediately* that a URI is
+a pipe and not a normal URI. We want those old client agents to display a
+message first, before they do lots of work they can't finish.
+
+I always imagined that the client agent would do all the work. Then our new
+scheme would be compatible with existing Internet services. So the client
+agent must process a uri-pipe. The client agent must download the whole
+archive, even to get one small file.
+
+I suppose it is possible for an FTP service to extract the latest.zip, then
+extract foo.jpg and return only foo.jpg to the client agent. By embedding
+one uri into another, a client agent sends the entire request to the
+service. Wouldn't this work?
+
+<A HREF="ftp://database.server.net/">ftp://database.server.net/</A> &lt;archive:archives/images/contents.jar&gt;
+&lt;archive:/update/latest.zip&gt; /acquired/foo.jpg
+?username=jeeves&amp;password=cafebabe
+
+Oh, in fact, you should be able to choose client-side or server-side
+decoding of a uri-pipe. Your pipe scheme would be best suited for
+client-side decoding. My scheme would be best suited for server-side decoding.
+
+The client agent would &quot;see&quot; this uri:
+
+<A HREF="ftp://database.server.net/aquired/foo.jpg">ftp://database.server.net/aquired/foo.jpg</A> ?username=jeeves&amp;password=cafebabe
+
+It would connect to an FTP service with username and password and download
+/aquired/foo.jpg. The FTP service would recieve this:
+
+/archives/images/contents.jar |/update/latest.zip |/acquired/foo.jpg 
+or
+&lt;archive:archives/images/contents.jar&gt;
+&lt;archive:/update/latest.zip&gt; /acquired/foo.jpg
+
+If there's a vertical bar (|) in a request or if the FTP service sees &quot;&lt;&quot;
+as the first character in the request, it knows immediately that its an
+embedded URI. It extracts /images/contents.jar and here's what's left:
+
+/update/latest.zip |/acquired/foo.jpg
+or
+&lt;archive:/update/latest.zip&gt; /acquired/foo.jpg
+
+Again, if there's a verticle bar (|) or a &quot;&lt;&quot; as the first character, it
+knows immediately that its an embedded URI. It extracts /update/latest.zip
+and here's what's left:
+
+/aquired/foo.jpg
+
+The FTP service OR client agent must keep track of its file source. At the
+beginning, it gets files from the OS file subsystem. With each archive, it
+gets files from an archive.
+
+A client agent would use its local cache. While a client agent would
+download a large archive to extract a small file, the client agent might be
+more efficient with subsequent requests. If the large archive has already
+been downloaded to its local cache, it won't download or extract it again.
+It just extracts another small file.
+
+When running bytecode for an applet or servlet across the Internet, it is
+more efficient to download the whole archive once rather than download one
+class file at a time from the archive. That's yet another reason to have
+the client agent handle the URI pipe and/or embedded URIs.
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000124.html">[JOS-Arch] Proposing archive: protocol</A></li>
+	<LI> Next message: <A HREF="000106.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#104">[ date ]</a>
+              <a href="thread.html#104">[ thread ]</a>
+              <a href="subject.html#104">[ subject ]</a>
+              <a href="author.html#104">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

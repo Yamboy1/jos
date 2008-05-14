@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Widgets</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000089.html">
+   <LINK REL="Next" HREF="000093.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Widgets</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-UI] Widgets">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 28 Jul 1999 17:42:40 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000089.html">[JOS-UI] Widgets</A></li>
+        <LI> Next message: <A HREF="000093.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#90">[ date ]</a>
+              <a href="thread.html#90">[ thread ]</a>
+              <a href="subject.html#90">[ subject ]</a>
+              <a href="author.html#90">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>DigiGod Q Frasché wrote:
+
+&gt;<i> DesktopWidget would also have to handle adding and removing
+</I>&gt;<i> ToolbarWidgets and Im sure other things but thats slightly offtopic.
+</I>
+Again, removeToolbarWidget() is very similar to disposeWindow(). For the
+same reason, I believe it should be a method on the model (and
+controller). I think you will find that some widgets (including
+DesktopWidget) will need to define /some/ public methods to handle
+direct interactions between views (widgets). I have found this
+unavoidable, but those methods are subordinate to the methods provided
+by the model (and controller). They would be needed, for example, to
+allow a ToolbarWidget component to be added (in AWT terms) to its
+Container. This is a direct view &lt;-&gt; view interaction that requires
+public widget methods.
+
+&gt;<i> I think making the desktop a JDesktopPane is the worst way to go, it
+</I>&gt;<i> requires to many messy hacks to work could cause problems with AWT
+</I>&gt;<i> components and is somewhat small minded design wise. several times Ive
+</I>&gt;<i> proposed the use of a Screen.
+</I>
+Yes, JDesktopPane is probably not the best choice.
+
+&gt;<i> we should decide what types of interfaces to design for the views and
+</I>&gt;<i> what to put in them, we could make a cheap imitation of a Desktop with a
+</I>&gt;<i> JWindow or even a JDesktopPane to test on, but I doubt will get that far
+</I>&gt;<i> so soon.
+</I>
+There is probably very little you can decide about the view interfaces
+at this point in time. When you start to consider how the controllers
+and models come in to play, your design will probably change completely.
+I definately think it is easier to start designing from the model end.
+Even then, your design will change a bit when you start to consider how
+the view fits into the picture. But at least when you get there, you
+will have already thought about the foundations of your MVC system.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000089.html">[JOS-UI] Widgets</A></li>
+	<LI> Next message: <A HREF="000093.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#90">[ date ]</a>
+              <a href="thread.html#90">[ thread ]</a>
+              <a href="subject.html#90">[ subject ]</a>
+              <a href="author.html#90">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

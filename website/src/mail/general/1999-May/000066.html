@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS] Using AOP in JOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000064.html">
+   <LINK REL="Next" HREF="000068.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS] Using AOP in JOS</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS] Using AOP in JOS">ryan@whitewolf.com.au</A><BR>
+    <I>Mon, 17 May 1999 18:11:08 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000064.html">[JOS] Using AOP in JOS</A></li>
+        <LI> Next message: <A HREF="000068.html">[JOS] Using AOP in JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Richard Smol wrote:
+
+&gt;<i> I have a hunch that AOP would indeed be very handy for a project like
+</I>&gt;<i> JOS.
+</I>
+The idea of aspects cutting across classes is interesting but the
+current design of AspectJ seems to be limited in what places you can cut
+through a class. Here are the defined entry points:
+
+before
+after
+catch
+finally
+
+Suppose you had a method that calls super.method() on its last line. You
+may wish for an aspect to cut through just above where it calls
+super.method(). Also, I could imagine the need to be able to cut through
+at any point in a method. For example, a debug aspect may wish to insert
+a debug message inside an if block. This could be implemented in AspectJ
+by allowing markers to be inserted in the code that can be targeted by
+an aspect. There could be more elegant ways.
+
+&lt;brain.dump&gt;
+hmm.. I wonder whether the idea of aspects can be generalised even
+further than the basic object + aspects idea. Maybe a class can be
+defined in terms of a number of intersecting aspects...
+&lt;/brain.dump&gt;
+
+&gt;<i> The thing is though that you need an Aspect Weaver (sort of like a
+</I>&gt;<i> specialized compiler). I don't know of any GPL'ed ones.
+</I>
+It would not be too difficult to implement one since its main task is
+copying lines of code from the Aspect into intersected classes.
+
+If I ever switched to using something like AspectJ, I would also want
+other language features in addition such as genericity and pre/post
+conditions. If someone wants to work on a (pre)compiler for an Aspect
+oriented language, they might want to consider adding these.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000064.html">[JOS] Using AOP in JOS</A></li>
+	<LI> Next message: <A HREF="000068.html">[JOS] Using AOP in JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

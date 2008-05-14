@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Binary Distribution</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000282.html">
+   <LINK REL="Next" HREF="000283.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Binary Distribution</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Binary Distribution">tmiller@haverford.edu</A><BR>
+    <I>Sat, 13 Nov 1999 19:29:39 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000282.html">[JOS-Arch] Binary Distribution</A></li>
+        <LI> Next message: <A HREF="000283.html">[JOS-Arch] Binary Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#284">[ date ]</a>
+              <a href="thread.html#284">[ thread ]</a>
+              <a href="subject.html#284">[ subject ]</a>
+              <a href="author.html#284">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Did I skip a step? Where did I go wrong?
+</I>
+	It looks right to me, but check your firewalling and bootpd logs
+(bootpd -d4 will dump all sorts of debug information to syslog, IIRC)
+on the server machine; make sure your bootptab is set up correctly.  If
+the server isn't receiving any bootp requests, try hooking the two
+directly via a null-ethernet cable, if they're on different subnets, etc.
+
+&gt;<i> This is a network computer architecture. I have a 500MB drive in my JOS
+</I>&gt;<i> machine. I would like to boot JOS directly from its hard drive and not
+</I>&gt;<i> through the network anyway. Where can I find more information about using
+</I>&gt;<i> JOS in a personal computer architecture?
+</I>
+	If you have the latest CVS code, one of the build options is 'make
+grub' (i386/nativecode); this will produce what ought to be a
+GRUB-bootable image of JJOS.  The GRUB instructions, according to George
+Marrows (who developed the JOS suport) are as follows:
+
+kernel=&lt;path to kernel&gt; init
+module=&lt;path to jjos-common.zip&gt;
+boot
+
+Ask around on the kernel list for more help if you need it.  GRUB will
+boot from a floppy; if you've got installed as your bootloader already,
+JOS will boot straight off your HD.  (Though it won't do much in its
+present state :))
+
+-_Quinn
+
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000282.html">[JOS-Arch] Binary Distribution</A></li>
+	<LI> Next message: <A HREF="000283.html">[JOS-Arch] Binary Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#284">[ date ]</a>
+              <a href="thread.html#284">[ thread ]</a>
+              <a href="subject.html#284">[ subject ]</a>
+              <a href="author.html#284">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

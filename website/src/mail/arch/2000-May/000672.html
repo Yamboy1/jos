@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [class types] Proposal</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000661.html">
+   <LINK REL="Next" HREF="000677.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [class types] Proposal</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [class types] Proposal">gchii@mindspring.com</A><BR>
+    <I>Wed, 24 May 2000 08:57:20 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000661.html">[JOS-Arch] Correctness</A></li>
+        <LI> Next message: <A HREF="000677.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#672">[ date ]</a>
+              <a href="thread.html#672">[ thread ]</a>
+              <a href="subject.html#672">[ subject ]</a>
+              <a href="author.html#672">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Here is a proposal that might make it easier to discuss classes and their
+different types. What is a class? What is a class definition?
+
+Raw bytecode is written by a javac tool and other assemblers/compilers. It
+is well-known as an inert collection of octets in a byte array.
+
+BClass - 'B' is for bytecode. This C++ class encapsulates raw bytecode. The
+C++ class makes it easy to decode raw bytecode. Instances of BClass can
+easily be cached in a bytecode cache and easily shared across class
+loaders. This is the type of class that results after loading a class file
+into memory. This is the type of class that works with bytecode as a
+resource. BClass is stand-alone and cannot be linked to any other BClass.
+
+DClass - 'D' is for definition. This C++ class further refines a BClass.
+DClass uses a BClass. Unlike BClass, DClass converts a codepool into
+internal structures. If necessary, a constant integer is converted to its
+platform-specific form. DClass is stand-alone and cannot be linked to any
+other DClass. Without links, a DClass can only be partially compiled into
+machine code. Compiled code would depend upon class loader lookup functions
+to find other classes.
+
+LClass - 'L' is for Link. This C++ class further refines a DClass. LClass
+uses a DClass. Unlike DClass, LClass resolves references to other classes.
+An LClass provides Java's &quot;static&quot; fields, since it is fully resolve-able.
+It respects the graph of class loaders and uses a lookup function to find
+other instances of LClass. With such links, a LClass can be fully compiled
+into machine code. Methods of an LClass are actually invoke-able. An LClass
+is well-known as the internal, vm-specific form of a class.
+
+JClass - 'J' is for Java. This is a C++ class equivalent to
+java.lang.Class. It provides a well-known interface into an LClass. This
+class further refines LClass with additional support for the reflection API.
+
+java.lang.Class - This bytecode class is an interface through JClass to an
+LClass.
+
+jclass - A jclass is well-known as the exposed, vm-independent form of a C
+structure/C++ class found in a native interface, like JNI.
+
+-----
+
+These are class types. Which one is equivalent to a &quot;class definition&quot;?
+
+Understanding a class definition is critical to understanding what can and
+cannot be done with a class definition. If a class definition has links to
+other class definitions, it interacts with a class loader to look up other
+class definitions. In my opinion, a class definition with links (LClass)
+cannot be reused by multiple primordial class loaders. A class definition
+without links ( DClass) can.
+
+-----
+
+In my opinion, there is great value in caching BClasses because of their
+great size and frequent reuse.
+
+In my opinion, BClass and LClass are the most significant. DClass does not
+have to be separated out; it can be folded into an LClass. A class
+definition without links (DClass) might as well be a base class for a class
+definition with links (LClass). The difference between a DClass and LClass
+is negligible. Here, I would optimize for size and never actually create a
+DClass. Neither LClasses nor JClasses can be shared among multiple class
+loaders.
+
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000661.html">[JOS-Arch] Correctness</A></li>
+	<LI> Next message: <A HREF="000677.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#672">[ date ]</a>
+              <a href="thread.html#672">[ thread ]</a>
+              <a href="subject.html#672">[ subject ]</a>
+              <a href="author.html#672">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

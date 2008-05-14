@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Console for Program</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000197.html">
+   <LINK REL="Next" HREF="000199.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Console for Program</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Console for Program">gchii@mindspring.com</A><BR>
+    <I>Wed, 18 Aug 1999 19:45:58 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000197.html">[JOS-Arch] Console for Program</A></li>
+        <LI> Next message: <A HREF="000199.html">[JOS-Arch] IBM AS/400 Java-server</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#198">[ date ]</a>
+              <a href="thread.html#198">[ thread ]</a>
+              <a href="subject.html#198">[ subject ]</a>
+              <a href="author.html#198">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 04:56 PM 8/18/99 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;&gt;<i> Gilbert wrote:
+</I>&gt;&gt;<i> Literally, I am trying to build a color-syntax highlighting program for
+</I>&gt;&gt;<i> C/C++/Java code. I want to write it once and only once because a program
+</I>&gt;&gt;<i> should be reusable. It must run as a batch application, where a GUI prompts
+</I>&gt;&gt;<i> for parameters and the Run button write static HTML files to disk. And, it
+</I>&gt;&gt;<i> must run as an applet on my website. And, it must run inside an HTML
+</I>&gt;&gt;<i> browser, under the control of a client-side servlet. And, it must run
+</I>&gt;&gt;<i> inside an HTTP service, under the control of a server-side servlet.
+</I>&gt;<i>
+</I>&gt;<i>	OOP strikes again.  The hard part of the code should be isolated
+</I>&gt;<i>into a method like syntaxColor( InputStream is, OutputStream os ).  With
+</I>&gt;<i>that in place, wrappers for each of the situations in which you're
+</I>&gt;<i>interested in should be easy to create... or is that the point you're
+</I>&gt;<i>trying to make with the Program (etc) interface?  That is to say, is the
+</I>&gt;<i>point not that Program should automagically adapt to each of the above
+</I>&gt;<i>situations, but that a standard wrapper should exist for each situation
+</I>&gt;<i>(except the GUI one, perhaps*), one that operates by using the Program
+</I>&gt;<i>interface?
+</I>
+Yes! The entire complexity of providing syntax highlighting for C/C++/Java
+source code should be encapsulated into such a method. Anyone wishing to
+provide syntax highlighting can use this method. I am building the
+equivalent of
+
+int syntaxColor( InputStream is, OutputStream os, ParameterList list );
+
+With that in place, wrappers do the rest.
+
+The next software project should be
+
+int prettyPrint( InputStream is, OutputStream os, ParameterList list );
+
+And yet, prettyPrint should use syntaxColor. Pretty print should be
+concerned with re-arranging the source code to fit a programming style.
+Your choice of programming style should be passed as a run-time parameter.
+Output from pretty print could be fed into syntax color to do the
+color-related stuff.
+
+As an architect, I would like it to be far more generic, based on a
+pattern. I can build the wrappers once, with a little help. Everyone can
+use them if they wish.
+
+int &lt;method&gt;( InputStream is, OutputStream os, ParameterList list );
+
+A new class, like java.lang.Runtime, would add these exec() methods:
+
+/**
+ * This method uses System.in and System.out.
+ */
+int exec( String method, ParameterList list ) {
+  return exec( method, System.in, System.out, list );
+
+/**
+ * This method uses a given input and output stream.
+ */
+int exec( String method, InputStream is, OutputStream os, ParameterList list )
+
+/**
+ * This method uses a &quot;console&quot;.
+ */
+int exec( String method, Console c, ParameterList list );
+
+/**
+ * This method uses a &quot;terminal&quot;.
+ */
+int exec( String method, Terminal c, ParameterList list );
+
+&gt;<i>	* : If the syntaxColor()-containing object is a Bean, it should be
+</I>&gt;<i>possible to create a generic reflection-based GUI interface object, which,
+</I>&gt;<i>when passed a Bean, extracts all the possible settings and their type, and
+</I>&gt;<i>creates a dialog box of those settings (and their defaults as defined by
+</I>&gt;<i>the result of a getX() before a setX()) with the proper widgets.  (I would
+</I>&gt;<i>imagine that JavaBean-based app builders already do this...)
+</I>
+This is one things that (desparately) needs to be done. Both the generic
+reflection and registry have a need for a property viewer/editor.
+
+How do you do that? I would like to see this for string-type properties,
+first.
+
+  public void example() {
+    String[] names = {
+      &quot;name-1&quot;,
+      &quot;name-2&quot;,
+      &quot;name-3&quot;
+      };
+    String[] values = {
+      &quot;value-1&quot;,
+      &quot;value-2&quot;,
+      &quot;value-3&quot;
+      };
+    show_property_editor( names, values ); // ??? 
+  }
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000197.html">[JOS-Arch] Console for Program</A></li>
+	<LI> Next message: <A HREF="000199.html">[JOS-Arch] IBM AS/400 Java-server</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#198">[ date ]</a>
+              <a href="thread.html#198">[ thread ]</a>
+              <a href="subject.html#198">[ subject ]</a>
+              <a href="author.html#198">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

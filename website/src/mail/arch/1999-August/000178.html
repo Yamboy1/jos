@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000171.html">
+   <LINK REL="Next" HREF="000187.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Program and ProgramContext">digigod@earthling.net</A><BR>
+    <I>Thu, 12 Aug 1999 23:54:07 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000171.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000187.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#178">[ date ]</a>
+              <a href="thread.html#178">[ thread ]</a>
+              <a href="subject.html#178">[ subject ]</a>
+              <a href="author.html#178">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;&gt;<i>note that this static initializer &quot;trick&quot; is what I use in my app class,
+</I>&gt;&gt;<i>a workaround nesseacary for the program to run both as a regular
+</I>&gt;&gt;<i>application and have the ability to be used in another easily.
+</I>&gt;<i> 
+</I>&gt;<i> Yes! I want to &quot;run&quot; most of my programs both as a regular Java application
+</I>&gt;<i> compatible with the java tool *and* from any other Java class. It should be
+</I>&gt;<i> easy. It should be direct. It shouldn't take much.
+</I>&gt;<i> 
+</I>&gt;<i> Like you, I want to build an application most of the time by extending a
+</I>&gt;<i> powerful base class. And yet, there are times when I need to run an
+</I>&gt;<i> existing class as a program, too. Delegating the ProgramContext to a
+</I>&gt;<i> separate object reduces the amount of new code I have to write in either case.
+</I>&gt;<i> 
+</I>&gt;<i> So far, this discussion has identified very important issues. I hope that
+</I>&gt;<i> some really good code comes out of it. I would like to use an
+</I>&gt;<i> implementation of ParameterParser (ArgumentParser) that parses parameters
+</I>&gt;<i> from ProgramContext using the UNIX(tm) way. What would a ParameterParser
+</I>&gt;<i> look like anyway?
+</I>
+abstract class ArgumentParser {
+ public ArgumentParser() { }
+
+ public abstract parse(String args[]);
+
+ public String getArg(int idx) {...}
+
+ //etc.
+}
+ 
+&gt;<i> A program should decide for itself if it needs the assistence a parameter
+</I>&gt;<i> parser, and if so which one.
+</I>&gt;<i> 
+</I>&gt;<i> Isn't this cool? I should be able to have properties of my program set
+</I>&gt;<i> automatically based on command line arguments. Could we do this?
+</I>&gt;<i> 
+</I>&gt;<i> public class DemoProgram {
+</I>&gt;<i> :
+</I>&gt;<i>   public void set__help( boolean v ) {
+</I>&gt;<i>   }
+</I>&gt;<i> :
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> so that when I use java org.jos.demo.DemoProgram --help, the set__help()
+</I>&gt;<i> method is called automatically? We can do this once with a
+</I>&gt;<i> UNIXStyleParameterParser. But wait! We can pass a Program to a
+</I>&gt;<i> ParameterParser, not a ProgramContext. The parser needs both the program
+</I>&gt;<i> and context, but getProgramContext() is part of the Program interface (or
+</I>&gt;<i> should be).
+</I>&gt;<i> 
+</I>&gt;<i> If we substitute underscores (_) for dashes (-), the names of all command
+</I>&gt;<i> line parameters are reflected in a program. If there's a command line
+</I>&gt;<i> parameter that does not match a method of a program, should the parser
+</I>&gt;<i> throw an exception?
+</I>&gt;<i> 
+</I>&gt;<i> My head hurts to think about this any more.
+</I>
+I thought you were against using reflection generally.
+
+but Im working on something similiar
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000171.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000187.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#178">[ date ]</a>
+              <a href="thread.html#178">[ thread ]</a>
+              <a href="subject.html#178">[ subject ]</a>
+              <a href="author.html#178">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

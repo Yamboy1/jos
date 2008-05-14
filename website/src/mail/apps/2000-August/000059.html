@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [jni] Defining system class?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000056.html">
+   <LINK REL="Next" HREF="000060.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [jni] Defining system class?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [jni] Defining system class?">gchii@mindspring.com</A><BR>
+    <I>Mon, 14 Aug 2000 08:12:59 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000056.html">[JOS-Apps] [bootdisk] New release 3</A></li>
+        <LI> Next message: <A HREF="000060.html">[JOS-Apps] [jni] Registering native methods</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The DefineClass() method is part of the Java Native Interface (JNI). It
+enables a machine code program to define classes. Here is its prototype:
+
+  jclass DefineClass(
+      JNIEnv *env,
+      const char *name,
+      jobject loader,
+      const jbyte *buf,
+      jsize bufLen
+      );
+
+The loader parameter is a class loader. Each class must be associated with
+a primordial or custom class loader. A primordial class loader is part of a
+virtual machine. A class is loaded by the primordial class loader is a
+&quot;system&quot; class. For system classes, the class loader property is null.
+
+How does a JNI program define a system class?
+
+The following code throws a memory exception. It is called before the first
+method is invoked.
+
+  const char *cn = &quot;org/jos/demo/Demo&quot;;
+  rc_Bytecode *bc = getBytecode( cn );
+  DefineClass( env, cn, NULL, bc-&gt;getPayload(), bc-&gt;getSize() );
+
+Is this an error in the implementation of one virtual machine? Or, is
+definition of system classes not supported by JNI?
+
+-----
+
+Learning about the JNI is one goal of the ERIC Project. The eric tool is
+able to launch an external virtual machine using the Invocation API, an
+important part of JNI.
+
+In theory, the eric tool could be a single, self-contained file. The eric
+tool mistakenly fails when the external org.jos.gchii.eric1c.jar file is
+missing. With eric 1c release 2, the bytecode for the eric tool is inside
+the org.jos.gchii.eric1c package. The org.jos.gchii.eric1c package has been
+imported into a C++ library called rceric1c.lib. This C++ library has been
+linked statically to the eric tool. But it doesn't work.
+
+The eric1c package contains a custom class loader. If one class loader
+cannot be defined without another, this is a circular reference which
+cannot be resolved.
+
+Why can't system classes be defined directly? System classes can be defined
+indirectly. Machine code can define any CLASSPATH, implying the load of any
+system class through the primordial class loader.
+
+Is there a JNI method to install an alternative primordial class loader?
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000056.html">[JOS-Apps] [bootdisk] New release 3</A></li>
+	<LI> Next message: <A HREF="000060.html">[JOS-Apps] [jni] Registering native methods</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

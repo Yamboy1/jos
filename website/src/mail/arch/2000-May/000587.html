@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000583.html">
+   <LINK REL="Next" HREF="000588.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">tmiller@haverford.edu</A><BR>
+    <I>Mon, 15 May 2000 19:27:44 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000583.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000588.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#587">[ date ]</a>
+              <a href="thread.html#587">[ thread ]</a>
+              <a href="subject.html#587">[ subject ]</a>
+              <a href="author.html#587">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i>From the JNI spec:
+</I>
+&gt;<i> JDK 1.1 does not support creating more than one VM in a single process. 
+</I>
+	The '1.2 enchancements' page makes no mention of this limitation
+being removed, or if it remains.  In the context of the 1.1 spec, I
+understand this to mean that a single /calling/ process may not have more
+than one VM -- not placing any limits on the VM itself.  The lack of such
+a mention in the 1.2 spec would seem to leave open the possibility of a
+'dispatch' process and/or IPC on the JVM handle for a single process which
+uses JNI to generate &gt; 1 JVM.
+
+&gt;<i> Look at JNI. There is nothing inherent in multiple virtual machines that
+</I>&gt;<i> requires more than a single machine code process.
+</I>
+	And there is also nothing inherent in them to support
+efficiency.  You said,
+
+&gt;<i> IBM chose to implement multiple Java processes in a single JVM.
+</I>
+	/as do we/.  I do not know how IBM implemented multiple multiple
+Java processes, or if it is possible to find out.  Perhaps, since they
+(AFAIK) neglected to provide a Java-side API for processes, they are
+runnig disjoint JVMs in a single process; your description leads to me to
+believe that they have discovered or implemented an efficient method for
+sharing class definitions accross those JVMs -- could you confirm this?  
+If they have, it is to the loss of the Java community that they neglected
+to tell anyone else (AFAIK) how to do this.  If they did (or have released
+source to their JVM), I would be very interested in reading it.
+
+	The decision to support multiple Java processes in single JVM was
+arrived at because we thought it would be easier to do such a thing than
+(a) program multiple /native/ processes and then (b) implement
+sufficiently advanced and efficient IPC to allow the efficiencies which
+have so concerned us in our discussions.
+
+	JNI is a specification for the interface between a native program
+and (in 1.2) one our JVMs.  MPCL is a specification for the implementation
+of more than one Java process in an efficient manner.  Ryan's 'os' package
+is the standard (albiet informal) interface to this ability.  (That is, it
+is like JNI for Java.)  MPCL, in fact, may be an option for the
+implementation of JNI.  (Which would be nice, should JOS ever decide to
+support JNI.)  It should not be suprising, then, that the two are similar;
+however, the critical difference is precisely that MPCL defines how to
+share classes.  And quite honestly, MPCL is not of general concern; Ryan's
+'os' package is, because it is what everyone will be /using/.*
+
+-_Quinn
+
+* In fact, it ought to be possible to write code for its interface such
+that it wrapped calls to a helper app which spawned a new JVM and did
+whatever IPC was necessary to support the various calls available in the
+interface.  If used with a JVM which supported multiple instances in a
+single process, a daemon could be written to respond to Ryan's OS code and
+spawn new processes with that JVM, instead.
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000583.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000588.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#587">[ date ]</a>
+              <a href="thread.html#587">[ thread ]</a>
+              <a href="subject.html#587">[ subject ]</a>
+              <a href="author.html#587">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

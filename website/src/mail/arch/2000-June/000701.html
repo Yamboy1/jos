@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Static fields/object sharing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000709.html">
+   <LINK REL="Next" HREF="000703.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Static fields/object sharing</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Static fields/object sharing">gchii@mindspring.com</A><BR>
+    <I>Thu, 01 Jun 2000 12:22:45 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000709.html">[JOS-Arch] Static fields/object sharing</A></li>
+        <LI> Next message: <A HREF="000703.html">[JOS-Arch] [subprogram] Test program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#701">[ date ]</a>
+              <a href="thread.html#701">[ thread ]</a>
+              <a href="subject.html#701">[ subject ]</a>
+              <a href="author.html#701">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 06:43 PM 5/30/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>	Gilbert, if you've been advocating an implicit proxy approach, my
+</I>&gt;<i>apologies.  It would, however, make your positions on what to do more
+</I>&gt;<i>clear (and convincing) if they included how to do, as well.
+</I>
+It is unfortunate that I haven't been clear about the use of a &quot;proxy&quot;. I
+assumed the system would &quot;hide&quot; the details of a proxy. An implicit proxy
+would be presented to application programmers. Look at the implicit proxies
+inside java.io and java.net. That kind of abstraction for application
+programming is a good thing.
+
+On the other hand, a shared-object subsystem has to deal with the proxy
+explicitely. If we expand the Java Virtual Machine Specification to include
+shared objects, we must re-write parts of it. I'd like to re-write as
+little as possible. Implicit proxies must behave as much like the real
+object as possible.
+
+I believe that Bytecode Native Interface provides one part of a generic
+mechanism for sharing system-wide objects. I believe the Smart API provides
+a mechanism for identifying a shared object with a uniform resource
+identifier.
+
+In the Alt Package project, for example, I put together a design for
+java.io that serves as an implicit proxy for system objects running on
+another machine across the network. The java.io package in machine A
+delegates its file subsystem to machine B. When A connects to B, machine B
+isolates the file I/O for machine A to one of B's subdirectories. While I'm
+not sure how practical that would be, it demonstrates that java.io is a
+framework with many potential implementations, including one especially for
+JOS.
+
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000709.html">[JOS-Arch] Static fields/object sharing</A></li>
+	<LI> Next message: <A HREF="000703.html">[JOS-Arch] [subprogram] Test program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#701">[ date ]</a>
+              <a href="thread.html#701">[ thread ]</a>
+              <a href="subject.html#701">[ subject ]</a>
+              <a href="author.html#701">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

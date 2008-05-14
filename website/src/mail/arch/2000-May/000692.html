@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Extending the type system</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000691.html">
+   <LINK REL="Next" HREF="000688.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Extending the type system</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Extending the type system">ryan@whitewolf.com.au</A><BR>
+    <I>Tue, 30 May 2000 00:30:01 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000691.html">[JOS-Arch] processes &amp; properties vs behaviors</A></li>
+        <LI> Next message: <A HREF="000688.html">[JOS-Arch] rheise.os-0.1.4-pre4 on java2 ?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#692">[ date ]</a>
+              <a href="thread.html#692">[ thread ]</a>
+              <a href="subject.html#692">[ subject ]</a>
+              <a href="author.html#692">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>* Part II *
+
+&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>         ** Incidentally, since the classfile doesn't store the 'current'
+</I>&gt;<i>            value of its static variables, you could take the position
+</I>&gt;<i>            that static variables are a (shared) /property/ of an object.
+</I>&gt;<i>            This supports Ryan's position, which I think I agree with now.
+</I>
+This is part of a broader observation that classes should not be shared.
+I have spent most of the weekend trying to justify this conceptually
+because as it stands, what I am proposing seems to undermine Java's type
+system. I think that is part of what Gilbert was trying to get across
+(although I didn't quite understand the rest).
+
+Firstly, why shouldn't classes be shared? One would think that the most
+straightforward approach to direct object sharing is to share the
+object's Class between the participating processes (or even just
+programs) so that type equivalence is done without undermining the type
+system. This can be done by having shared classes loaded by a common
+class loader. This is the UNIX shared memory model _Quinn was mentioning
+earlier (both the object and class (ie. statics) are shared in memory in
+a 'single' location).
+
+To see how such a solution might work, let's look at an old design I
+posted a while ago:
+
+=====
+I could imagine a server process that corresponds to an ORB (Object
+Request Broker), and a findSharedClass(domain, class) method that defers
+loading to the ORB's class loader for the specified domain*. Once
+loaded, the class still cannot be redefined in that class loader, but
+you can then call orb.reload(domain) which will cause the ORB to replace
+its class loader for your particular domain.
+
+{*} domains would correspond to the individual uses of IpC. For example,
+you could define a domain for doing IPC between the window manager and
+processes that wish to draw to a window.
+=====
+
+The general design here is fine (although I'd improve orb.reload() now).
+The concept of domains allows for two separate IPC channels to coexist
+using different versions of the same classes since each domain has its
+own class loader. But what is wrong with this particular implementation?
+(that is, assuming you understand the benefits of direct object
+sharing?)
+
+It turns out that sharing classes to ensure proper type equivalence when
+sharing objects does not work in practice (or at least that seems to be
+the case). A single process is unable to do IPC with two server
+processes where both server processes are of the same type, but are
+being used for different purposes. In this case, each server process
+will set up a different domain with the ORB, and therefore each server
+process will load its own class for the shared object. When my
+application wants to do IPC with both of those server processes, it is
+only able to load a single class to reference both shared objects. It
+needs two, but it can only use a certain class name once. Using Java's
+type system, we are unable to achieve direct object sharing with the two
+servers this way.
+
+By allowing two classes that share the same class definition to be
+treated as the same for shared objects, we get around this problem (the
+exact semantics of this have already been discussed). What we are aiming
+for is a way to keep processes separate with their own classes (as in
+CORBA) but to provide an efficient interface to server objects in a
+server process. Because of Java's type system, the Class the client uses
+to interface with the server object should not be the same as the Class
+in the server (as demonstrated in the above example). However, we want
+to treat both classes as the same *type*.
+
+And here we come to the point of this email. My original goal was to
+justify our bodgy type equivalence based on class definitions. I am
+proposing that we extend Java's type system as follows: two classes may
+(*) be of the same type (**) if they both share the same class
+definition. The same type may be used in different processes but the
+same class may not. An object may be cast between two classes of the
+same type.
+
+(*) The exact semantics are left to discussion. Hint: what type do you
+assign to classes loaded by custom class loaders?
+(**) The word &quot;type&quot; is open to debate. Upon first glance of the
+relevant section of the vm spec (chapter 5), my use of the term seems to
+fit in without any confusion. If you find there is some confusion, it is
+entirely possible to select a different word.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000691.html">[JOS-Arch] processes &amp; properties vs behaviors</A></li>
+	<LI> Next message: <A HREF="000688.html">[JOS-Arch] rheise.os-0.1.4-pre4 on java2 ?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#692">[ date ]</a>
+              <a href="thread.html#692">[ thread ]</a>
+              <a href="subject.html#692">[ subject ]</a>
+              <a href="author.html#692">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,1991 @@
+From DearWebby@webby.com Wed, 31 Mar 1999 11:47:36 -0800
+Date: Wed, 31 Mar 1999 11:47:36 -0800
+From: Helmut DearWebby@webby.com
+Subject: [JOS-Admin] Re: The jos web site
+
+At 09:53 AM 3/31/99 , Clark Evans wrote:
+>Helmut is the administrator for the jos.org site.  The site has
+>Perl and Python, it does not have MySQL, PostgreSQL or PHP3 at 
+>this moment.  Helmut, what are the chances of getting PostgreSQL
+>and PHP3 installed on jos.org?
+>
+
+No problem. We used to have them on but nobody used them so last spring we
+stopped installing them on new machines. Just locate the stuff and we'll
+see where it should go. PHP3 I think has to go up in the root with the C
+compilers, the rest can probably live happily inside JOS.
+
+Helmut
+
+btw. The Cardmasters Spring World Championship has 
+started and YOU are one of the judges who determines
+who the new World Champion is. Your voting booth is at
+
+http://cards.webby.com
+So, check out the competitors and make your opinion count. Thanks for voting !
+
+DearWebby
+(Helmut)
+----------------------------------------------------------------------------
+------
+Webby, Inc  Web Marketing and high traffic web hosting
+Internet postcards and other effective marketing software
+
+
+
+From clark.evans@manhattanproject.com Wed, 31 Mar 1999 20:04:50 +0000
+Date: Wed, 31 Mar 1999 20:04:50 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] Re: The jos web site
+
+Helmut wrote:
+> At 09:53 AM 3/31/99 , Clark Evans wrote:
+> >Helmut is the administrator for the jos.org site.  The site has
+> >Perl and Python, it does not have MySQL, PostgreSQL or PHP3 at
+> >this moment.  Helmut, what are the chances of getting PostgreSQL
+> >and PHP3 installed on jos.org?
+> >
+> 
+> No problem. We used to have them on but nobody used them so last spring we
+> stopped installing them on new machines. Just locate the stuff and we'll
+> see where it should go. PHP3 I think has to go up in the root with the C
+> compilers, the rest can probably live happily inside JOS.
+
+Great.  PostgreSQL has it's own user.  If you create a user
+for me, (we can install the program in /sites/jos/postgres )
+this would be cool.  I'll also need an entry for the postmaster 
+in your /etc/inittab (I'll send you the entry)
+
+
+As for PHP3, there are two ways to run it, one as a cgi script
+(which isn't all that safe) and the other one as a Apache builtin
+module (which I've heard is much faster and safer).  I assume you
+are using the secure version of Apache, how hard would it be to
+buildin PHP3 support?
+
+Thanks!
+
+Clark
+
+
+
+From RegierAveryJ@JDCORP.deere.com Wed, 31 Mar 1999 14:27:48 -0600
+Date: Wed, 31 Mar 1999 14:27:48 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Admin] Where can we have Constitutional discussions?
+
+Hi all,
+
+Since the 'biz' list apparently got nixed, I'm wondering what the best
+mailing list is to have discussions about the upcoming Constitution vote and
+other non-site related administrative discussions that are not of general
+interest to the entire community?  While we were developing the Constitution
+we used the unused 'requirements' list for this purpose.  I don't see a good
+place in the @jos.org lists for this type of discussion.  Right now we are
+having these discussions on private email but would like for them to be
+archived.  Do you have any suggestions?  Why was the 'biz@jos.org' list
+nixed?  I will admin it if the reason it was nixed was for lack of admin.
+
+Regards,
+Avery J. Regier
+Information Technology Analyst
+WebWorks Team
+Consumer & Commercial Equipment Division, Deere & Co
+
+
+
+
+
+
+
+From clark.evans@manhattanproject.com Wed, 31 Mar 1999 20:28:20 +0000
+Date: Wed, 31 Mar 1999 20:28:20 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] Where can we have Constitutional discussions?
+
+Regier Avery J wrote:
+> 
+> Do you have any suggestions?  Why was the 'biz@jos.org' list
+> nixed?  I will admin it if the reason it was nixed was for lack of admin.
+> 
+
+I'll put it back into production.
+
+:) Clark
+
+
+
+From clark.evans@manhattanproject.com Wed, 31 Mar 1999 23:44:39 +0000
+Date: Wed, 31 Mar 1999 23:44:39 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] Re: The jos web site
+
+I talked to Helmut some, and he dosn't seem
+all that thrilled about PHP3 on his box, also,
+I couldn't get PostgreSQL to compile on his
+box since he's missing several development tools,
+including bintools.
+
+So, unless anyone else has any ideas, we can 
+stick with the previous plan, we keep all of 
+the static pages and the wiki web on www.jos.com 
+and put the PHP3/PostgreSQL stuff on db.jos.org?
+
+Is this ok?
+
+Clark
+
+
+
+From clark.evans@manhattanproject.com Thu, 01 Apr 1999 00:07:04 +0000
+Date: Thu, 01 Apr 1999 00:07:04 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] Re: The jos web site
+
+Helmut did mention that SSI could be useful.  I can 
+see that.  Perhaps we can have "pagelets" updated
+once a day or so with the 'dynamic' stuff from 
+the database.  The 'static' pages could do a server
+side include to pull in the dynamically generated 
+pages.   Queries and other nice things, of course,
+would have to go to the database.  But there are
+many semi-static pages that could go half and half.
+
+Clark
+
+
+Clark Evans wrote:
+> So, unless anyone else has any ideas, we can
+> stick with the previous plan, we keep all of
+> the static pages and the wiki web on www.jos.com
+> and put the PHP3/PostgreSQL stuff on db.jos.org?
+
+
+
+From ajregier@earthlink.net Wed, 31 Mar 1999 20:22:12 -0500
+Date: Wed, 31 Mar 1999 20:22:12 -0500
+From: Avery J. Regier ajregier@earthlink.net
+Subject: [JOS-Admin] Re: The jos web site
+
+If Helmut is going to be compiling in PHP3 to Apache, wouldn't we much more 
+want to have servlets and develop a site in a language that every JOS 
+member knows and with an API that is a proven good performer?
+
+Seems to make good sense to me...
+
+Avery J. Regier
+
+-----Original Message-----
+From:	Clark Evans [SMTP:clark.evans@manhattanproject.com]
+Sent:	Wednesday, March 31, 1999 7:07 PM
+To:	shigeoka@ukans.edu; Helmut; admin@jos.org
+Subject:	Re: [JOS-Admin] Re: The jos web site
+
+Helmut did mention that SSI could be useful.  I can
+see that.  Perhaps we can have "pagelets" updated
+once a day or so with the 'dynamic' stuff from
+the database.  The 'static' pages could do a server
+side include to pull in the dynamically generated
+pages.   Queries and other nice things, of course,
+would have to go to the database.  But there are
+many semi-static pages that could go half and half.
+
+Clark
+
+
+Clark Evans wrote:
+> So, unless anyone else has any ideas, we can
+> stick with the previous plan, we keep all of
+> the static pages and the wiki web on www.jos.com
+> and put the PHP3/PostgreSQL stuff on db.jos.org?
+
+_______________________________________________
+Admin maillist  -  Admin@jos.org
+http://jos.org/mailman/listinfo/admin
+
+
+
+
+From DearWebby@webby.com Wed, 31 Mar 1999 17:32:31 -0800
+Date: Wed, 31 Mar 1999 17:32:31 -0800
+From: Helmut DearWebby@webby.com
+Subject: [JOS-Admin] Re: The jos web site
+
+Just go to for example 
+
+http://hicards.com
+and have a look how a simple, very basic database is 
+used to serve pages either with a keyword search or 
+by clicking on one of the 50 categories.
+
+Both keyword search and category selection produce
+scrollable result tables for final selection. By clicking 
+on a selection you use SSI to pass variables that are 
+then used to construct a page according to stored data.
+
+Go ahead and try it !
+On the constructed page,  called a "Composition Page",
+where you compose a postcard, you select some stuff 
+and add text, addresses etc.
+Choose the option to send the card later and see 
+how that is done.
+
+Then choose to send the card to 25 people, and see 
+how you jump out to a detour page to collect another 
+50 variables before going on to submit and generate 
+and send the actual output.
+
+Also note how all the pages are built with virtual 
+includes for tops, headers, footers, etc., and how the
+dynamic banners are linked into 2 or more accounting
+databases.
+
+Sure, it is probably a lot more involved than what you
+need, but it is a very clean and simple example 
+of using databases and SSI.
+
+Btw., on that site you will also see Java in action.
+Choose your horoscope, and it will scroll the current 
+day's horoscope. If you send a card and it will be 
+picked up for example next Tuesday, then it will
+correctly display THAT day's correct horoscope, 
+even though that horoscope is not even written 
+yet when you send the card. 
+
+How ? At run-time the Java text scroller simply 
+looks in the horoscope bin what is there at that time,
+formats the raw text for your browser and screen 
+width and scrolls it.
+
+So, send a few cards to your friends, and watch 
+the process. You will probably get all kinds of 
+useful ideas from it.
+
+Helmut
+
+
+
+
+
+At 04:07 PM 3/31/99 , Clark Evans wrote:
+>Helmut did mention that SSI could be useful.  I can 
+>see that.  Perhaps we can have "pagelets" updated
+>once a day or so with the 'dynamic' stuff from 
+>the database.  The 'static' pages could do a server
+>side include to pull in the dynamically generated 
+>pages.   Queries and other nice things, of course,
+>would have to go to the database.  But there are
+>many semi-static pages that could go half and half.
+>
+>Clark
+>
+>
+>Clark Evans wrote:
+>> So, unless anyone else has any ideas, we can
+>> stick with the previous plan, we keep all of
+>> the static pages and the wiki web on www.jos.com
+>> and put the PHP3/PostgreSQL stuff on db.jos.org?
+>
+>_______________________________________________
+>Admin maillist  -  Admin@jos.org
+>http://jos.org/mailman/listinfo/admin
+> 
+btw. The Cardmasters Spring World Championship has 
+started and YOU are one of the judges who determines
+who the new World Champion is. Your voting booth is at
+
+http://cards.webby.com
+So, check out the competitors and make your opinion count. Thanks for voting !
+
+DearWebby
+(Helmut)
+----------------------------------------------------------------------------
+------
+Webby, Inc  Web Marketing and high traffic web hosting
+Internet postcards and other effective marketing software
+
+
+
+From tmiller@haverford.edu Wed, 31 Mar 1999 22:58:10 -0500 (EST)
+Date: Wed, 31 Mar 1999 22:58:10 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Admin] Re: The jos web site
+
+> Seems to make good sense to me...
+
+	While I don't particularly care -- having better things to do than
+fiddle with pages (a.k.a. code) -- it would strike me as a trifle odd if
+the website of a Java organization weren't to use servlets.
+
+	Just my $0.02.
+
+-_Quinn
+
+
+
+
+From shigeoka@ukans.edu Thu, 1 Apr 1999 15:50:52 -0600
+Date: Thu, 1 Apr 1999 15:50:52 -0600
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS-Admin] Re: The jos web site
+
+"Avery J. Regier" <ajregier@earthlink.net> writes:
+
+> If Helmut is going to be compiling in PHP3 to Apache, wouldn't we much more 
+> want to have servlets and develop a site in a language that every JOS 
+> member knows and with an API that is a proven good performer?
+
+"Todd L. Miller" <tmiller@haverford.edu> adds:
+
+> 	While I don't particularly care -- having better things to do than
+> fiddle with pages (a.k.a. code) -- it would strike me as a trifle odd if
+> the website of a Java organization weren't to use servlets.
+
+From my brief experimentation with servlets, I would argue that they 
+belong in the realm of "Web Application Software".  And for the same 
+reason that you don't find that many dynamic sites being driven by C or 
+lisp code, I don't feel that java is a great choice simply because there's 
+too much "mental overhead" in creating simple web sites driven by java.  
+You actually have to design a program, code, compile, etc.  I know, boo 
+hoo hoo.  But if you're familiar with the frequency of changes, updates, 
+and complete rewrites on websites you'd know that any time saved is 
+huge.
+
+(IMHO) With servlets it's a lot of design and work to simply get the 5 
+latest update announcements posted to the update database, formatting 
+it into a table and spitting it out in html.  You have to worry about getting 
+the jdbc driver loaded and connected, then how you're going to get the 
+html template for the page, parse it, insert the database content 
+(formatted) into the page and stream the whole mess to the web server.  
+Maybe worth the effort if you're doing a join across several disparate 
+databases and trying to use xml metadata to connect everything...
+
+With scripting tools like php, you are author the page, insert simple 
+tags to indicate to php that you're going into php mode, insert the php 
+code, and then close the tag.  So the html and code are in the same 
+source.
+
+I think servlet have their place and that we should try and get them 
+running on the site for other uses (maybe a wiki replacement, or for 
+source control) but for the basic web site, its just not a very practical 
+technology.
+
+Comments?
+
+-iain
+
+
+
+From RegierAveryJ@JDCORP.deere.com Thu, 1 Apr 1999 16:22:51 -0600
+Date: Thu, 1 Apr 1999 16:22:51 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Admin] Re: The jos web site
+
+Iain,
+
+I am an active servlet developer and I can certainly see your points for
+general page development.  For that there are .jsp pages as an easier
+alternative.
+
+The main reason I want servlets on the site is that I want to replace the
+PERL stuff, such as the source server and wiki, as you mentioned.  We should
+somehow be able to integrate the source server and the CVS repository.
+Downloading off of the source server is buggy and a pain (though I have
+written a quick Java utility to take the pain out of it) and it would be
+nice to make some changes to it.  The problem is that my Perl is extremely
+rusty and the original authors of those tools either aren't working on JOS
+anymore or are no longer making improvements.  There have been a couple of
+starts at making a servlet wiki, but those have generally stopped due to
+there not being a place to run them on the JOS site because it doesn't
+support servlets.  Not having the ability on the site greatly decreases the
+number of JOS participants who have the skills to help with site
+development;  whereas if we have servlet support, most if not all JOS
+participants have the skills necessary.
+
+That and Todd's point. :)
+
+Regards,
+Avery J. Regier
+
+
+> -----Original Message-----
+> From:	Iain Shigeoka [SMTP:shigeoka@ukans.edu]
+> Sent:	Thursday, April 01, 1999 4:51 PM
+> To:	admin@jos.org
+> Cc:	Avery J. Regier; Todd L. Miller
+> Subject:	RE: [JOS-Admin] Re: The jos web site
+> 
+> "Avery J. Regier" <ajregier@earthlink.net> writes:
+> 
+> > If Helmut is going to be compiling in PHP3 to Apache, wouldn't we much
+> more 
+> > want to have servlets and develop a site in a language that every JOS 
+> > member knows and with an API that is a proven good performer?
+> 
+> "Todd L. Miller" <tmiller@haverford.edu> adds:
+> 
+> > 	While I don't particularly care -- having better things to do than
+> > fiddle with pages (a.k.a. code) -- it would strike me as a trifle odd if
+> > the website of a Java organization weren't to use servlets.
+> 
+> From my brief experimentation with servlets, I would argue that they 
+> belong in the realm of "Web Application Software".  And for the same 
+> reason that you don't find that many dynamic sites being driven by C or 
+> lisp code, I don't feel that java is a great choice simply because there's
+> 
+> too much "mental overhead" in creating simple web sites driven by java.  
+> You actually have to design a program, code, compile, etc.  I know, boo 
+> hoo hoo.  But if you're familiar with the frequency of changes, updates, 
+> and complete rewrites on websites you'd know that any time saved is 
+> huge.
+> 
+> (IMHO) With servlets it's a lot of design and work to simply get the 5 
+> latest update announcements posted to the update database, formatting 
+> it into a table and spitting it out in html.  You have to worry about
+> getting 
+> the jdbc driver loaded and connected, then how you're going to get the 
+> html template for the page, parse it, insert the database content 
+> (formatted) into the page and stream the whole mess to the web server.  
+> Maybe worth the effort if you're doing a join across several disparate 
+> databases and trying to use xml metadata to connect everything...
+> 
+> With scripting tools like php, you are author the page, insert simple 
+> tags to indicate to php that you're going into php mode, insert the php 
+> code, and then close the tag.  So the html and code are in the same 
+> source.
+> 
+> I think servlet have their place and that we should try and get them 
+> running on the site for other uses (maybe a wiki replacement, or for 
+> source control) but for the basic web site, its just not a very practical 
+> technology.
+> 
+> Comments?
+> 
+> -iain
+> 
+> _______________________________________________
+> Admin maillist  -  Admin@jos.org
+> http://jos.org/mailman/listinfo/admin
+
+
+
+From shigeoka@ukans.edu Thu, 1 Apr 1999 17:03:05 -0600
+Date: Thu, 1 Apr 1999 17:03:05 -0600
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS-Admin] Re: The jos web site
+
+> The main reason I want servlets on the site is that I want to replace the
+> PERL stuff, such as the source server and wiki, as you mentioned.  We should
+> somehow be able to integrate the source server and the CVS repository.
+
+For that purpose, I couldn't agree more.  Especially with the wiki and 
+CVS server there are so many obvious enhancements that a java servlet 
+and java client would add.  
+
+So, how about it Helmut?  
+
+Or can we set up another machine for the servlet server?  Although that 
+would leave www.jos.org with practically nothing left if wiki and source 
+server went there.  Hasn't this been discussed before?  I thought I recall 
+mentions of maybe installing jrun on the server.
+
+-iain
+
+
+
+From DearWebby@webby.com Thu, 01 Apr 1999 16:36:44 -0800
+Date: Thu, 01 Apr 1999 16:36:44 -0800
+From: Helmut DearWebby@webby.com
+Subject: [JOS-Admin] Re: The jos web site
+
+If you guys can convince me that servlets are still being used in the real
+world outside of some schools, and that there is some real world benefit to
+them, we will quite gladly enable them.
+
+However, so far nobody has been able to show me any reason why we should
+take them off the shelf where PHP3, PERL and MIVA sit.
+
+If servlets can accomplish better and faster and easier what all our other
+clients routinely do with XXSSI, I will be  _VERY_  interested. 
+
+Anything that is better or faster or easier than what we currently use,
+will be eagerly and quickly installed. 
+
+I have explained to you yesterday in great detail how we use SSI  and Java
+for using variables to produce dynamic content, and I showed you a simple
+and straightforward and easy to understand example:
+
+
+http://hicards.com
+
+Show me on THAT example, how that lady could do it better or faster or
+easier with servlets, and you got me convinced. But simply saying that it's
+not quite as bad as PERL, that's not good enough.
+
+I WANT progress, so please convince me !
+Helmut
+
+
+At 03:03 PM 4/1/99 , Iain Shigeoka wrote:
+>> The main reason I want servlets on the site is that I want to replace the
+>> PERL stuff, such as the source server and wiki, as you mentioned.  We
+should
+>> somehow be able to integrate the source server and the CVS repository.
+>
+>For that purpose, I couldn't agree more.  Especially with the wiki and 
+>CVS server there are so many obvious enhancements that a java servlet 
+>and java client would add.  
+>
+>So, how about it Helmut?  
+>
+>Or can we set up another machine for the servlet server?  Although that 
+>would leave www.jos.org with practically nothing left if wiki and source 
+>server went there.  Hasn't this been discussed before?  I thought I recall 
+>mentions of maybe installing jrun on the server.
+>
+>-iain
+>
+>_______________________________________________
+>Admin maillist  -  Admin@jos.org
+>http://jos.org/mailman/listinfo/admin
+> 
+btw. The Cardmasters Spring World Championship has 
+started and YOU are one of the judges who determines
+who the new World Champion is. Your voting booth is at
+
+http://cards.webby.com
+So, check out the competitors and make your opinion count. Thanks for voting !
+
+DearWebby
+(Helmut)
+----------------------------------------------------------------------------
+------
+Webby, Inc  Web Marketing and high traffic web hosting
+Internet postcards and other effective marketing software
+
+
+
+From DearWebby@webby.com Fri, 02 Apr 1999 02:19:00 -0800
+Date: Fri, 02 Apr 1999 02:19:00 -0800
+From: Helmut DearWebby@webby.com
+Subject: [JOS-Admin] Re: The jos web site
+
+At 01:41 AM 10/18/98 , Ryan Heise wrote:
+>Helmut wrote:
+>
+>> Anything that is better or faster or easier than what we currently use,
+>> will be eagerly and quickly installed.
+
+>The obvious reason to go with Java, though, is that we can be sure to
+>find a Java programmer to write any code that is required :-) {{ This
+>being a Java project and all }}
+>Ryan Heise
+
+Well, show me !
+WE use Java, but so far all JOS is noticed for is for putting extremely
+disproportionate loads on the server with archaic relics like PERL and
+Python. Just look at TOP next time you go in with telnet. You don't see the
+sites that use Java, SSI, XXSSI and SHTML to process a thousand dynamic
+multimedia pages per hour lingering on TOP. Their processes just zip right
+through. The only ones that are lingering are  your "view", your "python",
+etc. 
+
+I had hoped we would be learning from you,  that you would contribute
+something new and better, or at the very least come up with a decent applet
+now and then. 
+
+If you can "write any code that is required", SHOW me on that example I
+mentioned:
+
+http://hicards.com
+Between all of you you should be able to come up with at least one tiny
+little token improvement !
+
+
+btw. The Cardmasters Spring World Championship has 
+started and YOU are one of the judges who determines
+who the new World Champion is. Your voting booth is at
+
+http://cards.webby.com
+So, check out the competitors and make your opinion count. Thanks for voting !
+
+DearWebby
+(Helmut)
+----------------------------------------------------------------------------
+------
+Webby, Inc  Web Marketing and high traffic web hosting
+Internet postcards and other effective marketing software
+
+
+
+From clark.evans@manhattanproject.com Fri, 02 Apr 1999 16:24:20 +0000
+Date: Fri, 02 Apr 1999 16:24:20 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] Re: The jos web site
+
+Helmut wrote:
+> Well, show me !
+
+Helmut,
+
+I don't want to get into a pissing contest.
+Unless your posts are relevant to JOS, I hope
+that you would refrain from posting.
+
+Clark
+
+
+
+From clark.evans@manhattanproject.com Fri, 02 Apr 1999 16:55:43 +0000
+Date: Fri, 02 Apr 1999 16:55:43 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] Re: The jos web site
+
+"Todd L. Miller" wrote:
+> While I don't particularly care -- having better things to do than
+> fiddle with pages (a.k.a. code) -- it would strike me as a trifle odd if
+> the website of a Java organization weren't to use servlets.
+
+If the people writing the web site would like to use
+servlets for the dynamic pages, they can do so at db.jos.org,
+I can build mod_jserv in if required.
+
+The only problem with servlets (besides memory and speed, which
+are also problems with PHP3 and Perl, etc), is that JDBC dosn't
+understand domain sockets, and thus, TCP/IP sockets must be
+enabled on the database.  This makes things slightly less secure,
+since there is one more port open for crackers.
+
+On the plus side for java, is the gjc compiler that
+cygnus is working on.  I hear the speedups are 2-10x
+the interpreted code.  However, it'll be a _long_ time
+before we see that available for servlets...
+
+PHP3 has proven to be relatively efficient, when you use
+it only for SSI, it's speed/time characteristics are 
+almost identical to Apache's built in SSI (since PHP3 is
+a compiled module).  When you start to use it for other
+tasks, (which SSI/XSSI cannot do), then it is, of course,
+slower.  But then, the alternative is a CGI call...
+
+As for perl, perl_mod is loaded once, removing 
+the hudge performance penalty that exists.  If 
+Helmut was smart, he'd include mod_perl in his
+apache compile and he'd see the wiki processes
+go to the bottom of his list...
+
+Clark
+
+
+
+From ajregier@earthlink.net Fri, 2 Apr 1999 14:42:37 -0500
+Date: Fri, 2 Apr 1999 14:42:37 -0500
+From: Avery J. Regier ajregier@earthlink.net
+Subject: [JOS-Admin] Re: The jos web site
+
+Helmut,
+
+>Well, show me !
+>WE use Java, but so far all JOS is noticed for is for putting extremely
+>disproportionate loads on the server with archaic relics like PERL and.
+>Python. Just look at TOP next time you go in with telnet. You don't see 
+the
+>sites that use Java, SSI, XXSSI and SHTML to process a thousand dynamic
+>multimedia pages per hour lingering on TOP. Their processes just zip right
+>through. The only ones that are lingering are  your "view", your "python",
+>etc.
+>
+>I had hoped we would be learning from you,  that you would contribute
+>something new and better, or at the very least come up with a decent 
+applet
+>now and then.
+
+You have a chance to learn from us.  You're not taking it.  There have been 
+repeated requests for servlets by various people within the JOS project 
+over the course of time.
+
+Here are some of the reasons why you haven't been learning from us:
+* PERL and Python are not the core competencies of the majority of JOS 
+members.  By nature, Java is.  It is of no surprise to me that some of the 
+tools we have built to support what we are trying to accomplish are poor 
+performers.  There have only been a few people who knew those languages and 
+technologies well enough to write those tools, and some of those people did 
+not stay with the project or got too busy to support the tools and make 
+improvements anymore.  We don't necessarily have people to take up the 
+slack because the core competency of our members is Java.
+* We haven't had much need for writing client side Java.  For those things 
+which we do need (such as the Chat applet) they required server-side 
+processes.  I don't know what the server portion of the Chat applet was 
+written in, but it certainly didn't stay running for long.  There isn't 
+much that people will be willing to do for the client-side Java piece if it 
+can't be used anyways.  Instead we have reverted to tried and true IRC.
+
+I work for an international, fortune 500 (at least) company and was the 
+technical person who spearheaded bringing servlets into our computing 
+environment and tested, recommended, implemented, and supported the servlet 
+runner.  It took a little bleeding to get the bugs worked out, but that 
+didn't take long.  Now the servlet applications we have are the most stable 
+and well behaving on the whole.  They are fast because a new process does 
+not have to be created for every hit like CGI.  Not only that but because 
+of their architecture, the only cost to starting execution of a normal 
+servlet hit is to create a new thread (depending on the servlet runner, 
+some of them even pool the threads).  We have been amazed at how many 
+applications we could fit onto one NT box.  (We had thought the limit of 
+manageability would be about ten per box, but we have already tripled that 
+with more to come.  The overhead on that box is not from the servlets, but 
+from our choice to have each application (each of which can be a rather 
+large number of servlets) in a seperate web server instance.  The web 
+servers are taking up far more memory than the well-writtten servlets.)  If 
+that can be done on a Windows machine, imagine what we can do on a Unix 
+box!
+
+Granted, we do have a very stable JIT compiler for our platform.  I don't 
+know what the status is of JIT compilers for the platform JOS is on (I'm 
+not even sure what that is.)  If there is no JIT compiler for the platform, 
+then we may be better off just waiting to go the servlet route until there 
+is a good one.  You can expect a 10X performance gain over plain 
+interpreted.
+
+Your apparent perception that servlets are not being used cannot be farther 
+from the truth.   They are being used all over the place and far more than 
+applets anymore.  It is kind of hard to see because they are all server 
+side, and there are many ways of masking their tell-tale sign in the URL.
+
+Servlets can and do have some drawbacks.  They are not good for everything, 
+and a good deal of what it sounds like you do they are not likely better 
+for.  There are, for instance, some problems with having to embed HTML in 
+your servlet code.  There are ways around this obstacle such as creating 
+reusable frameworks and tools for this purpose, such as many devlelopers 
+have done at my company.  There are also technologies such as page 
+compilation and JSP to help with that too.  However, the flexibility and 
+performance you gain over other technologies makes that pain worthwhile for 
+many a project.  Also, if you have a stupid developer, you can have memory 
+problems with servlets, but that is just like any other technology.
+
+If the JOS members are given the ability to develop the JOS site with the 
+technology that is their core competency, you will quite likely start 
+seeing some very interesting things come out of the project which will be 
+of a help to you.  I wouldn't expect much too fast, because site 
+development is not our primary focus.  Writing an operating system is.  We 
+will write the tools that are necessary for us to better communicate to 
+help us reach that goal.  If you decide that it isn't worh it, then we will 
+make do with what we have.
+
+We are appreciative of what you have contributed to us and the support you 
+give us.  I'm going to try and get back to studying Todd's code now...
+
+Thanks,
+Avery J. Regier
+
+-----Original Message-----
+From:	Helmut [SMTP:DearWebby@webby.com]
+Sent:	Friday, April 02, 1999 5:19 AM
+To:	Ryan Heise
+Cc:	shigeoka@ukans.edu; Regier Avery J; admin@jos.org
+Subject:	Re: [JOS-Admin] Re: The jos web site
+
+At 01:41 AM 10/18/98 , Ryan Heise wrote:
+>Helmut wrote:
+>
+>> Anything that is better or faster or easier than what we currently use,
+>> will be eagerly and quickly installed.
+
+>The obvious reason to go with Java, though, is that we can be sure to
+>find a Java programmer to write any code that is required :-) {{ This
+>being a Java project and all }}
+>Ryan Heise
+
+Well, show me !
+WE use Java, but so far all JOS is noticed for is for putting extremely
+disproportionate loads on the server with archaic relics like PERL and
+Python. Just look at TOP next time you go in with telnet. You don't see the
+sites that use Java, SSI, XXSSI and SHTML to process a thousand dynamic
+multimedia pages per hour lingering on TOP. Their processes just zip right
+through. The only ones that are lingering are  your "view", your "python",
+etc.
+
+I had hoped we would be learning from you,  that you would contribute
+something new and better, or at the very least come up with a decent applet
+now and then.
+
+If you can "write any code that is required", SHOW me on that example I
+mentioned:
+
+http://hicards.com
+Between all of you you should be able to come up with at least one tiny
+little token improvement !
+
+
+btw. The Cardmasters Spring World Championship has
+started and YOU are one of the judges who determines
+who the new World Champion is. Your voting booth is at
+
+http://cards.webby.com
+So, check out the competitors and make your opinion count. Thanks for 
+voting !
+
+DearWebby
+(Helmut)
+------------------------------------------------------------------------  
+----
+------
+Webby, Inc  Web Marketing and high traffic web hosting
+Internet postcards and other effective marketing software
+
+_______________________________________________
+Admin maillist  -  Admin@jos.org
+http://jos.org/mailman/listinfo/admin
+
+
+
+
+From shigeoka@ukans.edu Fri, 2 Apr 1999 14:42:16 -0600
+Date: Fri, 2 Apr 1999 14:42:16 -0600
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS-Admin] Re: The jos web site
+
+Avery J. Regier wrote:
+
+> Helmut,
+> 
+> >Well, show me !
+
+> You have a chance to learn from us.  You're not taking it.  There have been 
+> repeated requests for servlets by various people within the JOS project 
+> over the course of time.
+
+> If the JOS members are given the ability to develop the JOS site with the 
+> technology that is their core competency, you will quite likely start 
+> seeing some very interesting things come out of the project which will be 
+> of a help to you.  I wouldn't expect much too fast, because site 
+> development is not our primary focus.  Writing an operating system is.  We 
+> will write the tools that are necessary for us to better communicate to 
+> help us reach that goal.  If you decide that it isn't worh it, then we will 
+> make do with what we have.
+
+OK, before this gets too far into advocacy, I think we should just settle 
+this for our particular situation.  Anyone that wants to continue the 
+debate can take it offline.  For JOS:
+
+www.jos.org
+=========
+Status: Will remain unchanged (Thank you's to Helmut and Webby)
+Environment:  Perl, SSI, and HTML (remains same)
+
+Static pages (with our without SSI), wiki, and the FTP/source server will 
+live here.
+
+db.jos.org
+=========
+Status: Our dynamic machine (Thank you's to Clark Evans)
+Environment: Perl, SSI, HTML, PHP, PostgreSQL, Java Servlets
+
+Dynamic pages, forms processing, cron jobs to auto-update 
+www.jos.org, and xperimental wiki/ftp/source server projects that require 
+Servlets can live here.
+
+So if you're interested in trying to port wiki or the source server to java 
+servlets/java clients, you can test installs and put up a beta site on 
+db.jos.org.  If we decide to make a switch to a new servlet based 
+system, Helmut can evaluate if the new java servlet based system shall 
+be moved to www.jos.org.  It would be Helmut's decision because he 
+must do the installation of servlet support, and its his machine that 
+could potentially suffer from poor performance.
+
+If he decides not to, we can either leave it on db.jos.org (if its ok with 
+Clark) or find a new home for it.  Any disagreements with this?  Post it 
+to the list so we can make a decision on this and move on.
+
+-iain
+
+btw - where would an email to webmaster@jos.org, support@jos.org, 
+etc go right now?  I was thinking that those would be nice email 
+addresses to put in certain places on the new web site... :)
+
+
+
+From tmiller@haverford.edu Fri, 2 Apr 1999 16:13:16 -0500 (EST)
+Date: Fri, 2 Apr 1999 16:13:16 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Admin] Re: The jos web site
+
+	Sounds like a plan to me.  Avery seems to think (I would, albeit
+w/ no experience or numbers to back me up) that servlets will work well
+and work efficiently, and in general be a very superior solution.  If this
+is the case, than helmut should be relatively easy to convince and
+db.jos.org won't be needed for very long.  (Though it might be handy to
+test servlet updates.)
+
+-_Quinn
+
+
+
+
+From DearWebby@webby.com Fri, 02 Apr 1999 13:32:30 -0800
+Date: Fri, 02 Apr 1999 13:32:30 -0800
+From: Helmut DearWebby@webby.com
+Subject: [JOS-Admin] Re: The jos web site
+
+At 12:42 PM 4/2/99 , Iain Shigeoka wrote:
+>Avery J. Regier wrote:
+>
+>> Helmut,
+>> 
+>> >Well, show me !
+>
+
+>debate can take it offline.  For JOS:
+>
+>www.jos.org
+>=========
+>Status: Will remain unchanged (Thank you's to Helmut and Webby)
+>Environment:  Perl, SSI, and HTML (remains same)
+>
+By Monday we will also enable XSSI for you.
+That will enable you to pass even more variables dynamically between pages.
+We got it on most of our servers and it is great !
+
+btw. The Cardmasters Spring World Championship has 
+started and YOU are one of the judges who determines
+who the new World Champion is. Your voting booth is at
+
+http://cards.webby.com
+So, check out the competitors and make your opinion count. Thanks for voting !
+
+DearWebby
+(Helmut)
+----------------------------------------------------------------------------
+------
+Webby, Inc  Web Marketing and high traffic web hosting
+Internet postcards and other effective marketing software
+
+
+
+From DearWebby@webby.com Fri, 02 Apr 1999 14:04:32 -0800
+Date: Fri, 02 Apr 1999 14:04:32 -0800
+From: Helmut DearWebby@webby.com
+Subject: [JOS-Admin] Re: The jos web site
+
+At 12:42 PM 4/2/99 , Iain Shigeoka wrote:
+>btw - where would an email to webmaster@jos.org, support@jos.org, 
+>etc go right now?  I was thinking that those would be nice email 
+>addresses to put in certain places on the new web site... :)
+> 
+Currently those addresses bounce to me, NOT because I want them, but
+because nobody else seems to want them for more than a few weeks.There
+doesn't seem to be any noticeable amount of mail to those addresses. If any
+of you want them, just tell Clark or me. It only takes a moment to assign
+them. All I ask is that if you get busy with other things or change your
+ISP, tell me.
+
+btw. The Cardmasters Spring World Championship has 
+started and YOU are one of the judges who determines
+who the new World Champion is. Your voting booth is at
+
+http://cards.webby.com
+So, check out the competitors and make your opinion count. Thanks for voting !
+
+DearWebby
+(Helmut)
+----------------------------------------------------------------------------
+------
+Webby, Inc  Web Marketing and high traffic web hosting
+Internet postcards and other effective marketing software
+
+
+
+From DearWebby@webby.com Sat, 03 Apr 1999 01:22:51 -0800
+Date: Sat, 03 Apr 1999 01:22:51 -0800
+From: Helmut DearWebby@webby.com
+Subject: [JOS-Admin] Re: The jos web site
+
+At 08:55 AM 4/2/99 , Clark Evans wrote:
+
+>As for perl, perl_mod is loaded once, removing 
+>the hudge performance penalty that exists.  If 
+>Helmut was smart, he'd include mod_perl in his
+>apache compile and he'd see the wiki processes
+>go to the bottom of his list...
+>Clark
+
+I don't think anybody else on that machine uses PERL any more.
+There are a bunch of HTML based chats on that machine, 
+but you never see them linger, neither at the top nor at the bottom.
+
+Also, hanging Perl onto Apache won't make a bit of difference with Wiki. 
+
+The program itself isn't really DOING anything that should account for a
+detectable load. It's not doing serious graphics work or compiling big
+stats,  -just minor messing with text and simple searches. Compared to all
+the heavy stuff flying through, that SHOULD not show up at all, and above
+all, light stuff like that should not linger in TOP.
+
+Maybe when you port Wiki to Java or C,  you could try to find out what in
+it hogs resources and doesn't release them. 
+
+
+btw. The Cardmasters Spring World Championship has 
+started and YOU are one of the judges who determines
+who the new World Champion is. Your voting booth is at
+
+http://cards.webby.com
+So, check out the competitors and make your opinion count. Thanks for voting !
+
+DearWebby
+(Helmut)
+----------------------------------------------------------------------------
+------
+Webby, Inc  Web Marketing and high traffic web hosting
+Internet postcards and other effective marketing software
+
+
+
+From clark.evans@manhattanproject.com Sat, 03 Apr 1999 19:57:53 +0000
+Date: Sat, 03 Apr 1999 19:57:53 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] Re: The jos web site
+
+Iain Shigeoka wrote:
+> db.jos.org
+> =========
+> Status: Our dynamic machine (Thank you's to Clark Evans)
+> Environment: Perl, SSI, HTML, PHP, PostgreSQL, Java Servlets
+> 
+> Dynamic pages, forms processing, cron jobs to auto-update
+> www.jos.org, and xperimental wiki/ftp/source server projects that require
+> Servlets can live here.
+> 
+> So if you're interested in trying to port wiki or the source server to java
+> servlets/java clients, you can test installs and put up a beta site on
+> db.jos.org.  If we decide to make a switch to a new servlet based
+> system, Helmut can evaluate if the new java servlet based system shall
+> be moved to www.jos.org.  It would be Helmut's decision because he
+> must do the installation of servlet support, and its his machine that
+> could potentially suffer from poor performance.
+
+Iain,
+
+I downloaded the new version of Apache, mod_jserv, and mod_php3 
+and installed them on db.jos.org.  The installation isn't perfect,
+so you are welcome to fix it up.   Apache is installed at /opt/apache,
+JServ is installed at /opt/jserv, and Java 1.1.7 is installed at
+/opt/java.  The "dev" group owns these trees and the /usr/local/src tree
+which contains the distribution.  Currently, the copy of apache in
+/opt/apache is running on port 8080 and I think I got the configuration
+correct.  PostgreSQL 6.4 is also up and running on that box, with
+the TCP/IP sockets enabled.
+
+So... I guess, let me know if you have problems.  I no doubt made
+some mistakes in the setup, but you have permission to fix anything
+in the dev group.
+
+Best,
+
+Clark
+
+
+
+From robfitz@geocities.com Thu, 15 Apr 1999 10:16:58 -0500
+Date: Thu, 15 Apr 1999 10:16:58 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS-Admin] (Fwd) jos CVS failed
+
+Hello
+
+There is a problem with the CVS repository.  It seems to have been 
+caused by some of the directories/files having the wrong permissions, 
+and when I or someone else starts the CVS server (after a reboot), we 
+can't access the files.
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+------- Forwarded Message Follows -------
+Date sent:      	Wed, 14 Apr 1999 09:13:58 -0700 (PDT)
+From:           	Benoit Cosials <bcosials@yahoo.com>
+Subject:        	jos CVS failed
+To:             	robfitz@geocities.com
+
+Hi, Mr Fitzsimons
+
+I just try to get some jos code and failed
+I am a newbie on CVS but perhaps I need some access
+permission? You'll find below the error report...
+
+Could you say me what 's going wrong
+
+Have a good day!
+
+
+cvs server: Updating
+jos/library/org/jos/server/popd/jos
+cvs server: failed to create lock directory in
+repository
+`/sites/jos/cvs/cvsroot/jos/library/org/jos/server/popd/jos':
+Permission denied
+cvs server: failed to obtain dir lock in repository
+`/sites/jos/cvs/cvsroot/jos/library/org/jos/server/popd/jos'
+cvs [server aborted]: read lock failed - giving up
+
+The command encountered an error
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at http://mail.yahoo.com
+
+
+
+
+From tmiller@haverford.edu Thu, 15 Apr 1999 12:43:46 -0400 (EDT)
+Date: Thu, 15 Apr 1999 12:43:46 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Admin] (Fwd) jos CVS failed
+
+> There is a problem with the CVS repository.  It seems to have been 
+> caused by some of the directories/files having the wrong permissions, 
+> and when I or someone else starts the CVS server (after a reboot), we 
+> can't access the files.
+
+	The files in question are owned by 'ryanh,' who I would guess is
+Ryan Heise; I can't change the permissions, which don't include
+group-write, unlike the rest of the jos directories.  If we can't get a
+hold of ryan or a sysadmin to make the change, I could probably copy them
+to some other directory with the right permissions.  (I'm not sure if this
+is any new information...)
+
+-_Quinn
+
+
+
+
+From shigeoka@ukans.edu Thu, 15 Apr 1999 12:27:57 -0500
+Date: Thu, 15 Apr 1999 12:27:57 -0500
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS-Admin] New www.jos.org Web Page...
+
+Hello all,
+
+The proposed "new" www.jos.org front end (index.html web page) is now 
+available for review at www.jos.org/test/.  As you can see its not that 
+much different than the current one.  I've been working on database 
+integration issues.  However, that's taking too long so I wanted to get 
+something moving (so everyone thinks _something_ related to the www 
+re-org is happening).
+
+You may be wondering what is/are the benefit(s) of this web re-org.  
+Right now this seems to be just a new border around the original web 
+?front door? page with links to Wiki.  Well, the idea is to provide some 
+structure to Wiki for new comers, members of the press, and those of 
+us who don?t like to bookmark every section of the Wiki so we can find 
+things.  The other is that we hope to add database functionality to make 
+things like news and status reports easier to do than with Wiki.  What 
+do you think?  Discussion should be carried out on the general jos 
+mailing list (general@jos.org).  If there are no serious objections, I?ll be 
+moving this into the main www.jos.org page April 22, 1999.
+
+What do people think about me adding the navigation box at the left to 
+the wiki templates so it appears in all wiki pages?
+
+-iain shigeoka
+
+
+
+From qfinger@mlink.net Thu, 15 Apr 1999 13:37:32 -0400
+Date: Thu, 15 Apr 1999 13:37:32 -0400
+From: Philippe Lalande qfinger@mlink.net
+Subject: [JOS-Admin] New www.jos.org Web Page...
+
+>What do people think about me adding the navigation box at the left to 
+>the wiki templates so it appears in all wiki pages?
+
+Yes it is a must. Being about to move to important section of a Web site
+from any pages is very important for its success. 
+
+Some comment about the front page. It looks a bit packed. Maybe adding more
+white space between the top heading and the navigation bar and between the
+navigation bar and  main text would improved the look. Otherwise, very nice
+work!
+
+Philippe
+
+
+
+
+
+From clark.evans@manhattanproject.com Thu, 15 Apr 1999 23:28:42 +0000
+Date: Thu, 15 Apr 1999 23:28:42 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Admin] (Fwd) jos CVS failed
+
+Helmut,
+
+Could you "chmod -R g+w /sites/jos/cvs"
+
+Thanks!
+
+Clark
+
+
+"Todd L. Miller" wrote:
+> 
+> > There is a problem with the CVS repository.  It seems to have been
+> > caused by some of the directories/files having the wrong permissions,
+> > and when I or someone else starts the CVS server (after a reboot), we
+> > can't access the files.
+> 
+>         The files in question are owned by 'ryanh,' who I would guess is
+> Ryan Heise; I can't change the permissions, which don't include
+> group-write, unlike the rest of the jos directories.  If we can't get a
+> hold of ryan or a sysadmin to make the change, I could probably copy them
+> to some other directory with the right permissions.  (I'm not sure if this
+> is any new information...)
+> 
+> -_Quinn
+> 
+> _______________________________________________
+> Admin maillist  -  Admin@jos.org
+> http://jos.org/mailman/listinfo/admin
+
+
+
+From ryan@whitewolf.com.au Fri, 16 Apr 1999 10:39:25 +1000
+Date: Fri, 16 Apr 1999 10:39:25 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] (Fwd) jos CVS failed
+
+Clark Evans wrote:
+> 
+> Helmut,
+> 
+> Could you "chmod -R g+w /sites/jos/cvs"
+> 
+> Thanks!
+
+I'm currently fixing this problem. The directories that are failing
+shouldn't be there. I was changing the directory structure and haven't
+removed the old directories yet. Sorry for any inconvenience caused.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From ryan@whitewolf.com.au Fri, 16 Apr 1999 10:52:06 +1000
+Date: Fri, 16 Apr 1999 10:52:06 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] (Fwd) jos CVS failed
+
+Clark Evans wrote:
+> 
+> Helmut,
+> 
+> Could you "chmod -R g+w /sites/jos/cvs"
+
+Don't run that. Do this instead:
+
+find /sites/jos/cvs/cvsroot -type d -exec chmod g+w '{}' \; 
+
+Thanks. (phew! - not that it would have been a disaster, it is easy
+enough to change the permissions back in such an event)
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From ryan@whitewolf.com.au Fri, 16 Apr 1999 11:27:32 +1000
+Date: Fri, 16 Apr 1999 11:27:32 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] (Fwd) jos CVS failed
+
+Robert Fitzsimons wrote:
+
+> There is a problem with the CVS repository.  It seems to have been
+> caused by some of the directories/files having the wrong permissions,
+> and when I or someone else starts the CVS server (after a reboot), we
+> can't access the files.
+
+Bernoit, you should be able to checkout everything from cvs now - just
+run "cvs co jos", or whatever module you want. If you still get errors,
+try removing the whole jos directory and try checking out again. If you
+already have a great deal downloaded and you don't want to remove what
+you've got, try this:
+
+rm -rf jos/library/org/jos/server
+cvs update -d jos
+
+Tell me if that works and I'll send out a message to the public mailing
+lists.
+
+Thanks.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From warpi@spin.de Fri, 16 Apr 1999 10:58:28 +0000
+Date: Fri, 16 Apr 1999 10:58:28 +0000
+From: Markus Peter warpi@spin.de
+Subject: [JOS-Admin] New www.jos.org Web Page...
+
+Iain Shigeoka wrote:
+> The other is that we hope to add database functionality to make
+> things like news and status reports easier to do than with Wiki.  What
+> do you think?  Discussion should be carried out on the general jos
+
+Hmm. The Wiki could be improved to handle this things nicely. I'll think
+about it.
+
+> mailing list (general@jos.org).  If there are no serious objections, I?ll be
+> moving this into the main www.jos.org page April 22, 1999.
+> 
+> What do people think about me adding the navigation box at the left to
+> the wiki templates so it appears in all wiki pages?
+
+As I'm the creator of this Wiki and know it rather well therefore, I
+think
+that maybe doing this with frames is the better idea. Otherwise the
+navigation
+box maybe interferes with the Wiki content and I do not want that
+somebody
+accidently damages the navigation bar with his Wiki page.
+
+-- 
+Markus Peter (SPiN GmbH - Java, Webdesign, Perl, Databases)
+warpi@spin.de - http://www.spin.de/
+
+
+
+From shigeoka@ukans.edu Sun, 18 Apr 1999 02:03:04 -0500
+Date: Sun, 18 Apr 1999 02:03:04 -0500
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS-Admin] New www.jos.org Web Page...
+
+> > The other is that we hope to add database functionality to make
+> > things like news and status reports easier to do than with Wiki.  What
+> > do you think?  Discussion should be carried out on the general jos
+> 
+> Hmm. The Wiki could be improved to handle this things nicely. I'll think
+> about it.
+
+OK.  I've actually been working on it using php and postgresql but if you 
+can think of a nice way to integrate it directly into Wiki that would be 
+cool too.  To avoid redundant work, we should coordinate efforts.  
+Speaking of Wiki:
+
+1. I've noticed the Wiki pages are set up for revisions of pages but its 
+not actually being done.  Any plans on getting this implemented? Or is 
+it and I'm just not seeing it?
+
+2. Helmut has noticed that the Wiki is a processor hog.  I've noticed 
+that there are typically < 10 changes a day to the wiki.  Perhaps 
+instead of doing the processing everytime a page is displayed (which 
+presumably happens often) we do the normal "view" processing for a 
+page everytime a page is changed (and unfortunately update all the 
+pages everytime any page is added/deleted (can a page be deleted 
+through the wiki?) which presumably happens even less often).  So Wiki 
+basically only runs when a change or add/delete are done.  It generates 
+static pages that are used whenever a wiki page is viewed.  The 
+algorithm you'd have to develop to scan/update all pages when a new 
+wiki page is created (to update links) could also be used to auto-
+generate a comprehensive wiki index which is sorely needed.  Also a 
+Wiki search?
+
+3. The wiki seems inherently hard to organize because its basically a 
+one layer deep, extremely bushy tree.  We basically have 6 braches:
+[JOS] [KAFFE] [KORE] [JAS] [RTEMS] [PSI] 
+with jos having the vast lion's share of pages 
+
+Branch: Page Count
+==============
+JOS           1249
+KAFFE       7
+KORE        3
+RTEMS      3
+PSI            3
+JAS           8
+
+Can you think of anyway for us to define "parent" page(s) for each page 
+so that they will show up in a heirarchy?  I suppose wiki could simply 
+move each file to a subdirectory when moved in the wiki system.  And 
+then at the top of each wiki page could be a "navigation line" similar to 
+the one they use on big sites like Yahoo.com (i.e.  
+"Location:  JOS -> WorkingGroups -> KernelGroup -> MicroKernel"
+with each step in the list being a link to the appropriate page).
+
+4.  Do you (Markus) have time to hack Wiki or should I help?  Since you 
+wrote wiki you can probably make these changes really fast but if you 
+don't have time I can help.
+
+> > What do people think about me adding the navigation box at the left to
+> > the wiki templates so it appears in all wiki pages?
+> 
+> As I'm the creator of this Wiki and know it rather well therefore, I think
+> that maybe doing this with frames is the better idea. Otherwise the navigation
+> box maybe interferes with the Wiki content and I do not want that somebody
+> accidently damages the navigation bar with his Wiki page.
+
+Not if its static (which I think is a "good idea").  It should only point to 
+major "stable" sections of the wiki to be useful so I don't see a problem 
+with putting it into the template.  Check out:
+
+http://jos.org/wiki/view/test/main
+
+Where I've hacked a pre-existing template to include a navigation bar.  If 
+we use SSI instead of hard coding it in like I've done there, we can 
+simply edit one "master" navigation bar code fragment and it will show 
+up in all wiki templates... and hence all wiki pages.  I was thinking of 
+doing it for the "static" front end web pages anyhow.
+
+(for test purposes only, that section of the wiki will be up and down and 
+deleted so don't put things you want to keep there).
+
+-iain
+
+
+
+From tmiller@haverford.edu Sat, 17 Apr 1999 16:09:46 -0400 (EDT)
+Date: Sat, 17 Apr 1999 16:09:46 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Admin] New www.jos.org Web Page...
+
+> ==============
+> JOS           1249
+> KAFFE       7
+> KORE        3
+> RTEMS      3
+> PSI            3
+> JAS           8
+
+	I motion that Kaffe, Kore, RTEMS, PSI, and JAS be dumped under a
+page in the JOS heirarchy, or put together under an 'other products'
+category.  Two things about the horizontal nav-bars: I'm not sure that the
+bottom one would add all that much, even if reorganized to include links
+more oriented towards developers browsing the tree*.  My complaint about
+the top one is that it's too wide -- [Changes] is always left hanging
+alone by itself on the next line.  Something like moving the 'glossary'
+and 'readings' under the FAQ link and renaming it 'help' (or something)
+would take care of the problem.
+
+	But I'm not a web designer.  BTW -- how's the 'front-end' coming
+along?  Wasn't there some motion toward making a site off the wiki to
+serve people interested in (getting) JOS but not helping with it?
+
+* As it stands now, I can't figure out *why* it's down there.  It doesn't
+seem to add much of any use.  The best use for it *I* can think of is
+links to the 'home pages' for various packages/distributions in/of JOS.
+Otherwise, just toss it.
+ 
+-_Quinn
+
+
+
+
+
+From bkn3@columbia.edu Sun, 18 Apr 1999 03:02:57 -0400 (EDT)
+Date: Sun, 18 Apr 1999 03:02:57 -0400 (EDT)
+From: Bradley Keith Neuberg bkn3@columbia.edu
+Subject: [JOS-Admin] Re: [JOS] Re: [JOS-Admin] New www.jos.org Web Page...
+
+On Sun, 18 Apr 1999, Iain Shigeoka wrote:
+
+> > > The other is that we hope to add database functionality to make
+> > > things like news and status reports easier to do than with Wiki.  What
+> > > do you think?  Discussion should be carried out on the general jos
+> > 
+> > Hmm. The Wiki could be improved to handle this things nicely. I'll think
+> > about it.
+> 
+> OK.  I've actually been working on it using php and postgresql but if you 
+> can think of a nice way to integrate it directly into Wiki that would be 
+> cool too.  To avoid redundant work, we should coordinate efforts.  
+> Speaking of Wiki:
+> 
+> 1. I've noticed the Wiki pages are set up for revisions of pages but its 
+> not actually being done.  Any plans on getting this implemented? Or is 
+> it and I'm just not seeing it?
+> 
+> 2. Helmut has noticed that the Wiki is a processor hog.  I've noticed 
+> that there are typically < 10 changes a day to the wiki.  Perhaps 
+> instead of doing the processing everytime a page is displayed (which 
+> presumably happens often) we do the normal "view" processing for a 
+> page everytime a page is changed (and unfortunately update all the 
+> pages everytime any page is added/deleted (can a page be deleted 
+> through the wiki?) which presumably happens even less often).  So Wiki 
+> basically only runs when a change or add/delete are done.  It generates 
+> static pages that are used whenever a wiki page is viewed.  The 
+> algorithm you'd have to develop to scan/update all pages when a new 
+> wiki page is created (to update links) could also be used to auto-
+> generate a comprehensive wiki index which is sorely needed.  Also a 
+> Wiki search?
+> 
+> 3. The wiki seems inherently hard to organize because its basically a 
+> one layer deep, extremely bushy tree.  We basically have 6 braches:
+> [JOS] [KAFFE] [KORE] [JAS] [RTEMS] [PSI] 
+> with jos having the vast lion's share of pages 
+> 
+> Branch: Page Count
+> ==============
+> JOS           1249
+> KAFFE       7
+> KORE        3
+> RTEMS      3
+> PSI            3
+> JAS           8
+> 
+> Can you think of anyway for us to define "parent" page(s) for each page 
+> so that they will show up in a heirarchy?  I suppose wiki could simply 
+> move each file to a subdirectory when moved in the wiki system.  And 
+> then at the top of each wiki page could be a "navigation line" similar to 
+> the one they use on big sites like Yahoo.com (i.e.  
+> "Location:  JOS -> WorkingGroups -> KernelGroup -> MicroKernel"
+> with each step in the list being a link to the appropriate page).
+
+Check out OpenPortal; it is like a Wiki but has nestable categories so
+that pages can contain pages.  So for example in Wiki a Wikiname might be
+MostRecentChanges, but in OpenPortal you could have a Wiki name such as
+/JOS/Projects/Kernel/Most Recent Changes (names can have spaces in
+OpenPortal).  Link services will automatically hyperlink to this page.  In
+OpenPortal pages can also return output, so that one page can 'call'
+another page as if it were a function and it could return output.  See
+www.openportal.org for the user interface templates.  OpenPortal will be
+released in June under the GPL, and is in 100% Pure Java using servlets.
+
+
+> 
+> 4.  Do you (Markus) have time to hack Wiki or should I help?  Since you 
+> wrote wiki you can probably make these changes really fast but if you 
+> don't have time I can help.
+> 
+> > > What do people think about me adding the navigation box at the left to
+> > > the wiki templates so it appears in all wiki pages?
+> > 
+> > As I'm the creator of this Wiki and know it rather well therefore, I think
+> > that maybe doing this with frames is the better idea. Otherwise the navigation
+> > box maybe interferes with the Wiki content and I do not want that somebody
+> > accidently damages the navigation bar with his Wiki page.
+> 
+> Not if its static (which I think is a "good idea").  It should only point to 
+> major "stable" sections of the wiki to be useful so I don't see a problem 
+> with putting it into the template.  Check out:
+> 
+> http://jos.org/wiki/view/test/main
+> 
+> Where I've hacked a pre-existing template to include a navigation bar.  If 
+> we use SSI instead of hard coding it in like I've done there, we can 
+> simply edit one "master" navigation bar code fragment and it will show 
+> up in all wiki templates... and hence all wiki pages.  I was thinking of 
+> doing it for the "static" front end web pages anyhow.
+> 
+> (for test purposes only, that section of the wiki will be up and down and 
+> deleted so don't put things you want to keep there).
+> 
+> -iain
+> 
+> _______________________________________________
+> General maillist  -  General@jos.org
+> http://jos.org/mailman/listinfo/general
+> 
+
+
+
+
+From scode_ufp@usa.net Sun, 18 Apr 1999 09:40:59 +0200 (CEST)
+Date: Sun, 18 Apr 1999 09:40:59 +0200 (CEST)
+From: Peter Schuller scode_ufp@usa.net
+Subject: [JOS-Admin] Re: [JOS] Re: [JOS-Admin] New www.jos.org Web Page...
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+> /JOS/Projects/Kernel/Most Recent Changes (names can have spaces in
+> OpenPortal).  Link services will automatically hyperlink to this page.  In
+
+Hmmm. I'm not sure about this, but doesn't the RFC that defines the URL
+explicitly forbid spaces in URLs? If so, one would have to remember to not
+use that feature of OpenPortal to maintain maximum compatibility.
+
+/ Peter Schuller
+
+- ---
+PGP userID: 0x5584BD98 or 'Peter Schuller <scode_ufp@usa.net>'
+E-Mail: scode_ufp@usa.net Web: http://hem.passagen.se/petersch
+Help create a free Java based operating system - www.jos.org.
+
+
+
+-----BEGIN PGP SIGNATURE-----
+Version: PGPfreeware 5.0i for non-commercial use
+Charset: noconv
+
+iQA/AwUBNxmJtcBfJ1FVhL2YEQLvhACeK9EcU325bqooibMm2JKxFK66W9QAoM5u
+sunjGzZ6H+lzRE3i9NMtEdou
+=XD6F
+-----END PGP SIGNATURE-----
+
+
+
+From warpi@spin.de Sun, 18 Apr 1999 09:02:36 +0000
+Date: Sun, 18 Apr 1999 09:02:36 +0000
+From: Markus Peter warpi@spin.de
+Subject: [JOS-Admin] Re: [JOS] Re: [JOS-Admin] New www.jos.org Web Page...
+
+Peter Schuller wrote:
+> 
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+> 
+> > /JOS/Projects/Kernel/Most Recent Changes (names can have spaces in
+> > OpenPortal).  Link services will automatically hyperlink to this page.  In
+> 
+> Hmmm. I'm not sure about this, but doesn't the RFC that defines the URL
+> explicitly forbid spaces in URLs? If so, one would have to remember to not
+> use that feature of OpenPortal to maintain maximum compatibility.
+
+The space simply must be converted to %20 - actually all characters can
+be present in URLs as long as they are encoded that way. JOS handles
+spaces, too,
+by the way (it was actually the first wiki to do so ) - but you have to
+explicitely create the link with a special command - and that way you
+lose
+much of what wiki is about.
+
+-- 
+Markus Peter (SPiN GmbH - Java, Webdesign, Perl, Databases)
+warpi@spin.de - http://www.spin.de/
+
+
+
+From shigeoka@ukans.edu Mon, 19 Apr 1999 01:21:43 -0500
+Date: Mon, 19 Apr 1999 01:21:43 -0500
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS-Admin] Re: [JOS] Re: [JOS-Admin] New www.jos.org Web Page...
+
+> Check out OpenPortal; it is like a Wiki but has nestable categories so
+...
+> www.openportal.org for the user interface templates.  OpenPortal will be
+> released in June under the GPL, and is in 100% Pure Java using servlets.
+
+Looks great!  I had wondered what you disappeared to do.  :)  So, 
+should we simply wait until OpenPortal is ready to go (and just hack the 
+current Wiki to hold us over)?  :)
+
+Seriously, I have some concerns regarding it:
+
+It appears to have all the new features we've been discussing.  However, 
+does it have all the old features?  For instance, in Wiki you simply write 
+a WikiName and its automatically linked (or a link to a potential new 
+page is generated).
+
+Does it have facilities for easily creating FAQ's and project  
+news/updates/status reports?  Or are those planned?  This was one of 
+the "new" things I had wanted to add to JOS's web site.
+
+Does it support versioning of pages (or is this planned)?
+
+I know you're still building the first prototype so things are a bit shakey 
+and you probably have a long wish list too.  Just wanted to get as much 
+info as possible.  I'd hate to do a lot of work on the current JOS web site 
+now only to have the effort become redundant in two months.  :)
+
+-iain
+
+
+
+From shigeoka@ukans.edu Mon, 19 Apr 1999 01:35:12 -0500
+Date: Mon, 19 Apr 1999 01:35:12 -0500
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS-Admin] New www.jos.org Web Page...
+
+> 	I motion that Kaffe, Kore, RTEMS, PSI, and JAS be dumped under a
+> page in the JOS heirarchy, or put together under an 'other products'
+
+I second the motion.  All in favor?  Unless there are serious objections 
+I'll do this on Thursday, April 22 when I migrate the new jos front page in.
+
+> category.  Two things about the horizontal nav-bars: I'm not sure that the
+> bottom one would add all that much, even if reorganized to include links
+> more oriented towards developers browsing the tree*.  My complaint about
+
+Agreed.  If I roll all the other wiki's into the main jos wiki, the bottom 
+horz nav bar will go away.  (maybe to be replaced by links to major 
+working group pages but initially just removed).
+
+> the top one is that it's too wide -- [Changes] is always left hanging
+> alone by itself on the next line.  Something like moving the 'glossary'
+> and 'readings' under the FAQ link and renaming it 'help' (or something)
+> would take care of the problem.
+
+Agreed.  Plus, I'd like to auto generate the "glossary" and call it an 
+"index".  The glossary should be an annotated index (but if the index is 
+autogenerated we'd need to come up with a specialized method of 
+annotating it so that the annotations "stick" between re-gen).
+
+> 	But I'm not a web designer.  BTW -- how's the 'front-end' coming
+> along?  Wasn't there some motion toward making a site off the wiki to
+> serve people interested in (getting) JOS but not helping with it?
+
+Yes.  The first crude prototype is available for review at 
+
+http://www.jos.org/test/
+
+It obviously needs more content but its available now to see if the 
+structure is what we're looking for.
+
+-iain
+
+
+
+From bkn3@columbia.edu Mon, 19 Apr 1999 00:38:11 -0400 (EDT)
+Date: Mon, 19 Apr 1999 00:38:11 -0400 (EDT)
+From: Bradley Keith Neuberg bkn3@columbia.edu
+Subject: [JOS-Admin] Re: [JOS] Re: [JOS-Admin] New www.jos.org Web Page...
+
+On Sun, 18 Apr 1999, Peter Schuller wrote:
+
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+> 
+> > /JOS/Projects/Kernel/Most Recent Changes (names can have spaces in
+> > OpenPortal).  Link services will automatically hyperlink to this page.  In
+
+When converted to URLs the spaces are turned into + (pluses), which is
+appropriate to the RFC spec.  So the above url would be
+/JOS/Projects/Kernel/Most+Recent+Changes
+
+> 
+> Hmmm. I'm not sure about this, but doesn't the RFC that defines the URL
+> explicitly forbid spaces in URLs? If so, one would have to remember to not
+> use that feature of OpenPortal to maintain maximum compatibility.
+> 
+> / Peter Schuller
+> 
+> - ---
+> PGP userID: 0x5584BD98 or 'Peter Schuller <scode_ufp@usa.net>'
+> E-Mail: scode_ufp@usa.net Web: http://hem.passagen.se/petersch
+> Help create a free Java based operating system - www.jos.org.
+> 
+> 
+> 
+> -----BEGIN PGP SIGNATURE-----
+> Version: PGPfreeware 5.0i for non-commercial use
+> Charset: noconv
+> 
+> iQA/AwUBNxmJtcBfJ1FVhL2YEQLvhACeK9EcU325bqooibMm2JKxFK66W9QAoM5u
+> sunjGzZ6H+lzRE3i9NMtEdou
+> =XD6F
+> -----END PGP SIGNATURE-----
+> 
+
+
+
+
+From bkn3@columbia.edu Mon, 19 Apr 1999 00:59:37 -0400 (EDT)
+Date: Mon, 19 Apr 1999 00:59:37 -0400 (EDT)
+From: Bradley Keith Neuberg bkn3@columbia.edu
+Subject: [JOS-Admin] Re: [JOS] Re: [JOS-Admin] New www.jos.org Web Page...
+
+On Mon, 19 Apr 1999, Iain Shigeoka wrote:
+
+> > Check out OpenPortal; it is like a Wiki but has nestable categories so
+> ...
+> > www.openportal.org for the user interface templates.  OpenPortal will be
+> > released in June under the GPL, and is in 100% Pure Java using servlets.
+> 
+> Looks great!  I had wondered what you disappeared to do.  :)  So, 
+> should we simply wait until OpenPortal is ready to go (and just hack the 
+> current Wiki to hold us over)?  :)
+
+It will be available in June under the GPL in 100% Pure Java.
+
+> 
+> Seriously, I have some concerns regarding it:
+> 
+> It appears to have all the new features we've been discussing.  However, 
+> does it have all the old features?  For instance, in Wiki you simply write 
+> a WikiName and its automatically linked (or a link to a potential new 
+> page is generated).
+> 
+
+Yes.  OpenPortal has extensive automagic linking services, which is what I
+call the Wiki names in Wiki.  OpenPortal has something called Easy Command
+Language (ECL), which let's you do some cool stuff.  The simplest example
+would be ["Main Page"], where the brackets indicate to the system that
+this is an ECL phrase.  This would be typed into a textarea box while
+editing a page.  The quotes say that this is the name of a page (this
+replaces the Wiki name idea.  So the system would automatically turn the
+phrase ["Main Page"] into a hyperlink that links to the page with the name
+"Main Page".
+
+Here's another example of ECL.  To make your own menu along the side of a
+page in OpenPortal, you would enter the following in the html through an
+edit box or in a template file:
+
+Menu
+----
+[Edit this Page]
+[Delete this Page]
+[Clone this Page]
+[Send Email to Author of this Page]
+
+OpenPortal's automagic system would automatically turn these into the
+correct hyperlinks to tell the openportal system to initiate these
+commands when clicked on by the user.
+
+Another cool ECL command is to put your email address between brackets at
+the bottom of an OpenPortal page, such as [bkn3@columbia.edu].  What this
+does is that every time the page is edited the OpenPortal system scans
+the page and sends email to anyone who has their email address in brackets
+on the system.  [bkn3@columbia.edu] is shorthand Easy Command Language for
+[on change bkn3@columbia.edu].
+
+One more cool ECL phrase is that you can use ownership terms instead of
+exact web page names.  So I could type the following into an edit form:
+
+Make sure to check out [My Home Page]
+
+and the system will convert it into the special form using whoever was
+the user who entered the MY part into the edit form:
+
+Make sure to check out [My {Brad Neuberg} Home Page]
+
+The sentence would print out on the screen as
+
+Make sure to check out _My Home Page_
+
+where the underscores are a hyperlink.  Anything between the {}s are not
+printed out.
+
+> Does it have facilities for easily creating FAQ's and project  
+> news/updates/status reports?  Or are those planned?  This was one of 
+> the "new" things I had wanted to add to JOS's web site.
+> 
+
+Yes.  OpenPortal supports something called weblets, which are sorta like
+server-side javabeans.  An example weblet would be a business card.  A
+weblet is a data-object that has data for certain properties, so for the
+business card this would be a Name, Organization, Phonenumber, etc.  A
+weblet also provides facilities to edit and change this data-object
+through a web interface, so that the weblet would provide an html form to
+change this data object.  One can add a new weblet to a page by using Easy
+Command Language.  To add a business card to a page I could type the
+following in the edit box:
+
+Make sure to check out my [BusinessCard].
+
+When I saved the page the page would reload with a blank business card
+embedded as html into the openportal page, with a tiny edit button next to
+it.  When I hit the edit button I would get a form with fields for the
+name, organization, phone number, etc.  One can have as many weblets on a
+page as they want:
+
+Everyone, please check out the [Schedule].  Also make sure to append your
+contact cards here:
+
+  [Brad Neuberg's Contact Card]
+  [Ward Cunningham's Contact Card]
+  [Markus Peter's Contact Card]
+
+Please read the FAQ below:
+
+[FAQ]
+
+Since weblets can be any sort of structured data, a FAQ Weblet could also
+be created.  Weblets are really just JavaBeans with a web interface to
+display and edit them.
+
+> Does it support versioning of pages (or is this planned)?
+
+Not right now.  Eventually CVS integration is planned (this would be
+OpenPortal 3).  OpenPortal 2 is what is being released at the end of June.
+
+> 
+> I know you're still building the first prototype so things are a bit shakey 
+> and you probably have a long wish list too.  Just wanted to get as much 
+> info as possible.  I'd hate to do a lot of work on the current JOS web site 
+> now only to have the effort become redundant in two months.  :)
+> 
+> -iain
+> 
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Tue, 20 Apr 1999 07:29:02 -0500
+Date: Tue, 20 Apr 1999 07:29:02 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Admin] (no subject)
+
+Anyone know what happened to the Changes page on the Wiki?  It is empty.
+http://www.jos.org/wiki/changes/main
+
+Thanks,
+Avery J. Regier
+
+
+
+
+From bcosials@yahoo.com Wed, 21 Apr 1999 06:11:19 -0700 (PDT)
+Date: Wed, 21 Apr 1999 06:11:19 -0700 (PDT)
+From: Benoit Cosials bcosials@yahoo.com
+Subject: [JOS-Admin] (Fwd) jos CVS failed
+
+Hello everybody :)
+
+I want to thank you all for helping me so quickly !
+And Now it's WORK !  GOOD !
+
+I will look closely the jos reorganisation.
+
+Bye.
+Benoit Cosials
+
+--- Ryan Heise <ryan@whitewolf.com.au> wrote:
+> Robert Fitzsimons wrote:
+> 
+> > There is a problem with the CVS repository.  It
+> seems to have been
+> > caused by some of the directories/files having the
+> wrong permissions,
+> > and when I or someone else starts the CVS server
+> (after a reboot), we
+> > can't access the files.
+> 
+> Bernoit, you should be able to checkout everything
+> from cvs now - just
+> run "cvs co jos", or whatever module you want. If
+> you still get errors,
+> try removing the whole jos directory and try
+> checking out again. If you
+> already have a great deal downloaded and you don't
+> want to remove what
+> you've got, try this:
+> 
+> rm -rf jos/library/org/jos/server
+> cvs update -d jos
+> 
+> Tell me if that works and I'll send out a message to
+> the public mailing
+> lists.
+> 
+> Thanks.
+> 
+> -- 
+> Ryan Heise
+> 
+> http://www.progsoc.uts.edu.au/~rheise/
+> 
+
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at http://mail.yahoo.com
+
+
+
+

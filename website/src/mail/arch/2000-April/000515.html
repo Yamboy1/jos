@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000512.html">
+   <LINK REL="Next" HREF="000513.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Fri, 28 Apr 2000 06:11:21 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000512.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000513.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#515">[ date ]</a>
+              <a href="thread.html#515">[ thread ]</a>
+              <a href="subject.html#515">[ subject ]</a>
+              <a href="author.html#515">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> &gt; Streams, RPC, IPC, RMI and CORBA are fundamental building blocks of shared
+</I>&gt;<i> &gt; objects.
+</I>&gt;<i> 
+</I>&gt;<i> I see it the other way around. Shared objects and streams are
+</I>&gt;<i> fundamental building blocks of RPC, IPC, RMI and CORBA.
+</I>
+(Strictly speaking, you could have said &quot;Shared objects and streams are
+the fundamental building blocks of RPC, RMI, and CORBA,&quot; because the other
+five things are all types of IPC.  But anyway...)
+
+	Any form of IPC can be implemented in terms of any other form of
+IPC.  Shared objects are currently implemented as message-passing between
+stubs, because they can't be shared directly in a conventional JVM.  It is
+similarly easy to see how RMI -- the invocation of a method in another
+process -- could implemented using shared objects.  The distinction and
+equivalance between IPC methods is of fundamental importance to parallel
+programming; the question of whether message-passing or shared-memory is
+appropriate rests on two questions: first, which is easier to program
+(which interface should you use?); and second, which is more efficient (is
+this program running on an 8-way SMP Alpha?  8 Athlons on a 10baseT
+network?), where the hardware topology is the primary determinant.  That
+is, the 8-way SMP will have better shared-memory performance, usually,
+than the network of workstations (NOW).  On the 8-way SMP, message-passing
+is implemented as an operation on shared memory, because it's so fast (has
+hardware support).  On the NOW, shared memory is implemented as
+message-passing because the only h/w support for i/o between nodes is the
+message-based network.
+
+	We can provide interfaces to both shared-memory (shared
+object/stream) and message-passing (RPC, RMI, CORBA) techniques.  The
+implementation of these interfaces (some of which are required by Java,
+some of which we can define) is h/w-specific.  My feeling is that the
+complexity of supporting loosely-coupled (non-physically-shared-memory)
+hardware should not be present in the kernel, and should be handled in a
+user-space library.  That user-space library may very well be jos.os.*!  
+The kernel shouldn't be able to tell.  As a matter of fact, of all the
+IPC methods, only shared memory requires kernel support.  Message-passing
+can always be arranged over the loopback network device.  (Well, the
+loopback network device (traditionally) requires kernel support, but it's 
+not exclusively used for IPC.)  Writing the RPC, CORBA, and RMI libs is,
+from my rather narrow-minded JVM-author POV, somebody else's
+problem.  Whether or not they're optimized for an architecture which can
+share objects is not my concern...  [btw, I used kernel a whole lot up
+here, and I technically should have been saying JVM support.  While kernel
+support would be necessary if we had native processes, we don't, so...]
+
+
+	Multiple native processes do not require 'natively' shared
+objects, as me and Ryan and have been contending; you could, conceivably,
+have the JavaProcess object in each Java process stub out to the canonical
+single JavaProcess that the (JVM's) scheduler plays with.  Doing this in
+(non-decaf) Java would require the use of RMI, which really should be
+implemented user-space -- and making a user-space call to create a process
+strikes me as a Bad Idea.  Implementing it natively, we actually have two
+choices: first, make two JavaProcess objects, one for each Java process,
+that have private native pointers to the same JVM (C++) object, and whose
+methods (all native) all operate on that object.  The second choice is
+more elegant, because it's a general solution to the problem of
+implementing a shared-objects API based on having references to
+processes.
+
+(BTW -- this API must be different from the one that would allow shared
+objects across multiple machines; again, we don't want process creation to
+depend on a user-space call.  That user-space API (PJM, let's say, for
+parallel java machine) would use the kernel (JVM) -level calls for shared
+objects if the processes in question were both/all on the same machine.)
+
+	The difficulty in the second choice -- what Ryan and I have been
+discussing/advocating -- doesn't like so much in enourmous complexity, but
+in doing it for the first time.  AFAIK, nobody's done work quite like this
+before.  (Though I have not done a literature search to confirm
+that.)  We must be very careful with what we're doing, and that takes time
+and alot of attention to little nagging details that looks suprisingly
+like complexity. :)  My objective in object-sharing is the principle of
+least suprises, mostly -- we want shared objects to act the way they
+'ought' to act, which, to me, implies the way objects shared between
+threads do.  It may be that we can't guarantee (sp?) certain properties we
+must be able to if we allow/support this very simple model.  (Also, most
+of the recent traffic has involved my rather stupid thoughts on
+flagging, which turns out to be totally useless.)
+
+	What properties do we need to guarantee?  First, that object
+sharing doesn't violate any requirements for in the VM or language specs,
+aside from the (I think) solved problem of type-safety.  That is, will the
+program operate as it should?  Second, we need to guarantee that object
+sharing does not adversely impact security or stability.  This combination
+of conditions may very well impose some very strict limits on the kinds of
+objects that can be shared.
+
+	In general, shared objects are desirous across processes for the
+same reasons they are across threads.  I see two: first, data, and second,
+methods.  For the first, shared-memory is a very convienient way to
+program certain kinds of parallelism; the second is OOP principle of
+packaging data with the methods necessary to utilise it.  As it turns out,
+we can mostly ignore methods!  Their bytecode is shared in the class
+definition share that enables object sharing.  Because the data associated
+with methods reside with the object, synchronization will behave exactly
+as expected across processes.  Sharing of data...
+
+	Clearly, sharing primitive types is not a problem, since they get
+handled by-value anyway.  (And since Strings are immutable, you could make
+a good argument that could be 'shared' by copying and nobody could
+tell.)  The question that remains to ponder is what happens when (a) we
+copy an object reference from a shared object or (b) a shared object's
+method returns an object reference.
+
+-_Quinn
+
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000512.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000513.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#515">[ date ]</a>
+              <a href="thread.html#515">[ thread ]</a>
+              <a href="subject.html#515">[ subject ]</a>
+              <a href="author.html#515">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

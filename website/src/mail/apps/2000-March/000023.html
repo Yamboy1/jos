@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] ZipFinder</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000022.html">
+   <LINK REL="Next" HREF="000024.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] ZipFinder</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] ZipFinder">gchii@mindspring.com</A><BR>
+    <I>Thu, 23 Mar 2000 08:49:51 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000022.html">[JOS-Apps] ConnectionBrowser</A></li>
+        <LI> Next message: <A HREF="000024.html">[JOS-Apps] ZipFinder</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#23">[ date ]</a>
+              <a href="thread.html#23">[ thread ]</a>
+              <a href="subject.html#23">[ subject ]</a>
+              <a href="author.html#23">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>BasicFinder is part of the org.jos.gchii.find2a package. It is an
+asynchronous I/O version of java.io.File. It searches for directories and
+files on a local file subsystem.
+
+ZipFinder is planned. It does not exist yet. For the Java 1 platform or
+higher, it is possible to create a ZipFinder to search for directories and
+files inside a .zip (or .jar) file. Like BasicFinder, ZipFinder must use
+asynchronous I/O.
+
+After opening a .zip file, its entire catalog is read. The catalog is
+sorted in alphabetical order. The ZipFinder iterates through the catalog,
+looking for files that match the given pattern. (Pattern matching has
+already been written.)
+
+As it iterates through the catalog, ZipFinder must detect changes in the
+directory. The name of each directory is broadcast to a directory listener.
+A directory is broadcast even when there are no matching files.
+
+A directory name is separated from a file name using the following
+conversion function:
+
+  /**
+   * Converts a file name (fn) to a directory name (dn).
+   * @param fn a file name
+   */
+  public String fn2dn( String fn ) {
+    int pos = fn.lastIndexOf( &quot;/&quot; ); // always slash in a .zip file
+    if ( pos &lt; 0 ) {
+      return &quot;&quot;;
+    }
+    return fn.substring( 0, pos );
+  }
+
+When ZipFinder finds a matching file, the name of each file is broadcast to
+a file listener. When there are no more files in the catalog, ZipFinder
+broadcasts this event to a FinderListener.
+
+(a) A finder is invoked through its run() method. Like BasicFinder,
+ZipFinder must implement the Finder interface in org.jos.finder1a.
+
+(b) If there is no listener installed when a finder is run, a finder must
+return immediately without broadcasting anything -- there is no listener to
+broadcast to.
+
+(c) When dealing with a zip file, the name of a directory and file always
+includes the name of the original zip.
+
+(d) Never broadcast the same directory twice. Never broadcast the same file
+twice.
+
+(e) The show option determines if a search is recursive. The starting path
+for a finder is determined by the path parameter. A ZipFinder needs a
+corresponding ZipFinderController for the Smart API. Here is an example of
+its URI:
+
+x-finder:zip:[file:sample.zip]/org/jos?pattern=*.*&amp;show=all
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000022.html">[JOS-Apps] ConnectionBrowser</A></li>
+	<LI> Next message: <A HREF="000024.html">[JOS-Apps] ZipFinder</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#23">[ date ]</a>
+              <a href="thread.html#23">[ thread ]</a>
+              <a href="subject.html#23">[ subject ]</a>
+              <a href="author.html#23">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Reflection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000224.html">
+   <LINK REL="Next" HREF="000226.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Reflection</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Reflection">digigod@earthling.net</A><BR>
+    <I>Mon, 13 Sep 1999 13:21:00 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000224.html">[JOS-Arch] Reflection</A></li>
+        <LI> Next message: <A HREF="000226.html">[JOS-Arch] =?iso-8859-1?Q?Jos=E9(tm)_for_Windows(tm)_-_Release_1a?=</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#225">[ date ]</a>
+              <a href="thread.html#225">[ thread ]</a>
+              <a href="subject.html#225">[ subject ]</a>
+              <a href="author.html#225">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> Reflect on this:
+</I>&gt;<i> 
+</I>&gt;<i> public class SystemExit() {
+</I>&gt;<i>   static() {
+</I>&gt;<i>     System.exit();
+</I>&gt;<i>   }
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> What happens when your code reflects this class?
+</I>&gt;<i> 
+</I>&gt;<i> Class c = Class.forName( &quot;SystemExit&quot; );
+</I>&gt;<i> Method[] c.getMethods();
+</I>&gt;<i> 
+</I>&gt;<i> Your program ends somewhere within the call to Class.forName(). So, how can
+</I>&gt;<i> you reflect the methods of such a class?
+</I>
+by denying the System.exit() call.
+ 
+&gt;<i> Have you ever wondered why the Java compiler never invokes a static method
+</I>&gt;<i> when it loads a class? It is because the Java compiler uses a better
+</I>&gt;<i> reflection API. Here is what reflection *should* do:
+</I>
+it does invoke anything, it loads the other classes to get bindings.
+ 
+&gt;<i> 1. Reflect without side-effects.
+</I>&gt;<i> 
+</I>&gt;<i> Reflection should be reflection-only. It must not assume the purpose of
+</I>&gt;<i> reflection is invocation. It must not invoke the static method of a class.
+</I>&gt;<i> 
+</I>&gt;<i> 2. Reflect any bytecode.
+</I>&gt;<i> 
+</I>&gt;<i> Reflection should be limitless. It must not assume the target of reflection
+</I>&gt;<i> is limited to the platform of the current JVM.
+</I>&gt;<i> 
+</I>&gt;<i> In other words, the right kind of reflection package should be able to
+</I>&gt;<i> reflect the Java 0 and 1 Platforms using a Java 2 Platform JVM. And
+</I>&gt;<i> likewise, the same package -- without modification -- should be able to
+</I>&gt;<i> reflect the Java 2 Platform using a Java 0 Platform JVM.
+</I>
+I like the reflection API, I think it does it right (more or less). I
+think what your describing is something slightly different and just as
+useful/important.
+ 
+&gt;<i> How not to do it
+</I>&gt;<i> Expanding the responsibilities of java.lang.Class is bad, very bad.
+</I>&gt;<i> Attaching reflection to the java.lang.Class class limits reflection to a
+</I>&gt;<i> platform equal to your JVM. The java.lang.Class object has nothing to do
+</I>&gt;<i> with static reflection.
+</I>&gt;<i>
+</I>&gt;<i> When java.lang.Class is used for reflection, the static() method is invoked
+</I>&gt;<i> while building the Class object. It executes bytecode that should not be
+</I>&gt;<i> executed for the sake of pure reflection.
+</I>
+thats because its not pure reflection, its useful reflection. but as I
+said above pure reflection has its place too.
+
+&gt;<i> How must bytecode can you write inside of a static() method?
+</I>&gt;<i> 
+</I>&gt;<i> There is no limit. There is nothing inherent in the static() method from
+</I>&gt;<i> loading a huge application. You can write a class-specific routine,
+</I>&gt;<i> following the recommended use of the static() method. Or, you can launch a
+</I>&gt;<i> thousand sub-programs.
+</I>&gt;<i> 
+</I>&gt;<i> Inside the JVM, the static() method must be invoked just like every other
+</I>&gt;<i> method. It has the potential to be very large. Before, the static() method
+</I>&gt;<i> is called, the JVM must update the class object itself to show that the
+</I>&gt;<i> static() method has been called, so that it cannot be called again for that
+</I>&gt;<i> instance of a class object.
+</I>&gt;<i> 
+</I>&gt;<i> The static() method must have its own stack frame, just like every other
+</I>&gt;<i> method. In a multiple thread environment, a static() method is able to
+</I>&gt;<i> create and start other threads. It must not block other threads. The JVM
+</I>&gt;<i> cannot afford to wait. It must continue to task-switch while the static()
+</I>&gt;<i> method is running.
+</I>
+its a class constructor, people misuse object constructors all the time
+too.
+ 
+&gt;<i> The static() method is *always* synchronized, preventing two or more
+</I>&gt;<i> threads from using the static() method at the same time. You write:
+</I>&gt;<i> 
+</I>&gt;<i> static() {
+</I>&gt;<i>   System.out.println( &quot;Hello, World!&quot; );
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> and the compiler writes:
+</I>&gt;<i> 
+</I>&gt;<i> public static synchronized static() {
+</I>&gt;<i>   System.out.println( &quot;Hello, World!&quot; );
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> [1] public because the JVM must invoke it.
+</I>&gt;<i> [2] static because it invoked without an instance of the class.
+</I>&gt;<i> [3] synchronized because it must be invoked once, and only once, as
+</I>&gt;<i> promised by the JVM.
+</I>
+its not a method like any other, you dont even use (). technically its a
+static initializer /block/ only the JVM can call it, just like its
+brethen the object constructors.
+ 
+&gt;<i> When does the JVM invoke this method()? It is a matter of semantics. The
+</I>&gt;<i> JVM usually invokes the static method as an instance of java.lang.Class is
+</I>&gt;<i> constructed. It must be invoked at some time after a class is resolved and
+</I>&gt;<i> before any other method is invoked.
+</I>
+I think it should be invoked when the class is resolved, you've given a
+clear argument for a pure-reflection API but not for altering the
+behavior of &lt;clinit&gt;.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000224.html">[JOS-Arch] Reflection</A></li>
+	<LI> Next message: <A HREF="000226.html">[JOS-Arch] =?iso-8859-1?Q?Jos=E9(tm)_for_Windows(tm)_-_Release_1a?=</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#225">[ date ]</a>
+              <a href="thread.html#225">[ thread ]</a>
+              <a href="subject.html#225">[ subject ]</a>
+              <a href="author.html#225">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Process Stuff</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000053.html">
+   <LINK REL="Next" HREF="000053.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Process Stuff</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Process Stuff">digigod@earthling.net</A><BR>
+    <I>Sun, 25 Jul 1999 14:14:48 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000053.html">[JOS-Arch] Re: Process Stuff, formally:Re: [JOS-Arch] Re: [JOS-UI] Re:
+ [JOS-Arch] RE:  [JOS-UI] peer-ui mappings
+ [JOS-Arch] RE:  [JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000053.html">[JOS-Arch] Process Stuff, formally:Re: [JOS-Arch] Re:
+ [JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings [JOS-UI] peer-ui
+ mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#56">[ date ]</a>
+              <a href="thread.html#56">[ thread ]</a>
+              <a href="subject.html#56">[ subject ]</a>
+              <a href="author.html#56">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> &gt;the process environment would be a thread, so that if app z doesnt have
+</I>&gt;<i> &gt;any threads it doesnt cause any problems and it can still spawn its own
+</I>&gt;<i> 
+</I>&gt;<i> Oh no. App z must be a separate thread because app z can spawn many child
+</I>&gt;<i> processes of its own. ProcessEnvironment is not a separate process. I'm
+</I>&gt;<i> pretty sure it doesn't need to run in a separate thread.
+</I>
+the Process would be a thread then? (I just woke up, when I wrote that I
+was up about 15hours) I want to say that that apps that just have a main
+would still run because the Process they were running in was a thread
+ 
+&gt;<i> Our create-process mechanism can't be arbitrary. It cannot run every class
+</I>&gt;<i> that has been compiled. In order for the process environment to run a class
+</I>&gt;<i> that class must implement a well-known interface. We could not, for
+</I>&gt;<i> example, run an instance of java.awt.Button, even if someone were to type
+</I>&gt;<i> java.awt.Button on a command line.
+</I>&gt;<i> 
+</I>&gt;<i> Every class that is &quot;launch-able&quot; by our process environment might be
+</I>&gt;<i> required to implement
+</I>&gt;<i> 
+</I>&gt;<i> public static void main( String[] args );
+</I>
+well, yea
+ 
+&gt;<i> or
+</I>&gt;<i> 
+</I>&gt;<i> java.lang.Runnable (could be dangerous)
+</I>
+I dont know about that, I know half the runnables I made would screw up
+royally if they were run as their own app, we should stick with public
+static void main(String args[])
+ 
+&gt;<i> or
+</I>&gt;<i> 
+</I>&gt;<i> public interface CustomProcess
+</I>&gt;<i>     extends Runnable {
+</I>&gt;<i>   public void setProcessEnvironment( ProcessEnvironment v );
+</I>&gt;<i> }
+</I>
+something like that would be ok, but it should have a main method also.
+you know check if the class has a main, if nto throw a null pointer
+exception, see if it implements custom process (or whatever) give it the
+extra info then run it like an ordinary up
+ 
+&gt;<i> Correction: I'm not sure how...but I think
+</I>&gt;<i> java.lang.System.getClass().getClassLoader() must return the
+</I>&gt;<i> process-specific class loader, while
+</I>&gt;<i> java.lang.Object.getClass().getClassLoader() can still return null.
+</I>
+you could never call System.getClass(), its a static class with 0
+instances and getClass isnt a static method
+ 
+&gt;<i> And, it may be Runtime rather than System that I'm thinking about. Runtime
+</I>&gt;<i> has those exec() methods, too. Exec should be called in the usual way to
+</I>&gt;<i> exec a child process--even on JOS.
+</I>
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000053.html">[JOS-Arch] Re: Process Stuff, formally:Re: [JOS-Arch] Re: [JOS-UI] Re:
+ [JOS-Arch] RE:  [JOS-UI] peer-ui mappings
+ [JOS-Arch] RE:  [JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000053.html">[JOS-Arch] Process Stuff, formally:Re: [JOS-Arch] Re:
+ [JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings [JOS-UI] peer-ui
+ mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#56">[ date ]</a>
+              <a href="thread.html#56">[ thread ]</a>
+              <a href="subject.html#56">[ subject ]</a>
+              <a href="author.html#56">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

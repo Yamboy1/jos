@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Great discussion!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000453.html">
+   <LINK REL="Next" HREF="000460.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Great discussion!</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [multiple process] Great discussion!">tmiller@haverford.edu</A><BR>
+    <I>Wed, 12 Apr 2000 01:11:19 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000453.html">[JOS-Arch] [multiple process] Great discussion!</A></li>
+        <LI> Next message: <A HREF="000460.html">[JOS-Arch] Distributed System Papers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#457">[ date ]</a>
+              <a href="thread.html#457">[ thread ]</a>
+              <a href="subject.html#457">[ subject ]</a>
+              <a href="author.html#457">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> 1. I recommend a &quot;MPCL/M&quot; design for a first pass at jJOS/decaf.
+</I>&gt;<i> 2. I recommend a &quot;MPCL/B&quot; design for a second pass.
+</I>
+	I agree.  (2) will require native support, but it should be
+relatively easy to adapt the code from (1), and I think we'll have a
+better idea of what needs to happen after working with (1).
+
+&gt;<i> The JNI design won't go away. The JNI design also provides multiple
+</I>&gt;<i> bytecode processes within a machine code process. Multiple instances of a
+</I>&gt;<i> virtual machine is infinitely more complex.
+</I>
+	Indeed, and since our kernel doesn't support multiple native
+processes yet, I think we can safely ignore if for now.  Again -- once
+(1) is done, this should become clearer.
+
+&gt;<i> For the first time, I see that it is not necessary to have multiple
+</I>&gt;<i> instances of a virtual machine to accomplish multiple processes in
+</I>&gt;<i> bytecode. By constantly chipping away at the assumptions of the Java
+</I>&gt;<i> Virtual Machine Specification, the JOS Project has convinced me that the
+</I>&gt;<i> primordial class loader is the critical component.
+</I>
+	Now that we agree on /what/ we're doing, we just need to agree on
+/how/ to do it. :)
+
+&gt;<i> A virtual machine can have many primordial class loaders. And, these class
+</I>&gt;<i> loaders can be hybrid classes, implimented partly in machine code and
+</I>&gt;<i> partly in bytecode.
+</I>
+	I might even say /ideally/ are hybrid classes, because the native
+code allows great integration with the JVM and the bytecode allows for
+more adaptable control.
+
+&gt;<i> Enabling more than one primordial class loader seems to be the minimum
+</I>&gt;<i> clarification to the Java Virtual Machine Specification that give us
+</I>&gt;<i> multiple bytecode processes.
+</I>
+	It's enabling /disjoint/ classloaders that is the minimum
+clarification (good word:)) to the JVM spec that allows multiple
+bytecode processes.  Implementation of disjoint classloaders (without
+breaking compatibility) requires multiple primordial classloaders*.
+
+&gt;<i> I am sorry. I have been working long and hard on the efficiency of a
+</I>&gt;<i> bytecode cache. We can enjoy multiple processes for a long time before we
+</I>&gt;<i> need to be concerned with virtual machine efficiency.
+</I>
+	OTOH, we /do/ need efficient virtual machines.  My development
+machine has 'just' 128 MB of RAM, so I'll be forced to write efficient
+processes just to get anything done.  And don't apologize, especially for
+working hard!  Trying to explain my ideas (and failing!) to you and Heise
+have helped my clarify them and realize where I've been wrong.  Hopefully,
+we'll be needing efficiency soon...
+
+&gt;<i> Before we optimize a bytecode cache, or class definition cache, or class
+</I>&gt;<i> cache, we should demonstrate a multiple process virtual machine (MPVM).
+</I>
+	Yes, we should.  Which means I should really get cranking on
+finishing the interpreter...
+
+&gt;<i> When I press enter, the shell program should create a new user process. The
+</I>&gt;<i> new user process re-loads parts of the Java standard class library. The
+</I>&gt;<i> runnable class runs in the new user process.
+</I>
+	Right on.  The big demonstration, though, is to pipe one
+application's System.out to another's System.in -- something that nobody
+else can do in a single JVM.
+
+The steps we need to take, then, are:
+
+(1) Allow multiple independent native/primordial classloaders.  Already done.
+(2) Allow Java code access to this new native power.  Either have it
+framed as a request to generate a new process, which returns a Process
+object (of some kind or another -- Gilbert, I believe you have a sketch of
+this class somewhere?), or frame it as a request to the classloader
+constructor, do I get a new primordial loader or not?  We need to
+decide; and since whatever we pick is pretty much 'just' an API issue, it
+can change if it doesn't work out.
+(3) Write a shell.  (Gilbert, this is right up your alley; it would
+basically suck input from System.in and pass it onto the browser, right?)
+(3A) This would, BTW, require that the consoles handle converting keyboard
+events into System.in and System.out into write requests.  (I think this
+would be a better place to put it than in each shell, but I may be wrong.)
+(3B) Make sure the shell redirects standard input and output as necessary.
+(4) Get decaf to the state where init will set up the console and keyboard
+drivers, and start 'login' on each of the consoles (or something
+appropriately ad-hoc), where login then sleeps waiting for the shell it
+started to end.
+(5) make 'generateRandomGarbageOnStdOut | sortStdIn' work :)
+
+That would conclude the demonstration.
+
+Further work:
+
+(6) Allow 'illegal' casts.  This won't be a problem until the processes
+start dumping Serializables down the pipes.
+(7) Do something more efficient than completely cleaning out each new
+primordial loader.
+
+
+	I think we all agree (more or less) on (1) to (5), and that we're
+all still hacking away at (6) and (7), which are closely related.  More on
+them from me later :)
+
+-_Quinn
+
+* Now that I'm thinking about it a little more, since classloaders can't
+be disjoint unless their primordial loaders are (or don't have any classes
+loaded, which can't (normally) happen), the two statements are
+equivalent.  That is, disjoint classloaders require multiple primordial
+classloaders, and multiple primordial classloaders, in turn, generate
+disjoint classloaders.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000453.html">[JOS-Arch] [multiple process] Great discussion!</A></li>
+	<LI> Next message: <A HREF="000460.html">[JOS-Arch] Distributed System Papers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#457">[ date ]</a>
+              <a href="thread.html#457">[ thread ]</a>
+              <a href="subject.html#457">[ subject ]</a>
+              <a href="author.html#457">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

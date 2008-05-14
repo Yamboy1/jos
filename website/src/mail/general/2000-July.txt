@@ -1,0 +1,348 @@
+From a.vanefferen@mediacom4.nl Thu, 13 Jul 2000 03:21:41 +0200
+Date: Thu, 13 Jul 2000 03:21:41 +0200
+From: Arjen van Efferen a.vanefferen@mediacom4.nl
+Subject: [JOS] JOS Website
+
+Hi all,
+
+It seems someone has done something wrong on the JOS Website. The
+MemberList is gone
+
+Who is the maintainer of that page?
+
+-- Arjen
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 13 Jul 2000 07:47:05 -0700 (PDT)
+Date: Thu, 13 Jul 2000 07:47:05 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] JOS Website
+
+If you are registered with the wiki, then you are!  :)
+Looks like someone nuked it.  I'll try and recover out
+of vcs.
+
+-iain
+
+
+--- Arjen van Efferen <a.vanefferen@mediacom4.nl> wrote:
+> Hi all,
+> 
+> It seems someone has done something wrong on the JOS Website. The
+> MemberList is gone
+> 
+> Who is the maintainer of that page?
+> 
+> -- Arjen
+> 
+> _______________________________________________
+> General maillist  -  General@jos.org
+> http://jos.org/mailman/listinfo/general
+
+
+__________________________________________________
+Do You Yahoo!?
+Get Yahoo! Mail ? Free email you can access from anywhere!
+http://mail.yahoo.com/
+
+
+
+
+From a.vanefferen@mediacom4.nl Thu, 13 Jul 2000 17:51:36 +0200
+Date: Thu, 13 Jul 2000 17:51:36 +0200
+From: Arjen van Efferen a.vanefferen@mediacom4.nl
+Subject: [JOS] Online Java Package Viewer
+
+A time ago i created a webapplication to be able to view Java-files
+online.
+
+You may have a look at http://jos.mediacom4.nl for the newest version.
+Maybe it's usefull for other JOS-members. Let me know.
+
+-- Arjen
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 13 Jul 2000 09:21:50 -0700 (PDT)
+Date: Thu, 13 Jul 2000 09:21:50 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] JOS Website
+
+Where did I learn how to type?  I meant RCS.  It ended up just
+being easier to edit the MemberList directly.  Let me know if
+there are other problems.
+
+-iain
+
+--- Iain Shigeoka <iainshigeoka@yahoo.com> wrote:
+> If you are registered with the wiki, then you are!  :)
+> Looks like someone nuked it.  I'll try and recover out
+> of vcs.
+> 
+> -iain
+> 
+> 
+> --- Arjen van Efferen <a.vanefferen@mediacom4.nl> wrote:
+> > Hi all,
+> > 
+> > It seems someone has done something wrong on the JOS Website. The
+> > MemberList is gone
+> > 
+> > Who is the maintainer of that page?
+> > 
+> > -- Arjen
+> > 
+> > _______________________________________________
+> > General maillist  -  General@jos.org
+> > http://jos.org/mailman/listinfo/general
+> 
+> 
+> __________________________________________________
+> Do You Yahoo!?
+> Get Yahoo! Mail ? Free email you can access from anywhere!
+> http://mail.yahoo.com/
+> 
+> _______________________________________________
+> General maillist  -  General@jos.org
+> http://jos.org/mailman/listinfo/general
+
+
+__________________________________________________
+Do You Yahoo!?
+Get Yahoo! Mail ? Free email you can access from anywhere!
+http://mail.yahoo.com/
+
+
+
+
+From a.vanefferen@mediacom4.nl Wed, 19 Jul 2000 21:43:16 +0200
+Date: Wed, 19 Jul 2000 21:43:16 +0200
+From: Arjen van Efferen a.vanefferen@mediacom4.nl
+Subject: [JOS] Communication between java application
+
+Hi all,
+
+Is there a way to have to applications communicate with eachother? I
+know i can use RMI, CORBA or TCP/IP to establish a connection between
+two applications, but isn't there a way to get a reference to a running
+program so i can invoke methods from that running app?
+
+This is the situation. I'm creating a Daemon app, This app runs in the
+backjground without user interaction. Now i want to create a manager-app
+to start and stop this daemon app. I've implemented two methods in that
+daemon (startService() and stopService()). Now i want to have that
+manager call one of those methods to start and stop the daemon. Is that
+possible?
+
+Or does JOS provide another environment where apps are running in?
+
+Thanks.
+
+-- Arjen van Efferen
+
+
+
+
+From iainshigeoka@yahoo.com Wed, 19 Jul 2000 14:02:43 -0700 (PDT)
+Date: Wed, 19 Jul 2000 14:02:43 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Communication between java application
+
+--- Arjen van Efferen <a.vanefferen@mediacom4.nl> wrote:
+
+> 
+> Is there a way to have to applications communicate with eachother? I
+> know i can use RMI, CORBA or TCP/IP to establish a connection between
+> two applications, but isn't there a way to get a reference to a running
+> program so i can invoke methods from that running app?
+
+Why not use one of those methods?  Is there any reason to avoid this
+tried and true solutions?
+
+> This is the situation. I'm creating a Daemon app, This app runs in the
+> backjground without user interaction. Now i want to create a manager-app
+> to start and stop this daemon app. I've implemented two methods in that
+> daemon (startService() and stopService()). Now i want to have that
+> manager call one of those methods to start and stop the daemon. Is that
+> possible?
+
+Sounds like the perfect place to use RMI Activation as provided
+for by rmid.  It's especially well suite to daemon processes as
+you describe.  I personally would use Jini with Activation to
+provide dynamic, loosely coupled, "federations" of services.
+
+> Or does JOS provide another environment where apps are running in?
+
+JOS is not ready for such use.  When it is, we plan on supporting
+the entire standard java platform which includes rmi, tcpip, and
+on top of it, activation and Jini.
+
+-iain
+
+__________________________________________________
+Do You Yahoo!?
+Get Yahoo! Mail ? Free email you can access from anywhere!
+http://mail.yahoo.com/
+
+
+
+
+From a.vanefferen@mediacom4.nl Thu, 20 Jul 2000 00:03:55 +0200
+Date: Thu, 20 Jul 2000 00:03:55 +0200
+From: Arjen van Efferen a.vanefferen@mediacom4.nl
+Subject: [JOS] Communication between java application
+
+
+-----Original Message-----
+From: Iain Shigeoka [mailto:iainshigeoka@yahoo.com]
+Sent: woensdag 19 juli 2000 23:03
+To: Arjen van Efferen; 'general@jos.org'
+Subject: Re: [JOS] Communication between java application
+
+
+
+--- Arjen van Efferen <a.vanefferen@mediacom4.nl> wrote:
+
+> 
+> Is there a way to have to applications communicate with eachother? I
+> know i can use RMI, CORBA or TCP/IP to establish a connection between
+> two applications, but isn't there a way to get a reference to a
+running
+> program so i can invoke methods from that running app?
+
+> Why not use one of those methods?  Is there any reason to avoid this
+> tried and true solutions?
+
+Well, i don't completely understand RMI and or CORBA.... We've used
+CORBA at school, and the first thing i did after those lessons was
+burning those books. Damn, i hate CORBA.
+I better start working on RMI instead :)
+
+> This is the situation. I'm creating a Daemon app, This app runs in the
+> backjground without user interaction. Now i want to create a
+manager-app
+> to start and stop this daemon app. I've implemented two methods in
+that
+> daemon (startService() and stopService()). Now i want to have that
+> manager call one of those methods to start and stop the daemon. Is
+that
+> possible?
+
+> Sounds like the perfect place to use RMI Activation as provided
+> for by rmid.  It's especially well suite to daemon processes as
+> you describe.  I personally would use Jini with Activation to
+> provide dynamic, loosely coupled, "federations" of services.
+
+> Or does JOS provide another environment where apps are running in?
+
+> JOS is not ready for such use.  When it is, we plan on supporting
+> the entire standard java platform which includes rmi, tcpip, and
+> on top of it, activation and Jini.
+
+> -iain
+
+> __________________________________________________
+> Do You Yahoo!?
+> Get Yahoo! Mail ? Free email you can access from anywhere!
+> http://mail.yahoo.com/
+
+_______________________________________________
+General maillist  -  General@jos.org
+http://jos.org/mailman/listinfo/general
+
+
+
+
+From iainshigeoka@yahoo.com Wed, 19 Jul 2000 15:03:56 -0700 (PDT)
+Date: Wed, 19 Jul 2000 15:03:56 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Communication between java application
+
+--- Arjen van Efferen <a.vanefferen@mediacom4.nl> wrote:
+
+> Well, i don't completely understand RMI and or CORBA.... We've used
+> CORBA at school, and the first thing i did after those lessons was
+> burning those books. Damn, i hate CORBA.
+> I better start working on RMI instead :)
+
+Yeah.  I dislike CORBA too.  Try rmi.  It takes a bit of learning
+to get your mind around the concept of codebase and downloadable
+code, but once you get it, its so easy to use you'll neve go back!
+
+-iain
+
+__________________________________________________
+Do You Yahoo!?
+Get Yahoo! Mail ? Free email you can access from anywhere!
+http://mail.yahoo.com/
+
+
+
+
+From a.vanefferen@mediacom4.nl Fri, 21 Jul 2000 00:48:56 +0200
+Date: Fri, 21 Jul 2000 00:48:56 +0200
+From: Arjen van Efferen a.vanefferen@mediacom4.nl
+Subject: [JOS] Timezones
+
+Hi all,
+
+I've got a question about timezones.
+
+I know what the GMT timezone is, but what is the UTC timezone?
+
+Thanks for help
+
+-- Arjen
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 21 Jul 2000 10:37:13 -0700 (PDT)
+Date: Fri, 21 Jul 2000 10:37:13 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Timezones
+
+--- Arjen van Efferen <a.vanefferen@mediacom4.nl> wrote:
+
+> I've got a question about timezones.
+> 
+> I know what the GMT timezone is, but what is the UTC timezone?
+
+They are one and the same.  GMT is the old way to indicate standard
+time (greenwich mean time) but the international standard dictates
+its name to be UTC (universal time something).  In any case, they
+indicate the same timezone.
+
+-iain
+
+ps - you may also see it referred to as 'zulu time' in USA military
+jargon/standards/software.
+
+__________________________________________________
+Do You Yahoo!?
+Get Yahoo! Mail ? Free email you can access from anywhere!
+http://mail.yahoo.com/
+
+
+
+
+From a.vanefferen@mediacom4.nl Sat, 22 Jul 2000 20:27:16 +0200
+Date: Sat, 22 Jul 2000 20:27:16 +0200
+From: Arjen van Efferen a.vanefferen@mediacom4.nl
+Subject: [JOS] CVS
+
+Hi all,
+
+Can someone tell me which CVS modules i'm able to download? SourceForge
+doesn;t know the Module "JOS" or "JJOS". Which modules are available?
+
+thanks
+
+-- Arjen
+
+
+
+

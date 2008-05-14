@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] About Generic Driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000144.html">
+   <LINK REL="Next" HREF="000142.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] About Generic Driver</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Arch] About Generic Driver">onewith1@flash.net</A><BR>
+    <I>Tue, 10 Aug 1999 19:43:04 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000144.html">[JOS-Arch] Re: [JOS-Kernel] Priority List</A></li>
+        <LI> Next message: <A HREF="000142.html">[JOS-Arch] About Generic Driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#140">[ date ]</a>
+              <a href="thread.html#140">[ thread ]</a>
+              <a href="subject.html#140">[ subject ]</a>
+              <a href="author.html#140">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>DigiGod wrote:
+
+&gt;<i>
+</I>&gt;<i>Device
+</I>&gt;<i> |
+</I>&gt;<i>StreamDevice
+</I>&gt;<i>
+</I>&gt;<i>but why event device? wouldnt it be more economical for the drivers to
+</I>&gt;<i>produce events?
+</I>&gt;<i>like the mouse event has a hasMoved() function the device waits for,
+</I>&gt;<i>when it reads positive it creates the event; a different driver could
+</I>&gt;<i>create a different event
+</I>
+The Mouse device will be setup to have an IRQ callback.  This is a type of
+event.  So why not let the mouse device translate this event into a mouse
+event, and fire it to the registered Drivers? (That's a retorical question -
+I'll try to answer it below)
+
+Using your method above, a mouse device would need to set the event, then
+notify() all waiting drivers.  This is friendly for multi-threaded
+applications, where the drivers can execute their mouse event in their own
+thread.  I don't know if you remember the discussion on the Kernel list when
+we were trying to figure out how to handle Interrupts.  Originally, IRQ
+listeners would do a:
+       synchronized( interrupt12 ) {
+          interrupt12.wait();
+       }
+And they would wake up when the interrupt occured.  The problem was that
+(with the keyboard), this routine quickly encountered a deadlock.
+
+The alternate method is to have the &quot;wait queue&quot;, which is a event queue
+where the queue performs a wait if it is empty on a request to retrieve the
+next element.  This is probably the way to go in a device/driver interface.
+The wait queue would be a shared object between the device and the driver.
+The device would need to keep one queue per registered driver, if multiple
+driver registration is supported.
+
+&gt;&gt;<i> hasDriver() *may* be appropriate for many devices (like HardDrive
+</I>device - I
+&gt;&gt;<i> wouldn't like multiple drivers, unaware of each other, messing around at
+</I>&gt;&gt;<i> low-level at the same time, but I don't care how many drivers listen to
+</I>the
+&gt;&gt;<i> MouseDevice).  isLoaded(), I feel, may be a reiterative method: if the
+</I>&gt;&gt;<i> Driver can find the device, it has been loaded.  Or maybe I'm not seeing
+</I>&gt;&gt;<i> something with this.  I dunno.
+</I>&gt;<i>
+</I>&gt;<i>hasDriver could throw OperationUnsupportedException or it could be in a
+</I>&gt;<i>UniDriver interface (horrid name, but you get the idea).
+</I>
+I'm crossed on this.  If we could implement both at the same time, I'd be
+happy 8-)
+
+&gt;<i>
+</I>&gt;<i>couldnt isLoaded() be for a device like a zip drive that you can plug
+</I>&gt;<i>and unplug at runtime, for speed the user sets it up to always have the
+</I>&gt;<i>device loaded (since he only takes it off to transfer data on a friends
+</I>&gt;<i>computer, for an example)
+</I>
+Hot-swappable devices?  I thought that JavaOS did a good job with this.
+When a device was disconnected, it sent an event to all listening drivers to
+say, &quot;Hey, I'm gone.  You're on your own.&quot;  The drivers then figure out how
+to handle this problem.
+
+In this way, devices are not in the system for registration purposes.  There
+is a problem with this in the way of Java's garbage collection, but, again,
+JavaOS handled it well.  I won't go into detail how they did it, unless you
+*really* want me to.
+
+&gt;&gt;<i> In this model, a &quot;HardwareResourceRequest&quot; is sent to the
+</I>&gt;&gt;<i> PrimaryHardwareResourceManager (to which every known specific
+</I>&gt;&gt;<i> HardwareResourceManager has registered itself with, or more accurately,
+</I>the
+&gt;&gt;<i> PrimaryHardwareResourceManager has registered all known
+</I>&gt;&gt;<i> HardwareResourceManagers to itself).  A request consists of a set of
+</I>&gt;&gt;<i> &quot;HardwareResourceSetting&quot;s dedicated for a specific
+</I>HardwareResourceManager
+&gt;&gt;<i> (like IOAddressHardwareResourceSetting is intended for
+</I>&gt;&gt;<i> IOAddressHardwareResourceManager).  The PrimaryHardwareResourceManager
+</I>&gt;&gt;<i> routes the request to the specific HardwareResourceManager, which
+</I>analyzes
+&gt;&gt;<i> the request, and allocates the best fit HardwareResourceSetting (if there
+</I>is
+&gt;&gt;<i> one), and creates a HardwareResourceInterface based on that setting for
+</I>the
+&gt;&gt;<i> Driver to use.  This interface has the native code ties.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> Is it any wonder no one volunteered to use it?
+</I>&gt;<i>
+</I>&gt;<i>I think my brain melted, jeez
+</I>
+Exactly.  But I haven't been able to come up with a simpler example, besides
+letting the driver send a series of requests to the manager until a hardware
+configuration turns up good.  That may be the way to go.
+
+&gt;&gt;<i> &gt;you should have a getDescription() and a getHRName(), if you make a tree
+</I>&gt;&gt;<i> &gt;of all of them you need getHRName for the name on the tree node, PNP6000
+</I>&gt;&gt;<i> &gt;(or whatever) will hardly make sense to the average person.
+</I>&gt;&gt;<i> &gt;
+</I>&gt;&gt;<i> &gt;or better yet getName() is the HR one and you have a
+</I>&gt;&gt;<i> &gt;get[Device|Driver]Name() for the ID
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> Great.  After typing those enormous class names above, I'll believe
+</I>&gt;&gt;<i> anything.  But really, that sounds like the way to go.
+</I>&gt;<i>
+</I>&gt;<i>be easier for creating a visual device tree at the very least...
+</I>
+Sounds useful.  Let's do it.
+
+-Matt
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000144.html">[JOS-Arch] Re: [JOS-Kernel] Priority List</A></li>
+	<LI> Next message: <A HREF="000142.html">[JOS-Arch] About Generic Driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#140">[ date ]</a>
+              <a href="thread.html#140">[ thread ]</a>
+              <a href="subject.html#140">[ subject ]</a>
+              <a href="author.html#140">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

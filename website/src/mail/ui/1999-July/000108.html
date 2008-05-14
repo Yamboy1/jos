@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] UIPurposeDesktop</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000100.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] UIPurposeDesktop</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-UI] UIPurposeDesktop">digigod@earthling.net</A><BR>
+    <I>Fri, 30 Jul 1999 19:30:16 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000100.html">[JOS-UI] general-idea</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#108">[ date ]</a>
+              <a href="thread.html#108">[ thread ]</a>
+              <a href="subject.html#108">[ subject ]</a>
+              <a href="author.html#108">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>this is in response to GilbertHerschberger's article UIPurposeDesktop on
+the Wiki (a prerequiste to this e-mail):
+
+personally Ive always thought of the desktop as a pretty background to
+the windows Im working with (which I always keep maximized, personal
+prefference I guess)
+
+the desktop itself does not run commands, well neither does the
+commandline; thats what we have JADE for. JADE processes commands for
+all the UI's since they all need to process commands and the only
+difference is how they abstract that to the user.
+
+good idea bout a shortcut/link/whatever referencing itself, I wouldnt
+have caught that
+
+whats the difference between a bookmark and a link? all I can see is
+that bookmarks are further abstracted by the application using them
+(with a treeview for editing and pulldown for accessing)
+
+Ive often mentioned my idea of an abstract screen thats extended to a
+&quot;DesktopScreen&quot; after reading this article (and some talking on UI) I
+think this is a good hierarchy
+
+Screen
+ |
+ +-TextScreen (CLI's)
+ |  |
+ |  +-TexttopScreen (TUI's, Desktop... Texttop... get it? in other
+words, needs a better name)
+ |
+ +-GraphicsScreen
+    |
+    +-DesktopScreen (GUI's)
+       |
+       +-IconDesktopScreen
+
+Screen is the abstract super class that offers all the stuff they'd all
+need (like Dimension size() and all that).
+
+TextScreen is for CLI's and has all that lovely text support stuff
+
+GraphicsScreen is a screen with AWT Graphics Support (probably
+subclassed for a 3DGraphicsScreen by XUI's), it has a setBackground
+thats lets you set the backfground pic (Im working on a Background class
+for general use thats really flexible, animation the whole sh'bang) (or
+should this be in DesktopScreen?))
+
+DesktopScreen adds support for moving AWT windows around and drawing
+them and all that fun
+
+IconDesktopScreen adds support for icons on the desktop (no fixed
+layout, thats what I hate about w9x and mac, I always wanted them across
+the top like everywhere else in the bloody OSes)
+
+personally Id just use DesktopScreen let the taskmanager and the
+applauncher deal with the rest.
+
+ooh! heres another idea, VirtualScreen extends GraphicsScreen (or just
+screen?) and handles switching between different Screen types for true
+VirtualScreen support (as handled not by JADE but a JADE PUI (VWSS
+--VirtualWindow SupportSystem?) that acts like a socket for other,
+mutliple PUI's)
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000100.html">[JOS-UI] general-idea</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#108">[ date ]</a>
+              <a href="thread.html#108">[ thread ]</a>
+              <a href="subject.html#108">[ subject ]</a>
+              <a href="author.html#108">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

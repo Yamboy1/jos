@@ -1,0 +1,1252 @@
+From gchii@mindspring.com Fri, 01 Oct 1999 19:55:06 -0400
+Date: Fri, 01 Oct 1999 19:55:06 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] JOS Distribution - Release 1d
+
+Announcement: Read the following article on Wiki:
+
+http://www.metamech.com/wiki/view/Main/JOSDistribution1d
+
+For an open source project, the mission includes the publication of source
+code. Please notice how the index for Command Line Utilities uses
+web-compatible static HTML for its Java code. Most of the HTML could be
+uploaded to www.jos.org.
+
+Thanks,
+
+
+
+
+From gchii@mindspring.com Mon, 04 Oct 1999 11:45:04 -0400
+Date: Mon, 04 Oct 1999 11:45:04 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Migration
+
+After working with the URI class for a while, it seems to me than the URI
+class is the *only* class that needs to be well-known. Even the smart
+object factory and smart stream factories are plug-ins.
+
+So, I think the entire scope of the Smart API package might be something
+like this:
+
+org.jos.smartapi2a.URI
+org.jos.smartapi2a.Controller
+org.jos.smartapi2a.ObjectController
+org.jos.smartapi2a.BaseController (or AbstractController)
+org.jos.smartapi2a.SmartFactory
+
+And furthermore, the URI class can be reduced to something like this:
+
+public class URI {
+  public static Controller getFactory() {
+    if ( factory == null ) {
+      return ObjectFactory.getFactory();
+    }
+    return factory;
+  }
+  public static void setFactory( Controller v ) {
+    if ( factory == null ) { 
+      factory = v;
+    }
+  }
+  private static Controller factory = null;
+  public URI( String v ) {
+    uriSpec = v;
+  }
+  public boolean acceptsURI() {
+    factory.acceptsURI( uriSpec );
+  }
+  public Object getObject() {
+    getFactory().getObject( uriSpec );
+  }
+  private String uriSpec;
+}
+
+
+
+
+From digigod@earthling.net Mon, 04 Oct 1999 15:15:55 -0700
+Date: Mon, 04 Oct 1999 15:15:55 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] Migration
+
+Gilbert Carl Herschberger II wrote:
+> 
+> After working with the URI class for a while, it seems to me than the URI
+> class is the *only* class that needs to be well-known. Even the smart
+> object factory and smart stream factories are plug-ins.
+> 
+> So, I think the entire scope of the Smart API package might be something
+> like this:
+> 
+> org.jos.smartapi2a.URI
+> org.jos.smartapi2a.Controller
+> org.jos.smartapi2a.ObjectController
+> org.jos.smartapi2a.BaseController (or AbstractController)
+> org.jos.smartapi2a.SmartFactory
+> 
+> And furthermore, the URI class can be reduced to something like this:
+> 
+> public class URI {
+>   public static Controller getFactory() {
+>     if ( factory == null ) {
+>       return ObjectFactory.getFactory();
+>     }
+>     return factory;
+>   }
+>   public static void setFactory( Controller v ) {
+>     if ( factory == null ) {
+>       factory = v;
+>     }
+>   }
+>   private static Controller factory = null;
+>   public URI( String v ) {
+>     uriSpec = v;
+>   }
+>   public boolean acceptsURI() {
+>     factory.acceptsURI( uriSpec );
+>   }
+>   public Object getObject() {
+>     getFactory().getObject( uriSpec );
+>   }
+>   private String uriSpec;
+> }
+
+you should add a URI->URL converter method and vice versa.
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From gchii@mindspring.com Thu, 07 Oct 1999 09:55:15 -0400
+Date: Thu, 07 Oct 1999 09:55:15 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Request for low-level memory layout
+
+The Intel 80486 is a "foreign" processor, foreign from the viewpoint of a
+program running on top of a Java virtual machine. A JOS kernel runs "on top
+of" a real microprocessor and a Java virtual machine runs "on top of" a
+kernel.
+
+What is the JOS memory layout? Where is it defined? Where is it discussed?
+
+Does a JOS kernel make its services available through standard interrupts?
+If so, how? A real microprocessor uses interrupts for low-level
+inter-process communication. What is the standard definition of these
+interrupts (0-255)?
+
+When using Linux as a prototype, we adopt standard definition of these
+interrupts directly from Linux for a JOS kernel. It is a quick fix. And
+yet, it must be documented with precision.
+
+Inside the architecture of JOS, it is not yet clear to me how a JOS kernel
+supports a Java virtual machine. When writing a virtual machine, how does a
+virtual machine communicate with a JOS kernel? Is it through interrupts? or
+direct calls to a kernel interface?
+
+Java applications run "on top of" a Java virtual machine. A perfectly
+compatible Java virtual machine will run all Java applications without
+modification. So, the architecture of JOS could be described in the
+following layers, too.
+
+Layer 1 - Real Microprocessor
+Layer 2 - JOS Kernel
+Layer 3 - Java virtual machine
+Layer 4 - Java application(s)
+
+What memory addresses would be useful to each layer?
+
+Interrupt table - A real microprocessor typically needs an interrupt table.
+Low-memory - A JOS kernel is loaded once and only once into low memory and
+is a main thread. A kernel must be able to allocate RAM -- even after the
+virtual machine is loaded.
+
+? - Where are device drivers loaded?
+
+? - Where is a Java virtual machine loaded?
+
+
+
+
+From digigod@earthling.net Thu, 7 Oct 1999 12:02:11 -0400 (EDT)
+Date: Thu, 7 Oct 1999 12:02:11 -0400 (EDT)
+From: digigod@earthling.net digigod@earthling.net
+Subject: [JOS-Arch] Request for low-level memory layout
+
+> Layer 1 - Real Microprocessor
+> Layer 2 - JOS Kernel
+> Layer 3 - Java virtual machine
+> Layer 4 - Java application(s)
+
+between 3 and 4 is the pseudo-kernel that the JVM loads to run all those apps
+
+Cheers,
+DigiGod
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+----------------------------------------------------------------
+Get your free email from AltaVista at http://altavista.iname.com
+
+
+
+From tmiller@haverford.edu Thu, 7 Oct 1999 13:10:18 -0400 (EDT)
+Date: Thu, 7 Oct 1999 13:10:18 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Request for low-level memory layout
+
+> What is the JOS memory layout? Where is it defined? Where is it discussed?
+
+	In the kernel sourcecode, actually :)  At some point, we (the
+kernel group) would like to implement the JavaOS/Businness memory APIs.
+
+> Inside the architecture of JOS, it is not yet clear to me how a JOS kernel
+> supports a Java virtual machine. When writing a virtual machine, how does a
+> virtual machine communicate with a JOS kernel? Is it through interrupts? or
+> direct calls to a kernel interface?
+
+	The JVM makes direct calls to the kernel; the JVM could be written
+to run on bare hardware but the conceptual distinction is useful.  Nothing
+aside from the JVM should ever 'see' the kernel.
+
+	Once you get past the device driver level, the memory model is set
+by Java for us, which means you don't get one.
+
+-_Quinn
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 7 Oct 1999 14:00:56 -0500
+Date: Thu, 7 Oct 1999 14:00:56 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] Request for low-level memory layout
+
+On 7 Oct 99, at 12:02, digigod@earthling.net wrote:
+
+> > Layer 1 - Real Microprocessor
+> > Layer 2 - JOS Kernel
+> > Layer 3 - Java virtual machine
+> > Layer 4 - Java application(s)
+> 
+> between 3 and 4 is the pseudo-kernel that the JVM loads to run all those apps
+
+It may help you when looking through Wiki discussions that these 
+layers have been generally labeled:
+
+Layer 1 - Hardware/bare metal
+Layer 2 - JOSBox (native code)
+Layer 3 - JOSSystem (Mix: Java and native code)
+Layer 4 - User applications (100% pure java)
+
+If and/or when someone produces a "java chip", then Layer 1 and 
+Layer 2 are both in the Hardware level.  JOS would then only 
+supply JOSSystem and user applications.
+
+-iain
+
+
+
+From gchii@mindspring.com Sat, 09 Oct 1999 21:40:11 -0400
+Date: Sat, 09 Oct 1999 21:40:11 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Registry? Or SmartAPI?
+
+It was a case of one concept with two names. You might call it a
+"registry"; I might call it a "Smart API".
+
+I was reading the JosAPI wiki article and came across a facinating quote by
+Clark Evans:
+
+"...Basically, I see a regisry object and an api package. The services are
+defined in org.jos.api by 100% Pure Interfaces. If an application (or any
+system service recursively) needs a service, it asks the registry for an
+object that implements the service. If the service is available on that
+computer, then an instantiated object is returned, otherwise a
+org.jos.api.SERVICE_NOT_AVAILABLE error would be raised." -- Clark Evans
+
+First, the SmartAPI has *already* implemented the idea of one-stop-shopping
+for any available service. Your program can ask the SmartAPI if a service
+is available on a computer, although it doesn't throw an exception; it
+simply returns true or false.
+
+boolean acceptsURI( String v );
+
+Second, the SmartAPI has already implemented what Clark is asking for in a
+registry. If an application needs a service, it asks the SmartAPI for a
+digital resource using the uniform resource identifier (URI). Instead of a
+"registry" with a key to services, the SmartAPI uses a URI. It doesn't
+throw an exception either; it returns null if a digital resource is
+unavailable (or missing).
+
+Object getObject( String v );
+
+And, digital resources (from their services) are defined in interface-heavy
+packages. The SmartAPI - Release 2a package is exactly that kind of
+refinement. I look forward to distributing it shortly.
+
+
+
+
+From onewith1@flash.net Sun, 10 Oct 1999 15:53:00 -0500
+Date: Sun, 10 Oct 1999 15:53:00 -0500
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Arch] Registry? Or SmartAPI?
+
+Gilbert Carl Herschberger II <gchii@mindspring.com> wrote:
+> It was a case of one concept with two names. You might call it a
+> "registry"; I might call it a "Smart API".
+>
+> I was reading the JosAPI wiki article and came across a facinating quote
+by
+> Clark Evans:
+>
+> "...Basically, I see a regisry object and an api package. The services are
+> defined in org.jos.api by 100% Pure Interfaces. If an application (or any
+> system service recursively) needs a service, it asks the registry for an
+> object that implements the service. If the service is available on that
+> computer, then an instantiated object is returned, otherwise a
+> org.jos.api.SERVICE_NOT_AVAILABLE error would be raised." -- Clark Evans
+>
+> First, the SmartAPI has *already* implemented the idea of
+one-stop-shopping
+> for any available service. Your program can ask the SmartAPI if a service
+> is available on a computer, although it doesn't throw an exception; it
+> simply returns true or false.
+>
+> boolean acceptsURI( String v );
+>
+> Second, the SmartAPI has already implemented what Clark is asking for in a
+> registry. If an application needs a service, it asks the SmartAPI for a
+> digital resource using the uniform resource identifier (URI). Instead of a
+> "registry" with a key to services, the SmartAPI uses a URI. It doesn't
+> throw an exception either; it returns null if a digital resource is
+> unavailable (or missing).
+>
+> Object getObject( String v );
+>
+> And, digital resources (from their services) are defined in
+interface-heavy
+> packages. The SmartAPI - Release 2a package is exactly that kind of
+> refinement. I look forward to distributing it shortly.
+>
+
+I think what Clark was talking about was something similar to what Jini
+does.  You ask the registry (or whatever) for a list of service implementors
+(objects registered to the registry which implement a particular service),
+by giving the registry the interface you're looking for.  This does not mean
+the use of a String class, unless that is how the interface is passed (via
+<interface>.class.getName() call, or something along those lines).
+
+In this manner, you won't need to know the name of the service; all you need
+to know is what you want from a service.
+
+-Matt
+
+
+
+
+From gchii@mindspring.com Mon, 11 Oct 1999 12:19:50 -0400
+Date: Mon, 11 Oct 1999 12:19:50 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Registry? Or SmartAPI?
+
+At 03:53 PM 10/10/99 -0500, "Matt Albrecht" <onewith1@flash.net> wrote:
+>I think what Clark was talking about was something similar to what Jini
+>does.  You ask the registry (or whatever) for a list of service implementors
+>(objects registered to the registry which implement a particular service),
+>by giving the registry the interface you're looking for.  This does not mean
+>the use of a String class, unless that is how the interface is passed (via
+><interface>.class.getName() call, or something along those lines).
+
+So you're saying that I must create an instance of a Class object for an
+interface, let's say the InputStream interface, and pass it to a registry
+(or whatever) and it returns an instance of every known service that can
+return an implementation of an InputStream interface?
+
+In other words:
+
+Class c = Class.forName( "java.io.InputStream" );
+Service[] list = TheRegistry.getService( c );
+
+>In this manner, you won't need to know the name of the service; all you need
+>to know is what you want from a service.
+
+With the Smart API, you don't need to know the class name of the service.
+You don't need to create an instance of a class. You need to have a uniform
+resource locator (URI) to get an instance of a "service" or object you
+want. It is something like this:
+
+URI uri = new URI( "in:gzip:buffer:http://www.jos.org/download/example.gz" );
+InputStream input = (InputStream) uri.getObject();
+
+When you want to use a "service" on a specific digital resource, the Smart
+API takes you there directly.
+
+It seems that both a registry (or whatever) and Smart API enable a program
+to search for a service and then use it. A Smart API has the flexibility of
+a query string and fragment to pre-select the kinds of services you're
+interested in. The Smart API separates the configuration of the factory
+from the use of a factory. The configuration of a factory is centralized.
+
+It seems that the Smart API is more universal. It has broader scope. It
+completely covers the registry (or whatever) mechanism. The selection of a
+service can be encapsulated inside a subsystem, and should be. Service
+selection and factories can be abstracted for use with every program. You
+want a digital resource, such as a service.
+
+If Jini is really the digital resource you want, you can get an appropriate
+instance of it through the Smart API. Some machines are Jini-enabled; some
+are not. The Smart API can be aware of Jini, but not dependent on it.
+
+
+
+
+From jm@mak.com Thu, 14 Oct 1999 08:01:20 -0400
+Date: Thu, 14 Oct 1999 08:01:20 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Arch] Re: Registry? Or SmartAPI?
+
+Hi;
+
+Sorry to be so late to follow-up -- I'm not subscribed to the arch list,
+and only check it every so often...
+
+The JavaOS System Database (abbreviated "JSD") performs the functions
+you request.  It contains a "device tree," descriptions of services,
+drivers, and other registry-like things.  "Events" are generated when
+entries within the JSD are added, modified, and removed, so that
+interested Java objects/threads/whatever can be notified.  This solves
+the problems typically associated with: boot-time machine configuration;
+hot-swappable devices; driver loading/unloading; etc. all via a single
+mechanism.
+
+Wouldn't that be nice?
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From gchii@mindspring.com Mon, 18 Oct 1999 07:56:41 -0400
+Date: Mon, 18 Oct 1999 07:56:41 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] JOS Packages
+
+Again, I feel it necessary to bring up the issue of JOS namespace on the
+architecture group. The JOS namespace is confusing because it is backward
+from the tradition established by Sun Microsystems (and others) for API vs.
+implementation.
+
+For the record, the java.* packages were intended to be an API, not
+implementation. It is most unfortunate that Sun Microsystems lost their
+original plans for the java.* packages by adding lots and lots of
+implementation. The sun.* packages were (are) Sun Microsystems' private
+implementation of an API. The com.sun.* packages were (are) Sun
+Microsystems' product namespace.
+
+There are three parts to the puzzle. First there is the public API for JOS.
+By tradition, it should have been called jos.*. It should be heavy on
+interfaces and light on implementation. The org.jos.api.* package might be
+a substitute for the jos.*, except that the API can be implemented by any
+organization, not just the JOS Project at www.org.jos. The API is supposed
+to be independent, designed by the JOS Project and implemented by anyone.
+
+Second, there are the packages the API depends on. The JOS Project seems to
+use both jos.* and org.jos.* packages for this purpose.
+
+Third, there are the applications that depend on the API. The JOS Project
+consistently uses org.jos.* packages for this.
+
+When there is uncertainty and doubt as to the "right" name for a package,
+it spell trouble for the long-term success of the project.
+
+Here is my recommendation:
+
+A "Distribution" group should be created to discuss the implications of JOS
+distribution. This group should focus on the impact packages have on
+distribution. Members of this group should develop recommendations for the
+packaging (and repackaging) for the JOS API.
+
+This group should be responsible for the collection and integration of the
+many different archives, which have already been created by the JOS Project.
+
+This group should provide one-stop-shopping to anyone who wants a runtime,
+standard or technical distribution of JOS. This group should be responsible
+for maintaining the original mirror site (at www.jos.org) for all source
+code created by members of the JOS Project.
+
+It should develop simple things like the legal template for source code
+falling under the JOS free software license. It should encourage, negotiate
+and discuss the difficulties of distributing open source code for a loosely
+knit group of C/C++/Java programmers on the Internet.
+
+It should not prevent volunteers from developing source code and
+distributing it to members of the JOS Project. It might become involved
+when two (or more) members want to use a different namespace for the same
+thing; or, the same namespace for different things.
+
+If there is already a group focused on these concerns, which group is that?
+Where are its members? While I once asked for an "API" group to discuss
+just the JOS Project namespace, I am convinced that "API" is a
+special-interest group within "Distribution" because "Distribution" must be
+responsible to many people external to the JOS Project. They must be
+responsible for JOS "licensees". (Whenever you have a free software
+license, you must expect "licensees".)
+
+As a programmer, distributing functional source code for the JOS Project is
+not easy. If it is difficult for me, as a programmer, it must difficult, if
+not impossible, for an end-user. Many people just want to *run* the
+software. They do not own a compiler. They only know a little about a JRE,
+nothing about a JDK.
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Oct 1999 10:38:47 -0500
+Date: Mon, 18 Oct 1999 10:38:47 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] JOS Packages
+
+On 18 Oct 99, at 7:56, Gilbert Carl Herschberger II wrote:
+
+> Here is my recommendation:
+> 
+> A "Distribution" group should be created to discuss the implications of JOS
+> distribution. This group should focus on the impact packages have on
+> distribution. Members of this group should develop recommendations for the
+> packaging (and repackaging) for the JOS API.
+
+I agree with your recommendation and the need for such a group.  
+However, I think its a little too early to make such a group effective. 
+I believe it should be formed when the first JOS system is ready in 
+at least alpha state.  So after the JOSBox, JOSSystem, and a 
+minimal port of the java libraries (classpath?) are ready to go into at 
+least alpha level testing.  When we're at that point, it would seem 
+appropriate to clean up the namespace and discuss cleaning up 
+distribution.  
+
+If its started too early (like now when a lot is still theoretical) then 
+the group will, IMHO, probably quickly burn out when there's 
+nothing to do but produce documentation and debate.  In addition, 
+we'll want to involve the coders of JOS in the discussion and invade 
+upon their code (at least to adjust their namespaces).  At this 
+point, that would just slow JOS development down.  
+
+This is just my opinion though.  I'm interested to hear others 
+thoughts.
+
+-iain
+
+
+
+From digigod@earthling.net Mon, 18 Oct 1999 17:52:44 -0400 (EDT)
+Date: Mon, 18 Oct 1999 17:52:44 -0400 (EDT)
+From: digigod@earthling.net digigod@earthling.net
+Subject: [JOS-Arch] JOS Packages
+
+> I agree with your recommendation and the need for such a group.  
+> However, I think its a little too early to make such a group effective. 
+> I believe it should be formed when the first JOS system is ready in 
+> at least alpha state.  So after the JOSBox, JOSSystem, and a 
+> minimal port of the java libraries (classpath?) are ready to go into at 
+> least alpha level testing.  When we're at that point, it would seem 
+> appropriate to clean up the namespace and discuss cleaning up 
+> distribution.  
+
+its JOSystem (said: "JOE-System") two Systems would be reduntant.
+
+Cheers,
+DigiGod
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+----------------------------------------------------------------
+Get your free email from AltaVista at http://altavista.iname.com
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Oct 1999 17:10:24 -0500
+Date: Mon, 18 Oct 1999 17:10:24 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] JOS Packages
+
+On 18 Oct 99, at 17:52, digigod@earthling.net wrote:
+
+> > at least alpha state.  So after the JOSBox, JOSSystem, and a 
+> 
+> its JOSystem (said: "JOE-System") two Systems would be reduntant.
+
+Hmm.  I thought JOS is actually a "word" like MMX (otherwise its 
+not copyright-able) which describes our free java based operating 
+system.  Not an acronym.  If so, JOSSystem (said JOS-System) 
+seems more appropriate.  Doesn't it?  Product name, subsystem 
+name.
+
+-iain
+
+
+
+From gchii@mindspring.com Tue, 19 Oct 1999 07:48:04 -0400
+Date: Tue, 19 Oct 1999 07:48:04 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Name for JOSystem
+
+At 05:52 PM 10/18/99 -0400, digigod@earthling.net wrote:
+>its JOSystem (said: "JOE-System") two Systems would be reduntant.
+
+My mistake. I understand how JOSystem is called JOSystem and documented as
+JOSystem, and not JOSSystem.
+
+On the other hand, there is a precedent for a mispronunciation of JOS. Just
+like a say M-S-doss" when pronouncing MS-DOS, I like to say "joss" when
+pronouncing JOS. I always wondered why JOS isn't spelled more like Joe or
+Joseph. If we were working on the JO project, we would build a JO system.
+
+And again, in a Wiki article somewhere, I read that it might be pronounced
+J-oss (jay-oss). The system "subsystem" exists. We should call it
+something. And be consistent about it. Would it be fair to listen to
+proposals for a new name for JOSystem?
+
+While the name of a subsystem, like JOSystem, is not critical to the
+success of an internal project (internal to the JOS Project team), it *is*
+critical to the success of an external product. After working with a
+code-name for the JOSystem for this long, it might not be a bad thing to
+think about a product name for the product. The JOSystem project should
+produce something that's distributable to other programmers, external to
+the JOS Project team.
+
+Here again is a good reason to establish a distribution group sooner --
+rather than later, as Iain suggested. It is important to pick a name at the
+right time. Not too soon. Not too late. When you pick a name too soon, it
+artificially delays a good idea. Pick a name too late, it artificially
+delays a great idea.
+
+What's in a name? A rose by any other name would smell...like ragweed.
+
+
+
+
+From gchii@mindspring.com Tue, 19 Oct 1999 07:58:22 -0400
+Date: Tue, 19 Oct 1999 07:58:22 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] JOS Packages
+
+At 05:10 PM 10/18/99 -0500, iainshigeoka@yahoo.com wrote:
+>On 18 Oct 99, at 17:52, digigod@earthling.net wrote:
+>
+>> > at least alpha state.  So after the JOSBox, JOSSystem, and a 
+>> 
+>> its JOSystem (said: "JOE-System") two Systems would be reduntant.
+>
+>Hmm.  I thought JOS is actually a "word" like MMX (otherwise its 
+>not copyright-able) which describes our free java based operating 
+>system.  Not an acronym.  If so, JOSSystem (said JOS-System) 
+>seems more appropriate.  Doesn't it?  Product name, subsystem 
+>name.
+
+Your point about copyright-able is the same as what I've read. If you
+intend to copyright the use of a name, it must be a pronounce-able word,
+not an acronym.
+
+JOSystem is a subsystem. The part of an OS that handles "files" might be
+referred to as an OS File subsystem. A file subsystem is separate and
+distinct from the OS itself and separate from other services, such as a
+relational database subsystem, HTTP-based subsystem, etc.
+
+OS/400 has many file subsystems. Each file subsystem manages its own
+"partition" or disk drive. The structures for storing files is slightly
+different with each subsystem. While one file subsystem might support long
+file names, another might not. They all run concurrently within a single
+file subsystem framework, known a THE file subsystem.
+
+What is the JOSystem? It is the part of an OS that runs inside any JOSBox.
+It is the JOSystem that must make it possible to run many independent
+(possibly multiple user) applications inside a single JVM, or rather, a
+single Java-oriented architecture.
+
+The mission of the JOSystem is to put distance between the
+platform-dependent implementation of a JOSBox and the platform-independent
+JVM.
+
+Isn't that right?
+
+
+
+
+From digigod@earthling.net Tue, 19 Oct 1999 18:17:11 -0400 (EDT)
+Date: Tue, 19 Oct 1999 18:17:11 -0400 (EDT)
+From: digigod@earthling.net digigod@earthling.net
+Subject: [JOS-Arch] JOS Packages
+
+> Hmm.  I thought JOS is actually a "word" like MMX (otherwise its 
+> not copyright-able) which describes our free java based operating 
+> system.  Not an acronym.  If so, JOSSystem (said JOS-System) 
+> seems more appropriate.  Doesn't it?  Product name, subsystem 
+> name.
+
+JOS is a word, but it's also an acronym standing for JavaOperatingSystem hence the redundancy. Although it is a subsystem of the JOS product it is the "system" part, and when I named it JOSystem I was just trying to highlight that fact.
+
+Also, I think MMX is an acronym for MultiMedia eXtensions (but I don't remember).
+
+Cheers,
+DigiGod
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+----------------------------------------------------------------
+Get your free email from AltaVista at http://altavista.iname.com
+
+
+
+From digigod@earthling.net Tue, 19 Oct 1999 18:46:10 -0400 (EDT)
+Date: Tue, 19 Oct 1999 18:46:10 -0400 (EDT)
+From: digigod@earthling.net digigod@earthling.net
+Subject: [JOS-Arch] Name for JOSystem
+
+> On the other hand, there is a precedent for a mispronunciation of JOS. Just
+> like I say M-S-doss" when pronouncing MS-DOS, I like to say "joss" when
+> pronouncing JOS. I always wondered why JOS isn't spelled more like Joe or
+> Joseph. If we were working on the JO project, we would build a JO system.
+
+It would just be "Java Operating" then though...
+
+I've been saying it "joss" too, I figure its either that or saying each letter seperatley -- "J-O-S". I'm guessing most people would just say "joss" so I don't see any reason not to say it like that.
+ 
+> And again, in a Wiki article somewhere, I read that it might be pronounced
+> J-oss (jay-oss). The system "subsystem" exists. We should call it
+> something. And be consistent about it. Would it be fair to listen to
+> proposals for a new name for JOSystem?
+> 
+> While the name of a subsystem, like JOSystem, is not critical to the
+> success of an internal project (internal to the JOS Project team), it *is*
+> critical to the success of an external product. After working with a
+> code-name for the JOSystem for this long, it might not be a bad thing to
+> think about a product name for the product. The JOSystem project should
+> produce something that's distributable to other programmers, external to
+> the JOS Project team.
+
+I don't really see the benifits, someones just going to download the installer and get JOSCore (JOSBox + JOSystem) the extensions for their computer (drivers and what not) and applications (notably JADE). If your a programmer or an expert user your going to find out its called JOSystem, otherwise you don't care or don't know.
+ 
+> Here again is a good reason to establish a distribution group sooner --
+> rather than later, as Iain suggested. It is important to pick a name at the
+> right time. Not too soon. Not too late. When you pick a name too soon, it
+> artificially delays a good idea. Pick a name too late, it artificially
+> delays a great idea.
+
+so everythings going to have a project name and a product name? I don't think we need the later until the beta stage, personally.
+ 
+> What's in a name? A rose by any other name would smell...like ragweed.
+
+it would smell the same, but no one would buy it.
+
+Cheers,
+DigiGod
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+----------------------------------------------------------------
+Get your free email from AltaVista at http://altavista.iname.com
+
+
+
+From gchii@mindspring.com Mon, 25 Oct 1999 08:37:58 -0400
+Date: Mon, 25 Oct 1999 08:37:58 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] JOS NC vs. PC
+
+I have every reason to believe that a Java operating system -- being
+platform independent -- is capable of serving all OS market segments, not
+just one:
+
+JOS-Hybrid
+Some people don't want a new OS; they want us to fix the OS they already
+have. This configuration of JOS is like a Java virtual machine. It will run
+on top of all other operating system. Like LOADLIN provides a mechanism to
+load Linux while running MS-DOS, JOS-Hybrid uses a foreign operating system
+for all its low-level drivers. This is the model used by Java(tm) and
+José(tm).
+
+JOS-NC
+Some people don't want a IBM PC; they just want a more powerful terminal,
+like a network computer. This configuration of JOS will run on a machine
+that is dependent on a network connection.
+
+JOS-PC
+Some people don't want a new personal computer; they want a new OS for the
+computer they already have. This configuration of JOS will run as (1) a
+stand-alone machine, (2) a network client, and (3) a network server.
+
+JOS-GPP
+Some people don't want one server; they want lots of servers. This
+configuration of JOS will run as a general purpose processor, where there
+is no need for a console (no keyboard, no mouse, no monitor). This
+configuration is in high demand for factory-configured server farms.
+
+
+
+
+From gchii@mindspring.com Tue, 26 Oct 1999 07:28:19 -0400
+Date: Tue, 26 Oct 1999 07:28:19 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] JOS NC vs. PC
+
+At 01:59 PM 10/25/99 -0400, digigod@earthling.net wrote:
+>it could also be "test-drive" mode on the JOS CD, try before you install.
+>as I mentioned previously all this needs is a special JOSBox and "wrapper"
+>drivers.
+
+For me, personally, this is one of the most compelling reasons to build a
+new operating system. I have been in pursuit of a goal of "No installation
+required." Here is what that means:
+
+Your OS must include Java runtime environment(s). Either you upgrade your
+OS to Java-ready by installing a JRE, or you purchase a Java-ready OS.
+
+Once you have a JRE, you do not need to explicitely install any other
+application. Just like applets are downloaded on-demand from a network
+service, your applications can be downloaded on-demand from diskette,
+CD-ROM, ZIP disk or across the network.
+
+Bytecode is relatively compact. When JOS has a bytecode cache, only the
+most recently used bytecode will be stored locally.
+
+After working with an NC version of JOS, I find that the application
+service is critical to the future of JOS. An application service works like
+this:
+
+GET <package-name> PACKAGE/1e
+[DATE:<date>]
+
+When a client-side bytecode cache needs a package, it downloads a package
+from an application service. The protocol between bytecode cache and
+application service looks familiar because it follows HTTP.
+
+1. An application service should download a package and only a package. It
+should never download more than one package. It should never download one
+class at a time.
+
+2. A bytecode cache needs an optional download. When a package stored in a
+cache is up-to-date, there is no need to download it again.
+
+A custom class loader uses a bytecode cache. When a JVM requests a class
+from any package, the custom class loader goes first to a local cache to
+find all classes in a package. If the package is up-to-date, it is used. If
+not, the bytecode cache downloads a package from an application service and
+stores it "locally".
+
+A bytecode cache might use a RAM disk for storing its package files. In the
+case of a network computer (NC), the cache is discarded when the computer
+is reset (re-booted).
+
+A bytecode cache might use a hard disk for storing its package files. When
+configured, the cache might be limited to a certain amount of space on the
+drive or a certain percentage of space.
+
+When a custom class loader uses a bytecode cache consistently, it does not
+matter where the original bytecode is stored. Even when original bytecode
+is stored in an archive, the application service provides package files.
+
+One bytecode cache can be chained to another. You can set aside a bytecode
+cache on the network that collects bytecode from the Internet. Like a
+firewall, the bytecode cache must deny any request for untrusted packages.
+
+By combining a few of these mechanisms, the boot image for JOS can be
+small. The boot image loads the JVM and a custom class loader. Through the
+custom class loader, it loads the init class. Even the init class can be
+downloaded through the bytecode cache mechanism. Bytecode becomes stored
+virtually. With this assumption, there is no explicite installation required.
+
+
+
+
+From digigod@earthling.net Wed, 27 Oct 1999 14:33:37 -0400 (EDT)
+Date: Wed, 27 Oct 1999 14:33:37 -0400 (EDT)
+From: digigod@earthling.net digigod@earthling.net
+Subject: [JOS-Arch] JOS NC vs. PC
+
+> Did you intend to post this to the arch@jos.org list? I think you sent it
+> directly to me.
+
+I think you are right, sorry about that (getting used to new mail software...)
+ 
+> >it should return dependencies also, that way you can download everything
+> >you need without having to know what you need...
+> 
+> Always starting from the bottom, I am building only the most basic bytecode
+> service. It does not automatically return dependencies, and here is why.
+> 
+> 1. A bytecode service cannot anticipate the purpose of a request. It cannot
+> determine the intent of a requestor. Sure, a package is typically
+> downloaded for the purpose of resolving. And yes, a custom class loader is
+> a frequest requestor. On the other hand, when bytecode services are daisy
+> chained, one service must make a simple request to another service.
+> 
+> 2. Determining dependencies makes an application service more complex. A
+> bytecode service provides the package requested and only the package
+> requested. At the primative level, the client-side is always responsible
+> for resolving classes and their dependencies.
+
+on the other hand if you wait until the package is needed you'll slow the application down, if each package was stored in an XML file (not the package itself but its name location and dependencies) you could A) let the server be told what the dependices are rather then having to divine them with a pure-reflector and B) you wouldn't have to force the dependices on the downloader just list them and let them worry about it... 
+
+but from what your saying that would be in a later version anyway...
+ 
+> 3. Good class design puts tightly coupled classes in a single package. When
+> a request is made for a package, all of the classes in a package are
+> transferred across a connection. An application becomes efficient when
+> classes are organized properly into reusable packages, and should be.
+
+not that you can expect everyone to do that (SUN still has some problems with it)
+ 
+> A more advanced bytecode cache is possible. A full-blown application
+> service might be able to respond to an explicit dependency request:
+> 
+> DEPENDENCY <package-name> PACKAGE/1e CR
+> CR
+> 
+> When a service receives a depency request, it would be helpful to (1) list
+> the name of each package and (2) the size of each package.
+> 
+> Eventually, a bytecode service must embrace multiple Java platforms. A
+> bytecode cache must be able to provide the platform information for each
+> package. When a custom class loader on a Java 3 Platform makes a request,
+> the bytecode service should serve up only Java 3 Platform-compatible
+> bytecode. A request for a list of all packages might look something like this:
+> 
+> LIST CR
+> CR
+> 
+> The bytecode cache might respond with a list of each package and the
+> implementations it can serve.
+> 
+> <package-name> +0
+> <package-name> +1 +2
+> <package-name> +3 +3d
+> 
+> "+" - only Java n is available; but, it is upward-compatible
+> "-" - package is not compatible with platform n.
+> "d" - a suffix of d is a debug version of a package.
+> 
+> When more than one version is listed, a separate package for each version
+> is available.
+
+I like the idea, but have been thinking we should use XML for our protocols; instead of what you wrote it would look like:
+
+<Packages>
+ <Package Name="pname">
+  <Version Upward="0"/>
+ </Package>
+ <Package Name="pname">
+  <Version Upward="1"/>
+  <Version Upward="2"/>
+ </Package>
+ <Package Name="pname">
+  <Version Upward="3"/>
+  <Version Upward="3" DEBUG/>
+ </Package>
+</Packages>
+
+thats of course formated for readability, it could return the whole thing as one line. but thats my point using XML streams allow fast parsing and code reusability/extensibility, all you have to do is save it to a file and slap on .xml to log it and it adds some extra standardization.
+
+I'm not saying you have to do that now, mind you...
+ 
+> >maybe it should be a resource cache, it would need to store stuff like
+> >the media a package/application needs. it could even cache "live"
+> >resources like sockets (for the OS, it shouldn't store them for an
+> >application; to risky)
+> 
+> Again, I'm building a cache limited to bytecode. I have ignored all other
+> digital resources, including images, property files, and "live" objects.
+> When I get the bytecode cache working, I can think about using its parts to
+> build an HTTP service. Wouldn't an HTTP service be able to serve up lots of
+> other digital resources?
+
+I think this should be built on top of the HTTP service (framework?) so people can use the HTTP sans classloader baggage.
+ 
+> Do you think it might be possible to by-pass a bytecode service and use an
+> HTTP service for package files? When package files are stored on my HTTP
+> service, along with HTML/XML files and graphic images, my custom class
+> loader has been able to download them. Unfortunately, it remains
+> unfinished. My configuration of a HTTP-based custom class loader looks
+> something like this:
+> 
+> url=http://dmrquest.com/jpkg
+
+couldnt get it to work.
+
+> Each class requested by the JVM is handled by my custom class loader. It
+> looks in its local cache. If the package is in the local cache, it is used
+> -- without contacting the HTTP service.
+> 
+> That is my original problem which I could not solve. Using HTTP and
+> java.net.URL, how does a program perform a conditional download -- asking
+> the HTTP service to compare the timestamp on a local file with the file on
+> the HTTP service? I was thinking that my program reads the timestamp off
+> the local file and sends it to the HTTP service. But how? Where do you
+> *put* the timestamp in a java.net.URL?
+
+I think your problem is java.net.URL, theres some HTTP thing (I haven't had do anything with it recently, a bit fuzzy...) that you can request the timestamp of a file on the server, but I think you have to design your own protocol handler to access it (again, not sure).
+
+Now that I'm thinking about it, why not have an XML-based metaprotocol... that way its easily extended by any application by adding more markup, as I said before XML-streams are a great way to communicate...
+
+XMTP (eXtensible Markup Transfer Protocol)?
+
+Cheers,
+DigiGod
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+----------------------------------------------------------------
+Get your free email from AltaVista at http://altavista.iname.com
+
+
+
+From digigod@earthling.net Wed, 27 Oct 1999 14:33:50 -0400 (EDT)
+Date: Wed, 27 Oct 1999 14:33:50 -0400 (EDT)
+From: digigod@earthling.net digigod@earthling.net
+Subject: [JOS-Arch] JOS NC vs. PC
+
+> Did you intend to post this to the arch@jos.org list? I think you sent it
+> directly to me.
+
+I think you are right, sorry about that (getting used to new mail software...)
+ 
+> >it should return dependencies also, that way you can download everything
+> >you need without having to know what you need...
+> 
+> Always starting from the bottom, I am building only the most basic bytecode
+> service. It does not automatically return dependencies, and here is why.
+> 
+> 1. A bytecode service cannot anticipate the purpose of a request. It cannot
+> determine the intent of a requestor. Sure, a package is typically
+> downloaded for the purpose of resolving. And yes, a custom class loader is
+> a frequest requestor. On the other hand, when bytecode services are daisy
+> chained, one service must make a simple request to another service.
+> 
+> 2. Determining dependencies makes an application service more complex. A
+> bytecode service provides the package requested and only the package
+> requested. At the primative level, the client-side is always responsible
+> for resolving classes and their dependencies.
+
+on the other hand if you wait until the package is needed you'll slow the application down, if each package was stored in an XML file (not the package itself but its name location and dependencies) you could A) let the server be told what the dependices are rather then having to divine them with a pure-reflector and B) you wouldn't have to force the dependices on the downloader just list them and let them worry about it... 
+
+but from what your saying that would be in a later version anyway...
+ 
+> 3. Good class design puts tightly coupled classes in a single package. When
+> a request is made for a package, all of the classes in a package are
+> transferred across a connection. An application becomes efficient when
+> classes are organized properly into reusable packages, and should be.
+
+not that you can expect everyone to do that (SUN still has some problems with it)
+ 
+> A more advanced bytecode cache is possible. A full-blown application
+> service might be able to respond to an explicit dependency request:
+> 
+> DEPENDENCY <package-name> PACKAGE/1e CR
+> CR
+> 
+> When a service receives a depency request, it would be helpful to (1) list
+> the name of each package and (2) the size of each package.
+> 
+> Eventually, a bytecode service must embrace multiple Java platforms. A
+> bytecode cache must be able to provide the platform information for each
+> package. When a custom class loader on a Java 3 Platform makes a request,
+> the bytecode service should serve up only Java 3 Platform-compatible
+> bytecode. A request for a list of all packages might look something like this:
+> 
+> LIST CR
+> CR
+> 
+> The bytecode cache might respond with a list of each package and the
+> implementations it can serve.
+> 
+> <package-name> +0
+> <package-name> +1 +2
+> <package-name> +3 +3d
+> 
+> "+" - only Java n is available; but, it is upward-compatible
+> "-" - package is not compatible with platform n.
+> "d" - a suffix of d is a debug version of a package.
+> 
+> When more than one version is listed, a separate package for each version
+> is available.
+
+I like the idea, but have been thinking we should use XML for our protocols; instead of what you wrote it would look like:
+
+<Packages>
+ <Package Name="pname">
+  <Version Upward="0"/>
+ </Package>
+ <Package Name="pname">
+  <Version Upward="1"/>
+  <Version Upward="2"/>
+ </Package>
+ <Package Name="pname">
+  <Version Upward="3"/>
+  <Version Upward="3" DEBUG/>
+ </Package>
+</Packages>
+
+thats of course formated for readability, it could return the whole thing as one line. but thats my point using XML streams allow fast parsing and code reusability/extensibility, all you have to do is save it to a file and slap on .xml to log it and it adds some extra standardization.
+
+I'm not saying you have to do that now, mind you...
+ 
+> >maybe it should be a resource cache, it would need to store stuff like
+> >the media a package/application needs. it could even cache "live"
+> >resources like sockets (for the OS, it shouldn't store them for an
+> >application; to risky)
+> 
+> Again, I'm building a cache limited to bytecode. I have ignored all other
+> digital resources, including images, property files, and "live" objects.
+> When I get the bytecode cache working, I can think about using its parts to
+> build an HTTP service. Wouldn't an HTTP service be able to serve up lots of
+> other digital resources?
+
+I think this should be built on top of the HTTP service (framework?) so people can use the HTTP sans classloader baggage.
+ 
+> Do you think it might be possible to by-pass a bytecode service and use an
+> HTTP service for package files? When package files are stored on my HTTP
+> service, along with HTML/XML files and graphic images, my custom class
+> loader has been able to download them. Unfortunately, it remains
+> unfinished. My configuration of a HTTP-based custom class loader looks
+> something like this:
+> 
+> url=http://dmrquest.com/jpkg
+
+couldnt get it to work.
+
+> Each class requested by the JVM is handled by my custom class loader. It
+> looks in its local cache. If the package is in the local cache, it is used
+> -- without contacting the HTTP service.
+> 
+> That is my original problem which I could not solve. Using HTTP and
+> java.net.URL, how does a program perform a conditional download -- asking
+> the HTTP service to compare the timestamp on a local file with the file on
+> the HTTP service? I was thinking that my program reads the timestamp off
+> the local file and sends it to the HTTP service. But how? Where do you
+> *put* the timestamp in a java.net.URL?
+
+I think your problem is java.net.URL, theres some HTTP thing (I haven't had do anything with it recently, a bit fuzzy...) that you can request the timestamp of a file on the server, but I think you have to design your own protocol handler to access it (again, not sure).
+
+Now that I'm thinking about it, why not have an XML-based metaprotocol... that way its easily extended by any application by adding more markup, as I said before XML-streams are a great way to communicate...
+
+XMTP (eXtensible Markup Transfer Protocol)?
+
+Cheers,
+DigiGod
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+----------------------------------------------------------------
+Get your free email from AltaVista at http://altavista.iname.com
+
+
+
+From gchii@mindspring.com Sat, 30 Oct 1999 19:52:37 -0400
+Date: Sat, 30 Oct 1999 19:52:37 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Package status
+
+What is the current status on each package inside the JOS Project?
+
+Which packages work? and which ones need work?
+
+For a list of Java packages with source code available through different
+JOS-related products, see my package cross-reference:
+
+<URL:http://www.mindspring.com/~gchii/jos/library/packages.html>
+
+Some packages are "proposed" while others have been developed, tested and
+distributed. I am not keeping track of proposed pacakages.
+
+What should we do about code in Source Server that's "broken"? Apparently,
+the "pretty printer" confused about 50 lines or so.
+
+
+
+

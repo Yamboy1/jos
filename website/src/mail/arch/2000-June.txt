@@ -1,0 +1,3908 @@
+From gchii@mindspring.com Thu, 01 Jun 2000 12:08:07 -0400
+Date: Thu, 01 Jun 2000 12:08:07 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Static fields/object sharing
+
+At 06:43 PM 5/30/00 -0400, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>	From the programmers P.O.V., I must disagree entirely.  I would
+>find it much easier to share an object than write de/serialization methods
+>for it.  If I'm making good use of OOP, I'm working with objects, not
+>data.
+
+>From an application programmers point of view, what I said is entirely
+backward. But of course I'm speaking from the system programmer's point of
+view. We are building an operating system. I am working on this project as
+a system programmer most of the time.
+
+In order to maintain the illusion of shared objects for an application
+programmer's point of view, a system programmer has to a lot of work. For a
+system programmer, providing data sharing is relatively straight forward
+and easy. Data sharing can be as simple as direct shared memory. While
+that's easy for a system programmer to implement, it is "hard" for an
+application programmer to use.
+
+On the other hand, providing object sharing is complex. Interactions
+between shared objects are often subtle and nonintuitive. Look at the
+complexity of implementing a CORBA or RMI service. While that's difficult
+for a system programmer to implement, it is "easy" for an application
+programmer to use.
+
+I've been talking from a system programmer's point of view on this mailing
+list for as long as I can remember. This is a discussion about the
+architecture of an operating system, isn't it? I am speaking as a system
+programmer and always expect others to speak from the same point of view.
+
+Let me clarify. When I speak of a "proxy", I prefer implicit proxies from
+the application programmer's point of view. I resort to explicit proxies
+when writing an implementation of a subsystem. This always reminds me of
+the FileInputStream and FileDescriptor object. On one hand, FileInputStream
+is a implicit proxy for a foreign file input stream. Its fd property is a
+FileDescriptor. In turn, a FileDescriptor object is an implicit proxy for a
+foreign file handle. Its handle property is an explicit proxy. The real
+file input stream is never owned by a virtual machine.
+
+Likewise, it seems to me that a new bytecode proxy could handle the
+standard in, out and err streams this way:
+
+  public abstract void setStandardStreamHandles(
+      int in,
+      int out,
+      int err );
+
+Unfortunately, most implementations of java.lang.System /assume/ the
+handles for standard in, out and err streams are always 0, 1 and 2. These
+handles are provided automatically in a foreign machine code process.
+Handles are turned into FileDescriptors. In turn, FileDescriptors are
+turned into FileInputStream and FileOutputStream. If handles were passed as
+formal parameters, we would be one step closer to a bytecode process.
+
+Notice that is it far more complex to pass standard streams like this
+
+  public abstract void setStandardStreams(
+      FileDescriptor in,
+      FileDescriptor out,
+      FileDescriptor err );
+
+or
+
+  public abstract void setStandardStreams(
+      FileInputStream in,
+      FileOutputStream out,
+      FileOutputStream err );
+
+When given a handle, a subroutine can create a new FileDescriptor and
+FileInputStream, like this:
+
+  public setStandardInHandle( int v ) {
+    in = new FileInputStream( FileDescriptor( v ) );
+  }
+
+When given a handle, a subroutine can create a new FileDescriptor and
+FileOutputStream, like this:
+
+  public setStandardOutHandle( int v ) {
+    out = new FileOutputStream( FileDescriptor( v ) );
+  }
+  public setStandardErrHandle( int v ) {
+    err = new FileOutputStream( FileDescriptor( v ) );
+  }
+
+This highlights the simplicity of passing handles between subsystems. The
+interface only depends on a primative. It does not depend on a particular
+plug-in version of java.io. The assignment of in, out and err is often
+delayed. It takes a while for the system classes to load and static fields
+to be assigned. A primative is easier to preserve through such a delay.
+
+If files, devices and other system objects are assumed to be shared, we
+have just come back to the original theme of sharing objects. We open an
+shared object, use it and close it.
+
+HANDLE open( const char *name );
+void sendMessage( HANDLE v, const char *msg );
+void close( HANDLE );
+
+The system must keep track of which bytecode process has opened which
+shared objects. Inside the open() subroutine, a shared object is added to a
+process-specific open-object list. When a process is terminated, all shared
+objects in this list are closed automatically by the operating system.
+
+  forEach( HANDLE, close );
+
+What is the "name" of a shared object? Each shared object is a digital
+resource. It should follow the rules for uniform resource identifier.
+
+In turn, a generic shared object proxy can be written in bytecode. It would
+look something like this:
+
+public final class SharedObject {
+  public SharedObject( String name ) {
+    handle = open( name );
+  }
+  public void sendMessage( String msg ) {
+    sendMessage( handle, msg );
+  }
+  public void close() {
+    close( handle );
+  }
+  public int handle;
+}
+
+
+
+
+
+From gchii@mindspring.com Thu, 01 Jun 2000 12:22:45 -0400
+Date: Thu, 01 Jun 2000 12:22:45 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Static fields/object sharing
+
+At 06:43 PM 5/30/00 -0400, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>	Gilbert, if you've been advocating an implicit proxy approach, my
+>apologies.  It would, however, make your positions on what to do more
+>clear (and convincing) if they included how to do, as well.
+
+It is unfortunate that I haven't been clear about the use of a "proxy". I
+assumed the system would "hide" the details of a proxy. An implicit proxy
+would be presented to application programmers. Look at the implicit proxies
+inside java.io and java.net. That kind of abstraction for application
+programming is a good thing.
+
+On the other hand, a shared-object subsystem has to deal with the proxy
+explicitely. If we expand the Java Virtual Machine Specification to include
+shared objects, we must re-write parts of it. I'd like to re-write as
+little as possible. Implicit proxies must behave as much like the real
+object as possible.
+
+I believe that Bytecode Native Interface provides one part of a generic
+mechanism for sharing system-wide objects. I believe the Smart API provides
+a mechanism for identifying a shared object with a uniform resource
+identifier.
+
+In the Alt Package project, for example, I put together a design for
+java.io that serves as an implicit proxy for system objects running on
+another machine across the network. The java.io package in machine A
+delegates its file subsystem to machine B. When A connects to B, machine B
+isolates the file I/O for machine A to one of B's subdirectories. While I'm
+not sure how practical that would be, it demonstrates that java.io is a
+framework with many potential implementations, including one especially for
+JOS.
+
+
+
+
+
+From gchii@mindspring.com Thu, 01 Jun 2000 12:28:41 -0400
+Date: Thu, 01 Jun 2000 12:28:41 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Static fields/object sharing
+
+Correction: It seems to me that a mechanism to set standard in, out and err
+streams for a bytecode process could use handles, like this:
+
+  public abstract void setStandardStreamHandles(
+      int in,
+      int out,
+      int err );
+
+
+
+
+
+From gchii@mindspring.com Thu, 01 Jun 2000 12:44:41 -0400
+Date: Thu, 01 Jun 2000 12:44:41 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [subprogram] Test program
+
+It might be the last thing people think of when building a new system. And
+yet, it is critical to building confidence in a system. It is a test program.
+
+Typically, a test program is part of a test suiste. A test program is
+designed to verify or stress a system. A test suite for the Java standard
+class libraries would be designed to verify all functions in the extensive
+framework and stress a virtual machine.
+
+How do I run a test program?
+
+There are two kinds of tests. One kind of test is expected to fail. It
+pushes the virtual machine until it crashes. This kind of test should be
+written as a classic Java application.
+
+Another kind of test is expected to succeed. This test is run repeatedly
+until it succeeds. A virtual machine is reworked until the test succeeds.
+It is a very useful to write these tests as subprograms. A complete
+regression test can be performed on one instance of a virtual machine. This
+begins to duplicate the real-world environment where a virtual machine is
+expected to run large monolithic applications.
+
+In extreme programming, a test class is just as important as production
+classes. It is treated with respect. In Java, each test suite should be put
+in a unique package. No test class should use the default package. A test
+suite should use a subprogram API to run each independent test in a suite.
+
+Every class in the Java standard class library should have one or more
+corresponding test classes. That represents a lifetime of work. Who has
+time to do that and write "real" applications too?
+
+On the other hand, when a virtual machine already runs your favorite
+application successfully, the test suite suddenly becomes irrelevant. A
+test suite is a stepping stone to getting your application to work. By
+extending the TestProgram class, it is easy to throw together a useful test
+program that plugs into a test suite. The output from a test suite should
+be HTML-compatible, so test results can be made available on-line.
+
+
+
+
+
+From ryan@whitewolf.com.au Fri, 02 Jun 2000 09:57:05 +1000
+Date: Fri, 02 Jun 2000 09:57:05 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] Static fields/object sharing
+
+Gilbert Carl Herschberger II wrote:
+
+> Let me clarify. When I speak of a "proxy", I prefer implicit proxies from
+> the application programmer's point of view.
+
+Just to be clear, are you accepting _Quinn's implicit proxy proposal?
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+
+
+From donaldp@mad.scientist.com Fri, 02 Jun 2000 19:55:25 +1000
+Date: Fri, 02 Jun 2000 19:55:25 +1000
+From: Peter Donald donaldp@mad.scientist.com
+Subject: [JOS-Arch] [subprogram] Test program
+
+Hi,
+
+At 03:00  2/6/00 -0400, you wrote:
+>From: Gilbert Carl Herschberger II <gchii@mindspring.com>
+>Subject: [JOS-Arch] [subprogram] Test program
+
+>There are two kinds of tests. One kind of test is expected to fail. It
+>pushes the virtual machine until it crashes. This kind of test should be
+>written as a classic Java application.
+
+I have just written a testing framework and are about to go back and redo
+it in a more java way. If you want I could throw this into the mix ? It is
+not 100% solid yet but over the next few weeks I hope to get it better ...
+
+Currently it has three notion of 
+TestFixture - The context in which tests occur
+TestSuite - A named group of TestCases
+TestCase - A particular method that tests a particular feature and can
+either fail or pass
+
+I am moving it to more Java-esque names (namely TestContext, TestSuite, and
+Testlet). It already has notion of TestListeners and TestEvents.  Over next
+month I want to expand it to semi-automatically test servlets, beans, EJBs
+and it may be useful for this ?
+
+>In extreme programming, a test class is just as important as production
+>classes. It is treated with respect. In Java, each test suite should be put
+>in a unique package. 
+
+Wow ! Someone else who has heard of extreme programming :P
+
+
+Cheers,
+
+Pete
+
+*------------------------------------------------------*
+| "Nearly all men can stand adversity, but if you want |
+| to test a man's character, give him power."          |
+|       -Abraham Lincoln                               |
+*------------------------------------------------------*
+
+
+
+
+From gchii@mindspring.com Fri, 02 Jun 2000 09:43:36 -0400
+Date: Fri, 02 Jun 2000 09:43:36 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Static fields/object sharing
+
+At 09:57 AM 6/2/00 +1000, Ryan Heise <ryan@whitewolf.com.au> wrote:
+>Just to be clear, are you accepting _Quinn's implicit proxy proposal?
+
+I am unaware of _Quinn's implicit proxy proposal. What is it?
+
+
+
+
+
+From ryan@whitewolf.com.au Sat, 03 Jun 2000 00:50:05 +1000
+Date: Sat, 03 Jun 2000 00:50:05 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] Static fields/object sharing
+
+Gilbert Carl Herschberger II wrote:
+> 
+> At 09:57 AM 6/2/00 +1000, Ryan Heise <ryan@whitewolf.com.au> wrote:
+> >Just to be clear, are you accepting _Quinn's implicit proxy proposal?
+> 
+> I am unaware of _Quinn's implicit proxy proposal. What is it?
+
+	http://jos.org/pipermail/arch/2000-May/000698.html
+
+If my interpretation is correct, he wants to know whether you're ok with
+the idea he described in that email.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+
+
+From gchii@mindspring.com Fri, 02 Jun 2000 12:51:43 -0400
+Date: Fri, 02 Jun 2000 12:51:43 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Static fields/object sharing
+
+At 06:43 PM 5/30/00 -0400, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>	What happens if we generate a JavaObject on the share, as if a
+>'new' instruction were executed, but with its instance variable pointer
+>the same as the shared object's?  Clearly, the proxy would automatically
+>synchronize with the shared object.  The type safety of each JVM is
+>guaranteed because neither JVM uses the other's class(es).  (Though their
+>definitions/bytecode may be shared.)  The only requirement imposed by
+>sharing instance data is that the two classes have identical fields in
+>identical locations; otherwise, the JVM's behavior will be erroneous.
+>
+>	We could then consider ensuring 'correct' behavior across the two
+>processes the domain of library or application code.  (However one might
+>ensure that the classes (methods) loaded by two different process are the
+>same; the API is still indeterminate/undecided.)  This would include
+>ensuring 'proper' parent classes.
+
+If I understand a JavaObject correctly, I'm pretty sure this is the essence
+of an object-sharing mechanism in a multiple process virtual machine.
+
+Internal to a virtual machine, I should be able to share() an object in
+basically the same way I can clone() it. The share() method might
+automatically load classes in a new primordial class loader. Potentially,
+this is equivalent to fork(). Imagine that! You could fully duplicate a
+bytecode process by a single call to share().
+
+The new operator always creates something owned by a bytecode process. A
+shared-new operator must create something owned by a bytecode process too,
+and yet, it shares instance fields that already exist in another bytecode
+process. The mutex for synchronization must be shared, so that even threads
+from different bytecode processes respect the synchronized sections.
+
+A JavaObject sounds like it points to its class and points to its instance
+fields. Its class must not be shared. Its instance fields can be shared. An
+object-sharing mechanism can work with all kinds of class loaders, not just
+the primordial kind.
+
+Earlier, I described type safety in detail. There are three cases:
+identical, equal and equivalent. Identical and equal are "easy" in
+bytecode. We might provide a hard-coded list of well-known casts that are
+allowed for equivalent classes. Once an object-sharing mechanism has
+allowed an object to be cast, a thread doesn't treat an object differently
+just because it is shared. A thread always runs at full speed. None of the
+opcode methods are adversely affected by sharing.
+
+Does this mean that a Java object without instance fields, like
+java.lang.Runnable, is always safe to type cast? Maybe it does.
+
+If JavaObject "points" to instance fields, JavaObject is already a proxy to
+an object's state. Could it be that simple? Maybe it is.
+
+Obviously, garbage collection must be aware of two JavaObjects that share a
+collection of instance fields. State must be garbage collected when there
+are no more objects that refer to it.
+
+It makes me think of the other extreme, where methods are ignored. A
+certain level of literal compatibility is possible. Two classes with two
+different names could be "compatible" if they happen to have the same
+number/type of instance fields, in the same order. Here is an example,
+because field names are arbitrary:
+
+public class ClassA {
+  private int i;
+  private float f;
+  private long l;
+  private double d;
+}
+
+public class ClassB {
+  private int size;
+  private float percent;
+  private long time;
+  private double angle;
+}
+
+Here is another because, interally, short and int may be identical:
+
+public class PointA {
+  private short x;
+  private short y;
+}
+
+public class PointB {
+  private int x;
+  private int y;
+}
+
+I can see where that kind of object sharing might be useful to data
+conversion, upgrades and re-serialization. It sure helps with compatibility
+across different implementations of a package.
+
+Of course, I would prefer to start out with a conservative approach where
+objects can be shared only if their bytecode is identical or equal.
+
+
+
+
+
+From gchii@mindspring.com Fri, 02 Jun 2000 12:55:21 -0400
+Date: Fri, 02 Jun 2000 12:55:21 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Static fields/object sharing
+
+At 12:50 AM 6/3/00 +1000, Ryan Heise <ryan@whitewolf.com.au> wrote:
+>If my interpretation is correct, he wants to know whether you're ok with
+>the idea he described in that email.
+
+I'm sorry. I couldn't make sense of his message the first time around. If
+it says what I think it says, we might have something that works.
+
+
+
+
+
+From gchii@mindspring.com Fri, 02 Jun 2000 13:06:56 -0400
+Date: Fri, 02 Jun 2000 13:06:56 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [bytecode process] Closing resources
+
+We should discuss another critical issue: automatically closing system
+resources.
+
+When a bytecode process is terminated, it must surrender all of its system
+resources. A bytecode process must keep track of system resources that have
+been opened so that, when the time comes, it can close any system resources
+that remain open.
+
+How is this going to work?
+
+How does this affect a virtual machine?
+
+The classic example is a file/socket. We are familiar with the way this
+work with handles in traditional operating systems.
+
+Another example is a listener. When a bytecode process plugs itself in as a
+device listener, like a mouse listener, it must be unplugged automatically
+when a bytecode process is terminated. Like files/sockets, a mouse listener
+might need to be separated into system and user parts. The system part is
+actually plugged into a mouse device. The user part is, like a file/socket/
+only a handle. A mouse device from a user process viewpoint is local
+bytecode. Behind the scenes, a mouse device must pass messages back and
+forth to a real mouse device.
+
+This is almost completely redundent. We already expect CORBA/RMI
+connections, using socket handles, to connect the system process.
+
+Personally, I think a process object in machine code should maintain a list
+of all open handles to system objects. When process is terminated, all open
+handles are closed generically by machine code.
+
+
+
+
+
+From gchii@mindspring.com Fri, 02 Jun 2000 13:08:49 -0400
+Date: Fri, 02 Jun 2000 13:08:49 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [bytecode resource] Attributes
+
+The classdata tool, which uses bytecode as a resource, is now able to
+expose class, field and method attributes. It is fast. The classdata tool
+produced this output in 2-3 seconds on a 233MHz Pentium-class computer
+(with 32MB of RAM). For a preview, here is the most recent output:
+
+<URL:http://www.mindspring.com/~gchii/jos/rc_preview-3.txt>
+
+I have converted my field tool to use the "anchor" model like attribute and
+method tools. The interpretation of a field list is delegated to a field
+tool. Now, the payload of a field tool starts with the first octet of field
+count. I have yet to convert a constant pool tool to use the "anchor" model.
+
+I have added the decoding for class attributes. After this session, it is
+pretty obvious that getFieldAttributes(), getMethodAttributes() and
+getClassAttributes() is more concise for the bytecode interface.
+
+I believe 2b may be the first version that is feasible to use inside a
+virtual machine. After the java.* packages are compiled, they are converted
+to C++ source code (.cpp) and compiled into a library. Then, these
+libraries are statically linked to a virtual machine.
+
+
+
+
+
+From ryan@whitewolf.com.au Sat, 03 Jun 2000 11:53:47 +1000
+Date: Sat, 03 Jun 2000 11:53:47 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] Static fields/object sharing
+
+Gilbert Carl Herschberger II wrote:
+
+> Of course, I would prefer to start out with a conservative approach where
+> objects can be shared only if their bytecode is identical or equal.
+
+So we're all agreed on (some form of) object sharing as opposed to data
+sharing?
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+
+
+From clemens@informatik.tu-muenchen.de Sat, 3 Jun 2000 10:18:06 +0000
+Date: Sat, 3 Jun 2000 10:18:06 +0000
+From: Claudio Clemens clemens@informatik.tu-muenchen.de
+Subject: [JOS-Arch] JOSCore and JOSExtensions (fwd)
+
+Oops, wrong adress ;_(
+-- 
++-----| http://linux.brasileiro.net - Seu site de informações |-----+
+|     Claudio Clemens at Work   -   Informatik   -   TU-München     |
+|         clemens@in.tum.de         http://www.in.tum.de/~clemens   |
+A .45 beats a royal flush EVERY TIME
+
+---------- Forwarded message ----------
+Date: Wed, 31 May 2000 12:14:01 +0200 (MET DST)
+From: Claudio Clemens <clemens@informatik.tu-muenchen.de>
+To: arch@jor.org
+Subject: JOSCore and JOSExtensions
+
+So I'm here again,
+
+Hoppe Gilbert reads this ;-)
+
+I was thinking about JOSystem. If JOSCOre is the bare mininum (what is the
+bare minimum?), it should offer some base services, like Filesystem,
+Process management, maybe also some memory management (OK, there's no
+virtual memory now). Does JOSCore needs the Java API, or the JAva API
+needs JOSCore? I mean how can you program JOSCore in Java, if you can't
+use the API? Can you produce bytecode without the Java API? It's just a
+little confusing...
+
+So you also don't need JOSExtensions (they are superfulous). But what
+could be in Extensions? Maybe a web server? Or is such an application
+running on top of the Java API, as a user program?
+
+And JOSCore is not org.jos.core.*, but org.jos.core.* is in JOSCore, isn't
+it? Can a service run on JOSCore (just bytecode) w/o the Java API? 
+
+Why do you compare the JOSCore (or org.jos.core.*) to sun.* or
+netscape.*. I thing these are just some libraries, writen as JNI,to serve
+the Java API of Sun / Netscape. But they are writen in C / C++, and are
+native code, not bytecode. How do you thing, you can create something in
+bytecode to serve the JOS Java API? Or better, I can thing of JOSCore
+being in bytecode, but _HOW_ do you create this bytecode (tell me a java
+program to produce bytecode without using a 
+
+class yzx {
+} 
+
+statment. Since Class is a subclass of Object, and Object is defined in
+the Java API, how can you program the JOSCore without the java API?
+
+Hoppe to get some answer...
+
+Claudio
+
+-- 
++-----| http://linux.brasileiro.net - Seu site de informações |-----+
+|     Claudio Clemens at Work   -   Informatik   -   TU-München     |
+|         clemens@in.tum.de         http://www.in.tum.de/~clemens   |
+Extra! Extra! Usuário suicida se joga do Windows! Extra!
+
+
+
+
+
+
+From donaldp@mad.scientist.com Sat, 03 Jun 2000 23:19:13 +1000
+Date: Sat, 03 Jun 2000 23:19:13 +1000
+From: Peter Donald donaldp@mad.scientist.com
+Subject: [JOS-Arch] Static fields/object sharing
+
+>From: Ryan Heise <ryan@whitewolf.com.au>
+>Subject: Re: [JOS-Arch] Static fields/object sharing
+
+>So we're all agreed on (some form of) object sharing as opposed to data
+>sharing?
+
+
+I was just wondering if anyone here has had a chance to look at preliminary
+Realtime Java specification ... it deals with a lot of similar stuff I have
+heard from this thou gives it odd names :D. One place to get it is from
+http://www-4.ibm.com/software/developer/library/rtjintro2.html
+
+
+Cheers,
+
+Pete
+
+*------------------------------------------------------*
+| "Nearly all men can stand adversity, but if you want |
+| to test a man's character, give him power."          |
+|       -Abraham Lincoln                               |
+*------------------------------------------------------*
+
+
+
+
+From tmiller@haverford.edu Sat, 3 Jun 2000 22:27:11 -0400 (EDT)
+Date: Sat, 3 Jun 2000 22:27:11 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Static fields/object sharing (fwd)
+
+> I've been talking from a system programmer's point of view on this mailing
+> list for as long as I can remember. This is a discussion about the
+> architecture of an operating system, isn't it? I am speaking as a system
+> programmer and always expect others to speak from the same point of view.
+
+	We are writing an operating system; we are system programmers.  
+Any programmer's objective is to 'serve' -- in some form or another --
+his/her users.  Our users, more or less, are application programmers.  We
+want to make them more effective; this includes doing hard things right,
+once, so that they can be used system-wide, and providing a standard set
+of services.  Such a service is object sharing.  While this can be
+implemented at the application level, it /should/ be done at the system
+level, for what I hope are fairly obvious reasons.
+
+-_Quinn
+
+
+
+
+
+
+From gchii@mindspring.com Sun, 04 Jun 2000 11:12:52 -0400
+Date: Sun, 04 Jun 2000 11:12:52 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [interface] Better design?
+
+I am sure that a dynamic interface approach to object sharing is better
+than otherwise. A dynamic interface approach goes something like this:
+
+Process A creates object X. X is owned exclusively by process A.
+
+Later, process B comes along and asks process A for object X. Of course,
+process A doesn't want to give process B a direct object reference because
+it wants to exclusively own object X. So what does process A do?
+
+Process A uses some native method to create an interface for object X. The
+native method /dynamically/ creates a class file and passes it and a
+orthogonal handle to process B. Process B defines the interface by turning
+a class file into a class. The class is owned exclusively by process B. In
+turn, the interface class is turned into an object using the handle. The
+interface class and handle are owned exclusively by process B.
+
+-----
+
+Every public method in the class of object X is added to the signature of
+an interface. Therefore, methods are shared, never fields. It means that
+any class can be shared at any time by any process. Obviously, beans are
+easier to share.
+
+Reflection on the dynamic interface will reveal all of the methods of the
+original class. This shared method approach would eliminate the need to
+compare class definitions to see if they are compatible. Every interface
+that is created through this mechanism would be guaranteed to be
+compatible...because when a thread "virtuallly invokes" an interface
+method, the original method of the original class will be invoked. Since
+the original method is invoked, there can be no casting errors.
+
+When process A grants B access to X, process A returns a shared interface
+definition. Later, because of the handle, process A can revoke access to X
+without disturbing process B.
+
+It would bother me to come up with a design that slows down non-shared
+performance within a virtual machine. Although it might be functional, I do
+not see how creating two objects (JavaObject and InstanceFields) for every
+Java object would be effective.
+
+
+
+
+
+From tmiller@haverford.edu Sun, 4 Jun 2000 11:19:26 -0400 (EDT)
+Date: Sun, 4 Jun 2000 11:19:26 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] [bytecode process] Closing resources
+
+> How is this going to work?
+
+	If we make system resources objects -- which seems like a natural
+thing to do -- why wouldn't garbage collection take care of this for us?
+
+-_Quinn
+
+
+
+
+
+
+
+From al@outworld.org Sun, 04 Jun 2000 23:34:24 +0300
+Date: Sun, 04 Jun 2000 23:34:24 +0300
+From: Al al@outworld.org
+Subject: [JOS-Arch] [bytecode process] Closing resources
+
+"Todd L. Miller" wrote:
+
+> If we make system resources objects -- which seems like a natural
+> thing to do -- why wouldn't garbage collection take care of this for
+> us?
+
+It might not happen fast enough. What happens if the GC won't close all
+the outgoing local ports used by TCP, for example?
+
+-- 
+
+        "Though this be madness, yet there is method in't."
+                                          - William Shakespeare
+________________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ICQ#: 11876955] [AIM: "petrounias"] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS E-MAIL
+
+
+
+
+From gchii@mindspring.com Mon, 05 Jun 2000 19:18:07 -0400
+Date: Mon, 05 Jun 2000 19:18:07 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] JOSCore and JOSExtensions (fwd)
+
+At 10:18 AM 6/3/00 +0000, Claudio Clemens
+<clemens@informatik.tu-muenchen.de> wrote:
+>I was thinking about JOSystem. If JOSCOre is the bare mininum (what is the
+>bare minimum?), it should offer some base services, like Filesystem,
+>Process management, maybe also some memory management (OK, there's no
+>virtual memory now).
+
+JOSCore is probably a issue of distribution, rather than namespace. How
+much must be distributed in order to say that it is JOS? or JOS-compatible?
+
+Very little is absolutely required. A file subsystem is not required. A
+protocol stack is not required. Process management is not required. A
+kernel and virtual machine, linked together statically, might be a
+JOS-compatible operating system.
+
+JOS is a computer operating system, not limited to a IBM PC-compatible
+computer. Why? Because JOS is so scaleable that, at the small end, it can
+fit in ROM on an embedded or consumer device. It can fit inside a IDE, SCSI
+or CD-ROM drive. It can fit inside a 104-key keyboard, a monitor or mouse.
+It can fit in a cell phone. It can fit inside ISA, PCI or PCMCIA card. JOS
+can be small enough that an entire TCP/IP protocol stack can be implemented
+/inside/ of a network interface card. The smallest JOS enables programmers
+to write their smallest devices in a processor-independent way.
+
+1. None of these consumer devices need a file subsystem.
+
+2. JOS is ROM-able; classes that are used in a specific application should
+be added to a ROM image.
+
+JOS is so scaleable that, at the big end, it can fit inside a personal
+computer, mini-computer, mainframe or supercomputer. It can fit inside a
+server farm or computer cluster.
+
+JOSystem is a kernel and virtual machine. A virtual machine on the low end
+is functionally equivalent to a virtual machine on the high end. Of course,
+a virtual machine on the high end might have greater optimization and
+virtual memory management.
+
+>Does JOSCore needs the Java API, or the JAva API needs JOSCore?
+
+JOSCore does not depend on the Java API; Java API does not depend JOSCore.
+JOSCore is a concern when distributing JOSystem. We encourage you to
+distribute only the packages an application uses. When an application
+requires the entire Java 2 standard class library, distribute the entire
+Java 2 standard class library. You might put the entire Java API and
+JOSCore into your distribution. When your application requires only a few
+packages from the Java 0 standard class library, distribute only the
+packages it uses. You might put java.lang, java.util and java.io and
+JOSCore into your distribution.
+
+I wish I had concrete examples to use. It might be easier to understand
+with examples taken from experience. JOS is going to be a little confusing
+and uncertain until someone implements a consumer device. Except, I don't
+know of any consumer device that uses the JOS architecture.
+
+>I mean how can you program JOSCore in Java, if you can't use the API?
+
+A team of programmers have been working on JOS for a few years. They write
+programs using off-the-shelf virtual machines from a variety of vendors. In
+the experimental programs that have been written, programmers use
+everything from the Java API. These experimental programs are not yet
+concerned with the real cost to a consumer device of using a class from an
+non-essential API.
+
+If you have a project with a a 34MB ROM image and 32MB or 64MB ROMs, you
+might like to know if you could eliminate any non-essential classes from
+your ROM image. If you find a package that you really do not have to
+include, you can remove it and ship with 32MB ROMs. (Assuming 32MB ROMs are
+less expensive than 64MB ROMs.)
+
+>Can you produce bytecode without the Java API?
+
+When you write your own virtual machine, you can do anything. In theory,
+you /can/ produce bytecode without the Java API. The Java API is not
+required at "compile-time". Bytecode can be assembled with a Java assembler
+like Jasmin.
+
+In theory, you can create more special-case objects like java.lang.Object.
+In the Alt Package project, I've been working on alt.lang.Object as a new
+anchor for alternative packages. If I write a virtual machine, it does not
+have to be compatible with the Java Virtual Machine Specification.
+
+In practice, this is a research project. It helps clarify what can and
+cannot be done in a Java Virtual Machine. When you write a Java Virtual
+Machine, you must follow one of the Java Virtual Machine Specifications.
+
+The JOS Project aims to implement the Java Virtual Machine Specification as
+much as possible. We want to build a host for standard Java applications.
+We must extend the specification where it does not provide for things we
+need, like a bytecode native interface and multiple primordial class
+loaders. Being practical, we would like very much to extend the
+specification a little as possible.
+
+>It's just a little confusing...
+
+Yes, it is confusing. JOSystem and JOSBox should be revisited in the
+architecture discussion.
+
+>So you also don't need JOSExtensions (they are superfulous). But what
+>could be in Extensions? Maybe a web server? Or is such an application
+>running on top of the Java API, as a user program?
+
+JOS extensions might include a file subsystem, protocol stack, process
+manager and things like these. Likely, a web server is an application, not
+an extension. A device manager might be an extension, too.
+
+>And JOSCore is not org.jos.core.*, but org.jos.core.* is in JOSCore, isn't
+>it? Can a service run on JOSCore (just bytecode) w/o the Java API?
+
+No, JOSCore is not org.jos.core. It is unfortunate that two completely
+different things were accidentally given similar names. For a while, I
+mistakenly thought they were the same. They sound the same, don't they?
+
+JOSCore is not limited to a single package. Meanwhile, org.jos.core
+namespace should not be reused.
+
+>Why do you compare the JOSCore (or org.jos.core.*) to sun.* or
+>netscape.*. I thing these are just some libraries, writen as JNI,to serve
+>the Java API of Sun / Netscape. But they are writen in C / C++, and are
+>native code, not bytecode. How do you thing, you can create something in
+>bytecode to serve the JOS Java API? Or better, I can thing of JOSCore
+>being in bytecode, but _HOW_ do you create this bytecode (tell me a java
+>program to produce bytecode without using a 
+>
+>class yzx {
+>} 
+>
+>statment. Since Class is a subclass of Object, and Object is defined in
+>the Java API, how can you program the JOSCore without the java API?
+
+Today, I am working on the assumption that java.lang, java.util, java.io
+and java.net are statically linked to a virtual machine. Instead of adding
+these boot packages to an archive file, such as classes.zip or rt.jar, they
+are part of the virtual machine executable image.
+
+The rest of the JOS/Java API is a radically different matter. From this I
+mean that I split the Java standard class libraries into two parts: boot
+and system packages. Boot packages depend on the virtual machine. The JOS
+platform API depends on boot packages. JOS applications depend on JOS API
+and boot packages. The Java standard class library depends on JOS API and
+boot packages. Java applications depend on the Java standard class library.
+
+Since boot packages includes java.lang, there doesn't seem to be a problem.
+
+Sun Microsystems' definition of "core" packages does not coincide with
+mine. Sun puts a lot of unnecessary stuff in the "core" packages. They have
+turned Java 2 into an exclusively server-side platform.
+
+Even something as popular as a file subsystem is unnecessary on a consumer
+device. A file subsystem is optional. If a file subsystem is implemented in
+a JOS machine, it must be compatible with the JOS Platform API. If it is
+not implemented, it does not have to be (re)distributed.
+
+
+
+
+
+From gchii@mindspring.com Mon, 05 Jun 2000 19:23:29 -0400
+Date: Mon, 05 Jun 2000 19:23:29 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [bulkmake] Release 1
+
+Release 1 of BulkMake(tm) is available for immediate download. For more
+information, see also DownloadBulkMake article on JOS Wiki.
+
+Someday I would like BulkMake(tm) to be a self-contained GUI application,
+with a button for each tool. It is not an integrated development
+environment (IDE). That would make it easier to use one tool after another.
+
+WARNING: The package option of the Package Compiler tool does not work
+properly in this release. This will probably be fixed in release 2.
+
+
+
+
+
+From gchii@mindspring.com Mon, 05 Jun 2000 19:34:24 -0400
+Date: Mon, 05 Jun 2000 19:34:24 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [bytecode resource] Kaffe? classpath?
+
+Inside bytecode as a resource, I have been working exclusively with Kore.
+Kore is compatible with "Java 0" platform, as demonstrated by Sun
+Microsystems' JDK 1.02. When I heard of KaffeOS, it got me thinking. Is
+there a KoreOS? or DecafOS? or ClasspathOS?
+
+A virtual machine written in C++ could be version-less, compatible with
+Kore, Kaffe and Classpath. By recompiling and relinking, our team could
+produce more than one version of an operating system.
+
+This is where the research of the JOS Project should shine. If anyone wants
+to turn their virtual machine into an operating system, they should benefit
+from the techniques we might develop.
+
+Doesn't everyone have the same challenge booting up a virtual machine?
+Doesn't everyone have the same challenge for boot packages? bytecode cache?
+and bytecode verification? Doesn't everyone have the same challenge of
+regression testing? I'd like to think so.
+
+All boot the same way. All have the same boot package names. All interpret
+bytecode. All share the class file format for executable images.
+
+
+
+
+
+From gchii@mindspring.com Tue, 06 Jun 2000 20:16:11 -0400
+Date: Tue, 06 Jun 2000 20:16:11 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Static fields/object sharing
+
+At 11:53 AM 6/3/00 +1000, Ryan Heise <ryan@whitewolf.com.au> wrote:
+>So we're all agreed on (some form of) object sharing as opposed to data
+>sharing?
+
+Hmm. I must think about this. Should we work exclusively on a
+project-specific form of object sharing? I don't think so.
+
+On the one hand, we are working on a research project. We'd like to have
+answers to some very important object-sharing questions. And yet, a
+project-specific mechanism for object sharing is one that might not be used
+in an off-the-shelf virtual machine.
+
+On the other hand, it seems as if we're so close to a breakthrough on what
+can and cannot be shared among multiple bytecode processes.
+
+Should object sharing be part of our brand new operating system? This is a
+difficult question. What are our priorities? I believe we can develop a
+genuine bytecode process with data sharing and nothing but data sharing.
+Object sharing might be a luxury.
+
+Because there is so much that is not known about it, object sharing might
+be better left to the next version of JOS. JOS does not require object
+sharing. There seem to be more important things to work on. We needed the
+discussion of object sharing only to push forward the boundaries and
+definition of a bytecode process.
+
+Data sharing is adequate for the communication between processes, both
+intra- and inter-virtual machine. How experimental should JOS be? How long
+can JOS survive without a public release?
+
+I would like to run JOS. I would like to switch all my production
+applications over to JOS. By finishing the first version of JOS, we can
+encourage a lot more participation and contribution to the JOS Project.
+
+
+
+
+
+From sean-cribbs@utulsa.edu Tue, 6 Jun 2000 22:53:30 -0500
+Date: Tue, 6 Jun 2000 22:53:30 -0500
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-Arch] Getting started on AWT
+
+Perhaps this topic is more appropriate for the Kernel group, but I was
+looking at the JOS1f dist the other day and realized that only a few more
+parts need to be in place in order to start working on an AWT
+implementation.  Is this assumption correct (Todd, Matt, Gilbert, et al)?
+
+The first AWT implementation may be simply VGA 640x480x16, but the only
+things that seem to be missing are hooks for the keyboard and mouse input.
+Or is there more work to be done that I just have not comprehended yet?
+Anyway, I believe that a simple and limited implementation is better than
+nothing, it at least serves as a starting point for more complex and
+advanced implementations.  And honestly, the only thing an AWT needs is a
+way to receive input and to bitblt images onto the screen (thanks to the
+standardVGA driver).  Anyway, I'm rambling.  Please tell me if the kernel/VM
+is in a state where this might be reasonable to start working on (i.e. does
+the VGA driver work as advertised, is the VM stable enough, etc).
+
+------------------------------------
+Sean Cribbs <sean-cribbs@utulsa.edu>
+Computer Science
+University of Tulsa Class of 2001
+-------------------------------------
+
+
+
+
+
+From gchii@mindspring.com Wed, 07 Jun 2000 09:50:38 -0400
+Date: Wed, 07 Jun 2000 09:50:38 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Getting started on AWT
+
+At 10:53 PM 6/6/00 -0500, "Sean D Cribbs" <sean-cribbs@utulsa.edu> wrote:
+>Perhaps this topic is more appropriate for the Kernel group, but I was
+>looking at the JOS1f dist the other day and realized that only a few more
+>parts need to be in place in order to start working on an AWT
+>implementation.  Is this assumption correct (Todd, Matt, Gilbert, et al)?
+
+This topic is appropriate for the Architecture group, too. Some members
+feel that the AWT must be implemented as soon as possible. Some members
+feel that AWT doesn't need to be implemented at all.
+
+I always work from the bottom up. My development method includes building
+upon things that work. If it doesn't work, don't build upon it.
+
+Here is a question for this list: Should the AWT be standardized for JOS?
+If so, why?
+
+How do we write AWT without a memory manager?
+
+>The first AWT implementation may be simply VGA 640x480x16, but the only
+>things that seem to be missing are hooks for the keyboard and mouse input.
+>Or is there more work to be done that I just have not comprehended yet?
+>Anyway, I believe that a simple and limited implementation is better than
+>nothing, it at least serves as a starting point for more complex and
+>advanced implementations.  And honestly, the only thing an AWT needs is a
+>way to receive input and to bitblt images onto the screen (thanks to the
+>standardVGA driver).  Anyway, I'm rambling.  Please tell me if the kernel/VM
+>is in a state where this might be reasonable to start working on (i.e. does
+>the VGA driver work as advertised, is the VM stable enough, etc).
+
+I agree with you: a simple and limited implementation is better than
+nothing. With the completion of a boot-able jJOS/decaf in text mode, the
+next milestone on my list is the JOS-specific implementation of AWT. I only
+wish I had more time to work on it.
+
+The AWT is complicated by the fact that java.awt.Toolkit is in the java.awt
+package instead of the java.awt.peer package. It creates a mutual package
+dependency, where two packages depend on each other (java.awt depends on
+java.awt.peer and java.awt.peer depends on java.awt).
+
+Our first goal should be exclusively to output to VGA, not interaction. We
+should be able to demonstrate the use of a VGA screen without a keyboard
+and mouse. If we write a simple demo program that draws continuously to a
+VGA screen, it would help us work through the simple stuff. Such a demo
+program would be similar to a screen saver, with only limited interaction.
+
+Personally, I have only worked on blitting character-based images, in the
+style of Turbo Vision and Curses. I have every reason to believe that it is
+the same thing.
+
+  public void blit( Point a, Dimension d, byte[] v );
+  public void blit( Point a, Point b, byte[] v );
+
+In addition, it must also be able to read the screen:
+
+  public byte[] read( Point a, Dimension d );
+  public byte[] read( Point a, Point b );
+
+Blit and read are complementary, so that reading a region after blitting it
+should return the same image. Further discussion of AWT should be part of
+the User Interface group, shouldn't it? The kernel/virtual machine might
+plug in any implementation of AWT.
+
+
+
+
+
+From sean-cribbs@utulsa.edu Wed, 7 Jun 2000 16:53:39 -0500
+Date: Wed, 7 Jun 2000 16:53:39 -0500
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-Arch] Getting started on AWT
+
+>
+> This topic is appropriate for the Architecture group, too. Some members
+> feel that the AWT must be implemented as soon as possible. Some members
+> feel that AWT doesn't need to be implemented at all.
+>
+> I always work from the bottom up. My development method includes building
+> upon things that work. If it doesn't work, don't build upon it.
+>
+> Here is a question for this list: Should the AWT be standardized for JOS?
+> If so, why?
+
+I believe that it might be a good idea to standardize the AWT, but it's
+got to be extremely pluggable -- and that's a problem with the original
+AWT design.  It was made to simply latch on to already-present native
+user-interface code.  I know JADE has tried to do this (pluggability),
+but JADE was never properly defined, and so never began implementation,
+or even functional design for that matter.
+
+>
+> How do we write AWT without a memory manager?
+>
+
+Good question. For now, the AWT will have to do its own memory management,
+at least w.r.t. images (oh, boy what am I getting in to? :)
+
+> I agree with you: a simple and limited implementation is better than
+> nothing. With the completion of a boot-able jJOS/decaf in text mode, the
+> next milestone on my list is the JOS-specific implementation of AWT. I
+only
+> wish I had more time to work on it.
+>
+> The AWT is complicated by the fact that java.awt.Toolkit is in the
+java.awt
+> package instead of the java.awt.peer package. It creates a mutual package
+> dependency, where two packages depend on each other (java.awt depends on
+> java.awt.peer and java.awt.peer depends on java.awt).
+
+I completely agree.  The AWT was a kludge to quickly get Java-based UI's
+on existing systems.  It was never a good design, even after Sun
+"fixed" it (aka AWT1.1, Swing (blech)).  Unfortunately, in order for
+maximum compatibility, we have to support it.  That doesn't mean we can't
+improve the back-end of it, we just have to make sure it's compliant.
+
+> Our first goal should be exclusively to output to VGA, not interaction. We
+> should be able to demonstrate the use of a VGA screen without a keyboard
+> and mouse. If we write a simple demo program that draws continuously to a
+> VGA screen, it would help us work through the simple stuff. Such a demo
+> program would be similar to a screen saver, with only limited interaction.
+
+I agree, in fact, the first thing I was going to do is figure out how to
+represent images so that I could draw a component on screen (even if it is
+just a Canvas).
+
+> Personally, I have only worked on blitting character-based images, in the
+> style of Turbo Vision and Curses. I have every reason to believe that it
+is
+> the same thing.
+>
+>   public void blit( Point a, Dimension d, byte[] v );
+>   public void blit( Point a, Point b, byte[] v );
+
+Right now, the VGA blit style is more like
+
+ blit(int x, int y, int[] image, int linelength)
+
+but that be changed or extended (extended is probably better).  "byte"s
+are more compact and economical too, although a bit harder to work
+with.  It appears that currently, int[] image simply contains a bunch of
+indices into the color palette (0-15), in left-to-right, top-to-bottom
+order.
+
+>
+> In addition, it must also be able to read the screen:
+>
+>   public byte[] read( Point a, Dimension d );
+>   public byte[] read( Point a, Point b );
+>
+> Blit and read are complementary, so that reading a region after blitting
+it
+> should return the same image. Further discussion of AWT should be part of
+> the User Interface group, shouldn't it? The kernel/virtual machine might
+> plug in any implementation of AWT.
+
+I think read should be almost as simple as a blit, considering the ease of
+mapping the memory into a byte array.
+
+It might be good to reawaken the UI group, considering it's had no
+messages since September (about the time I started getting busy in school
+:).
+-------------------------------------
+Sean Cribbs <sean-cribbs@utulsa.edu>
+Computer Science
+University of Tulsa Class of 2001
+-------------------------------------
+
+
+
+
+
+From sean-cribbs@utulsa.edu Wed, 7 Jun 2000 16:54:34 -0500
+Date: Wed, 7 Jun 2000 16:54:34 -0500
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-Arch] More on AWT
+
+On the note of AWT, I believe that there was somewhere in the discussion
+of MPCL that each process would have a gui thread.  Does there need to be
+some special VM hook, or should I just fire up a new thread when the AWT
+is initialized?
+
+-------------------------------------
+Sean Cribbs <sean-cribbs@utulsa.edu>
+Computer Science
+University of Tulsa Class of 2001
+------------------------------------- 
+
+
+
+
+From iainshigeoka@yahoo.com Wed, 7 Jun 2000 23:44:57 -0500
+Date: Wed, 7 Jun 2000 23:44:57 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] Getting started on AWT
+
+On 7 Jun 00, at 9:50, Gilbert Carl Herschberger II wrote:
+
+> At 10:53 PM 6/6/00 -0500, "Sean D Cribbs" <sean-cribbs@utulsa.edu> wrote:
+
+> >Perhaps this topic is more appropriate for the Kernel group, but I was
+> >looking at the JOS1f dist the other day and realized that only a few more
+> >parts need to be in place in order to start working on an AWT
+> >implementation.  Is this assumption correct (Todd, Matt, Gilbert, et al)?
+> 
+> This topic is appropriate for the Architecture group, too. Some members
+> feel that the AWT must be implemented as soon as possible. Some members
+> feel that AWT doesn't need to be implemented at all.
+> 
+The sooner the better.  Unfortunately, pretty pictures are always 
+the most impressive (no matter what's going on under the covers) 
+so a GUI is definitely a killer feature we should at least be thinking 
+about.
+
+> Here is a question for this list: Should the AWT be standardized for JOS?
+> If so, why?
+
+Yes.  Because then we can have a 'signature' JOS look and feel.
+
+> How do we write AWT without a memory manager?
+
+We can't (it would be difficult).  The memory manager would need 
+to be written at this point (otherwise, you'll end up writing it into the 
+GUI code anyhow so might as well make it generic).
+
+> >The first AWT implementation may be simply VGA 640x480x16, but the only
+> 
+> I agree with you: a simple and limited implementation is better than
+> nothing. With the completion of a boot-able jJOS/decaf in text mode, the
+
+if we get it started, I think you can get a lot of help.  The problem 
+with this aspect of the problem is getting started is so hard 
+because there is so much to do.
+
+> Our first goal should be exclusively to output to VGA, not interaction. We
+
+Agreed.
+
+> Personally, I have only worked on blitting character-based images, in the
+> style of Turbo Vision and Curses. I have every reason to believe that it is
+> the same thing.
+
+Actually I was wondering if we couldn't build it on the Java2D 
+foundations (use its method of breaking up the graphics tasks).  If 
+you implement Java2D you have all the tools (masking, fills, 
+shapes, fonts, etc) to build any gui you like.
+
+Of course I'm pulling a lot of this out of the air since I haven't really 
+examined the Java2D api in depth.
+
+-iain
+
+
+
+
+From George.Marrows@Smallworld.co.uk Thu, 8 Jun 2000 08:37:37 +0100
+Date: Thu, 8 Jun 2000 08:37:37 +0100
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Arch] Getting started on AWT
+
+	Regarding memory managers -- there is already a system-wide memory
+allocator and garbage collector (code is in common/native/gc). It's
+doubtless pretty abysmal on the efficiency / performance front, but has been
+kind of working since November. That said, I'm not sure it's really been
+stressed too much up to now ... AWT et al might flush out some exciting new
+bugs.
+
+	-- George
+
+
+> > How do we write AWT without a memory manager?
+> 
+> Good question. For now, the AWT will have to do its own memory management,
+> at least w.r.t. images (oh, boy what am I getting in to? :)
+> 
+
+
+
+
+From tmiller@haverford.edu Thu, 8 Jun 2000 08:07:34 -0400 (EDT)
+Date: Thu, 8 Jun 2000 08:07:34 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Getting started on AWT
+
+	We had, at one point (with the old decaf), a functional virtual
+console system, one console of which was (IIRC) 640x480x16 VGA.  It was,
+unfortunately, glacially slow, especially in mode-switching.
+
+	There's no particular reason to start work on the AWT at the
+VGA driver level, however.  If nothing else, we'll probably need h/w
+acceleration to make things run quickly enough to be useful for a good bit
+of time.  (e.g. optimize the interpreter/implement JIT
+compiling)  Furthermore, you may want to consider writing the back-end as
+a vector package, a-la OSX.  (Not sure if there's a Java standard (java
+2d?) for this yet.)  Basically, you ought to be able to fake a
+frame-buffer fairly easily, and try different ideas with that on a normal
+JVM, possibly with help from rheise.os if/when you need an AWT
+(peer(s)) process.
+
+-_Quinn
+
+
+
+
+
+From sean-cribbs@utulsa.edu Thu, 8 Jun 2000 21:06:44 -0500
+Date: Thu, 8 Jun 2000 21:06:44 -0500
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-Arch] Getting started on AWT
+
+>  We had, at one point (with the old decaf), a functional virtual
+> console system, one console of which was (IIRC) 640x480x16 VGA.  It was,
+> unfortunately, glacially slow, especially in mode-switching.
+
+I'm not expecting any kind of decent performance, only functionality.
+
+>
+>  There's no particular reason to start work on the AWT at the
+> VGA driver level, however.  If nothing else, we'll probably need h/w
+> acceleration to make things run quickly enough to be useful for a good bit
+> of time.  (e.g. optimize the interpreter/implement JIT
+> compiling)  Furthermore, you may want to consider writing the back-end as
+> a vector package, a-la OSX.  (Not sure if there's a Java standard (java
+> 2d?) for this yet.)  Basically, you ought to be able to fake a
+> frame-buffer fairly easily, and try different ideas with that on a normal
+> JVM, possibly with help from rheise.os if/when you need an AWT
+> (peer(s)) process.
+
+I'm not positive about this, but doesn't the VGA standard automatically
+provide one backbuffer (bank)?  I agree that hardware acceleration is
+needed, either through native drivers or JIT, but I figure that something
+is better than nothing (as I said before).  In the far future, it may be
+necessary to implement AWT in mostly native code, just for performance
+reasons.  This kind of shoots down our idea of Java-based drivers, but
+there may be a compromise solution somewhere.  Anyway, I just thought of
+working on an AWT because it's what interests me, and it's something
+that's (hopefully) not too far in the future anyway.
+
+
+-------------------------------------
+Sean Cribbs <sean-cribbs@utulsa.edu>
+Computer Science
+University of Tulsa Class of 2001
+-------------------------------------
+
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 8 Jun 2000 23:45:36 -0500
+Date: Thu, 8 Jun 2000 23:45:36 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] Getting started on AWT
+
+On 8 Jun 00, at 21:06, Sean D Cribbs wrote:
+
+> I'm not expecting any kind of decent performance, only functionality.
+
+Yup.  I agree.  first cut should be just something that works.
+
+> reasons.  This kind of shoots down our idea of Java-based drivers, but
+> there may be a compromise solution somewhere.  Anyway, I just thought of
+ 
+Or may hint at ways to optimize either the jvm, os, or driver 
+architecture to avoid native code.  In any case, the best thing in my 
+experience is just to throw some code together not worrying about 
+optimization at all.  Then run a profiler on the code.  It's always 
+amazing where the real bottlenecks lie.
+
+> working on an AWT because it's what interests me, and it's something
+> that's (hopefully) not too far in the future anyway.
+
+Well, I haven't heard a better reason ever for doing something.  Go 
+to it!
+
+-iain
+
+
+
+
+From sean-cribbs@utulsa.edu Fri, 9 Jun 2000 14:42:48 -0500
+Date: Fri, 9 Jun 2000 14:42:48 -0500
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-Arch] AWT Toolkit
+
+One thing that caught my eye about Toolkits -- the function
+getSystemEventQueue().  The documentation says the function will "get the
+application's or applet's EventQueue instance.  Depending on the Toolkit
+implementation, different EventQueues may be returned for different
+applets."  This implies to me that if we have MPCL, then each process
+might (or should) have it's own EventQueue.  Obviously, we would override
+the getSystemEventQueueImpl() function to implement this functionality,
+but it's something to think about, i.e. how will we determine which
+process receives system-produced events (like input events), and then
+once we know, how will we get the events to the proper process.  I assume
+this is probably straightforward, but it's new territory for me!
+
+-------------------------------------
+Sean Cribbs <sean-cribbs@utulsa.edu>
+Computer Science
+University of Tulsa Class of 2001
+------------------------------------- 
+
+
+
+
+From gchii@mindspring.com Tue, 13 Jun 2000 10:36:42 -0400
+Date: Tue, 13 Jun 2000 10:36:42 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Java-Linux
+
+I believe the JOS Project is a research project. It is a research project,
+isn't it?
+
+As a research project, I believe there is more to JOS than just jJOS/decaf.
+JOS is more than jJOS/decaf, isn't it? jJOS/decaf is a JOS subproject.
+There is room for more than one subproject under the JOS umbrella.
+
+Once again, it has been suggested on the JavaLobby to build a
+"distribution" of Linux that uses Java applications instead of C++
+applications. Why do others get the mistaken impression that the JOS
+Project has a very narrow focus on building a Java Virtual Machine?
+Development of a Java Virtual Machine might be a worthwhile project. It
+might be a admirable effort. It might be necessary to develop the ultimate
+expression of a Java-rich operating system.
+
+There is a better way. The JOS Project should re-invent itself as a portal
+for all kinds of Java-based operating systems. That's right; there must be
+more than one. We must re-invent ourselves to attract the kind of
+programmers we need to finish the ultimate JOS.
+
+I am convinced that 80% or more of a Java-based operating system will run
+-- verbatim -- on more than one kernel/virtual machine. While I applaud the
+effort to write a new kernel/virtual machine, I am not convinced we need to
+write our own kernel or write our own virtual machine. We can take an
+existing kernel and rework it. We can take an existing virtual machine and
+rework it.
+
+We should make a public statement (press release) on the JavaLobby website
+explaining that we, the JOS Project, are already working on a combination
+of Linux and Java to build a Java-rich operating system. Such an operating
+system cannot be exclusively Java. As we know, much of it must be written
+in machine code.
+
+With a transitional platform, like SimpleJOS, many tools and applications
+can be identified, organized and collected together under the JOS umbrella.
+The JOS website should point to existing websites, not replace them. The
+JOS website should build on its strength: to collect together more links
+than any Java-rich operating system website.
+
+KaffeOS has its own website and should be a JOS subproject. jJOS/decaf
+should have its own "website". SimpleJOS should have its own website.
+
+Besides, the ultimate combination of Java and Linux is only a
+specification. A public forum is required to put together the best
+specification. Many people have good ideas about existing products that
+would fill out the operating system to stand alone. It is not a new kernel
+or virtual machine. It is not a distribution. I would like to use an
+existing mailing list, like apps@jos.org as a public forum to build the
+Java-rich operating system.
+
+Remember that jJOS/decaf needs these applications, too. I believe the Java
+community would be willing and able to identify all of the applications
+that have already been written that might be used for a Java-rich operating
+system.
+
+Starting with transitional JOS, we could replace C/C++ components with
+equivalent bytecode until there is nothing but bytecode -- giving us
+ultimate JOS. Transitional JOS runs on a foreign operating system,
+including both Linux and Windows.
+
+
+
+
+
+From tmiller@haverford.edu Tue, 13 Jun 2000 19:34:24 -0400 (EDT)
+Date: Tue, 13 Jun 2000 19:34:24 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Java-Linux
+
+> I believe the JOS Project is a research project. It is a research
+> project, isn't it?
+
+	The last time /I/ checked TheGoal, it was "To create, distribute,
+and support a free and open operating system implementing the
+Java(tm) Platform."  While creation, distribution, and support all may
+involve research, the operating system is our goal.
+
+> I believe there is more to JOS than just jJOS/decaf.
+
+	And there is, and we've discussed more than just
+jJOS/decaf.  jJOS/decaf is certainly the largest codebase in the JOS
+project, and arguably the most important.  It should come as no suprise
+that it is, then, the most discussed codebase on the kernel mailing
+list.  Naturally, the kernel and the JVM are important parts of the
+architecture, so I contribute to this list regularly as well, especially
+concentrating on the issues of implementation -- further referencing the
+jJOS/decaf codebase.
+
+	I do not object to others coding other parts of JOS before the
+kernel and JVM are done; there is plenty of work that needs to be done
+that can or should be implemented as a classic Java application.  
+Depending on where you draw the line between operating system and
+distribution, it's certainly possible that only 20% of the JOS/OS** code
+needs multiple processes, et al, from a custom kernel and JVM.  It is
+furthermore possible that it would be faster to to fork Kaffe or
+ElectricalFire, etc, but that it is not something I'm interested in.
+
+	If someone were to begin customizing another JVM, it is possible
+that they could both argue me out of my position that a ground-up custom
+JVM is a better solution and convince me to work on the port.  Until then,
+I will continue to work on decaf.
+
+> Why do others get the mistaken impression that the JOS Project has a
+> very narrow focus on building a Java Virtual Machine?
+
+	Perhaps because we haven't developed anything else of general
+interest yet.  The raison-d'etre of a next-generation operating system
+(enviroment*) is to enable next-generation applications.  We don't have
+any next-generation applications yet, AFAIK.
+
+	I am not opposed to generating distributions of Java applications;
+it's something we need to do anyway.  I just don't think it will attract
+very much attention; what is, after all, the point of redoing something
+you've already got, but slower?  Without something to enable
+next-generation applications, I will not spend my time following any of
+your suggestions.
+
+	In general, what is an operating system?  It is a mean to ends;
+for JOS, to enable next-generation applications by the leveraging the
+power and flexibility of the Java Platform.  It has been shown to my
+satisfication that JOS will require processes to achieve its goals.  It
+has not been shown to my satisfaction that anything other than extending
+the Java Virtual Machine will enable processes.  I intend to extend the
+JVM in decaf; you are invited to convince me of a better course of action
+-- I prefer not work in error.
+
+-_Quinn
+
+* I'm sure you've all heard me talk about KDE and GNOME before.
+
+** As distinguished from a/the canonical distribution of JOS
+
+
+
+
+
+
+
+From jewel@pixie.co.za Wed, 14 Jun 2000 05:19:58 -0200 (GMT+2)
+Date: Wed, 14 Jun 2000 05:19:58 -0200 (GMT+2)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Arch] Java-Linux
+
+> > I believe the JOS Project is a research project. It is a research
+> > project, isn't it?
+> 
+> 	The last time /I/ checked TheGoal, it was "To create, distribute,
+> and support a free and open operating system implementing the
+> Java(tm) Platform."  While creation, distribution, and support all may
+> involve research, the operating system is our goal.
+
+I don't see JOS as a research project, for me the purpose is to create a
+working, usable Java-based OS.
+ 
+> > I believe there is more to JOS than just jJOS/decaf.
+... 
+> 	If someone were to begin customizing another JVM, it is possible
+> that they could both argue me out of my position that a ground-up custom
+> JVM is a better solution and convince me to work on the port.  Until then,
+> I will continue to work on decaf.
+
+I have been working a JVM "of my own" for about a year and a half now. The
+last time I compared it to decaf it was more "feature-complete" with GC
+working, support for Classpath, reflection, native threads and
+accompanying IO libraries etc.
+
+But I support the decaf effort, there is nothing more rewarding than
+attacking a fairly complex problem (like a JVM / Kernel etc) and coding
+and understanding it from bottom-to-top.
+
+This is exactly the reason I have devoted so many hundreds of hours to my
+JVM. I use it mostly for my own research and as such it is extremely
+beneficial to know it backwards.
+
+In the same vein the developers of JOS should have an intimate aquaintance
+with the core of the OS. The people putting the effort into the JVM
+development ultimately must decide how they go about it. Since I am not
+contributing anything to the effort (at the moment) I consider Todd and
+John to be the custodians of this area of development.
+
+It is possible to use an outside JVM to accelerate the JOS project a bit,
+but I don't know how many people would enjoy such an effort. 
+
+My personal view on the kernel however is different, especially since I
+have little knowledge of low-level programming and kernel programming. In
+my opinion I would prefer to host the JVM on an established microkernel, I
+know of a few that are options:
+
+RTEMS
+GNU Mach
+rtmk
+some kind of OSKit build
+
+
+I hope I don't sound patronising in the above, I think you're doing a
+great job. (I do sometimes get a bit frustrated with the speed of
+development though -- but I also understand the enormity of the task ... )
+
+Jumping to another topic:
+
+My latest work with my JVM has been a JIT (written in Java) that uses an
+IA32 assembler (also written in Java). It's not an "everything gets
+compiled before it runs" type of system, rather the interpreter interacts
+with compiled code. The whole implementation is quite tricky, but I hope
+to bring whatever I have learned / produced to JOS in a few months time.
+
+This also raises the issue of eventually having JOS self-hosting,
+ultimately it would be nice to write a C / C++ compiler in Java (on top of
+the assembler), along with a linker and then we'ld be free from UNIX. (Not
+that I don't love Unix!).
+
+John Leuner
+
+
+
+
+
+From baviship@email.uah.edu Tue, 13 Jun 2000 23:21:40 -0500 (CDT)
+Date: Tue, 13 Jun 2000 23:21:40 -0500 (CDT)
+From: Pankaj Bavishi baviship@email.uah.edu
+Subject: [JOS-Arch] (no subject)
+
+Hello,
+I am looking for academic journal articals on the topic of Java Operating
+Systems. Please guide me if you know the name/no./author of the articles.
+
+Thanks
+Pankaj
+
+******************
+**************************************************************
+
+Snail mail:
+Pankaj Bavishi
+1500, Sparkman drive,
+# 20 J
+Huntsville, Al- 35816
+
+Voice: (256) 430-4583 (apt)
+       (256) 890-6179 (off) 
+       (256) 890-6106 (lab)
+
+
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 15 Jun 2000 00:11:18 -0500
+Date: Thu, 15 Jun 2000 00:11:18 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] Java-Linux
+
+On 14 Jun 00, at 5:19, John Leuner wrote:
+
+> I don't see JOS as a research project, for me the purpose is to create a
+> working, usable Java-based OS.
+
+I would agree with both approaches.  I think the OS will be 
+experimental for a while to come, but the ultimate purpose the 
+research is devoted to is to create a working usable os.
+
+> It is possible to use an outside JVM to accelerate the JOS project a bit,
+> but I don't know how many people would enjoy such an effort. 
+
+Well, there is much beyond a JVM to create a fully usable OS.  
+Although I do believe that much of that research and development 
+can be accomplished on any JVM currently available (say the jdk 
+on windows or linux) and doesn't require one on a stripped down os.
+
+> My personal view on the kernel however is different, especially since I
+> have little knowledge of low-level programming and kernel programming. In
+> my opinion I would prefer to host the JVM on an established microkernel, I
+> know of a few that are options:
+> 
+> RTEMS
+
+This has been suggested numerous times and the RTEMS people 
+are very interested in someone doing such a port.  Just hasn't 
+happened yet.  I think getting the RTEMS basic kernel built and 
+running on a system has been too big a task an has discouraged 
+this approach.
+
+> GNU Mach
+> rtmk
+> some kind of OSKit build
+
+All are very interesting options.
+
+> My latest work with my JVM has been a JIT (written in Java) that uses an
+> IA32 assembler (also written in Java). It's not an "everything gets
+> compiled before it runs" type of system, rather the interpreter interacts
+> with compiled code. The whole implementation is quite tricky, but I hope
+> to bring whatever I have learned / produced to JOS in a few months time.
+
+That would be wonderful.
+
+> This also raises the issue of eventually having JOS self-hosting,
+> ultimately it would be nice to write a C / C++ compiler in Java (on top of
+> the assembler), along with a linker and then we'ld be free from UNIX. (Not
+> that I don't love Unix!).
+
+I agree with this.  Assemblers are relatively easy to write.  My 
+current very small campaign has been to have the native code 
+written in C because its a much simpler language to write 
+compilers for (if and when that task ever comes up).
+
+-iain
+
+
+
+
+From jewel@pixie.co.za Fri, 16 Jun 2000 05:39:28 -0200 (GMT+2)
+Date: Fri, 16 Jun 2000 05:39:28 -0200 (GMT+2)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Arch] Java-Linux
+
+> > This also raises the issue of eventually having JOS self-hosting,
+> > ultimately it would be nice to write a C / C++ compiler in Java (on top of
+> > the assembler), along with a linker and then we'ld be free from UNIX. (Not
+> > that I don't love Unix!).
+> 
+> I agree with this.  Assemblers are relatively easy to write.  My 
+> current very small campaign has been to have the native code 
+> written in C because its a much simpler language to write 
+> compilers for (if and when that task ever comes up).
+
+You mean as opposed to C++?
+
+I must say I agree. Although OO is a huge bonus and makes code a lot
+cleaner (for example decaf compared to my JVM written in C) I'm wary of
+the complexity of C++ compilers.
+
+Currently I'm writing little "routines" and "fragments" of assembly as I
+implement my JIT. Sometimes however I need to call back into native C
+code to access some structures and stuff.
+
+I hope to replace this by allowing the assembler to "understand" a C
+structure and access it's members in a macro-like fashion.
+
+If there was object inheritance and stuff happening there it would make
+life very much more complicated.
+
+John
+
+---------------------------------------------------------------- 
+Soul Brother Spaceman, flying through the sky, fighting wars and
+battles, defending you and I.
+He's spreading Super-love vibrations, for a better day, Electronic
+super-soul vibrations coming all the way.
+			-- Lenny Kravitz - 5
+
+
+
+
+
+From clemens@informatik.tu-muenchen.de Thu, 15 Jun 2000 09:31:12 +0200 (CEST)
+Date: Thu, 15 Jun 2000 09:31:12 +0200 (CEST)
+From: Claudio Clemens clemens@informatik.tu-muenchen.de
+Subject: [JOS-Arch] (no subject)
+
+On Wed, 14 Jun 2000, Pankaj Bavishi wrote:
+
+>Hello,
+>I am looking for academic journal articals on the topic of Java Operating
+>Systems. Please guide me if you know the name/no./author of the articles.
+
+Try TOS.
+
+-Claudio
+
+-- 
++-----| http://linux.brasileiro.net - Seu site de informações |-----+
+|     Claudio Clemens at Home   -   Informatik   -   TU-München     |
+|         clemens@in.tum.de         http://www.in.tum.de/~clemens   |
+Win'95 - agora os crashs são em 32 bits !
+
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 16 Jun 2000 11:03:36 -0700 (PDT)
+Date: Fri, 16 Jun 2000 11:03:36 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] Java-Linux
+
+--- John Leuner <jewel@pixie.co.za> wrote:
+> > > This also raises the issue of eventually having JOS self-hosting,
+> > > ultimately it would be nice to write a C / C++ compiler in Java (on
+> > 
+> > I agree with this.  Assemblers are relatively easy to write.  My 
+> > current very small campaign has been to have the native code 
+> > written in C because its a much simpler language to write 
+> > compilers for (if and when that task ever comes up).
+> 
+> You mean as opposed to C++?
+
+Yes.
+
+> I must say I agree. Although OO is a huge bonus and makes code a lot
+> cleaner (for example decaf compared to my JVM written in C) I'm wary of
+> the complexity of C++ compilers.
+
+I agree.  Especially with a goal of minimal native code, you really only
+need a very small subset of even C functionality.  So if you choose the
+subset carefully, writing a C->assembly->exe. code tool chain in java
+should be relatively simple... which means self-hosting JOS development
+would be more practical.
+
+> Currently I'm writing little "routines" and "fragments" of assembly as I
+> implement my JIT. Sometimes however I need to call back into native C
+> code to access some structures and stuff.
+> 
+> I hope to replace this by allowing the assembler to "understand" a C
+> structure and access it's members in a macro-like fashion.
+> 
+> If there was object inheritance and stuff happening there it would make
+> life very much more complicated.
+
+Yes.  I have been reading the "developing your own 32-bit os" book by
+burgess and he developed his own simple assembler and C compiler.  The
+nice  thing in his design is because he controlled the c subset, he was
+able to make a nice c -> assembly compiler.  Then an all purpose
+assembler/linker takes care of all machine code production.  it seemed to
+be a much easier design to implement, and seemed much more "hackable" for
+getting kernel stuff done.  Beyond kernel writing, you should be using
+java so even the C capabilties is really more like producing a assembly
+macro compiler on steroids rather than a full on C implementation...
+
+-iain
+
+__________________________________________________
+Do You Yahoo!?
+Send instant messages with Yahoo! Messenger.
+http://im.yahoo.com/
+
+
+
+
+From tmiller@haverford.edu Sat, 17 Jun 2000 01:02:05 -0400 (EDT)
+Date: Sat, 17 Jun 2000 01:02:05 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Java-Linux
+
+> My personal view on the kernel however is different, especially since I
+> have little knowledge of low-level programming and kernel programming. In
+> my opinion I would prefer to host the JVM on an established microkernel, I
+> know of a few that are options:
+
+	I, personally, don't have any objections to hosting on another
+kernel, though I won't port decaf (to whatever extent is required) away
+from JJOS unless/until I need to do something that JJOS does not
+provide.  Since JM has been inactive in development for quite some time
+now, it grows more and more likely that I will hit a wall sooner than
+later.  We'll probably see it in writing support for a class library; I
+may have to end up adopting a kernel that does dynamic linking and
+multiple native processes.  (Sigh.)
+
+> I hope I don't sound patronising in the above, I think you're doing a
+> great job. (I do sometimes get a bit frustrated with the speed of
+> development though -- but I also understand the enormity of the task ... )
+
+	I also get frustrated with the speed of development, but there's a
+hard limit on how much coding a single mind can handle in a single day,
+and I'm sure you can guess what my job is...
+
+-_Quinn
+
+
+
+
+
+From digigod@earthling.net Fri, 16 Jun 2000 23:34:48 -0700
+Date: Fri, 16 Jun 2000 23:34:48 -0700
+From: DigiGod digigod@earthling.net
+Subject: [JOS-Arch] JOSCore and JOSExtensions (fwd)
+
+> JOSCore is probably a issue of distribution, rather than namespace. How
+> much must be distributed in order to say that it is JOS? or JOS-compatible?
+
+To me, JOSCore isn't a matter of distribution or namespace it is an idea
+and no more. It is the abstract, simple form of JOS: the bare minimum of
+bytes required to fill the definition of "JOS" in the literal OS sense.
+JOSCore isn't much of an OS, what it is is the platform on which the
+various, compatible, JOS platforms are built upon. JOSCore requires
+/some/ JOSExtensions before it can be an OS in the traditional sense.
+All distributions of JOS are going to be various mixtures of JOSCore,
+JOSExtensions and Applications each targeted to a different market,
+i.e.: DeskJOS, JOServer, MicroJOS, etc. JOSCore isn't just bytecode,
+it's also the kernel and the VM of the JOSBox (although many JOSBox
+components are JOSCore, some qualify as extensions) it is also some of
+the more abstract mechanisms of JOSystem (the mechanisms mechanisms,
+probably not the most efficient design but its the easiest, most
+balanced way to produce the desired flexibility.) JOSCore is the
+bootstrap, the metamechanisms (and the statically linked default
+implementation: necessary bloat) JOSExtensions are built on this either
+by implementing a solution or adding an extra level of gradation or
+abstraction (i.e.: the file system abstraction -- a JOSExtension that is
+a port for extension itself, an extensible extension)
+ 
+> Very little is absolutely required. A file subsystem is not required. A
+> protocol stack is not required. Process management is not required. A
+> kernel and virtual machine, linked together statically, might be a
+> JOS-compatible operating system.
+
+JOSCore is the abstractions abstractions, the meta-abstractions for
+loading the file subsystem and the process manager and all the stuff
+that makes the JOS, well, usable. The goal of JOSCore is to /ideally/
+make all of the various incarnations of JOS JOS-compatible (practically
+you'd, of course, hit support walls like this app requires this resource
+or this library and what not) which is why I think we should reserve the
+term "JOS-compatible" for something else entirely, something we wont
+create (except as a stepping-stone to JOS.)
+ 
+> JOS is a computer operating system, not limited to a IBM PC-compatible
+> computer. Why? Because JOS is so scaleable that, at the small end, it can
+> fit in ROM on an embedded or consumer device. It can fit inside a IDE, SCSI
+> or CD-ROM drive. It can fit inside a 104-key keyboard, a monitor or mouse.
+> It can fit in a cell phone. It can fit inside ISA, PCI or PCMCIA card. JOS
+> can be small enough that an entire TCP/IP protocol stack can be implemented
+> /inside/ of a network interface card. The smallest JOS enables programmers
+> to write their smallest devices in a processor-independent way.
+> 
+> 1. None of these consumer devices need a file subsystem.
+> 
+> 2. JOS is ROM-able; classes that are used in a specific application should
+> be added to a ROM image.
+> 
+> JOS is so scaleable that, at the big end, it can fit inside a personal
+> computer, mini-computer, mainframe or supercomputer. It can fit inside a
+> server farm or computer cluster.
+
+exactly.
+ 
+> JOSystem is a kernel and virtual machine. A virtual machine on the low end
+> is functionally equivalent to a virtual machine on the high end. Of course,
+> a virtual machine on the high end might have greater optimization and
+> virtual memory management.
+
+JOSBox is the kernel+VM, JOSystem is the higher level junk like the
+process manager and the installation/update/uninstall
+framework/library/manager and things of that ilk.
+ 
+> >Does JOSCore needs the Java API, or the JAva API needs JOSCore?
+> 
+> JOSCore does not depend on the Java API; Java API does not depend JOSCore.
+> JOSCore is a concern when distributing JOSystem. We encourage you to
+> distribute only the packages an application uses. When an application
+> requires the entire Java 2 standard class library, distribute the entire
+> Java 2 standard class library. You might put the entire Java API and
+> JOSCore into your distribution. When your application requires only a few
+> packages from the Java 0 standard class library, distribute only the
+> packages it uses. You might put java.lang, java.util and java.io and
+> JOSCore into your distribution.
+> 
+> I wish I had concrete examples to use. It might be easier to understand
+> with examples taken from experience. JOS is going to be a little confusing
+> and uncertain until someone implements a consumer device. Except, I don't
+> know of any consumer device that uses the JOS architecture.
+> 
+> >I mean how can you program JOSCore in Java, if you can't use the API?
+> 
+> A team of programmers have been working on JOS for a few years. They write
+> programs using off-the-shelf virtual machines from a variety of vendors. In
+> the experimental programs that have been written, programmers use
+> everything from the Java API. These experimental programs are not yet
+> concerned with the real cost to a consumer device of using a class from an
+> non-essential API.
+> 
+> If you have a project with a a 34MB ROM image and 32MB or 64MB ROMs, you
+> might like to know if you could eliminate any non-essential classes from
+> your ROM image. If you find a package that you really do not have to
+> include, you can remove it and ship with 32MB ROMs. (Assuming 32MB ROMs are
+> less expensive than 64MB ROMs.)
+> 
+> >Can you produce bytecode without the Java API?
+> 
+> When you write your own virtual machine, you can do anything. In theory,
+> you /can/ produce bytecode without the Java API. The Java API is not
+> required at "compile-time". Bytecode can be assembled with a Java assembler
+> like Jasmin.
+> 
+> In theory, you can create more special-case objects like java.lang.Object.
+> In the Alt Package project, I've been working on alt.lang.Object as a new
+> anchor for alternative packages. If I write a virtual machine, it does not
+> have to be compatible with the Java Virtual Machine Specification.
+> 
+> In practice, this is a research project. It helps clarify what can and
+> cannot be done in a Java Virtual Machine. When you write a Java Virtual
+> Machine, you must follow one of the Java Virtual Machine Specifications.
+> 
+> The JOS Project aims to implement the Java Virtual Machine Specification as
+> much as possible. We want to build a host for standard Java applications.
+> We must extend the specification where it does not provide for things we
+> need, like a bytecode native interface and multiple primordial class
+> loaders. Being practical, we would like very much to extend the
+> specification a little as possible.
+> 
+> >It's just a little confusing...
+> 
+> Yes, it is confusing. JOSystem and JOSBox should be revisited in the
+> architecture discussion.
+> 
+> >So you also don't need JOSExtensions (they are superfulous). But what
+> >could be in Extensions? Maybe a web server? Or is such an application
+> >running on top of the Java API, as a user program?
+> 
+> JOS extensions might include a file subsystem, protocol stack, process
+> manager and things like these. Likely, a web server is an application, not
+> an extension. A device manager might be an extension, too.
+
+a web server and a device manager are both borderline cases, the most
+efficient way to implement them might be to have the bulk of the code as
+an OS extension with a configuration/manager application. That is
+somewhat off the point.
+ 
+> >And JOSCore is not org.jos.core.*, but org.jos.core.* is in JOSCore, isn't
+> >it? Can a service run on JOSCore (just bytecode) w/o the Java API?
+> 
+> No, JOSCore is not org.jos.core. It is unfortunate that two completely
+> different things were accidentally given similar names. For a while, I
+> mistakenly thought they were the same. They sound the same, don't they?
+> 
+> JOSCore is not limited to a single package. Meanwhile, org.jos.core
+> namespace should not be reused.
+> 
+> >Why do you compare the JOSCore (or org.jos.core.*) to sun.* or
+> >netscape.*. I thing these are just some libraries, writen as JNI,to serve
+> >the Java API of Sun / Netscape. But they are writen in C / C++, and are
+> >native code, not bytecode. How do you thing, you can create something in
+> >bytecode to serve the JOS Java API? Or better, I can thing of JOSCore
+> >being in bytecode, but _HOW_ do you create this bytecode (tell me a java
+> >program to produce bytecode without using a 
+> >
+> >class yzx {
+> >} 
+> >
+> >statment. Since Class is a subclass of Object, and Object is defined in
+> >the Java API, how can you program the JOSCore without the java API?
+> 
+> Today, I am working on the assumption that java.lang, java.util, java.io
+> and java.net are statically linked to a virtual machine. Instead of adding
+> these boot packages to an archive file, such as classes.zip or rt.jar, they
+> are part of the virtual machine executable image.
+> 
+> The rest of the JOS/Java API is a radically different matter. From this I
+> mean that I split the Java standard class libraries into two parts: boot
+> and system packages. Boot packages depend on the virtual machine. The JOS
+> platform API depends on boot packages. JOS applications depend on JOS API
+> and boot packages. The Java standard class library depends on JOS API and
+> boot packages. Java applications depend on the Java standard class library.
+> 
+> Since boot packages includes java.lang, there doesn't seem to be a problem.
+> 
+> Sun Microsystems' definition of "core" packages does not coincide with
+> mine. Sun puts a lot of unnecessary stuff in the "core" packages. They have
+> turned Java 2 into an exclusively server-side platform.
+> 
+> Even something as popular as a file subsystem is unnecessary on a consumer
+> device. A file subsystem is optional. If a file subsystem is implemented in
+> a JOS machine, it must be compatible with the JOS Platform API. If it is
+> not implemented, it does not have to be (re)distributed.
+
+Conflicts like this need to be resolved before JOS can be considered,
+well, JOS.
+
+I hope this message makes sense, I've had plenty of time to crystallize
+my thoughts but I haven't put much effort into attempting to communicate
+the said crystallization. I'll try to do some work on that over the
+weekend as its a problem that crops up every now and then which is way
+to much for me.
+
+Cheers,
+DigiGod
+_____________________________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_____________________________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_____________________________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+
+O-
+
+_____________________________________________
+NetZero - Defenders of the Free World
+Click here for FREE Internet Access and Email
+http://www.netzero.net/download/index.html
+
+
+
+
+From digigod@earthling.net Sat, 17 Jun 2000 12:30:13 -0700
+Date: Sat, 17 Jun 2000 12:30:13 -0700
+From: DigiGod digigod@earthling.net
+Subject: [JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I hope...
+
+I've been looking over the Wiki, seeing what I wrote previously on
+JOSCore/JOSExtensions and was surprised by the many naming conflicts I
+created as my own ideas evolved. I would like to atone by clearly
+defining these terms as they are now understood by me.
+
+JOSCore is a minimalists dream, it is a pure OS unfettered by concerns
+of the user and only remotely interested in the concerns of the computer
+it is the first domino to fall when the computer is powered on, JOSCore
+is the method for loading JOSExtensions it is the /base/ of the /base/
+of JOS, it is both the abstractions for all JOSExtensions and the
+mechanism for attaching them to itself. It is the nexus of the Gestalt
+(if you wanna get real wordy.)
+
+JOSExtensions are what allow JOS to be useful. They are the atomics of
+the OS, built around the genetic code of JOSCore; without them JOSCore
+would be useless. I doubt you could even run an application without
+several extensions.
+
+JOSBox is the kernel and the VM, it's more complicated then that but
+basically it is hardware not in copper in silicon but in binary, Java
+runs on a Virtual Machine it only makes sense that JOS should run on a
+Virtual Platform (VP?)
+
+JOSystem is the OS we strive for, everything else is just a means to
+this end. JOSBox starts and runs JOSystem like a BIOS loads a
+traditional OS. JOSystem qua JOSCore is a set of abstractions for
+loading the JOSystem JOSExtensions. On a desktop or a server or any
+traditional setting JOSystem would load the file system abstraction
+extension and what ever filesystem(s) are in use it would load the
+process and security managers and most likely a few applications, like
+JADE.
+
+JOSPlatform is a JOSBox and JOSystem, originally I thought of JOSCore
+and JOSExtensions being merely a division of JOSystem but now I realize
+that there is a core to the JOSBox and it has many extensions (although
+mostly the extensions will be exactly the same with additional ones
+added for functions specific to a certain system, the bulk though would
+only be altered for embedded systems and things of that ilk.) So, JOSBox
+and JOSystem are a layer division while JOSCore and JOSExtensions are a
+core division. I think the confusion on everyone's part (including me,
+until recently) is that we, or I at any rate, was thinking
+two-dimensionally when the distinctions were three dimensional. That is,
+I saw JOS like this:
+
+ +---------------------+
+ |      JOSBox         |
+ +---------------------+
+ |    JOSystem         |
+ |JOSCore|JOSExtensions|
+ +---------------------+
+
+When it was really like this:
+
+  X->         Y->
+ Z+--------+ Z+----+-+----+
+ || JOSBox | ||   J|J|J   |
+ v+--------+ v|   O|O|O   |
+  |        |  |   S|S|S   |
+  |        |  |   E|C|E   |
+  |        |  |   x|o|x   |
+  |        |  |   t|r|t   |
+  |JOSystem|  |   e|e|e   |
+  |        |  |   n| |n   |
+  |        |  |   s| |s   |
+  |        |  |   i| |i   |
+  |        |  |   o| |o   |
+  |        |  |   n| |n   |
+  |        |  |   s| |    |
+  +--------+  +----+-+----+
+
+That is as close as I can represent it without making a 3D chart in
+ASCII, which I wont do for various, obvious reasons.
+
+Cheers,
+DigiGod
+_____________________________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_____________________________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_____________________________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+
+O-
+_____________________________________________
+NetZero - Defenders of the Free World
+Click here for FREE Internet Access and Email
+http://www.netzero.net/download/index.html
+
+
+
+
+From jewel@pixie.co.za Mon, 19 Jun 2000 13:46:31 -0200 (GMT+2)
+Date: Mon, 19 Jun 2000 13:46:31 -0200 (GMT+2)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Arch] Java-Linux
+
+> I agree.  Especially with a goal of minimal native code, you really only
+> need a very small subset of even C functionality.  So if you choose the
+> subset carefully, writing a C->assembly->exe. code tool chain in java
+> should be relatively simple... which means self-hosting JOS development
+> would be more practical.
+
+Yes, although the VM is probably more complex than the native code used
+for the libraries.
+ 
+> > Currently I'm writing little "routines" and "fragments" of assembly as I
+> > implement my JIT. Sometimes however I need to call back into native C
+> > code to access some structures and stuff.
+> > 
+> > I hope to replace this by allowing the assembler to "understand" a C
+> > structure and access it's members in a macro-like fashion.
+> > 
+> > If there was object inheritance and stuff happening there it would make
+> > life very much more complicated.
+> 
+> Yes.  I have been reading the "developing your own 32-bit os" book by
+> burgess and he developed his own simple assembler and C compiler.
+
+The book sounds interesting, I'll try find out more about that.
+
+> The
+> nice  thing in his design is because he controlled the c subset, he was
+> able to make a nice c -> assembly compiler.  Then an all purpose
+> assembler/linker takes care of all machine code production.  it seemed to
+> be a much easier design to implement, and seemed much more "hackable" for
+> getting kernel stuff done. 
+
+I'm sure. I don't understand the ELF format and how the linker / loaders
+work, and this makes a lot of kernel stuff seem more mystical than it
+should be.
+
+> Beyond kernel writing, you should be using
+> java so even the C capabilties is really more like producing a assembly
+> macro compiler on steroids rather than a full on C implementation...
+
+Yip, ideally I also want the JIT to "inline" methods which access hardware
+directly. So for example a dummy routine to write to an I/O port gets
+replaced by the JIT with the asm instructions to do the action. This will
+probably result in much less overhead than the JNI model and will allow
+the native code to be better optimised in the context of the Java code.
+
+John
+
+
+
+
+
+
+
+From jewel@pixie.co.za Mon, 19 Jun 2000 13:46:43 -0200 (GMT+2)
+Date: Mon, 19 Jun 2000 13:46:43 -0200 (GMT+2)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Arch] Java-Linux
+
+> > My personal view on the kernel however is different, especially since I
+> > have little knowledge of low-level programming and kernel programming. In
+> > my opinion I would prefer to host the JVM on an established microkernel, I
+> > know of a few that are options:
+> 
+> 	I, personally, don't have any objections to hosting on another
+> kernel, though I won't port decaf (to whatever extent is required) away
+> from JJOS unless/until I need to do something that JJOS does not
+> provide.  Since JM has been inactive in development for quite some time
+> now, it grows more and more likely that I will hit a wall sooner than
+> later.  We'll probably see it in writing support for a class library; I
+> may have to end up adopting a kernel that does dynamic linking and
+> multiple native processes.  (Sigh.)
+
+In my opinion the most important requirement is kernel support for
+threads. 
+
+When I implemented the class library support for IO (file and networking)
+it became painfully apparent that either you need a kernel with native
+threads or you need to jump through hoops to make the native IO code act
+like it was blocking when it fact it wasn't.
+
+> > I hope I don't sound patronising in the above, I think you're doing a
+> > great job. (I do sometimes get a bit frustrated with the speed of
+> > development though -- but I also understand the enormity of the task ... )
+> 
+> 	I also get frustrated with the speed of development, but there's a
+> hard limit on how much coding a single mind can handle in a single day,
+> and I'm sure you can guess what my job is...
+
+:-). I have great respect for people with day jobs who manage to work on
+other projects in their spare time. Since I'm studying full-time I have
+the freedom to spend any amount of time in a day on open-source projects,
+it's a luxury I should be more grateful for ;-).
+
+John
+
+
+
+
+
+
+From mgangelen@quintop.nl Mon, 19 Jun 2000 14:29:34 +0200
+Date: Mon, 19 Jun 2000 14:29:34 +0200
+From: mgangelen@quintop.nl mgangelen@quintop.nl
+Subject: [JOS-Arch] Java-Linux
+
+>> Currently I'm writing little "routines" and "fragments" of assembly as I
+>> implement my JIT. Sometimes however I need to call back into native C
+>> code to access some structures and stuff.
+>>
+>> I hope to replace this by allowing the assembler to "understand" a C
+>> structure and access it's members in a macro-like fashion.
+>>
+>> If there was object inheritance and stuff happening there it would make
+>> life very much more complicated.
+
+> Yip, ideally I also want the JIT to "inline" methods which access
+hardware
+> directly. So for example a dummy routine to write to an I/O port gets
+> replaced by the JIT with the asm instructions to do the action. This will
+> probably result in much less overhead than the JNI model and will allow
+> the native code to be better optimised in the context of the Java code.
+
+Sounds interesting.
+
+Currently I'm doing some research for my own VM I have in mind. This will
+be a JAVA VM and OS written completely in JAVA where only the boot process
+will be coded in ASM.
+Much of this is inspired by the following article:
+
+http://www-4.ibm.com/software/developer/library/jalapeno/index.html
+
+Here are some thoughts:
+
+There will be 2 VM's: VM1 and VM2
+VM1 is a JAVA bytecode to machinecode compiler, written in JAVA. It will
+compile ITSELF to a binary (elf?). It will be a fairly generic VM written
+for an unoptimized processor, eg. i386.
+
+When the machine boots, the bootloader (ASM) will load VM1, which is
+compiled for i386 code. The only job VM1 has to do is compile VM2. VM2 is
+actualy the same as VM1, but with a few exceptions.
+VM1 will test what processor the machine is on, eg i586/MMX. VM1 will now
+compile VM2 for this processor, taking into account the extra opcodes for
+the i586 and MMX.
+After that, VM1 will give control to VM2 and load itself out of memory.
+
+VM2 (the optimized one) will now compile the java class libraries
+(java.lang, etc.) and load all the OS-related stuff (memory management, IO
+routines, disk/network drivers, etc). All of these are written in JAVA.
+
+The VMs will compile the bytecode directly to machinecode.
+There are ofcourse situations where direct control over machinecode is
+preferred. Eg. device-drivers will almost certainly want that. For this I
+have the following in mind:
+
+1.) Native methods will be written in JAVA where possible.
+2.) There will be a JNI-like system (like BCNI)
+3.) When access to machinecode is neccessary, a method could be placed in a
+seperate namespace:
+
+package asm.i386;
+
+class File extends I386_Assembly
+{
+   /*
+    * Code to execute a call to byte[] java.io.File.readBytes( int n )
+    */
+   public static void readBytes()
+   {
+      asm.write( MOV, BX, SP );       // get the File object
+      asm.write( DEC, SP );
+      asm.write( MOV, AX, SP );       // get parameter n
+      asm.write( DEC, SP );
+
+      asm.write(......)               // do the IO-things
+
+      asm.write( MOV, SP, AX );       // return the byte array
+      asm.write( RET );
+   }
+}
+
+Note: this 'assembly' is just for clarification, now it's totaly bogus
+since I'm fairly new to assembler.... :)
+
+These ASM methods are actualy never really executed. They will be executed
+once when class java.io.File is being resolved, and the asm.writes will be
+used directly as machinecode.
+
+It will be needless to say that these ASM methods must be kept to a minimum
+for portability reasons.
+
+Maybe there are some people who like to brainstorm with me about this
+idea...
+
+
+Menno.
+
+
+
+
+
+From Matt.Albrecht@trilogy.com Sun, 18 Jun 2000 21:44:41 -0500
+Date: Sun, 18 Jun 2000 21:44:41 -0500
+From: Matt.Albrecht@trilogy.com Matt.Albrecht@trilogy.com
+Subject: [JOS-Arch] Getting started on AWT
+
+Iain wrote:
+>Actually I was wondering if we couldn't build it on the Java2D
+>foundations (use its method of breaking up the graphics tasks).  If
+>you implement Java2D you have all the tools (masking, fills,
+>shapes, fonts, etc) to build any gui you like.
+
+Another good reason to build on Java2D is its support of the Graphic Driver
+classes.  It has already established a class model for graphics drivers and
+multiple display modes.  I did a tad bit of work on this when decaf was in
+its infancy (before case statements were supported!).  This is a good
+starting point.  We may not need to support *everything* Java2D has to
+start with, though.  Alpha colors in 16-bit VGA mode are a little
+rediculous :-)
+
+Matt
+
+Colonel Edwards: This is the most fantastic story I've ever heard.
+Jeff Trent: And every word of it's true, too.
+Colonel Edwards: That's the fantastic part of it.
+-- Plan 9 From Outer Space
+
+
+
+
+
+
+
+
+From sean-cribbs@utulsa.edu Mon, 19 Jun 2000 11:05:24 -0500 (CDT)
+Date: Mon, 19 Jun 2000 11:05:24 -0500 (CDT)
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-Arch] Getting started on AWT
+
+
+> Another good reason to build on Java2D is its support of the Graphic Driver
+> classes.  It has already established a class model for graphics drivers and
+> multiple display modes.  I did a tad bit of work on this when decaf was in
+> its infancy (before case statements were supported!).  This is a good
+> starting point.  We may not need to support *everything* Java2D has to
+> start with, though.  Alpha colors in 16-bit VGA mode are a little
+> rediculous :-)
+
+Does Java2D have primitives implemented?  What I mean is, given a
+primitive graphics command, can it produce a raster format?  This would be
+a great help in implementing the Graphics class.  For now, I'd like to
+keep everything 1.1-compliant, and the footprint small, so if Java2D is
+big, we may have to leave it out.  Once our VM & class library are
+approaching 1.2 compliancy, we could fully integrate it.  If Java2D
+doesn't provide the vector-to-raster translation though, I may be looking
+for someone who is geometrically/graphically inclined to help implement
+primitives.
+
+Here's my current plan for the VGA AWT:
+1) Make a bare-bones implementation of the toolkit and a simple peer
+(Canvas or the like) and graphics contexts. Draw some random primitives on
+the screen.
+2) Implement off-screen images.(a lot bigger task than it sounds) Draw
+onto an image, then blit it on the screen.
+
+Others to follow (in no particular order):
+* Implement some raster fonts, draw onto a component.
+* Implement other simple components, e.g. Button.
+* Implement windows (frames, dialogs, etc).
+* Implement the rest of the AWT!!
+
+Anyone who is interested please feel free to help.  At this point, I'm not
+too picky about clean implementation, as long as it's readable and
+understandable.  However, efficiency is a must - we know the VGA driver is
+slow, so we have to keep our code to a minimum.
+
+Sean
+
+
+
+
+
+From Matt.Albrecht@trilogy.com Mon, 19 Jun 2000 17:17:24 -0500
+Date: Mon, 19 Jun 2000 17:17:24 -0500
+From: Matt.Albrecht@trilogy.com Matt.Albrecht@trilogy.com
+Subject: [JOS-Arch] Getting started on AWT
+
+Sean Cribbs wrote:
+>Does Java2D have primitives implemented?
+
+>From my brief glances it doesn't appear that Java2D has the primitives
+implemented.  These aren't difficult to add, though.  /Computer Graphics:
+Principles and Practice, 2nd ed/ (J.D. Foley) has very detailed information
+about all the different kinds of graphics algorithms.  Also, Michael
+Abrash's /Zen of Graphics Programming/ is a great source for optimized
+graphics on the x86 platform (it is also in his compilation work /Graphics
+Programming Black Book/).  I wrote a graphics library in C a long while
+back, but it was for VESA SVGA modes using 256 colors.  It's technique was
+to have an in-memory buffer which was later copied to the screen.  I can
+e-mail it to you if you want to see how the basic algorithms worked.
+
+>For now, I'd like to
+>keep everything 1.1-compliant, and the footprint small, so if Java2D is
+>big, we may have to leave it out.  Once our VM & class library are
+>approaching 1.2 compliancy, we could fully integrate it.  If Java2D
+>doesn't provide the vector-to-raster translation though, I may be looking
+>for someone who is geometrically/graphically inclined to help implement
+>primitives.
+
+I think it would help us in the long run to follow the Java2D architecture
+for the underlying graphics.  Of course, we would only need to support the
+functionality that JDK 1.1 supports initially.  This would cut down on a
+lot of code overhead, and graphics techniques that are a bit of a headache.
+
+
+Matt
+
+Colonel Edwards: This is the most fantastic story I've ever heard.
+Jeff Trent: And every word of it's true, too.
+Colonel Edwards: That's the fantastic part of it.
+-- Plan 9 From Outer Space
+
+
+
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 19 Jun 2000 16:59:38 -0700 (PDT)
+Date: Mon, 19 Jun 2000 16:59:38 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] Java-Linux
+
+--- mgangelen@quintop.nl wrote:
+
+> There will be 2 VM's: VM1 and VM2
+> VM1 is a JAVA bytecode to machinecode compiler, written in JAVA. It will
+> compile ITSELF to a binary (elf?). It will be a fairly generic VM
+> written
+> for an unoptimized processor, eg. i386.
+
+....
+
+> Maybe there are some people who like to brainstorm with me about this
+> idea...
+
+The approach seems like it would hold a lot of promise.  I'm not sure if
+you need to do the self-booting system for every boot of the os though...
+seems like you just need the process to build itself once for each
+platform.  I definitely think it deserves discussion.  Both here on the
+mailing list, and as a series of Wiki pages.
+
+-iain
+
+__________________________________________________
+Do You Yahoo!?
+Send instant messages with Yahoo! Messenger.
+http://im.yahoo.com/
+
+
+
+
+From gchii@mindspring.com Tue, 20 Jun 2000 09:44:28 -0400
+Date: Tue, 20 Jun 2000 09:44:28 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Java-Linux
+
+At 02:29 PM 6/19/00 +0200, mgangelen@quintop.nl wrote:
+>Maybe there are some people who like to brainstorm with me about this
+>idea...
+
+I applaud the idea of VM1 and VM2. VM1 provides a way to load and bind VM2
+to a kernel and specific platform. While VM1 might be identical on every
+platform, VM2 is a plug-in. It becomes application-specific. It can be
+optimized for a particular application.
+
+Are you working on the premise that VM1 is discarded when control is passed
+to VM2? I assume VM1 is always loaded. My VM1 uses bytecode as a resource
+so that a kernel, virtual machine and its core classes are statically
+linked at link-time. The whole runtime image is loaded as a single "file".
+My preference is for VM1 to be a light-weight virtual machine (like JDK
+1.02) and VM2 to be a heavy-weight virtual machine (like JDK 1.1 or 1.2 or
+1.3).
+
+The idea of VM1 and VM2 goes along with the distributed computing idea of
+multiple "domains" where VM1 is the primary domain and VM2 is a secondary
+domain. VM1 can load and compile multiple versions of VM2 without
+rebooting. Thus it is possible for only one instance of VM1 but many
+"instances" of VM2, giving us multiple bytecode processes in the classic
+design. Once VM2 is fully compiled for a specific processor, it can be
+reused for each bytecode process.
+
+VM1 does not run custom Java applications. This greatly simplifies VM1. VM1
+does not need to support the latest version of Java from Sun Microsystems.
+VM1 does not need serialization. VM1 does not need JDBC (SQL). VM1 does not
+need JFC/Swing. VM1 does not need support for Java Beans. These are things
+that might be needed by VM2[].
+
+I am working with a subset of Kore for VM1. I'm preserving java.lang,
+java.util, java.io and java.net. With these classes, VM2 can be loaded and
+compiled. With java.io, VM2 can be loaded from a local file subsystem. With
+java.net, VM2 can be loaded from across the network.
+
+By breaking apart VM1 and VM2, very good things happen. We enable our
+operating system to be open-ended. We encourage multiple implementations of
+VM2. It can support many Java platforms, now and in the future. We might
+write VM2 in the Java programming language so that JOS becomes
+self-hosting. The JIT compiler for VM1 is simpler because it always uses
+the same Java platform.
+
+Machine code can be embedded in a class file as a method attribute. The
+name of the attribute would be "xxxMachineCode", where xxx is a
+platform/processor. The javac tool should recognize the asm keyword, like
+this:
+
+  public native void example() {
+    asm {
+      mov ax, dx
+      :
+    }
+  }
+
+or cpp keyword, like this:
+
+  public native void example() {
+    cpp {
+      *t = *s;
+      :
+    }
+  }
+
+
+
+
+
+From sean-cribbs@utulsa.edu Tue, 20 Jun 2000 08:51:09 -0500 (CDT)
+Date: Tue, 20 Jun 2000 08:51:09 -0500 (CDT)
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-Arch] standardVGA driver
+
+Is anyone familiar enough with the standardVGA class to write in a read()
+function for it?  I'd like to be able to read an array of pixels from the
+screen and return it in an int[].  I thought it might be as simple as
+mapping the vga memory range to a byte array, then reading from the array,
+but after looking at the class, I think it might be more complex than
+that.  Anyone have an idea?
+
+--------------------------------------
+ Sean Cribbs <sean-cribbs@utulsa.edu>
+ Computer Science
+ University of Tulsa class of 2001
+--------------------------------------
+
+
+
+
+
+From gchii@mindspring.com Tue, 20 Jun 2000 10:14:33 -0400
+Date: Tue, 20 Jun 2000 10:14:33 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I
+ hope...
+
+At 12:30 PM 6/17/00 -0700, digigod@earthling.net wrote:
+>JOSCore is a minimalists dream, it is a pure OS unfettered by concerns
+>of the user and only remotely interested in the concerns of the computer
+>it is the first domino to fall when the computer is powered on, JOSCore
+>is the method for loading JOSExtensions it is the /base/ of the /base/
+>of JOS, it is both the abstractions for all JOSExtensions and the
+>mechanism for attaching them to itself. It is the nexus of the Gestalt
+>(if you wanna get real wordy.)
+
+I am trying to make sense of your latest definition JOSCore. Are you saying
+that JOSCore is written in machine code? JOSCore would be written in
+machine code if it is first and comes before a kernel and virtual machine.
+
+Why does JOSCore come before the kernel?
+
+Are you saying that we can write a platform-independent kernel on top of a
+platform-dependent JOSCore?
+
+Are JOSExtensions written in machine code too?
+
+We have defined a kernel and its kernel modules. Both a kernel and its
+kernel modules are compiled to machine code and, at runtime, are
+platform-dependent. A JOS-compatible kernel would be able to load
+JOS-compatible kernel modules. Loading a JOS-compatible kernel modules must
+include fix-up, or binding a kernel module to the kernel.
+
+At least, we can agree that JOSCore is neither jos.core nor org.jos.core.
+
+We have defined a kernel interface. RJK has consistently called the layer
+between a portable kernel and non-portable kernel as a kernel interface. A
+portable kernel is made platform-specific at compile-time. A JOS-compatible
+kernel might load JOS-compatible kernel modules, all written in machine code.
+
+When a virtual machine is a JOS-compatible kernel module, any
+JOS-compatible kernel can load it, bind it and run it. A virtual machine
+becomes a plug-in to the kernel.
+
+I believe we have run "JOSCore" into the ground by giving it too many
+incompatible definitions. Can't we invent a new name for the JOS start-up
+sequence? Can't we define a new term for the four or five concepts
+previously known as JOSCore?
+
+There is an issue of distribution. If JOSCore is not an issue of
+distribution, what shall we call the minimum distribution of JOS? How much
+needs to exist before an operating system is called JOS? Does jJOS/decaf
+qualify as a JOS-compatible operating system?
+
+For example, the start-up sequence might be known as JOSBoot. At JOSBoot, a
+kernel and virtual machine need to be loaded, forming the JOSBox. I
+understood the mechanism to work this way: JOSBoot loads a kernel. JOSBoot
+instructs the kernel to load, bind and run a virtual machine. Both
+Etherboot and GRUB qualify as JOSBoot.
+
+jJOS/decaf are statically linked. When jJOS/decaf are loaded with Etherboot
+or GRUB, there is no distinction between kernel and virtual machine. The
+entire JOSBox is loaded together. What is needed to make jJOS/decaf more
+JOS-compatible?
+
+With kernel modules, kernel interface, a start-up sequence and
+distribution, what is left for JOSCore?
+
+Might JOSCore be too abstract for me to understand today because we don't
+have more than one JOS-compatible operating system?
+
+I would like to see a three-dimensional view of JOSBox and JOSystem. It
+might help us better understand JOSCore.
+
+
+
+
+
+From gchii@mindspring.com Tue, 20 Jun 2000 11:02:52 -0400
+Date: Tue, 20 Jun 2000 11:02:52 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [JOSCore] 3D picture
+
+Here is my third attempt to picture JOSCore in 3 dimensions:
+
+<URL:http://www.mindspring.com/gchii/jos/image/joscore-3.gif>
+
+
+
+
+
+From gchii@mindspring.com Tue, 20 Jun 2000 11:04:44 -0400
+Date: Tue, 20 Jun 2000 11:04:44 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [JOSCore] 3D picture w/ correction
+
+Here is my third attempt to picture JOSCore in 3 dimensions:
+
+<URL:http://www.mindspring.com/~gchii/jos/image/joscore-3.gif>
+
+
+
+
+
+From digigod@earthling.net Tue, 20 Jun 2000 10:08:41 -0700
+Date: Tue, 20 Jun 2000 10:08:41 -0700
+From: DigiGod digigod@earthling.net
+Subject: [JOS-Arch] [JOSCore] 3D picture
+
+Gilbert Carl Herschberger II wrote:
+> 
+> Here is my third attempt to picture JOSCore in 3 dimensions:
+> 
+> <URL:http://www.mindspring.com/gchii/jos/image/joscore-3.gif>
+
+Here's my less professional 3D graph of JOS:
+<URL:http://digigod.freehosting.net/temp/JOS-chart.png>
+
+I had always thought JOSCore/JOSExtensions were a subdivision of
+JOSystem, then I realized that JOSBox exhibited properties of the
+JOSCore/JOSExtensions subdivision and when I recognized that... the
+confusion arose.
+
+Cheers,
+DigiGod
+_____________________________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_____________________________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_____________________________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+
+O-
+_____________________________________________
+NetZero - Defenders of the Free World
+Click here for FREE Internet Access and Email
+http://www.netzero.net/download/index.html
+
+
+
+
+From tmiller@haverford.edu Tue, 20 Jun 2000 19:31:28 -0400 (EDT)
+Date: Tue, 20 Jun 2000 19:31:28 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I  hope...
+
+> Why does JOSCore come before the kernel?
+
+	For much the same reason that BSD comes before Mach when you're
+talking about OS X, I would think -- but I may be thinking of a different
+JOSCore than others are.
+
+	Any java platform needs a JVM.  That's one component of JOS.  Any
+operating system needs an API.  That's one component of JOS, but it gets
+(a little) tricky here.  Sun has defined an enourmous API that with which
+we must remain compatible.  That API, however, is inadequate for systems
+programming.  JOS must define its own system API for systems programming.  
+This needs name -- the SystemAPI, for now.  Very probably, we will want to
+include higher-level abstractions as part what we require of a JOS
+distribution; this, too, needs a name -- call it the ApplicationAPI.  
+Because of the vastness of Sun's library, the ApplicationAPI will probably
+be rather small.
+
+	So we have two pieces which are externally evident -- the System
+and Application APIs -- and one which is internally necessary.  These two
+APIs, for the most part, define JOS.  The parts they do not define all
+operate in support of them -- including the JVM.  The purpose of having a
+standard interface between pieces behind these APIs is to allow them to be
+replaced like one would bricks in a wall.  (Beware, incoming
+metaphor.)  It is not important to anyone aside from the bricklayer and
+the brickmaker how the wall of a museum is constructed, so long as it does
+not detract from the art hanging on it.*
+
+	Right now, the wall is only made of two bricks -- the (decaf) JVM
+and the (jJOS) kernel.**  The only interface we, at present, require, is
+the kernel/JVM interface.  This interface must exist and be consistent
+even if we don't ever use another kernel or JVM, just to make porting to a
+new architecture feasible.
+
+	As it stands, it's entirely the responsibility and problem of the
+kernel to get itself booted.  Unless anyone has a good reason to think
+that Etherboot and GRUB won't satisfy our booting needs indefinitely, I
+don't think there's a need to spend time and energy on a boot
+specification.
+
+	In general, I feel the best way to write a spec is to write an
+implementation first, and then write the spec to reflect the way it ought
+to be when you re-write the implemention to get it right...
+
+-_Quinn
+
+* It is for this reason that I haven't bothered to rewrite jJOS/decaf to
+comply with any interface specifications; since, AFAIK, there is only one
+kernel and only one VM under development for JOS, it seems rather silly to
+spend time on it when decaf needs so much work.
+
+** Though the distinction between the two could be considered rather
+arbitrary, it'll firm up with the first port off the IA32.
+
+
+
+
+
+
+From digigod@earthling.net Tue, 20 Jun 2000 16:57:59 -0700
+Date: Tue, 20 Jun 2000 16:57:59 -0700
+From: DigiGod digigod@earthling.net
+Subject: [JOS-Arch] JOSCore vis-a-vis JOSExtensions: clarity, Ihope...
+
+Gilbert Carl Herschberger II wrote:
+> >JOSCore is a minimalists dream, it is a pure OS unfettered by concerns
+> >of the user and only remotely interested in the concerns of the computer
+> >it is the first domino to fall when the computer is powered on, JOSCore
+> >is the method for loading JOSExtensions it is the /base/ of the /base/
+> >of JOS, it is both the abstractions for all JOSExtensions and the
+> >mechanism for attaching them to itself. It is the nexus of the Gestalt
+> >(if you wanna get real wordy.)
+> 
+> I am trying to make sense of your latest definition JOSCore. Are you saying
+> that JOSCore is written in machine code? JOSCore would be written in
+> machine code if it is first and comes before a kernel and virtual machine.
+
+I'm saying that JOSCore isn't written in any code (metaphorically,) it
+is just a division to help us design JOS and a seed to base all of our
+distributions on. JOSCore may never be distributed, but it would both
+be-in and be-the-same-in every distribution.
+ 
+> Why does JOSCore come before the kernel?
+
+It doesn't, it /includes/ the kernel. As I said, I thought
+JOSCore/JOSExtensions were _just_ divisions of JOSystem but now I think
+they are more abstract then that and that they are divisions of _both_
+JOSystem and JOSBox.
+ 
+> Are you saying that we can write a platform-independent kernel on top of a
+> platform-dependent JOSCore?
+
+No, but I do think the JOSCore section of JOSystem should act as a
+platform-independent kernel on top of JOSBox (as it is, basically
+virtual hardware)
+ 
+> Are JOSExtensions written in machine code too?
+
+You mean to ask if JOSExtensions will be written entirely in machine
+code like JOSCore *but* JOSCore isn't written entirely in machine code,
+the JOSBox section of JOSCore is while the JOSystem section is not. So
+JOSExtensions will be written in machine code also, but not exclusively.
+ 
+> We have defined a kernel and its kernel modules. Both a kernel and its
+> kernel modules are compiled to machine code and, at runtime, are
+> platform-dependent. A JOS-compatible kernel would be able to load
+> JOS-compatible kernel modules. Loading a JOS-compatible kernel modules must
+> include fix-up, or binding a kernel module to the kernel.
+
+I don't know much about such things, but from my understanding I'd say
+the kernel modules are JOSExtensions. In other words the kernel /core/
+is made up of two parts the kernel (bootstrap) and the abstractions and
+binding methods (builder) for the modules, or /extensions/. You may have
+also noticed that I broke my definition of core into two elements: The
+bootstrap, the part of core that initializes its self and the builder,
+the part that glues the necessary extensions on. I see a bootstrap and a
+builder in the JOSBox-JOSCore and one in the JOSystem-JOSCore.
+ 
+> At least, we can agree that JOSCore is neither jos.core nor org.jos.core.
+
+Almost to the point where it doesn't have to be said.
+ 
+> We have defined a kernel interface. RJK has consistently called the layer
+> between a portable kernel and non-portable kernel as a kernel interface. A
+> portable kernel is made platform-specific at compile-time. A JOS-compatible
+> kernel might load JOS-compatible kernel modules, all written in machine code.
+> 
+> When a virtual machine is a JOS-compatible kernel module, any
+> JOS-compatible kernel can load it, bind it and run it. A virtual machine
+> becomes a plug-in to the kernel.
+> 
+> I believe we have run "JOSCore" into the ground by giving it too many
+> incompatible definitions. Can't we invent a new name for the JOS start-up
+> sequence? Can't we define a new term for the four or five concepts
+> previously known as JOSCore?
+
+This may be a necessity, but it may also prove useful -- we all being
+fastidious people (mentally at least) will be forced to think of what
+something is before we can think of what we call it.
+ 
+> There is an issue of distribution. If JOSCore is not an issue of
+> distribution, what shall we call the minimum distribution of JOS? How much
+> needs to exist before an operating system is called JOS? Does jJOS/decaf
+> qualify as a JOS-compatible operating system?
+
+It both is and isn't the minimum distribution, in the sense that JOSCore
+by itself is useless and would only make a technical distribution (I'm
+guessing with the platform-specific code uncompiled since none but true
+experimenters would want it...). A minimal distribution would be close
+to a minimal JOS but it would probably still have such things as a file
+system and JADE (albeit with a small CLI.)
+ 
+> For example, the start-up sequence might be known as JOSBoot. At JOSBoot, a
+> kernel and virtual machine need to be loaded, forming the JOSBox. I
+> understood the mechanism to work this way: JOSBoot loads a kernel. JOSBoot
+> instructs the kernel to load, bind and run a virtual machine. Both
+> Etherboot and GRUB qualify as JOSBoot.
+
+This is what I called the "bootstrap element of JOSBox's JOSCore
+section," as always over-intellectulization has created uncomprehensible
+complex neologisms; or, in other words, I'm happy with calling it
+JOSBoot if everyone else is.
+ 
+> jJOS/decaf are statically linked. When jJOS/decaf are loaded with Etherboot
+> or GRUB, there is no distinction between kernel and virtual machine. The
+> entire JOSBox is loaded together. What is needed to make jJOS/decaf more
+> JOS-compatible?
+> 
+> With kernel modules, kernel interface, a start-up sequence and
+> distribution, what is left for JOSCore?
+>
+> Might JOSCore be too abstract for me to understand today because we don't
+> have more than one JOS-compatible operating system?
+
+Possibly, but I'd like to give it one more try.... First of all let me
+say that by my definition a JOS-compatible OS is any OS with JOSCore
+(even if you couldn't run the same apps on them or even have them
+communicate together) it was thinking about what "JOS-compatible" meant
+that led me to extend my previous definition. 
+
+My old way of thinking was a bit clearer, it divided JOSystem into
+JOSCore and JOSExtensions -- perhaps this is a better way to think about
+it, and perhaps Ill return to this old mode of thinking.
+
+My new way of thinking is that when we add something to JOS we should
+ask ourselves "is this, really truly necessary? is it more
+compatible/economical to add an extra layer of abstraction?" or "is this
+part of JOSCore, or should it be a JOSExtension?" Maybe I don't
+understand the design of JOSBox well enough, but I think the
+core/extension classification applies to it as well.
+
+Then I realized that JOSBox/JOSystem and JOSCore/JOSExtensions were two
+different ways of dividing the same thing, two different perspectives,
+the former from a system-level, the latter from a design level. I also
+noticed how perfectly they overlap:
+
+If imagine JOS as a square:
+
++-----+
+|     |
+| JOS |
+|     |
++-----+
+
+
+And you draw a horizontal line in the middle of the square (the
+machine-/byte-code boundary) you get this:
+
++--------+
+|JOSystem|
++--------+
+|JOSBox  |
++--------+
+
+If you redrew the square then drew a vertical line down its center (the
+need/want boundary) you get this:
+
++---------+---------------+
+|         |               |
+| JOSCore | JOSExtensions |
+|         |               |
++---------+---------------+
+
+It's still the same square, just two different ways of looking at it,
+now if we overlay the two diagrams, we get this:
+
++------------------+------------------------+
+| JOSystem-JOSCore | JOSystem-JOSExtensions |
++------------------+------------------------+
+| JOSBox-JOSCore   | JOSBox-JOSExtensions   |
++------------------+------------------------+
+
+Or perhaps a bit more clearly:
+
++-----------------------+
+|JOSystem               |
+|JOSCore | JOSExtensions|
++-----------------------+
+|JOSBox                 |
+|JOSCore | JOSExtensions|
++--------+--------------+
+
+
+Even if I'm wrong, I hope at least was able to explain my self (I'm
+getting ASCII-box cramp)
+ 
+> I would like to see a three-dimensional view of JOSBox and JOSystem. It
+> might help us better understand JOSCore.
+
+I posted a really rotten (Image creation is harder then I thought it
+would be) 3D description, but I think the above makes more sense 
+
+Cheers,
+DigiGod
+_____________________________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_____________________________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_____________________________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+
+O-
+_____________________________________________
+NetZero - Defenders of the Free World
+Click here for FREE Internet Access and Email
+http://www.netzero.net/download/index.html
+
+
+
+
+From mgangelen@quintop.nl Wed, 21 Jun 2000 19:05:49 +0200
+Date: Wed, 21 Jun 2000 19:05:49 +0200
+From: mgangelen@quintop.nl mgangelen@quintop.nl
+Subject: [JOS-Arch] More on brainstorm... Project name: Black
+
+To get back on the multiple stage VMs...
+I'll try and clarify more on what I had in mind. (long update !!!)
+
+The project name I find very attractive is 'Black'.
+Black refers to the purity of JAVA: "No milk or sugar added, just JAVA".
+
+But let's get back to reality.
+In my previous mail I talked about VM1 and VM2. Maybe the VMx keywords are
+a little bit too optimistic about there functionalities. I'll better call
+them JIT1 and JIT2.
+
+STAGE 1:
+
++------+
+|      |
+| JIT1 |
+|      |
++------+
+
+JIT1 is a JIT compiler, written entirely in JAVA.
+JIT1 has got some modules. These modules are responsible for compiling JAVA
+bytecode to a certain processor. JIT1 can have:
+ - jos.black.jit.intel.I386Compiler
+ - jos.black.jit.intel.I486Compiler
+ - jos.black.jit.intel.I586Compiler
+ - jos.black.jit.amd.P6Compiler
+ - jos.black.jit.ibm.AS400Compiler
+ - jos.black.jit.extensions.intel.MMXCompiler
+ - jos.black.jit.extensions.amd.3DNowCompiler
+ etc.
+
+=== Iain Shigeoka <iainshigeoka@yahoo.com wrote:
+
+> The approach seems like it would hold a lot of promise.  I'm not sure if
+> you need to do the self-booting system for every boot of the os though...
+> seems like you just need the process to build itself once for each
+> platform.
+
+Let's say we have an Intel 486 PC and an Intel 586MMX PC.
+If we install a distribution of Linux on these PC's, they will both get a
+kernel compiled for I386. This means that we don't use all of the
+capabilities of the processor. The only thing to get max performance is to
+recompile the Linux kernel (and ALL other Linux programs!) with a 486
+option and a 586MMX option. Now we have 2 kernels on 2 PC's.
+Things get ever worse if we upgrade (or downgrade) one of the processors.
+Then we'll have to recompile the entire kernel again!
+This procedure is absolutely a no-go for the default user (me...) and for
+network-administrators.
+
+Therefor I do think we need to go for the following construction:
+
+JIT1 will be compiled for the lowest platform in a range, say I386.
+JIT1 only has the classes in jos.black.JIT.* and beyond. NO java.*, javax.
+*, com.* or whatsoever, only classes needed to do JIT-related stuff. This
+makes JIT1 quite small.
+
+The JIT1 binary AND the classfiles from JIT1 (jos_black_jit.jar?) will be
+installed on both PC's. When booted, JIT1 will determine on what kind of
+processor it is running. When it sees a 586MMX Processor, it will recompile
+a copy of ITSELF (JIT2) to a binary for a 586 Processor with MMX extension.
+This proces will take very little time, because only the classes from
+jos_black_jit.jar (and from this only the classes needed for a 586MMX
+compiler) have to be compiled.
+
+STAGE 2:
+
++------+
+|      |   +------+
+| JIT1 |-->| JIT2 |
+|      |   +------+
++------+
+
+JIT2 will even be smaller than JIT1, because it won't have modules for
+processors higher or different from a 586MMX in its codebase.
+
+JIT1 will now unload itself and give control to JIT2. JIT2 can compile
+classes a lot faster now.
+
+STAGE 3:
+
+           +------+
+           | JIT2 |
+           +------+
+
+
+=== Gilbert Carl Herschberger II <gchii@mindspring.com> wrote:
+> I applaud the idea of VM1 and VM2. VM1 provides a way to load and bind
+VM2
+> to a kernel and specific platform. While VM1 might be identical on every
+> platform, VM2 is a plug-in. It becomes application-specific. It can be
+> optimized for a particular application.
+
+
+Well, not quite. There will be one 'real' VM: BlackVM. This will be the VM
+that handles all of the OS responsabilities: memory management,
+task-switching, iterrupts, IO, etc.
+
+STAGE 4:
+                     +---------+
+       +------+      |         |
+       | JIT2 |----->| BlackVM |
+       +------+      |         |
+                 +---+---------+------+
+                 |        |           |
+            +--------+ +--------+ +--------+
+            |   IO   | | Memory | |  Task  |
+            | Module | | Module | | Module |
+            +--------+ +--------+ +--------+
+
+BlackVM will be able to load multiple default class-libraries. It will have
+one class-library for itself (Black's own java.* classes) but it should
+also be able to load Sun's rt.jar, Microsoft's classes.zip and even
+Personal Java's classfiles (personal_classes.zip?).
+
+STAGE 5:
+
+                                            +----------------------+
+                 +---------+              +-| Black's java classes |
+   +------+      |         |              | +----------------------+
+   | JIT2 |----->| BlackVM |--------------+
+   +------+      |         |              | +----------------------+
+             +---+---------+------+       +-| Sun's java classes   |
+             |        |           |       | +----------------------+
+        +--------+ +--------+ +--------+  |            .
+        |   IO   | | Memory | |  Task  |  |            .
+        | Module | | Module | | Module |  | +----------------------+
+        +--------+ +--------+ +--------+  +-| XXX's java classes   |
+                                            +----------------------+
+
+On previous mailthreads, there was talk about that a process (or VM) only
+need different classloaders. These classloaders can now be build to ask
+Black VM for the appropriate java.* classes.
+
+
+MACHINECODE
+
+=== Gilbert Carl Herschberger II <gchii@mindspring.com> wrote:
+> Machine code can be embedded in a class file as a method attribute. The
+> name of the attribute would be "xxxMachineCode", where xxx is a
+> platform/processor. The javac tool should recognize the asm keyword, like
+> this:
+>
+>   public native void example() {
+>     asm {
+>       mov ax, dx
+>       :
+>     }
+>   }
+
+How temptive that sounds, I do not think that it is a very good idea. It
+will just contribute to fragmentation of the the java platform. Also, I
+want to be able to program JOS/Black with just my favorite editors and
+compilers (SUN/J++/IBM VA/etc.).
+Look at my previous code:
+
+package asm.i386;
+
+class File extends I386_Assembly
+{
+   /*
+    * Code to execute a call to byte[] java.io.File.readBytes( int n )
+    */
+   public static void readBytes()
+   {
+      asm.write( MOV, BX, SP );       // get the File object
+      asm.write( DEC, SP );
+      asm.write( MOV, AX, SP );       // get parameter n
+      asm.write( DEC, SP );
+
+      asm.write(......)               // do the IO-things
+
+      asm.write( MOV, SP, AX );       // return the byte array
+      asm.write( RET );
+   }
+}
+
+
+The asm object can just be some kind of OutputStream where the opcodes for
+the MOV instructions are to be written. The first call (from process A) to
+readBytes() will trigger JIT2 to execute the function once, get the
+resulting machinecodes written to the asm object, construct a methodblock
+around it, and finally redirect the call from process A to the newly
+created methodblock. All subsequent calls to readBytes() will also be
+redirected to the methodblock.
+
+This way we still maintain compatability in our java-sources and
+classfiles, only a change in the VM is needed to accomplish the on-the-fly
+assembly.
+
+
+
+Hope to hear some more of you all...
+
+Menno.
+
+
+
+
+
+From jewel@pixie.co.za Tue, 27 Jun 2000 16:53:11 -0200 (GMT+2)
+Date: Tue, 27 Jun 2000 16:53:11 -0200 (GMT+2)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Arch] Java VGA driver on linux
+
+Today I felt like working on some graphics stuff again, so I compiled some
+native code to allow me to run Thomas Boceks' VGA driver on Linux. 
+
+I had to do an iopl(3) to allow the linux process to access the IO ports.
+
+Then I telnetted to a linux box and ran the java interpreter on there as
+root.
+
+The driver seems to switch the video mode, but I don't see the jos logo as
+expected (the bitblt routine should show the logo). 
+
+I suspect the problem may be that the linux graphics drivers are already
+running to enable the virtual text consoles. They are probably putting 
+the card in some mode that the driver doesn't expect. Does anyone know how
+I can disable these consoles, or somehow unload the graphics driver?
+
+Another question:
+
+I have about 3 ATI RageII (mach64) graphics cards and I would love to
+write some Java drivers to use these. Probably just enabling a 1024x768x16
+mode would be a great achievement, but I don't really know enough about
+video hardware to do this easily. 
+
+I have the source code for the mach64 drivers from XFree86, but I need
+more background knowledge about how this stuff works. Can someone
+recommend a book or a web article that would help me out?
+
+John Leuner
+
+
+
+
+
+From sean-cribbs@utulsa.edu Tue, 27 Jun 2000 09:00:15 -0500 (CDT)
+Date: Tue, 27 Jun 2000 09:00:15 -0500 (CDT)
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-Arch] Java VGA driver on linux
+
+> Today I felt like working on some graphics stuff again, so I compiled some
+> native code to allow me to run Thomas Boceks' VGA driver on Linux. 
+> 
+> I had to do an iopl(3) to allow the linux process to access the IO ports.
+> 
+> Then I telnetted to a linux box and ran the java interpreter on there as
+> root.
+> 
+> The driver seems to switch the video mode, but I don't see the jos logo as
+> expected (the bitblt routine should show the logo). 
+> 
+> I suspect the problem may be that the linux graphics drivers are already
+> running to enable the virtual text consoles. They are probably putting 
+> the card in some mode that the driver doesn't expect. Does anyone know how
+> I can disable these consoles, or somehow unload the graphics driver?
+
+It's also possible that the driver just doesn't work right.  Todd et al
+had stated that it was incredibly slow.  I personally am tempted to
+rewrite it in mostly native code, primarily for speed reasons, and also
+because I have sample VGA code in ASM.  This kind of defeats the purpose
+of a Java-based driver, but we all want performance too, right?
+
+> Another question:
+> 
+> I have about 3 ATI RageII (mach64) graphics cards and I would love to
+> write some Java drivers to use these. Probably just enabling a 1024x768x16
+> mode would be a great achievement, but I don't really know enough about
+> video hardware to do this easily. 
+
+Somewhere there has to be information on using VESA modes.  I've looked
+around but haven't found any.  Most newer cards (like the mach64 series)
+use the VESA API, either directly or through an executable BIOS extension.
+It's definitely worth looking into if we want higher resolutions.
+
+> I have the source code for the mach64 drivers from XFree86, but I need
+> more background knowledge about how this stuff works. Can someone
+> recommend a book or a web article that would help me out?
+
+Some libraries are good about having technical information like that, but
+many do not.  I was lucky enough to find a book about EGA/VGA programming
+that has tons of information about the base-level architecture of graphics
+cards.  Unfortunately, chipset-specific stuff is probably not available,
+unless through ATI's website.  Good luck!
+
+--------------------------------------
+ Sean Cribbs <sean-cribbs@utulsa.edu>
+ Computer Science
+ University of Tulsa class of 2001
+--------------------------------------
+
+
+
+
+
+
+
+From draft@fear.ch Tue, 27 Jun 2000 16:29:13 +0200
+Date: Tue, 27 Jun 2000 16:29:13 +0200
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Arch] Java VGA driver on linux
+
+John Leuner wrote:
+> Today I felt like working on some graphics stuff again, so I compiled some
+> native code to allow me to run Thomas Boceks' VGA driver on Linux. 
+> 
+> I had to do an iopl(3) to allow the linux process to access the IO ports.
+> 
+> Then I telnetted to a linux box and ran the java interpreter on there as
+> root.
+> 
+> The driver seems to switch the video mode, but I don't see the jos logo as
+> expected (the bitblt routine should show the logo). 
+> 
+> I suspect the problem may be that the linux graphics drivers are already
+> running to enable the virtual text consoles. They are probably putting 
+> the card in some mode that the driver doesn't expect. Does anyone know how
+> I can disable these consoles, or somehow unload the graphics driver?
+
+Can you send me your program? I'll have a look at it.
+
+> Another question:
+> 
+> I have about 3 ATI RageII (mach64) graphics cards and I would love to
+> write some Java drivers to use these. Probably just enabling a 1024x768x16
+> mode would be a great achievement, but I don't really know enough about
+> video hardware to do this easily. 
+> 
+> I have the source code for the mach64 drivers from XFree86, but I need
+> more background knowledge about how this stuff works. Can someone
+> recommend a book or a web article that would help me out?
+
+I havent used the XFree86 sorce code, it was too complicated and not very
+usefull for me. I think there must be a better documentation on the net.
+
+-- 
+Thomas Bocek
+draft@fear.ch
+--
+mob: +41 79 678 9328
+lab: +41 56 210 9242
+
+
+
+
+From gchii@mindspring.com Tue, 27 Jun 2000 12:29:21 -0400
+Date: Tue, 27 Jun 2000 12:29:21 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [boot disk] byte array
+
+Today, I was surprised and disappointed by my Java compiler. My Java
+compiler stores a byte array as individual 4-byte integers in codepool. A
+50KB resource created a 800KB class file. With equivalent C++ code, a 50KB
+resource created a 50KB object file.
+
+Within the Java programming language, I cannot create a custom class
+attribute, can I? I might like to store a byte array in a class attribute
+instead of codepool. There isn't a syntax or keyword for that. I don't want
+to write my own Java compiler.
+
+I am writing a Java application to create boot diskettes for Etherboot and
+GRUB. With point and click, it can create a boot diskette. For Etherboot, I
+downloaded tools.tgz from the JOS Project. For GRUB, I downloaded
+jos-grub-boot.tar.gz from the JOS Binary Distribution page. By using
+strings, I have reduced a 50KB resource to a 100KB class file.
+
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 27 Jun 2000 16:06:52 -0700 (PDT)
+Date: Tue, 27 Jun 2000 16:06:52 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] [boot disk] byte array
+
+--- Gilbert Carl Herschberger II <gchii@mindspring.com> wrote:
+> Today, I was surprised and disappointed by my Java compiler. My Java
+> compiler stores a byte array as individual 4-byte integers in codepool.
+
+Yup.  It's not meant for embedded resources.  Instead, keep your resources
+outside of the class and have the class read it in during startup.  There
+are ways to cobble your way around the problem (I think) but its really
+not worth it.  Is there a reason not to just put the raw resource in the
+jar?
+
+> Within the Java programming language, I cannot create a custom class
+> attribute, can I? I might like to store a byte array in a class
+> attribute
+> instead of codepool. There isn't a syntax or keyword for that. I don't
+> want
+> to write my own Java compiler.
+
+Nope.  You can jam the data into a constant String for the class or hack
+the raw class file.
+
+> I am writing a Java application to create boot diskettes for Etherboot
+> and
+> GRUB. With point and click, it can create a boot diskette. For
+> Etherboot, I
+> downloaded tools.tgz from the JOS Project. For GRUB, I downloaded
+> jos-grub-boot.tar.gz from the JOS Binary Distribution page. By using
+> strings, I have reduced a 50KB resource to a 100KB class file.
+
+The tool should be separate from the data.  You can distribute them
+together in the same jar but it doesn't seem to make much sense to compile
+it into the tool itself.
+
+Won't you also need native methods to implement the actual disk writing
+(rawwrite)?
+
+-iain
+
+__________________________________________________
+Do You Yahoo!?
+Get Yahoo! Mail - Free email you can access from anywhere!
+http://mail.yahoo.com/
+
+
+
+
+From tmiller@haverford.edu Tue, 27 Jun 2000 19:33:25 -0400 (EDT)
+Date: Tue, 27 Jun 2000 19:33:25 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Java VGA driver on linux
+
+> It's also possible that the driver just doesn't work right.  Todd et al
+> had stated that it was incredibly slow.  I personally am tempted to
+> rewrite it in mostly native code, primarily for speed reasons, and also
+> because I have sample VGA code in ASM.  This kind of defeats the purpose
+> of a Java-based driver, but we all want performance too, right?
+
+	*shrug*  decaf isn't up to providing fast drivers yet, so write
+away.  At some point, it should be relatively straightforward to JIT
+compile the driver -- the h/w access methods we provide are basically
+one-to-one with ASM, and a large chunk of the driver should be compilable
+that way.
+
+-_Quinn
+
+
+
+
+
+From gchii@mindspring.com Tue, 27 Jun 2000 19:55:52 -0400
+Date: Tue, 27 Jun 2000 19:55:52 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [boot disk] byte array
+
+At 04:06 PM 6/27/00 -0700, Iain Shigeoka <iainshigeoka@yahoo.com> wrote:
+>Yup.  It's not meant for embedded resources.  Instead, keep your resources
+>outside of the class and have the class read it in during startup.  There
+>are ways to cobble your way around the problem (I think) but its really
+>not worth it.  Is there a reason not to just put the raw resource in the
+>jar?
+
+BootDisk, while immediately useful, is an exercise. It was designed for me
+to test the limits of Java. It tries to answer the question of putting a
+binary resource into a class file. Until I tried it, I was surprised that
+my compiler failed to optimize my static final byte array. I assumed it
+would be smarter than it is.
+
+I do not intend to limit my application to Java 2. While I could put a
+binary resource into a jar file, I would be hard pressed to get it out with
+a virtual machine compatible with the Java 0 Platform.
+
+Sometimes, I wish Java were more of a system programming language, like
+C/C++. I would like it to support porting from one version of Java to another!
+
+How are we going to write system programs for an operating system without
+support for binary data? Isn't the byte array one of the fundamental
+constructs of programming?
+
+Rather than find a way to store binary resources in a class file, maybe I
+should be looking for a way to distribute binary resources with Java 0. Is
+CLASSPATH always available as a system property?
+
+>Nope.  You can jam the data into a constant String for the class or hack
+>the raw class file.
+
+I jammed the data into a constant String. I don't have access to a raw
+class file in an off-the-shelf virtual machine.
+
+>The tool should be separate from the data.  You can distribute them
+>together in the same jar but it doesn't seem to make much sense to compile
+>it into the tool itself.
+
+While the tool should be separate from the data, a class loader is the only
+mechanism to load anything. When a class loader does not support external
+resources, separate data becomes a problem.
+
+>Won't you also need native methods to implement the actual disk writing
+>(rawwrite)?
+
+I don't think so. On Linux, I am working under the assumption that BootDisk
+writes directly to /dev/fd0. It's like rawwrite.
+
+On Windows, I am working under the assumption that BootDisk can invoke the
+external rawwrite program.
+
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 27 Jun 2000 19:37:16 -0700 (PDT)
+Date: Tue, 27 Jun 2000 19:37:16 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] [boot disk] byte array
+
+--- Gilbert Carl Herschberger II <gchii@mindspring.com> wrote:
+> At 04:06 PM 6/27/00 -0700, Iain Shigeoka <iainshigeoka@yahoo.com> wrote:
+
+> BootDisk, while immediately useful, is an exercise. It was designed for
+> me
+> to test the limits of Java. It tries to answer the question of putting a
+> binary resource into a class file. Until I tried it, I was surprised
+> that
+> my compiler failed to optimize my static final byte array. I assumed it
+> would be smarter than it is.
+
+Nope.  Java compilation by default optimizes for 'safety'.  If you have a
+byte array, its an array (the object) of bytes.  Whether this is a good
+idea or not is a judgement call.
+
+> I do not intend to limit my application to Java 2. While I could put a
+> binary resource into a jar file, I would be hard pressed to get it out
+> with
+> a virtual machine compatible with the Java 0 Platform.
+
+OK.  Well, then put it in the classpath or serve it via an httpd server.
+
+> Sometimes, I wish Java were more of a system programming language, like
+> C/C++. I would like it to support porting from one version of Java to
+> another!
+> 
+> How are we going to write system programs for an operating system
+> without
+> support for binary data? Isn't the byte array one of the fundamental
+> constructs of programming?
+
+Well, if you want to do systems programming in java, you need to write a
+new extension to java and a special java compiler to handle it.  It
+shouldn't be too big a stretch since its been done before with other
+languages (but could be a good amount of work).
+
+> CLASSPATH always available as a system property?
+
+yes and no.  It doesn't have to be but it is for now.  its an
+implementation detail I believe.  Once again, i could be wrong since I
+don't have my spec with me.
+
+> >Nope.  You can jam the data into a constant String for the class or
+> hack
+> >the raw class file.
+> 
+> I jammed the data into a constant String. I don't have access to a raw
+> class file in an off-the-shelf virtual machine.
+
+Well, its not the virtual machine but rather a hex editor you need (even
+nicer, a java class hex editor that understands proper java class file
+format).
+
+> >The tool should be separate from the data.  You can distribute them
+> >together in the same jar but it doesn't seem to make much sense to
+> compile
+> >it into the tool itself.
+> 
+> While the tool should be separate from the data, a class loader is the
+> only
+> mechanism to load anything. When a class loader does not support
+> external
+> resources, separate data becomes a problem.
+
+No.  Why not just use a File object.
+
+> >Won't you also need native methods to implement the actual disk writing
+> >(rawwrite)?
+> 
+> I don't think so. On Linux, I am working under the assumption that
+> BootDisk
+> writes directly to /dev/fd0. It's like rawwrite.
+> 
+> On Windows, I am working under the assumption that BootDisk can invoke
+> the
+> external rawwrite program.
+
+OK.  Essentially the same thing.  Just making sure you weren't hoping to
+use just java to get the write done.  :)
+
+-iain
+
+__________________________________________________
+Do You Yahoo!?
+Get Yahoo! Mail - Free email you can access from anywhere!
+http://mail.yahoo.com/
+
+
+
+
+From gchii@mindspring.com Tue, 27 Jun 2000 23:01:35 -0400
+Date: Tue, 27 Jun 2000 23:01:35 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [boot disk] byte array
+
+At 07:37 PM 6/27/00 -0700, Iain Shigeoka <iainshigeoka@yahoo.com> wrote:
+>OK.  Well, then put it in the classpath or serve it via an httpd server.
+
+I'll have to reconsider using CLASSPATH.
+
+I'll have to reconsider using an HTTP service. Should the creation of a
+boot disk depend on HTTP? I don't know.
+
+I wonder if the GUI application should have another field for the location
+of the external resources. If you type in the location, it can be a local
+directory or HTTP URL. That would completely separate the program from its
+data.
+
+>Well, if you want to do systems programming in java, you need to write a
+>new extension to java and a special java compiler to handle it.  It
+>shouldn't be too big a stretch since its been done before with other
+>languages (but could be a good amount of work).
+
+A system programming language might support an extension of a native method
+with assembler or C/C++. I really don't like the idea of keeping my .java
+and .c code in separate files.
+
+  public native void example() {
+    // C code goes here.
+  }
+
+>> CLASSPATH always available as a system property?
+>
+>yes and no.  It doesn't have to be but it is for now.  its an
+>implementation detail I believe.  Once again, i could be wrong since I
+>don't have my spec with me.
+
+If CLASSPATH is unreliable, it won't help. Maybe CLASSPATH is missing from
+a browser?
+
+>Well, its not the virtual machine but rather a hex editor you need (even
+>nicer, a java class hex editor that understands proper java class file
+>format).
+
+Huh? I meant something else. At runtime, a class does not have access to
+its own bytecode. The defineClass() method gets a byte array but doesn't
+let a class know where it is. Only a virtual machine has that kind of access.
+
+>No.  Why not just use a File object.
+
+That is worth considering.
+
+>OK.  Essentially the same thing.  Just making sure you weren't hoping to
+>use just java to get the write done.  :)
+
+The GUI application would create a boot disk image. With instructions, a
+Windows user could manually rawwrite it to a diskette, too. The GUI
+application is meant to reduce the complexity of creating a boot disk
+image. There are quite a few Etherboot options.
+
+
+
+
+
+From gchii@mindspring.com Tue, 27 Jun 2000 23:10:28 -0400
+Date: Tue, 27 Jun 2000 23:10:28 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [boot disk] Release 1
+
+The first release of my Boot Disk application is available for immediate
+download.
+
+Warning: I have not yet tested the boot from the boot image, only the
+creation of the image for each option.
+
+TGZ format:
+<URL:http://www.jos.org/redist/mirror/jos1f/jos1f-bootdisk1a-1.tgz>
+
+ZIP format:
+<URL:http://www.jos.org/redist/mirror/jos1f/jos1f-bootdisk1a-1.zip>
+
+About Etherboot: I have compiled Etherboot to work exclusively with BOOTP
+service, not DHCP. EtherbootProgram requires a single parameter called
+"path". It is the path to the Etherboot "bin" directory, where the
+floppyload.bin file is stored. EtherbootProgram imports only the 32-bit ROM
+images from the bin/32 directory.
+
+About GRUB: I downloaded jos-boot-grub.tar.gz from JOS Binary Distribution.
+The stage1 and stage2 files were imported by GrubProgram. GrubProgram
+requires a single parameter called "path". It is the path to the GRUB
+directory, where stage1 and stage2 are stored.
+
+
+
+
+
+From gchii@mindspring.com Wed, 28 Jun 2000 13:06:51 -0400
+Date: Wed, 28 Jun 2000 13:06:51 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [websource] New for Windows(tm)
+
+I am pleased to announce a Windows(tm)-specific distribution of
+WebSource(tm) 3b - Release 3. This is a runtime edition for Windows(tm)
+9x/NT/2000. It is easy to install and, with the help of the ERIC Project,
+easy to integrate into your Windows(tm) environment.
+
+<URL:http://www.jos.org/redist/jos1f/jos1f-websource3b-3-win.zip>
+
+WebSource(tm) is an open source application. It creates HTML pages from
+Java source code. For more information, see also DownloadWebSource article
+on JOS Wiki.
+
+This release requires a JNI-compatible JDK/JRE from Java 1 or 2. While a
+JDK/JRE from Sun Microsystems is detected automatically, websource.ini
+provides a "javahome" parameter to run any JNI-compatible virtual machine.
+
+1. Decompress jos1f-websource3b-3-win.zip.
+2. Double-click on websource.exe to run Universal Browser.
+3. Click on "websource" and press the Run button. (Or click on "examples"
+and press the Run button to run examples.)
+
+This distribution is wonderful for non-technical people. It do not use a
+batch file. It does not require you to edit AUTOEXEC.BAT. It is completely
+self-contained. It does not use the Windows(tm) registry. To remove
+WebSource(tm) for Windows(tm) from your computer, simply delete the
+websource3b-3-win directory.
+
+
+
+
+

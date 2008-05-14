@@ -1,0 +1,183 @@
+From gchii@mindspring.com Sat, 30 Sep 2000 14:10:58 -0400
+Date: Sat, 30 Sep 2000 14:10:58 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [pure reflection] GUI/Browser Reflection
+
+Pure Reflection for Java might be useful to build an interactive,
+GUI-enabled application. A user might point and click at a package to be
+reflected.
+
+It might be useful to build an interactive, Java servlet-enabled
+application. An end-user might point and click at a package to be reflected
+inside of an off-the-shelf HTML browser.
+
+A class file contains many details. Many cross-reference indices are
+possible. An application might, for example, display the average size of
+the constant pool structure across a suite of classes. It might provide an
+analysis of classes, including a class with the most complex inheritence
+and others.
+
+While one-class-at-a-time browsing is nice, it does not measure the
+complexity of a Java application as a whole. Pure reflection can quickly
+answer questions about your application:
+
+How many classes?
+How many fields? instance fields? static fields?
+How many constants (final fields)?
+How many methods? instance methods? static methods? native methods?
+
+With the implementation of a ZipFinder, pure reflection is capable of
+reflecting classes stored in zip and jar archive.
+
+Given a simulated CLASSPATH, pure reflection can provide the names of every
+class that can be loaded.
+
+
+
+
+
+From gchii@mindspring.com Sat, 30 Sep 2000 14:27:32 -0400
+Date: Sat, 30 Sep 2000 14:27:32 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [pure reflection] Class consistency
+
+Sometimes classes are not stored in a directory (folder) consistent with
+their package name. A package name is embedded in a class file. Pure
+reflection is useful to get a package name from a class file, like this:
+
+  // converts a class name (cn) to a package name (pn).
+  public String cn2pn( String cn ) {
+    if ( cn == null ) {
+      return null;
+    }
+    int pos = cn.lastInstanceOf( "." );
+    /* *L!
+    if ( pos < 0 ) {
+      return "";
+    }
+    */
+    return cn.substring( 0, pos );
+  }
+  // convert from package name (pn) to package directory (pf)
+  public String pn2pf( String pn ) {
+    if ( pn == null ) {
+      return null;
+    }
+    return pn.replace( '.', File.separator.charAt( 0 ) );
+  }
+
+A typical class loader converts a class name to a package name and then
+from a package name to a directory name. For example, the
+org.jos.demo.DemoApplet class file is consistently stored in a directory
+called org/jos/demo. Otherwise, a class file is inconsistent with its
+package. An inconsistent class file cannot be used by a typical class loader.
+
+To check the consistency of your classes, you might load a class file and
+check the package against what the package should be.
+
+For example, /usr/local/shared/org/jos/demo/DemoApplet.class is a class
+file. By loading the class, any of the following packages would be consistent:
+
+usr.local.shared.org.jos.demo
+local.shared.org.jos.demo
+shared.org.jos.demo
+org.jos.demo
+jos.demo
+demo
+
+
+Using pure reflection, the DemoApplet.class file is loaded. The class name
+is converted to a package name and then to a package directory. If the
+original directory name "ends with" the package directory, the class is
+consistent. Otherwise, the .class file is probably in the wrong directory.
+
+The getThisClassName() method returns "org.jos.demo.DemoApplet". Passing
+this to cn2pn() returns "org.jos.demo". In turn, passing this to pn2pf()
+returns "org/jos/demo" (platform-specific). In this case, the package is
+consistent because "/usr/local/shared/org/jos/demo" ends with "org/jos/demo".
+
+Note: Pure reflection for Java should be used by the erica tool to make
+sure classes are consistent before adding them to a package file. The erica
+tool is part of the ERIC subproject.
+
+
+
+
+
+From gchii@mindspring.com Fri, 06 Oct 2000 18:15:37 -0400
+Date: Fri, 06 Oct 2000 18:15:37 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [bulkmake] Release 4
+
+Release 4 of BulkMake 2b is available for immediate download. For more
+information, see also the AboutBulkMake article on JOS Wiki.
+
+http://www.metamech.com/wiki/view/Main/AboutBulkMake
+
+The configuration file for the Package Compiler has always been
+'compiler.txt'. Sometime during the construction of the Setup viewer, it
+was mistakenly written as 'compiler.ini'. Therefore, changes in the
+compiler configuration was not reflected in the compiler.
+
+The package archive tool also reads its configuration from 'compiler.txt'.
+
+The deprecation property is recognized by the Package Compiler. When
+deprecation=false, the -deprecation option is not passed to the javac tool.
+This is supports the javac tool from JDK 1.02.
+
+
+
+
+
+From gchii@mindspring.com Fri, 06 Oct 2000 18:18:42 -0400
+Date: Fri, 06 Oct 2000 18:18:42 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [smartapi] Release 14
+
+Release 14 of the Smart API 2a is available for immediate download. For
+more information, see also the AboutSmartAPI article on JOS Wiki.
+
+http://www.metamech.com/wiki/view/Main/AboutSmartAPI
+
+This release contains a new version of Pure Reflection for Java. See the
+gchii.library.reflection3a package.
+
+This release contains a new Instance Of utility. See the
+org.jos.gchii.instanceof1a package.
+
+This release contains a new zip-compatible finder. While its URI support is
+incomplete, this finder is usable and demonstrates the potential of
+asynchronous I/O model. See the org.jos.gchii.zipfinder1a package. (This
+package requires Java 1 platform (JDK 1.1) or higher.)
+
+
+
+
+
+From gchii@mindspring.com Tue, 10 Oct 2000 10:04:03 -0400
+Date: Tue, 10 Oct 2000 10:04:03 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [file count] New utility
+
+The File Count utility is part of the Smart API Utilities. It is AWT-based
+for maximum compatibility. It uses the x-finder: protocol. It searches for
+files matching a given pattern. When complete, it prints the number of files.
+
+
+
+
+
+From gchii@mindspring.com Tue, 10 Oct 2000 10:05:43 -0400
+Date: Tue, 10 Oct 2000 10:05:43 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [file name length] New utility
+
+The File Name utility is part of the Smart API Utilities. It is AWT-based
+for maximum compatibility. It uses the x-finder: scheme. It searches for
+file names matching a pattern. It prints an analysis of file names, based
+on their length.
+
+
+
+
+

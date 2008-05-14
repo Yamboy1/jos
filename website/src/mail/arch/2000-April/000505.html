@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os-0.1.2 released</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000503.html">
+   <LINK REL="Next" HREF="000506.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os-0.1.2 released</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] rheise.os-0.1.2 released">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 26 Apr 2000 14:13:11 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000503.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+        <LI> Next message: <A HREF="000506.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#505">[ date ]</a>
+              <a href="thread.html#505">[ thread ]</a>
+              <a href="subject.html#505">[ subject ]</a>
+              <a href="author.html#505">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; I didn't really &quot;move&quot; to doing that. The System wrapper class is used
+</I>&gt;<i> &gt; 99% of the time (which is good because it prevents one process from
+</I>&gt;<i> &gt; writing over the System.in that is being used by another process), and
+</I>&gt;<i> &gt; the static field wrappers are used as a fallback for the other 1% of the
+</I>&gt;<i> &gt; time.
+</I>&gt;<i> 
+</I>&gt;<i>         My bad.  I didn't look at enough of the code, obviously :)
+</I>&gt;<i> However, I think it /could/ be done with just that -- though I may not be
+</I>&gt;<i> thinking clearly at this point...
+</I>
+The System wrapper class is required to prevent one process from writing
+over the System.in that is being used by another process.
+
+Echidna does as you are saying but it suffers from the flaw I'm pointing
+out: System.setIn() stuffs everything up, and we must support it.
+Echidna provides a non-standard api for setting System.in to avoid the
+problem but this means standard Java programs that attempt to call
+System.setIn() will stuff up the system (all processes will suddenly
+start reading from the single stdin that was just set).
+
+&gt;<i> splitting it up ought to be more
+</I>&gt;<i> efficient, right?
+</I>
+I'm not exactly sure what you're referring to here. rheise.os uses two
+methods where one is a fallback. The one that is used 99% of the time is
+the System wrapper class ,which is the most efficient method because it
+doesn't do any forwarding. The fallback method is less efficient because
+it must determine the current process and forward on the request to
+where it was /meant/ to go, but it is necessary to cover the remaining
+1% (*).
+
+(*) As I noted earlier, it doesn't actually cover all of the remaining
+1% but most of it. There is a chance something could go wrong, but it
+might be that there is no &quot;system code&quot; that causes this to happen, so
+we're ok. I can deal with it when/if it happens, but the &quot;host&quot;
+implementation isn't really meant to be perfect anyway - in fact it
+can't be. The &quot;nativ&quot; implementation will be able to handle these
+problems, however.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000503.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+	<LI> Next message: <A HREF="000506.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#505">[ date ]</a>
+              <a href="thread.html#505">[ thread ]</a>
+              <a href="subject.html#505">[ subject ]</a>
+              <a href="author.html#505">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

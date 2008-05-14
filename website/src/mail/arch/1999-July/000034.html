@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] RE: [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000033.html">
+   <LINK REL="Next" HREF="000035.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] RE: [JOS-UI] peer-ui mappings</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] RE: [JOS-UI] peer-ui mappings">gchii@mindspring.com</A><BR>
+    <I>Wed, 21 Jul 1999 20:28:09 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000033.html">[JOS-Arch] Design</A></li>
+        <LI> Next message: <A HREF="000035.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#34">[ date ]</a>
+              <a href="thread.html#34">[ thread ]</a>
+              <a href="subject.html#34">[ subject ]</a>
+              <a href="author.html#34">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:54 AM 7/21/99 -0500, Regier Avery J wrote:
+&gt;<i>That is all fine and dandy, but there is nothing we can do about the
+</I>&gt;<i>incompatibilities that Sun introduces.  Sun has created a standard, and
+</I>&gt;<i>whether that standard is flawed or perfect, we are responsible to implement
+</I>&gt;<i>that standard so that every application behaves like it is running in an
+</I>&gt;<i>environment exactly compatible with the version of the standard it was
+</I>&gt;<i>written to.
+</I>
+A. We, at the JOS Project, are responsible to implement that standard
+(created by Sun Microsystems) so that every 100% Pure Java application
+behaves like it is running in an environment exactly compatible with the
+version of the standard it was written to.
+
+I believe I shall take this out of your e-mail and frame it. It will hang
+upon the wall in my office.
+
+&gt;<i>If we do not implement the standard, and instead try to
+</I>&gt;<i>'correct' it, we are ourselves introducing incompatibilities into the
+</I>&gt;<i>platform.  Suddenly someone writing an application on JOS doesn't
+</I>&gt;<i>automatically get compatibility with Java on Win32.
+</I>
+Our responsibility is different for two different platforms. We cannot
+correct the standard of the 100% Pure Java platform. But in addition to the
+100% Pure Java platform, we are creating this other thing. We are building
+this JOS platform. And application written directly to JOS does not have to
+suffer any of the design flaws created by Sun. It only has to suffer the
+flaws created by the JOS organization. When we build the JOS platform, we
+should make it right. We shouldn't build flaws into the JOS platform just
+because there are problems with the Java API.
+
+In theory, it is possible to build a JOS application that cannot not run on
+Sun's JVM. It only runs on JOS, with its kernel. While I don't know a way
+around using java.lang, my JOS application doesn't have to _use_ classes
+from any other java.* package.
+
+&gt;<i>The best thing we can do is to work around those incompatibilities.  We can
+</I>&gt;<i>implement the class libraries once for each version of the JDK.  When we run
+</I>&gt;<i>an application written to 1.02, we run it with the 1.02 class libraries.
+</I>&gt;<i>When we run an application written to 1.2, we run it with 1.2 class
+</I>&gt;<i>libraries.  If an application was written to Swing 1.0.3, then we run it
+</I>&gt;<i>with Swing 1.0.3.  If the latest and greatest, then we run it with the
+</I>&gt;<i>latest and greatest.  It means that the user will have to configure what
+</I>&gt;<i>versions are to be used with what applications.  (using your registry,
+</I>&gt;<i>perhaps?)  It means that we have to provide mulit-process support in our JVM
+</I>&gt;<i>so that every application behaves like it is running alone in a seperate
+</I>&gt;<i>instance of the JDK, because that is the assumption the JDK makes.  This is
+</I>&gt;<i>the only reasonable thing we can do to solve this problem such that every
+</I>&gt;<i>application runs robustly as the developer expected it to when he wrote it,
+</I>&gt;<i>whichever JDK he wrote it for.
+</I>
+I truely believe this. This is what everybody thinks when they hear write
+once. It runs on the version of the standard it was written to. I see
+nothing wrong with running three (or more) JVMs on top of the JOS kernel.
+If only we have the resources to do it, this is exactly what we should do.
+
+What does it mean for JOS architecture? It means that there is one JOS
+kernel and three (or more) JVMs. Now that would be asking a lot, except for
+one thing. I know that Java 1.0, 1.1 and 2.0 (1.2) are mostly compatible.
+While they are incompatible with running a Java 1.0 application inside a
+1.2 JVM, it is possible to build an architecture that our three JVMs share
+most of their infrastructure.
+
+All three JVMs must implement an OS file subsystem; but, there will be only
+version of the source. All three JVMs must implement a peer-ui package;
+but, there will be only one version of the source.
+
+The problem was porting. Nobody wants to port. It has been a necessary
+evil. Sun has re-introduced the evils of porting again by creating three
+versions of Java. It didn't have to be this way.
+
+We can do something about it. We can build a JOS platform that has one JOS
+kernel. The JOS kernel loads and runs one or more JVMs, each in a separate
+process. You can start and stop JVMs. There should be three JVMs to choose
+from. Java 1.0, 1.1 or 2.0 (1.2). And when Java 3.0 is available, there
+will be four. You can run multiple copies of Java 1.0 JVM...but only one
+copy of its bytecode will be loaded. Same with 1.1 and 1.2.
+
+Why...we'll be more compatible with Java than Sun.
+
+&gt;<i>In the meantime, we have a technical issue brought about by Sun's decisions.
+</I>&gt;<i>We don't have the capabliity described above yet, though we will try to work
+</I>&gt;<i>towards it.  Let the developers do what they need to do in the meantime to
+</I>&gt;<i>just make it work.
+</I>
+I'm thinking long term. That's what I do. I think the capability is just
+around the corner. I wish there was some way for JOS to take advantage of it.
+
+I am disgusted with Sun Microsystems because, everywhere I look, they are
+the same. They doing the same kind of things that lead Microsoft Windows
+down a dead-end road. Here is what Microsoft (and Sun) have done: Ignore
+compatiblity. Frustrate their customers. Trash all of their customer's
+code. Offend people they haven't met. Mindlessly upgrade. Mindlessly
+upgrade. Mindlessly upgrade. Throw their products away. Shrink the software
+industry.
+
+I want a new OS because these organizations are incapable of building an
+operating system that lasts.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000033.html">[JOS-Arch] Design</A></li>
+	<LI> Next message: <A HREF="000035.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#34">[ date ]</a>
+              <a href="thread.html#34">[ thread ]</a>
+              <a href="subject.html#34">[ subject ]</a>
+              <a href="author.html#34">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000673.html">
+   <LINK REL="Next" HREF="000674.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">jewel@pixie.co.za</A><BR>
+    <I>Wed, 24 May 2000 13:00:03 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000673.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000674.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#671">[ date ]</a>
+              <a href="thread.html#671">[ thread ]</a>
+              <a href="subject.html#671">[ subject ]</a>
+              <a href="author.html#671">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>
+On Tue, 23 May 2000, Todd L. Miller wrote:
+
+&gt;<i> &gt; For the problem of 'where' they resolve to, we have two proposals, so
+</I>&gt;<i> &gt; that shouldn't be hard to solve. But the other issue is much more
+</I>&gt;<i> &gt; difficult: symbolic references in a class definition can be interpreted
+</I>&gt;<i> &gt; differently depending on the particular class that is using that class
+</I>&gt;<i> &gt; definition, and this will make inlining difficult to do.
+</I>&gt;<i> 
+</I>&gt;<i> 	I think we're talking about the same thing.  Every symbolic
+</I>&gt;<i> reference depends on the classloader it's being resolved in.  I don't
+</I>&gt;<i> think there's a way around this.  That is, we'd need unique inlines per
+</I>&gt;<i> process. -- However, in general, because we're sharing class definitions,
+</I>&gt;<i> the resolution varies only for pointers to statics, which, IIRC, are
+</I>&gt;<i> resolved not to pointers but to indices into the static table -- which
+</I>&gt;<i> means the lookup procedure is exactly the same.  (And if I didn't recall
+</I>&gt;<i> correctly, decaf can be changed to make this the case.  Yes, it's another 
+</I>&gt;<i> level of indirection, but one that can be cached in most cases.)
+</I>
+A bit off-topic, but does the class definition sharing include the
+bytecode for the methods?
+
+Reason being that when you overwrite instructions in the bytecode with
+_quick variants you might also run into trouble with sharing.
+
+John
+
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000673.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000674.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#671">[ date ]</a>
+              <a href="thread.html#671">[ thread ]</a>
+              <a href="subject.html#671">[ subject ]</a>
+              <a href="author.html#671">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,296 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000173.html">
+   <LINK REL="Next" HREF="000157.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Program and ProgramContext">gchii@mindspring.com</A><BR>
+    <I>Thu, 12 Aug 1999 12:37:23 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000173.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000157.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#156">[ date ]</a>
+              <a href="thread.html#156">[ thread ]</a>
+              <a href="subject.html#156">[ subject ]</a>
+              <a href="author.html#156">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 06:45 PM 8/12/99 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+&gt;<i>Applications, applets and servlets are each used in entirely different
+</I>&gt;<i>situations, hence they have different interfaces that reflect how they
+</I>&gt;<i>are used:
+</I>
+You are correct. Applications, applets and servlets are used in different
+environments today. That is going change. We, members of the JOS Project,
+should anticipate this change, embracing it.
+
+It has been difficult for Sun Microsystems and others to see how much all
+these programs have in common. All of these run Java bytecode inside a JVM.
+That means that all of these have more in common than it may at first appear.
+
+&gt;<i>- A servlet can only be run from within a servlet engine because it
+</I>&gt;<i>relies on a very unique environment. For example, an HTTP servlet relies
+</I>&gt;<i>on the fact that it can access various information in the HTTP header of
+</I>&gt;<i>a request. It relies on the fact that its instance can persist between
+</I>&gt;<i>invocations, so it can keep a database connection open (for example).
+</I>&gt;<i>Both of these dependencies bar servlets from being invoked in a uniform
+</I>&gt;<i>manner with other types of programs. For example, you just can't run a
+</I>&gt;<i>servlet from the command-line. It doesn't make any sense.
+</I>
+Yes, well, sort of. Servlets run inside a servlet engine. Sun provides a
+servletrunner, so you don't have to have a separate HTTP service.
+
+Warning: This information might be shocking to all those who follow Sun
+Microsystems wherever they go. Sun's website very clearly states that this
+can't be done.
+
+First, you run servlets from a command line. When I run this command from
+my HTML browser, or rather its location field, it invokes a servlet. The
+location field is-a command line.
+
+<A HREF="http://localhost:8080/servlet/org.jos.demo.DemoServlet">http://localhost:8080/servlet/org.jos.demo.DemoServlet</A>
+
+Second, servlets are based exclusively on *streams*, not TCP/IP. A
+servletrunner provides ServletInputStreams and ServletOutputStream to a
+servlet, so that a servlet doesn't need to know about TCP/IP connections.
+There are no dependencies that prevent servlets from running elsewhere.
+There is no need for a servlet engine to use TCP/IP--even for HTTP servlets.
+
+Your servlet get HTTP header information from a ServletInputStream. It
+writes HTTP header information to a ServletOutputStream. It doesn't need to
+connect with a requestor using a TCP/IP connection.
+
+Why would anyone want to? As a Java programmer, I need to build servlets in
+the shortest amount of time possible. Debugging a servlet *inside* the
+servletrunner is less than optimum for debugging servlets. You can set
+break-points inside your servlet code. Yes, you can even create debugging
+frames and dialog boxes (only used during testing). I would rather debug my
+servlets in a plain-text browser. Hey, that's what I'm doing.
+
+In the location field of my plain-text browser, I type the following URI:
+
+x-servlet:org.jos.demo.DemoServlet
+
+My plain-text browser will provide a servlet environment completely free of
+TCP/IP connections. It will load and run any servlet, just like the servlet
+specification says. The output from the servlet is displayed in plain text,
+so that I can look at the raw HTML, to make sure the servlet produces the
+HTML code that I want it to. It will be fast. It will be direct. My
+plain-text browser will be easy to restart (with a restart button) so that
+I can recompile my servlet frequently and start a new &quot;session&quot; whenever I
+want.
+
+After I get the servlet working, then I move to a more complicated
+environment, using an HTML browser, a servletrunner tool, and TCP/IP.
+
+x-servlet:org.jos.demo.DemoServlet
+
+is equivalent to
+
+<A HREF="http://localhost:8080/servlet/org.jos.demo.DemoServlet">http://localhost:8080/servlet/org.jos.demo.DemoServlet</A>
+
+Parameters are passed with a standard query string. I can quickly test
+different combinations of parameters and instantly see the results. When I
+pause a servlet right in the middle of building an HTML file, I see all
+output that has been written so far.
+
+Sidebar: You can run servlets on the client-side. Every machine that has a
+JVM is capable of being a &quot;server&quot;. If you integrate servletrunner into
+your client-side Java application, you can run servlets on the client-side.
+Sounds strange only because Sun mis-named them &quot;servlets&quot;, giving everyone
+the mistaken impression that they only run on the server-side.
+
+&gt;<i>- An applet is also very different from a command-line program. The key
+</I>&gt;<i>quality of an Applet is that it is a part of a larger entity. It
+</I>&gt;<i>requires this entity to be useful. An applet cannot be executed unless
+</I>&gt;<i>it is in a web page. The applet is very aware that it is in a web page.
+</I>&gt;<i>It can read its applet parameters which are defined in the web page, it
+</I>&gt;<i>can communicate with other applets that are in the web page, it can even
+</I>&gt;<i>make another web page load. Because of its different nature, it can't be
+</I>&gt;<i>treated in a similar way to applications or servlets. Another point is
+</I>&gt;<i>that you don't really invoke an applet (as you do with the programs you
+</I>&gt;<i>speak of), you &quot;embed&quot; it in an application specific way that is
+</I>&gt;<i>provided by the applet itself.
+</I>
+Yes, well, sort of. Applets run inside an applet engine. Sun provides a
+appletrunner, so you don't have to have a separate HTML browser.
+
+First, you can definitely run applets outside a browser. You can run the
+appletrunner, right?
+
+Second, you can definitely run applets without HTML. This might be a
+surprise to all those who use Sun's brain-dead appletrunner tool. But, it
+is no surprise to those using JavaBee. Check out the wonderful JavaBee
+product at &lt;URL:<A HREF="http://www.javabee.com/">http://www.javabee.com/</A>&gt;.
+
+My applet browser provides a simple way to run applets with support for
+parameters. In the location field of my applet browser, I type the
+following URI:
+
+x-applet:org.jos.demo.DemoApplet
+
+My applet browser provides an applet environment completely free of HTML.
+It loads and runs an applet, just like the applet specification says. The
+output from the applet is displayed in a frame, so that I reside the applet
+and interact with its visual components, to make sure the applet behaves
+the way I want it to. It is fast. It is direct. My applet browser is easy
+to restart (with a restart button) so that I can recompile my applet
+frequently. I invoke an applet with exactly the same mechanism as I invoke
+a servlet.
+
+Parameters are passed with a standard query string. I can test different
+combinations of parameters. Feedback is immediate. No bulky HTML browser is
+required.
+
+My applet browser supports the showDocument() and showStatus() methods
+required by the applet environment. The showDocument() method overwrites
+the location field with a new URI, but does not automatically run it. I can
+look at the output from showDocument() to see if looks right.
+
+Then, I move up to embedding an applet on an HTML page.
+
+&gt;<i>- Applications (both gui and command-line) are intended to be invoked.
+</I>&gt;<i>Applications are a unique type of program that are designed to carry out
+</I>&gt;<i>a task and return to the shell, or carry out tasks given through a user
+</I>&gt;<i>interface until the user wishes to exit the application. These types of
+</I>&gt;<i>programs are the only programs that are suitable for shells because they
+</I>&gt;<i>can be invoked, they have a clearly defined lifespan, and a definite way
+</I>&gt;<i>of returning to the shell.
+</I>
+Exactly! Applications &quot;carry out tasks given through a user interface until
+the user wishes to exit the application.&quot; That's a key difference between
+&quot;applications&quot; and &quot;programs&quot;.
+
+My program browser--you guessed it--runs programs. It provides a simple way
+to run programs with full support for parameters. In the location field of
+my program browser, I type the following URI:
+
+x-program:org.jos.demo.DemoProgram
+
+The standard output from the DemoProgram is display just like the
+plain-text browser.
+
+&gt;<i>Not surprisingly, I am interested in the use of what you are proposing.
+</I>&gt;<i>Debugging was something that caught my eye. I don't yet understand how a
+</I>&gt;<i>unified API is useful for debugging, but if you can explain it to me,
+</I>&gt;<i>there might be a use for this unified API after all.
+</I>
+In the end, I wish to combine all specialized browsers into a unified JOS
+browser. Here is what you'll be able to debug and demonstrate within a
+single application:
+
+Protocol - Program Type - Status
+
+run:os: - native OS processes - complete
+run:jose: - José applications - complete
+multi - (file:, http:, x-registry:, in:*, out:*) - complete
+x-applet: - Java applets - almost complete
+x-archive - JOS archive browser (.cab, .gz, .jar, .zip) - not started yet
+x-servlet: - Java servlets - needs more work
+x-program: - JOS programs - needs more work
+x-aglet: - Java aglets - not started yet
+
+What does this mean? It means that you can build a servlet that dynamically
+creates an HTML index of all your applications, applets, programs, native
+programs, archives, and other servlets. You click on the digital resource
+you want to invoke. Ta-da! You get one.
+
+Do you want it all? You can have it all. You can mix and match until you
+get dizzy and your head hurts. We live in a brave new world where programs
+are multiply connected.
+
+- You can download and run Java bytecode from anywhere (if that's what you
+really want).
+- You can build a program that runs as a program...and a servlet.
+- You can build a Java application that runs as a Java application...or a
+program or servlet.
+- You can build an applet that runs as an applet...and a program.
+- You can run a servlet that runs as a servlet...and a program.
+- You can run a native program as a native program...and a servlet.
+- Your aglet can roam around and bring back its search results as a
+program, applet, or servlet.
+
+- It is recursive, too. So that you can launch an applet that starts a
+program that uses servlets that use native programs. You can do anything
+you want.
+
+As an operating system, JOS should take advantage of some of the
+combinations that make the most sense. For example, the ls command should
+be available as a program, a Java application, and a servlet. When you
+invoke the ls command from within your HTML browser, the results should be
+returned as (1) plain-text or (2) full HTML code. Here is where program
+inheritence becomes critically important.
+
+We should have a plain-text ls program. The HTML version of the ls program
+should extend the plain-text version. Both have identical functionality.
+While one runs as a program or Java application, the other runs as a
+servlet. You can browse around your JOS OS file subsystem using your HTML
+browser on a local machine or across the Internet.
+
+We can be compatible with other names for ls. The dir command can use the
+ls program. The dir command takes much different command line parameters
+than ls. The dir command should translate command line parameters, for
+example, and then call the ls command. See, that's why we need to run
+programs within the same process.
+
+Or, the ls and dir commands could use a brand-new JOS program with a new
+name that does file-listing better than any other operating system.
+
+Here is one for the road. JOS command-line utilities should consistently
+recognize the -html option. This command-line parameter tells a program
+when it should output HTML code to standard out. When the servletrunner
+runs a program as a servlet, it should automatically pass the -html option
+to all of our JOS command-line utilities.
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000173.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000157.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#156">[ date ]</a>
+              <a href="thread.html#156">[ thread ]</a>
+              <a href="subject.html#156">[ subject ]</a>
+              <a href="author.html#156">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

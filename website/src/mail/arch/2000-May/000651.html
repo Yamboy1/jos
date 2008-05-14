@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000683.html">
+   <LINK REL="Next" HREF="000631.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">ryan@whitewolf.com.au</A><BR>
+    <I>Sun, 21 May 2000 23:30:31 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000683.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000631.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#651">[ date ]</a>
+              <a href="thread.html#651">[ thread ]</a>
+              <a href="subject.html#651">[ subject ]</a>
+              <a href="author.html#651">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Apoligies for the late reply, I have been taking time off and giving
+rheise.os long deserved attention.
+
+John Leuner wrote:
+
+&gt;<i> Ok I see. But I think you have to be careful. A cache will make sure it
+</I>&gt;<i> doesn't hold unneeded stuff in memory. If you duplicate the cache (the
+</I>&gt;<i> file cache and your own 'cache'), you might end up not using available
+</I>&gt;<i> memory optimally (you will duplicate info in both caches).
+</I>
+Fortunately, we are not using up any additional memory at all. Decaf
+needs an internal data structure to store the code that it is executing,
+and the class definition is that structure (ordinarily this structure
+would be called &quot;class&quot; but the class/definition split allows us to do
+amazing things).
+
+&gt;<i> For example, where a traditional FTP daemon might spawn processes to
+</I>&gt;<i> service requests, a Java one would naturally create threads.
+</I>
+Naturally :-) Check out my ftp server written in Java:
+
+	<A HREF="http://www.progsoc.uts.edu.au/~rheise/projects/jftpd/">http://www.progsoc.uts.edu.au/~rheise/projects/jftpd/</A>
+
+It is sensible that an ftp server be one process rather than 20. The old
+UNIX model forced the programmer to make more processes than intended.
+Not only do threads make things easier, but new concepts such as
+JavaBeans help too.
+
+&gt;<i> But undex UNIX the kernel allows you to control the resources used by that
+</I>&gt;<i> process, to account for how much CPU time it has used etc.
+</I>
+Right. Sensible process usage (eg. a process per application) would
+allow sensible tracking. Whether or not we want finer control is an
+interesting question. Of course, accounting per thread is definately
+something to consider, but maybe there's not much more we will need.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000683.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000631.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#651">[ date ]</a>
+              <a href="thread.html#651">[ thread ]</a>
+              <a href="subject.html#651">[ subject ]</a>
+              <a href="author.html#651">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

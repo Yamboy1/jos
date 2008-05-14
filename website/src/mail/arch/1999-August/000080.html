@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] java.net.URL and file:</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000081.html">
+   <LINK REL="Next" HREF="000082.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] java.net.URL and file:</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] java.net.URL and file:">gchii@mindspring.com</A><BR>
+    <I>Sun, 01 Aug 1999 21:22:54 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000081.html">[JOS-Arch] Fourth Generation</A></li>
+        <LI> Next message: <A HREF="000082.html">[JOS-Arch] java.net.URL and file:</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#80">[ date ]</a>
+              <a href="thread.html#80">[ thread ]</a>
+              <a href="subject.html#80">[ subject ]</a>
+              <a href="author.html#80">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>java.net.URL doesn't match RFC2396. The colon (:) is reserved and the
+backslash (\) is unwise.
+
+When I use the file: protocol on Windows 95, java.net.URL does not work
+with a platform-independent name. It doesn't handle any escaped characters
+(like %3a). While &quot;file:/C|/windows/win.ini&quot; does not work,
+&quot;file:/C:\windows\win.ini&quot; does!
+
+&quot;file:/C|/windows/win.ini&quot; is a valid URL, right? Try it. It doesn't work.
+Besides, it doesn't throw a java.net.MalformedURLException either.
+
+&quot;mailto:<A HREF="mailto:gchii@mindspring.com">gchii@mindspring.com</A>?subject=JOS&quot; is a valid URL, right? I haven't
+been able to get it to work.
+
+java.net.URL throws a MalformedURLException whenever I use an applet:
+protocol. Isn't &quot;applet:org.jos.demo.DemoApplet?option=1&quot; a valid URL? It
+should be.
+
+How do you add new protocols to java.net.URL? Is there documentation on this?
+
+I found a java.net.URLEncoder class. It has a method to encode a URL; but,
+no method to decode one. It highlights both the encoding of spaces to plus
+(+) and the escaping of illegal characters.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000081.html">[JOS-Arch] Fourth Generation</A></li>
+	<LI> Next message: <A HREF="000082.html">[JOS-Arch] java.net.URL and file:</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#80">[ date ]</a>
+              <a href="thread.html#80">[ thread ]</a>
+              <a href="subject.html#80">[ subject ]</a>
+              <a href="author.html#80">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

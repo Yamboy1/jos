@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Admin] cvs permissions fix</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   
+   <LINK REL="Next" HREF="000074.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Admin] cvs permissions fix</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Admin] cvs permissions fix">ryan@whitewolf.com.au</A><BR>
+    <I>Mon, 28 Jun 1999 14:44:54 +1000</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000074.html">[JOS-Admin] cvs permissions fix</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#73">[ date ]</a>
+              <a href="thread.html#73">[ thread ]</a>
+              <a href="subject.html#73">[ subject ]</a>
+              <a href="author.html#73">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>_quinn (or whoever owns the cvs process by the time you read this),
+
+I have created a new startup script called pserver-new which should fix
+some file permission problems. Unfortunately I can't restart the server
+when the existing process is owned by someone else (maybe we could do
+this with sudo - Helmut?)
+
+The problem occurs if you create new files or directories. If your umask
+isn't set properly, the correct permissions are only granted to the user
+under which the cvs process is running. They are not granted to the
+whole jos group which is a problem if someone else in the jos group
+tries to restart the server (with the wrong umask).
+
+The new script tries to set the umask for you.
+
+Could you (or whoever owns the cvs process) please test if the new
+script solves the problem? Thanks.
+
+
+
+$ find . -exec ls -ld '{}' \; | grep '.---'
+-rw-rwx---   1 clark    jos          443 Feb 15 07:01 ./CVSROOT/passwd
+-r--rwx---   1 clark    jos          312 Dec 11  1998 ./test/bar,v
+-r--------   1 _quinn   jos          182 Jun 11 08:42 ./test/hoho,v
+
+passwd can be left the way it is. The other two files should be
+chmod'ed. I guess to:
+
+-r--r--r--
+
+ie. chmod 444 filename
+
+
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000074.html">[JOS-Admin] cvs permissions fix</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#73">[ date ]</a>
+              <a href="thread.html#73">[ thread ]</a>
+              <a href="subject.html#73">[ subject ]</a>
+              <a href="author.html#73">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

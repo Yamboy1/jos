@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000445.html">
+   <LINK REL="Next" HREF="000443.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">gchii@mindspring.com</A><BR>
+    <I>Mon, 10 Apr 2000 21:01:10 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000445.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000443.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#448">[ date ]</a>
+              <a href="thread.html#448">[ thread ]</a>
+              <a href="subject.html#448">[ subject ]</a>
+              <a href="author.html#448">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 01:53 PM 4/10/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;&gt;<i> &gt;- always maintain separate statics for different classloaders
+</I>&gt;<i>
+</I>&gt;&gt;<i> It is an option, not a requirement. The Java Virtual Machine specification
+</I>&gt;&gt;<i> does not require separate statics for different class loaders. It
+</I>&gt;&gt;<i> rightfully puts the decision in the hands of the custom class loader. A
+</I>&gt;&gt;<i> virtual machine must support the option of separate statics for each
+</I>&gt;&gt;<i> instance of a custom class loader.
+</I>&gt;<i>
+</I>&gt;<i>	No, it doesn't.  Our requirement for maintaining statics is the
+</I>&gt;<i>same as a conventional JVM, with the exception that classloaders /in
+</I>&gt;<i>different processes/, by definition, can't share statics.  (Otherwise,
+</I>&gt;<i>they're not separate processes.)  In fact, if a class already /has/
+</I>&gt;<i>statics, a conventional-JVM classloader /must/ define its own version of
+</I>&gt;<i>the class to get different statics!
+</I>
+I may have misunderstood.
+
+I agree that our requirement for maintaining statics is identical to a
+conventional JVM. That is a good thing, too. We won't have to change much
+to get multiple processes within a virtual machine after all. In fact,
+that's why I asked if it really is *that* simple.
+
+In a process environment, the findSystemClass() method must be re-worked.
+It must always return a process-wide class. The java.lang.ClassLoader class
+is the base class for all other class loaders. It must be re-written to
+find the class loader for the process. The findSystemClass() method might
+look something like this:
+
+  public static Class findSystemClass( String className ) 
+      throws ClassNotFoundException {
+    Process p = jos.process.getCurrentProcess();
+    ClassLoader loader = p.getClass().getClassLoader();
+    if ( this == loader ) {
+      throw new ClassNotFoundException( className );
+    }
+    return loader.loadClass( className );
+  }
+
+This again implies that the primordial class loader should be a real Java
+class. A class loader can be written to load class files based on
+CLASSPATH. It can load class files from archives (.cab, .jar and .zip). It
+can load classes from package files (.package).
+
+The primordial class loader should be a real Java class -- even if it
+defines some native method to load classes.
+
+A primordial class loader is a JVM-specific class. It could be compatible
+with the BCNI, like this:
+
+  public void example() {
+    Factory factory = Factory.getFactory();
+    ClassLoader loader = factory.getObject( &quot;java.lang.ClassLoader&quot; );
+    :
+  }
+
+-----
+
+Let me put it this way. I want to continue to use my Java-based HTTP
+service on JOS. My Java-based HTTP service uses many custom class loaders,
+one for each servlet. A custom class loader is required so that a servlet
+can be loaded, unloaded and re-loaded without taking the HTTP service down.
+
+When I run my HTTP service as a JOS process, I'm not asking for a radical
+change in the way a class loader works. As we agree, it is identical to a
+conventional virtual machine.
+
+When my HTTP service loads a servlet, the custom class loader indirectly
+determines if it requires separate statics. It determines which classes are
+loaded with findSystemClass() and which ones are not.
+
+Maybe there are two ways to use class loaders. There is the conventional
+way of using class loaders. The standard way is highly valued for web
+browsers and HTTP services. It includes this:
+
+A. All class loaders shared the Java standard class library.
+B. All classes shared java.lang.System and java.lang.Runtime.
+
+Then, there is the unconventional way of using class loaders.
+
+A. Each process has it own instance of the Java standard class library.
+B. Within a process, all classes share java.lang.System and java.lang.Runtime.
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000445.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000443.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#448">[ date ]</a>
+              <a href="thread.html#448">[ thread ]</a>
+              <a href="subject.html#448">[ subject ]</a>
+              <a href="author.html#448">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

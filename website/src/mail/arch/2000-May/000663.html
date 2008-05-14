@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000649.html">
+   <LINK REL="Next" HREF="000664.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">jewel@pixie.co.za</A><BR>
+    <I>Tue, 23 May 2000 03:40:02 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000649.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000664.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#663">[ date ]</a>
+              <a href="thread.html#663">[ thread ]</a>
+              <a href="subject.html#663">[ subject ]</a>
+              <a href="author.html#663">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> &gt; What exactly will the two java.lang.Class objects be sharing?
+</I>&gt;<i> 
+</I>&gt;<i> 	A java.lang.Class object, from the native side, is a collection of
+</I>&gt;<i> static variables and method definitions, the constant pool, etc -- the
+</I>&gt;<i> vast majority of the bulk of the .class file.  Everything but the static
+</I>&gt;<i> variables can be shared across java.lang.Class objects.
+</I>
+It's difficult for me to distinguish between the java.lang.Class objects
+(which are real java objects), and the native code used to handle
+structures.
+
+It sounds like you're putting the native info into the java.lang.Class
+object in decaf? This is probably why I'm a bit confused, in my JVM the
+native structure (a tClass structure) has an optional pointer to a
+pstClassObject, but it isn't neccessary to have such an object.
+  
+&gt;<i> &gt; Ok, so is the &quot;class definition&quot; separated from the static variables for
+</I>&gt;<i> &gt; that class?
+</I>&gt;<i> 
+</I>&gt;<i> 	Yes -- that's how we distinguish between a class and its
+</I>&gt;<i> definition.  I thought we had made that clear. :)
+</I>&gt;<i> 
+</I>&gt;<i> &gt; This isn't clear in my mind, but do you see what I'm getting at?
+</I>&gt;<i> 
+</I>&gt;<i> 	Yes.  We're beginning to look into it now.  It's already clear
+</I>&gt;<i> that parent classes must be the same, but we need to determine what to do
+</I>&gt;<i> about symbolic references...
+</I>
+Because basically they just point to other classes, which have
+undetermined origins ...
+ 
+John
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000649.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000664.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#663">[ date ]</a>
+              <a href="thread.html#663">[ thread ]</a>
+              <a href="subject.html#663">[ subject ]</a>
+              <a href="author.html#663">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

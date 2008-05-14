@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] GSI</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000215.html">
+   <LINK REL="Next" HREF="000217.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] GSI</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] GSI">tmiller@haverford.edu</A><BR>
+    <I>Sat, 28 Aug 1999 20:24:35 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000215.html">[JOS-Arch] GSI</A></li>
+        <LI> Next message: <A HREF="000217.html">[JOS-Arch] GSI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#216">[ date ]</a>
+              <a href="thread.html#216">[ thread ]</a>
+              <a href="subject.html#216">[ subject ]</a>
+              <a href="author.html#216">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> what if we want to make our java object an element in the script though?
+</I>&gt;<i> like an add-on library, say we have a LuaMathLib object that has X math
+</I>&gt;<i> methods that we want to map into the Lua interpreter as X fucntions...
+</I>&gt;<i> how would we handle that? 
+</I>
+	Not through getScriptInfo(), because that returns information on
+the script, and not on the (extended) interperter on which it runs.
+
+
+&gt;<i> my purpose in defining the Element top-level class was to allow a java
+</I>&gt;<i> program to use parts of the script; say we have a reinit() function in
+</I>&gt;<i> our script that we need to call... we get the Element for it to use
+</I>&gt;<i> it... but what does Element look like?
+</I>
+	Okay, this makes a lot of sense.  Why not make Element an
+interface implemented by java.lang.Reflect.* inheriting subclasses?  i.e.:
+
+public class tclMethod extends Method implements jos.gsi.Element {}
+
+&gt;<i> ok, when does the interpreter start and when does the script start? if
+</I>&gt;<i> we have BOB (which is a C/C++ish type script) which has a main like C,
+</I>&gt;<i> does the interpreter start the script when its loaded by calling main,
+</I>&gt;<i> or does it wait until we tell it to start? what if its a library you
+</I>&gt;<i> created to make programming your app easier and doesnt have a main as
+</I>&gt;<i> its just a collection of functions... does it return a
+</I>&gt;<i> NotARunnableScriptEvent?
+</I>
+	I think the ability to select when the script runs is necessary.
+If we adapt the event model I've described, then generating a ScriptStart
+(or whatever) event will start the script in an interperter-independent
+way.  Likewise, event-triggered scripts would become 'active' on a
+ScriptStart event.  Libraries are hard, but I think if you generate a
+ScriptStart event, then it should be the interperter's/script's choice to
+ignore it if it's inappropriate or throw an exception.
+
+
+	Basically, I'm imagining a system where an object like
+'jos.gsi.ScriptManager mySM' functions as a clearing-house for
+jos.gsi.Script objects, so that the application can do something like:
+
+init() {
+	appMainFrame.addKeyboardListener( mySM );
+	appMainFrame.addMouseListener( mySM );
+	appMainFrame.addFocusListener( mySM );
+	}
+
+and the ScriptManager would handle throwing the different events at the
+different scripts, so that appMainFrame suddenly becomes a scripted
+object.  Something like
+
+	appMainFrame.addURLListener( mySM );
+
+	could be achieved by subclassing ScriptManager to implement the
+URLListener interface.  (Where one would do something like:
+
+for ( int i = 0; i &lt; myScripts.size(); i++ ) {
+	switch URLEvent.getType() {
+		case FTP:
+			try { myScripts.elementAt(i).runMethod( &quot;FTP&quot; ); }
+			catch ( NoSuchMethodException nsme ) {
+				/* if every element of myScripts fails,
+				   throw a NoSuchMethodException... */
+				}
+			break;
+/* etc. */
+
+	would be the body of the URLListener methods.)
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000215.html">[JOS-Arch] GSI</A></li>
+	<LI> Next message: <A HREF="000217.html">[JOS-Arch] GSI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#216">[ date ]</a>
+              <a href="thread.html#216">[ thread ]</a>
+              <a href="subject.html#216">[ subject ]</a>
+              <a href="author.html#216">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

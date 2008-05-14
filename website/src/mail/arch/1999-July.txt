@@ -1,0 +1,3036 @@
+From gchii@mindspring.com Sun, 18 Jul 1999 14:14:40 -0400
+Date: Sun, 18 Jul 1999 14:14:40 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] JOS: SmartAPI/Object Factory
+
+What is the difference between an object factory and a class factory?
+
+We have two fundamentally different factories. I am sorry if I am confused
+between the two. It is hard to keep them straight.
+
+The protocol for an object factory should be "object:". An object factory
+creates objects. A class factory creates classes. An object factory creates
+any object derived from the java.lang.Object class.
+
+The protocol for a class factory should be "class:". A class factory
+creates any object derived from the java.lang.Class class. If
+java.lang.Class is a final class, java.lang.Class is it; there can be no
+other kinds of objects created by the class factory.
+
+And here is the difficult part: A class factory can use an object factory
+because classes are a kind of object. But this is a circular reference.
+
+When I want an object, I should ask for an object:
+
+<URL:object:?class=java.awt.Button>
+
+When I want a class, I should ask for a class:
+
+<URL:class:java.awt.Button>
+
+The object returned from the class: protocol is always going to be an
+instance of java.lang.Class.
+
+When the object factory needs to create an object, it first needs to create
+a class. So the object factory uses the class factory.
+
+When I want a class, I should not ask for an object, right?
+
+<URL:object:?class=java.lang.class+name=java.awt.Button>
+
+
+
+
+From digigod@earthling.net Tue, 20 Jul 1999 22:09:42 -0700
+Date: Tue, 20 Jul 1999 22:09:42 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] Design
+
+Its somewhat well agreed that we should split the design of the overall
+OS into several sections:
+
+JOSBox--JOSystem--Apps(including JADE) 
+
+JOSBox is the virtual hardware, it consists of the real hardware, the
+picokernel, and the JVM; its where all the native code is. A "windows
+JOSBox" or a "linux JOSBox" can be made so JOS can be run on top of
+another OS without having to modifiy it.
+
+JOSystem is of two parts, JOSCore which is the absolute minimum required
+for (and can be thought of a second, all java, kernel) JOS to be JOS
+(including the generic extension mechanism for...) JOSExtensions which
+will be grafted to JOS at runtime via JOSCore and will consist of things
+that arent part of minimum JOS, but will include very common things too
+(ie a file system). JOSCore holds process and security managers and via
+its configuration metamechanism loads one predefined process only at
+startup, the default for this being JADE (which the user can then launch
+more apps from...)
+ 
+Apps are what people use the OS for, the UI is an app. JADE is the UI,
+it lets people run and interact with apps, it provides everything needed
+for various types of UI's, like an AWT Toolkit for a GUI. JADE handles
+the various process cycles of Apps so non-JOS apps dont have to worry
+about it (or more importantly, be aware of).
+
+Given that, we need to design the basic structure for these various
+sections. we cant really do anything until we have a basic design, a
+basic idea of what to do.  We should discuss what we need/want on our
+various levels of expertise until we get a basic design to build off of
+(JOS starts, it loads this which looks like that and then...)
+
+lets get a crackin'
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         "To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command"
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From gchii@mindspring.com Wed, 21 Jul 1999 20:28:09 -0400
+Date: Wed, 21 Jul 1999 20:28:09 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+At 10:54 AM 7/21/99 -0500, Regier Avery J wrote:
+>That is all fine and dandy, but there is nothing we can do about the
+>incompatibilities that Sun introduces.  Sun has created a standard, and
+>whether that standard is flawed or perfect, we are responsible to implement
+>that standard so that every application behaves like it is running in an
+>environment exactly compatible with the version of the standard it was
+>written to.
+
+A. We, at the JOS Project, are responsible to implement that standard
+(created by Sun Microsystems) so that every 100% Pure Java application
+behaves like it is running in an environment exactly compatible with the
+version of the standard it was written to.
+
+I believe I shall take this out of your e-mail and frame it. It will hang
+upon the wall in my office.
+
+>If we do not implement the standard, and instead try to
+>'correct' it, we are ourselves introducing incompatibilities into the
+>platform.  Suddenly someone writing an application on JOS doesn't
+>automatically get compatibility with Java on Win32.
+
+Our responsibility is different for two different platforms. We cannot
+correct the standard of the 100% Pure Java platform. But in addition to the
+100% Pure Java platform, we are creating this other thing. We are building
+this JOS platform. And application written directly to JOS does not have to
+suffer any of the design flaws created by Sun. It only has to suffer the
+flaws created by the JOS organization. When we build the JOS platform, we
+should make it right. We shouldn't build flaws into the JOS platform just
+because there are problems with the Java API.
+
+In theory, it is possible to build a JOS application that cannot not run on
+Sun's JVM. It only runs on JOS, with its kernel. While I don't know a way
+around using java.lang, my JOS application doesn't have to _use_ classes
+from any other java.* package.
+
+>The best thing we can do is to work around those incompatibilities.  We can
+>implement the class libraries once for each version of the JDK.  When we run
+>an application written to 1.02, we run it with the 1.02 class libraries.
+>When we run an application written to 1.2, we run it with 1.2 class
+>libraries.  If an application was written to Swing 1.0.3, then we run it
+>with Swing 1.0.3.  If the latest and greatest, then we run it with the
+>latest and greatest.  It means that the user will have to configure what
+>versions are to be used with what applications.  (using your registry,
+>perhaps?)  It means that we have to provide mulit-process support in our JVM
+>so that every application behaves like it is running alone in a seperate
+>instance of the JDK, because that is the assumption the JDK makes.  This is
+>the only reasonable thing we can do to solve this problem such that every
+>application runs robustly as the developer expected it to when he wrote it,
+>whichever JDK he wrote it for.
+
+I truely believe this. This is what everybody thinks when they hear write
+once. It runs on the version of the standard it was written to. I see
+nothing wrong with running three (or more) JVMs on top of the JOS kernel.
+If only we have the resources to do it, this is exactly what we should do.
+
+What does it mean for JOS architecture? It means that there is one JOS
+kernel and three (or more) JVMs. Now that would be asking a lot, except for
+one thing. I know that Java 1.0, 1.1 and 2.0 (1.2) are mostly compatible.
+While they are incompatible with running a Java 1.0 application inside a
+1.2 JVM, it is possible to build an architecture that our three JVMs share
+most of their infrastructure.
+
+All three JVMs must implement an OS file subsystem; but, there will be only
+version of the source. All three JVMs must implement a peer-ui package;
+but, there will be only one version of the source.
+
+The problem was porting. Nobody wants to port. It has been a necessary
+evil. Sun has re-introduced the evils of porting again by creating three
+versions of Java. It didn't have to be this way.
+
+We can do something about it. We can build a JOS platform that has one JOS
+kernel. The JOS kernel loads and runs one or more JVMs, each in a separate
+process. You can start and stop JVMs. There should be three JVMs to choose
+from. Java 1.0, 1.1 or 2.0 (1.2). And when Java 3.0 is available, there
+will be four. You can run multiple copies of Java 1.0 JVM...but only one
+copy of its bytecode will be loaded. Same with 1.1 and 1.2.
+
+Why...we'll be more compatible with Java than Sun.
+
+>In the meantime, we have a technical issue brought about by Sun's decisions.
+>We don't have the capabliity described above yet, though we will try to work
+>towards it.  Let the developers do what they need to do in the meantime to
+>just make it work.
+
+I'm thinking long term. That's what I do. I think the capability is just
+around the corner. I wish there was some way for JOS to take advantage of it.
+
+I am disgusted with Sun Microsystems because, everywhere I look, they are
+the same. They doing the same kind of things that lead Microsoft Windows
+down a dead-end road. Here is what Microsoft (and Sun) have done: Ignore
+compatiblity. Frustrate their customers. Trash all of their customer's
+code. Offend people they haven't met. Mindlessly upgrade. Mindlessly
+upgrade. Mindlessly upgrade. Throw their products away. Shrink the software
+industry.
+
+I want a new OS because these organizations are incapable of building an
+operating system that lasts.
+
+
+
+
+From hilarycheng@usa.net Thu, 22 Jul 1999 09:24:10 +0800
+Date: Thu, 22 Jul 1999 09:24:10 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+Hi,
+
+Hm, after reading ur email, I got some questions.
+
+1. What's the different between JVM of JDK1.0, JDK1.1, JDK2.0 ?
+    As far as I know, JVM itself hasn't changed a lot. The Library/Classes
+of JDK
+    has changed a lot from 1.0 to 2.0. If this is true, it isn't affected
+JOS Kernel a lots.
+
+2. Will JOS use classes directly from Sun JDK ? Sun JDK got lots of things
+that
+    are depends on the platform. On Win32, it got Windows Peer, etc. On
+Linux
+    , it got Motif Peer. Should we think about using the classes from
+www.classpath.org ?
+    and then we added some JOS feature into it just like the Sun JDK ?
+
+3. About Sun, IMO, after JDK2.0, Sun will decrease rate of introducing new
+JDK. Since lots
+    of people are blaming Java. Sun will put all of their effect making Java
+much faster and
+    stable. I don't think we need to think about the future JDK version
+comptability. Keep on
+    our work.
+
+Regards,
+
+Hilary
+
+>
+>I truely believe this. This is what everybody thinks when they hear write
+>once. It runs on the version of the standard it was written to. I see
+>nothing wrong with running three (or more) JVMs on top of the JOS kernel.
+>If only we have the resources to do it, this is exactly what we should do.
+>
+>What does it mean for JOS architecture? It means that there is one JOS
+>kernel and three (or more) JVMs. Now that would be asking a lot, except for
+>one thing. I know that Java 1.0, 1.1 and 2.0 (1.2) are mostly compatible.
+>While they are incompatible with running a Java 1.0 application inside a
+>1.2 JVM, it is possible to build an architecture that our three JVMs share
+>most of their infrastructure.
+>
+>All three JVMs must implement an OS file subsystem; but, there will be only
+>version of the source. All three JVMs must implement a peer-ui package;
+>but, there will be only one version of the source.
+>
+>The problem was porting. Nobody wants to port. It has been a necessary
+>evil. Sun has re-introduced the evils of porting again by creating three
+>versions of Java. It didn't have to be this way.
+>
+>We can do something about it. We can build a JOS platform that has one JOS
+>kernel. The JOS kernel loads and runs one or more JVMs, each in a separate
+>process. You can start and stop JVMs. There should be three JVMs to choose
+>from. Java 1.0, 1.1 or 2.0 (1.2). And when Java 3.0 is available, there
+>will be four. You can run multiple copies of Java 1.0 JVM...but only one
+>copy of its bytecode will be loaded. Same with 1.1 and 1.2.
+>
+>Why...we'll be more compatible with Java than Sun.
+>
+>>In the meantime, we have a technical issue brought about by Sun's
+decisions.
+>>We don't have the capabliity described above yet, though we will try to
+work
+>>towards it.  Let the developers do what they need to do in the meantime to
+>>just make it work.
+>
+>I'm thinking long term. That's what I do. I think the capability is just
+>around the corner. I wish there was some way for JOS to take advantage of
+it.
+>
+>I am disgusted with Sun Microsystems because, everywhere I look, they are
+>the same. They doing the same kind of things that lead Microsoft Windows
+>down a dead-end road. Here is what Microsoft (and Sun) have done: Ignore
+>compatiblity. Frustrate their customers. Trash all of their customer's
+>code. Offend people they haven't met. Mindlessly upgrade. Mindlessly
+>upgrade. Mindlessly upgrade. Throw their products away. Shrink the software
+>industry.
+
+Well, that's we called "Business". It is much different from Open Source
+World.
+
+>
+>I want a new OS because these organizations are incapable of building an
+>operating system that lasts.
+>
+
+me2, I want a new OS that would be build on Java. :D
+
+Regards,
+
+Hilary
+
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Thu, 22 Jul 1999 09:15:11 -0500
+Date: Thu, 22 Jul 1999 09:15:11 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+> -----Original Message-----
+> From:	Gilbert Carl Herschberger II [SMTP:gchii@mindspring.com]
+> Sent:	Wednesday, July 21, 1999 8:28 PM
+> To:	arch@jos.org
+> Subject:	[JOS-Arch] RE: [JOS-UI] peer-ui mappings
+> 
+	<snip> 
+
+> I believe I shall take this out of your e-mail and frame it. It will hang
+> upon the wall in my office.
+> 
+I will kindly ignore your flame.
+
+> >If we do not implement the standard, and instead try to
+> >'correct' it, we are ourselves introducing incompatibilities into the
+> >platform.  Suddenly someone writing an application on JOS doesn't
+> >automatically get compatibility with Java on Win32.
+> 
+> Our responsibility is different for two different platforms. We cannot
+> correct the standard of the 100% Pure Java platform. But in addition to
+> the
+> 100% Pure Java platform, we are creating this other thing. We are building
+> this JOS platform. And application written directly to JOS does not have
+> to
+> suffer any of the design flaws created by Sun. It only has to suffer the
+> flaws created by the JOS organization. When we build the JOS platform, we
+> should make it right. We shouldn't build flaws into the JOS platform just
+> because there are problems with the Java API.
+> 
+I completely agree with this.  In the question that started this whole mess,
+Sean is working to create a new Toolkit that we can use to jumpstart the
+creation of our gui.  Unfortunately, Sean has to rely on Sun API's and work
+around shortsightedness in Sun's implementation.  Thus, Sean's code is
+necessarily tailored to one set of versions of packages of classes written
+by Sun, and must adhere to an API written by Sun.  There is nothing that he
+can do to correct this problem in the long term in the class he is writing
+now.  BUT, when we replace the JDK that Sean is using for testing with our
+own implementation (most likely based upon $Classpath) of the API's, we can
+create an org.jos.awt.ToolkitFactory which searches in our JOS SmartRegistry
+for the appropriate implementation of the Toolkit for this particular use of
+the Toolkit.  So if we have one application which relies on Swing 1.1.1
+(because it uses Swing 1.1.1 on top of the AWT and we need its peer
+implementation to be consistent) and another which relies on Swing 1.0.3,
+and another which wants to use something not even created yet as its peer
+implementation, all of these settings can be placed in our SmartRegistry and
+JOS will handle it all perfectly and it all just works.  We just need to
+pick the right level at which to make things future ready.
+
+> In theory, it is possible to build a JOS application that cannot not run
+> on
+> Sun's JVM. It only runs on JOS, with its kernel. While I don't know a way
+> around using java.lang, my JOS application doesn't have to _use_ classes
+> from any other java.* package.
+> 
+Yes, it is possible.  Do we want to encourage this?  Absolutely not.  All
+applications that are tied to the JOS platform should be by nature OS
+utilities, shells, drivers, etc. and distributed with JOS and be a part of
+the JOS project.  Generic applications should never be JOS specific, but
+rather adhere to the Java spec and nothing more.  Additional libraries used
+by generic applications should also be built on top of the Java spec and not
+be reliant on JOS libraries.  The only exception to this rule is where some
+library (for instance java3d) which on other Java platforms uses native
+methods to get its work done, we may choose instead to call JOS specific
+libraries, but all of this is hidden from the application.
+
+> I'm thinking long term. That's what I do. I think the capability is just
+> around the corner. I wish there was some way for JOS to take advantage of
+> it.
+> 
+It is just around the corner!  Here's what has to happen:
+   * JJOS+decaf gets to the point where we can begin to integrate
+$Classpath.
+   * We start modifying $Classpath for our specific needs:
+      ** We add muli-process support into both decaf & $Classpath so that
+$Classpath's java.lang is calling org.jos.core.* which will handle things
+like interacting with the SmartRegistry to make sure that each process gets
+what it needs.
+      ** We modify the java.awt.Toolkit class to integrate with the
+SmartRegistry and return the proper Toolkit for the situation.
+      ** a whole bunch of other things.
+
+In the meantime, there are some things that can be worked on:
+   * In order for JOS to be secure, we REALLY need an airtight secure
+SmartRegistry.  It must be encrypted and we need to figure out what kinds of
+protections it will need from the rest of the system to ensure that it is
+too expensive to hack to be worth it.
+   * I need to find time to continue to work on org.jos.core.* and defining
+the process model from the view of the JOS API.  This process model will
+need to be used by JADE so that shells can be implemented correctly.
+Integrating org.jos.core.* with your SmartRegistry I think is the critical
+step to ensuring that we can make JOS future-ready.  Care to work together
+on this?
+
+Regards,
+Avery J. Regier  
+>  
+
+
+
+From RegierAveryJ@JDCORP.deere.com Thu, 22 Jul 1999 10:20:15 -0500
+Date: Thu, 22 Jul 1999 10:20:15 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Arch] Registries
+
+Oops.  I've noticed that I consistently used SmartRegistry where I should
+have said Registry or possibly SmartAPI.  Both are needed to make JOS
+future-ready.  
+
+Gilbert:  Are you planning to change the Registry API after your experiences
+creating version 1?  I am a little confused whether the code in
+Registry1Lessons is the basis for the new API or the current one.
+Admitedly, I am only starting to read your pages on that, and I'm sure it'll
+become clear as I get time to read it fully, but a quick confirmation would
+be nice.
+
+Thanks,
+Avery J. Regier
+
+> -----Original Message-----
+> From:	Regier Avery J 
+> Sent:	Thursday, July 22, 1999 10:15 AM
+> To:	arch@jos.org
+> Subject:	RE: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+> 
+> > -----Original Message-----
+> > From:	Gilbert Carl Herschberger II [SMTP:gchii@mindspring.com]
+> > Sent:	Wednesday, July 21, 1999 8:28 PM
+> > To:	arch@jos.org
+> > Subject:	[JOS-Arch] RE: [JOS-UI] peer-ui mappings
+> > 
+> 	<snip> 
+> 
+> > I believe I shall take this out of your e-mail and frame it. It will
+> hang
+> > upon the wall in my office.
+> > 
+> I will kindly ignore your flame.
+> 
+> > >If we do not implement the standard, and instead try to
+> > >'correct' it, we are ourselves introducing incompatibilities into the
+> > >platform.  Suddenly someone writing an application on JOS doesn't
+> > >automatically get compatibility with Java on Win32.
+> > 
+> > Our responsibility is different for two different platforms. We cannot
+> > correct the standard of the 100% Pure Java platform. But in addition to
+> > the
+> > 100% Pure Java platform, we are creating this other thing. We are
+> building
+> > this JOS platform. And application written directly to JOS does not have
+> > to
+> > suffer any of the design flaws created by Sun. It only has to suffer the
+> > flaws created by the JOS organization. When we build the JOS platform,
+> we
+> > should make it right. We shouldn't build flaws into the JOS platform
+> just
+> > because there are problems with the Java API.
+> > 
+> I completely agree with this.  In the question that started this whole
+> mess,
+> Sean is working to create a new Toolkit that we can use to jumpstart the
+> creation of our gui.  Unfortunately, Sean has to rely on Sun API's and
+> work
+> around shortsightedness in Sun's implementation.  Thus, Sean's code is
+> necessarily tailored to one set of versions of packages of classes written
+> by Sun, and must adhere to an API written by Sun.  There is nothing that
+> he
+> can do to correct this problem in the long term in the class he is writing
+> now.  BUT, when we replace the JDK that Sean is using for testing with our
+> own implementation (most likely based upon $Classpath) of the API's, we
+> can
+> create an org.jos.awt.ToolkitFactory which searches in our JOS
+> SmartRegistry
+> for the appropriate implementation of the Toolkit for this particular use
+> of
+> the Toolkit.  So if we have one application which relies on Swing 1.1.1
+> (because it uses Swing 1.1.1 on top of the AWT and we need its peer
+> implementation to be consistent) and another which relies on Swing 1.0.3,
+> and another which wants to use something not even created yet as its peer
+> implementation, all of these settings can be placed in our SmartRegistry
+> and
+> JOS will handle it all perfectly and it all just works.  We just need to
+> pick the right level at which to make things future ready.
+> 
+> > In theory, it is possible to build a JOS application that cannot not run
+> > on
+> > Sun's JVM. It only runs on JOS, with its kernel. While I don't know a
+> way
+> > around using java.lang, my JOS application doesn't have to _use_ classes
+> > from any other java.* package.
+> > 
+> Yes, it is possible.  Do we want to encourage this?  Absolutely not.  All
+> applications that are tied to the JOS platform should be by nature OS
+> utilities, shells, drivers, etc. and distributed with JOS and be a part of
+> the JOS project.  Generic applications should never be JOS specific, but
+> rather adhere to the Java spec and nothing more.  Additional libraries
+> used
+> by generic applications should also be built on top of the Java spec and
+> not
+> be reliant on JOS libraries.  The only exception to this rule is where
+> some
+> library (for instance java3d) which on other Java platforms uses native
+> methods to get its work done, we may choose instead to call JOS specific
+> libraries, but all of this is hidden from the application.
+> 
+> > I'm thinking long term. That's what I do. I think the capability is just
+> > around the corner. I wish there was some way for JOS to take advantage
+> of
+> > it.
+> > 
+> It is just around the corner!  Here's what has to happen:
+>    * JJOS+decaf gets to the point where we can begin to integrate
+> $Classpath.
+>    * We start modifying $Classpath for our specific needs:
+>       ** We add muli-process support into both decaf & $Classpath so that
+> $Classpath's java.lang is calling org.jos.core.* which will handle things
+> like interacting with the SmartRegistry to make sure that each process
+> gets
+> what it needs.
+>       ** We modify the java.awt.Toolkit class to integrate with the
+> SmartRegistry and return the proper Toolkit for the situation.
+>       ** a whole bunch of other things.
+> 
+> In the meantime, there are some things that can be worked on:
+>    * In order for JOS to be secure, we REALLY need an airtight secure
+> SmartRegistry.  It must be encrypted and we need to figure out what kinds
+> of
+> protections it will need from the rest of the system to ensure that it is
+> too expensive to hack to be worth it.
+>    * I need to find time to continue to work on org.jos.core.* and
+> defining
+> the process model from the view of the JOS API.  This process model will
+> need to be used by JADE so that shells can be implemented correctly.
+> Integrating org.jos.core.* with your SmartRegistry I think is the critical
+> step to ensuring that we can make JOS future-ready.  Care to work together
+> on this?
+> 
+> Regards,
+> Avery J. Regier  
+> >  
+> 
+> _______________________________________________
+> Arch maillist  -  Arch@jos.org
+> http://jos.org/mailman/listinfo/arch
+
+
+
+From tmiller@haverford.edu Thu, 22 Jul 1999 15:32:39 -0400 (EDT)
+Date: Thu, 22 Jul 1999 15:32:39 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+> 1. What's the different between JVM of JDK1.0, JDK1.1, JDK2.0 ?
+>     As far as I know, JVM itself hasn't changed a lot. The Library/Classes of JDK
+>     has changed a lot from 1.0 to 2.0. If this is true, it isn't affected JOS Kernel a lots.
+
+	Mostly, the JVM spec has changed in how it addresses various bits
+and pieces that were broken either in the original spec or in the original
+implementation(s) of the JVM from Sun (quite frequently both, and in
+incompatible ways).  It's a horrible mess, and I have a great desire to
+wash my hands of the whole thing.  Since I'm not writing the class
+libraries ( classpath is! ), I can basically take the position that I'm
+writing to Rev 2 of the JVM spec, which, AFAIK, is the spec equivalent to
+the "Java 2" platform, and that classpath is (will be) the Canonical Code,
+that is, I won't 'fix' anything broken in the spec if it will break
+classpath.  This will undoubtedly make me rather unpopular with a great
+number of people, but since even the Rev 2 JVM/Java Language spec is
+*still* broken in many horribly fascinating ways, the temptation to sit it
+out and wait for the academics to fix it is very strong.  (Notably, Java's
+official memory model is, to my understanding, a standing joke to JVM
+designers; a similar example is the classloader-spoof attack, which can be
+fixed in one of two mutually incompatible ways; one of which is the Right
+Thing from a language-design perspective, and the other the Right Thing
+from the platform-design perspective.)
+
+	Currently, enourmous chunks of the JVM spec in decaf are missing,
+and, in fact, the compatibility in decaf most closely resembles jdk 1.0.2.
+Of course, since Sun charges for the JCK, I couldn't tell you how well 
+I'm actually doing.	
+
+	Summary: the coder at the keyboard (me) is going to write
+something that works with classpath, unless the JOS project has a whole
+lot of extra coders lying around that I'm unfamiliar with who have
+mysteriously generated our own (more-)correct class library.  I rather
+suspect we won't hash out the Right Thing regarding compatibility for
+quite a while yet anyway...
+
+-_Quinn
+
+
+
+
+From digigod@earthling.net Thu, 22 Jul 1999 15:16:08 -0700
+Date: Thu, 22 Jul 1999 15:16:08 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+Regier Avery J wrote:
+> It is just around the corner!  Here's what has to happen:
+>    * JJOS+decaf gets to the point where we can begin to integrate
+> $Classpath.
+>    * We start modifying $Classpath for our specific needs:
+>       ** We add muli-process support into both decaf & $Classpath so that
+> $Classpath's java.lang is calling org.jos.core.* which will handle things
+> like interacting with the SmartRegistry to make sure that each process gets
+> what it needs.
+>       ** We modify the java.awt.Toolkit class to integrate with the
+> SmartRegistry and return the proper Toolkit for the situation.
+
+well a platform only needs one Toolkit, so it would just return the
+JOSToolkit
+
+>       ** a whole bunch of other things.
+> 
+> In the meantime, there are some things that can be worked on:
+>    * In order for JOS to be secure, we REALLY need an airtight secure
+> SmartRegistry.  It must be encrypted and we need to figure out what kinds of
+> protections it will need from the rest of the system to ensure that it is
+> too expensive to hack to be worth it.
+
+I dont know if the registry needs to be encrypted, other then slowing
+things down shouldnt it just be "read-only" to everyone who isnt a
+superuser (maybe even then being "read/write-with-password")?
+
+That should be part of the core JOS security system is what I think Im
+saying
+
+>    * I need to find time to continue to work on org.jos.core.* and defining
+> the process model from the view of the JOS API.  This process model will
+> need to be used by JADE so that shells can be implemented correctly.
+> Integrating org.jos.core.* with your SmartRegistry I think is the critical
+> step to ensuring that we can make JOS future-ready.  Care to work together
+> on this?
+
+inter-process communication would be nice for JADE too, how are you
+planning on implementing this (out of curiosity)?
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         "To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command"
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From gchii@mindspring.com Thu, 22 Jul 1999 21:09:54 -0400
+Date: Thu, 22 Jul 1999 21:09:54 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+At 09:15 AM 7/22/99 -0500, Regier Avery J <RegierAveryJ@JDCORP.deere.com>
+wrote:
+>> Gilbert wrote:
+>> Our responsibility is different for two different platforms. We cannot
+>> correct the standard of the 100% Pure Java platform. But in addition to
+>> the
+>> 100% Pure Java platform, we are creating this other thing. We are building
+>> this JOS platform. And application written directly to JOS does not have
+>> to
+>> suffer any of the design flaws created by Sun. It only has to suffer the
+>> flaws created by the JOS organization. When we build the JOS platform, we
+>> should make it right. We shouldn't build flaws into the JOS platform just
+>> because there are problems with the Java API.
+>> 
+>I completely agree with this.  In the question that started this whole mess,
+>Sean is working to create a new Toolkit that we can use to jumpstart the
+>creation of our gui.  Unfortunately, Sean has to rely on Sun API's and work
+>around shortsightedness in Sun's implementation.  Thus, Sean's code is
+>necessarily tailored to one set of versions of packages of classes written
+>by Sun, and must adhere to an API written by Sun.  There is nothing that he
+>can do to correct this problem in the long term in the class he is writing
+>now.  BUT, when we replace the JDK that Sean is using for testing with our
+>own implementation (most likely based upon $Classpath) of the API's, we can
+>create an org.jos.awt.ToolkitFactory which searches in our JOS SmartRegistry
+>for the appropriate implementation of the Toolkit for this particular use of
+>the Toolkit.  So if we have one application which relies on Swing 1.1.1
+>(because it uses Swing 1.1.1 on top of the AWT and we need its peer
+>implementation to be consistent) and another which relies on Swing 1.0.3,
+>and another which wants to use something not even created yet as its peer
+>implementation, all of these settings can be placed in our SmartRegistry and
+>JOS will handle it all perfectly and it all just works.  We just need to
+>pick the right level at which to make things future ready.
+
+I see. You have put this into two phases. Something of phase one is
+JumpStart, where Sean creates "a new Toolkit that we can use to jumpstart
+the creation of our gui."
+
+Something of phase two is Refinement, where we replace the JDK and combine
+the toolkit with the power of the SmartRegistry. In the end, "JOS will
+handle it all perfectly."
+
+When you say it that way, it sounds like a good plan. I think it can work.
+We could break each of the projects into phase one/phase two. JumpStart and
+Refinement. Sounds like another Wiki page to me.
+
+And, I applaud you for calling it the SmartRegistry. That sound like a
+great name to me.
+
+>> In theory, it is possible to build a JOS application that cannot not run
+>> on
+>> Sun's JVM. It only runs on JOS, with its kernel. While I don't know a way
+>> around using java.lang, my JOS application doesn't have to _use_ classes
+>> from any other java.* package.
+>> 
+>Yes, it is possible.  Do we want to encourage this?  Absolutely not.  All
+>applications that are tied to the JOS platform should be by nature OS
+>utilities, shells, drivers, etc. and distributed with JOS and be a part of
+>the JOS project.  Generic applications should never be JOS specific, but
+>rather adhere to the Java spec and nothing more.  Additional libraries used
+>by generic applications should also be built on top of the Java spec and not
+>be reliant on JOS libraries.  The only exception to this rule is where some
+>library (for instance java3d) which on other Java platforms uses native
+>methods to get its work done, we may choose instead to call JOS specific
+>libraries, but all of this is hidden from the application.
+
+Oh. You don't want us to encourage this. Other operating systems have
+failed because applications are tied to a platform. Hey, that's one reason
+I'm writing applications in Java--because it's not tied to a platform.
+
+We are going to need utilities, shells, drivers, etc. Each piece has to be
+tied to the JOS platform on its own merits. Everything that can be
+platform-independent should be platform-independent. See also AboveAndBelow
+on Wiki.
+
+We may be surprised, in the end, how little of JOS is platform-dependent.
+The SmartAPI is platform-independent. The SmartRegistry is going to be.
+(There's one or two methods I kludged). We can package most of JOS to run
+on any JVM. We can distribute our class libraries separately from OS.
+
+>> I'm thinking long term. That's what I do. I think the capability is just
+>> around the corner. I wish there was some way for JOS to take advantage of
+>> it.
+>> 
+>It is just around the corner!  Here's what has to happen:
+>   * JJOS+decaf gets to the point where we can begin to integrate
+>$Classpath.
+>   * We start modifying $Classpath for our specific needs:
+>      ** We add muli-process support into both decaf & $Classpath so that
+>$Classpath's java.lang is calling org.jos.core.* which will handle things
+>like interacting with the SmartRegistry to make sure that each process gets
+>what it needs.
+>      ** We modify the java.awt.Toolkit class to integrate with the
+>SmartRegistry and return the proper Toolkit for the situation.
+>      ** a whole bunch of other things.
+>
+
+That's good news! We should start with classpath and modify it (a little)
+for our specific needs. For example, we need to move all remaining native
+methods out of the java.* packages, exchange them for calls to classes in
+the jos.native package.
+
+before: public native String[] list();
+after: public String[] list() {
+         return impl.list( this );
+       }
+       private FileImpl impl = new FileImpl();
+
+>In the meantime, there are some things that can be worked on:
+>   * In order for JOS to be secure, we REALLY need an airtight secure
+>SmartRegistry.  It must be encrypted and we need to figure out what kinds of
+>protections it will need from the rest of the system to ensure that it is
+>too expensive to hack to be worth it.
+
+You have started me thinking about the way it could be. I have already
+tried to explain that a secure registry is created by using an
+Encrypted..Stream. The API is written so that the StreamFactory creates a
+stream. The StreamFactory should be able to create an DecryptInputStream
+and EncryptOutputStream. The stream factory turns to a
+SecureStreamController to get this done.
+
+But, ANY registry can benefit from encrypted stream. Any registry can be
+saved using an encrypted stream. When you want to load the registry again,
+you have to have the right key.
+
+If you want signed registry files, you create a SignedStreamController, add
+it to the stream factory, to get this done. Anything you can think of, we
+can do it through controllers and configuration.
+
+The sky is the limit, too. You can compress a registry. Just ask for a
+CompressedOutputStream. Pipe the compressed registry into a strong
+encryption stream. Pipe the strong encryption into a custom bit-swapping
+algorhythm of your own design. Pipe that into a password-protected zip file.
+
+>   * I need to find time to continue to work on org.jos.core.* and defining
+>the process model from the view of the JOS API.  This process model will
+>need to be used by JADE so that shells can be implemented correctly.
+>Integrating org.jos.core.* with your SmartRegistry I think is the critical
+>step to ensuring that we can make JOS future-ready.  Care to work together
+>on this?
+
+I would like to help wherever I can. I have a picture in my head about a
+simple process model. If we start with a simple process model, we can
+always refine it, right?
+
+If I have a telnet client program written in Java...
+If I have a telnet service written in Java...
+If I have a simple shell written in Java...
+why can't I type commands in telnet to start JOS programs inside a multiple
+process JVM?
+
+I say telnet because System.in does not provide the character-by-character
+events a shell needs. I was wondering...couldn't we prove the multi-process
+model within a telnet service? We start one JVM and it runs the telnet
+service, an interface to a simple JOS shell. From that shell, we can start
+one or more JOS programs. Because it's a telnet shell, the shell can turn
+individual characters into keystroke events.
+
+We can start another JVM, or any other off-the-shelf telnet program. I
+think this isolates the simple JOS shell from the assumptions of System.in
+and the Java AWT peers.
+
+And another thing. If you run a JVM with a telnet service and simple JOS
+shell on one machine, you can telnet over to it from another...across the
+network. Personally, that would let me experiment with JOS without business
+interruption.
+
+
+
+
+From gchii@mindspring.com Thu, 22 Jul 1999 20:29:53 -0400
+Date: Thu, 22 Jul 1999 20:29:53 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+At 09:15 AM 7/22/99 -0500, Regier Avery J <RegierAveryJ@JDCORP.deere.com>
+wrote:
+>> -----Original Message-----
+>> From:	Gilbert Carl Herschberger II [SMTP:gchii@mindspring.com]
+>> Sent:	Wednesday, July 21, 1999 8:28 PM
+>> To:	arch@jos.org
+>> Subject:	[JOS-Arch] RE: [JOS-UI] peer-ui mappings
+>> 
+>	<snip> 
+>
+>> I believe I shall take this out of your e-mail and frame it. It will hang
+>> upon the wall in my office.
+>> 
+>I will kindly ignore your flame.
+
+Oh, my. I'm afraid I wasn't clear. Your statement of goal/mission/purpose
+for the JOS Project is stated clearly. I was actually trying to be
+agreeable, although it didn't sound like it. I didn't intend to flame.
+(Isn't flame akin to being dis-agreeable?)
+
+I would like the JOS Project to use your words in a statement of purpose.
+After stating the obvious that our mission is to build a Java-based
+operating system, we should say, sincerely, "We, at the JOS Project, are
+responsible to implement the Java standard, created by Sun Microsystems, so
+that every 100% Pure Java application behaves like it is running in an
+environment exactly compatible with the version of the standard it was
+written to."
+
+Such a clear statement of mission turns our attention to solve-able
+technical problems and meeting of the minds. It builds enthusiasm,
+motivation, and the edge--to go that extra mile. I think you have summed it
+up nicely.
+
+If that is our mission, there are direct implications. There is a path to
+follow as a consequence of our mission.
+
+
+
+
+From gchii@mindspring.com Thu, 22 Jul 1999 22:07:47 -0400
+Date: Thu, 22 Jul 1999 22:07:47 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Re: [JOS-UI] Compatibility might be off-topic
+
+At 12:53 PM 7/22/99 +1000, Ryan Heise <ryan@whitewolf.com.au> wrote:
+
+>- Sun give (IMHO) sufficient warning of API changes through the use of
+>the @deprecated javadoc tag. In this way, if Sun plans to remove a
+>method from the API, it takes two JDK versions to happen. In the next
+>version, the method is still there but deprecated. In the version after,
+>it may be removed.
+
+What is sufficient warning for one is insufficient warning for another. If
+you think about all of those heavily discounted Java 1.0 books that arrived
+at the bookstore just as Sun Microsystems announced Java 1.1. The promises
+published in those Java 1.0 books were based on things said by Sun and
+enthusiastically published by all major publishers. It promised a lot.
+
+At the very first test of Sun's talent for write once, they failed
+miserably. They invented depretiation so that they didn't have to be
+compatible like they promised. Depretiation is bad, very bad. It doesn't
+give sufficient warning to the software you distribute on CD-ROM.
+
+Publishers wrote about the wonders of Java 1.1. They gave away millions of
+free CD-ROMs in the back of Java 1.1 books. When someone buys that book,
+promises of write once on the cover, they expect it to work.
+
+It was Sun that chose to separate Java from the rest of the programming
+languages based on compatibility. And from a purely technical viewpoint,
+Java is the first time it could have been done. Perfect compatibility.
+Every Java 1.0 and 1.1 program could have been compiled and run on a Java
+1.2 platform without changing the API.
+
+It was Sun that wimped out on compatibility in the second round. They
+invented hundreds of excuses why they couldn't obtain the kind of
+compatibility they promised. They showed that they don't believe in
+compatibility (or Java) after all. They want something else. Is it world
+domination? I don't know.
+
+When Sun announced that they were dumping Java 1.0 in favor of Java 1.1,
+the Java evangelists were stunned. They couldn't believe that something
+that showed such potential could be stuck down so quickly. Talk to Michael
+Daconta. See how he was burned. He said he felt betrayed. It didn't have to
+be this way.
+
+Look at FreeBuilder, too. By the time you have something that works, Sun
+changes all of the rules. It is so unnecessary.
+
+>- Sun appears to have used this tool effectively, except with Swing
+>which underwent a package renaming. Obviously the @deprecated tool
+>cannot be used here, and coincidently it was this Swing incompatibility
+>that fired the discussion off.
+
+Sun has used it politically. They were happy to let themselves "off the
+hook". While they promised write once, they didn't deliver. And even
+programmers that are being burned by Sun take up for them.
+
+Next, Sun demonstrated their arrogance and ignorance by moving Swing around
+like a pendulum. For Java 2.0 (1.2) they put Swing inside the java packages
+where it does not belong. Swing is not Java. Swing is a Java application.
+Who does Sun thing they are? If I can't put my applications inside the java
+packages, they can't either. What was wrong with com.sun.swing? Nothing. It
+didn't have to be incompatible. It is incompatible just for the sake of
+being incompatible. It is meant to ruin their competition.
+
+Sun put JDBC inside the java packages; JDBC is not Java. Sun put Jars
+inside the java package; jars are not Java. Sun put more garbage inside the
+java packages than the garbage Microsoft put in Win32. It took Microsoft
+years to show their arrogance and ignorance. It only took Sun 140 days.
+
+>I don't see the point in bashing Sun, but I do see that compatibility is
+>something that we should consider. It is conceivable that Sun could, for
+>example, change the JVM specification making new JVMs incompatible with
+>older JVMs, or that they could make incompatible changes to the JDK
+>libraries. However, call me short-sighted but I just don't think it is
+>something worth worrying about now -- at this point in the project
+>timeline. Someone will need to think about these issues in the future.
+>Actually, you sound quite keen. Why don't you come up with a proposal?
+
+There is no point in bashing Sun. There is a purpose for being critical of
+software. When the software doesn't work as promised, you should be
+critical. You shouldn't lower your standards, accepting that software
+doesn't have to work. If you celebrate something, if you publish something,
+if you get all of your friends involved in something, you have to take some
+responsibility for the results.
+
+I don't want to follow bad practices. I don't want to build software that
+doesn't work. How long can I stay in business if I can't deliver working
+software? I'd be out of business in a week.
+
+I am critical of the software industry. The software industry has lowered
+standards again and again over the last thirty-five years. The software
+industry is testing the market to see how low they can go. The market has
+become saturated with low quality software.
+
+Why do you want to build a new operating system? Are you unhappy with the
+one you have? Why? Could it be because it is such poor quality? Could it be
+that you have been disappointed one too many times? Was it too hard to
+configure? Is it unstable? Does it crash too often? Do you need it to be
+more flexible?
+
+Is it because your old software stopped working? Or, because you have to
+buy a new computer just to install new software?
+
+The existance of the JOS project shows that Sun Microsystems hasn't been
+able to give us what we want.
+
+My proposal is the Smart API and something like real implementation
+packages (Java versioning):
+
+Java 1.0 Implementation Packages:
+java.10.java.applet
+java.10.awt
+java.10.lang
+java.10.math
+java.10.net
+java.10.sql
+java.10.util
+
+Java 1.1 Implementation Packages:
+java.11.applet
+java.11.awt
+java.11.awt.events
+java.11.lang
+java.11.math
+java.11.net
+java.11.sql
+java.11.util
+java.11.util.jar
+java.11.util.zip
+
+Java 1.2 Implementation Packages
+java.12.applet
+java.12.awt
+java.12.awt.swing
+java.12.lang
+java.12.net
+java.12.sql
+java.12.util
+java.12.util.jar
+java.12.util.zip
+
+Java API Packages
+Implementation packages are only virtually inside the java packages.
+Through the power of the JVM, the JVM is configured to use Java 1.0, 1.1 or
+1.2 for each process. This virtualization is only going to be important for
+the java packages. If a program links to the java.net package while running
+with the Java 1.1 switch, the JVM feeds up java.11.net.*;
+
+I believe that a few "native" classes java.10.*, java.11.* and java.12
+should be a bridge to the core implementation of jos.*.
+
+Can you see this? You can intentionally write to a specific version of Java
+by changing your import statements. In other words, you really can use Java
+1.0, 1.1 and 1.2 at the same time. You can compare them side by side within
+a single JVM.
+
+If we start with classpath, compatible with Java 1.2, we can copy the code
+to these packages and get what we want mostly by process of elimination.
+
+- all of the code in java.10 must be compile-able by a standard Java 1.0
+compiler.
+- all of the code in java.11 must be compile-able by a standard Java 1.1
+compiler; it does not have to be backward compatible at all with Java 1.0.
+- all of the code in java.12 must be compile-able by a standard Java 1.2
+compiler; it does not have to be backward compatible at all with Java 1.0
+or 1.1.
+
+You might compile all this code someday with javac for JOS.
+
+I ask you: Why didn't Sun Microsystems do this from day one? There was no
+need whatsoever to put Java 1.1 in the namespace already occupied by Java
+1.0. And, guess what? You could have added most of the
+java-one-point-one.jar to your Java 1.0 classpath without delay.
+
+There was no need to put Java 2.0 (1.2) in the namespace already occupied
+by Java 1.0 and 1.1. You could have your cake and eat it too. You could
+have all your Java 1.0 and 1.1 applications mixing it up with the power of
+Java 2.0 without a single depretiation. Perfect compatibility.
+
+
+
+
+From ryan@whitewolf.com.au Fri, 23 Jul 1999 15:40:04 +1000
+Date: Fri, 23 Jul 1999 15:40:04 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] Re: [JOS-Kernel] About Graphics Device
+
+Hilary Cheng wrote:
+
+> It seems that two group of people.
+> One is Kernel Developers. Another is UI Developers. Graphics Devices
+> seems that it is not belongs to both. It may need to find a group that called
+> "JOS System".
+
+The JOS architecture list (mailto:arch@jos.org) is used to discuss the
+low-level Java code between the application layer and the kernel/jvm
+layer. Integration of Shark into JOS should probably happen on that
+list, while the user interface design itself can be discussed on the
+ui@jos.org list.
+
+I have CC'd arch@jos.org. If anyone wishes to continue this thread, you
+should perhaps remove kernel@jos.org from the mail header.
+
+Now, back to the discussion...
+
+The good think about Shark is that it works and we can start using it
+straight away. If Sean's project ends up being better than Shark in the
+future, then we can switch to it when it's ready.
+
+Has anyone here got Shark working? From memory, it didn't work right out
+of the box when I tried it. I haven't had a look since but if anyone
+manages to install it, could you possibly email the list how you got it
+to work? (ie. if you had any problems).
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From hilarycheng@usa.net Fri, 23 Jul 1999 14:30:52 +0800
+Date: Fri, 23 Jul 1999 14:30:52 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Arch] Re: [JOS-Kernel] About Graphics Device
+
+Hi,
+
+
+>Hilary Cheng wrote:
+>
+>> It seems that two group of people.
+>> One is Kernel Developers. Another is UI Developers. Graphics Devices
+>> seems that it is not belongs to both. It may need to find a group that
+called
+>> "JOS System".
+>
+>The JOS architecture list (mailto:arch@jos.org) is used to discuss the
+>low-level Java code between the application layer and the kernel/jvm
+>layer. Integration of Shark into JOS should probably happen on that
+>list, while the user interface design itself can be discussed on the
+>ui@jos.org list.
+>
+>I have CC'd arch@jos.org. If anyone wishes to continue this thread, you
+>should perhaps remove kernel@jos.org from the mail header.
+
+Ok, let discuss in arch.
+
+>Now, back to the discussion...
+>
+>The good think about Shark is that it works and we can start using it
+>straight away. If Sean's project ends up being better than Shark in the
+>future, then we can switch to it when it's ready.
+
+Hm, some of Shark are similar to Sean's Project. Since Shark contains
+Graphics Drivers and UI Peers Implementation on Linux.
+
+>Has anyone here got Shark working? From memory, it didn't work right out
+>of the box when I tried it. I haven't had a look since but if anyone
+>manages to install it, could you possibly email the list how you got it
+>to work? (ie. if you had any problems).
+
+Hm, I can't got Shark working. I will ask the author how to make Shark
+making
+and let people have a feel on Shark.
+
+Regarsd,
+
+Hilary
+
+
+
+
+
+From linus@bomben.nu Fri, 23 Jul 1999 10:26:21 +0200 (MEST)
+Date: Fri, 23 Jul 1999 10:26:21 +0200 (MEST)
+From: Linus G Larsson linus@bomben.nu
+Subject: [JOS-Arch] Re: [JOS-Kernel] About Graphics Device
+
+
+On Fri, 23 Jul 1999, Ryan Heise wrote:
+
+>Hilary Cheng wrote:
+>
+>> It seems that two group of people.
+>> One is Kernel Developers. Another is UI Developers. Graphics Devices
+>> seems that it is not belongs to both. It may need to find a group that called
+>> "JOS System".
+>
+>The JOS architecture list (mailto:arch@jos.org) is used to discuss the
+>low-level Java code between the application layer and the kernel/jvm
+>layer. Integration of Shark into JOS should probably happen on that
+>list, while the user interface design itself can be discussed on the
+>ui@jos.org list.
+>
+>I have CC'd arch@jos.org. If anyone wishes to continue this thread, you
+>should perhaps remove kernel@jos.org from the mail header.
+>
+>Now, back to the discussion...
+>
+>The good think about Shark is that it works and we can start using it
+>straight away. If Sean's project ends up being better than Shark in the
+>future, then we can switch to it when it's ready.
+>
+>Has anyone here got Shark working? From memory, it didn't work right out
+>of the box when I tried it. I haven't had a look since but if anyone
+>manages to install it, could you possibly email the list how you got it
+>to work? (ie. if you had any problems).
+
+I tried to use it a couple of days ago. I gad to tweak it a great lot, and some
+stuff still doesn't compile. Some files had the wrong package-names, some the
+wrong class-names &c.
+It seems strange to me, 'cause if people work with it, that shouldn't be
+possible.
+Anyways, I can start the little test-thingy they've got, but I haven't coded
+against it myself yet.
+
+Greetz
+//Linus G Larsson
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Fri, 23 Jul 1999 16:07:35 -0500
+Date: Fri, 23 Jul 1999 16:07:35 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+> -----Original Message-----
+> From:	DigiGod Q Frasché [SMTP:digigod@earthling.net]
+> Sent:	Thursday, July 22, 1999 6:16 PM
+> To:	Regier Avery J
+> Cc:	arch@jos.org
+> Subject:	Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+> 
+> Regier Avery J wrote:
+> >       ** We modify the java.awt.Toolkit class to integrate with the
+> > SmartRegistry and return the proper Toolkit for the situation.
+> 
+> well a platform only needs one Toolkit, so it would just return the
+> JOSToolkit
+> 
+Not necessarily.  I envision the possibility of there being many toolkits
+available just as there are many X window manager available.   Each shell
+(which extends off of JADE) may implement the Toolkit differently.  I
+personally think it is a mistake to embed the Toolkit into JADE.  I had
+envisioned JADE as being flexible enough to be the base both TUI's and
+GUI's.  Most TUI's won't have a Toolkit at all.  There will be some GUI's
+which don't want to use Swing as their peers.  We need to give the shell
+writers the flexibility to do whatever they please. 
+
+> > 
+> > In the meantime, there are some things that can be worked on:
+> >    * In order for JOS to be secure, we REALLY need an airtight secure
+> > SmartRegistry.  It must be encrypted and we need to figure out what
+> kinds of
+> > protections it will need from the rest of the system to ensure that it
+> is
+> > too expensive to hack to be worth it.
+> 
+> I dont know if the registry needs to be encrypted, other then slowing
+> things down shouldnt it just be "read-only" to everyone who isnt a
+> superuser (maybe even then being "read/write-with-password")?
+> 
+I'm thinking that the Registry is the prime opportunity for hackers to get
+around the security model we implement.  We require a Registry for
+configurability, but it will also have to contain settings that directly
+specify security.  For instance, if we set in the Registry as a default that
+applets may only take up to 30% of the CPU and 1/4 of the System's RAM, and
+we didn't secure the Registry such that those settings cannot be changed by
+hostile applets, we have failed.  If the system administrator sets the
+settings such that a user 'guest' may only access certain files, and the
+guest is able to get in and hack the registry to give himself more
+permissions, then we have failed.  One way to ensure that the registry is
+only changed by those with permissions to change it, is to encrypt it.  Not
+just that, but make sure the decryption routines are secure as well.
+
+> That should be part of the core JOS security system is what I think Im
+> saying
+They are all tied together and dependent on one another.  One hole and the
+whole thing is useless.  The registry is part of the security system.
+
+> >    * I need to find time to continue to work on org.jos.core.* and
+> defining
+> > the process model from the view of the JOS API.  This process model will
+> > need to be used by JADE so that shells can be implemented correctly.
+> > Integrating org.jos.core.* with your SmartRegistry I think is the
+> critical
+> > step to ensuring that we can make JOS future-ready.  Care to work
+> together
+> > on this?
+> 
+> inter-process communication would be nice for JADE too, how are you
+> planning on implementing this (out of curiosity)?
+> 
+> Cheers,
+> DigiGod
+> _________________________
+> 
+Glad you asked!  I'm not really sure!  Right now the system I'm playing with
+is that it is all controlled via the shell.  For instance any process can
+also be a parent process.  It can spawn other processes.  If the parent
+process decides that it is willing to share {x} static data with the child,
+it may.  If the parent spawns two processes, and gives both permissions to
+its statics, then WALAH!  IPC.  Shells are the parent process for most every
+application in the system.  The shell would check the registry to determine
+what static class data, if any should be shared with that process.  The data
+may not come from the registry, but also could come from user commands, be
+they GUI in nature or text commands.  If a GUI shell spawns a text command
+shell, then it is possible that an app launched from the GUI and an app
+launched from the command shell can do IPC.  This is a simple explanation of
+a tough problem, but from JADE's point of view I'm hoping that it will be
+just that simple.  It is not so simple from the kernel/JVM point of view.
+This complicates the memory and process management tasks a lot.  Figuring
+all of this out is really what the org.jos.core.* project is all about.
+This is also why I want JADE to be more generic.  Its job is to make all of
+this process stuff easy as pie for shells.  All shells should really have to
+worry about is human interaction.  JADE takes care of interacting with the
+system, as this is what must be consistent across all shells, otherwise our
+users would go batty trying to keep it all straight.  
+
+The definition of a process must be consistent accross all shells.  You
+start and stop and kill processes with the same API into the jvm+kernel.  A
+process whether started from a TUI or GUI is defined the same way for
+security and configuration in the registry.  JADE should make it simple to
+pull all of that information together so that when a user clicks on an icon
+for Netscape, the shell just says to JADE, "JADE.getProgram("Netscape",
+"Avery").createProcess();" and it all just works.
+
+Regards, 
+Avery J. Regier
+
+
+
+From RegierAveryJ@JDCORP.deere.com Fri, 23 Jul 1999 16:12:34 -0500
+Date: Fri, 23 Jul 1999 16:12:34 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+Oh, okay, go ahead and frame it then.  Maybe there is a place on the wiki
+for that one?  :)
+
+I hope that:
+	Such a clear statement of mission turns our attention to solve-able
+	technical problems and meeting of the minds.
+actually comes to pass!  That statement has been the whole reason for the
+org.jos.core.* stuff I've been (trying) to work on.
+
+Regards,
+Avery J. Regier
+
+
+
+> -----Original Message-----
+> From:	Gilbert Carl Herschberger II [SMTP:gchii@mindspring.com]
+> Sent:	Thursday, July 22, 1999 8:30 PM
+> To:	arch@jos.org
+> Subject:	RE: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+> 
+> At 09:15 AM 7/22/99 -0500, Regier Avery J <RegierAveryJ@JDCORP.deere.com>
+> wrote:
+> >> -----Original Message-----
+> >> From:	Gilbert Carl Herschberger II [SMTP:gchii@mindspring.com]
+> >> Sent:	Wednesday, July 21, 1999 8:28 PM
+> >> To:	arch@jos.org
+> >> Subject:	[JOS-Arch] RE: [JOS-UI] peer-ui mappings
+> >> 
+> >	<snip> 
+> >
+> >> I believe I shall take this out of your e-mail and frame it. It will
+> hang
+> >> upon the wall in my office.
+> >> 
+> >I will kindly ignore your flame.
+> 
+> Oh, my. I'm afraid I wasn't clear. Your statement of goal/mission/purpose
+> for the JOS Project is stated clearly. I was actually trying to be
+> agreeable, although it didn't sound like it. I didn't intend to flame.
+> (Isn't flame akin to being dis-agreeable?)
+> 
+> I would like the JOS Project to use your words in a statement of purpose.
+> After stating the obvious that our mission is to build a Java-based
+> operating system, we should say, sincerely, "We, at the JOS Project, are
+> responsible to implement the Java standard, created by Sun Microsystems,
+> so
+> that every 100% Pure Java application behaves like it is running in an
+> environment exactly compatible with the version of the standard it was
+> written to."
+> 
+> Such a clear statement of mission turns our attention to solve-able
+> technical problems and meeting of the minds. It builds enthusiasm,
+> motivation, and the edge--to go that extra mile. I think you have summed
+> it
+> up nicely.
+> 
+> If that is our mission, there are direct implications. There is a path to
+> follow as a consequence of our mission.
+> 
+> 
+> _______________________________________________
+> Arch maillist  -  Arch@jos.org
+> http://jos.org/mailman/listinfo/arch
+
+
+
+From digigod@earthling.net Fri, 23 Jul 1999 22:46:44 -0700
+Date: Fri, 23 Jul 1999 22:46:44 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+Regier Avery J wrote:
+> Not necessarily.  I envision the possibility of there being many toolkits
+> available just as there are many X window manager available.   Each shell
+> (which extends off of JADE) may implement the Toolkit differently.  I
+> personally think it is a mistake to embed the Toolkit into JADE.  I had
+> envisioned JADE as being flexible enough to be the base both TUI's and
+> GUI's.  Most TUI's won't have a Toolkit at all.  There will be some GUI's
+> which don't want to use Swing as their peers.  We need to give the shell
+> writers the flexibility to do whatever they please.
+
+Your absolutley right, what ever I was thinking when I said that is...
+well.
+
+What we should do is have a JOSToolkit that provides all the base
+functionality, like getSystemClipboard() isnt going to change, then have
+various subclasses like SwingToolkit to provide the default
+implementations. I think we could use the Toolkit in a CLI anyway for
+stuff like beep() and that just throw something akin to a
+GraphicsNotSupportedException.
+
+Now that I think about it we could define the default JADE toolkit to
+get a HashMap from the registry and create the peers from that... (the
+default being the Swing ones)
+
+> I'm thinking that the Registry is the prime opportunity for hackers to get
+> around the security model we implement.  We require a Registry for
+> configurability, but it will also have to contain settings that directly
+> specify security.  For instance, if we set in the Registry as a default that
+> applets may only take up to 30% of the CPU and 1/4 of the System's RAM, and
+> we didn't secure the Registry such that those settings cannot be changed by
+> hostile applets, we have failed.  If the system administrator sets the
+> settings such that a user 'guest' may only access certain files, and the
+> guest is able to get in and hack the registry to give himself more
+> permissions, then we have failed.  One way to ensure that the registry is
+> only changed by those with permissions to change it, is to encrypt it.  Not
+> just that, but make sure the decryption routines are secure as well.
+
+or we could follow KOH (the DOS virus people intentinally let on their
+systems to encrypt all their disks) with extra security of course, and
+just for the hell of it encrypt the security section of the registry and
+require superuser access just to be asked for the pass phrase (you'd
+need a small nuclear weapon to get throught that ;)
+ 
+> Glad you asked!  I'm not really sure!  Right now the system I'm playing with
+> is that it is all controlled via the shell.  For instance any process can
+> also be a parent process.  It can spawn other processes.  If the parent
+> process decides that it is willing to share {x} static data with the child,
+> it may.  If the parent spawns two processes, and gives both permissions to
+> its statics, then WALAH!  IPC.  Shells are the parent process for most every
+> application in the system.  The shell would check the registry to determine
+> what static class data, if any should be shared with that process.  The data
+> may not come from the registry, but also could come from user commands, be
+> they GUI in nature or text commands.  If a GUI shell spawns a text command
+> shell, then it is possible that an app launched from the GUI and an app
+> launched from the command shell can do IPC.  This is a simple explanation of
+> a tough problem, but from JADE's point of view I'm hoping that it will be
+> just that simple.  It is not so simple from the kernel/JVM point of view.
+> This complicates the memory and process management tasks a lot.  Figuring
+> all of this out is really what the org.jos.core.* project is all about.
+> This is also why I want JADE to be more generic.  Its job is to make all of
+> this process stuff easy as pie for shells.  All shells should really have to
+> worry about is human interaction.  JADE takes care of interacting with the
+> system, as this is what must be consistent across all shells, otherwise our
+> users would go batty trying to keep it all straight.
+
+exatcly!
+
+system <> JADE <> UI
+
+couldnt have said it better myself
+
+the system is considered with doing... um, system stuff not looking
+pretty and making a noise telling you you cant click there
+
+> The definition of a process must be consistent accross all shells.  You
+> start and stop and kill processes with the same API into the jvm+kernel.  A
+> process whether started from a TUI or GUI is defined the same way for
+> security and configuration in the registry.  JADE should make it simple to
+> pull all of that information together so that when a user clicks on an icon
+> for Netscape, the shell just says to JADE, "JADE.getProgram("Netscape",
+> "Avery").createProcess();" and it all just works.
+
+I imagine this getProgram method to be incredibly complex and Im sure as
+hell not writing it, but Id like it.
+
+before Gilbert brings it up though it should except a URI as the program
+
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         "To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command"
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From tmiller@haverford.edu Thu, 22 Jul 1999 16:05:12 -0400 (EDT)
+Date: Thu, 22 Jul 1999 16:05:12 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+	Just a note: while you can't get around using java.lang.* (at
+least, not without your own rather oddly written compiler), decaf
+shouldn't have any problems supporting more than one instance of those
+classes distributed over multiple processes, thought the native calls
+could get quite messy.
+
+	Another note: it's rather important to bear in my the distinction
+between the java language and the java platform.  The problem is that Sun
+doesn't keep this distinction terribly sharp... JOS is its own platform.
+The question standing before us is: should we make JOS a superset of the
+Java platform, or should we ignore the Java platform so far as possible
+and write a jBCS* module up later?
+
+
+* jBCS: the notional equivalent of Linux's (et al) intel Binary
+Compatiblity System.
+
+	There are important ramifications.  (Warning: the previous was an
+understatement of epic proportions.  You may wish to adjust your scale of
+thinking. :))  The first one that comes to *my* mind is the question of
+difficulty: would it be substantially more difficult to write jBCS modules
+for a system that may or may not substantially resemble Sun's Java
+platform(s) than it would be to write a superset of Sun's Java platform
+(pick one) that has a mysterious way of running what amounts
+incompabitbile binaries?  The initial response in my mind is: the Right
+Way to write such a superset would be with jBCS modules.  Therefore, the
+difficulties come down to which notional JOS platform (our own, or some
+superset) would be more amenable to jBCS modules.
+
+	[ Sidebar: an application of the jBCS modules, if they really do
+need to end up modifying the way in which certain bytecodes are executed,
+and that this is done well, would be automagic support the binfmt_* idea
+from linux.  This would include things like _perl, _tcltk, _javascript,
+and so on.  At any rate... ]
+
+	It might be worthwhile to investigate how the WINE project is
+handling its Win3.1/Win95/Win98 problems, which amount to almost the same
+thing: the platform (i386) is the same, but with large differences in the
+libraries, and (perhaps) subtle differences in the way that the libraries
+are understood (by the applications.)
+
+> It is just around the corner!  Here's what has to happen:
+>    * JJOS+decaf gets to the point where we can begin to integrate
+> $Classpath.
+
+	Soon.  Maybe as early as late September.
+
+	As for modifying classpath to support processes, I'm very
+sincerely hoping we won't have to do much at all.  Since spawning
+processes would have to be handled by a separate library (jos.core.proc?)
+anyway, we should be able to do all the slight-of-hand necessary behind
+closed doors, so to speak, and thus not fork classpath, which has enough
+to do already.
+
+-_Quinn
+
+
+
+
+From digigod@earthling.net Sat, 24 Jul 1999 23:33:17 -0700
+Date: Sat, 24 Jul 1999 23:33:17 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+"Todd L. Miller" wrote:
+>         Just a note: while you can't get around using java.lang.* (at
+> least, not without your own rather oddly written compiler), decaf
+> shouldn't have any problems supporting more than one instance of those
+> classes distributed over multiple processes, thought the native calls
+> could get quite messy.
+
+ugh, that would take up more memorty then Id like to think. its a good
+start mind you, but we could create a "multiprocess aware" java.lang
+(changing nothing of course) that is maintained by the master process
+(the kernel) and accesed by all its children.
+ 
+>         Another note: it's rather important to bear in my the distinction
+> between the java language and the java platform.  The problem is that Sun
+> doesn't keep this distinction terribly sharp... JOS is its own platform.
+> The question standing before us is: should we make JOS a superset of the
+> Java platform, or should we ignore the Java platform so far as possible
+> and write a jBCS* module up later?
+> 
+> * jBCS: the notional equivalent of Linux's (et al) intel Binary
+> Compatiblity System.
+
+Im not entirely clear of what this would mean but Im guessing more
+native code then Id like anyone to have to port to all the
+machine-platforms Id like us to support (people on macs should be able
+to use it too) and its just going to confuse the issue more anyway
+ 
+>         There are important ramifications.  (Warning: the previous was an
+> understatement of epic proportions.  You may wish to adjust your scale of
+> thinking. :))  The first one that comes to *my* mind is the question of
+> difficulty: would it be substantially more difficult to write jBCS modules
+> for a system that may or may not substantially resemble Sun's Java
+> platform(s) than it would be to write a superset of Sun's Java platform
+> (pick one) that has a mysterious way of running what amounts
+> incompabitbile binaries?  The initial response in my mind is: the Right
+> Way to write such a superset would be with jBCS modules.  Therefore, the
+> difficulties come down to which notional JOS platform (our own, or some
+> superset) would be more amenable to jBCS modules.
+> 
+>         [ Sidebar: an application of the jBCS modules, if they really do
+> need to end up modifying the way in which certain bytecodes are executed,
+> and that this is done well, would be automagic support the binfmt_* idea
+> from linux.  This would include things like _perl, _tcltk, _javascript,
+> and so on.  At any rate... ]
+
+its not my area, but Im going to say superset (+ a line to sun telling
+them they should put it in Java anyway)
+ 
+>         It might be worthwhile to investigate how the WINE project is
+> handling its Win3.1/Win95/Win98 problems, which amount to almost the same
+> thing: the platform (i386) is the same, but with large differences in the
+> libraries, and (perhaps) subtle differences in the way that the libraries
+> are understood (by the applications.)
+
+WINE?
+ 
+>         As for modifying classpath to support processes, I'm very
+> sincerely hoping we won't have to do much at all.  Since spawning
+> processes would have to be handled by a separate library (jos.core.proc?)
+> anyway, we should be able to do all the slight-of-hand necessary behind
+> closed doors, so to speak, and thus not fork classpath, which has enough
+> to do already.
+
+jos.process?
+
+someone should change the subject on this thread, this doesnt sound like
+peer-ui mapping to me ;)
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         "To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command"
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From gchii@mindspring.com Sat, 24 Jul 1999 11:15:10 -0400
+Date: Sat, 24 Jul 1999 11:15:10 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+At 10:46 PM 7/23/99 -0700, DigiGod Q Frasché <digigod@earthling.net> wrote:
+>Regier Avery J wrote:
+>> The definition of a process must be consistent accross all shells.  You
+>> start and stop and kill processes with the same API into the jvm+kernel.  A
+>> process whether started from a TUI or GUI is defined the same way for
+>> security and configuration in the registry.  JADE should make it simple to
+>> pull all of that information together so that when a user clicks on an icon
+>> for Netscape, the shell just says to JADE, "JADE.getProgram("Netscape",
+>> "Avery").createProcess();" and it all just works.
+>
+>I imagine this getProgram method to be incredibly complex and Im sure as
+>hell not writing it, but Id like it.
+>
+>before Gilbert brings it up though it should except a URI as the program
+
+:)
+
+But wait! This reminds me of something else that's important, too.
+
+It really should be that easy. When we pass "Navigator" to
+JADE.getProgram(), it should be able to look up the full URI. Imagine that
+a program name has no scheme, no path, no query, no fragment. The
+getProgram() method should look it up in a short list of well-known program
+names. That's what short-cuts are for.
+
+It may be that our system has a system short-cut path and a user-specific
+short-cut path. Short-cut "files" we talked about would look like a
+registry, too. If we put the full program URI in a short-cut file, like
+Navigator.app, we use the name of the short-cut to load a program.
+
+When you do not have a short-cut for a program, you can still run it.
+That's when you would supply the full program URI.
+
+I still think the PATH concept is a good idea. We might list each resource
+where short-cuts are stored similar to the classic PATH. In other words,
+when we pass a program name as an ordinary string to JADE.getProgram(), we
+should be able to abbreviate.
+
+These load-and-go mechanisms are in all of the classic operating systems.
+These are Runtime and Process classes, part of the standard API. This
+discussion should make it clear that a shell is not responsible for
+short-cuts. JADE.getProgram() is a system function that must be available
+for all shells _and_ all JOS applications, applets, servlets etc.
+
+And what about the monitoring of a child process? Should createProcess()
+also run (start) a process and return it's int result code? The result code
+is set by System.exit(). It should be passed back to the parent process (if
+the parent is interested).
+
+getProgram()/createProcess() is incredibly complex. It is important. It
+defines the fundamental mechanism of an operating system: to load custom
+programs. It gets a little easier if we break it down.
+
+--inside getProgram()
+1. Handle short-cuts. Translate a program name for a program URI. Since one
+short-cut can make reference to another, repeat if necessary. If there's a
+circular reference, throw an exception.
+2. Verify the program URI. If it is a malformed URI, throw an exception.
+3. Get the class for a program. If the class cannot be found, throw an
+exception.
+4. Verify the class implements the right interface (it can be run() in a
+separate process). If a class doesn't implement the right interface, throw
+an exception.
+5. Verify user parameter. If the user is not authorized to use this
+program, throw an exception.
+6. Get an object from the class. If the object cannot be created, throw an
+exception. A custom program must define a default constructor, right?
+
+At this point, a separate process has not been created yet. (No harm done.)
+
+--inside Program.createProcess().
+1. Create a Process object so that a parent process can monitor the status
+of a child process.
+2. Create process environment for the child process. If a process
+environment cannot be created, throw an exception. It is the process
+environment that must store command-line parameters, not a program.
+3. Configure the program object with its process environment.
+4. Start the program. It runs in a separate thread, right?
+
+--inside custom-program.run();
+1. A base program provides a getProcessEnvironment() method. The process
+environment maintains the standard input stream, standard output stream,
+standard error stream. The process environment provides all the command
+line parameters. ProcessEnvironment sounds a lot like java.lang.System to me.
+
+JADE.getProgram() should return a Program object:
+public Program JADE.getProgram( String program, String user );
+
+and Program.createProcess() should return a java.lang.Process object:
+public Process Program.createProcess();
+
+While we're on the topic of process environment, I've been doing a little
+research. A multiple process JVM may need multiple instances of
+java.lang.System. According to the semantics of the static keyword, you can
+have one instance of java.lang.System for each class loader; but, single
+process JVMs won't allow it. When you have multiple instances of System,
+you don't have to take great pains to handle System.exit(). This is THE
+difference between a multiple process JVM and a single process JVM. A new
+instance of a class loader must be created during getProgram() inside step 3.
+
+There should be a special JOS-only JVM function to get a new
+PrimordialClassLoader object. There should be a new instance of
+PrimordialClassLoader for each process. Here is where we can reduce the
+demand for RAM with our multiple process JVM: Each instance of
+PrimordialClassLoader shares all system classes...except for a short list,
+like java.lang.System.
+
+I'm not sure how...but I think java.lang.System.getClassLoader() must
+return the process-specific class loader, while
+java.lang.Object.getClassLoader() can still return null.
+
+
+
+
+From digigod@earthling.net Sun, 25 Jul 1999 07:17:40 -0700
+Date: Sun, 25 Jul 1999 07:17:40 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] Process Stuff, formally:Re: [JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE:
+ [JOS-UI] peer-ui mappings
+ [JOS-UI] peer-ui mappings
+
+Gilbert Carl Herschberger II wrote:
+> But wait! This reminds me of something else that's important, too.
+
+oy, here we go... :)
+ 
+> It really should be that easy. When we pass "Navigator" to
+> JADE.getProgram(), it should be able to look up the full URI. Imagine that
+> a program name has no scheme, no path, no query, no fragment. The
+> getProgram() method should look it up in a short list of well-known program
+> names. That's what short-cuts are for.
+
+since Im writing the actual JADE class (and dont want it to get to damn
+big) how 'bout: JADE.getDefaultProgramManager.getProgram(String program) 
+note that I left off the second String user since it is a USER
+interface, not userS interface. I think multiple JADE's can interact
+with one system (zero to one running on it, n communicating via the
+whatever net.protocol)
+ 
+> It may be that our system has a system short-cut path and a user-specific
+> short-cut path. Short-cut "files" we talked about would look like a
+> registry, too. If we put the full program URI in a short-cut file, like
+> Navigator.app, we use the name of the short-cut to load a program.
+
+basically be a specialized INI file
+
+class=class:netscape.navigator.Main
+args=... bla 
+bla
+bla
+
+or 
+
+class=shortcut:Navigator.app
+bla 
+bla
+
+ 
+> When you do not have a short-cut for a program, you can still run it.
+> That's when you would supply the full program URI.
+
+you type in NortonUtilites for Java the UI says "Im sorry I dont have
+that reference, kindly show it to me" and has a
+FileChooser/search-dialog that lets you associate the name you typed
+with a class...
+ 
+> I still think the PATH concept is a good idea. We might list each resource
+> where short-cuts are stored similar to the classic PATH. In other words,
+> when we pass a program name as an ordinary string to JADE.getProgram(), we
+> should be able to abbreviate.
+> 
+> These load-and-go mechanisms are in all of the classic operating systems.
+> These are Runtime and Process classes, part of the standard API. This
+> discussion should make it clear that a shell is not responsible for
+> short-cuts. JADE.getProgram() is a system function that must be available
+> for all shells _and_ all JOS applications, applets, servlets etc.
+
+This would be a JADE standard feature, like the systemClipboard that is
+avaliable to every UI to let them be more uniform in behaviaor if not
+apperance.
+ 
+> And what about the monitoring of a child process? Should createProcess()
+> also run (start) a process and return it's int result code? The result code
+> is set by System.exit(). It should be passed back to the parent process (if
+> the parent is interested).
+> 
+> getProgram()/createProcess() is incredibly complex. It is important. It
+> defines the fundamental mechanism of an operating system: to load custom
+> programs. It gets a little easier if we break it down.
+
+createProcess() being part of the OS, getProgram() being part of JADE
+ 
+> --inside getProgram()
+> 1. Handle short-cuts. Translate a program name for a program URI. Since one
+> short-cut can make reference to another, repeat if necessary. If there's a
+> circular reference, throw an exception.
+> 2. Verify the program URI. If it is a malformed URI, throw an exception.
+> 3. Get the class for a program. If the class cannot be found, throw an
+> exception.
+> 4. Verify the class implements the right interface (it can be run() in a
+> separate process). If a class doesn't implement the right interface, throw
+> an exception.
+
+Id like it if it didnt require it to implement a different interface, we
+want to be compatabile. the Process can be the Thread if it doesnt have
+any of its own
+
+> 5. Verify user parameter. If the user is not authorized to use this
+> program, throw an exception.
+
+Id like it if this was in the fs/security system by that I mean if your
+not allowed to run a program you cant SEE a program. you cant covet what
+you cant see (anticrack teqniques meet Silence of tha Lambs)
+
+> 6. Get an object from the class. If the object cannot be created, throw an
+> exception. A custom program must define a default constructor, right?
+
+I make it a point to always define an empty constructor, it should be
+common practice
+ 
+> At this point, a separate process has not been created yet. (No harm done.)
+> 
+> --inside Program.createProcess().
+> 1. Create a Process object so that a parent process can monitor the status
+> of a child process.
+> 2. Create process environment for the child process. If a process
+> environment cannot be created, throw an exception. It is the process
+> environment that must store command-line parameters, not a program.
+> 3. Configure the program object with its process environment.
+> 4. Start the program. It runs in a separate thread, right?
+
+the process environment would be a thread, so that if app z doesnt have
+any threads it doesnt cause any problems and it can still spawn its own
+ 
+> --inside custom-program.run();
+> 1. A base program provides a getProcessEnvironment() method. The process
+> environment maintains the standard input stream, standard output stream,
+> standard error stream. The process environment provides all the command
+> line parameters. ProcessEnvironment sounds a lot like java.lang.System to me.
+
+System would be wrapper for ProcessEnvironement for legacy support
+ 
+> JADE.getProgram() should return a Program object:
+> public Program JADE.getProgram( String program, String user );
+> 
+> and Program.createProcess() should return a java.lang.Process object:
+> public Process Program.createProcess();
+> 
+> While we're on the topic of process environment, I've been doing a little
+> research. A multiple process JVM may need multiple instances of
+> java.lang.System. According to the semantics of the static keyword, you can
+> have one instance of java.lang.System for each class loader; but, single
+> process JVMs won't allow it. When you have multiple instances of System,
+> you don't have to take great pains to handle System.exit(). This is THE
+> difference between a multiple process JVM and a single process JVM. A new
+> instance of a class loader must be created during getProgram() inside step 3.
+
+the System.exit() would only affect the current process your saying
+
+I was just looking at the code for System (see below) and System.exit()
+just calls Runtime.getRuntime().exit(); maybe thats what we should
+concentrate on.
+ 
+> There should be a special JOS-only JVM function to get a new
+> PrimordialClassLoader object. There should be a new instance of
+> PrimordialClassLoader for each process. Here is where we can reduce the
+> demand for RAM with our multiple process JVM: Each instance of
+> PrimordialClassLoader shares all system classes...except for a short list,
+> like java.lang.System.
+> 
+> I'm not sure how...but I think java.lang.System.getClassLoader() must
+> return the process-specific class loader, while
+> java.lang.Object.getClassLoader() can still return null.
+
+I just doublechecked with the System code and theres no getClassLoader()
+there's Object.getClass() but not Object.getClassLoader() you need to
+say Object.getClass().getClassLoader()
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         "To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command"
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From gchii@mindspring.com Sun, 25 Jul 1999 10:11:52 -0400
+Date: Sun, 25 Jul 1999 10:11:52 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+At 04:05 PM 7/22/99 -0400, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>	Just a note: while you can't get around using java.lang.* (at
+>least, not without your own rather oddly written compiler), decaf
+>shouldn't have any problems supporting more than one instance of those
+>classes distributed over multiple processes, thought the native calls
+>could get quite messy.
+
+When you look closely at Sun's proposal for versioning (see Versioning page
+on Wiki), you'll find that Sun is already doing this. Their proposal is for
+a secret namespace. You can't debug with Sun's proposal. Your debugger
+shows you source code; but, it's the wrong source code.
+
+By using rt-10.jar, rt-11.jar, and rt-12.jar, they put three different
+copies of the java.* classes on your JVM. A classloader uses only the first
+jar its classpath.
+
+Here is how Sun wants it:
+
+Java 1.0.2:
+
+/dev/java/10/src/java - This source directory contains all of the source
+code for java.* packages for Java 1.0.2.
+
+/dev/java/10/lib/ - This target directory contains rt.jar (rt-10.jar).
+
+Java 1.1:
+
+/dev/java/11/src/java - This source directory contains all of the source
+code for java.* packages for Java 1.1, using depretiation. Direct calls to
+Java 1.0.2 are impossible. All code must be duplicated. It preserves even
+the code that you're not supposed to use.
+
+/dev/java/11/lib/ - This target directory contains rt.jar (rt-11.jar).
+
+Java 1.2:
+
+/dev/java/12/src/java - This source directory contains all of the source
+code for java.* packages for Java 1.2, using depretiation. Direct calls to
+Java 1.0.2 and 1.1 are impossible. All code must be duplicated. It
+preserves even the code you're not supposed to use.
+
+/dev/java/12/lib/ - This target directory contains rt.jar (rt-12.jar).
+
+In Sun's architecture, they require you to have duplication, duplication,
+and more duplication. They imagine you're only going to run on JVM at a
+time. But, I have a JVM that comes with Navigator, a JVM that comes with
+Internet Explorer, a JVM that comes with JBuilder, a JVM that comes with
+Borland C++ 5.0, a JVM that comes with C++Builder, a JVM from JDK 1.0.2, a
+JVM from blackdown, a JVM from JRE 1.1.7B, etc., etc., etc.
+
+An Java-based operating system, like JOS, should provide direct JVM
+support. JVMs should be shared among shells, browsers, compilers, and
+development tools. When we "install" a JOS-compatible HTML browser, is it
+going to install its own JVM so that it can run applets and servlets (yes,
+servlets can run in a browser)? When we "install" a HTTP server, is it
+going to install its own JVM so that it can run servlets? When we "install"
+JBuilder 4 for JOS, is it going to install its own JVM, too?
+
+Sun Microsystems has been thinking small. Their plan for versioning makes
+things worse, not better.
+
+My proposal suggests that it is possible to unify three Java platforms
+under one JOS platform. Such unification would eliminate arbitrary
+duplication and redundency. It would also enable us to write native code
+once, not once per Java platform. It would enable us to write our Java
+applications once, not once per Java platform.
+
+My proposal conserves our resources. All three implementations of the zip
+package would use one jos.zip implementation. All three implementations of
+the awt package would use one set of fully debugged "peers".
+
+Implementing native methods would benefit from the latest Java Native
+Interface. We are not required to use the Java 1.0.2 native interface to
+implement Java 1.0.2 native methods. There should be no native methods in
+any class inside the java.* packages anyway. All JOS-specific native
+methods should be implemented in the jos.native package.
+
+We don't need an "oddly written" compiler. If we build a multiple process
+JVM, we are already breaking away from the single process JVM standard
+created by Sun. The Java virtual machine specification is clear. By design,
+a JVM must support a single process. 
+
+I believe we need a JOS-compatible javac tool. A multiple process JVM is
+likely to need a compiler with multiple process support.
+
+Rule 2: All JOS code that can be written to the Java 1.0.2 standard should
+be written to the Java 1.0.2 standard.
+
+
+
+
+From gchii@mindspring.com Sun, 25 Jul 1999 10:31:10 -0400
+Date: Sun, 25 Jul 1999 10:31:10 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+At 04:05 PM 7/22/99 -0400, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>> It is just around the corner!  Here's what has to happen:
+>>    * JJOS+decaf gets to the point where we can begin to integrate
+>> $Classpath.
+>
+>	Soon.  Maybe as early as late September.
+>
+>	As for modifying classpath to support processes, I'm very
+>sincerely hoping we won't have to do much at all.  Since spawning
+>processes would have to be handled by a separate library (jos.core.proc?)
+>anyway, we should be able to do all the slight-of-hand necessary behind
+>closed doors, so to speak, and thus not fork classpath, which has enough
+>to do already.
+
+High quality operating systems use "partitions". Partitions are used to
+protect the operation of a machine while new applications are being built.
+Partitions prevent raw experimental code (test) from interfering with
+stable code (production). Classpath is the classic way to have two (or
+more) copies of the same code running one a processor at the same time.
+
+How do we develop JOS on JOS? We boot a primary partition with a production
+classpath. We spawn new partitions with test classpath. We should be able
+to spawn many partitions, too.
+
+[Wait just a minute. Is JOS going to be a multiple user operating system,
+or not? I hope it is. If JOS is going to be a multiple user operating
+system, it must be able to support multiple concurrent partitions/domains
+and multiple concurrent classpaths. Security is a very important part of a
+partition/domain.
+
+When someone connect to JOS through telnet, a new partition/domain (with a
+unique classpath) is created when they log in. The partition/domain
+provides a default shell for each user.
+
+When I'm compiling Java code, using the multiple user JOS operating system,
+I certainly don't want to bring down the system for all its other users.]
+
+On a large business machine, it might have all these partitions running at
+the same time:
+
+prod1
+prod2
+prod3
+test1
+test2
+test3
+test4
+
+On Wiki, these have been called domains and instances of a JVM. When
+spawning a partition, you can pass a parameter for Java 1.0, 1.1 or 1.2
+platform compatibility.
+
+public class Partition {
+  public Partition( Platform v ) {
+  :
+  }
+}
+
+public class Platform {
+  public static final Platform JAVA_10 = new Platform( 1.0 );
+  public static final Platform JAVA_11 = new Platform( 1.1 );
+  public static final Platform JAVA_12 = new Platform( 1.2 );
+  private Platform( float v ) {
+    platformID = v;
+  }
+  public getPlatformID() {
+    return platformID;
+  }
+  private float platformID;
+}
+
+
+
+
+From gchii@mindspring.com Sun, 25 Jul 1999 10:51:40 -0400
+Date: Sun, 25 Jul 1999 10:51:40 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Re: Process Stuff, formally:Re: [JOS-Arch] Re: [JOS-UI] Re:
+ [JOS-Arch] RE:  [JOS-UI] peer-ui mappings
+ [JOS-Arch] RE:  [JOS-UI] peer-ui mappings
+
+At 07:17 AM 7/25/99 -0700, DigiGod Q Frasché <digigod@earthling.net> wrote:
+
+<snip>
+This is great! I agree with everything else you said.
+
+>the process environment would be a thread, so that if app z doesnt have
+>any threads it doesnt cause any problems and it can still spawn its own
+
+Oh no. App z must be a separate thread because app z can spawn many child
+processes of its own. ProcessEnvironment is not a separate process. I'm
+pretty sure it doesn't need to run in a separate thread.
+
+Our create-process mechanism can't be arbitrary. It cannot run every class
+that has been compiled. In order for the process environment to run a class
+that class must implement a well-known interface. We could not, for
+example, run an instance of java.awt.Button, even if someone were to type
+java.awt.Button on a command line.
+
+Every class that is "launch-able" by our process environment might be
+required to implement
+
+public static void main( String[] args );
+
+or
+
+java.lang.Runnable (could be dangerous)
+
+or
+
+public interface CustomProcess 
+    extends Runnable {
+  public void setProcessEnvironment( ProcessEnvironment v );
+}
+
+>I just doublechecked with the System code and theres no getClassLoader()
+>there's Object.getClass() but not Object.getClassLoader() you need to
+>say Object.getClass().getClassLoader()
+
+Correction: I'm not sure how...but I think
+java.lang.System.getClass().getClassLoader() must return the
+process-specific class loader, while
+java.lang.Object.getClass().getClassLoader() can still return null.
+
+And, it may be Runtime rather than System that I'm thinking about. Runtime
+has those exec() methods, too. Exec should be called in the usual way to
+exec a child process--even on JOS.
+
+
+
+
+From gchii@mindspring.com Sun, 25 Jul 1999 11:18:14 -0400
+Date: Sun, 25 Jul 1999 11:18:14 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Process Stuff, formally:Re: [JOS-Arch] Re:
+ [JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings [JOS-UI] peer-ui
+ mappings
+
+At 07:17 AM 7/25/99 -0700, DigiGod Q Frasché <digigod@earthling.net> wrote:
+>you type in NortonUtilites for Java the UI says "Im sorry I dont have
+>that reference, kindly show it to me" and has a
+>FileChooser/search-dialog that lets you associate the name you typed
+>with a class...
+
+That's the way it should be. I really want a shell like that. Non-technical
+people (all 5 billion of them) want a shell like that, too.
+
+And if that weren't enough, we have the strength of Java and the power of
+the network, too. This means that when you type in NortonUtilities, the
+short-cuts for NortonUtilities may be stored on a network service
+(Internet/intranet). The local shell can "look-up" the NortonUtilities
+short-cut, like looking up a domain name with DNS. So we need a short-cut
+"look-up" service for JOS.
+
+When I want HTML pages from the JOS Project, I type "http://www.jos.org/",
+right? When I want to run the JOS MegaSmartHTMLBrowser Pro, I should be
+able to type "shortcut://www.jos.org/MegaSmartHTMLBrowserPro" at the
+command line. The short-cut is downloaded; plus all of the packages used by
+this application are downloaded. It is seemless. It is easy. It is
+future-oriented, too.
+
+What if I don't trust that code? If my shell supports it, I can reduce the
+shell to sand-box permissions. Or, I can open a new partition, with only
+sand-box permissions. Then, I type in the same command. Bytecode for that
+application is sand-boxed on a package-by-package basis.
+
+Plus, the actual byte codes to run NortonUtilities does *not* have to be
+installed on your local drive. JOS can download the bytecode from an
+Internet/intranet application service (if you like), keep it in a local LRU
+bytecode cache. JOS can "download" the bytecode from a floppy or CD-ROM or
+game cartridge.
+
+What does it mean? It means there doesn't have to be an explicit
+installation step. If you want to run NortonUtilities, you type
+NortonUtilities on a command line or click on the NortonUtilities
+short-cut. It runs even if it has never been installed.
+
+This is something that you just can't do on any other operating system.
+This is where JOS shines. It is the strength of using Java to build an OS.
+
+For non-technicians, they want a high quality operating system. They want
+to run programs (not install them). They want to experiment with stuff (not
+commit to it). They change their mind frequently.
+
+For every program that has a cost-free license, why should there be
+separate installation step? If you can install it, you can upgrade it, too.
+All of the bytecode on the Internet should be virtually available to your
+bytecode cache.
+
+Hey! If you want to distribute your application to lots and lots of people,
+you only really need to give them the URI for your shortcut. You can put
+such a URI in a hot-link on a webpage. You can send it with e-mail. All the
+other complexity is handled by the operating system, and should be.
+
+
+
+
+From tmiller@haverford.edu Sun, 25 Jul 1999 16:03:34 -0400 (EDT)
+Date: Sun, 25 Jul 1999 16:03:34 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Re: Java Versions
+
+	W.r.t. to multiple copies of java.lang.*, that was simply in case
+we needed different versions of those classes for different revs of the
+spec.
+
+> Im not entirely clear of what this would mean but Im guessing more
+> native code then Id like anyone to have to port to all the
+> machine-platforms Id like us to support (people on macs should be able
+> to use it too) and its just going to confuse the issue more anyway
+
+	No, you've mis-understood.  If we decide jos is its own platform,
+we no longer have to guarentee that jdk 1.0.x/1.1.x/1.2.x code will work
+on it -- we can write a "jBCS" module that handles translating other java
+platform calls into JOS platform calls on the fly -- no native code
+involved.
+
+> WINE?
+
+	WINE Is Not an Emulator: run windows binaries on i386 linux.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Sun, 25 Jul 1999 16:22:57 -0400 (EDT)
+Date: Sun, 25 Jul 1999 16:22:57 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+> My proposal suggests that it is possible to unify three Java platforms
+> under one JOS platform. Such unification would eliminate arbitrary
+> duplication and redundency. It would also enable us to write native code
+> once, not once per Java platform. It would enable us to write our Java
+> applications once, not once per Java platform.
+
+	It should be posisble to write an O/S that will run Sun's current
+three platforms.  Whether or not it can be done is still open to question,
+as is the exact mechanism by which such a task might be accomplished.  I
+would suggest the Right Thing to do is to write JOS's platform without
+worrying too much about Sun's, and take care of compatibility problems
+with compatability modules.  Sun's platforms will change again, and
+probably in ways that aren't compatible with any unified problem we might
+come with.  Again, to my understanding, the exact changes to the VM spec
+involve either (a) additions that older VMs can safely ignore or
+(b) alterations to the interpertation of some parts of the VM or language
+spec which either were or are incorrect.
+
+> We don't need an "oddly written" compiler. If we build a multiple process
+> JVM, we are already breaking away from the single process JVM standard
+> created by Sun. The Java virtual machine specification is clear. By design,
+> a JVM must support a single process. 
+
+	If you don't want your classfile to have java.lang.* references in
+it, you need an oddly-written compiler.  By default, all java compilers
+import java.lang.*, and java.lang.Object is the defined superclass of
+every other class...
+
+	So far as I've read the spec, it doesn't require a single-process
+model (thought it might assume one) -- large chunks of the class library
+will break in amusing ways if the VM doesn't fake one, but it's entirely
+possible to write a multi-process VM that will execute non-process-aware
+programs without difficulty; as a matter of fact, for JOS to work, we
+*have* to write such a JVM.
+
+> I believe we need a JOS-compatible javac tool. A multiple process JVM is
+> likely to need a compiler with multiple process support.
+
+	Absolutely not.  Processes MUST be an API that has native-code
+links into our JVM, otherwise we've just cut ourselves off from every
+other java developer out there, which is unacceptable.
+
+	Multiple java processes in a single JVM are simply a matter of
+keeping namespaces disjoint.  Certain elements of the extant Java API will
+have to be rewritten to act appropriately (i.e. System.exit() will kill
+the process, not the system), but the classfile will remain the
+same.  To maintain separate namespaces requires a slight modification to
+the primordial classloader, and that's it.  Every Java class already
+maintains the classloader that loaded it.
+
+-_Quinn
+
+
+
+
+From digigod@earthling.net Sun, 25 Jul 1999 14:14:48 -0700
+Date: Sun, 25 Jul 1999 14:14:48 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] Process Stuff
+
+Gilbert Carl Herschberger II wrote:
+> >the process environment would be a thread, so that if app z doesnt have
+> >any threads it doesnt cause any problems and it can still spawn its own
+> 
+> Oh no. App z must be a separate thread because app z can spawn many child
+> processes of its own. ProcessEnvironment is not a separate process. I'm
+> pretty sure it doesn't need to run in a separate thread.
+
+the Process would be a thread then? (I just woke up, when I wrote that I
+was up about 15hours) I want to say that that apps that just have a main
+would still run because the Process they were running in was a thread
+ 
+> Our create-process mechanism can't be arbitrary. It cannot run every class
+> that has been compiled. In order for the process environment to run a class
+> that class must implement a well-known interface. We could not, for
+> example, run an instance of java.awt.Button, even if someone were to type
+> java.awt.Button on a command line.
+> 
+> Every class that is "launch-able" by our process environment might be
+> required to implement
+> 
+> public static void main( String[] args );
+
+well, yea
+ 
+> or
+> 
+> java.lang.Runnable (could be dangerous)
+
+I dont know about that, I know half the runnables I made would screw up
+royally if they were run as their own app, we should stick with public
+static void main(String args[])
+ 
+> or
+> 
+> public interface CustomProcess
+>     extends Runnable {
+>   public void setProcessEnvironment( ProcessEnvironment v );
+> }
+
+something like that would be ok, but it should have a main method also.
+you know check if the class has a main, if nto throw a null pointer
+exception, see if it implements custom process (or whatever) give it the
+extra info then run it like an ordinary up
+ 
+> Correction: I'm not sure how...but I think
+> java.lang.System.getClass().getClassLoader() must return the
+> process-specific class loader, while
+> java.lang.Object.getClass().getClassLoader() can still return null.
+
+you could never call System.getClass(), its a static class with 0
+instances and getClass isnt a static method
+ 
+> And, it may be Runtime rather than System that I'm thinking about. Runtime
+> has those exec() methods, too. Exec should be called in the usual way to
+> exec a child process--even on JOS.
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         "To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command"
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From digigod@earthling.net Sun, 25 Jul 1999 14:22:04 -0700
+Date: Sun, 25 Jul 1999 14:22:04 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] Process Stuff
+
+Gilbert Carl Herschberger II wrote:
+> That's the way it should be. I really want a shell like that. Non-technical
+> people (all 5 billion of them) want a shell like that, too.
+
+your underestimating...
+ 
+> And if that weren't enough, we have the strength of Java and the power of
+> the network, too. This means that when you type in NortonUtilities, the
+> short-cuts for NortonUtilities may be stored on a network service
+> (Internet/intranet). The local shell can "look-up" the NortonUtilities
+> short-cut, like looking up a domain name with DNS. So we need a short-cut
+> "look-up" service for JOS.
+> 
+> When I want HTML pages from the JOS Project, I type "http://www.jos.org/",
+> right? When I want to run the JOS MegaSmartHTMLBrowser Pro, I should be
+> able to type "shortcut://www.jos.org/MegaSmartHTMLBrowserPro" at the
+> command line. The short-cut is downloaded; plus all of the packages used by
+> this application are downloaded. It is seemless. It is easy. It is
+> future-oriented, too.
+> 
+> What if I don't trust that code? If my shell supports it, I can reduce the
+> shell to sand-box permissions. Or, I can open a new partition, with only
+> sand-box permissions. Then, I type in the same command. Bytecode for that
+> application is sand-boxed on a package-by-package basis.
+
+that kind of security should be built into JADE so all shells have it
+ 
+> Plus, the actual byte codes to run NortonUtilities does *not* have to be
+> installed on your local drive. JOS can download the bytecode from an
+> Internet/intranet application service (if you like), keep it in a local LRU
+> bytecode cache. JOS can "download" the bytecode from a floppy or CD-ROM or
+> game cartridge.
+> 
+> What does it mean? It means there doesn't have to be an explicit
+> installation step. If you want to run NortonUtilities, you type
+> NortonUtilities on a command line or click on the NortonUtilities
+> short-cut. It runs even if it has never been installed.
+
+we'd have to have support for all that silly e-commerce stuff so they
+can pay the one cent to use the app one time or the 29.95us to be always
+granted access to it.
+ 
+> This is something that you just can't do on any other operating system.
+> This is where JOS shines. It is the strength of using Java to build an OS.
+> 
+> For non-technicians, they want a high quality operating system. They want
+> to run programs (not install them). They want to experiment with stuff (not
+> commit to it). They change their mind frequently.
+> 
+> For every program that has a cost-free license, why should there be
+> separate installation step? If you can install it, you can upgrade it, too.
+> All of the bytecode on the Internet should be virtually available to your
+> bytecode cache.
+
+tech support people are going to hate us
+"did you install on your computer or just run it once off the internet"
+"did I what with my what now?"
+"sigh"
+ 
+> Hey! If you want to distribute your application to lots and lots of people,
+> you only really need to give them the URI for your shortcut. You can put
+> such a URI in a hot-link on a webpage. You can send it with e-mail. All the
+> other complexity is handled by the operating system, and should be.
+
+viva la JOS
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         "To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command"
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From digigod@earthling.net Sun, 25 Jul 1999 14:28:43 -0700
+Date: Sun, 25 Jul 1999 14:28:43 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] Re: Java Versions
+
+"Todd L. Miller" wrote:
+>         No, you've mis-understood.  If we decide jos is its own platform,
+> we no longer have to guarentee that jdk 1.0.x/1.1.x/1.2.x code will work
+> on it -- we can write a "jBCS" module that handles translating other java
+> platform calls into JOS platform calls on the fly -- no native code
+> involved.
+
+I dont know, as long as it doesnt link us to a single processer
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         "To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command"
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From gchii@mindspring.com Sun, 25 Jul 1999 20:06:58 -0400
+Date: Sun, 25 Jul 1999 20:06:58 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] StreamFactory passed URL test
+
+Just moments ago, the stream factory has passed its URL test. I should have
+the release of the SmartAPI and the StreamFactory ready for download by
+next weekend. Although you might not be able to see all it yet, it is very
+easy to use.
+
+Once you experience the SmartAPI and StreamFactory, you'll never go back.
+
+If you want a buffered data input stream, change
+    String uri = "data:http://www.realignsoft.com/";
+to
+    String uri = "data:buffer:http://www.realignsoft.com/";
+
+
+----- URL_Test.java
+/*
+
+  Installation : Realign Software Inc.
+                 Copyright (C) 1999 Realign Software Inc.
+                 All rights reserved.
+  Date Written : GCHII July 25, 1999
+
+*/
+package com.realignsoft.streamfactory1a.test;
+
+import com.realignsoft.jose1d.TestException;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+
+import com.realignsoft.smartapi1a.Factory;
+
+import com.realignsoft.streamfactory1a.InputStreamFactory;
+
+/**
+ * Downloads a webpage from the internet.
+ */
+public class URL_Test
+    extends UnitTest {
+  /**
+   * Creates an application.
+   */
+  public URL_Test() {
+    super();
+  }
+
+  /**
+   * Runs a best-case scenario test.
+   */
+  protected void runTest()
+      throws TestException {
+    println( "Running URL test..." );
+
+    String uri = "data:http://www.realignsoft.com/";
+
+    Factory factory = InputStreamFactory.getFactory();
+    DataInputStream input = (DataInputStream) factory.getObject( uri );
+
+    TestException exception = null;
+    try {
+      printFile( input );
+    }
+    catch( TestException e ) {
+      exception = e;
+    }
+
+    try {
+      input.close();
+    }
+    catch( IOException e ) {
+      _print( e );
+      throw _TEX( "input.close()" );
+    }
+
+    if ( exception != null ) {
+      throw exception;
+    }
+  }
+
+  protected void printFile( DataInputStream input )
+      throws TestException {
+    String line;
+
+    for (;;) {
+      try {
+        line = input.readLine();
+      }
+      catch( IOException e ) {
+        _print( e );
+        throw _TEX( "input.readLine();" );
+      }
+      
+      if ( line == null ) {
+        break;
+      }
+
+      println( line );
+    }
+  }
+}
+
+
+
+
+From gchii@mindspring.com Sun, 25 Jul 1999 20:34:29 -0400
+Date: Sun, 25 Jul 1999 20:34:29 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+
+At 04:22 PM 7/25/99 -0400, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>I would suggest the Right Thing to do is to write JOS's platform without
+>worrying too much about Sun's, and take care of compatibility problems
+>with compatability modules.
+
+Sounds good.
+
+>Sun's platforms will change again, and probably in ways that aren't
+>compatible with any unified problem we might come with.  Again, to my
+>understanding, the exact changes to the VM spec involve either (a) 
+>additions that older VMs can safely ignore or (b) alterations to the
+>interpertation of some parts of the VM or language spec which either 
+>were or are incorrect.
+
+We should expect Sun's platform to change. And with their track record, we
+can reasonably expect their changes to be incompatible. That's why I would
+like to see an architecture that doesn't crumble under the weight of just
+one more change.
+
+>> We don't need an "oddly written" compiler. If we build a multiple process
+>> JVM, we are already breaking away from the single process JVM standard
+>> created by Sun. The Java virtual machine specification is clear. By design,
+>> a JVM must support a single process.
+>
+>	If you don't want your classfile to have java.lang.* references in
+>it, you need an oddly-written compiler.  By default, all java compilers
+>import java.lang.*, and java.lang.Object is the defined superclass of
+>every other class...
+
+I want application programs to have java.* references. I want many JOS
+applications to have java.* references. I'm talking about building JOS, not
+building applications that run on top of JOS.
+
+>	So far as I've read the spec, it doesn't require a single-process
+>model (thought it might assume one) -- large chunks of the class library
+>will break in amusing ways if the VM doesn't fake one, but it's entirely
+>possible to write a multi-process VM that will execute non-process-aware
+>programs without difficulty; as a matter of fact, for JOS to work, we
+>*have* to write such a JVM.
+
+There is a book called the Java Virtual Machine. In chapter one, it says
+that Sun intended a native process to make multiple JVMs available on a
+single machine. It isn't encouraging. It says that Sun doesn't want anyone
+to go beyond one process/one JVM.
+
+The JOS Project may be the only organization that is giving serious
+throught to a multiple process JVM. Although I would like to work within a
+multiple process JVM, it is not required for JOS to work. There are
+alternatives.
+
+A multiple process JVM for JOS should follow the development of a single
+process JVM for JOS. If we build a single process JVM that works, we can
+expand it for multiple processes.
+
+>> I believe we need a JOS-compatible javac tool. A multiple process JVM is
+>> likely to need a compiler with multiple process support.
+>
+>	Absolutely not.  Processes MUST be an API that has native-code
+>links into our JVM, otherwise we've just cut ourselves off from every
+>other java developer out there, which is unacceptable.
+
+Again, I'm talking about building JOS. How do you compile the classes in
+java.lang.*?
+
+>	Multiple java processes in a single JVM are simply a matter of
+>keeping namespaces disjoint.  Certain elements of the extant Java API will
+>have to be rewritten to act appropriately (i.e. System.exit() will kill
+>the process, not the system), but the classfile will remain the
+>same.  To maintain separate namespaces requires a slight modification to
+>the primordial classloader, and that's it.  Every Java class already
+>maintains the classloader that loaded it.
+
+Yes, it's in the class loader. It isn't as difficult as it sometimes
+sounds. We must change the JVM to create a separate class loader for each
+process.
+
+I just got an idea. Why don't we change the start-up sequence? Why doesn't
+the java tool call our JOS launcher instead of custom.main()? I'll have to
+think about that more. When the java tool initializes the JVM, it calls
+custom.main() only because that's the standard convention. What if the java
+tool calls JOS.main() and passes the name of the custom class to launch?
+JOS.main() can create a new PrimordialClassLoader() with no problem.
+
+
+
+
+From gchii@mindspring.com Mon, 26 Jul 1999 13:01:23 -0400
+Date: Mon, 26 Jul 1999 13:01:23 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] SmartAPI - Release 1a
+
+I posted the first public release of the SmartAPI. It has working code for
+creating objects from a JOS-compatible URI. It also has, I think, a number
+of implementations so that you can see how primative controllers can be
+built from the API.
+
+You want a buffered StringTokenizer for an HTML file on the JOS website? No
+problem. Use this JOS-compatible URI, something like this:
+
+String uri = "in:token:buffer:http://www.jos.org/wiki/view/main/SmartAPI";
+ObjectFactory factory = ObjectFactory.getFactory();
+StringTokenizer tokenizer = (StringTokenizer) factory.getObject( uri );
+
+You want a print stream for a file across your SMB network? Just like this.
+
+String uri = "out:print:file://sharename/usr/local/example";
+ObjectFactory factory = ObjectFactory.getFactory();
+PrintStream printer = (PrintStream) factory.getObject( uri );
+
+I suppose you could do it like this, too.
+
+PrintStream printer = (PrintStream) ObjectFactory.getFactory().getObject(
+    "out:print:file://sharename/usr/local/example" );
+
+
+
+
+
+From gchii@mindspring.com Mon, 26 Jul 1999 13:04:08 -0400
+Date: Mon, 26 Jul 1999 13:04:08 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Downloads
+
+The downloads for SmartAPI are found on SmartAPIPages page on Wiki.
+
+<URL:http://www.jos.org/wiki/view/main/SmartAPIPages>
+
+The downloads for the RegistryAPI are found on RegistryPages page.
+
+<URL:http://www.jos.org/wiki/view/main/RegistryPages>
+
+
+
+
+
+From tmiller@haverford.edu Mon, 26 Jul 1999 17:52:19 -0400 (EDT)
+Date: Mon, 26 Jul 1999 17:52:19 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Multi-process VM
+
+	The current plan is to continue work on decaf+JJOS as a
+single-process VM until it has a class library and is fully functional
+(i.e. jdk-1.0.2 or higher compliant).  At that point, or earlier, if other
+parts of the JOS project require a multi-process VM, I will modify
+decaf+JJOS so as to support multiple processes, which should involve two
+steps: first, rewriting the class-equality checks to look at the
+classloader involved, and second, writing the hooks necessary for java
+code to implement processes by manipulating classloaders, including (and
+especially) the primordial classloader.  The exact mechanics of the second
+step are subject to change; I expect the initial proof-of-concept
+implementation to set up classloaders whose class sets are completely
+disjoint and not sharing class definitions.  Refinements to this
+implementation are obvious.
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Tue, 27 Jul 1999 08:59:24 -0400
+Date: Tue, 27 Jul 1999 08:59:24 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Multi-process VM
+
+At 05:52 PM 7/26/99 -0400, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>	The current plan is to continue work on decaf+JJOS as a
+>single-process VM until it has a class library and is fully functional
+>(i.e. jdk-1.0.2 or higher compliant).
+
+Excellent plan!
+
+>At that point, or earlier, if other
+>parts of the JOS project require a multi-process VM, I will modify
+>decaf+JJOS so as to support multiple processes, which should involve two
+>steps: first, rewriting the class-equality checks to look at the
+>classloader involved, and second, writing the hooks necessary for java
+>code to implement processes by manipulating classloaders, including (and
+>especially) the primordial classloader.  The exact mechanics of the second
+>step are subject to change; I expect the initial proof-of-concept
+>implementation to set up classloaders whose class sets are completely
+>disjoint and not sharing class definitions.  Refinements to this
+>implementation are obvious.
+
+I have been looking for this mechanism in the wrong place. IF we have a
+single process JVM that works, why can't we create multiple instances of
+it? We should plan to create a multiple process JVM in three steps: (1)
+single-process, (2) inefficient multi-process, (3) streamlined multi-process.
+
+I have been looking at the Java Native Interface. In a C/C++ program, you
+create an instance of the JVM, like this:
+
+JVM jvm = new JVM( env );
+
+The jvm variable must be used throughout your code.
+
+So why can't we create a java tool that creates more than one instance of a
+JVM?
+
+JVM[] jvm = new JVM[ 100 ];
+jvm[ 0 ] = new JVM( env );
+
+When a JVM is implemented as a shared library (or dynamic link library),
+there is only one instance of the JVM's code in RAM.
+
+In a multiple JVM environment, a C/C++ program can start each JVM in a
+separate native thread. Secondary JVMs would use standard inter-process
+communication to communicate with the primary JVM.
+
+When we change the start-up sequence of the java and javaw tools, we can
+almost use an existing off-the-shelf JVM and the Java Native Interface to
+create an inefficient multiple process environment. It is yet another way
+to experiment with the primordial class loader. And most of the code would
+be written with Java, the programming language.
+
+JVMs are added (and destroyed) as needed. To start secondary JVMs, the Java
+Native Interface must communicate with the java tool, not the kernel.
+
+
+
+
+From tmiller@haverford.edu Tue, 27 Jul 1999 20:32:44 -0400 (EDT)
+Date: Tue, 27 Jul 1999 20:32:44 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Multi-process VM
+
+> I have been looking for this mechanism in the wrong place. IF we have a
+> single process JVM that works, why can't we create multiple instances of
+> it? We should plan to create a multiple process JVM in three steps: (1)
+> single-process, (2) inefficient multi-process, (3) streamlined multi-process.
+
+	Primarily because multiple native threads/processes is an
+enourmous project for the kernel author.  Once we had such a kernel,
+however, it would be another project of only slightly lesser difficulty to
+make such an arrangement efficient, because we'd have to implement IPC and
+all that attendant nastiness.  (Basically, we'd be implementing
+multi-processor support without the benefit of a second processor...)
+Aside from the difficulties of groundwork (including a new garbage
+collector!), the interperter currently assumes that it can't be
+interrupted in the middle of a java bytecode.  Allowing this to happen
+would be Very Bad Mojo, and either of the ways to handle it (forbidding it
+to happen, or rewriting to make it safe) are labor and code intensive. 
+
+-_Quinn
+
+
+
+
+From digigod@earthling.net Tue, 27 Jul 1999 19:22:01 -0700
+Date: Tue, 27 Jul 1999 19:22:01 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Arch] Re: Taskbar - formerly Re: [JOS-UI] ScreenSaver
+
+Gilbert Carl Herschberger II wrote:
+>
+> JADE should provide a non-visual process list (or task list) component. It
+> almost seems as if the process manager should be inside a separate package
+> from JADE, although I would like JADE to manage processes.
+> 
+> >From the process list, any UI can create a taskbar. Any program should be
+> able to read a process list. This is like the ps command. The process list
+> must be managed by the same package that creates new processes.
+> 
+> There are events associated with process list management:
+> 
+> - just before a new process is created (request may be denied)
+> - just after a new process has been created (ready for IPC)
+> - just before a process is shutdown (dropped from IPC)
+> - just after a process is shutdown (maybe)
+> - just after a process is killed (for a system log)
+> 
+> The process API must provide methods where one process can shutdown
+> another, besides methods for one process to launch another.
+> 
+> A process should be able to set its own title inside the process list.
+> While the process manager assignes unique names to each process, the title
+> (or caption) of the process can change.
+> 
+> Other processes should be able to iterate through the list of current
+> processes, to extract the process ID and its title.
+
+I thought this belonged on this list more.
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         "To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command"
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From gchii@mindspring.com Wed, 28 Jul 1999 10:34:42 -0400
+Date: Wed, 28 Jul 1999 10:34:42 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Resource - Release 1a
+
+It should be this easy to create a digital resource in Java:
+
+String s = "in:token:buffer:file:/usr/local/example?delimi=%20%0A%0D";
+CustomClass o = (CustomClass) new URI( s ).getObject();
+
+With a separate resource package, we can build the URI class from the
+bottom up to give us what we want. Even programs and processes are digital
+resources. Some day, you might be able to launch a process, something like
+this:
+
+String s = "process:program:class:org.jos.demo.DemoProgram";
+Process p = (Process) new URI( s ).getObject();
+
+While a process runs in a new process environment, a program runs in the
+same process environment of its parent. While a program might be "runnable"
+in a separate thread, its process environment (security access, user
+profile) are identical to its parent. Only a new process creates a new
+distributed computing domain.
+
+
+
+
+From gchii@mindspring.com Wed, 28 Jul 1999 10:37:11 -0400
+Date: Wed, 28 Jul 1999 10:37:11 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Resource - Release 1a
+
+The first release of the resource package is available. See the
+SmartAPIPages page on Wiki. It is a model. It is not "use-able". It only
+has interfaces where classes should be. For more information, see the
+SmartAPIResource page on Wiki.
+
+
+
+

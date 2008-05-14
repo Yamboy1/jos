@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Classpath Project</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000355.html">
+   <LINK REL="Next" HREF="000360.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Classpath Project</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Classpath Project">gchii@mindspring.com</A><BR>
+    <I>Thu, 30 Dec 1999 10:24:41 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000355.html">[JOS-Arch] Classpath Project</A></li>
+        <LI> Next message: <A HREF="000360.html">[JOS-Arch] Classpath Project</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#358">[ date ]</a>
+              <a href="thread.html#358">[ thread ]</a>
+              <a href="subject.html#358">[ subject ]</a>
+              <a href="author.html#358">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 11:10 PM 12/28/99 -0500, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>	I'll agree with point 1 and 2, but I can't agree with 3.  java.*
+</I>&gt;<i>has to be there if we want normal java 1.x/2.x applications to run.
+</I>
+Point 3 is a procedural issue. Understanding this point is critical to the
+success of any cleanroom implementation of Java class libraries. Building
+classes directly in the java.* namespace has always been the obvious thing
+to do and yet it has never worked. Design, develop and debug Java class
+libraries requires an alternative namespace.
+
+Think about how Sun Microsystems did it. It is no secret. They used JDK 0.0
+(Oak) to develop the class libraries for JDK 1.0. They use JDK 1.0 to
+develop the class libraries for JDK 1.1. They used JDK 1.1 to develop the
+class libraries for JDK 1.2. The alternative namespace at Sun Microsystems
+is javax.*. The original purpose of the javax.* namespace comes from the
+need to develop classes for a new virtual machine using an old one. 
+
+There is a very good reason why I expected to find code in the
+org.classpath namespace. Sun Microsystems &quot;owns&quot; the java.*, javax.*, sun.*
+and com.sun.* namespaces. No organization should put new designs there. The
+strengths and weakness of Sun Microsystems' namespaces is theirs and theirs
+alone.
+
+ - According to cleanroom rules, we can put exactly the same design in
+java.* and javax.*. We must match a specification exactly. We can put new
+design in org.classpath (or org.jos). Sun Microsystems has made it clear
+that we cannot put anything in sun.* or com.sun.*.
+
+An alternative namespace is required for the design, development and
+debugging of the original bytecode. So, where did the java.* libraries come
+from? At the &quot;last minute&quot;, the source code for the alternative namespace
+is copied to java.* and compiled. At the time the Java class libraries are
+compiled, they have already been thoroughly tested.
+
+What are the implications? It means that you can write a class called
+alt.io.ByteArrayInputStream and test it immediately in any JDK. You can run
+down a check list to make certain your awt.io.ByteArrayInputStream matches
+the specification of java.io.ByteArrayInputStream. You have two classes
+side-by-side that you can systematically compare, feature for feature.
+
+While a test program is written to test a class alternative namespace, it
+can depend on existing, fully debugged and reliable classes in the java.*
+namespace. When you write a test program framework, you're free to use any
+and all existing classes. By using an existing JDK, you have a reliable
+virtual machine to run on.
+
+&gt;&gt;<i> 4. Much of the effort cannot be reused in an off-the-shelf virtual machine
+</I>&gt;&gt;<i> from Sun Microsystems or others.
+</I>&gt;<i>
+</I>&gt;<i>	Unfortunately, I think this will be true for any class
+</I>&gt;<i>library.  The phrase 'class library' is misleading in a way that suggests
+</I>&gt;<i>it's not an integral part of the VM; it doesn't (AFAIK) /have/ to be, but
+</I>&gt;<i>Sun seems to have designed it that way.
+</I>
+Developing classes in an alternative namespace has many advantages. One
+advantage is the reuse of the class library immediately in any
+off-the-shelf virtual machine. It is not at all necessary to wait until the
+alternative class libraries have been copied into java.* namespace. They
+are immediately available for use in any application.
+
+I use 'class library' to mean any class library. A class library is a
+collection of classes. In Java-speak, a class library is a &quot;package&quot;. The
+Java class libraries are found in java.* namespace.
+
+A class library is not an integral part of the virtual machine. From a
+purely technical viewpoint, few classes in the Java class libraries are an
+integral part of a virtual machine.
+
+Most of the class libraries in Java 2 Platform are not integral to the
+virtual machine. I call them class libraries because most class libraries
+are optional. There are only a few, like java.lang, that put &quot;Java&quot; in
+&quot;Java Virtual Machine&quot;.
+
+I do not wish to misrepresent bytecode technologies. I want people to
+understand that too many of Sun's products have been coerced into the Java
+2 Platofrm when, in fact, they are optional. You can run a bytecode virtual
+machine without them.
+
+Adding things to the java.* packages that are not an integral part of the
+virtual machine undermines competition. Sun Microsystems does not worry
+about competition on JDBC and Swing. They threw it into the core to
+discourage innovation and competition. While it makes some people happy in
+the short term, it undermines the development of open source software in
+the long term.
+
+Instead of producing a straight forward implementation of a Java-compatible
+virtual machine, designers are thrown into confusion. They must maintain
+competence on JDBC, RMI, JFC/Swing and all of these non-essencial
+technologies. With my proposal, you only design a virtual machine when you
+want to develop a Java-compatible virtual machine. Non-essencial class
+libraries are developed once and all Java-compatible virtual machines can
+use them -- verbatim.
+
+It is a double standard. There is a fake core and a true core. Sun
+Microsystems promotes the idea of a fake core. They define &quot;core&quot; as the
+packages that an application depends on. Frankly, that's stupid. My
+application depends on javax.servlet. Why would that be left out of the
+core? My application depends on javax.swing. Why would that be that part of
+the core?
+
+A true core is defined as the packages that all virtual machines depends
+on. The true core is very small. There are only a few packages and few
+class that all virtual machines depends on.
+
+This does not include JVM-specific classes either. One virtual machine
+depends on a JVM-specific class.
+
+Everything else is non-essential. While it might be nice to have all these
+packages in one namespace, it is unnecessary and undesireable to put
+non-essencial classes into the virtual machine specification.
+
+I continue to use JDK 1.0. Does JDK 1.0 contain a Java Virtual Machine, or
+not? Even JDK 1.0 contains non-essencial packages, like java.applet and
+java.awt.
+
+&gt;&gt;<i> 5. The Classpath Project has not solved the puzzle of JVM-specific classes
+</I>&gt;&gt;<i> or native methods. Instead, they have added JVM-specific classes to the
+</I>&gt;&gt;<i> java.* namespace.
+</I>&gt;<i>
+</I>&gt;<i>	On the other hand, they /did/ break the JVM-specific classes off
+</I>&gt;<i>into a separate tree from the rest of them.  This would suggest converting
+</I>&gt;<i>them to BCNI wouldn't be terribly difficult.
+</I>&gt;<i>
+</I>&gt;&gt;<i> Here is my proposal. We need a liason between JOS and Classpath. In order
+</I>&gt;&gt;<i> for us to reuse the software created by the Classpath Project, it must be
+</I>&gt;&gt;<i> perfectly compatible with the Java specification or it must not be added to
+</I>&gt;&gt;<i> the java.* namespace.
+</I>&gt;<i>
+</I>&gt;<i>	Oh, BTW, classpath is going to merge with gcj, (native java
+</I>&gt;<i>compiler front-end to gcc), so it looks like they're going to add another
+</I>&gt;<i>'primary' (i.e. japhar) platform for their class library and merge in a
+</I>&gt;<i>good chunk of new code.  Whoever this liason might be should definitely
+</I>&gt;<i>get in on the action soon -- as long as the codebase is undergoing big
+</I>&gt;<i>changes, it will be easier to to get our changes in.
+</I>
+You understand what classpath means to us. What approach should we use?
+What plan should we have to help classpath put together the best cleanroom
+implementation of Java class libraries?
+
+On the one hand, bad habits are hard to break. Classpath has already set
+precedent by developing their classes in the java.* namespace. How will
+they learn there's an easier way?
+
+What are the implications of merging with gcj? Does it mean that I will be
+able to use C/C++ pre-processor with Java source code?
+
+&gt;<i>	I'm working on getting classpath to work with the host build of
+</I>&gt;<i>jJOS right now.  It looks like decaf has a bug when working with
+</I>&gt;<i>classfiles generated by compilers other than javac, in that it expects the
+</I>&gt;<i>compiler to have gone ahead and chased down the actual class/interface to
+</I>&gt;<i>which the field/method belongs -- that is, it does NOT check the parents
+</I>&gt;<i>of the class to which a Fieldref_info points, because it should be (?)
+</I>&gt;<i>pointing to the right one.  This might require some fairly substantial
+</I>&gt;<i>changes to a part of the back-end, because I'm not sure the field-table
+</I>&gt;<i>structure I set up will work for what amounts to multiple
+</I>&gt;<i>inheritance.  (Sigh.)
+</I>
+A bytecode verifier is important to the success of a Java-compatible
+virtual machine. I am still looking for the bytecode verifier in decaf.
+Once I knew about the need for a bytecode verifier, I went about creating a
+pure reflection package. It is a separate package, written in Java, to
+decode &quot;class files&quot;. This Java-based prototype was written for the purpose
+of implementing it eventually in C++.
+
+A bytecode verifier is a stand-alone subsystem. Like pure reflection, it is
+independent of any virtual machine. The bytecode verifier exposes
+variations between different javac tools. When integrated into decaf, for
+example, it would &quot;protect&quot; decaf from bytecode you describe (until decaf
+can handle it).
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000355.html">[JOS-Arch] Classpath Project</A></li>
+	<LI> Next message: <A HREF="000360.html">[JOS-Arch] Classpath Project</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#358">[ date ]</a>
+              <a href="thread.html#358">[ thread ]</a>
+              <a href="subject.html#358">[ subject ]</a>
+              <a href="author.html#358">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

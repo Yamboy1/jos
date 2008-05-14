@@ -1,0 +1,133 @@
+From jm@mak.com Fri, 30 Apr 1999 20:42:20 -0400
+Date: Fri, 30 Apr 1999 20:42:20 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-UI] jjos+decaf status/update
+
+Hi All;
+
+(Sorry for the wide distribution, but I think this might be of general
+interest.)
+
+No, Todd and I have neither dropped dead nor given up.  So, what the
+heck *have* we been up to, then?
+
+(1)  We have re-written large segments of the guts of the JVM in order
+to implement 64-bit Java types.  This involved substantial changes to
+the representations of basic JVM objects.
+
+(2) We have added an (incomplete) trace facility so you can watch the
+Java opcodes run.
+
+(3) We have fixed some bugs in the java array code.
+
+(4) We have added "#ifdef PARANOID" subscript-checking array templates
+which are now used throughout the code (e.g., the Java arrays).
+
+(5) We have added inspector and mutator member functions to create
+places one can set breakpoints to track down the places where
+C++ instances get read/written (ah, to have a "who calls" facility).
+
+(6) We have (incompletely) put in protection for member variables
+(however, where we have done so, and where it is appropriate, we have
+put in inspectors/mutators).
+
+(7) We have (incompletely) put in "const" declarations.
+
+(8) We have (incompletely) replaced explicit memory allocation calls
+with C++ allocator calls (so constructors get fired up) so as to avoid
+memory-initialization problems.
+
+(9) We have (probably incompletely) inspected code to make sure
+constructors actually initialize member variables to reasonable values.
+
+(10) We have cleaned up lots of random things too numerous to mention.
+
+(11) We have discussed coding conventions to enhance comprehensibility
+of the code.
+
+Currently in-process:
+
+(1) We are reconciling our respective changes, and testing them a little
+more thoroughly before committing the new sources to CVS.
+
+(2) We are about to make some changes to the main JVM opcode-parsing
+function to turn it into a method (probably) of the basic C++ class
+which represents a Java thread.
+
+(3) We are debating the "right" class hierarchy for java class
+instances, java class objects, and java array objects (we think we're
+converging).
+
+Still to-do:
+
+(1) We noticed that the basic 64-bit integer type we support is UNsigned
+(whoops).  This needs to be changed for the java longs to work right.
+If anybody feels so inclined, feel free to tackle this fairly
+self-contained problem!
+
+(2) We have discussed the relationship/identity of resolved vs.
+unresolved Java classes, and we think we're converging on an approach.
+
+(3) Sheesh, there are SO many other things, I'll just point you at the
+"doc/TODO" file (once it's checked-in).
+
+Sorry to be taking so long, but, hey, we're working as fast as we can
+and yet still remain in good academic standing, employed, and married
+(not necessarily in that order).
+
+Very Truly Yours,
+
+-jm
+
+
+
+
+
+
+From jm@mak.com Mon, 10 May 1999 08:38:06 -0400
+Date: Mon, 10 May 1999 08:38:06 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-UI] An idea for increasing the number of code-writers
+
+Hello All;
+
+Sorry for the wide distribution, but, as should become clear from the rest of
+this message, we're seeking programming help beyond just the "kernel" group.
+
+In general, I get the feeling that we need to increase the number of people
+writing actual code.  I'm sure there are people Out There who want to write
+code, but don't know either where or how to jump in.  In specific, as Todd and I
+work on jjos+decaf, we sometimes are held up because we have to build some
+infrastructure first before building the Java-specific functionality we're
+*really* after.
+
+For example, as we think about building some method-lookup machinery for
+"built-in" classes, we discovered we could *really* use a good hash-table C++
+template.  
+
+If Todd and/or I would put out requests for implementation of reasonably
+well-defined pieces of toolsmithing (e.g., "Help! We need a good hashtable
+template!"), would anybody Out There be interested in contributing?  
+
+Right now, I can think of two obvious things we need:
+
+(1) The hashtable template, for use with UTF8->function pointer mappings, and
+
+(2) A Boehm-something-or-other derived conservative garbage collector (I can
+provide references and pointers to other implementations).
+
+Please reply either to the various lists or to me personally.
+
+Thanks!
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== jm@mak.com               ==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+
+
+

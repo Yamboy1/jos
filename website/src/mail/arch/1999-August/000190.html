@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Console for Program</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000192.html">
+   <LINK REL="Next" HREF="000191.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Console for Program</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Console for Program">gchii@mindspring.com</A><BR>
+    <I>Mon, 16 Aug 1999 11:45:42 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000192.html">[JOS-Arch] Console for Program</A></li>
+        <LI> Next message: <A HREF="000191.html">[JOS-Arch] Terminal and Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#190">[ date ]</a>
+              <a href="thread.html#190">[ thread ]</a>
+              <a href="subject.html#190">[ subject ]</a>
+              <a href="author.html#190">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 11:45 PM 8/15/99 -0700, DigiGod Q Frasché &lt;<A HREF="mailto:digigod@earthling.net">digigod@earthling.net</A>&gt; wrote:
+&gt;<i>then I made a default SystemApplicationContext, Im going to make a
+</I>&gt;<i>SwingApplicationContext that uses textpanes to emulate a console...
+</I>&gt;<i>anyway, thats how I did it. leave it up to the children.
+</I>
+We have done the same thing, more or less. I made a &quot;system&quot; application
+context and an &quot;AWT&quot; application context. While &quot;system&quot; application
+context uses System.out, the &quot;AWT&quot; application context uses java.awt.List
+and java.awt.TextArea and java.awt.Label to emulate a console.
+
+I have been unable to create the equivalent context in Swing. Which version
+of Swing should we support? We should support all of them.
+
+I pushed a little farther by creating a console factory. This weekend, I
+created a smart console factory. This smart console factory is part of
+Console Studio - Release 2a. It is compatible with Smart API - Release 1b.
+It supports a wide variety of different consoles:
+
+System Console Controller
+x-console:null - consolestudio.SystemNullConsole
+x-console:out - consolestudio.SystemOutConsole
+x-console:err - consolestudio.SystemErrConsole
+
+OutputStream Console Controller
+x-console:out:&lt;output-stream-URI&gt; - BasicStreamConsole
+x-console:log:&lt;output-stream-URI&gt; - BasicLogConsole
+
+AWT Console Controller
+x-console:awt:&lt;component-class&gt;?&lt;options&gt; - custom AWT component/console
+     - editable option := &quot;true&quot; | &quot;false&quot;
+     - enabled option := &quot;true&quot; | &quot;false&quot;
+     - title option := plain-text
+     - visible option := &quot;true&quot; | &quot;false&quot;
+
+Swing Console Controller (planned):
+x-console:swing:&lt;component-class&gt; - custom Swing component/console
+
+Through a smart console factory, you can create a console that outputs to
+*any* output stream supported by the smart stream factory.
+
+Through a smart console factory, you can create a console from any custom
+AWT component that implements the Console interface.
+
+Through a smart console factory, you will be able to create a console from
+any custom Swing component that implements the Console interface.
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000192.html">[JOS-Arch] Console for Program</A></li>
+	<LI> Next message: <A HREF="000191.html">[JOS-Arch] Terminal and Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#190">[ date ]</a>
+              <a href="thread.html#190">[ thread ]</a>
+              <a href="subject.html#190">[ subject ]</a>
+              <a href="author.html#190">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

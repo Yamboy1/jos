@@ -1,0 +1,1166 @@
+From digigod@earthling.net Fri, 30 Apr 1999 20:37:17 -0700
+Date: Fri, 30 Apr 1999 20:37:17 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS] Wiki Pages
+
+Iain Shigeoka wrote:
+> No plans at the present.  There seemed to be quite a few people that
+> were violently opposed to frames so I had pretty much removed it from
+> consideration in the redesign.  Do you consider it a "must have" feature?
+
+I know I dont, theres no point; most of the issues they bring up would slow us down (like we cant do that ourselves).
+ 
+> If you have time, I'd really appreciate help reorganizing the Wiki.  The
+> project signup page is not organized well.  If you could try and
+> reorganize it that would help.  Actually we need a separate wiki page
+> that is a nice list of active JOS projects (as a compliment to the working
+> groups listing) with a link to each project's wiki page, and perhaps a
+> short description.  Right now, its pretty difficult to figure out exactly
+> what are the active jos projects...  You know, where actual code is
+> being created to create concrete programs (as opposed to the working
+> groups where ideas are being discussed and coding is optional).
+
+This is what I attempted to do with JosReportCard although know one seemed to add there stuff (either that or we only have two projects only one with code!).
+ 
+> The main wiki page could use some reorganization, and the jos irc
+> meeting announcement should probably be moved to a separate
+> JosAnnounce wiki page with only a one liner announcement and a link
+> to the times on the main wiki page.  *whew*
+
+I miss the OldMain
+ 
+> I have been looking over the original wiki site (the site where we got the
+> first copy of the wiki) and the way they keep things organized is they
+> have several self-appointed wiki organizers that just go around and clean
+> up pages, create "meta-pages" that basically summarize groups of
+> pages and provide links to them, and organize the links between pages
+> to make sense.  We (jos wiki) only seem to have people that create the
+> "leaf" pages of the wiki.  We're missing the self-appointed organizers
+> that help to organize, summarize and arrange the wiki pages.   So if you
+> could, whenever you have the time, just start organizing when you see a
+> need, it would help a ton.  I think many members are reluctant to edit
+> other people's pages or create summaries which basically leaves a ton
+> of pages "stranded" with only a few links to them buried deep inside the
+> bodies of other pages...
+
+Agreed, although this would be much easier if it was automated. Like adding a page to main/WorkingGroups/UserInterfaceGroup/ rather then adding a page to main/ then linking it to the
+UserInterfacePage. And if on top of that tree structure you could navigate up and down pages automatically generated for each branch like:
+
+ main/WorkingGroups contains: [up] [main] [help] [etc..]
+     UserInterfaceGroup
+     KernelGroup
+     EtceteraEtcetera
+
+     
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+	"Why should I press the start button to turn my computer 
+         off?" -Windows, go fig.
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From jm@mak.com Fri, 30 Apr 1999 20:42:20 -0400
+Date: Fri, 30 Apr 1999 20:42:20 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS] jjos+decaf status/update
+
+Hi All;
+
+(Sorry for the wide distribution, but I think this might be of general
+interest.)
+
+No, Todd and I have neither dropped dead nor given up.  So, what the
+heck *have* we been up to, then?
+
+(1)  We have re-written large segments of the guts of the JVM in order
+to implement 64-bit Java types.  This involved substantial changes to
+the representations of basic JVM objects.
+
+(2) We have added an (incomplete) trace facility so you can watch the
+Java opcodes run.
+
+(3) We have fixed some bugs in the java array code.
+
+(4) We have added "#ifdef PARANOID" subscript-checking array templates
+which are now used throughout the code (e.g., the Java arrays).
+
+(5) We have added inspector and mutator member functions to create
+places one can set breakpoints to track down the places where
+C++ instances get read/written (ah, to have a "who calls" facility).
+
+(6) We have (incompletely) put in protection for member variables
+(however, where we have done so, and where it is appropriate, we have
+put in inspectors/mutators).
+
+(7) We have (incompletely) put in "const" declarations.
+
+(8) We have (incompletely) replaced explicit memory allocation calls
+with C++ allocator calls (so constructors get fired up) so as to avoid
+memory-initialization problems.
+
+(9) We have (probably incompletely) inspected code to make sure
+constructors actually initialize member variables to reasonable values.
+
+(10) We have cleaned up lots of random things too numerous to mention.
+
+(11) We have discussed coding conventions to enhance comprehensibility
+of the code.
+
+Currently in-process:
+
+(1) We are reconciling our respective changes, and testing them a little
+more thoroughly before committing the new sources to CVS.
+
+(2) We are about to make some changes to the main JVM opcode-parsing
+function to turn it into a method (probably) of the basic C++ class
+which represents a Java thread.
+
+(3) We are debating the "right" class hierarchy for java class
+instances, java class objects, and java array objects (we think we're
+converging).
+
+Still to-do:
+
+(1) We noticed that the basic 64-bit integer type we support is UNsigned
+(whoops).  This needs to be changed for the java longs to work right.
+If anybody feels so inclined, feel free to tackle this fairly
+self-contained problem!
+
+(2) We have discussed the relationship/identity of resolved vs.
+unresolved Java classes, and we think we're converging on an approach.
+
+(3) Sheesh, there are SO many other things, I'll just point you at the
+"doc/TODO" file (once it's checked-in).
+
+Sorry to be taking so long, but, hey, we're working as fast as we can
+and yet still remain in good academic standing, employed, and married
+(not necessarily in that order).
+
+Very Truly Yours,
+
+-jm
+
+
+
+
+
+
+From dean@gallant.com Sat, 01 May 1999 08:12:08 -0400
+Date: Sat, 01 May 1999 08:12:08 -0400
+From: Dean S Jones dean@gallant.com
+Subject: [JOS] Command Line idea
+
+
+Al wrote:
+> 
+> "David C. Adams" wrote:
+> 
+> > There is a freeware ECMAscript implemented in Java. Maybe the
+> > developer would be interested in sharing the code.
+> 
+> I have already contacted the author, and am testing the app. I assume
+> you are talking about BeanShell, ne?
+
+I think he was talking about FESI - the Free ECMA Script Interpreter.
+A very nice piece of work:
+
+http://home.worldcom.ch/~jmlugrin/fesi/index.html
+
+Dean S Jones
+
+
+
+From ktidwell@texomaonline.com Sat, 1 May 1999 09:35:29 -0500
+Date: Sat, 1 May 1999 09:35:29 -0500
+From: Tidwell ktidwell@texomaonline.com
+Subject: [JOS] JOS partnership
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0048_01BE93B5.F43302E0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0045_01BE93B5.F4191240"
+
+
+------=_NextPart_000_0045_01BE93B5.F4191240
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hello.
+=20
+My name is Dustin Tidwell.  I am CEO of the startpoint corporation.  I =
+am contacting you today to inquire as to the status of your Java OS.
+=20
+The reason that I ask is that startpoint is a privately funded company =
+(that means there isn't any money yet) which seeks the development of an =
+all-in-one internet site.  Not only do we wish to provide access to =
+every utility available on the internet, but we also want to build a =
+Java OS into our site.  This would allow all of our users, which =
+subscribe free of charge, access to numerous programs and facilities.  =
+No longer would they have to buy the expensive program for one use and =
+then be stuck with it. =20
+=20
+Where we plan to make our money is the advertising revenue and =
+licensing.  Computer application developers such as IBM and Microsoft =
+would develop applications to run in Java, then pay us to allow our =
+users to access them.  The application developers would still make money =
+by selling the full product, or upgrades to the products.
+=20
+We are currently in the process of developing our full access site, but =
+are at a loss when it comes to the Java OS.  Our programmers are mostly =
+versed HTML & Visual Basic.  What I propose is that we arrange a =
+partnership between our company and you.  Once it is available from our =
+site, you will receive a portion of the revenue collected from the =
+developers and advertisers, or some such arrangement.
+=20
+I hope that you will consider this proposal carefully.
+
+------=_NextPart_000_0045_01BE93B5.F4191240
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML//EN">
+<HTML>
+<HEAD>
+
+<META content=3Dtext/html;charset=3Diso-8859-1 =
+http-equiv=3DContent-Type>
+<META content=3D'"MSHTML 4.72.2106.6"' name=3DGENERATOR>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV>
+<DIV><FONT color=3D#000000 size=3D2>Hello.</FONT></DIV>
+<DIV><FONT color=3D#000000 size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT color=3D#000000 size=3D2>My name is Dustin Tidwell.&nbsp; I =
+am CEO of the=20
+startpoint corporation.&nbsp; I am contacting you today to inquire as to =
+the=20
+status of your Java OS.</FONT></DIV>
+<DIV><FONT color=3D#000000 size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT color=3D#000000 size=3D2>The reason that I ask is that =
+startpoint is a=20
+privately funded company (that means there isn't any money yet) which =
+seeks the=20
+development of an all-in-one internet site.&nbsp; Not only do we wish to =
+provide=20
+access to every utility available on the internet, but we also want to =
+build a=20
+Java OS into our site.&nbsp; This would allow all of our users, which =
+subscribe=20
+free of charge, access to numerous programs and facilities.&nbsp; No =
+longer=20
+would they have to buy the expensive program for one use and then be =
+stuck with=20
+it.&nbsp; </FONT></DIV>
+<DIV><FONT color=3D#000000 size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT color=3D#000000 size=3D2>Where we plan to make our money is =
+the=20
+advertising revenue and licensing.&nbsp; Computer application developers =
+such as=20
+IBM and Microsoft would develop applications to run in Java, then pay us =
+to=20
+allow our users to access them.&nbsp; The application developers would =
+still=20
+make money by selling the full product, or upgrades to the=20
+products.</FONT></DIV>
+<DIV><FONT color=3D#000000 size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT color=3D#000000 size=3D2>We are currently in the process of =
+developing=20
+our full access site, but are at a loss when it comes to the Java =
+OS.&nbsp; Our=20
+programmers are mostly versed HTML &amp; Visual Basic.&nbsp; What I =
+propose is=20
+that we arrange a partnership between our company and you.&nbsp; Once it =
+is=20
+available from our site, you will receive a portion of the revenue =
+collected=20
+from the developers and advertisers, or some such =
+arrangement.</FONT></DIV>
+<DIV><FONT color=3D#000000 size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT color=3D#000000 size=3D2>I hope that you will consider this =
+proposal=20
+carefully.</FONT></DIV></DIV></BODY></HTML>
+
+------=_NextPart_000_0045_01BE93B5.F4191240--
+
+------=_NextPart_000_0048_01BE93B5.F43302E0
+Content-Type: application/x-pkcs7-signature;
+	name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="smime.p7s"
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIII7DCCAnow
+ggHjoAMCAQICAwDVlzANBgkqhkiG9w0BAQQFADCBuTELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdl
+c3Rlcm4gQ2FwZTEUMBIGA1UEBxMLRHVyYmFudmlsbGUxGjAYBgNVBAoTEVRoYXd0ZSBDb25zdWx0
+aW5nMSkwJwYDVQQLEyBUaGF3dGUgUEYgUlNBIElLIDE5OTguOS4xNiAxNzo1NTE2MDQGA1UEAxMt
+VGhhd3RlIFBlcnNvbmFsIEZyZWVtYWlsIFJTQSBJc3N1ZXIgMTk5OC45LjE2MB4XDTk5MDQyOTIz
+MDMyN1oXDTAwMDQyODIzMDMyN1owSzEfMB0GA1UEAxMWVGhhd3RlIEZyZWVtYWlsIE1lbWJlcjEo
+MCYGCSqGSIb3DQEJARYZa3RpZHdlbGxAdGV4b21hb25saW5lLmNvbTBcMA0GCSqGSIb3DQEBAQUA
+A0sAMEgCQQCEtfqRZpsELFEm+bWA1OtGKH9RUU9P9rbdcRokVw8TXKc35srs91c3aU44cBooPbSs
+iq/7iGvEQO2StY/JGtHPAgMBAAGjQTA/MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB8G
+A1UdIwQYMBaAFP4+YJxrjA+w2DPGysYeWLBxOLXgMA0GCSqGSIb3DQEBBAUAA4GBAB/b428hqTFn
+P0CsDKYQU78ihw2PmI7Agu1TH+d544it7aorXblY6H7O/94TcOWf9tizxnnaNYM3Me4p0rXTMc7G
+bq4hTSXiueT+iZ/JRFtVC/FRwTa85F6YoJNx/A9JX0PSvBGijQUh/WK2fpKXViBE/06T2Dt3GSGA
+p1bsEtESMIIDLTCCApagAwIBAgIBADANBgkqhkiG9w0BAQQFADCB0TELMAkGA1UEBhMCWkExFTAT
+BgNVBAgTDFdlc3Rlcm4gQ2FwZTESMBAGA1UEBxMJQ2FwZSBUb3duMRowGAYDVQQKExFUaGF3dGUg
+Q29uc3VsdGluZzEoMCYGA1UECxMfQ2VydGlmaWNhdGlvbiBTZXJ2aWNlcyBEaXZpc2lvbjEkMCIG
+A1UEAxMbVGhhd3RlIFBlcnNvbmFsIEZyZWVtYWlsIENBMSswKQYJKoZIhvcNAQkBFhxwZXJzb25h
+bC1mcmVlbWFpbEB0aGF3dGUuY29tMB4XDTk2MDEwMTAwMDAwMFoXDTIwMTIzMTIzNTk1OVowgdEx
+CzAJBgNVBAYTAlpBMRUwEwYDVQQIEwxXZXN0ZXJuIENhcGUxEjAQBgNVBAcTCUNhcGUgVG93bjEa
+MBgGA1UEChMRVGhhd3RlIENvbnN1bHRpbmcxKDAmBgNVBAsTH0NlcnRpZmljYXRpb24gU2Vydmlj
+ZXMgRGl2aXNpb24xJDAiBgNVBAMTG1RoYXd0ZSBQZXJzb25hbCBGcmVlbWFpbCBDQTErMCkGCSqG
+SIb3DQEJARYccGVyc29uYWwtZnJlZW1haWxAdGhhd3RlLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOB
+jQAwgYkCgYEA1GnX1LCUZFtx6UfYDFG26nKRsIRefS0Nj3sS34UldSh0OkIsYyeflXtL734Zhx2G
+6qPduc6WZBrCFG5ErHzmj+hND3EfQDimAKOHePb5lIZererAXnbr2RSjXW56fAylS1V/Bhkpf56a
+JtVquzgkCGqYx7Hao5iR/Xnb5VrEHLkCAwEAAaMTMBEwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG
+9w0BAQQFAAOBgQDH7JJ+Tvj1lqVnYiqk8E0RYNBvjWBYYawmu1I1XAjPMPuoSpaKH2JCI4wXD/S6
+ZJwXrEcp352YXtJsYHFcoqzceePnbgBHH7UNKOgCneSa/RP0ptl8sfjcXyMmCZGAc9AUG95DqYMl
+8uacLxXK/qarigd1iwzdUYRr5PjRzneigTCCAzkwggKioAMCAQICAQowDQYJKoZIhvcNAQEEBQAw
+gdExCzAJBgNVBAYTAlpBMRUwEwYDVQQIEwxXZXN0ZXJuIENhcGUxEjAQBgNVBAcTCUNhcGUgVG93
+bjEaMBgGA1UEChMRVGhhd3RlIENvbnN1bHRpbmcxKDAmBgNVBAsTH0NlcnRpZmljYXRpb24gU2Vy
+dmljZXMgRGl2aXNpb24xJDAiBgNVBAMTG1RoYXd0ZSBQZXJzb25hbCBGcmVlbWFpbCBDQTErMCkG
+CSqGSIb3DQEJARYccGVyc29uYWwtZnJlZW1haWxAdGhhd3RlLmNvbTAeFw05ODA5MTYxNzU1MzRa
+Fw0wMDA5MTUxNzU1MzRaMIG5MQswCQYDVQQGEwJaQTEVMBMGA1UECBMMV2VzdGVybiBDYXBlMRQw
+EgYDVQQHEwtEdXJiYW52aWxsZTEaMBgGA1UEChMRVGhhd3RlIENvbnN1bHRpbmcxKTAnBgNVBAsT
+IFRoYXd0ZSBQRiBSU0EgSUsgMTk5OC45LjE2IDE3OjU1MTYwNAYDVQQDEy1UaGF3dGUgUGVyc29u
+YWwgRnJlZW1haWwgUlNBIElzc3VlciAxOTk4LjkuMTYwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJ
+AoGBAMSl5dTU0F8IAu4HIX0kv6trjh7rIAcCFYRrj9CTJB8bne5osrksT+mTZxcQFx6h+UNBI7kw
+qnaXu/Pn/YHAtTGL9qZQJlTylSjrGaQelx6w4ribwQSaMtA8CWxP5DVP8Ha/ABMDT0UIYPP8tNCQ
+AYoSyZy6f1LqKpM1Njw85DUvAgMBAAGjNzA1MBIGA1UdEwEB/wQIMAYBAf8CAQAwHwYDVR0jBBgw
+FoAUcknCczTGVfQLdnKBfnf0h+fGsg4wDQYJKoZIhvcNAQEEBQADgYEALMeCHwFDPgeP7mlcqWSC
++MCWrZMry5tQ10CagcK6pnadPJVA3FXB4VWCeasKKabVDOFXKD6P+bvV3w2TWKpbLYuPM+TdWBU1
+dnIVKb1C9FqSC3dfnSfbmi1OG4IGjtKNVruV3tsMZQXelZ4C3VMXvr78a8MaInoUK2G9wp9eelox
+ggGgMIIBnAIBATCBwTCBuTELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
+A1UEBxMLRHVyYmFudmlsbGUxGjAYBgNVBAoTEVRoYXd0ZSBDb25zdWx0aW5nMSkwJwYDVQQLEyBU
+aGF3dGUgUEYgUlNBIElLIDE5OTguOS4xNiAxNzo1NTE2MDQGA1UEAxMtVGhhd3RlIFBlcnNvbmFs
+IEZyZWVtYWlsIFJTQSBJc3N1ZXIgMTk5OC45LjE2AgMA1ZcwCQYFKw4DAhoFAKB3MBgGCSqGSIb3
+DQEJAzELBgkqhkiG9w0BBwEwGAYJKoZIhvcNAQkPMQswCTAHBgUrDgMCHTAcBgkqhkiG9w0BCQUx
+DxcNOTkwNTAxMDkzNTI5WjAjBgkqhkiG9w0BCQQxFgQUjKDgIWbWamdAuS/+TNVNvIsVR5kwDQYJ
+KoZIhvcNAQEBBQAEQF/In63wo4HuHIf6pG5rZemg0rxqffFiQkW+gUvCO/tuk3T4rqxFOGkQKu80
+jrN1KMt5bDq0ebZBEioHsPJQlNwAAAAAAAA=
+
+------=_NextPart_000_0048_01BE93B5.F43302E0--
+
+
+
+
+
+From robfitz@geocities.com Sun, 2 May 1999 21:01:29 -0500
+Date: Sun, 2 May 1999 21:01:29 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS] IRC Meeting - May 1999
+
+Hi everybody
+
+We had a really good meeting today, we covered a lot, mainly stuff 
+about the web site.
+
+The web site:
+
+* We need volunteers to be wiki guardians, there job is to maintain 
+the wiki pages group them together, index them, etc.
+* A Java applet for editing the wiki pages.
+* Add support to the wiki web for searching and indexing of wik pages.
+* Project status and events pages need to be made.
+* Also a few changes to the wike templates.
+
+Organizational structure:
+
+* We need a point of contact or representative, this person will just 
+be a stand in until a person can be voted into the position.  The 
+main reason for this is this email message to the admin mailing list 
+<URL:http://jos.org/pipermail/admin/1999-May/000067.html>.
+* Markus would you be able to put the wiki web source into the cvs 
+repository?
+
+Design:
+
+* I believe it is starting to worry people that there are two 
+different kernel development efforts taking place, JJOS by John 
+Morrison and rjk by myself (Robert Fitzsimons).  I'm not to worried 
+about it myself, I want JOS to be a plugable operating system at all 
+levels.  This means even if the kernel and jvm are closely coupled as 
+I believe is the case with JJOS and decaf (by Todd Miller), that is 
+ok, as long as it is compatible at a different level, maybe the jvm 
+and class library level.
+
+Something else:
+
+I also talked with gchii about a job his company are working on, for 
+which a Java operating system would seem like the perfect based.  The 
+problem is that he needs it now, not in year (maybe longer) for JOS 
+to reach a proper stage of development.
+
+So we talked about using the Linux kernel, the Blackdown port of 
+Sun's JVM, and X Windows.  I'm starting to warm to this idea, it 
+would allow development of the rest of the system (non kernel, jvm, 
+drivers).
+
+Now, how I would do this is, to use the Linux kernel for the kernel 
+and drivers, Japhar as the jvm, Classpath as the class libraries, and 
+the frame buffer support in the latest kernels or svgalib for 
+graphics.  Does anybody want to work on this?
+
+The next meeting will be on Sunday 6th of June 1999, at 17:00 UTC, on 
+your local Undernet IRC server.
+
+The logs for this meeting are available at 
+<URL:http://www.jos.org/~robfitz/jos-19990502.zip> (21 kb), previous 
+meetings logs can be found at 
+<URL:http://www.jos.org/wiki/view/main/Logs>.  
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+
+
+From clark.evans@manhattanproject.com Mon, 03 May 1999 02:21:52 +0000
+Date: Mon, 03 May 1999 02:21:52 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS] Ann: NSF & Distributed Copyright
+
+Well all.  About a year ago we had hudge licensing 
+debates, at that time I mostly withdrew from JOS
+to spend more time on those issues.
+
+Anyway, as it turns out, I received an NSF grant
+this January to work on bookkeeping system and
+to further develop a 'commercial open source'
+license.    
+
+I'm not 'done' yet, however, I think I'm 
+ready for your comments.   
+
+The NSF grant:
+
+	http://clarkevans.com/nsf.html
+
+The Distributed Copyright model:
+
+	http://distributedcopyright.org/
+
+Anyway, either Tomorow or the next day
+I'm going to try and write up a small
+article for SlashDot, and hopefully they
+might humor me.  :)
+
+Best Wishes,
+
+Clark
+
+P.S. 
+
+Helmut should be enabling the list server
+for discussion soon, so the mailing list mentioned
+on the page might not totally work yet (the 
+confirmation currently bounces, and that's 
+as far as you can get).  So, if you could hold
+your coments untill the list starts working,
+this would be great.
+
+
+
+From hackcat@banzai.apana.org.au Tue, 4 May 1999 08:00:52 +1000
+Date: Tue, 4 May 1999 08:00:52 +1000
+From: Geoff O'Callaghan hackcat@banzai.apana.org.au
+Subject: [JOS] IRC Meeting - May 1999
+
+In article <199905030202.CAA15872@vti.ie> you wrote:
+> Hi everybody
+
+> We had a really good meeting today, we covered a lot, mainly stuff 
+> about the web site.
+
+Sorry I missed it.
+
+[snip]
+
+> Design:
+
+> * I believe it is starting to worry people that there are two 
+> different kernel development efforts taking place, JJOS by John 
+> Morrison and rjk by myself (Robert Fitzsimons).  I'm not to worried 
+> about it myself, I want JOS to be a plugable operating system at all 
+> levels.  This means even if the kernel and jvm are closely coupled as 
+> I believe is the case with JJOS and decaf (by Todd Miller), that is 
+> ok, as long as it is compatible at a different level, maybe the jvm 
+> and class library level.
+
+> Something else:
+
+[snip]
+
+> So we talked about using the Linux kernel, the Blackdown port of 
+> Sun's JVM, and X Windows.  I'm starting to warm to this idea, it 
+> would allow development of the rest of the system (non kernel, jvm, 
+> drivers).
+
+> Now, how I would do this is, to use the Linux kernel for the kernel 
+> and drivers, Japhar as the jvm, Classpath as the class libraries, and 
+> the frame buffer support in the latest kernels or svgalib for 
+> graphics.  Does anybody want to work on this?
+
+This is what i've been working on for the past week of so.  It's 
+progressing slowly but surely - nothing really useable yet but it shows
+great promise.  
+
+Cheers
+Geoff
+
+-- 
+Geoff O'Callaghan
+hackcat@banzai.apana.org.au
+
+
+
+From robfitz@geocities.com Mon, 3 May 1999 19:45:28 -0500
+Date: Mon, 3 May 1999 19:45:28 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS] IRC Meeting - May 1999
+
+Hi Geoff
+
+> > Now, how I would do this is, to use the Linux kernel for the
+> > kernel and drivers, Japhar as the jvm, Classpath as the class
+> > libraries, and the frame buffer support in the latest kernels or
+> > svgalib for graphics.  Does anybody want to work on this? 
+> 
+> This is what i've been working on for the past week of so.  It's
+> progressing slowly but surely - nothing really useable yet but it
+> shows great promise.  
+
+Could you send more details on what you are using and how you are 
+going this?
+
+I have in the past, not liked the idea of using and existing kernel 
+and jvm.  But I have been turned around on this idea, i'm even 
+willing to put my work on rjk on hold for a month or two, to work on 
+this.  So lets see what we come up with.
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+
+
+From digigod@earthling.net Mon, 03 May 1999 22:05:06 -0700
+Date: Mon, 03 May 1999 22:05:06 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS] IRC Meeting - May 1999
+
+Robert Fitzsimons wrote:
+> I have in the past, not liked the idea of using and existing kernel
+> and jvm.  But I have been turned around on this idea, i'm even
+> willing to put my work on rjk on hold for a month or two, to work on
+> this.  So lets see what we come up with.
+
+even though Im not working on the kernel (my knowledge on that topic is limited to: "kernel good") Im with you, I wanted us to make our own but now Im ready to just slap something together and replace
+it later.
+
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+	"Why should I press the start button to turn my computer 
+         off?" -Windows, go fig.
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From hackcat@banzai.apana.org.au Tue, 4 May 1999 19:46:09 +1000
+Date: Tue, 4 May 1999 19:46:09 +1000
+From: Geoff O'Callaghan hackcat@banzai.apana.org.au
+Subject: [JOS] IRC Meeting - May 1999
+
+In article <199905040047.AAA00028@vti.ie> you wrote:
+> Hi Geoff
+
+[snip]
+
+>> 
+>> This is what i've been working on for the past week of so.  It's
+>> progressing slowly but surely - nothing really useable yet but it
+>> shows great promise.  
+
+> Could you send more details on what you are using and how you are 
+> going this?
+
+Ok...  What i've been working on is the *absolute* minimum i386 based
+linux system to be able to fully support a useable jvm execution environment.
+This I figured would be enough to allow the real work to get going on
+the Java OS part of JOS.  Basically I hope to have soon the absolute
+linux basics (kernel, + enough support environment to run japhar or
+the Blackdown JVM (probably japhar in the medium term) and svgalib or the 
+newer framebuffer stuff).
+
+Then what i'd like to see is the direct integration of the jvm into
+an even further stripped down Linux kernel and some of this now hybrid linux
+/ java kernel implemented into JJOS.  
+
+From then on a synergistic approach to JJOS development and kernel reduction
+should lead to a minimization of the Linux specific code and a nice clean
+kernel support environment for JOS.
+
+> I have in the past, not liked the idea of using and existing kernel 
+> and jvm.  But I have been turned around on this idea, i'm even 
+> willing to put my work on rjk on hold for a month or two, to work on 
+> this.  So lets see what we come up with.
+
+I think we need to do whatever we can to maximize the use of 
+our time and resources.
+What i've actually got at the moment is pretty disorganized but I should be
+able to put it into coherent order within a couple of weeks.  I'll put together
+a brief document on how to create this minimal system and see how many
+people get turned on.
+
+Cheers
+
+Geoff O'Callaghan
+hackcat@banzai.apana.org.au
+
+p.s. Sorry about the delay - I'll add my work address to the list so that
+I can e-chat more frequently.
+
+
+
+
+From tim.lewis@soe.securicor.co.uk Wed, 5 May 1999 09:13:47 +0000
+Date: Wed, 5 May 1999 09:13:47 +0000
+From: tim.lewis@soe.securicor.co.uk tim.lewis@soe.securicor.co.uk
+Subject: [JOS] Wiki Pages
+
+I don't see frames as a must have feature, but they can be very useful.
+However, if people don't want a frames based web site then there's no need
+to go annoying anyone!!!
+
+I'll start having a go at a bit of re-organisation then.  I can't promise
+huge amounts of time but bits and bobs here and there.
+
+Cheers,
+
+Tim.
+
+
+
+
+"Iain Shigeoka" <shigeoka@ukans.edu> on 30/04/99 04:33:33
+
+Please respond to shigeoka@ukans.edu
+
+To:   Tim Lewis/SOE IT/Sutton/SOE
+cc:   general@jos.org
+Subject:  Re: [JOS] Wiki Pages
+
+
+
+
+Hello,
+> Just thought I'd give a bit of input on the new style wiki pages.  I
+think
+> they look really good.  Easy to read and pretty easy to navigate around.
+I
+> can't remember who is responsible for them (hence mailing here) but well
+> done.
+Thanks.
+> Any thoughts on producing a frame based version at some point?  I know
+this
+> produces a few issues.  Actually, if you need any help on the page
+> re-design / update then let me know.
+No plans at the present.  There seemed to be quite a few people that
+were violently opposed to frames so I had pretty much removed it from
+consideration in the redesign.  Do you consider it a "must have" feature?
+If you have time, I'd really appreciate help reorganizing the Wiki.  The
+project signup page is not organized well.  If you could try and
+reorganize it that would help.  Actually we need a separate wiki page
+that is a nice list of active JOS projects (as a compliment to the working
+groups listing) with a link to each project's wiki page, and perhaps a
+short description.  Right now, its pretty difficult to figure out exactly
+what are the active jos projects...  You know, where actual code is
+being created to create concrete programs (as opposed to the working
+groups where ideas are being discussed and coding is optional).
+The main wiki page could use some reorganization, and the jos irc
+meeting announcement should probably be moved to a separate
+JosAnnounce wiki page with only a one liner announcement and a link
+to the times on the main wiki page.  *whew*
+I have been looking over the original wiki site (the site where we got the
+first copy of the wiki) and the way they keep things organized is they
+have several self-appointed wiki organizers that just go around and clean
+up pages, create "meta-pages" that basically summarize groups of
+pages and provide links to them, and organize the links between pages
+to make sense.  We (jos wiki) only seem to have people that create the
+"leaf" pages of the wiki.  We're missing the self-appointed organizers
+that help to organize, summarize and arrange the wiki pages.   So if you
+could, whenever you have the time, just start organizing when you see a
+need, it would help a ton.  I think many members are reluctant to edit
+other people's pages or create summaries which basically leaves a ton
+of pages "stranded" with only a few links to them buried deep inside the
+bodies of other pages...
+Sorry for the rant.  Just trying to be a cheerleader for some self-
+appointed wiki organizers to emerge and start aggressively organizing
+the wiki.  :)
+-iain
+
+
+
+
+
+
+
+
+
+From adric@adric.com Tue, 4 May 1999 01:27:30 -0400
+Date: Tue, 4 May 1999 01:27:30 -0400
+From: adric adric@adric.com
+Subject: [JOS] IRC Meeting - May 1999
+
+
+> We need a point of contact or representative, this person will just
+>be a stand in until a person can be voted into the position.  The
+>main reason for this is this email message to the admin mailing list
+><URL:http://jos.org/pipermail/admin/1999-May/000067.html>.
+
+
+That would be me.  I haven't replied to that email, though, as I wanted to
+discuss it with everyone first.  I am not sure that the corp understands
+that we are an org, and what the difference is.  I don't see any trouble
+with them using our code, except that we  don't have a license yet (cough)
+Clark? (cough)..
+
+We should probably take this up on the info list, but I'm not sure it's
+working yet (?)
+
+Anyway, what are y'alls comments on the proposal from Mr Dustin Tidwell of
+Startpoint Corporation?
+
+-adric@adric.com
+(excuse any inadvertant Outlook crap..sigh)
+
+
+
+
+
+From shigeoka@ukans.edu Thu, 6 May 1999 23:45:36 -0500
+Date: Thu, 6 May 1999 23:45:36 -0500
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS] IRC Meeting - May 1999
+
+> discuss it with everyone first.  I am not sure that the corp understands
+> that we are an org, and what the difference is.  I don't see any trouble
+
+I KNOW that the corp does NOT understand that we are an org.  I 
+actually recieved that email from Mr. Tidwell first (it was sent to 
+webmaster@jos.org) and replied to him, trying to explain that we were 
+an org, that we were an open-source movement (with appropriate links), 
+and that any sort of "business" relationship would have to be voted on 
+(or at least referred to "someone in charge").  At the last point, I gave 
+him the email address of the mailing list... Evidently, he only read the 
+part about the mailing list, and just reposted the same darn message 
+here.
+
+> Anyway, what are y'alls comments on the proposal from Mr Dustin Tidwell of
+> Startpoint Corporation?
+
+If they contribute to the code base, user base, or non-existant jos cash 
+reserves, it seems like a good deal for jos.
+
+-iain
+
+
+
+From gfx@e-com.cc Sat, 08 May 1999 22:08:01 +0200
+Date: Sat, 08 May 1999 22:08:01 +0200
+From: Romain Guy gfx@e-com.cc
+Subject: [JOS] New software anouncement
+
+A new text editor is being released in the package org.jos.app.editor !!
+Its name is Jext. Until I've uploaded its sources, you can try it while
+downloading it at: http://members.aol.com/romainguy/jext.zip
+It is only 235 kb to download, and I'm sure you'll like it !!
+
+                        Romain
+
+
+
+
+
+From jm@mak.com Mon, 10 May 1999 08:38:06 -0400
+Date: Mon, 10 May 1999 08:38:06 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS] An idea for increasing the number of code-writers
+
+Hello All;
+
+Sorry for the wide distribution, but, as should become clear from the rest of
+this message, we're seeking programming help beyond just the "kernel" group.
+
+In general, I get the feeling that we need to increase the number of people
+writing actual code.  I'm sure there are people Out There who want to write
+code, but don't know either where or how to jump in.  In specific, as Todd and I
+work on jjos+decaf, we sometimes are held up because we have to build some
+infrastructure first before building the Java-specific functionality we're
+*really* after.
+
+For example, as we think about building some method-lookup machinery for
+"built-in" classes, we discovered we could *really* use a good hash-table C++
+template.  
+
+If Todd and/or I would put out requests for implementation of reasonably
+well-defined pieces of toolsmithing (e.g., "Help! We need a good hashtable
+template!"), would anybody Out There be interested in contributing?  
+
+Right now, I can think of two obvious things we need:
+
+(1) The hashtable template, for use with UTF8->function pointer mappings, and
+
+(2) A Boehm-something-or-other derived conservative garbage collector (I can
+provide references and pointers to other implementations).
+
+Please reply either to the various lists or to me personally.
+
+Thanks!
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== jm@mak.com               ==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+
+
+
+From whooops@gmx.de Thu, 13 May 1999 22:42:04 +0200
+Date: Thu, 13 May 1999 22:42:04 +0200
+From: Mark whooops@gmx.de
+Subject: [JOS] Using AOP in JOS
+
+Hi.
+I recently read an article about AspectJ and wanted to know if I/we
+could use it for jos development. It's available for free, but the
+license is cruel. I'm in contact with a person out of the team and
+they're willing to change it.
+
+AspectJ is an implementation of AOP done by Xerox' PARC, which extends
+Java. 
+AspectJ adds aspects to objects. For example debugging could be an
+aspect. With AspectJ you'd put this special aspect outside the object. 
+This makes code much more maintainable and objects much more OO.
+
+I'm not sure about AOP, as nobody really is (AFAIK). It's still
+researched, although it seams already very usable in particular
+purposes.
+
+What do you think?
+
+Wiki:
+   * AspectJ
+   * AOP
+
+
+
+
+From shigeoka@ukans.edu Fri, 14 May 1999 02:53:43 -0500
+Date: Fri, 14 May 1999 02:53:43 -0500
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS] Announce list?
+
+Hello,
+
+I was working on a new front page for the web site and found that we 
+don't have an Announce only mailing list!  Or do we and I just can't find 
+it?  Or are we to use Vote-Info? I can see arguements that maybe 
+admin or general fill this role but both lists have too much traffic (such 
+as this one) that aren't really announcements.
+
+Anyhow, it seems that we really need a separate read-only, low traffic 
+announce mailing list.  Only major announcements from "qualified 
+people" can post to this list.  People only vaguely interested in JOS 
+(such as members of the press) or those that want to "monitor" jos 
+without having to deal with any "noise" can use this list to keep tabs on 
+JOS.  
+
+Clark.  Can you set this up?  I can't see why there would be any 
+objections unless an announce only list already exists and I wanted to 
+get this new front page posted to the web asap.  Thanks.
+
+-iain shigeoka
+
+
+
+From bkn3@columbia.edu Thu, 13 May 1999 16:14:43 -0400 (EDT)
+Date: Thu, 13 May 1999 16:14:43 -0400 (EDT)
+From: Bradley Keith Neuberg bkn3@columbia.edu
+Subject: [JOS] Using AOP in JOS
+
+Not sure exactly what Aspects are, but I have something called Dynamic
+Composition that lets you add Facets to primary objects, to extend their
+behavior at run-time without the object having to know about the Facets.
+It's under the LGPL; do you want it?
+
+On Thu, 13 May 1999, Mark wrote:
+
+> Hi.
+> I recently read an article about AspectJ and wanted to know if I/we
+> could use it for jos development. It's available for free, but the
+> license is cruel. I'm in contact with a person out of the team and
+> they're willing to change it.
+> 
+> AspectJ is an implementation of AOP done by Xerox' PARC, which extends
+> Java. 
+> AspectJ adds aspects to objects. For example debugging could be an
+> aspect. With AspectJ you'd put this special aspect outside the object. 
+> This makes code much more maintainable and objects much more OO.
+> 
+> I'm not sure about AOP, as nobody really is (AFAIK). It's still
+> researched, although it seams already very usable in particular
+> purposes.
+> 
+> What do you think?
+> 
+> Wiki:
+>    * AspectJ
+>    * AOP
+> 
+> 
+> _______________________________________________
+> General maillist  -  General@jos.org
+> http://jos.org/mailman/listinfo/general
+> 
+
+
+
+
+From jazzcat@dds.nl Fri, 14 May 1999 11:18:13 +0200 (MET DST)
+Date: Fri, 14 May 1999 11:18:13 +0200 (MET DST)
+From: Richard Smol jazzcat@dds.nl
+Subject: [JOS] Using AOP in JOS
+
+On Thu, 13 May 1999, Bradley Keith Neuberg wrote:
+
+> Not sure exactly what Aspects are, but I have something called Dynamic
+> Composition that lets you add Facets to primary objects, to extend their
+> behavior at run-time without the object having to know about the Facets.
+> It's under the LGPL; do you want it?
+
+That sounds very handy, but Aspects are a totally different beastie 
+altogether. They form a new programming paradigm and lately they have 
+been implemented in existing OO languages, primarily Smalltalk but 
+nowadays Java as well. 
+
+I am just now delving into Aspect Oriented Programming and am pretty much 
+learning, so I can't tell you all the ins and outs myself. But do visit 
+Xerox' AOP site: http://www.parc.xerox.com/spl/projects/aop
+AspectJ is in http://www.parc.xerox.com/spl/projects/aop/aspectj
+
+I have a hunch that AOP would indeed be very handy for a project like 
+JOS. The thing is though that you need an Aspect Weaver (sort of like a 
+specialized compiler). I don't know of any GPL'ed ones.
+
+Greetz,
+
+RS
+
+
+
+From warpi@spin.de Fri, 14 May 1999 09:42:23 +0000
+Date: Fri, 14 May 1999 09:42:23 +0000
+From: Markus Peter warpi@spin.de
+Subject: [JOS] Re: [JOS-Admin] Announce list?
+
+Iain Shigeoka wrote:
+> 
+> Hello,
+> 
+> I was working on a new front page for the web site and found that we
+> don't have an Announce only mailing list!  Or do we and I just can't find
+> it?  Or are we to use Vote-Info? I can see arguements that maybe
+> admin or general fill this role but both lists have too much traffic (such
+> as this one) that aren't really announcements.
+
+There is an announce only mailing list already, running on
+the SPiN servers. I did not know the subscribe information
+did vanish. The reason we could not migrate the announce mailing
+list to the new mailman lists is that it seems mailman could
+not handle the 2000+ subscriptions on the announce list we
+already have.
+
+-- 
+Markus Peter (SPiN GmbH - Java, Webdesign, Perl, Databases)
+
+
+
+
+From ryan@whitewolf.com.au Mon, 17 May 1999 18:11:08 +1000
+Date: Mon, 17 May 1999 18:11:08 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS] Using AOP in JOS
+
+Richard Smol wrote:
+
+> I have a hunch that AOP would indeed be very handy for a project like
+> JOS.
+
+The idea of aspects cutting across classes is interesting but the
+current design of AspectJ seems to be limited in what places you can cut
+through a class. Here are the defined entry points:
+
+before
+after
+catch
+finally
+
+Suppose you had a method that calls super.method() on its last line. You
+may wish for an aspect to cut through just above where it calls
+super.method(). Also, I could imagine the need to be able to cut through
+at any point in a method. For example, a debug aspect may wish to insert
+a debug message inside an if block. This could be implemented in AspectJ
+by allowing markers to be inserted in the code that can be targeted by
+an aspect. There could be more elegant ways.
+
+<brain.dump>
+hmm.. I wonder whether the idea of aspects can be generalised even
+further than the basic object + aspects idea. Maybe a class can be
+defined in terms of a number of intersecting aspects...
+</brain.dump>
+
+> The thing is though that you need an Aspect Weaver (sort of like a
+> specialized compiler). I don't know of any GPL'ed ones.
+
+It would not be too difficult to implement one since its main task is
+copying lines of code from the Aspect into intersected classes.
+
+If I ever switched to using something like AspectJ, I would also want
+other language features in addition such as genericity and pre/post
+conditions. If someone wants to work on a (pre)compiler for an Aspect
+oriented language, they might want to consider adding these.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From shigeoka@ukans.edu Mon, 17 May 1999 23:21:03 -0500
+Date: Mon, 17 May 1999 23:21:03 -0500
+From: Iain Shigeoka shigeoka@ukans.edu
+Subject: [JOS] Website updates
+
+Hello all,
+
+The front page (static page) at www.jos.org and the main wiki page have 
+been updated (along with a few small cosmetic changes through out the 
+site/wiki).  Please take a look and send comments and feedback either 
+to the list or directly to me.  Thanks.
+
+-iain shigeoka (IainS) shigeoka@ukans.edu
+
+
+
+From whooops@gmx.de Tue, 18 May 1999 16:58:40 +0200
+Date: Tue, 18 May 1999 16:58:40 +0200
+From: Mark whooops@gmx.de
+Subject: [JOS] Using AOP in JOS
+
+Ryan Heise wrote:
+
+> The idea of aspects cutting across classes is interesting but the
+> current design of AspectJ seems to be limited in what places you can cut
+> through a class. Here are the defined entry points:
+> 
+> before
+> after
+> catch
+> finally
+
+No, it seems to can do more according to the aj primer. E.g. "automatic
+composition".(I had no time to read+understand the full primer, I'm
+going to dig through this this weekend)
+
+> <brain.dump>
+> hmm.. I wonder whether the idea of aspects can be generalised even 
+> further than the basic object + aspects idea. Maybe a class can be
+> defined in terms of a number of intersecting aspects...
+> </brain.dump>
+
+The most important thing is to keep a certain grade of encapsulation,
+IMHO AspectJ has to manage this... Could be done by Interfaces (? define
+an interface for every object?). Sounds possible, but is AOP
+(standalone) as powerful as OOP+AOP?
+
+> It would not be too difficult to implement one since its main task is
+> copying lines of code from the Aspect into intersected classes.
+
+It's one thing to compete with an existing product and another to
+compete with Xerox PARC in developing a new programming paradigm. If at
+all, IMHO we should concentrate in pushing the development of aj and or
+in general the application of aop to java, so when the question of a
+reimplementation comes we'd have a good product to reimplement.
+
+regards.mark.a.m
+
+
+
+From robfitz@geocities.com Sun, 30 May 1999 16:40:34 -0500
+Date: Sun, 30 May 1999 16:40:34 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS] Notice for IRC Meeting on 6th June 1999
+
+Hi everybody
+
+There is going to be an IRC meeting this Sunday the 6th of June 1999, 
+at 17:00 UTC for two hours.  This meeting will taking place on the 
+Undernet IRC Network.
+
+I would like to discuss the following topics:
+* The Constitution <URL:http://jos.org/wiki/view/main/Constitution>, 
+there should be a vote coming up on this soon.
+* The Kernel Interface, I have updated the Kernel Interface, so that 
+I should be able to start working on a JOS-Linux host soon.
+* The plans for the next month.
+
+Also, would anybody like to have a face-to-face meeting?  The story 
+is that I was hoping to go to JavaOne but that isn't going to happen 
+this (maybe next year ;).
+
+But the company i'm working for says, I can have a free set of 
+flights, so I was hoping to fly to the US (i'm in Mexico at the 
+moment) and meet some of the others working on JOS.
+
+The only problem I see is that the meeting would have to take place 
+before the end of June.  But I wasn't thinking of anything big, just 
+a couple of us meeting up for a few hours.
+
+Also there isn't really a problem with where I go, so is there 
+anybody up for this?
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+
+

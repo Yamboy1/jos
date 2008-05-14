@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Registry? Or SmartAPI?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000250.html">
+   <LINK REL="Next" HREF="000252.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Registry? Or SmartAPI?</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Arch] Registry? Or SmartAPI?">onewith1@flash.net</A><BR>
+    <I>Sun, 10 Oct 1999 15:53:00 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000250.html">[JOS-Arch] Registry? Or SmartAPI?</A></li>
+        <LI> Next message: <A HREF="000252.html">[JOS-Arch] Registry? Or SmartAPI?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#251">[ date ]</a>
+              <a href="thread.html#251">[ thread ]</a>
+              <a href="subject.html#251">[ subject ]</a>
+              <a href="author.html#251">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II &lt;<A HREF="mailto:gchii@mindspring.com">gchii@mindspring.com</A>&gt; wrote:
+&gt;<i> It was a case of one concept with two names. You might call it a
+</I>&gt;<i> &quot;registry&quot;; I might call it a &quot;Smart API&quot;.
+</I>&gt;<i>
+</I>&gt;<i> I was reading the JosAPI wiki article and came across a facinating quote
+</I>by
+&gt;<i> Clark Evans:
+</I>&gt;<i>
+</I>&gt;<i> &quot;...Basically, I see a regisry object and an api package. The services are
+</I>&gt;<i> defined in org.jos.api by 100% Pure Interfaces. If an application (or any
+</I>&gt;<i> system service recursively) needs a service, it asks the registry for an
+</I>&gt;<i> object that implements the service. If the service is available on that
+</I>&gt;<i> computer, then an instantiated object is returned, otherwise a
+</I>&gt;<i> org.jos.api.SERVICE_NOT_AVAILABLE error would be raised.&quot; -- Clark Evans
+</I>&gt;<i>
+</I>&gt;<i> First, the SmartAPI has *already* implemented the idea of
+</I>one-stop-shopping
+&gt;<i> for any available service. Your program can ask the SmartAPI if a service
+</I>&gt;<i> is available on a computer, although it doesn't throw an exception; it
+</I>&gt;<i> simply returns true or false.
+</I>&gt;<i>
+</I>&gt;<i> boolean acceptsURI( String v );
+</I>&gt;<i>
+</I>&gt;<i> Second, the SmartAPI has already implemented what Clark is asking for in a
+</I>&gt;<i> registry. If an application needs a service, it asks the SmartAPI for a
+</I>&gt;<i> digital resource using the uniform resource identifier (URI). Instead of a
+</I>&gt;<i> &quot;registry&quot; with a key to services, the SmartAPI uses a URI. It doesn't
+</I>&gt;<i> throw an exception either; it returns null if a digital resource is
+</I>&gt;<i> unavailable (or missing).
+</I>&gt;<i>
+</I>&gt;<i> Object getObject( String v );
+</I>&gt;<i>
+</I>&gt;<i> And, digital resources (from their services) are defined in
+</I>interface-heavy
+&gt;<i> packages. The SmartAPI - Release 2a package is exactly that kind of
+</I>&gt;<i> refinement. I look forward to distributing it shortly.
+</I>&gt;<i>
+</I>
+I think what Clark was talking about was something similar to what Jini
+does.  You ask the registry (or whatever) for a list of service implementors
+(objects registered to the registry which implement a particular service),
+by giving the registry the interface you're looking for.  This does not mean
+the use of a String class, unless that is how the interface is passed (via
+&lt;interface&gt;.class.getName() call, or something along those lines).
+
+In this manner, you won't need to know the name of the service; all you need
+to know is what you want from a service.
+
+-Matt
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000250.html">[JOS-Arch] Registry? Or SmartAPI?</A></li>
+	<LI> Next message: <A HREF="000252.html">[JOS-Arch] Registry? Or SmartAPI?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#251">[ date ]</a>
+              <a href="thread.html#251">[ thread ]</a>
+              <a href="subject.html#251">[ subject ]</a>
+              <a href="author.html#251">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

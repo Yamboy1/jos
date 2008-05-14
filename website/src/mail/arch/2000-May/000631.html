@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000651.html">
+   <LINK REL="Next" HREF="000608.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">gchii@mindspring.com</A><BR>
+    <I>Fri, 19 May 2000 09:40:01 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000651.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000608.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#631">[ date ]</a>
+              <a href="thread.html#631">[ thread ]</a>
+              <a href="subject.html#631">[ subject ]</a>
+              <a href="author.html#631">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 02:59 AM 5/19/00 -0200, John Leuner &lt;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&gt; wrote:
+&gt;<i>Will our solution be able to cope when the user starts compiling the whole
+</I>&gt;<i>class library and spawns hundreds of processes in quick succession?
+</I>
+Yes, it will. With a simple bytecode cache, it is possible to recompile the
+Java standard class library and launch a new process without restarting a
+virtual machine. All processes loaded after the library is installed will
+use the new library. Older processes will continue to use the older library.
+
+As a wild guess, a virtual machine with a 32MB swap partition and bytecode
+cache should be able to support many more bytecode processes than the
+equivalent JNI design. The JNI design already supports 10X more bytecode
+processes than the classic design. The &quot;space&quot; required by read-only
+bytecode does not consume any swap space.
+
+Write a program/script that launches a simple Java application repeatedly.
+How many can be loaded before your foreign operating system fails to create
+a new process?
+
+  public void example() {
+    int iMax = 1000;
+    for ( int i = 0; i &lt; iMax; i++ ) {
+      String cmd = &quot;java org.jos.demo.Demo&quot;;
+      Runtime.getRuntime().exec( cmd );
+      Thread.sleep( 2000 );
+    }
+  }
+
+You might be surprised how little overhead is required to run a classic
+virtual machine, even without a system-wide bytecode/class definition
+cache. Your operating system will runs out of swap space eventually. With
+each virtual machine, part of the Java standard class library is reloaded.
+Here is an example of this Demo application:
+
+package org.jos.demo;
+public class Demo {
+  public static void main( String[] args ) {
+    for (;;) {
+    }
+  }
+}
+
+Of course, your application is intended to do something. As it requires
+more and more of the Java standard class library, more and more swap space
+is required. As it loads more and more custom classes, more and more swap
+space is required.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000651.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000608.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#631">[ date ]</a>
+              <a href="thread.html#631">[ thread ]</a>
+              <a href="subject.html#631">[ subject ]</a>
+              <a href="author.html#631">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,438 @@
+From gchii@mindspring.com Fri, 25 Feb 2000 08:32:51 -0500
+Date: Fri, 25 Feb 2000 08:32:51 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] Listing all apps
+
+Can you help identify all JOS applications?
+
+Like the man pages for Linux, we need a simple summary for each class
+application. After successfully compiling the source code from the JOS, now
+what? Few of the classes are documented so that I can use them. I am now in
+search of more information about JOS applications.
+
+There are two kinds of JOS applications: borrowed and built. Each class
+that defines public static void main( String[] ) is-a Java application.
+Loosly speaking, all of the Java applications related to the JOS Project
+are JOS applications. While technically they might not require JOS,
+applications we build are maintained for and by members of the JOS Project.
+From the source code, it looks like there are many programs and
+applications that have been written. And yet, many remain unused and
+undocumented.
+
+Borrowed:
+
+ClassFile
+Jasmin/JAS
+Jext
+jCVS
+clUtilities (cat, cd, ls, whois, etc.)
+DemoShell
+
+
+Built:
+
+Downloader
+init
+TestSuite?
+Applet Browser
+Connection Browser
+Desktop Browser
+PlainText Browser
+Property Browser
+Universal Browser
+WebSource
+Find
+Package Compiler
+Package Archiver
+ERIC Project (zerich, deric, erica)
+
+Future applications are on our wish list. We need to keep a list of
+applications that need to be "borrowed" or built. If we identify
+applications that run on JOS, we can borrow them from other open-source
+projects.
+
+For JEPS:
+
+ping
+telnet
+telnetd
+ftp
+ftpd
+bootpd
+tftpd
+echod
+syslogd
+
+If you know of any JOS-related class that defines main(), please reply. We
+can summarize these classes in an application list. This might be a good
+use of our apps mailing list.
+
+
+
+
+From gchii@mindspring.com Fri, 25 Feb 2000 08:50:17 -0500
+Date: Fri, 25 Feb 2000 08:50:17 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] RunEricApplication
+
+The RunEricApplication is part of the org.jos.gchii.eric1c package. It
+invokes an ERIC Shell using both jars and package files.
+
+cache=v
+
+The cache parameter identifies a read-write directory. The v parameter is a
+OS directory name. ERIC uses this directory to cache volatile package
+files. If a recent package file is found in the cache, it is preferred to
+downloading a package file across the 'net.
+
+path=v
+
+The path parameter identifies the package path. The v parameter is a
+semi-colon separated list of package directories. A package directory is
+either local or an HTTP URL.
+
+shell=v
+
+The shell parameter identifies the ERIC Shell. The v parameter is a class
+name. ERIC supports a number of "shell"s besides
+org.jos.gchii.eric1c.Shell. See the source code for RunEricApplication.
+
+location=v
+
+The location parameter identifies the digital resource invoked by the
+shell. The v parameter is a URI.
+
+Of course, the eric tool passes all these parameter to RunEricApplication
+according to an ERIC shortcut. The cache parameter is automatic. The path
+parameter is automatic; although you can add additional package
+directories. The shell parameter is Universal Browser by default. A
+shortcut can call any shell. The default location parameter is determined
+by each shell. The Universal Browser defaults to
+"desktop:ini:file:default.desktop".
+
+Without the eric tool, you can use the java tool to do the same thing. In
+fact, the RunEricApplication uses URI-style parameters (which are easier to
+pass through Java Native Interface). It uses one and only one argument to
+main(), a query string.
+
+$ java RunEricApplication cache=v&path=v&shell=v&location=v
+
+Named parameters are passed in any order. Additional parameters are ignored.
+
+
+
+
+From gchii@mindspring.com Fri, 25 Feb 2000 08:58:13 -0500
+Date: Fri, 25 Feb 2000 08:58:13 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] Universal Browser
+
+UniversalBrowser is part of the org.jos.gchii.browser1b package. Usually,
+it is invoked without arguments to main(). When used, the first argument to
+main() is copied to the Location: field; but, the location is not invoked.
+
+I can start UniversalBrowser with a batch file.
+
+// browser1b.bat
+java org.jos.gchii.browser1b.UniversalBrowser %1
+
+To pass a location to the browser/shell, the command looks something like
+this:
+
+$ browser1b run:program:org.jos.gchii.find1a.FindProgram?path=&extension=.txt
+
+I can start UniversalBrowser with ERIC.
+
+ - by double-clicking on the eric.exe program,
+ - by typing in eric on the command line,
+ - by double-clicking on an ERIC shortcut, and
+ - by typing start shortcut on the command line.
+
+Once in the Universal Browser, I can open another Universal Browser. The
+location looks something like this:
+
+run:program:org.jos.gchii.browser1b.UniversalBrowser
+
+
+
+
+From idstewart@softhome.net Sun, 27 Feb 2000 13:01:59 -0500
+Date: Sun, 27 Feb 2000 13:01:59 -0500
+From: Ian D. Stewart idstewart@softhome.net
+Subject: [JOS-Apps] RunEricApplication
+
+Gilbert Carl Herschberger II wrote:
+
+> The RunEricApplication is part of the org.jos.gchii.eric1c package. It
+> invokes an ERIC Shell using both jars and package files.
+>
+> cache=v
+>
+> The cache parameter identifies a read-write directory. The v parameter is a
+> OS directory name. ERIC uses this directory to cache volatile package
+> files. If a recent package file is found in the cache, it is preferred to
+> downloading a package file across the 'net.
+>
+> path=v
+>
+> The path parameter identifies the package path. The v parameter is a
+> semi-colon separated list of package directories.
+
+I would recommend using File.pathSeparator instead of hard-coding on
+semi-colon.  This would allow users of different platforms to do what feels
+natural.  This is of course assuming that you intend for the ERIC applications
+to be run on different platforms, and not just JOS.
+
+> A package directory is
+> either local or an HTTP URL.
+>
+> shell=v
+>
+> The shell parameter identifies the ERIC Shell. The v parameter is a class
+> name. ERIC supports a number of "shell"s besides
+> org.jos.gchii.eric1c.Shell. See the source code for RunEricApplication.
+>
+> location=v
+>
+> The location parameter identifies the digital resource invoked by the
+> shell. The v parameter is a URI.
+
+Have you considerred using java system properties instead?
+
+Example: java -Deric.cache=cachev -Deric.path=pathv -Deric.shell=shellv
+-Deric.location=locationv RunEricApplication
+
+This would then allow these values to be accessible to any application running
+within the same VM.  Additionally, by creating a ~/.ericrc properties file,
+which could be parsed at startup, a user could be able to customize the ERIC
+suite to their own personal preferences.
+
+
+Ian
+
+>
+>
+> Of course, the eric tool passes all these parameter to RunEricApplication
+> according to an ERIC shortcut. The cache parameter is automatic. The path
+> parameter is automatic; although you can add additional package
+> directories. The shell parameter is Universal Browser by default. A
+> shortcut can call any shell. The default location parameter is determined
+> by each shell. The Universal Browser defaults to
+> "desktop:ini:file:default.desktop".
+>
+> Without the eric tool, you can use the java tool to do the same thing. In
+> fact, the RunEricApplication uses URI-style parameters (which are easier to
+> pass through Java Native Interface). It uses one and only one argument to
+> main(), a query string.
+>
+> $ java RunEricApplication cache=v&path=v&shell=v&location=v
+>
+> Named parameters are passed in any order. Additional parameters are ignored.
+>
+> _______________________________________________
+> Apps maillist  -  Apps@jos.org
+> http://jos.org/mailman/listinfo/apps
+
+
+
+
+From gchii@mindspring.com Sun, 27 Feb 2000 18:16:44 -0500
+Date: Sun, 27 Feb 2000 18:16:44 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] RunEricApplication
+
+At 01:01 PM 2/27/00 -0500, you wrote:
+>> path=v
+>>
+>> The path parameter identifies the package path. The v parameter is a
+>> semi-colon separated list of package directories.
+>
+>I would recommend using File.pathSeparator instead of hard-coding on
+>semi-colon.  This would allow users of different platforms to do what feels
+>natural.  This is of course assuming that you intend for the ERIC
+applications
+>to be run on different platforms, and not just JOS.
+
+Thank you for your direct observation. How compatible should a JOS
+application be with foreign operating systems? This is a complex issue.
+
+I like the mechanism HTML uses. No matter what platform you're on, an HTML
+page always uses the forward slash to separate the parts of a URL. That's
+one way to achieve platform independence.
+
+Typically, the path comes from an ERIC shortcut. An ERIC shortcut is
+binary-compatible across all Java-based platforms. You can copy an ERIC
+shortcut from JOS to Linux to Windows to a Mac. The shortcut itself remains
+the same. It work without modification.
+
+On the other hand, the semi-colon is more compatible with a foreign OS that
+already happens to use it. It might be easier for others to teach
+themselves how to manually edit a shortcut.
+
+I would much rather see a platform-independent tool that helps you create
+an ERIC shortcut. Such a GUI tool would not require you to know about the
+semi-colon. Alas, I am not a gifted GUI person. I haven't got a clue what
+an ERIC shortcut editor might look like.
+
+>Have you considerred using java system properties instead?
+>
+>Example: java -Deric.cache=cachev -Deric.path=pathv -Deric.shell=shellv
+>-Deric.location=locationv RunEricApplication
+>
+>This would then allow these values to be accessible to any application
+running
+>within the same VM.  Additionally, by creating a ~/.ericrc properties file,
+>which could be parsed at startup, a user could be able to customize the ERIC
+>suite to their own personal preferences.
+
+From a foreign operating system, the eric tool uses a configuration file
+for system-wide settings and ERIC shortcut for localize, application
+specific settings. The eric tool uses JNI to create a virtual machine and
+invoke RunEricApplication.
+
+But, that's not the only way to invoke RunEricApplication. Once an
+application is running it can invoke another. Parameters are passed
+directly from a parent process to a child, without going through system
+properties.
+
+ERIC is leaning heavily toward a single virtual machine/multiple process
+idea. ERIC doesn't use system properties for the second and third
+application. With two or more applications running in a single virtual
+machine with only one class loader, system properties don't allow more than
+one instance of cache, path, shell and location.
+
+Thanks,
+
+
+
+
+From gchii@mindspring.com Sun, 27 Feb 2000 18:33:08 -0500
+Date: Sun, 27 Feb 2000 18:33:08 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] eric tool
+
+From a foreign operating system, the eric tool is invoked one of two ways.
+The first way uses no parameters. The shell and location default to ERIC's
+system-wide configuration. The cache and path are calculated at runtime
+based on the location of your virtual machine and the eric tool. The path
+automatically includes jar files in the <apphome>/lib directory.
+
+$ eric
+
+When the eric tool is called "eric", it reads "eric.ini" for its
+system-wide configuration. The eric tool can be renamed without
+recompiling. When it is called "minisrv", it reads "minisrv.ini" for its
+system-wide configuration.
+
+My eric tool configuration starts the Universal Browser through the
+UniversalBrowserShell.
+
+shell=org.jos.gchii.deric1c.UniversalBrowserShell
+
+-----
+
+The second way uses one parameter. The first parameter is the name of the
+ERIC shortcut file. Usually, a location is specified in a shortcut file.
+
+$ eric shortcut
+
+-----
+
+My findjava shortcut for ERIC uses the default path and shell. It contains
+the following line:
+
+location=run:program:org.jos.gchii.find1a.FindProgram?path=C:\&extension=.java
+
+-----
+
+My jext shortcut for ERIC uses the default path, but selects the non-visual
+RunShell. When I use eric to launch Jext, I do not see a MS-DOS box on
+Microsoft Windows. This shortcut contains the following lines:
+
+shell=org.jos.gchii.deric1c.RunShell
+location=run:main:com.chez.powerteam.jext.Jext
+
+-----
+
+An ERIC shortcut is a file with an .eric extension. On my Windows machine,
+an ERIC shortcut is associated with the eric tool. When I double-click on
+an ERIC shortcut, Windows passes the name of the shortcut to the eric tool.
+
+Add a link to an ERIC shortcuts to an HTML page. When I click on a link to
+an ERIC shortcut, my browser passes the name of the shortcut to the eric tool.
+
+
+
+
+From gchii@mindspring.com Sun, 27 Feb 2000 18:49:36 -0500
+Date: Sun, 27 Feb 2000 18:49:36 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] WebSource
+
+WebSource is a JOS application. It reads .java files and writes .src.html
+files. It offers a dialog box to pass parameters to the WebSourceProgram.
+It saves the last values typed in. It extends
+org.jos.gchii.appstudio2a.GUIApplication.
+
+WebSourceProgram is a JOS program. It extends
+org.jos.gchii.smartprogram2a.BaseConsoleProgram. It uses the following
+parameters:
+
+path=v
+or
+directory=v
+
+Path is a directory. It is used as codebase. The program searches for .java
+files in the codebase directory and its subdirectories.
+
+package=v
+
+Typically, package is blank. When blank, the program searches all
+subdirectories starting with codebase. Otherwise, the program starts with
+the given package.
+
+Packages are printed consistently, like this:
+
+Package [M:\jos\bcni1a] org.jos.bcni1a
+
+where path is a platform-specific directory name and package is always a
+Java package name in dot notation.
+
+-----
+
+WebSource completes its scan for .java file before writing the first HTML
+file. During the initial scan, it builds a list of link-able classes. The
+list of link-able classes is used when writing individual HTML files.
+
+Like the Java compiler, WebSource pays attention to the import statement.
+The java.lang package is imported automatically. You can use the same class
+name in many different packages and WebSource won't get confused.
+
+
+
+
+From gchii@mindspring.com Mon, 28 Feb 2000 08:51:09 -0500
+Date: Mon, 28 Feb 2000 08:51:09 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] run:mc: scheme
+
+When I want to run a Master Compiler(tm) script, I use a URI something like
+this:
+
+run:mc:file:eric.mc
+
+The run:mc: scheme returns a program that calls the Master Compiler(tm).
+Since this scheme is connected to the InputStreamController, a script can
+be stored locally or across the network. Here is an example of running a
+script across the network:
+
+run:mc:http://dmrquest.com/eric.mc
+
+The first line of a script must contain the name of the script processor,
+something like this:
+
+#gchii.tools.programscript1a.dev.BatchCompiler
+
+
+
+

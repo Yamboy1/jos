@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Proposing archive: protocol</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000120.html">
+   <LINK REL="Next" HREF="000101.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Proposing archive: protocol</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Proposing archive: protocol">digigod@earthling.net</A><BR>
+    <I>Thu, 05 Aug 1999 21:10:24 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000120.html">[JOS-Arch] Proposing archive: protocol</A></li>
+        <LI> Next message: <A HREF="000101.html">[JOS-Arch] Re: [JOS-Kernel] the vga driver is working now</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#205">[ date ]</a>
+              <a href="thread.html#205">[ thread ]</a>
+              <a href="subject.html#205">[ subject ]</a>
+              <a href="author.html#205">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> The ftp: scheme is a very good example. Remind me again, though. I am a
+</I>&gt;<i> little rusty with ftp. Doesn't ftp: expect name and password parameters? In
+</I>&gt;<i> the example above, &quot;?username=jeeves&amp;password=cafebabe&quot; would be part of
+</I>&gt;<i> ftp: scheme. I'll just move the parameters to ftp: forward:
+</I>&gt;<i> 
+</I>&gt;<i> <A HREF="ftp://database.server.net/archives/images/contents.jar">ftp://database.server.net/archives/images/contents.jar</A>
+</I>&gt;<i> ?username=jeeves&amp;password=cafebabe |/update/latest.zip |/acquired/foo.jpg
+</I>
+actually it uses the awkward (but legal):
+
+<A HREF="ftp://user:password@domanin.com/">ftp://user:password@domanin.com/</A>
+ 
+&gt;<i> Let's talk a little about MIME types. MIME types only hint at a default
+</I>&gt;<i> decoding and presentation. It isn't absolute; it is only a clue.
+</I>&gt;<i> Explicitely adding the protocol should produce the same results.
+</I>&gt;<i> 
+</I>&gt;<i> <A HREF="ftp://database.server.net/archives/images/contents.jar">ftp://database.server.net/archives/images/contents.jar</A> ?
+</I>&gt;<i> username=jeeves&amp;password=cafebabe | archive:zip:/update/latest.zip |
+</I>&gt;<i> image:jpeg:/acquired/foo.jpg
+</I>
+image:jpeg: hmm, reminds me of image/jpeg. howz bouts we assume your
+MIME configuration is the default editor or viewer... but you want to
+open it *as* another MIME type:
+
+mime:&lt;uri&gt;?family=text&amp;species=hex
+
+this is easier to read for an override
+
+nota bene: I used family/species because I couldnt, for the life of me,
+think of the actual names...
+ 
+&gt;<i> Imagine, though, that I have made up my mind and really want to see the
+</I>&gt;<i> contents of an JPEG file in hexidecimal notation. I want the default MIME
+</I>&gt;<i> type to be *ignored*. My decision should be reflected in the URI. Maybe it
+</I>&gt;<i> should be like this:
+</I>&gt;<i> 
+</I>&gt;<i> <A HREF="ftp://database.server.net/archives/images/contents.jar">ftp://database.server.net/archives/images/contents.jar</A>
+</I>&gt;<i> ?username=jeeves&amp;password=cafebabe | archive:zip:/update/latest.zip |
+</I>&gt;<i> file:hex:/acquired/foo.jpg
+</I>&gt;<i>
+</I>&gt;<i> Sure, if there is a table of default MIME types, I may be able to imply
+</I>&gt;<i> decoding with file extensions. But our URI architecture must be able to
+</I>&gt;<i> support explicit choices.
+</I>
+see above. instead of file extensions we should have a &quot;file attribute&quot;
+or something that holds the mime (I remember when my computer was giving
+me grief, it turned out I didnt have image/jpeg setup to include .jpeg
+too)
+ 
+&gt;<i> Sometimes, I wonder how we're going to succeed with any of this. The URI is
+</I>&gt;<i> supposed to be a global, platform-independent model. Current URIs are
+</I>&gt;<i> monolythic and short-sighted. We *need* to do things with URIs in JOS that
+</I>&gt;<i> none of the other operating systems can do (yet and maybe ever). We are out
+</I>&gt;<i> in front. We are on the bleeding edge.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;From RFC 2396, the verticle bar (|) is considered an &quot;unwise&quot; character.
+</I>&gt;<i> We're supposed to be careful not to think about JOS as an island. JOS will
+</I>&gt;<i> interact with all other operating systems. How can we limit URIs to
+</I>&gt;<i> internal use only?
+</I>
+forget how, ask why should we. answer: we shouldnt.
+ 
+&gt;<i> uri-pipe := uri &quot;|&quot; uri &quot;|&quot; uri
+</I>&gt;<i> 
+</I>&gt;<i> uri := scheme &quot;:&quot; path [ &quot;?&quot; query ] [ &quot;#&quot; fragment ]
+</I>&gt;<i> 
+</I>&gt;<i> Decoding a uri-pipe must be performed first, prior to decoding an
+</I>&gt;<i> individual uri inside a pipe. Each uri inside a uri-pipe may have query
+</I>&gt;<i> part and fragment part. The final MIME type of the uri-pipe is the MIME
+</I>&gt;<i> type of the last uri inside the pipe.
+</I>&gt;<i> 
+</I>&gt;<i> This is almost right. But it means that all URIs that already use the
+</I>&gt;<i> pipe--even though its an unwise character--will not be compatible with the
+</I>&gt;<i> uri-pipe. Incompatibility with all those existing URIs is bad, very bad.
+</I>&gt;<i> 
+</I>&gt;<i> The problem would be solved if we choose another &quot;symbol&quot; for the pipe.
+</I>&gt;<i> Hey, what about this:
+</I>&gt;<i> 
+</I>&gt;<i> uri-pipe := uri &quot;&gt;&gt;&quot; uri &quot;&gt;&gt;&quot; uri
+</I>&gt;<i> 
+</I>&gt;<i> Oh, and another thing. A client agent must know *immediately* that a URI is
+</I>&gt;<i> a pipe and not a normal URI. We want those old client agents to display a
+</I>&gt;<i> message first, before they do lots of work they can't finish.
+</I>&gt;<i> 
+</I>&gt;<i> I always imagined that the client agent would do all the work. Then our new
+</I>&gt;<i> scheme would be compatible with existing Internet services. So the client
+</I>&gt;<i> agent must process a uri-pipe. The client agent must download the whole
+</I>&gt;<i> archive, even to get one small file.
+</I>&gt;<i> 
+</I>&gt;<i> I suppose it is possible for an FTP service to extract the latest.zip, then
+</I>&gt;<i> extract foo.jpg and return only foo.jpg to the client agent. By embedding
+</I>&gt;<i> one uri into another, a client agent sends the entire request to the
+</I>&gt;<i> service. Wouldn't this work?
+</I>&gt;<i> 
+</I>&gt;<i> <A HREF="ftp://database.server.net/">ftp://database.server.net/</A> &lt;archive:archives/images/contents.jar&gt;
+</I>&gt;<i> &lt;archive:/update/latest.zip&gt; /acquired/foo.jpg
+</I>&gt;<i> ?username=jeeves&amp;password=cafebabe
+</I>
+as long as you dont want to put it in HTML or XML... in HTML you would
+get this:
+
+<A HREF="ftp://database.server.net/<archive:archives/images/contents.jar">ftp://database.server.net/&lt;archive:archives/images/contents.jar</A>&gt; the
+parser would ignore the rest
+ 
+&gt;<i> Oh, in fact, you should be able to choose client-side or server-side
+</I>&gt;<i> decoding of a uri-pipe. Your pipe scheme would be best suited for
+</I>&gt;<i> client-side decoding. My scheme would be best suited for server-side decoding.
+</I>&gt;<i> 
+</I>&gt;<i> The client agent would &quot;see&quot; this uri:
+</I>&gt;<i> 
+</I>&gt;<i> <A HREF="ftp://database.server.net/aquired/foo.jpg">ftp://database.server.net/aquired/foo.jpg</A> ?username=jeeves&amp;password=cafebabe
+</I>&gt;<i> 
+</I>&gt;<i> It would connect to an FTP service with username and password and download
+</I>&gt;<i> /aquired/foo.jpg. The FTP service would recieve this:
+</I>&gt;<i> 
+</I>&gt;<i> /archives/images/contents.jar |/update/latest.zip |/acquired/foo.jpg
+</I>&gt;<i> or
+</I>&gt;<i> &lt;archive:archives/images/contents.jar&gt;
+</I>&gt;<i> &lt;archive:/update/latest.zip&gt; /acquired/foo.jpg
+</I>&gt;<i> 
+</I>&gt;<i> If there's a vertical bar (|) in a request or if the FTP service sees &quot;&lt;&quot;
+</I>&gt;<i> as the first character in the request, it knows immediately that its an
+</I>&gt;<i> embedded URI. It extracts /images/contents.jar and here's what's left:
+</I>&gt;<i> 
+</I>&gt;<i> /update/latest.zip |/acquired/foo.jpg
+</I>&gt;<i> or
+</I>&gt;<i> &lt;archive:/update/latest.zip&gt; /acquired/foo.jpg
+</I>&gt;<i> 
+</I>&gt;<i> Again, if there's a verticle bar (|) or a &quot;&lt;&quot; as the first character, it
+</I>&gt;<i> knows immediately that its an embedded URI. It extracts /update/latest.zip
+</I>&gt;<i> and here's what's left:
+</I>&gt;<i> 
+</I>&gt;<i> /aquired/foo.jpg
+</I>&gt;<i> 
+</I>&gt;<i> The FTP service OR client agent must keep track of its file source. At the
+</I>&gt;<i> beginning, it gets files from the OS file subsystem. With each archive, it
+</I>&gt;<i> gets files from an archive.
+</I>&gt;<i> 
+</I>&gt;<i> A client agent would use its local cache. While a client agent would
+</I>&gt;<i> download a large archive to extract a small file, the client agent might be
+</I>&gt;<i> more efficient with subsequent requests. If the large archive has already
+</I>&gt;<i> been downloaded to its local cache, it won't download or extract it again.
+</I>&gt;<i> It just extracts another small file.
+</I>&gt;<i> 
+</I>&gt;<i> When running bytecode for an applet or servlet across the Internet, it is
+</I>&gt;<i> more efficient to download the whole archive once rather than download one
+</I>&gt;<i> class file at a time from the archive. That's yet another reason to have
+</I>&gt;<i> the client agent handle the URI pipe and/or embedded URIs.
+</I>
+how bout server: (or client: depending on which is non-default) to
+differentiate?
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000120.html">[JOS-Arch] Proposing archive: protocol</A></li>
+	<LI> Next message: <A HREF="000101.html">[JOS-Arch] Re: [JOS-Kernel] the vga driver is working now</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#205">[ date ]</a>
+              <a href="thread.html#205">[ thread ]</a>
+              <a href="subject.html#205">[ subject ]</a>
+              <a href="author.html#205">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

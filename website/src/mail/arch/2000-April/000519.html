@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000517.html">
+   <LINK REL="Next" HREF="000480.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Fri, 28 Apr 2000 14:20:38 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000517.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000480.html">[JOS-Arch] [multiple process] Kernel class loader</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#519">[ date ]</a>
+              <a href="thread.html#519">[ thread ]</a>
+              <a href="subject.html#519">[ subject ]</a>
+              <a href="author.html#519">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Exactly! Earlier, I offered an equivalent example in the Java programming
+</I>&gt;<i> language and used bytecode instead of class definition. Bytecode and class
+</I>&gt;<i> definition are the same thing.
+</I>
+	Well, from here in the JVM trenches, they're not, but yeah, I
+think I see where you were coming from.
+
+&gt;<i> Class definitions (or bytecode) can be intern'd. If the primordial class
+</I>&gt;<i> loader is the only class loader that can intern a class definition,
+</I>&gt;<i> checking for equal class loaders is redundent. An object can be shared if
+</I>&gt;<i> its class definition is the same.
+</I>
+	I thought there was a hole in this somewhere when I coded the
+example, but I may be wrong.  (That is, since pointers to class
+definitions vary between classloaders, they carry information equivalent
+to both...)  I'll think about this some more.
+
+&gt;<i> If a primordial class loader is written in bytecode, it needs to intern
+</I>&gt;<i> class definitions too. Any class definition could be intern'd by any class
+</I>&gt;<i> loader. If both primordial and custom class loaders can intern a class
+</I>&gt;<i> definition, an object can be shared if its class definition is the same.
+</I>
+	No.  A custom classloader which does not use findSystemClass() (or
+equivalent, e.g. asking a process-wide static for a Class) can not share
+definitions with another custom classloader.  The semantics of the VM
+require that those classes be considered different, and to do otherwise is
+not transparent to 'legacy' applications which use custom
+classloaders.  If a custom classloader passes on a Class from somewhere
+else in the same process, naturally the Class is the same in both
+classloaders, and casting is allowed.  (According to my recollection of
+the spec.)
+
+&gt;<i> I'm pretty sure I cannot make use of an operating system that exclusively
+</I>&gt;<i> intern's system classes. Most of the reusable classes in my applications
+</I>&gt;<i> are /not/ system classes. JEPS, JADE and JSDK and other javax.* packages
+</I>&gt;<i> are big; but, they are /not/ system classes. Even their class definitions
+</I>&gt;<i> should be intern'd.
+</I>
+	Yes, the should be, but in order to make sure that their sharing
+is transparent, they must be loaded by a primordial loader.  However,
+there is not, to my understanding, a limitation on how the class
+definition gets into the primordial loader.  You have pointed out that a
+bytecode primordial loader ought to be possible; it would then be
+relatively easy to perform whatever non-mounted-fs method you want in
+order to generate class definitions.  If we could define a special variety
+of custom classloaders that could be used to generate class definitions to
+hand off to a primordial loader, than we /may/ be able to do shares that
+way.  But I think this is a complexity that can be handled later.
+
+-_Quinn
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000517.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000480.html">[JOS-Arch] [multiple process] Kernel class loader</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#519">[ date ]</a>
+              <a href="thread.html#519">[ thread ]</a>
+              <a href="subject.html#519">[ subject ]</a>
+              <a href="author.html#519">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

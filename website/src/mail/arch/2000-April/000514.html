@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000511.html">
+   <LINK REL="Next" HREF="000517.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Fri, 28 Apr 2000 18:24:02 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000511.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000517.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#514">[ date ]</a>
+              <a href="thread.html#514">[ thread ]</a>
+              <a href="subject.html#514">[ subject ]</a>
+              <a href="author.html#514">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>         Originally, I'd been thinking the additional cost for always
+</I>&gt;<i> allowing illegal casts would be high, but it's not, for two reasons: the
+</I>&gt;<i> class definition sharing is done at class loading, and second, because our
+</I>&gt;<i> OO-IPC method secures cross-process object references, we don't have to
+</I>&gt;<i> worry about security.
+</I>&gt;<i> 
+</I>&gt;<i>         So it turns out I was, in fact, just being totally stupid.
+</I>
+Hardly. If you stopped thinking the way you do, this project would make
+far less progress.
+
+I think flags are still useful if we use Gilbert's byte cache and apply
+it to user defined class loaders. This breaks our assumption that any
+two classes that share the same class definition can be shared. A more
+correct statement is that any two classes that share the same class
+definition and are loaded by primordial class loaders may be shared. It
+just so happens that in my proposal for class definition sharing, my
+original assumption held.
+
+Although, even in this case, maybe the check can be done efficiently
+without a flag.. Anyway, we can sort it out in the case that we end up
+using Gilbert's byte cache.
+
+&gt;<i>         Honestly, I haven't looked at how different (in VM terms) JDK1.2
+</I>&gt;<i> is from 1.1.x; I'm still not supporting inner classes, either.  I'll look
+</I>&gt;<i> into, hopefully sometime soon, but I'm not optimistic.  My gut feeling is
+</I>&gt;<i> that Sun added a great deal of native code to the 1.2 libraries to allow
+</I>&gt;<i> it do what it does, code that we're not going to port any time
+</I>&gt;<i> soon.
+</I>
+Right. It's not just the JVM support, but native code support. I think
+the 1.2 JVM does need to maintain additional information associated with
+the class loader, stuff that's related to security. I'm not certain this
+is the case, but from looking at the security APIs, it seems like there
+needs to be JVM support.
+
+
+&gt;<i> Actually, I'm pretty sure the JVM changes
+</I>&gt;<i> will fairly minor, because otherwise the 1.2 jdk couldn't run 1.1 code :)
+</I>
+Although being backwards compatible doesn't mean that there aren't a
+whole set of new features in JDK 1.2 that don't work under JDK 1.1.
+
+&gt;<i> &gt; I must have missed it. We are talking about access to statics of shared
+</I>&gt;<i> &gt; objects, right?
+</I>&gt;<i> 
+</I>&gt;<i>         Right.  MultipleJavaProcesses is the wiki topic for the text
+</I>&gt;<i> of the 'final summary', which seems to me like a good place to put this
+</I>&gt;<i> kind of consideration; I was just setting up the wiki page as a
+</I>&gt;<i> possibility for collaboration.
+</I>
+Ok. I think it's probably best for you to work out how to phrase this
+bit since you're most familiar with how the JVM works - if that's ok. Of
+course, that means there's nothing left for me to write :-) Well, at
+least for the moment.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000511.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000517.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#514">[ date ]</a>
+              <a href="thread.html#514">[ thread ]</a>
+              <a href="subject.html#514">[ subject ]</a>
+              <a href="author.html#514">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

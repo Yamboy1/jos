@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Compiling bytecode</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000460.html">
+   <LINK REL="Next" HREF="000456.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Compiling bytecode</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Compiling bytecode">gchii@mindspring.com</A><BR>
+    <I>Tue, 11 Apr 2000 21:22:20 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000460.html">[JOS-Arch] Distributed System Papers</A></li>
+        <LI> Next message: <A HREF="000456.html">[JOS-Arch] [multiple process] Compiling bytecode</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#454">[ date ]</a>
+              <a href="thread.html#454">[ thread ]</a>
+              <a href="subject.html#454">[ subject ]</a>
+              <a href="author.html#454">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>It is important to know your applications when building an operating
+system. Consider the following scenario.
+
+// MyUtility.java
+public static void main(String[] argv) {
+  System.out.println( &quot;Running...&quot; );
+  System.out.println( &quot;Done.&quot; );
+}
+
+$ javac MyUtility.java
+
+$ MyUtility
+Running...
+Done.
+
+$ cp utility-1/MyUtility.java .
+
+$ javac MyUtility.java
+
+$ MyUtility
+???
+
+Does a MPVM run the old MyUtility.class or the new one?
+
+Does a MPVM always discard the static fields of the old class?
+
+Choice is what I want. I always want to explicitely choose between running
+a program within the current process or running in a new process. That is
+why the Smart API defines two sub-schemes for running programs:
+
+run:program: - This sub-scheme runs a program within the current process.
+Typically, it's faster and retains all static fields. It retains all
+instances of java.lang.Class that have already been used.
+
+run:process: - This sub-scheme runs a program in a new bytecode process.
+While it may be slower, it also loads or re-loads all bytecode. All static
+fields are process-specific. It shares no instances of java.lang.Class with
+other processes.
+
+Actually, I want more choice. That's why the Smart API defines the thread:
+subscheme. This sub-scheme runs a program within the current process but
+creates a new thread.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000460.html">[JOS-Arch] Distributed System Papers</A></li>
+	<LI> Next message: <A HREF="000456.html">[JOS-Arch] [multiple process] Compiling bytecode</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#454">[ date ]</a>
+              <a href="thread.html#454">[ thread ]</a>
+              <a href="subject.html#454">[ subject ]</a>
+              <a href="author.html#454">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

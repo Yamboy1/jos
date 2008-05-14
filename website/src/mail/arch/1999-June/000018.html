@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: [JOS] Concerning the registry...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000015.html">
+   <LINK REL="Next" HREF="000019.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: [JOS] Concerning the registry...</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Re: [JOS] Concerning the registry...">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 17 Jun 1999 16:39:17 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000015.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+        <LI> Next message: <A HREF="000019.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#18">[ date ]</a>
+              <a href="thread.html#18">[ thread ]</a>
+              <a href="subject.html#18">[ subject ]</a>
+              <a href="author.html#18">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Al wrote:
+
+&gt;<i> I was thinking of implementing quota-based handling of the registry,
+</I>&gt;<i> that is, specific Threads could use more &quot;time&quot; of the registry, such as
+</I>&gt;<i> security and system threads, and other threads (such as screen savers or
+</I>&gt;<i> user applications) use less time. Or, you could count the size each
+</I>&gt;<i> application is using. I know how to measure the time of a thread, but
+</I>&gt;<i> how would you measure the size of data? Is the only way to serialize it
+</I>&gt;<i> and count the bytes, or is there a simpler way?
+</I>
+That's like a token server where you must obtain a token to perform
+operations on the registry. The token has a lifetime and possibly other
+things. It's up to you how you make use of the token. I don't know how
+useful this would be.
+
+&gt;<i> Anyway, I think that the registry could be split up into sections, such
+</I>&gt;<i> as hives for instance, each one in its own space, possibly even
+</I>&gt;<i> different instances. This way, you can have a System, Security, JOS, and
+</I>&gt;<i> User registry. We can guarantee that all but the User registries remain
+</I>&gt;<i> cool, and I suppose that if the User registry goes out of hand, deleting
+</I>&gt;<i> parts of it would not even be dangerous for the system...
+</I>
+Yes, but it would still be nice to know which parts of the registry
+belong to which applications and which parts of the registry are shared
+between a number of applications. At least, this is something we should
+think about in the future.
+
+&gt;<i> &gt; &gt; In the same way many things in JOS should be, that is, servers. If not
+</I>&gt;<i> &gt; &gt; servers, then Servlets. Hmm... FileSystemServlet, RegistryServlet,
+</I>&gt;<i> &gt; &gt; sounds nice.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; On a system with 400 users that might bring a large overhead. I do
+</I>&gt;<i> &gt; believe that each repository instance should work like a server so that
+</I>&gt;<i> &gt; read/writes are synchronized across multiple clients, but if the server
+</I>&gt;<i> &gt; runs in a different address space, this will incur a performance penalty
+</I>&gt;<i> &gt; of having to use Sockets to talk to it.
+</I>&gt;<i> 
+</I>&gt;<i> How does RMI solve this, if at all? I was assuming that the only problem
+</I>&gt;<i> with multiple users on an RMI connection would be speed decrease.
+</I>
+Well, perhaps it is a better idea to run just one server :-) My initial
+security concerns are starting to go away now that I have put some more
+thought into how JOS might handle security (I will post my research to
+the list RSN).
+
+&gt;<i> Do you
+</I>&gt;<i> think that we should implement the server in such a way that it responds
+</I>&gt;<i> just like a HTTP server, with Thread pools, priorities, timeouts etc.?
+</I>
+Possibly. Ideally, applications should not have to worry about thread
+pools. JOS should try to be efficient enough for it not to matter.
+
+&gt;<i> &gt; Then there is the issue of how long should the server be running (as a
+</I>&gt;<i> &gt; thread)? UNIX uses the concept of a super-server that fires up server
+</I>&gt;<i> &gt; processes only when they are needed. So for example, the ftp server is
+</I>&gt;<i> &gt; not running and consuming resources the whole time.
+</I>&gt;<i> 
+</I>&gt;<i> Would not the registry, though, be VERY frequently used? Maybe the
+</I>&gt;<i> overhead for creating and starting servers is too much, compared to the
+</I>&gt;<i> little time the registry is not used.
+</I>
+If there is only one registry server that manages all registries, yes it
+would be frequently used. I am starting to think this is the best way to
+do it anyhow.
+
+&gt;<i> I would propose something else, a
+</I>&gt;<i> registry cache.
+</I>&lt;snip&gt;
+&gt;<i> Opinions?
+</I>
+If the cache is on the client side, it would improve performance a lot.
+If it is on the server side, it won't improve performance much.
+
+&gt;<i> Well, I guess I would want the following types of access:
+</I>&gt;<i> 
+</I>&gt;<i> Entry
+</I>&gt;<i> 
+</I>&gt;<i> read, write (delete implied), change security options
+</I>&gt;<i> 
+</I>&gt;<i> Directory
+</I>&gt;<i> 
+</I>&gt;<i> read, write, read entries, read subdirectories, create subdirectory,
+</I>&gt;<i> create entry, change security options
+</I>&gt;<i> 
+</I>&gt;<i> The above because the Directory contains a default Entry, so it has a
+</I>&gt;<i> name and value.
+</I>
+Types of access is a generic concept that is supported in JDK 1.1, so
+yes you can have all of those types of access. I would suggest you have
+a look at the javadoc for the java.security.acl package in JDK 1.1 (JDK
+1.2 has some additional security stuff which we can't make use of unless
+we commit to using JDK 1.2). The documentation explains how you can
+define and grant types of access to individual users and groups.
+
+&gt;<i> &gt; Having a unified security mechanism would improve security IMHO. Even
+</I>&gt;<i> &gt; though a single hole gets the entire system, a single security system
+</I>&gt;<i> &gt; means a simpler security system, and the simpler it is, the more robust
+</I>&gt;<i> &gt; it is likely to be.
+</I>&gt;<i> 
+</I>&gt;<i> True. Do you think the registry should also have a mechanism for
+</I>&gt;<i> handling GuardedObjects and such seamlessly for the user? That is, for
+</I>&gt;<i> security while storing or retransmitting the registry?
+</I>
+GuardedObject is a new class in JDK 1.2. I haven't found a need for them
+in my model yet, but if I end up needing them, I can invent a similar
+class that works with JDK 1.1.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000015.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+	<LI> Next message: <A HREF="000019.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#18">[ date ]</a>
+              <a href="thread.html#18">[ thread ]</a>
+              <a href="subject.html#18">[ subject ]</a>
+              <a href="author.html#18">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

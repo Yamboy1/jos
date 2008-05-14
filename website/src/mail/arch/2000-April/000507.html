@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000500.html">
+   <LINK REL="Next" HREF="000508.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 27 Apr 2000 00:25:56 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000500.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000508.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#507">[ date ]</a>
+              <a href="thread.html#507">[ thread ]</a>
+              <a href="subject.html#507">[ subject ]</a>
+              <a href="author.html#507">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Tue, 25 Apr 2000, Todd L. Miller wrote:
+
+&gt;<i> &gt; Shared-object IPC might be more important from a functional perspective.
+</I>&gt;<i> &gt; rheise.os demonstrates that JavaProcess objects must be shared (although
+</I>&gt;<i> &gt; I'm sure there are hacky ways around this).
+</I>&gt;<i> 
+</I>&gt;<i> 	D'oh!  I'd clean forgotten that we needed shared objects for
+</I>&gt;<i> rheise.os.  How about:
+</I>&gt;<i> 
+</I>&gt;<i> &quot;The desire for multiple processes ... benefits.  Most elegant
+</I>&gt;<i> implentations of multiple processes requires shared-object IPC, if for
+</I>&gt;<i> nothing aside from the created process object.  (Strictly, the process
+</I>&gt;<i> object returned to the creating function could be a message-passing stub,
+</I>&gt;<i> like RMI.)&quot;
+</I>
+Sounds fine.
+
+&gt;<i> &gt; - I think the mechanism for (1) needs to be investigated further.
+</I>&gt;<i> &gt;   Flagging the object is one way to handle it. Another way is to simply
+</I>&gt;<i> &gt; control &quot;access&quot; to the object. A process can't ordinarily gain access to
+</I>&gt;<i> &gt; an object in another process, so there needs to be some bridge method
+</I>&gt;<i> &gt; that returns a reference to an object of another process. This method
+</I>&gt;<i> &gt; can perform access control. The difficulty in flagging is that you can't
+</I>&gt;<i> &gt; simply flag an object as shared because that won't give you access to
+</I>&gt;<i> &gt; its member variables, or to objects returned by methods on the object
+</I>&gt;<i> &gt; you do have access to. Flagging is obviously a way to make the system
+</I>&gt;<i> &gt; safer, but is it really necessary?
+</I>&gt;<i> 
+</I>&gt;<i> 	Flagging was my suggestiong for an implementation of (1).  With a
+</I>&gt;<i> bridge method, once the object has been returned, how does decaf know it
+</I>&gt;<i> can be 'illegally' cast?
+</I>
+If we use a bridge method, that method can perform access control,
+meaning decaf itself doesn't need to do access control. So, decaf can
+allow illegal casts between any two objects that share the same class
+definition, so long as you are &quot;able to gain access to&quot; the object.
+
+There are advantages and disadvantages to both approaches but I suspect
+implementing access control in a Java method will be simpler than
+providing special JVM support. So even if we end up agreeing that
+objects must be flagged, I think it might be easier to start with the
+simplest implementation.
+
+&gt;<i> &gt; &quot;Now, if the client process directly accesses static members, it will
+</I>&gt;<i> &gt; access the cloned versions that belong to its own process. However, if
+</I>&gt;<i> &gt; you call a method on an object that really belongs to another process,
+</I>&gt;<i> &gt; and that method accesses a static member, then it should access the
+</I>&gt;<i> &gt; static members of the class in the _other_process. Are there any
+</I>&gt;<i> &gt; problems in implementing that?&quot;
+</I>&gt;<i> 
+</I>&gt;<i> 	I think it comes out implicitly in the way things are done by the
+</I>&gt;<i> interpreter.  The shared object's class references will be resolved in/by
+</I>&gt;<i> the classloader which loaded it first, because the CL of an object
+</I>&gt;<i> (actually, of its class definition) is never changed.  This should be an
+</I>&gt;<i> exact fit for the ownership semantics.  This also means, incidentally,
+</I>&gt;<i> that a process that exits can't be cleaned up until we're sure no shared
+</I>&gt;<i> object classloaders point at it.  (That is, we have to run a garbage
+</I>&gt;<i> collection on process exit.)
+</I>
+You could provide the option to share objects via weak references (JDK
+1.2). In this case, references to the shared object will automatically
+become null when the server process exits.
+
+Otherwise, you need to somehow notify the client processes that the
+server's dead and they should give up their references. That may mean
+that the clients must themselves exit.
+
+Or, another option is to have clients deal with a proxy object that
+transparently hooks up to the new version of the shared server object if
+the server is simply restarted. This might not work if state information
+is lost.
+
+&gt;<i> 	I'll think about how to add this to the summary.
+</I>
+Ok.
+
+&gt;<i> &gt; Can you point me to these papers? Thanks.
+</I>&gt;<i> 
+</I>&gt;<i> 	<A HREF="http://www.cs.umd.edu/~pugh/java/">http://www.cs.umd.edu/~pugh/java/</A>  has a great deal of information
+</I>&gt;<i> about various problems with Java, including the memory model and
+</I>&gt;<i> type-safety.  (esp see his paper from the ACM Java Grande conference)
+</I>
+Thanks. I'll be sure to check it out.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000500.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000508.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#507">[ date ]</a>
+              <a href="thread.html#507">[ thread ]</a>
+              <a href="subject.html#507">[ subject ]</a>
+              <a href="author.html#507">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

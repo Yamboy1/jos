@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000592.html">
+   <LINK REL="Next" HREF="000594.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">gchii@mindspring.com</A><BR>
+    <I>Tue, 16 May 2000 12:17:55 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000592.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000594.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#593">[ date ]</a>
+              <a href="thread.html#593">[ thread ]</a>
+              <a href="subject.html#593">[ subject ]</a>
+              <a href="author.html#593">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 07:27 PM 5/15/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>In the context of the 1.1 spec, I understand this to mean that a single
+</I>&gt;<i>/calling/ process may not have more than one VM -- not placing any limits on
+</I>&gt;<i>the VM itself.
+</I>
+In Chapter 13 of &quot;Essential JNI: Java Native Interface&quot; by Rob Gordon,
+Prentice Hall PTR, the author demonstrates the use of multiple virtual
+machines inside a single machine code process. Each virtual machine is
+attached to a different machine code thread.
+
+&gt;<i>I do not know how IBM implemented multiple multiple Java processes, or if it
+</I>&gt;<i>is possible to find out. Perhaps, since they (AFAIK) neglected to provide a
+</I>&gt;<i>Java-side API for processes, they are runnig disjoint JVMs in a single
+</I>&gt;<i>process; your description leads to me to believe that they have discovered or
+</I>&gt;<i>implemented an efficient method for sharing class definitions accross those
+</I>&gt;<i>JVMs -- could you confirm this? If they have, it is to the loss of the Java
+</I>&gt;<i>community that they neglected to tell anyone else (AFAIK) how to do this. If
+</I>&gt;<i>they did (or have released source to their JVM), I would be very interested
+</I>&gt;<i>in reading it.
+</I>
+The product I'm using is IBM's Java Development Kit 1.1.6 for OS/400. IBM
+and others have published many articles to the AS/400 community. IBM has
+published many implementation details on their as400.ibm.com website.
+
+Since OS/400 is already running a virtual machine interface similar to a
+Java virtual machine, their product translates from one virtual machine
+language to another. Most of the Java support is found in the equivalent of
+a pre-compiled dynamically shared library.
+
+Java is a natural on OS/400. The virtual machine interface had already been
+done. Long before Java, the entire OS/400 has a single garbage collector.
+When OS/400 creates an object reference, it is a system-wide object
+reference. Objects are stored on the equivalent of a swap partition. It
+already does short- and long-term persistence. Everything is tied directly
+into a system-wide virtual memory manager.
+
+&gt;<i>MPCL is a specification for the implementation of more than one Java process
+</I>&gt;<i>in an efficient manner.
+</I>
+MPCL is a proposed for further modifying the Java Virtual Machine
+Specification to enable multiple independent bytecode processes. MPCL is
+more of a theory than a specification.
+
+&gt;<i>Ryan's 'os' package is the standard (albiet informal) interface to this
+</I>&gt;<i>ability.
+</I>
+Ryan's rheise.os product is one member's implementation. It demonstrates a
+small fraction of what is understood about multiple bytecode processes so
+far. It is far too premature to adopt rheise.os as a standard for the JOS
+Project. It might lead us to a standard. It may be a useful model. It
+cannot be taken literally.
+
+Give me something I can use. I can't use rheise.os. Running a Java
+application as a subprogram is not equivalent to running a Java application
+as a process. If we think of ourselves as finished, we will miss the
+greatest opportunity to find the best solution.
+
+For example, a process has no concept of a parent. There is no parent
+property inside a process. Only a subprogram has a parent. Only a
+subprogram can share real objects with its parent.
+
+And, a basic process has no concept of a user. There is no user property
+inside a process. Only a multiple user operating system has a user.
+
+And, a new process must be given its environment. Its entire environment
+must be passed to the process manager. A genuine process manager must be
+written in machine code, maybe with a bytecode proxy.
+
+The rheise.os product demonstrates many different ideas at the same time.
+It is not focused on the bare essentials of creating a bytecode process. We
+need a focused, bare essential demonstration of a bytecode process.
+
+We need to create a better test. The test of a genuine bytecode process is
+not, as others have said, piping the output from one process to another.
+The acid test is far more complicated than that. Piping from one Java
+application to another doesn't prove much.
+
+Don't be distracted by rheise.os. It is only a small step along a path that
+will lead us to a genuine bytecode process.
+
+-----
+
+Examine the following code. What should happen?
+
+// Demo.java
+public class Demo1 {
+  public static void main( String[] args ) {
+    String cmd = &quot;java Demo2&quot;;
+    Runtime.getRuntime().exec( cmd );
+    System.exit( 0 );
+  }
+}
+
+If Demo2 defines a static main() method, it must continue running long
+after Demo1 is gone. Demo2 is not accidentally destroyed when a Demo1
+invokes System.exit(). The java.lang.Process object is always a proxy to
+the real process that's running. It might contain a single
+ProcessDescriptor field, enabling it to do things with the real process.
+
+In bytecode, a process manager cannot maintain a reference to real
+processes or the real process manager. Like a FileDescriptor, a process
+manager might return a ProcessDescriptor. The ProcessDescriptor is passed
+back to a process manager to invoke methods of a process.
+
+public ProcessDescriptor {
+  public ProcessDescriptor( int v ) {
+    pid = v;
+  }
+  :
+  int pid;
+}
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000592.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000594.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#593">[ date ]</a>
+              <a href="thread.html#593">[ thread ]</a>
+              <a href="subject.html#593">[ subject ]</a>
+              <a href="author.html#593">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

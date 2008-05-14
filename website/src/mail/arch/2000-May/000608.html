@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000631.html">
+   <LINK REL="Next" HREF="000578.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 18 May 2000 11:09:56 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000631.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000578.html">[JOS-Arch] rheise.os-0.1.4-pre4</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#608">[ date ]</a>
+              <a href="thread.html#608">[ thread ]</a>
+              <a href="subject.html#608">[ subject ]</a>
+              <a href="author.html#608">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> 
+</I>&gt;<i> Let's get back to the discussion. The reloading of classes cannot be
+</I>&gt;<i> ignored. Each process has its own potentially unique CLASSPATH. So, each
+</I>&gt;<i> process must load its own classes.
+</I>
+We haven't ignored it. It has already been discussed that each process
+has its own CLASSPATH in the form of
+System.getProperty(&quot;java.class.path&quot;).
+
+Reference:
+
+	<A HREF="http://jos.org/pipermail/arch/2000-April/000449.html">http://jos.org/pipermail/arch/2000-April/000449.html</A>
+
+&gt;<i> All classes must be unique to a bytecode process. None can be shared
+</I>&gt;<i> without a proxy.
+</I>
+Simple composition. Not proxy.
+
+&gt;<i> When a Java application runs inside a MPCL-compatible virtual machine, all
+</I>&gt;<i> of its classes must be discarded when a process dies.
+</I>
+There are two options:
+
+1. We can discard the classes when a process dies.
+2. We can just let them be discarded when there are no references to any
+shared objects inside the process from outside the process (where I am
+proposing that not only may there be shared objects within the
+application, but the Process object itself is a shared object).
+
+It is irrelevant for me to say which one I think is best here, just that
+it is incorrect to say that the classes *must* be discarded when a
+process dies. We have two options. One may be better than the other, but
+we won't know unless we can consider them BOTH long enough to compare
+them equally.
+
+&gt;<i> A process can share objects with any other process, not just the process
+</I>&gt;<i> that created it. For more information, see also ParentProcess article on
+</I>&gt;<i> JOS Wiki.
+</I>
+You raise an interesting point about the effect that a hard parent link
+has on garbage collection. I have not checked the POSIX standard, but
+through experimentation on Linux, it appears that when the parent of a
+process dies, the parent reference is automatically reassigned to the
+init process (which is responsible for killing off child processes when
+a runlevel exits).
+
+&gt;<i> A versionless virtual machine is able to adapt at runtime to different
+</I>&gt;<i> versions of the Java standard class libraries. The class library is plugged
+</I>&gt;<i> into a versionless virtual machine through CLASSPATH. Within a single
+</I>&gt;<i> virtual machine, each process is built upon a different platform. One
+</I>&gt;<i> process can run Java 2 platform while another runs Java 1.
+</I>
+That would be nice, though maybe it requires that the JVM be carefully
+written. It should be possible.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000631.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000578.html">[JOS-Arch] rheise.os-0.1.4-pre4</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#608">[ date ]</a>
+              <a href="thread.html#608">[ thread ]</a>
+              <a href="subject.html#608">[ subject ]</a>
+              <a href="author.html#608">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

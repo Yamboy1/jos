@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000533.html">
+   <LINK REL="Next" HREF="000541.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Tue, 02 May 2000 13:32:32 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000533.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000541.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#540">[ date ]</a>
+              <a href="thread.html#540">[ thread ]</a>
+              <a href="subject.html#540">[ subject ]</a>
+              <a href="author.html#540">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i>         This message concerns Ryan's response to Gilbert's implementation
+</I>&gt;<i> of object-sharing by proxy/ownership lists.  I feel like I'm missing
+</I>&gt;<i> something of importance -- I don't find myself concerned by having
+</I>&gt;<i> multiple 'owners' of an object.  Ownership is a concern of the security
+</I>&gt;<i> system, rather than of IPC.  (I realize that security has to be built in
+</I>&gt;<i> from the ground up to really work, but hold on a second here.)  All that
+</I>&gt;<i> garbage collection cares about is the number of references -- one per
+</I>&gt;<i> accessor/(shared) owner.
+</I>
+Right. It so happens that ProcessClassLoader has a reference to the
+process that it is loading classes for. This reference is used in
+ProcessManager.getOwningProcess(clazz) which traverses up the class
+loader chain until the primordial class loader is reached, then finally
+calls getProcess() on it to return the process owning that class. This
+is also a method which you felt should be defined at the generic level
+because it would work the same for host and nativ implementations. I
+think I agree.
+
+What this means is, it sort of does matter which process owns the
+object, because this reference will stop the real owner of the process
+from being garbage collected if it drops out of the distributed system.
+
+&gt;<i>  If an object is shared, our security system has
+</I>&gt;<i> OK'd it, so the 'ownership' of an object doesn't seem particularly
+</I>&gt;<i> important;
+</I>
+The above was actually in response to this bit.
+
+&gt;<i> (BTW -- I really like the idea
+</I>&gt;<i> of just re-assigning the classloader property for object passing.)
+</I>
+It seems like this is the primitive for doing all sorts of stuff related
+to do object ownership. For example, to emulate multiple owners of an
+object, ownership of the object can be re-assigned to an independent
+master process: the(/a) shared object broker.
+
+&gt;<i>         Ownership seems to be important only if it confers privileges that
+</I>&gt;<i> accessors don't have.  Maybe I'm missing something, but it seems like the
+</I>&gt;<i> processes sharing the object must have equal access to it, because once
+</I>&gt;<i> the object is shared, the JVM isn't going to call security again, unless
+</I>&gt;<i> explicitly directed to do so.  Being able to do some things but not others
+</I>&gt;<i> to an object, without those explicit security checks, also seems like it
+</I>&gt;<i> would violate the spec.  What am I missing here?
+</I>
+Security doesn't really depend on having shared ownership, it's more to
+do with designing elegant distributed systems, to avoid the problem
+where the object owner drops out of the ring.
+
+But security is an interesting topic in itself. One way of handling it
+is as you said: each process that shares access to the object is
+restricted in exactly the same way. But when you look at how access
+restriction is implemented, you see it is possible to actually allow one
+process to have more access than another. Each method which the client
+process can call is able to check who the calling process is and grant
+or deny access. So some methods on the object can be called by process
+A, some methods can be called by process B, and some can be called by
+both.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000533.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000541.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#540">[ date ]</a>
+              <a href="thread.html#540">[ thread ]</a>
+              <a href="subject.html#540">[ subject ]</a>
+              <a href="author.html#540">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

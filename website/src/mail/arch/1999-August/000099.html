@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] javac tool - update</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000096.html">
+   <LINK REL="Next" HREF="000098.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] javac tool - update</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] javac tool - update">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 04 Aug 1999 11:25:09 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000096.html">[JOS-Arch] javac tool - update</A></li>
+        <LI> Next message: <A HREF="000098.html">[JOS-Arch] Package files</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#99">[ date ]</a>
+              <a href="thread.html#99">[ thread ]</a>
+              <a href="subject.html#99">[ subject ]</a>
+              <a href="author.html#99">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> Does anyone know how the javac tool can compile classes in the java.*
+</I>&gt;<i> packages? If javac uses the java.* packages, how can it compile the java.*
+</I>&gt;<i> packages?
+</I>
+When you run javac, the java.* classes are already in your CLASSPATH. If
+javac compiles java.util.Vector, there are now two Vector classes: the
+one linked into the javac process and the one that javac is generating.
+
+This is probably one reason why javac does not read development classes
+from its ClassLoader. Your development classes need to be kept separate
+from the classes used by the javac process. However, if your development
+classes appear in your CLASSPATH before classes.zip and you are
+compiling java.* classes, javac might become confused.
+
+The other part of the question is: if the java.* classes must already be
+in your CLASSPATH to compile anything, then how were those classes
+compiled in the first place? The very first Java code would have either
+been written by hand in assembly (bytecodes) or compiled with a compiler
+written in a language other than Java. In both cases, the circular
+dependency on Java has been eliminated. The first step would have been
+to write enough Java code to be self supporting, then a compiler could
+be written in Java. As new classes were added to the library, javac
+would have been modified to take advantage of them.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000096.html">[JOS-Arch] javac tool - update</A></li>
+	<LI> Next message: <A HREF="000098.html">[JOS-Arch] Package files</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#99">[ date ]</a>
+              <a href="thread.html#99">[ thread ]</a>
+              <a href="subject.html#99">[ subject ]</a>
+              <a href="author.html#99">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

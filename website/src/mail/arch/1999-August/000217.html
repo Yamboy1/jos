@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] GSI</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000216.html">
+   <LINK REL="Next" HREF="000218.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] GSI</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] GSI">digigod@earthling.net</A><BR>
+    <I>Sat, 28 Aug 1999 19:07:35 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000216.html">[JOS-Arch] GSI</A></li>
+        <LI> Next message: <A HREF="000218.html">[JOS-Arch] GSI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#217">[ date ]</a>
+              <a href="thread.html#217">[ thread ]</a>
+              <a href="subject.html#217">[ subject ]</a>
+              <a href="author.html#217">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> &gt; what if we want to make our java object an element in the script though?
+</I>&gt;<i> &gt; like an add-on library, say we have a LuaMathLib object that has X math
+</I>&gt;<i> &gt; methods that we want to map into the Lua interpreter as X fucntions...
+</I>&gt;<i> &gt; how would we handle that?
+</I>&gt;<i>         Not through getScriptInfo(), because that returns information on
+</I>&gt;<i> the script, and not on the (extended) interperter on which it runs.
+</I>
+no, no. getScriptInfo() is in the Scriptable interface and implemented
+by a class that wants to be &quot;plugged&quot; into a Script to extend the
+Scripts functionality...
+ 
+&gt;<i> &gt; my purpose in defining the Element top-level class was to allow a java
+</I>&gt;<i> &gt; program to use parts of the script; say we have a reinit() function in
+</I>&gt;<i> &gt; our script that we need to call... we get the Element for it to use
+</I>&gt;<i> &gt; it... but what does Element look like?
+</I>&gt;<i> 
+</I>&gt;<i>         Okay, this makes a lot of sense.  Why not make Element an
+</I>&gt;<i> interface implemented by java.lang.Reflect.* inheriting subclasses?  i.e.:
+</I>&gt;<i> 
+</I>&gt;<i> public class tclMethod extends Method implements jos.gsi.Element {}
+</I>
+those classes are all final
+ 
+&gt;<i> &gt; ok, when does the interpreter start and when does the script start? if
+</I>&gt;<i> &gt; we have BOB (which is a C/C++ish type script) which has a main like C,
+</I>&gt;<i> &gt; does the interpreter start the script when its loaded by calling main,
+</I>&gt;<i> &gt; or does it wait until we tell it to start? what if its a library you
+</I>&gt;<i> &gt; created to make programming your app easier and doesnt have a main as
+</I>&gt;<i> &gt; its just a collection of functions... does it return a
+</I>&gt;<i> &gt; NotARunnableScriptEvent?
+</I>&gt;<i> 
+</I>&gt;<i>         I think the ability to select when the script runs is necessary.
+</I>&gt;<i> If we adapt the event model I've described, then generating a ScriptStart
+</I>&gt;<i> (or whatever) event will start the script in an interperter-independent
+</I>&gt;<i> way.  Likewise, event-triggered scripts would become 'active' on a
+</I>&gt;<i> ScriptStart event.  Libraries are hard, but I think if you generate a
+</I>&gt;<i> ScriptStart event, then it should be the interperter's/script's choice to
+</I>&gt;<i> ignore it if it's inappropriate or throw an exception.
+</I>
+shouldnt we have an execute method that generates a scriptStart event?
+ 
+&gt;<i>         Basically, I'm imagining a system where an object like
+</I>&gt;<i> 'jos.gsi.ScriptManager mySM' functions as a clearing-house for
+</I>&gt;<i> jos.gsi.Script objects, so that the application can do something like:
+</I>&gt;<i> 
+</I>&gt;<i> init() {
+</I>&gt;<i>         appMainFrame.addKeyboardListener( mySM );
+</I>&gt;<i>         appMainFrame.addMouseListener( mySM );
+</I>&gt;<i>         appMainFrame.addFocusListener( mySM );
+</I>&gt;<i>         }
+</I>&gt;<i> 
+</I>&gt;<i> and the ScriptManager would handle throwing the different events at the
+</I>&gt;<i> different scripts, so that appMainFrame suddenly becomes a scripted
+</I>&gt;<i> object.  Something like
+</I>&gt;<i> 
+</I>&gt;<i>         appMainFrame.addURLListener( mySM );
+</I>&gt;<i> 
+</I>&gt;<i>         could be achieved by subclassing ScriptManager to implement the
+</I>&gt;<i> URLListener interface.  (Where one would do something like:
+</I>&gt;<i> 
+</I>&gt;<i> for ( int i = 0; i &lt; myScripts.size(); i++ ) {
+</I>&gt;<i>         switch URLEvent.getType() {
+</I>&gt;<i>                 case FTP:
+</I>&gt;<i>                         try { myScripts.elementAt(i).runMethod( &quot;FTP&quot; ); }
+</I>&gt;<i>                         catch ( NoSuchMethodException nsme ) {
+</I>&gt;<i>                                 /* if every element of myScripts fails,
+</I>&gt;<i>                                    throw a NoSuchMethodException... */
+</I>&gt;<i>                                 }
+</I>&gt;<i>                         break;
+</I>&gt;<i> /* etc. */
+</I>&gt;<i> 
+</I>&gt;<i>         would be the body of the URLListener methods.)
+</I>
+if I understand that right, it would be easier to just have the
+individual scripts handle those events via an adapeter and not have a
+ScriptManager...
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000216.html">[JOS-Arch] GSI</A></li>
+	<LI> Next message: <A HREF="000218.html">[JOS-Arch] GSI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#217">[ date ]</a>
+              <a href="thread.html#217">[ thread ]</a>
+              <a href="subject.html#217">[ subject ]</a>
+              <a href="author.html#217">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

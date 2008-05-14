@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000541.html">
+   <LINK REL="Next" HREF="000552.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 03 May 2000 17:19:12 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000541.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000552.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#551">[ date ]</a>
+              <a href="thread.html#551">[ thread ]</a>
+              <a href="subject.html#551">[ subject ]</a>
+              <a href="author.html#551">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>         OK.  I see why the process which originated object might want to
+</I>&gt;<i> maintain a reference to the shared object;
+</I>
+It's the other way around, actually.
+
+&gt;<i>         I'm still stuck on the idea of ownership over here.  All I
+</I>&gt;<i> (still) see a need for is object references.  Even if we were to
+</I>&gt;<i> implement finer-grained security than by-process, what special priviliges
+</I>&gt;<i> does the object/process from which the shared object under consideration
+</I>&gt;<i> came (the 'owner') have, as a matter of kernel-level policy?
+</I>
+None which are granted by the kernel. The fact that it is recorded by
+the kernel, though, means it can be used at the user level.
+
+The kernel doesn't care how it is used. But garbage collection in the
+kernel would benefit from smart use of object ownership by user
+processes. That was my point about multiple ownership of objects. If we
+emulate it the way I suggested, that helps the garbage collector - it
+doesn't leave dead processes around in memory (besides, that's ugly,
+conceptually).
+
+&gt;<i>         All your points are good, but the connection to ownership
+</I>&gt;<i> continues to elude me.  Why is 'ownership' a kernel-level primitive?
+</I>
+That's the nature of the system. An object is associated with one class,
+which is associated with one defining class loader, which is associated
+with one process. Therefore, objects are owned by (/associated with)
+processes and that is reflected in the implementation of the
+kernel(/JVM). Reassigning ownership of an object to another process is
+therefore a kernel(/JVM) primative, too.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000541.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000552.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#551">[ date ]</a>
+              <a href="thread.html#551">[ thread ]</a>
+              <a href="subject.html#551">[ subject ]</a>
+              <a href="author.html#551">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

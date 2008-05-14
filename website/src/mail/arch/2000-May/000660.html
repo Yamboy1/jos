@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000659.html">
+   <LINK REL="Next" HREF="000666.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs">ryan@whitewolf.com.au</A><BR>
+    <I>Mon, 22 May 2000 11:25:23 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000659.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+        <LI> Next message: <A HREF="000666.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#660">[ date ]</a>
+              <a href="thread.html#660">[ thread ]</a>
+              <a href="subject.html#660">[ subject ]</a>
+              <a href="author.html#660">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; When talking about the shared object, there is only one memory location
+</I>&gt;<i> &gt; for that static. However, when talking about the class (which is not
+</I>&gt;<i> &gt; shared due to complexities discussed in another email to John), the
+</I>&gt;<i> &gt; static you find is the one that belongs to your process.
+</I>&gt;<i> 
+</I>&gt;<i>         I'm missing something here.  A shared object's static is in its
+</I>&gt;<i> class.  If there is a single memory location for that static, how can the
+</I>&gt;<i> class find something other than the object?  It makes no sense to me that
+</I>&gt;<i> one object of type A could be shared, and another not, and that this
+</I>&gt;<i> difference would cause them to find different values in their statics.
+</I>
+Not would, but could. If a process creates two objects of type A, they
+both share the same class, and therefore the same statics.
+
+If a process creates one object of type A, and obtains another object of
+type A from a different process, then that object will be defined by a
+different class and will therefore have different statics.
+
+If a process obtains one object of type A from one process, and another
+object of type A from another process, then each of those shared objects
+will be defined by different classes (from different processes) and
+therefore will have different statics. This allows a process to do IPC
+with two servers without any interference.
+
+&gt;<i> (As an aside, I'm reasonably sure that this would violate spec.)
+</I>
+You must have an misunderstanding. I am not interested in cutting
+corners, and I believe this solution is the only solution presented so
+far that _does_ meet the spec (apart from the fact that we are doing
+object IPC).
+
+Perhaps you are thinking of the case where one process creates two
+objects of type A and attempts to share them individually with two other
+processes. In this case, the statics are shared. It is ok (and right) to
+share statics between objects that were created in the same process and
+therefore defined by the same class (well, we're talking specifically
+about primordial class loaders here). However, it is not ok to share
+statics between objects that were created in different processes. This
+causes static interference. One process should not be able to affect
+another process *except* through a shared object.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000659.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+	<LI> Next message: <A HREF="000666.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#660">[ date ]</a>
+              <a href="thread.html#660">[ thread ]</a>
+              <a href="subject.html#660">[ subject ]</a>
+              <a href="author.html#660">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

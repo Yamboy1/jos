@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [Smart API] x-device: scheme</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000066.html">
+   <LINK REL="Next" HREF="000069.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [Smart API] x-device: scheme</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [Smart API] x-device: scheme">gchii@mindspring.com</A><BR>
+    <I>Fri, 18 Aug 2000 11:39:07 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000066.html">[JOS-Apps] [eric] Smart ERIC package</A></li>
+        <LI> Next message: <A HREF="000069.html">[JOS-Apps] [redirection] Request for program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#67">[ date ]</a>
+              <a href="thread.html#67">[ thread ]</a>
+              <a href="subject.html#67">[ subject ]</a>
+              <a href="author.html#67">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>It might be possible to implement an experimental device: scheme that works
+on the Linux operating system, since devices are available through its file
+subsystem. The x-device: scheme is something like the following:
+
+public interface Device {
+  public abstract InputStream getInputStream()
+      throws IOException;
+  public abstract OutputStream getOuputStream()
+      throws IOException;
+}
+
+The x-device: scheme always returns an instance of Device (or null). Here
+is an location that would return a floppy disk device:
+
+x-device:floppydisk:?drive=0
+
+Here is an example location that would return a hard disk device:
+
+x-device:harddisk:?drive=0&amp;partition=0
+
+Unlike an earlier discussion, limited resources are not controlled by the
+operating system. Creating an instance of Device does not lock the device
+for the exclusive use of a process. Rather, the locking is left up to the
+implementation of a particular device. Typically, the getInputStream() and
+getOutputStream() methods handle locking implicitly. If a device is
+&quot;in-use&quot;, these methods throw an IOException.
+
+For Linux, this scheme can be supported by creating a generic
+implementation of Device, something like this:
+
+public class GenericDevice
+    implements Device {
+  public GenericDevice( String v ) {
+    name = v;
+  }
+  public InputStream getInputStream() {
+    return new FileInputStream( name );
+  }
+  public OutputStream getOutputStream() {
+    return new FileOutputStream( name );
+  }
+  private String name;
+}
+
+-----
+
+For compatibility, it is possible to implement a parallel subscheme, where
+both subschemes work at the same time. Here is a location that returns a
+floppy disk device:
+
+x-device:fd0
+
+This location would be translated into x-device:floppydisk:?drive=0
+
+Here is a location that returns a hard disk device:
+
+x-device:hda0
+
+This location would be translated into x-device:harddisk:?drive=0&amp;partition=0
+
+-----
+
+An operating system does not have to make devices available through its
+file subsystem. In fact, a file subsystem could be written on top of the
+x-device: scheme. For these operating systems, such as JOS, an application
+could be written in a more platform-independent way:
+
+  public void example() {
+    URI uri = new URI( &quot;x-device:floppydrive:?drive=0&quot; );
+    Device d = (Device) uri.getObject();
+    if ( d == null ) {
+      // device is not yet supported
+      return;
+    }
+
+    InputStream input;
+    try {
+      input = d.getInputStream();
+    }
+    catch ( IOException e ) {
+      // device is being used by another process
+    }
+
+    OutputStream output;
+    try {
+      output = d.getOutputStream();
+    }
+    catch ( IOException e ) {
+      // device is being used by another process
+    }
+  }
+
+A suitable implementation of Device must be created for other operating
+systems and other devices. This might involve custom classes on JOS or
+might involve machine code on Windows. Even a network interface card could
+be read from and written to by streams.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000066.html">[JOS-Apps] [eric] Smart ERIC package</A></li>
+	<LI> Next message: <A HREF="000069.html">[JOS-Apps] [redirection] Request for program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#67">[ date ]</a>
+              <a href="thread.html#67">[ thread ]</a>
+              <a href="subject.html#67">[ subject ]</a>
+              <a href="author.html#67">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

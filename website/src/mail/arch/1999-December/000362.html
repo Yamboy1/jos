@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Smart API Distribution</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000361.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Smart API Distribution</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Smart API Distribution">gchii@mindspring.com</A><BR>
+    <I>Thu, 30 Dec 1999 17:22:13 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000361.html">[JOS-Arch] Smart API Distribution</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#362">[ date ]</a>
+              <a href="thread.html#362">[ thread ]</a>
+              <a href="subject.html#362">[ subject ]</a>
+              <a href="author.html#362">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 01:44 PM 12/30/99 -0500, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>A non-trivial -- and perhaps non-obvious -- paralellization would be to
+</I>&gt;<i>fire off N-1 (N = number of processors) compiler runs, instead of doing
+</I>&gt;<i>them sequentially, since, aside from the headers, compiling on C/C++ file
+</I>&gt;<i>is independent of the rest.
+</I>
+Here is the kind of programming environment I want:
+
+I want my &quot;compiler&quot; like gcc, javac, javadoc, bulkmake and sourcedoc to
+run 24 hours a day, 7 days a week -- as services on one or more machines. I
+want my compiler to search out new code, seek out changed code, and compile
+it automatically when it finds it. I do not want to be bothered to
+explicitely start the compile or link process.
+
+While it might &quot;waste&quot; a few CPU cycles trying to build code with a syntax
+error, a serverfarm should have more than enough capacity. If I know what I
+am doing, I'll be rewarded with new executable programs in the least amount
+of time possible.
+
+I want my compile-and-link services to produce many different builds
+(prototype vs. production) without prompting. When I want to debug a
+program, I want to debug a program, not wait for the explicit
+compile-and-link step. If I have explained the rules of compilation and
+linking to the compile-and-link service, an executable file simply
+&quot;appears&quot; as soon as possible.
+
+Even as two or more programmers on a team edit and add code to the project,
+the compiler builds new files as needed. Each programmer is insulated from
+others by writing code in their personal space. Code is distributed from
+one member to another only after it compiles perfectly (according to the
+compile-and-link service).
+
+An Internet-based compile-and-link service might work like this. Many
+programmers working on a JOS project would upload source code to the JOS
+compile-and-link service. The compile-and-link service would (1) put it
+through version control, (2) determine how many targets need to be rebuilt,
+(3) choose a new build name, (4) compile and link a new target that
+everyone on the JOS project can download (as soon as its ready).
+
+Not only does the compile-and-link service produce .class files (and .jar
+files). It also produces JavaDoc and SourceDoc and other cross-reference
+and analysis files. When source code is &quot;compiled&quot; into JavaDoc, the HTML
+is available to members as soon as its ready. With sophisticated rules, the
+compile-and-link services are distribute-able. If there are many targets
+affected by one source file, each target can be compiled in parallel on a
+different process.
+
+I only want to know when the computer is finished with the results of my
+editing. When I build a Java product, for example, I wish all the .class
+files, .html files, and archives were &quot;compiled&quot; and &quot;distributed&quot; in
+parallel. I wish it were automatic, by a project file. I would rather not
+spend my nights and weekends watching one computer compile these products
+serially.
+
+It is the same with database applications. I run one query script and then
+wait. My single-CPU computer -- even at 700MHz -- does not have the
+capacity to finish my query script in an instant.
+
+I do not care about &quot;idle&quot; time. I don't care if 256 processors spend all
+night invoking no-ops. I only care about my immediate request to affect a
+new product distribution after I make a source-level change. I would like
+to compress the time it takes to get a new distribution once I have saved a
+.java file.
+
+Here is yet another example. After I have changed a .java file, it must be
+compiled into a .class file. After a .class file is saved, the entire
+regression test suite must be run, starting with test #1. I would like each
+CPUs to run one test suite at a time until all the regression tests are
+completed. The results of the regression test should be presented to me (in
+HTML) as soon as possible.
+
+When a .java file is written into the alternative namespace, the &quot;make&quot;
+process should simultaneously broadcast the .java file to the Java 0, 1 and
+2 Platform subdirectories. Each platform subdirectory should be recompiled
+in parallel, using tools appropriate to the task. If Java 2 takes more CPU
+cycles to recompile, it might be possible to assign the Java 2 project more
+CPUs in the serverfarm.
+
+I take pictures to the drugstore to have them developed. I think I would be
+happy on a very large (100+ million lines of code) project to write source
+code today and run the executable program(s) tomorrow.
+
+I have lots of work for my computer to do. I could certainly use the extra
+processing power in crunch time, when a new distribution is needed as soon
+as possible. I am not alone.
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000361.html">[JOS-Arch] Smart API Distribution</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#362">[ date ]</a>
+              <a href="thread.html#362">[ thread ]</a>
+              <a href="subject.html#362">[ subject ]</a>
+              <a href="author.html#362">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

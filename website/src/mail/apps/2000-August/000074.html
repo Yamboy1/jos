@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [cmp] Compare text files</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000073.html">
+   <LINK REL="Next" HREF="000075.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [cmp] Compare text files</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [cmp] Compare text files">gchii@mindspring.com</A><BR>
+    <I>Fri, 25 Aug 2000 14:01:16 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000073.html">[JOS-Apps] [JOS Technical Edition] Update</A></li>
+        <LI> Next message: <A HREF="000075.html">[JOS-Apps] [cmp] Compare text files</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Based on the design of TextSearch, it should be possible to compare text
+files in any two directory trees. The basic process might look something
+like this:
+
+1. Open file &quot;A&quot; and file &quot;B&quot;.
+
+If file &quot;A&quot; or file &quot;B&quot; is missing, files are different. Print a message
+and exit.
+
+2. Read one line from file &quot;A&quot; and one line from file &quot;B&quot;.
+
+IF both A.line and B.line are null, the files have identical content. Print
+a message and exit.
+
+IF A.line is null, the files are different because file &quot;A&quot; has fewer lines
+than &quot;B&quot;. Print a message and exit.
+
+IF B.line is null, the files are different because file &quot;B&quot; has fewer lines
+than &quot;A&quot;. Print a message and exit.
+
+IF A.line is not equal to B.line, the files are different. Print a message
+and exit.
+
+Otherwise, continue with step 2.
+
+The compare program would search for files with the same name in a
+different directory. The location of a compare program could be something
+like this:
+
+run:program:org.jos.gchii.textcompare1a.TextCompareProgram
+    ?directory1=somedirectory
+    &amp;directory2=someotherdirectory
+    &amp;pattern=*.txt
+    &amp;show=all
+
+The TextCompare utility could have the following fields
+
+Directory 1:
+Directory 2:
+Pattern:
+Show:
+
+When a file is in directory 1 but not directory 2, a message is printed.
+But what about the other way around? A file in directory 2 that is not in
+directory 1 would be ignored.
+
+A directory comparison utility that looks at names, not content would also
+be useful in the Source Server clean-up project.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000073.html">[JOS-Apps] [JOS Technical Edition] Update</A></li>
+	<LI> Next message: <A HREF="000075.html">[JOS-Apps] [cmp] Compare text files</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

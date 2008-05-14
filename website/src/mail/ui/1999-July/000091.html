@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Widgets</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:scribbs%40ida.org">
+   <LINK REL="Previous"  HREF="000096.html">
+   <LINK REL="Next" HREF="000092.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Widgets</H1>
+    <B>Sean Cribbs</B> 
+    <A HREF="mailto:scribbs%40ida.org"
+       TITLE="[JOS-UI] Widgets">scribbs@ida.org</A><BR>
+    <I>Wed, 28 Jul 1999 08:59:31 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000096.html">[JOS-UI] Widgets</A></li>
+        <LI> Next message: <A HREF="000092.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#91">[ date ]</a>
+              <a href="thread.html#91">[ thread ]</a>
+              <a href="subject.html#91">[ subject ]</a>
+              <a href="author.html#91">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I think making the desktop a JDesktopPane is the worst way to go, it
+</I>&gt;<i> requires to many messy hacks to work could cause problems with AWT
+</I>&gt;<i> components and is somewhat small minded design wise. several times Ive
+</I>&gt;<i> proposed the use of a Screen.
+</I>
+Actually, after messing with my peer-toolkit hack for long enough, I'm
+inclined to agree.  Mixing AWT and Swing is just too messy.  Of course,
+that doesn't mean we have to forgo having PL&amp;F in standard AWT.  I think
+using the Swing UI delegates directly won't work, because one way or
+another they require a JComponent (and probably typecast to whatever
+subclass they are working with).  Instead, I'm going to investigate
+making the L&amp;F pluggable at the peer level.  Since our peers will never
+make graphics calls directly through native libraries, but instead
+through some Screen or GraphicsDevice object, our system is essentially
+lightweight.  I think I will botch my old code and start some new stuff,
+mimicing Swing's idea of the UIManager-JComponent connection in the
+Toolkit-Peer connection.  Unfortunately, this means that the AWT L&amp;F
+will be separate from and independent of the Swing L&amp;F, but I see no
+reason why we can't create AWT L&amp;F's that look like the Swing versions. 
+Then, hypothetically, a user selecting a particular look and feel could
+have the two L&amp;F's changed in tandem.  Anyway, those are my ideas for
+now.
+
+Later,
+
+Sean Cribbs
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000096.html">[JOS-UI] Widgets</A></li>
+	<LI> Next message: <A HREF="000092.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#91">[ date ]</a>
+              <a href="thread.html#91">[ thread ]</a>
+              <a href="subject.html#91">[ subject ]</a>
+              <a href="author.html#91">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

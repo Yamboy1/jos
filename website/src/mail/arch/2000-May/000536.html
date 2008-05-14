@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000528.html">
+   <LINK REL="Next" HREF="000543.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">ryan@whitewolf.com.au</A><BR>
+    <I>Tue, 02 May 2000 13:06:55 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000528.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000543.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#536">[ date ]</a>
+              <a href="thread.html#536">[ thread ]</a>
+              <a href="subject.html#536">[ subject ]</a>
+              <a href="author.html#536">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I think it is important to understand both the positives and negatives I
+pointed out (I know I wasn't clear enough, though) in order to put
+things into perspective. I hope after I explain those points a little
+better, you might have some comments on the rest of my original email
+(which IMHO was the more interesting part to discuss):
+
+Gilbert Carl Herschberger II wrote:
+
+&gt;<i> &gt;1. it must retain the original payload of the class file
+</I>&gt;<i> 
+</I>&gt;<i> 1. Yes, a bytecode cache must retain the original payload. This means that
+</I>&gt;<i> a class definition can point to the original Code attribute of a method,
+</I>&gt;<i> rather than copy it. It means a class definition can point to the original
+</I>&gt;<i> class access, field access and method access, not copy it.
+</I>
+_Quinn might like to comment here. As he pointed out, when you look at
+the implementation of decaf, a class definition is not the same as what
+you would put in the bytecode cache. Therefore, it is &quot;extra&quot;
+information that we need to hang on to. Sure, you can propose an
+alternate JVM design that always keeps the complete class file contents
+in memory, and for for this JVM, it would not be considered extra
+information.
+
+But, my point is that if a JVM implements the bytecode cache idea, &quot;it
+_must_ retain the original payload of the class file&quot;.
+
+&gt;<i> A class definition cache must retain something, a conversion of the
+</I>&gt;<i> original payload to something else. A class definition might make a copy of
+</I>&gt;<i> Code attributes for each method. This means a class definition may require
+</I>&gt;<i> multiple calls to alloc(), one for each Code attribute.
+</I>
+I'll leave _Quinn to respond to JVM implemenation details :-)
+
+&gt;<i> &gt;2. it must always read the class data from disk or network when defining
+</I>&gt;<i> &gt;a class.
+</I>&gt;<i> 
+</I>&gt;<i> 2. No, not at all. When defining a class, a bytecode cache has little to do
+</I>&gt;<i> with a disk or network. A bytecode cache is plugged into the
+</I>&gt;<i> ClassLoader.defineClass() method. It does not know and does not care where
+</I>&gt;<i> the payload came from. It works across the board for both primordial and
+</I>&gt;<i> custom class loaders.
+</I>
+I think you missed my point completely :-) &quot;it&quot; doesn't refer to the
+bytecode cache, but to the code that is *forced* by the bytecode cache
+to generate or read the class data from some source every time.
+
+So, my point is that you &quot;must always read --or generate-- class data
+from disk or network --or some other source-- when defining a class&quot; in
+the bytecode cache approach.
+
+The &quot;or some other source&quot; should cover any further responses, I think,
+including sources such as the filesystem cache.
+
+&gt;<i> &gt;3. it must always do a byte for byte comparison to ensure class
+</I>&gt;<i> &gt;definition sharing is valid.
+</I>&gt;<i> 
+</I>&gt;<i> 3. Not exactly. If the payload is retained, a byte-for-byte comparison of
+</I>&gt;<i> one payload to another is the most efficient comparison I can think of. But
+</I>&gt;<i> the implementation of the comparison operator is left up to the
+</I>&gt;<i> implementor. If there is a safer or faster way to compare two class
+</I>&gt;<i> definitions, find it and use it.
+</I>
+Just to keep things in perspective (my aim), a perfect comparator is
+always more computationally expensive, however you do it.
+
+So, my point is that &quot;it must always do a byte for byte comparison -- or
+something to that effect -- to ensure class definition sharing is valid.
+This is inherently more computationally expensive.&quot;
+
+I hope this time my points are clear. If they still contain errors, I
+hope you at least see the actual disadvantages I am trying to show in
+each point, as well as the advantages I am trying to show in each point.
+I do still believe this is an accurate analysis that puts things in
+perspective and enables us to see that merging our two approaches (yours
+which focusses memory efficiency, and mine which focusses on
+computational efficiency) &quot;might&quot; be beneficial in the end.
+
+Which of the three alternatives is most beneficial we can discuss in the
+other thread.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000528.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000543.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#536">[ date ]</a>
+              <a href="thread.html#536">[ thread ]</a>
+              <a href="subject.html#536">[ subject ]</a>
+              <a href="author.html#536">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

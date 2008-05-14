@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000539.html">
+   <LINK REL="Next" HREF="000531.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Mon, 01 May 2000 13:03:40 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000539.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000531.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#525">[ date ]</a>
+              <a href="thread.html#525">[ thread ]</a>
+              <a href="subject.html#525">[ subject ]</a>
+              <a href="author.html#525">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i> &gt; If a primordial class loader is written in bytecode, it needs to intern
+</I>&gt;<i> &gt; class definitions too. Any class definition could be intern'd by any class
+</I>&gt;<i> &gt; loader. If both primordial and custom class loaders can intern a class
+</I>&gt;<i> &gt; definition, an object can be shared if its class definition is the same.
+</I>&gt;<i> 
+</I>&gt;<i>         No.  A custom classloader which does not use findSystemClass() (or
+</I>&gt;<i> equivalent, e.g. asking a process-wide static for a Class) can not share
+</I>&gt;<i> definitions with another custom classloader.  The semantics of the VM
+</I>&gt;<i> require that those classes be considered different, and to do otherwise is
+</I>&gt;<i> not transparent to 'legacy' applications which use custom
+</I>&gt;<i> classloaders.  If a custom classloader passes on a Class from somewhere
+</I>&gt;<i> else in the same process, naturally the Class is the same in both
+</I>&gt;<i> classloaders, and casting is allowed.  (According to my recollection of
+</I>&gt;<i> the spec.)
+</I>
+There appears to be some confusion in the understanding of Gilbert's
+bytecode cache. One of the advantages of Gilbert's idea is that it
+_does_ allow class definition sharing with classes loaded by custom
+class loaders. This does not mean it goes against the spec, if you
+realise that classes and class definitions are not the same thing. We
+just need to understand that this changes the rules for object sharing.
+Instead of allowing illegal casts between any two classes that share the
+same class definition, we only allow illegal casts if the Classes were
+also both loaded by primordial class loaders.
+
+To clarify, there are two constraints for illegal casting between two
+classes:
+
+1. The two class defintions must be the same
+2. The two classes must be loaded by primordial class loaders
+
+In my proposal for class definition sharing, (1) implies (2), therefore
+there was no need to separate the two. But if we use Gilbert's bytecode
+cache, we must consider both constraints individually.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000539.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000531.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#525">[ date ]</a>
+              <a href="thread.html#525">[ thread ]</a>
+              <a href="subject.html#525">[ subject ]</a>
+              <a href="author.html#525">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

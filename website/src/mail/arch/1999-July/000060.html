@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] RE: [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000055.html">
+   <LINK REL="Next" HREF="000063.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] RE: [JOS-UI] peer-ui mappings</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] RE: [JOS-UI] peer-ui mappings">gchii@mindspring.com</A><BR>
+    <I>Sun, 25 Jul 1999 20:34:29 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000055.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000063.html">[JOS-Arch] Multi-process VM</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#60">[ date ]</a>
+              <a href="thread.html#60">[ thread ]</a>
+              <a href="subject.html#60">[ subject ]</a>
+              <a href="author.html#60">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 04:22 PM 7/25/99 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>I would suggest the Right Thing to do is to write JOS's platform without
+</I>&gt;<i>worrying too much about Sun's, and take care of compatibility problems
+</I>&gt;<i>with compatability modules.
+</I>
+Sounds good.
+
+&gt;<i>Sun's platforms will change again, and probably in ways that aren't
+</I>&gt;<i>compatible with any unified problem we might come with.  Again, to my
+</I>&gt;<i>understanding, the exact changes to the VM spec involve either (a) 
+</I>&gt;<i>additions that older VMs can safely ignore or (b) alterations to the
+</I>&gt;<i>interpertation of some parts of the VM or language spec which either 
+</I>&gt;<i>were or are incorrect.
+</I>
+We should expect Sun's platform to change. And with their track record, we
+can reasonably expect their changes to be incompatible. That's why I would
+like to see an architecture that doesn't crumble under the weight of just
+one more change.
+
+&gt;&gt;<i> We don't need an &quot;oddly written&quot; compiler. If we build a multiple process
+</I>&gt;&gt;<i> JVM, we are already breaking away from the single process JVM standard
+</I>&gt;&gt;<i> created by Sun. The Java virtual machine specification is clear. By design,
+</I>&gt;&gt;<i> a JVM must support a single process.
+</I>&gt;<i>
+</I>&gt;<i>	If you don't want your classfile to have java.lang.* references in
+</I>&gt;<i>it, you need an oddly-written compiler.  By default, all java compilers
+</I>&gt;<i>import java.lang.*, and java.lang.Object is the defined superclass of
+</I>&gt;<i>every other class...
+</I>
+I want application programs to have java.* references. I want many JOS
+applications to have java.* references. I'm talking about building JOS, not
+building applications that run on top of JOS.
+
+&gt;<i>	So far as I've read the spec, it doesn't require a single-process
+</I>&gt;<i>model (thought it might assume one) -- large chunks of the class library
+</I>&gt;<i>will break in amusing ways if the VM doesn't fake one, but it's entirely
+</I>&gt;<i>possible to write a multi-process VM that will execute non-process-aware
+</I>&gt;<i>programs without difficulty; as a matter of fact, for JOS to work, we
+</I>&gt;<i>*have* to write such a JVM.
+</I>
+There is a book called the Java Virtual Machine. In chapter one, it says
+that Sun intended a native process to make multiple JVMs available on a
+single machine. It isn't encouraging. It says that Sun doesn't want anyone
+to go beyond one process/one JVM.
+
+The JOS Project may be the only organization that is giving serious
+throught to a multiple process JVM. Although I would like to work within a
+multiple process JVM, it is not required for JOS to work. There are
+alternatives.
+
+A multiple process JVM for JOS should follow the development of a single
+process JVM for JOS. If we build a single process JVM that works, we can
+expand it for multiple processes.
+
+&gt;&gt;<i> I believe we need a JOS-compatible javac tool. A multiple process JVM is
+</I>&gt;&gt;<i> likely to need a compiler with multiple process support.
+</I>&gt;<i>
+</I>&gt;<i>	Absolutely not.  Processes MUST be an API that has native-code
+</I>&gt;<i>links into our JVM, otherwise we've just cut ourselves off from every
+</I>&gt;<i>other java developer out there, which is unacceptable.
+</I>
+Again, I'm talking about building JOS. How do you compile the classes in
+java.lang.*?
+
+&gt;<i>	Multiple java processes in a single JVM are simply a matter of
+</I>&gt;<i>keeping namespaces disjoint.  Certain elements of the extant Java API will
+</I>&gt;<i>have to be rewritten to act appropriately (i.e. System.exit() will kill
+</I>&gt;<i>the process, not the system), but the classfile will remain the
+</I>&gt;<i>same.  To maintain separate namespaces requires a slight modification to
+</I>&gt;<i>the primordial classloader, and that's it.  Every Java class already
+</I>&gt;<i>maintains the classloader that loaded it.
+</I>
+Yes, it's in the class loader. It isn't as difficult as it sometimes
+sounds. We must change the JVM to create a separate class loader for each
+process.
+
+I just got an idea. Why don't we change the start-up sequence? Why doesn't
+the java tool call our JOS launcher instead of custom.main()? I'll have to
+think about that more. When the java tool initializes the JVM, it calls
+custom.main() only because that's the standard convention. What if the java
+tool calls JOS.main() and passes the name of the custom class to launch?
+JOS.main() can create a new PrimordialClassLoader() with no problem.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000055.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000063.html">[JOS-Arch] Multi-process VM</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#60">[ date ]</a>
+              <a href="thread.html#60">[ thread ]</a>
+              <a href="subject.html#60">[ subject ]</a>
+              <a href="author.html#60">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

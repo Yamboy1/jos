@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Device Architecture</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000137.html">
+   <LINK REL="Next" HREF="000109.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Device Architecture</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Arch] Device Architecture">onewith1@flash.net</A><BR>
+    <I>Thu, 5 Aug 1999 15:37:59 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000137.html">[JOS-Arch] URI?</A></li>
+        <LI> Next message: <A HREF="000109.html">[JOS-Arch] URI?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#105">[ date ]</a>
+              <a href="thread.html#105">[ thread ]</a>
+              <a href="subject.html#105">[ subject ]</a>
+              <a href="author.html#105">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ah, into my field of study.  Unfortunately, after my change in jobs, I have
+had very little time to work on this problem of discovery and storage.
+When/if Wiki's back up, look at my page under DeviceArchitecture.
+
+-----Original Message-----
+From: John Morrison &lt;<A HREF="mailto:jm@mak.com">jm@mak.com</A>&gt;
+To: <A HREF="mailto:kernel@jos.org">kernel@jos.org</A> &lt;<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>&gt;
+Date: Thursday, August 05, 1999 8:28 AM
+Subject: Re: [JOS-Kernel] the vga driver is working now
+
+
+&gt;&gt;<i> Now we should start with a generic device loader (what do you think,
+</I>&gt;&gt;<i> Hilary? The shark examples are quite good). I'm also very interested in
+</I>&gt;&gt;<i> writing an IDE driver.
+</I>&gt;<i>
+</I>&gt;<i>The following paragraph is based upon only what I can remember from a
+</I>cursory
+&gt;<i>reading of both the &quot;Inside JavaOS&quot; book and the IBM &quot;JavaOS for Business&quot;
+</I>&gt;<i>documentation (neither is in front of me now), so there's a distinct
+</I>possibility
+&gt;<i>that I can be really mistaken:
+</I>&gt;<i>
+</I>&gt;<i>JavaOS has this concept where they (apparently) unify the concept of a
+</I>registry
+&gt;<i>and the traditional UNIX &quot;/dev&quot; device entries, and driver entries, too.
+</I>This
+&gt;<i>Java-object tree gets populated when the device discovery is done at boot
+</I>time,
+&gt;<i>and then drivers are also elements of the tree.  Also, user preferences are
+</I>&gt;<i>stored the same way somehow (serialization?).  Finally, they seem to one-up
+</I>the
+&gt;<i>concept of a registry in that, when a member of the tree is updated (e.g.,
+</I>a
+&gt;<i>hot-swappable device is discovered, or a new driver is loaded), then other
+</I>Java
+&gt;<i>objects can get notified, so they can remain in synchrony with the
+</I>database.  It
+&gt;<i>seems neat and elegant (which implies that maybe it'll be simpler to
+</I>&gt;<i>implement?), and I'm thinking we should clone it.
+</I>
+I'm attempting to summarize my design/thoughts in quick words, so this might
+get confusing...  My rough sketch of the device tree was initially based on
+a combination of JavaOS's viewpoint, and Jini's device discovery/listing
+tree.  I agree with JavaOS's design of placing devices in a &quot;/dev&quot; entry in
+the registry, but I feel that applications should *NOT* have access to this.
+It would create too large of a dependancy on the devices - when we know that
+we want real-time add/remove/replace features for drivers.  Thus, we keep
+the user from having to reboot at every minor device change.
+
+Instead, I said that we should have a &quot;device interface&quot; layer in the
+registry, which basically has a set of classes with links to the &quot;/dev&quot; or
+&quot;/devInterface&quot; locations.  This way, applications which request a device
+will be unaware of a device being replaced.  All that changes is the device
+interface links.  Since this is in the registry, different threads/processes
+can have different sets of device links.  This requires rewriting many of
+the basic java.* classes so that they reference the registry's device links.
+
+&gt;<i>
+</I>&gt;<i>(With respect to device-discovery, I have some pretty good documentation on
+</I>the
+&gt;<i>BIOS data areas, in which the BIOS stores the results of its device-probing
+</I>&gt;<i>activities.  Now that we can read physical memory, we can stroll through
+</I>this
+&gt;<i>area and find out exactly what devices are in the box.  I'm more than
+</I>willing to
+&gt;<i>help out here...)
+</I>
+The reason why I initially volunteered to cover device-discovery (which bled
+into the whole device architecture) was that I have some good plug-n-play
+documentation, as well as a history of device driver implementation in DOS.
+Ah, those were the days...
+
+&gt;<i>Fabulous work -- congratulations!!
+</I>&gt;<i>
+</I>&gt;<i>-jm
+</I>
+Good going on the VGA driver.  Anyone up for writing a MGA driver? :)
+
+-Matt
+
+&quot;Imagine a person with a gift of ridicule.  [He might say] First that a
+negative quality has no square root; secondly that a negative quality has no
+logarithm; thirdly that the second non-existant is to the first as the
+circumference of a circle is to the diameter.&quot;
+       - Augustus de Morgan
+
+
+&gt;<i>
+</I>&gt;<i>--
+</I>&gt;<i>==== John Morrison            ==== MaK Technologies, Inc.
+</I>&gt;<i>==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA
+</I>02138
+&gt;<i>==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+</I>&gt;<i>==== vox:617-876-8085 x115    ==== fax:617-876-9208
+</I>&gt;<i>
+</I>&gt;<i>_______________________________________________
+</I>&gt;<i>Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i><A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000137.html">[JOS-Arch] URI?</A></li>
+	<LI> Next message: <A HREF="000109.html">[JOS-Arch] URI?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#105">[ date ]</a>
+              <a href="thread.html#105">[ thread ]</a>
+              <a href="subject.html#105">[ subject ]</a>
+              <a href="author.html#105">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

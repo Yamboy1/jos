@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os-0.1.4-pre4</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000608.html">
+   <LINK REL="Next" HREF="000579.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os-0.1.4-pre4</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] rheise.os-0.1.4-pre4">ryan@whitewolf.com.au</A><BR>
+    <I>Mon, 15 May 2000 00:58:42 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000608.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000579.html">[JOS-Arch] rheise.os-0.1.4-pre4</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#578">[ date ]</a>
+              <a href="thread.html#578">[ thread ]</a>
+              <a href="subject.html#578">[ subject ]</a>
+              <a href="author.html#578">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is prerelease 4 of rheise.os-0.1.4. I haven't had time to put
+together a proper release, but at least you can try out the new
+functionality I've been working on:
+
+	<A HREF="http://www.progsoc.uts.edu.au/~rheise/projects/rheise.os/">http://www.progsoc.uts.edu.au/~rheise/projects/rheise.os/</A>
+
+The main changes in this release are:
+
+	- Packages renamed to jos.*
+	- SwingToolkit more usable.
+	- Preliminary JDK 1.2 support.
+
+Windows is still an issue. I don't have a copy of Windows so I am unable
+to test it. I have heard that there are various security exceptions that
+get thrown because I'm doing evil things, but I believe that can be
+fixed by editing the security policy file for your JVM. If not, there is
+probably another way to get it to work.
+
+A few things to notice: in graphics mode, the shell program runs inside
+a graphical terminal program called GTerm (like xterm). It's very basic
+- no scrollbar yet, and the delete key actually, inserts a delete
+character, but it basically works. Also note that shell commands can now
+be followed by a '&amp;' to run a command in the background. Since you will
+have downloaded JTA, you may as well try running de.mud.jta.Main
+&lt;hostname&gt; to test running the telnet app from inside SwingToolkit.
+
+BTW, thanks to everybody who suggested new names for rheise.os. I
+haven't decided which one I'll go with yet, but I will eventually.
+
+Here is the full change-log for this release:
+
+ - Renamed rheise.os.* to jos.*
+ - Renamed rheise.os.impl.* to josp.* (jos-private)
+ - JavaProcess.waitFor() skips daemon threads.
+ - JavaProcess.waitForAll() includes daemon threads.
+ - JavaProcess.destroy() implemented using ProcessDeath.
+ - All processes are added to the root thread group.
+ - HostProcessClassLoader works with jars and zips.
+ - Implemented a simple archive cache for class loading efficiency.
+ - HostInit is now a process spawned by HostBoot.
+ - HostBoot provides a -g option to enable graphics mode.
+ - Standard awt.toolkit no longer supported (must use SwingToolkit).
+ - SecurityManager delegator is no longer set (interferes with menus).
+ - Provided hook to allow SwingToolkit to clean up after process dies.
+ - Fixed System.exit() so it works from within AWT Thread.
+ - JDK 1.2/Linux works in text mode.
+ - Introduced jos.system package (includes shutdown() method).
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000608.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000579.html">[JOS-Arch] rheise.os-0.1.4-pre4</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#578">[ date ]</a>
+              <a href="thread.html#578">[ thread ]</a>
+              <a href="subject.html#578">[ subject ]</a>
+              <a href="author.html#578">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

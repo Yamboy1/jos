@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os-0.1.2 released</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000502.html">
+   <LINK REL="Next" HREF="000503.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os-0.1.2 released</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] rheise.os-0.1.2 released">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 26 Apr 2000 13:28:36 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000502.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+        <LI> Next message: <A HREF="000503.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#504">[ date ]</a>
+              <a href="thread.html#504">[ thread ]</a>
+              <a href="subject.html#504">[ subject ]</a>
+              <a href="author.html#504">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; If you have further questions I'll explain at a later time.
+</I>&gt;<i> 
+</I>&gt;<i>         Okay, took a look there.  You moved from wrapping System to
+</I>&gt;<i> wrapping its static variables, right, setting those wrappers in the kernel
+</I>&gt;<i> System class so they couldn't be avoided.  I like it.
+</I>
+I didn't really &quot;move&quot; to doing that. The System wrapper class is used
+99% of the time (which is good because it prevents one process from
+writing over the System.in that is being used by another process), and
+the static field wrappers are used as a fallback for the other 1% of the
+time.
+
+When these fallback wrappers are used, there is still a chance things
+can go wrong, for example if &quot;system&quot; code calls setIn() or any of the
+other set methods. Luckily I don't think there is any system code that
+does this. Another thing that could go wrong is if system code tries to
+set the security manager. It is usually expected that no security
+manager is set, however I must set the security manager to something so
+I can do forwarding. I emulate a null security manager with
+NullSecurityManager. However, if any system code tries to call
+setSecurityManager() it will fail. So, any code that wishes to call
+setSecurityManager() must belong to a user process which has its own
+System (wrapper) class and an actual 'null' for the security manager
+(which is 99% of the time).
+
+By the way, the only reason I am able to load my own System class and
+have it work 99% of the time is that java.lang.System is a purely static
+class. There are no instances of System, and so there are no references
+to System objects. If there were references to System objects, rheise.os
+would fail when you tried to pass in a reference to a System object
+owned by your process into a method in a class loaded by the host
+primordial class loader (ie. system code). That was the original insight
+that led me to this solution.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000502.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+	<LI> Next message: <A HREF="000503.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#504">[ date ]</a>
+              <a href="thread.html#504">[ thread ]</a>
+              <a href="subject.html#504">[ subject ]</a>
+              <a href="author.html#504">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

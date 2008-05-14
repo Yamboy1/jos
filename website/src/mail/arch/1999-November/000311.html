@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] TCP/IP stack.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:kumarrk%40usa.net">
+   <LINK REL="Previous"  HREF="000332.html">
+   <LINK REL="Next" HREF="000313.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] TCP/IP stack.</H1>
+    <B>Kumar Ramanathan</B> 
+    <A HREF="mailto:kumarrk%40usa.net"
+       TITLE="[JOS-Arch] TCP/IP stack.">kumarrk@usa.net</A><BR>
+    <I>17 Nov 99 06:05:06 MST</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000332.html">[JOS-Arch] JOS Packages.. I'm a litte confused!</A></li>
+        <LI> Next message: <A HREF="000313.html">[JOS-Arch] TCP/IP stack ...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#311">[ date ]</a>
+              <a href="thread.html#311">[ thread ]</a>
+              <a href="subject.html#311">[ subject ]</a>
+              <a href="author.html#311">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hey everybody,
+I've been reading the postings on the Networking mailing list and would like
+to be part of this effort ... 
+I've had some experience in C++/UNIX/OOAD and TCP/IP in the industry and would
+like to make a contribution.
+
+Please make me part of all the mailers regarding the stack.I've quite some
+free time now after being in a crazily crazily  hectic schedule last 2 months
+...
+
+Thanks,
+Kumar
+
+Ranieri Argentini &lt;<A HREF="mailto:R.Argentini@student.tudelft.nl">R.Argentini@student.tudelft.nl</A>&gt; wrote:
+&gt;<i>The first thing to do is identify what we need to get started. What
+</I>&gt;<i>exactly do we want to implement first, and how can we generate the
+</I>&gt;<i>necessary input / output to test what we're writing? 
+</I>
+First thing to do is usually to get all the eth. packets received through a
+function/method that examines them. This method decides wether they are
+handled (in case of ARP RARP or IP) or discarded, and pass them to their
+respective handlers.
+This could be implemented modularly so new protocols can be added without
+modifying the code, simply by adding another instance of a &quot;protocol&quot; class
+into a suitable structure.
+
+Next would be to get ARP and RARP working to map IPs onto MAC adresses and
+finally the IP stuff, which will be pretty hairy (think routing,
+fragmentation and reassembly, errors via ICMP etc.)
+Now we should have something semi-useable.
+Adding in UDP should be trivial at this stage, for it just a very thin
+layer on top of IP.
+The TCP is going to prove even hairier than IP, but that's for later worries
+:<i>)
+</I>
+The very important thing (as in all OO projects) is to have a good
+interface definition to the visible objects.
+Sun has defined TCP and UDP classes, i just suggest we implement those when
+we get there. There's however still a lot of room to improvise.
+
+&gt;<i>At this stage it might be a good idea to just use Linux to provide the
+</I>&gt;<i>lower networking layers, and feed the data into a Java app.
+</I>
+While this is undoubtedly a good idea, we need a couple of native methods
+to implement some serious black magic, and i'm not much of a linux device
+wizard. I'm willing to experiment though :)
+We need to make this &quot;black magic class&quot; compatible with the &quot;jos driver
+interface for block devices&quot; if such a thing exists, and then plugging it
+into the kernel should be fairly painless.
+
+Keep up the brainstorm!
+Ranieri.
+
+PS: are we expected to have garbage collection for the tcp/ip stack?
+
+
+_______________________________________________
+Arch maillist  -  <A HREF="mailto:Arch@jos.org">Arch@jos.org</A>
+<A HREF="http://jos.org/mailman/listinfo/arch">http://jos.org/mailman/listinfo/arch</A>
+
+
+____________________________________________________________________
+Get free email and a permanent address at <A HREF="http://www.netaddress.com/?N=1">http://www.netaddress.com/?N=1</A>
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000332.html">[JOS-Arch] JOS Packages.. I'm a litte confused!</A></li>
+	<LI> Next message: <A HREF="000313.html">[JOS-Arch] TCP/IP stack ...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#311">[ date ]</a>
+              <a href="thread.html#311">[ thread ]</a>
+              <a href="subject.html#311">[ subject ]</a>
+              <a href="author.html#311">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

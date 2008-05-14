@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000434.html">
+   <LINK REL="Next" HREF="000438.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">tmiller@haverford.edu</A><BR>
+    <I>Sun, 9 Apr 2000 12:36:25 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000434.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000438.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#435">[ date ]</a>
+              <a href="thread.html#435">[ thread ]</a>
+              <a href="subject.html#435">[ subject ]</a>
+              <a href="author.html#435">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> findSystemClass() isn't just called to save memory. You *must* call
+</I>&gt;<i> findSystemClass() on all the linked classes which are to be referenced
+</I>&gt;<i> by the calling code.
+</I>
+	If they were referenced by the calling code /before/ the call to
+the classloader, they've already been loaded; otherwise, this is the first
+time they've been loaded for the calling code, and whatever you define it
+as is 'right' -- although, as in your applet example, useless.
+
+&gt;<i> You cannot cast the return value of newInstance() from
+</I>&gt;<i> Applet(L2) to Applet(L1). You must ensure that Applet in each case is
+</I>&gt;<i> the *same* class.
+</I>
+	Until that Applet(L2) is passed to a method (or assigned to a
+field) that knows about Applet(L1), we're good.  It is not required, to my
+understanding, that a classloader be /useful/.
+
+	A native extension that would both allow efficient 'illegal' casts
+and efficient memory usage would be, then, an assignClassLoader( Class c,
+ClassLoader cl) method.  The JOS default custom classloader could use
+findSystemClass to locate the (shared) class definition, and the
+assignClassLoader() method to 'clone' it, marking it as a separate class
+(and generating its independent statics) but flagging it as identical to
+the system class for the 'illegal' casts.
+
+&gt;<i> Also, when you consider that it is a security risk to allow user defined
+</I>&gt;<i> classes to invoke native system methods (eg. you could bypass the
+</I>&gt;<i> sandbox), various system classes (eg. System) must always be loaded by
+</I>&gt;<i> the(/a) primordial class loader in order to make use of their native
+</I>&gt;<i> methods. Of course, in JOS we might have an effective primordial class
+</I>&gt;<i> loader for each process, so it's ok to reload the System class in each
+</I>&gt;<i> primordial (JOS-controlled) classloader.
+</I>
+	Right.  Classes which, for whatever reason, the Java code is
+prevented from reloading must be reloaded by the native code; and it /is/
+a good idea to restrict access to certain (specified) members of the (JOS)
+class library.  (This would probably be better cast as a security issues
+-- e.g. only code with an effective uid of root can call (native) method
+N, but security is a while off...)
+
+&gt;<i> Ideally, separate namespaces should be completely separate, apart from
+</I>&gt;<i> the classes we *want* to share. Would it be possible to provide a native
+</I>&gt;<i> method to invoke a program in a new process without requiring any
+</I>&gt;<i> classes to be in common? It seems that all it needs to do is convert
+</I>&gt;<i> the String array argument from String(L1) to String(L2). This would seem
+</I>&gt;<i> safe given that L1 and L2 are primordial class loaders for process 1 and
+</I>&gt;<i> process 2, and String is a system class.
+</I>
+	Yes.  (Of course, it would need a separate Object, as well.)
+
+&gt;<i> I suspect this won't work (see above) - at least not in a normal JVM.
+</I>
+	The empirical test I described in the last email generated a log
+of loaded class that included java.lang.System; whether or not I can
+redefine it for long enough to be useful is another question entirely...
+
+&gt;<i> Yes, it is definately useful. I hope the &quot;approved illegal casts&quot; idea
+</I>&gt;<i> is a way to solve this.
+</I>
+	I think it could be; implementation is an issue, but it always
+is. See my above assignClassLoader() idea for a way of doing this and
+saving memory at the same time.
+
+	BTW, thanks for the smart feedback.
+
+-_Quinn
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000434.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000438.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#435">[ date ]</a>
+              <a href="thread.html#435">[ thread ]</a>
+              <a href="subject.html#435">[ subject ]</a>
+              <a href="author.html#435">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

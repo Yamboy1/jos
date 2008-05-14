@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000477.html">
+   <LINK REL="Next" HREF="000500.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Tue, 25 Apr 2000 18:13:06 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000477.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000500.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#498">[ date ]</a>
+              <a href="thread.html#498">[ thread ]</a>
+              <a href="subject.html#498">[ subject ]</a>
+              <a href="author.html#498">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>As promised, here is my response to _Quinn's final summary. Nice,
+thorough summary. I only have a couple of comments:
+
+On Wed, 19 Apr 2000, Todd L. Miller wrote:
+
+&gt;<i> another.)  The desire for multiple Java processes in a single JVM stems
+</I>&gt;<i> from two sources: first, the JJOS kernel's current lack of multiple native
+</I>&gt;<i> processes (that is, we can't take the 'easy way out' and run multiple
+</I>&gt;<i> instances of decaf); second, the potential space efficiency benefits.  A
+</I>&gt;<i> more secondary concern is the handling of shared-object IPC.
+</I>
+Shared-object IPC might be more important from a functional perspective.
+rheise.os demonstrates that JavaProcess objects must be shared (although
+I'm sure there are hacky ways around this). Rather than perfecting
+memory efficiency, then implementing IPC, we could start with incomplete
+implementations of each one and work from there. eg. allow IPC for
+&quot;kernel required&quot; classes (regardless of whether memory efficiency is
+implemented).
+
+&gt;<i> our own.  The key realization for shared-memory OO-IPC is that the
+</I>&gt;<i> classloaders, being disjoint, do not share classes, and thus, the object
+</I>&gt;<i> can not be cast from one process to another.  We solve this by allowing
+</I>&gt;<i> 'illegal' cast operations as follows:
+</I>&gt;<i> 
+</I>&gt;<i> (1) The security system must OK the object share.  This allows us to flag
+</I>&gt;<i> 	the object as shared for efficiency.
+</I>&gt;<i> (2) The object's class definition must be shared between the two
+</I>&gt;<i> 	processes.  (Implying it was loaded by a (native)** primordial
+</I>&gt;<i> 	classloader.)
+</I>
+- I think the mechanism for (1) needs to be investigated further.
+  Flagging the object is one way to handle it. Another way is to simply
+control &quot;access&quot; to the object. A process can't ordinarily gain access to
+an object in another process, so there needs to be some bridge method
+that returns a reference to an object of another process. This method
+can perform access control. The difficulty in flagging is that you can't
+simply flag an object as shared because that won't give you access to
+its member variables, or to objects returned by methods on the object
+you do have access to. Flagging is obviously a way to make the system
+safer, but is it really necessary?
+
+- The model of sharing here is not fully specified. In particular, with
+  regard to access to static member variables of shared objects. In a
+past email (<A HREF="http://www.jos.org/pipermail/arch/2000-April/000438.html">http://www.jos.org/pipermail/arch/2000-April/000438.html</A>) I
+proposed:
+
+&quot;Now, if the client process directly accesses static members, it will
+access the cloned versions that belong to its own process. However, if
+you call a method on an object that really belongs to another process,
+and that method accesses a static member, then it should access the
+static members of the class in the _other_process. Are there any
+problems in implementing that?&quot;
+
+&gt;<i> * Amusingly enough, Java isn't type-safe anyway.  I don't have the
+</I>&gt;<i> (academic) citations handy, unfortunately.
+</I>
+You might be referring to this:
+
+	<A HREF="http://www.research.att.com/~vj/bug.html">http://www.research.att.com/~vj/bug.html</A>
+
+I think Sun has resolved this problem in JDK 1.2:
+
+	<A HREF="http://java.sun.com/people/gbracha/classloaders.ps">http://java.sun.com/people/gbracha/classloaders.ps</A>
+
+It introduces new loader constraints, which I think are getting in the
+way of rheise.os working with JDK 1.2. I haven't looked at this yet (I'm
+in no rush either since I'm not using JDK 1.2 :-)
+
+&gt;<i> Likewise, Java's memory model
+</I>&gt;<i> -- which I'm mostly ignoring, in part because of this -- is horribly
+</I>&gt;<i> broken.  Bill Pugh, who's written some papers about it, seems to hold the
+</I>&gt;<i> opinion (based on my second-hand information) that Sun's VM implementation
+</I>&gt;<i> has a memory model which makes sense but doesn't follow the spec...
+</I>
+Can you point me to these papers? Thanks.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000477.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000500.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#498">[ date ]</a>
+              <a href="thread.html#498">[ thread ]</a>
+              <a href="subject.html#498">[ subject ]</a>
+              <a href="author.html#498">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

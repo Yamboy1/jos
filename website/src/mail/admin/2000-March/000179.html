@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Admin] Source Server</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000178.html">
+   <LINK REL="Next" HREF="000180.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Admin] Source Server</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Admin] Source Server">ryan@whitewolf.com.au</A><BR>
+    <I>Fri, 24 Mar 2000 09:47:45 +1100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000178.html">[JOS-Admin] Source Server</A></li>
+        <LI> Next message: <A HREF="000180.html">[JOS-Admin] [Wiki] Article Names</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#179">[ date ]</a>
+              <a href="thread.html#179">[ thread ]</a>
+              <a href="subject.html#179">[ subject ]</a>
+              <a href="author.html#179">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> 
+</I>&gt;<i> I have been thinking about this:
+</I>&gt;<i> 
+</I>&gt;<i> What prevents us from replacing the Source Server?
+</I>
+There have been two ideas for this so far (that I know of):
+
+1. Iain and I were going to write a user-friendly wrapper around CVS.
+2. Someone proposed that we move to SourceForge. 
+
+I am no longer sure how I would prefer to do it.
+
+Let's look at some requirements:
+
+1. Serious developers need full CVS capabilities and control over who
+can edit their files.
+2. The rest would just like to upload their changes without any hassles.
+
+So, it looks like whichever proposal we choose, we are going to need two
+separate repositories with different levels of security and different
+management tools.
+
+I am imagining a system in which serious/trusted developers are given
+write access to selected parts of the developers' repository, while
+everyone has write access to the contributors' repository. Some how,
+official updates to the developers' repository are propagated to the
+contributors' repository while leaving contributors' changes intact. CVS
+(indirectly) provides the ability to do this.
+
+If a contributor has contributed something that they think should be
+integrated into the official version, an official developer will copy
+the changes made to the contributors' tree and apply them to the
+developers' tree.
+
+In order to support automatic synchronisation of the two repositories,
+the new SourceServer (the public contributors' repository) should be
+based on CVS.
+
+This is just a half-baked idea as yet. I need to think more before I
+know it will work.
+
+&gt;<i> 2. Source Server sorts for interfaces, exceptions, errors, abstract classes
+</I>&gt;<i> and classes. WebSource does not. How does Source Server do it? We should
+</I>&gt;<i> put this feature in WebSource.
+</I>
+The changes I'm making to your parser might make that easier to
+implement.
+
+&gt;<i> 4. Source Server enables you to download one source file at a time.
+</I>&gt;<i> WebSource does not. WebSource does not yet publish a plain-text, non-HTML
+</I>&gt;<i> version of each source file. An entire product is download-able as an archive.
+</I>
+I see a number cooperating components:
+
+1. The developers' repository
+2. The contributors' repository
+3. Publishing tools for (2)
+4. cvsweb (serves text/plain source files in CVS over HTTP)
+5. WebSource (converting source files to HTML)
+6. Javadoc
+
+If WebSource needs to display plain text, it can link to cvsweb. If it
+wants inline publishing and downloading capabilities, it can link to the
+other systems, written in other programming languages.
+
+SourceServer itself does not HTML'ify java files, it cooperates with
+PrettyPrinter to do that. In the same way, WebSource does not need to
+implement all of the functionality; Other components can take care of
+that.
+
+&gt;<i> 5. The scope of the WebSource project has exceeded the Source Server. I
+</I>&gt;<i> have included source code that has been submitted through CVS, Source
+</I>&gt;<i> Server and individual archives.
+</I>
+See above.
+
+&gt;<i> WebSource is compatible with Java servlet technology, too. A servlet is
+</I>&gt;<i> planned. Source code in its original form (.java) can be published
+</I>&gt;<i> dynamically as syntax-highlighted HTML pages.
+</I>
+Do you mean java-&gt;HTML conversion on the fly?
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000178.html">[JOS-Admin] Source Server</A></li>
+	<LI> Next message: <A HREF="000180.html">[JOS-Admin] [Wiki] Article Names</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#179">[ date ]</a>
+              <a href="thread.html#179">[ thread ]</a>
+              <a href="subject.html#179">[ subject ]</a>
+              <a href="author.html#179">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Registry? Or SmartAPI?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000251.html">
+   <LINK REL="Next" HREF="000253.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Registry? Or SmartAPI?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Registry? Or SmartAPI?">gchii@mindspring.com</A><BR>
+    <I>Mon, 11 Oct 1999 12:19:50 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000251.html">[JOS-Arch] Registry? Or SmartAPI?</A></li>
+        <LI> Next message: <A HREF="000253.html">[JOS-Arch] Re: Registry? Or SmartAPI?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#252">[ date ]</a>
+              <a href="thread.html#252">[ thread ]</a>
+              <a href="subject.html#252">[ subject ]</a>
+              <a href="author.html#252">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 03:53 PM 10/10/99 -0500, &quot;Matt Albrecht&quot; &lt;<A HREF="mailto:onewith1@flash.net">onewith1@flash.net</A>&gt; wrote:
+&gt;<i>I think what Clark was talking about was something similar to what Jini
+</I>&gt;<i>does.  You ask the registry (or whatever) for a list of service implementors
+</I>&gt;<i>(objects registered to the registry which implement a particular service),
+</I>&gt;<i>by giving the registry the interface you're looking for.  This does not mean
+</I>&gt;<i>the use of a String class, unless that is how the interface is passed (via
+</I>&gt;<i>&lt;interface&gt;.class.getName() call, or something along those lines).
+</I>
+So you're saying that I must create an instance of a Class object for an
+interface, let's say the InputStream interface, and pass it to a registry
+(or whatever) and it returns an instance of every known service that can
+return an implementation of an InputStream interface?
+
+In other words:
+
+Class c = Class.forName( &quot;java.io.InputStream&quot; );
+Service[] list = TheRegistry.getService( c );
+
+&gt;<i>In this manner, you won't need to know the name of the service; all you need
+</I>&gt;<i>to know is what you want from a service.
+</I>
+With the Smart API, you don't need to know the class name of the service.
+You don't need to create an instance of a class. You need to have a uniform
+resource locator (URI) to get an instance of a &quot;service&quot; or object you
+want. It is something like this:
+
+URI uri = new URI( &quot;in:gzip:buffer:<A HREF="http://www.jos.org/download/example.gz"">http://www.jos.org/download/example.gz&quot;</A> );
+InputStream input = (InputStream) uri.getObject();
+
+When you want to use a &quot;service&quot; on a specific digital resource, the Smart
+API takes you there directly.
+
+It seems that both a registry (or whatever) and Smart API enable a program
+to search for a service and then use it. A Smart API has the flexibility of
+a query string and fragment to pre-select the kinds of services you're
+interested in. The Smart API separates the configuration of the factory
+from the use of a factory. The configuration of a factory is centralized.
+
+It seems that the Smart API is more universal. It has broader scope. It
+completely covers the registry (or whatever) mechanism. The selection of a
+service can be encapsulated inside a subsystem, and should be. Service
+selection and factories can be abstracted for use with every program. You
+want a digital resource, such as a service.
+
+If Jini is really the digital resource you want, you can get an appropriate
+instance of it through the Smart API. Some machines are Jini-enabled; some
+are not. The Smart API can be aware of Jini, but not dependent on it.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000251.html">[JOS-Arch] Registry? Or SmartAPI?</A></li>
+	<LI> Next message: <A HREF="000253.html">[JOS-Arch] Re: Registry? Or SmartAPI?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#252">[ date ]</a>
+              <a href="thread.html#252">[ thread ]</a>
+              <a href="subject.html#252">[ subject ]</a>
+              <a href="author.html#252">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [bytecode process] Closing resources</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000722.html">
+   <LINK REL="Next" HREF="000717.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [bytecode process] Closing resources</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [bytecode process] Closing resources">gchii@mindspring.com</A><BR>
+    <I>Fri, 02 Jun 2000 13:06:56 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000722.html">[JOS-Arch] Static fields/object sharing</A></li>
+        <LI> Next message: <A HREF="000717.html">[JOS-Arch] [bytecode process] Closing resources</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#710">[ date ]</a>
+              <a href="thread.html#710">[ thread ]</a>
+              <a href="subject.html#710">[ subject ]</a>
+              <a href="author.html#710">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>We should discuss another critical issue: automatically closing system
+resources.
+
+When a bytecode process is terminated, it must surrender all of its system
+resources. A bytecode process must keep track of system resources that have
+been opened so that, when the time comes, it can close any system resources
+that remain open.
+
+How is this going to work?
+
+How does this affect a virtual machine?
+
+The classic example is a file/socket. We are familiar with the way this
+work with handles in traditional operating systems.
+
+Another example is a listener. When a bytecode process plugs itself in as a
+device listener, like a mouse listener, it must be unplugged automatically
+when a bytecode process is terminated. Like files/sockets, a mouse listener
+might need to be separated into system and user parts. The system part is
+actually plugged into a mouse device. The user part is, like a file/socket/
+only a handle. A mouse device from a user process viewpoint is local
+bytecode. Behind the scenes, a mouse device must pass messages back and
+forth to a real mouse device.
+
+This is almost completely redundent. We already expect CORBA/RMI
+connections, using socket handles, to connect the system process.
+
+Personally, I think a process object in machine code should maintain a list
+of all open handles to system objects. When process is terminated, all open
+handles are closed generically by machine code.
+
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000722.html">[JOS-Arch] Static fields/object sharing</A></li>
+	<LI> Next message: <A HREF="000717.html">[JOS-Arch] [bytecode process] Closing resources</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#710">[ date ]</a>
+              <a href="thread.html#710">[ thread ]</a>
+              <a href="subject.html#710">[ subject ]</a>
+              <a href="author.html#710">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

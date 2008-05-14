@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [bootdisk] Formatting a floppy</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000038.html">
+   <LINK REL="Next" HREF="000039.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [bootdisk] Formatting a floppy</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Apps] [bootdisk] Formatting a floppy">jewel@pixie.co.za</A><BR>
+    <I>Fri, 04 Aug 2000 03:47:38 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000038.html">[JOS-Apps] [bootdisk] Formatting a floppy</A></li>
+        <LI> Next message: <A HREF="000039.html">[JOS-Apps] [bulkmake] Release 2</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#40">[ date ]</a>
+              <a href="thread.html#40">[ thread ]</a>
+              <a href="subject.html#40">[ subject ]</a>
+              <a href="author.html#40">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> There seem to be two Linux commands to format a floppy disk.
+</I>&gt;<i> 
+</I>&gt;<i> 1. mkfs.minix /dev/fd0
+</I>&gt;<i> 
+</I>&gt;<i> This &quot;installs&quot; the minix filesystem on the floppy. It does its work quickly.
+</I>
+Usually you don't want to use a minix filesystem, but rather FAT or ext2.
+
+If you do:
+
+ls /sbin/mkfs*
+
+you will see something like:
+
+/sbin/mkfs  /sbin/mkfs.ext2  /sbin/mkfs.minix  /sbin/mkfs.msdos
+
+They work the same way as the minix mkfs.
+ 
+&gt;<i> 2. fdformat /dev/fd0
+</I>&gt;<i> 
+</I>&gt;<i> This formats a floppy disk.
+</I>
+The previous commands install a filesystem on the floppy disk (mkfs = make
+filesystem), formatting is the equivalent of a low-level disk format.
+ 
+&gt;<i> Do I have to format a floppy before installing GRUB?
+</I>
+No. 
+
+I recommend you install GRUB like this:
+
+First get
+
+<A HREF="ftp://alpha.gnu.org/gnu/grub/grub-0.5.95.tar.gz">ftp://alpha.gnu.org/gnu/grub/grub-0.5.95.tar.gz</A>
+
+then unpack it,
+
+$ tar xzf grub-0.5.95.tar.gz
+
+$ cd grub-0.5.95
+
+configure it
+
+$ ./configure
+
+make it
+
+$ make
+
+and then install it as the root user
+
+# make install
+
+It should put some files in /usr/local/share/grub/i386-pc/ . 
+
+Now to read the installation documentation:
+
+info -f docs/grub.info
+
+Go to the section *Installation, it tells you to copy the 'stage1',
+'stage2' and '*stage1_5' files to the /boot/grub directory. (Note that if
+you have a separate boot partition, this will be the /boot/boot/grub
+directory).
+
+Next choose *Installing GRUB on a floppy
+
+
+Install GRUB on the floppy:
+
+# cd /boot/grub (or /boot/boot/grub)
+# dd if=stage1 of=/dev/fd0 bs=512 count=1
+# dd if=stage2 of=/dev/fd0 bs=512 seek=1
+
+If there are no errors you will have a bootable GRUB floppy. If there are
+any errors, use a new floppy.
+
+When you boot with the floppy you will see a GRUB prompt. Here is how I
+boot Linux on my machine:
+
+&gt;<i> root=(hd0,0)      -- set the current filesystem to be the first
+</I>partition on the first hard disk (in this case my /boot partition)
+
+&gt;<i> kernel=/vmlinuz root=/dev/hda5       -- tell grub what kernel to load
+</I>and what options to pass
+
+&gt;<i> boot
+</I>
+Once you've entered the root=xxx command, you can use TAB completion like
+in BASH, it's very useful for finding the kernel you want to boot.
+
+Grub will also search the filesystems for you if you don't know what
+partition to use:
+
+&gt;<i> find /vmlinuz
+</I> (hd0,0)
+
+I suppose you could also do something like:
+
+&gt;<i> find /myhomedir/jos/josimage
+</I>
+
+
+
+
+
+Well, I hope that helps, feel free to ask any questions.
+
+
+John Leuner
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000038.html">[JOS-Apps] [bootdisk] Formatting a floppy</A></li>
+	<LI> Next message: <A HREF="000039.html">[JOS-Apps] [bulkmake] Release 2</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#40">[ date ]</a>
+              <a href="thread.html#40">[ thread ]</a>
+              <a href="subject.html#40">[ subject ]</a>
+              <a href="author.html#40">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

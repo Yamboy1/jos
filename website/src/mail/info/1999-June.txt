@@ -1,0 +1,147 @@
+From jm@mak.com Tue, 29 Jun 1999 08:30:42 -0400
+Date: Tue, 29 Jun 1999 08:30:42 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Info] [Fwd: Alternative approach to "memory" classes...]
+
+This is a multi-part message in MIME format.
+--------------0EA8AAB78E2AB0ECE0CE09B6
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+Sorry for the broken header in my first sending attempt...
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+--------------0EA8AAB78E2AB0ECE0CE09B6
+Content-Type: message/rfc822
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Received: from alexander.mak.com (IDENT:root@alexander.mak.com [207.86.232.32])
+	by mak.com (8.9.1/8.9.0) with ESMTP id IAA26336
+	for <jm@mak.com>; Tue, 29 Jun 1999 08:26:04 -0400 (EDT)
+Received: from mak.com (jm@localhost [127.0.0.1])
+	by alexander.mak.com (8.8.7/8.8.7) with ESMTP id IAA01037;
+	Tue, 29 Jun 1999 08:25:29 -0400
+Sender: jm@alexander.mak.com
+Message-ID: <3778BB38.F249786C@mak.com>
+Date: Tue, 29 Jun 1999 08:25:28 -0400
+From: John Morrison <jm@mak.com>
+Reply-To: arch@jos.org, general@jos.org, info@jos.org
+Organization: MaK Technologies, Inc.
+X-Mailer: Mozilla 4.05 [en] (X11; I; Linux 2.0.34 i686)
+MIME-Version: 1.0
+To: kernel@jos.org, admin@jos.org
+CC: jm@mak.com
+Subject: Alternative approach to "memory" classes...
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hi All;
+
+Sorry for the wide distribution, but I am interested in hearing your
+thoughts on the following, JOS-wide, and (unfortunately) related
+issues...
+
+Issue #1:
+
+Just bought the "Inside JavaOS" book.  Haven't had time to read the
+whole thing (you know how it is).  JavaOS has a quite different (and
+much more comprehensive) approach to memory classes than any of the ones
+I wrote about in my recent message to the kernel list (those of you who
+aren't on the kernel list can check the archives if you're really
+interested, but I really need your inputs on Issue #2...)
+
+Seems they have opaque (to Java, anyways) address32 and address64
+classes.  They also have "address range" classes, DMA address space
+classes, and even (seems to me) I/O space classes (as a 16-bit address
+space).  I haven't exactly figured out and/or read far enough to know
+if/how they handle the *contents* of addresses as unsigned quantities,
+although I'm sure they can handle it also via opaque classes.  Finally,
+they even seem to have an approach to handling physical<->virtual
+mapping machinery.
+
+So, I guess this comes down to either of two options (please excuse the
+hyperbole):
+
+(1) inventing our own, unique, simplistic, must-be-upgraded-later
+approach, which will be expedient in the short term, but will never be
+able to use JavaOS drivers/software, and will be much harder for us to
+get consensus upon (e.g., agreeing upon driver, system, OS, and "kernel"
+APIs), or
+
+(2) implementing something as close as is humanly possible to the JavaOS
+API(s), which will be more work in the short term, but maybe less in the
+long term, and which will obviate the consensus-building group-grope
+problem we currently have, which makes it much harder to get anything
+done that involves more than one person...
+
+Basically, option (1) is the "let's re-invent the wheel" approach, and
+(2) is the time-honored, Open Source "chase the tail-lights" approach. 
+As much as I like designing my own APIs (of course, they would be far
+superior to and more aesthetically pleasing than the JavaOS ones --
+*N-O-T*), I'm kind of leaning towards option (2).  I mean, hell, we're
+not redesigning the Java language, the bytecodes, or the java.* classes,
+so...
+
+Issue #2:
+
+Are there any legal ramifications of cloning the JavaOS APIs?  Is
+anybody in a position to find out?  If there are issues, I'd sure like
+to know about them right now so that we can do option (1) instead...
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+--------------0EA8AAB78E2AB0ECE0CE09B6--
+
+
+
+
+
+From tmiller@haverford.edu Tue, 29 Jun 1999 09:24:25 -0400 (EDT)
+Date: Tue, 29 Jun 1999 09:24:25 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Info] Re: [JOS-Admin] Alternative approach to "memory" classes...
+
+> Issue #2:
+> 
+> Are there any legal ramifications of cloning the JavaOS APIs?  Is
+> anybody in a position to find out?  If there are issues, I'd sure like
+> to know about them right now so that we can do option (1) instead...
+
+	Paired with this issue: does anyone know what the
+kind of redistribution of the JavaOS drivers is allowed?  I would guess
+that individual manufacturers don't particularly care, but Sun might have
+something against letting the drivers it ships with JavaOS spread to the
+four routers of the internet.
+
+	As for the legal ramifications of cloning the JavaOS APIs, we'll
+be engaged in an even more time-honored approach than Open Source
+"tail-light chasing" -- reverse engineering!
+
+-_Quinn
+
+
+
+
+

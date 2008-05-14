@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Terminal and Program</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000190.html">
+   <LINK REL="Next" HREF="000193.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Terminal and Program</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Terminal and Program">gchii@mindspring.com</A><BR>
+    <I>Mon, 16 Aug 1999 13:07:21 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000190.html">[JOS-Arch] Console for Program</A></li>
+        <LI> Next message: <A HREF="000193.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#191">[ date ]</a>
+              <a href="thread.html#191">[ thread ]</a>
+              <a href="subject.html#191">[ subject ]</a>
+              <a href="author.html#191">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Well, that didn't work either. I tried to add read/write methods to
+ProgramContext and it ruins an otherwise simple model. I must switch to a
+different model.
+
+// Terminal.java
+public interface Terminal {
+  public String readLine();
+  public void println( String v );
+}
+
+// TerminalProgram.java
+public interface TerminalProgram
+    extends Program {
+  public void setTerminal( Terminal v );
+}
+
+// IOStream.java
+public interface IOStream {
+  public InputStream getInputStream();
+  public OutputStream getOutputStream();
+}
+
+// IOStreamProgram.java
+public interface IOStreamProgram 
+    extends Program {
+  public void setIOStream( IOStream v );
+}
+
+There are different kinds of programs, so there should be different
+extensions of the program interface. They all have a ProgramContext in
+common because they all extend the Program interface.
+
+IOStreamProgram should support pipes and redirection.
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000190.html">[JOS-Arch] Console for Program</A></li>
+	<LI> Next message: <A HREF="000193.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#191">[ date ]</a>
+              <a href="thread.html#191">[ thread ]</a>
+              <a href="subject.html#191">[ subject ]</a>
+              <a href="author.html#191">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

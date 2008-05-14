@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000665.html">
+   <LINK REL="Next" HREF="000670.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">tmiller@haverford.edu</A><BR>
+    <I>Tue, 23 May 2000 09:31:34 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000665.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000670.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#667">[ date ]</a>
+              <a href="thread.html#667">[ thread ]</a>
+              <a href="subject.html#667">[ subject ]</a>
+              <a href="author.html#667">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> For the problem of 'where' they resolve to, we have two proposals, so
+</I>&gt;<i> that shouldn't be hard to solve. But the other issue is much more
+</I>&gt;<i> difficult: symbolic references in a class definition can be interpreted
+</I>&gt;<i> differently depending on the particular class that is using that class
+</I>&gt;<i> definition, and this will make inlining difficult to do.
+</I>
+	I think we're talking about the same thing.  Every symbolic
+reference depends on the classloader it's being resolved in.  I don't
+think there's a way around this.  That is, we'd need unique inlines per
+process. -- However, in general, because we're sharing class definitions,
+the resolution varies only for pointers to statics, which, IIRC, are
+resolved not to pointers but to indices into the static table -- which
+means the lookup procedure is exactly the same.  (And if I didn't recall
+correctly, decaf can be changed to make this the case.  Yes, it's another 
+level of indirection, but one that can be cached in most cases.)
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000665.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000670.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#667">[ date ]</a>
+              <a href="thread.html#667">[ thread ]</a>
+              <a href="subject.html#667">[ subject ]</a>
+              <a href="author.html#667">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

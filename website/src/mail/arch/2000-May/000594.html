@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000593.html">
+   <LINK REL="Next" HREF="000597.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">tmiller@haverford.edu</A><BR>
+    <I>Tue, 16 May 2000 13:03:07 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000593.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000597.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#594">[ date ]</a>
+              <a href="thread.html#594">[ thread ]</a>
+              <a href="subject.html#594">[ subject ]</a>
+              <a href="author.html#594">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> We need to create a better test. The test of a genuine bytecode process is
+</I>&gt;<i> not, as others have said, piping the output from one process to another.
+</I>&gt;<i> The acid test is far more complicated than that. Piping from one Java
+</I>&gt;<i> application to another doesn't prove much.
+</I>
+	No?  Arbitrary piping from non-JOS-specific (legacy) application A
+to B can not be done without processes.  System is a static, constant
+across every thread in the JVM.  It is impossible for the same static
+variables to have different values in different threads (e.g. invocation
+of main) at the same time without classloader tricks which amount to an
+implementation of bytecode processes.  I can not see how piping is not a
+necessary condition, though there may be something I'm missing which
+prevents it from being sufficient to prove bytecode processes.
+
+	As for multiple processes in Java being a theory -- every
+specification is a theory, usually unproved, which asserts that the Right
+Thing (usually undefined) will happen if you maintain certain properties
+on (usually loosely defined) certain things.  The MultipleJavaProcesses
+wiki page fits this definition quite well: 'If you maintain disjoint
+classloaders, with the exception that you may share class definitions so
+long as that sharing ..., with the exception that you may share objects as
+long as that sharing ..., then you will have multiple java
+processes.  (Which have properties ....)'  You could also think of it as
+an RFC, I suppose.
+
+	I believe Ryan and I have already discussed making a Process
+object wrap a pid as a way around requiring object IPC, though I do not
+recall our conclusion.
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000593.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000597.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#594">[ date ]</a>
+              <a href="thread.html#594">[ thread ]</a>
+              <a href="subject.html#594">[ subject ]</a>
+              <a href="author.html#594">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

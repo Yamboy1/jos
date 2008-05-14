@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: [JOS] Concerning the registry...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000010.html">
+   <LINK REL="Next" HREF="000012.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: [JOS] Concerning the registry...</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS-Arch] Re: [JOS] Concerning the registry...">al@outworld.org</A><BR>
+    <I>Wed, 09 Jun 1999 13:13:27 +0300</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000010.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+        <LI> Next message: <A HREF="000012.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#11">[ date ]</a>
+              <a href="thread.html#11">[ thread ]</a>
+              <a href="subject.html#11">[ subject ]</a>
+              <a href="author.html#11">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ryan Heise wrote:
+
+&gt;<i> I do see the advantage in having a
+</I>&gt;<i> more organised system of storing per user preferences - perhaps each
+</I>&gt;<i> user can have their own &quot;application preferences&quot; registry.
+</I>
+True, each application could use the registry classes, since they are
+part of &quot;org.jos&quot; and not &quot;jos.*&quot; But if the applications are written
+specifically for JOS, such as the system, the GUI managers, the system
+applications (defrag tools, monitors, etc.), then these applications can
+utilize a standard JOS registry - merely an instance of
+org.jos.registry.RegistryServer.
+
+&gt;<i> Do you have an ideas of what might be stored in the global registry?
+</I>
+Yes, actually, I started developing the registry because I had found out
+that my own applications (non related to JOS) would naturally need to
+use certain configuration files. I found the method of INI files in
+Windows very disturbing, since they are slow and need access to the disk
+hardware, and fragment the disk, etc. I also realized that some settings
+are common, such as Look &amp; Feel preferences, custom commands, network
+settings (such as suggested speed and buffering size and methods), etc.
+
+I believe that JOS will also need a lot of these preferences, settings
+and configuration information, and a neat place to do that is the
+registry. Don't get me wrong, I call this API &quot;registry&quot; because it
+began as a form of registry, but in reality, it is a structured,
+tree-like, OO database, with hierarchies and data types and algorithms
+for searching, replacing, recursion, etc. The API can be used in many
+other ways, even in GUI managers (layers, etc.)
+
+&gt;<i> In  a multi-user environment, can every user write anywhere in the
+</I>&gt;<i> registry, or will you use ACLs to restrict this?
+</I>
+I can guarantee that access to things like [//system/config] will only
+be accessible from system classes - i.e. jos.system.* or jos.fs.* etc.
+This can easily be done with the Access Controller. I can also guarantee
+that in a networked environment, CodeBase security will be good. IF, and
+I stress *if* the JOS system is well implemented, then the system
+classes will deny reading or writing to things like [//system/config]
+unless the user is authorized to do so.
+
+Since the RegistryServer is an abstract class, the implementation can
+handle the security. For example, JOSRegistryServer extends
+RegistryServer may use the JOSSecurityManager that contains Registry
+policies and restrictions. As long as the system can detect the group
+and name of the user, then access to the registry can be monitored.
+
+Of course, the registry will use ACLs. The point is that I do not know
+if these things should be in the registry itself, or in the policy file,
+in the form of:
+
+RegistryPermission (&quot;read, write, list&quot;, &quot;//system/config/entry&quot;);
+
+I would suggest that the security be implemented in the registry, and it
+be accessed in a similar way to JDBC, that is:
+
+<A HREF="registry://localhost/system/config/entry?action=delete&user=jeeves&password=cafebabe">registry://localhost/system/config/entry?action=delete&amp;user=jeeves&amp;password=cafebabe</A>
+
+This could possibly use SSL or PGP or whatever. If user &quot;jeeves&quot; is
+authenticated with the password &quot;cafebabe&quot; then the ACL is checked
+(possibly a second registry, as a private member of the
+JOSRegistryServer), and user jeeves is either granted or denied action
+&quot;delete&quot;. If the concern is the URL system, then a POST request can be
+made. If firewalls are not of a problem (system could have access to
+multiple hosts, but if the computer is a public terminal, maybe not...),
+then a custom protocol could be used.
+
+&gt;<i> Replication would be very useful for maintaining network configuration
+</I>&gt;<i> across all computers in a network. However, network configuration data
+</I>&gt;<i> is a broad category that could be partitioned into data managed by
+</I>&gt;<i> individual network services. If for security reasons, it is desirable
+</I>&gt;<i> to run these network services under different user spaces (unlike UNIX
+</I>&gt;<i> where many services run as root), it may also be desirable to have a
+</I>&gt;<i> different registry for each network service, and then you would have
+</I>&gt;<i> to replicate each registry individually. Is it possible to group these
+</I>&gt;<i> registries into one replication operation?
+</I>
+Well, the registry is merely a place to store information. If we deem
+more appropriate to use dedicated replication services, then so be it.
+But in many cases, having a standard and transparent mechanism for
+replicating is useful. Like this:
+
+Registry registry = (Registry)Naming.lookup(&quot;//localhost/registryserv&quot;);
+
+Address local = new Address(&quot;//system/mirrors/dir/dir/&quot;);
+Address remote = new Address(&quot;//otherdomain.org/regserve/dir/dir/&quot;);
+
+registry.copy(remote, local, true);
+
+Where Registry.copy(Address source, Address target, boolean overwrite);
+
+&gt;<i> There may be more elegant was to achieve the same result.
+</I>
+True, since my replication is based on RMI and Object Serialization...
+I am not planning, though, on creating custom protocols for replication,
+or even direct access to the registry, at least not within the next few
+months.
+
+&gt;<i> Another point is that if the registry runs as a server, does each user
+</I>&gt;<i> have to run their own server for their &quot;application preferences&quot;
+</I>&gt;<i> registry?
+</I>
+In the same way many things in JOS should be, that is, servers. If not
+servers, then Servlets. Hmm... FileSystemServlet, RegistryServlet,
+sounds nice.
+
+On a local system, you could do something like this:
+
+RegistryServer registry = JOSSystem.getLocalRegistryServer();
+
+On a remote, yes, you would have to use an RMI connection.
+
+&gt;<i> Or does one server manage all the registries on the system?
+</I>
+I thought of making the server contain a Hashtable with multiple
+registries, and I probably will. If I don't, you can still run many
+servers in different RMI namespaces:
+
+Naming.bind(&quot;SystemRegistry&quot;, systemRegistry);
+Naming.bind(&quot;AppRegistry&quot;, appRegistry);
+etc...
+
+&gt;<i> The second approach would put less load on the system but raises more
+</I>&gt;<i> security issues...
+</I>
+Indeed, unless each Registry is responsible for its security, and not
+the server. The server could pass a &quot;RegistryServerContext&quot; to the
+registry, and the registry can thus find out things about the user, his
+domain, etc.
+
+Just have in mind that this is only an experimental API, and is not by
+any means done - I have not yet even implemented the RMI services! It
+only works locally now (but everything works normally, only RMI is under
+development).
+
+&gt;<i> If you look in java.security.* and java.security.acl.* there are
+</I>&gt;<i> concepts such as users, groups and ACLs. I just spent the weekend
+</I>&gt;<i> writing implementations of these interfaces and sketching out a user
+</I>&gt;<i> model and security model for JOS.
+</I>
+I would really like to see this model. I read a few books and article
+about Java's security nitty gritty details, but have not yet spent
+enough time (I am more involved in data types and algorithms currently,
+that's why!) I am merely familiar with Permissions and Permission groups
+and how to really implement a program that used custom permissions in
+the access controller.
+
+Do you think you could look into the registry security, or at least
+brief me in how the JOS security model will be structured, so I can
+blend in the registry? It would be nice for everything to use a unified
+security mechanism (Yeah, right! So a single hole gets the entire
+system! :)
+
+&gt;<i> The security classes have not been checked in yet, and I will start a
+</I>&gt;<i> discussion about various design issues before I commit them to CVS.
+</I>
+I'll be listening to the lists. :)
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+___________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: <A HREF="http://www.outworld.org/people/al/]">http://www.outworld.org/people/al/]</A> [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000010.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+	<LI> Next message: <A HREF="000012.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#11">[ date ]</a>
+              <a href="thread.html#11">[ thread ]</a>
+              <a href="subject.html#11">[ subject ]</a>
+              <a href="author.html#11">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

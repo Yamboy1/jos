@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000164.html">
+   <LINK REL="Next" HREF="000155.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Program and ProgramContext">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 12 Aug 1999 18:45:28 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000164.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000155.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#151">[ date ]</a>
+              <a href="thread.html#151">[ thread ]</a>
+              <a href="subject.html#151">[ subject ]</a>
+              <a href="author.html#151">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> JOS is expected to run all kinds of programs. In theory, a uniform API for
+</I>&gt;<i> all kinds programs is possible. This is what we're working toward. --snip--
+</I>&gt;<i> Why are there separate models for Java applications, Java applets, Java
+</I>&gt;<i> servlets and Java aglets? Aren't all of these trying to do exactly the same
+</I>&gt;<i> thing?
+</I>
+No, and this is why I cannot understand your goal.
+
+Applications, applets and servlets are each used in entirely different
+situations, hence they have different interfaces that reflect how they
+are used:
+
+- A servlet can only be run from within a servlet engine because it
+relies on a very unique environment. For example, an HTTP servlet relies
+on the fact that it can access various information in the HTTP header of
+a request. It relies on the fact that its instance can persist between
+invocations, so it can keep a database connection open (for example).
+Both of these dependencies bar servlets from being invoked in a uniform
+manner with other types of programs. For example, you just can't run a
+servlet from the command-line. It doesn't make any sense.
+
+- An applet is also very different from a command-line program. The key
+quality of an Applet is that it is a part of a larger entity. It
+requires this entity to be useful. An applet cannot be executed unless
+it is in a web page. The applet is very aware that it is in a web page.
+It can read its applet parameters which are defined in the web page, it
+can communicate with other applets that are in the web page, it can even
+make another web page load. Because of its different nature, it can't be
+treated in a similar way to applications or servlets. Another point is
+that you don't really invoke an applet (as you do with the programs you
+speak of), you &quot;embed&quot; it in an application specific way that is
+provided by the applet itself.
+
+- Applications (both gui and command-line) are intended to be invoked.
+Applications are a unique type of program that are designed to carry out
+a task and return to the shell, or carry out tasks given through a user
+interface until the user wishes to exit the application. These types of
+programs are the only programs that are suitable for shells because they
+can be invoked, they have a clearly defined lifespan, and a definite way
+of returning to the shell.
+
+&gt;<i> A result code is irrelevant for an &quot;application&quot;
+</I>&gt;<i> because it is never expected to &quot;fail&quot;.
+</I>
+I agree. There is definately a distinction between applications and
+command-line tools, even though Sun decided to invoke both types through
+the same unified interface - the main() method. However, I think they
+realised that the unification could not extend beyond applications and
+command-line tools. So, applets and servlets are &quot;used&quot; through a
+different interface that caters for their use.
+
+&gt;<i> While the &quot;Java applet&quot; is a strong model for a program, an &quot;application&quot;
+</I>&gt;<i> is not. What is wrong with static main()? Since a static method cannot be
+</I>&gt;<i> inherited, an application cannot inherit the main() behavior of its
+</I>&gt;<i> superclass.
+</I>
+main() typically does not have any behaviour to inherit. It should fire
+up a reusable object and let it handle the rest of the processing. Any
+behaviour you put in to main() is not reusable from an OO perspective so
+it is wise to pass control into reusable objects as soon as possible.
+
+&gt;<i> This model enables a program to use another program within a single JVM,
+</I>&gt;<i> without resorting to the Runtime/Process model. We retain the benefit of
+</I>&gt;<i> knowing when a program's result code.
+</I>--snip--
+&gt;<i> It would be a bad thing if your shell launches a sub-program that calls
+</I>&gt;<i> System.exit() with a result code. Your shell would end prematurely.
+</I>
+What you don't realise is that none of these problems exist in the
+current system. Just because System.exit() is the only way to return a
+result code doesn't mean that Java can't use this returned value. When
+you call Runtime.exec() it returns a Process object. You can wait for
+the process to exit and then query it for its result code.
+
+Secondly, just because you are using Runtime.exec() doesn't mean that
+you are starting up a whole new JVM. It simply means you are starting up
+a new process. This is how UNIX works. We can implement it the same way
+with a modified JVM that can spawn new processes in a lightweight
+manner. You mentioned that Sun insists that we don't do this. Well who
+cares what Sun say. It is obviously possible.
+
+Your wish to have sub-programs running in the same process is a
+dangerous approach. Even if you provide an alternate mechnism for
+returning result codes, System.exit() is still there and used by nearly
+every Java application in existence today. If a sub-program calls this,
+your shell will also die, along with other sub-programs in the same
+process. That is, unless you stick with the current program model where
+you spawn new processes with the Runtime class (same way as UNIX). If
+you impose a SecurityManager on programs which choose to call
+System.exit(), they will crash. Only new programs written to your API
+will work and I somehow don't think many people will want to switch.
+
+&gt;<i> More importantly, this gives us a unified model for JOS programs. When you
+</I>&gt;<i> want to run a program from a shell, the shell can check for a program
+</I>&gt;<i> interface. The shell can run many programs, properly, with result codes,
+</I>&gt;<i> within a single JVM.
+</I>
+Refer to my points about this at the beginning of this email.
+
+Ok, this one I saved 'till last:
+
+&gt;<i> Since applications, applets, servlets and aglets are different kinds of
+</I>&gt;<i> &quot;programs&quot;, it becomes possible to unify all programs under a program API.
+</I>&gt;<i> A program browser would provide a host environment for running (and
+</I>&gt;<i> debugging!) all kinds of programs.
+</I>
+Not surprisingly, I am interested in the use of what you are proposing.
+Debugging was something that caught my eye. I don't yet understand how a
+unified API is useful for debugging, but if you can explain it to me,
+there might be a use for this unified API after all.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000164.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000155.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#151">[ date ]</a>
+              <a href="thread.html#151">[ thread ]</a>
+              <a href="subject.html#151">[ subject ]</a>
+              <a href="author.html#151">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000552.html">
+   <LINK REL="Next" HREF="000557.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 4 May 2000 00:30:28 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000552.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000557.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#554">[ date ]</a>
+              <a href="thread.html#554">[ thread ]</a>
+              <a href="subject.html#554">[ subject ]</a>
+              <a href="author.html#554">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Wed, 3 May 2000, Todd L. Miller wrote:
+
+&gt;<i> 	Er -- aren't references and ownership indistinguishable from the
+</I>&gt;<i> POV of the garbage collector*?  Let me re-phrase the question: when is it
+</I>&gt;<i> beneficial to make the distinction between process-with-reference and
+</I>&gt;<i> process-with-ownership?
+</I>
+The key reference when talking about the GC is the reference from the
+shared object to its owning process (via the ProcessClassLoader).
+
+A process-with-reference (or more correctly, a process running a program
+with a reference) to a shared object is indirectly causing the process
+that owns that object to hang around in memory needlessly. I'm just
+pointing out that although having a reference to an object like this is
+nothing out of the norm, it is conceptually ugly in the case where the
+process object being referenced (indirectly) is no longer needed. It is
+a dead process.
+
+Although, you do talk about this being useful later on. I'll get to
+that.
+
+&gt;<i> If a process dies, its entire memory tree is
+</I>&gt;<i> pruned.
+</I>
+Not its entire memory tree. If another process has a reference to one of
+its shared objects, the memory tree of that object will hang around in
+memory. Note that this includes the process that is supposed to be dead.
+Invoking an object in a dead process doesn't strike me as a good idea
+conceptually (at least not in this context - read on)
+
+&gt;<i>  If we decide that all shared objects operate with weak
+</I>&gt;<i> references, this is not a problem, right?  The reference just becomes
+</I>&gt;<i> null.  (Having never /used/ weak references, I'm probably wrong about
+</I>&gt;<i> something here.)  (OTOH, weak references are a JDK1.2 thing, right?)
+</I>
+I consider weak reference as an option because they are not as
+convenient to program against. You have to call
+(ObjectType)reference.get() before you do anything. If you just called
+get() once and always referred to that, that would defeat the purpose of
+weak references. But they are useful. We just don't always need to use
+them, especially when we can avoid the problem by making sure the owner
+of the shared object is always alive as long as other processes wish to
+use it. This means re-assigning ownership if the current owner wishes to
+die.
+
+Yes, weak references are a JDK 1.2 thing.
+
+&gt;<i> &gt; That's the nature of the system. An object is associated with one class,
+</I>&gt;<i> &gt; which is associated with one defining class loader, which is associated
+</I>&gt;<i> &gt; with one process. Therefore, objects are owned by (/associated with)
+</I>&gt;<i> &gt; processes and that is reflected in the implementation of the
+</I>&gt;<i> &gt; kernel(/JVM). Reassigning ownership of an object to another process is
+</I>&gt;<i> &gt; therefore a kernel(/JVM) primative, too.
+</I>&gt;<i> 
+</I>&gt;<i> 	Okay, I think I understand where you're coming from here.  I tend
+</I>&gt;<i> to think of it as an object HasA process, rather than a process OwnsAn
+</I>&gt;<i> object.
+</I>
+I think the &quot;concept&quot; of multiple Java processes is that the process
+&quot;contains&quot; everything running inside of it. So, I would say an object
+HasAn owning process (for instance, ProcessManager.getOwningProcess()).
+
+Compare the concept of a hierarchical structure with a particular
+implementation of it. You would think that a directory contains a list
+of children. However, in the implementation, each child may have a link
+to the directory instead (eg. a relational database) or as well as. Do
+you say each child has a directory? Rather, you say each child has an
+owning directory, or more commonly in this case, a parent directory.
+
+&gt;<i> garbage collector.  If a process sharing an object terminates without
+</I>&gt;<i> using the setSomeOtherOwner() (or whatever) function, it may have good a
+</I>&gt;<i> reason for doing so -- the shared object may depend on its
+</I>&gt;<i> originating/owner process for functionality.
+</I>
+You want to depend on a dead process for functionality? I think that if
+a process was ever alive, its purpose was to live, and any functionality
+you're talking about should be carried on while it is still alive.
+
+However, and this is an idea I couldn't work out how to implement until
+you gave me the idea, it might be desirable to have processes that have
+no threads. ie. they are never technically alive. All they provide is a
+separate namespace for code that is actually executed by threads which
+belong to other processes. Sort of like how a JavaBean can provide
+useful functionality even though it usually doesn't run in its own
+thread.
+
+Consider, for example, a servlet engine. Today's servlet engines run all
+servlets in the same namespace which makes it difficult for different
+users to run servlets on the same server that don't trust each other.
+The way a servlet is invoked is not the same as a program. The servlet
+engine treats each servlet as an object (like a bean) and calls a method
+on it, service(), and passes in a request and response object. It is
+also not like a process in that the thread in which the servlet is
+executing is not owned by the servlet, but by the servlet engine.
+However, ideally it would be nice to treat a servlet as a process in one
+way: it should have its own namespace and user privileges. A JavaProcess
+provides both of these things through the ProcessClassLoader and the
+UserToken. Working out how to actually implement this is tricky, though.
+
+&gt;<i> 	Quick little question session: the kernel (/decaf) already
+</I>&gt;<i> maintains 'ownership' (origination) information.  Is the proposal that for
+</I>&gt;<i> (only shared?) objects, we should be able to perform a lookup from it to
+</I>&gt;<i> the classloaders/processes which could reference it?  (e.g. had, at one
+</I>&gt;<i> point, shared it.  This does not necessarily mean it actually /does/
+</I>&gt;<i> reference it.)  And that there is some efficiency/elegance gain from
+</I>&gt;<i> maintaining such a reverse lookup?
+</I>
+I was never suggesting we add a reverse lookup. As you just said, the
+kernel already maintains ownership information. All I'm proposing is
+that we provide a function to reassign ownership. Multiple ownership can
+then be emulated without any further kernel support.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000552.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000557.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#554">[ date ]</a>
+              <a href="thread.html#554">[ thread ]</a>
+              <a href="subject.html#554">[ subject ]</a>
+              <a href="author.html#554">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

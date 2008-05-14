@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Stumped, again</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000538.html">
+   <LINK REL="Next" HREF="000542.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Stumped, again</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Stumped, again">gchii@mindspring.com</A><BR>
+    <I>Mon, 01 May 2000 22:07:22 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000538.html">[JOS-Arch] rheise.os-0.1.3 released.</A></li>
+        <LI> Next message: <A HREF="000542.html">[JOS-Arch] [multiple process] Stumped, again</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#535">[ date ]</a>
+              <a href="thread.html#535">[ thread ]</a>
+              <a href="subject.html#535">[ subject ]</a>
+              <a href="author.html#535">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I have searched and searched; but, I cannot find anything that prevents us
+from sharing class definitions for all class loaders, both primordial and
+custom. Where does this requirement come from?
+
+ - Is it a security issue? I don't see how the internals of how a virtual
+machine uses class definitions affects security. The mechanism, as I
+understand it so far, is transparent to a Java application.
+
+ - Is it a process issue? Even the ClassLoader property is a static field
+for a class; it is not part of a class definition. A class definition is
+system-wide or vm-wide. A class definition cannot be optimized to resolve
+references to other classes because those classes are process-wide. For
+example, a codepool reference to a field or method in another class cannot
+be resolved at the class definition level. A bytecode pre-compiler can only
+perform a limited amount of optimization at the class definition level.
+
+ - Is it an efficiency issue? If the payloads are exactly the same, two
+class definitions have an equivalent payload and are themselves equivalent.
+Since the class definition is everything except static fields, the class
+loader is not involved at this level.
+
+ - Is it an interpretation issue? When two classes come from two different
+class loaders, a classic virtual machine won't allow a dynamic cast from
+one to the other. This is not object sharing. Object sharing is, like RMI
+and CORBA, where an object in one process is used in another process.
+Object sharing and dynamic casting are separate issues, aren't they?
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000538.html">[JOS-Arch] rheise.os-0.1.3 released.</A></li>
+	<LI> Next message: <A HREF="000542.html">[JOS-Arch] [multiple process] Stumped, again</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#535">[ date ]</a>
+              <a href="thread.html#535">[ thread ]</a>
+              <a href="subject.html#535">[ subject ]</a>
+              <a href="author.html#535">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

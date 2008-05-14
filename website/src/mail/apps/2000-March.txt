@@ -1,0 +1,241 @@
+From gchii@mindspring.com Tue, 07 Mar 2000 10:58:15 -0500
+Date: Tue, 07 Mar 2000 10:58:15 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] AppletBrowser application
+
+The AppletBrowser is part of the Smart API project. Probably, it should
+have been a stand-alone application. It enables you to run any applet from
+a Location field. No HTML is require.
+
+When I combine the AppletBrowser and DesktopBrowser, I can quickly show my
+customers what an applet might look like on their website. The
+DesktopBrowser enables me to recall the URI for a particular applet. I can
+use the URI again.
+
+The AppletBrowser is interactive. It enables us to play with applet
+parameters. It enables us to reshape the applet's window to see what
+happens. Once the applet works perfectly, the applet's URI is manually
+translated to an HTML page. While it is possible to create an HTML page
+(snippet) automatically, I never got around to it.
+
+When running the UniversalBrowser, the AppletBrowser is a plug in. Click
+the Applet button on the tool bar. Of course, the AppletBrowser is
+automatically activated when you use an applet URI. An applet URI starts
+with the applet: scheme. Here is the general syntax of the applet scheme:
+
+applet:<classname>[?n1=v1[&n2=v2[...]]
+
+
+
+
+From gchii@mindspring.com Tue, 07 Mar 2000 11:03:43 -0500
+Date: Tue, 07 Mar 2000 11:03:43 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] ConnectionBrowser
+
+The ConnectionBrowser is part of the Smart API project. Likely, it should
+have been a separate application.
+
+This browser enables you to open JDBC connections.
+
+1. It enables you to test any JDBC connection. It prints the metadata for
+the connection. You can also look at tables, etc..
+
+2. It is a great troubleshooting tool. If your JDBC application isn't
+working, is it your application? Or, is it the JDBC connection? If the
+ConnectionBrowser can't establish a connection either, it's probably not
+your application.
+
+The ConnectionBrowser is also a plug-in for the UniversalBrowser. Click the
+Connection button on the tool bar. The ConnectionBrowser plug-in is
+automatically activated whenever you use the jdbc: scheme. Type any JDBC
+URL in the Location: field and press the Run button.
+
+
+
+
+From gchii@mindspring.com Thu, 23 Mar 2000 08:49:51 -0500
+Date: Thu, 23 Mar 2000 08:49:51 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] ZipFinder
+
+BasicFinder is part of the org.jos.gchii.find2a package. It is an
+asynchronous I/O version of java.io.File. It searches for directories and
+files on a local file subsystem.
+
+ZipFinder is planned. It does not exist yet. For the Java 1 platform or
+higher, it is possible to create a ZipFinder to search for directories and
+files inside a .zip (or .jar) file. Like BasicFinder, ZipFinder must use
+asynchronous I/O.
+
+After opening a .zip file, its entire catalog is read. The catalog is
+sorted in alphabetical order. The ZipFinder iterates through the catalog,
+looking for files that match the given pattern. (Pattern matching has
+already been written.)
+
+As it iterates through the catalog, ZipFinder must detect changes in the
+directory. The name of each directory is broadcast to a directory listener.
+A directory is broadcast even when there are no matching files.
+
+A directory name is separated from a file name using the following
+conversion function:
+
+  /**
+   * Converts a file name (fn) to a directory name (dn).
+   * @param fn a file name
+   */
+  public String fn2dn( String fn ) {
+    int pos = fn.lastIndexOf( "/" ); // always slash in a .zip file
+    if ( pos < 0 ) {
+      return "";
+    }
+    return fn.substring( 0, pos );
+  }
+
+When ZipFinder finds a matching file, the name of each file is broadcast to
+a file listener. When there are no more files in the catalog, ZipFinder
+broadcasts this event to a FinderListener.
+
+(a) A finder is invoked through its run() method. Like BasicFinder,
+ZipFinder must implement the Finder interface in org.jos.finder1a.
+
+(b) If there is no listener installed when a finder is run, a finder must
+return immediately without broadcasting anything -- there is no listener to
+broadcast to.
+
+(c) When dealing with a zip file, the name of a directory and file always
+includes the name of the original zip.
+
+(d) Never broadcast the same directory twice. Never broadcast the same file
+twice.
+
+(e) The show option determines if a search is recursive. The starting path
+for a finder is determined by the path parameter. A ZipFinder needs a
+corresponding ZipFinderController for the Smart API. Here is an example of
+its URI:
+
+x-finder:zip:[file:sample.zip]/org/jos?pattern=*.*&show=all
+
+
+
+
+From al@outworld.org Fri, 24 Mar 2000 11:39:56 +0200
+Date: Fri, 24 Mar 2000 11:39:56 +0200
+From: Al al@outworld.org
+Subject: [JOS-Apps] ZipFinder
+
+Gilbert Carl Herschberger II wrote:
+> 
+> BasicFinder is part of the org.jos.gchii.find2a package. It is an
+> asynchronous I/O version of java.io.File. It searches for directories
+> and files on a local file subsystem.
+> 
+> ZipFinder is planned.
+
+
+The "archive" attribute on Windows is probably the stupidest thing I've
+ever seen, as no modern backup media really has the limitations that the
+"archive" attribute is there to assist for. On JOS, this attribute could
+be very useful indeed... What if the filesystem knew that when a file is
+attributed as archive, then it can search inside?
+
+Something like:
+
+in:file://localhost/hda2/docs/stored.jar/apps/name.jar
+
+This should return a FileInputStream to the file called "name.jar"
+inside the archive file "stored.jar" in the appropriate directory paths.
+If "stored.jar" is a directory, then things are simple. If, however,
+"stored.jar" is a file, and is recognized as an archive, then an
+appropriate handler will be used to open it and extract the required
+file.
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+________________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+PLEASE DO NOT SEND ME ANY UNSOLICITED COMMERCIAL EMAIL [DSS: 0xDBEF8ECC]
+
+
+
+From idstewart@softhome.net Sat, 25 Mar 2000 15:39:40 -0500
+Date: Sat, 25 Mar 2000 15:39:40 -0500
+From: Ian D. Stewart idstewart@softhome.net
+Subject: [JOS-Apps] Graphical Compression Utility
+
+Howdy Folks,
+
+Does anyone know of any work underway (not necisarilly JOS-specific) on 
+a graphical compression utility (something along the lines of MakoSoft's 
+WinZip)?  Such a utility should support numerous 
+comression/decompression technologies, including (Pk|Info)zip, gzip, tar 
+and bzip2 (yes, I know technically speaking, tar is an archiving 
+technology, and does not do (de)compression).  It would be nice, but not 
+necesarry, if it also provided Corba support.
+
+TIA,
+Ian
+
+
+
+
+From akibobo2000@hotmail.com Sun, 26 Mar 2000 12:22:24 GMT
+Date: Sun, 26 Mar 2000 12:22:24 GMT
+From: akibobo akibobo2000@hotmail.com
+Subject: [JOS-Apps] BackToJava needs volunteers <AkiBobo>
+
+Hi everybody,
+
+I building a graphical application for manipulating ByteCode (assembly, 
+disassembly, obfuscate, statistics, decompilation, complexity analyser) for 
+hacking purpose (hacking = try to be an expert <> do illegal things).
+I think this project could be useful for JOS, so I'm here.
+
+I hope someone'll answer.
+
+AkiBobo
+______________________________________________________
+Get Your Private, Free Email at http://www.hotmail.com
+
+
+
+
+From iainshigeoka@yahoo.com Sun, 26 Mar 2000 18:29:16 -0600
+Date: Sun, 26 Mar 2000 18:29:16 -0600
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Apps] BackToJava needs volunteers <AkiBobo>
+
+On 26 Mar 00, at 12:22, akibobo wrote:
+
+> I building a graphical application for manipulating ByteCode (assembly, 
+> disassembly, obfuscate, statistics, decompilation, complexity analyser) for 
+> hacking purpose (hacking = try to be an expert <> do illegal things).
+> I think this project could be useful for JOS, so I'm here.
+
+That definitely sounds like something we could use.  Do you have a 
+write up on it in the Wiki yet?  If you put a wiki page up for it, then 
+I'll put an announcement on the jos homepage and try and drum up 
+some support!
+
+-iain
+
+
+
+From gchii@mindspring.com Tue, 28 Mar 2000 19:21:03 -0500
+Date: Tue, 28 Mar 2000 19:21:03 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] Signature Services
+
+I wrote a new article for JOS Wiki. I hope you'll read it.
+
+<URL:http://www.metamech.com/wiki/view/Main/SignatureServices>
+
+This week, I'm going to be working on the BaseTCPService class.
+
+
+
+

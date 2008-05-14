@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Widgets</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000088.html">
+   <LINK REL="Next" HREF="000090.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Widgets</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-UI] Widgets">digigod@earthling.net</A><BR>
+    <I>Tue, 27 Jul 1999 21:42:04 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000088.html">[JOS-UI] Widgets</A></li>
+        <LI> Next message: <A HREF="000090.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#89">[ date ]</a>
+              <a href="thread.html#89">[ thread ]</a>
+              <a href="subject.html#89">[ subject ]</a>
+              <a href="author.html#89">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ryan Heise wrote:
+&gt;<i> If you take the MVC approach, the methods in DesktopWidget would not be
+</I>&gt;<i> at all interesting. In fact DesktopWidget could be defined to have no
+</I>&gt;<i> methods. Instead, we have the following design:
+</I>&gt;<i> 
+</I>&gt;<i> class DesktopModel
+</I>&gt;<i>  - showWindow(win)
+</I>&gt;<i>  - hideWindow(win)
+</I>&gt;<i>  - selectWindow(win)
+</I>&gt;<i>  - disposeWindow(win)
+</I>&gt;<i>  - moveWindow(win, x, y)
+</I>&gt;<i>  - resizeWindow(win, w, h)
+</I>&gt;<i> 
+</I>&gt;<i> interface DesktopListener
+</I>&gt;<i>  - windowShown(event)
+</I>&gt;<i>  - windowHidden(event)
+</I>&gt;<i>  - windowSelected(event)
+</I>&gt;<i>  - windowDisposed(event)
+</I>&gt;<i>  - windowMoved(event)
+</I>&gt;<i>  - windowResized(event)
+</I>&gt;<i> 
+</I>&gt;<i> Then perhaps:
+</I>&gt;<i> 
+</I>&gt;<i> class SwingDesktopWidget extends JDesktopPane implements Widget
+</I>&gt;<i> {
+</I>&gt;<i>         class SwingDesktopListener implements DesktopListener
+</I>&gt;<i>         {
+</I>&gt;<i>                 public void windowShown(DesktopEvent e)
+</I>&gt;<i>                 {
+</I>&gt;<i>                         findWindow(e.getWindow()).setVisible(true);
+</I>&gt;<i>                 }
+</I>&gt;<i>         }
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> As you can see, there is no need for a DesktopWidget interface that
+</I>&gt;<i> defines methods to move windows around. In MVC, you would call
+</I>&gt;<i> controller.moveWindow(...) to move the window. As a result, all
+</I>&gt;<i> DesktopListeners will be notified through the windowMoved() method,
+</I>&gt;<i> which as you can see I have handled with an inner class to prevent
+</I>&gt;<i> people from calling these methods directly.
+</I>&gt;<i> 
+</I>&gt;<i> I mentioned in another email that you don't really need a separate
+</I>&gt;<i> controller class, SwingDesktopWidget could interact directly with
+</I>&gt;<i> DesktopModel to move the window but SwingDesktopWidget itself has no
+</I>&gt;<i> public methods to move a window. It is not an interface for moving
+</I>&gt;<i> windows, it is just a view that internally is allowed to move windows.
+</I>&gt;<i> 
+</I>&gt;<i> Now, the class design above was just given to demonstrate MVC. It is not
+</I>&gt;<i> necessarily the best design. It is possible to divide DesktopModel into
+</I>&gt;<i> a finer set of model components.
+</I>&gt;<i> 
+</I>&gt;<i> If you go with MVC, the first step is to define the *Model, *Listener
+</I>&gt;<i> and *Event interfaces. As for the Widget interfaces, I think you will
+</I>&gt;<i> need only a single Widget interface. The requirements for the view layer
+</I>&gt;<i> will become clearer later on.
+</I>
+DesktopWidget would also have to handle adding and removing
+ToolbarWidgets and Im sure other things but thats slightly offtopic. 
+
+The only point of the widget interface was to act as a parent to the
+others. The widget interfaces are supposed to be an abstract way of
+defigning the view, the view could be in Swing, AWT, or something else
+in all cases it just has to implement the widget type(s).
+
+I think making the desktop a JDesktopPane is the worst way to go, it
+requires to many messy hacks to work could cause problems with AWT
+components and is somewhat small minded design wise. several times Ive
+proposed the use of a Screen.
+
+public abstract class Screen
+
+it handles the different types of screens, graphics and text
+(TextScreen, GraphicsScreen) its not hooked to Swing (it does, however,
+use many AWT classes; like GraphicsContext getGraphicsContext() and the
+like), its better OO a desktop is not a swing container, its a container
+but not in that sense.
+
+public class DesktopScreen extends GraphicsScreen implements
+DesktopWidget (whatever that entails)
+
+...would be the standard Screen used for any TGUI (especially the JOS
+default UI, lets call it GEM, no reason) it would handle the background
+(via a pluggable Background class) the Icon Layer (which is optinal and
+should be handled by another extension class) it handles window
+managment (this while may be done by an inner class doesnt have to be
+pluggable, only one way to do it) and at the top it handles &quot;desktop
+components&quot; that is ToolbarWidgets (which could include stuff like a
+TaskbarWidget/DockWidget/ToolbarWidget implementin' JWindow) it would
+also handle the ScreenSaver. it acts as a container/controller for all
+these things and it hands down the graphics objects to them.
+
+I think this is the most flexible way to go, I also think this is not
+the time to discuss it (Im sorry I brought it up)
+
+we should decide what types of interfaces to design for the views and
+what to put in them, we could make a cheap imitation of a Desktop with a
+JWindow or even a JDesktopPane to test on, but I doubt will get that far
+so soon.
+
+keep the comments/suggestions comin'
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000088.html">[JOS-UI] Widgets</A></li>
+	<LI> Next message: <A HREF="000090.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#89">[ date ]</a>
+              <a href="thread.html#89">[ thread ]</a>
+              <a href="subject.html#89">[ subject ]</a>
+              <a href="author.html#89">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Transitional JOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000304.html">
+   <LINK REL="Next" HREF="000300.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Transitional JOS</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Transitional JOS">gchii@mindspring.com</A><BR>
+    <I>Thu, 18 Nov 1999 14:50:16 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000304.html">[JOS-Arch] Transitional JOS</A></li>
+        <LI> Next message: <A HREF="000300.html">[JOS-Arch] Distribution Group</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#325">[ date ]</a>
+              <a href="thread.html#325">[ thread ]</a>
+              <a href="subject.html#325">[ subject ]</a>
+              <a href="author.html#325">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 04:11 PM 11/16/99 -0600, <A HREF="mailto:iainshigeoka@yahoo.com">iainshigeoka@yahoo.com</A> wrote:
+&gt;<i>Sounds interesting.
+</I>
+It has been interesting to see different browsers come together (finally)
+after each was built on its own. Each browser is a plug-in. You can switch
+from one browser to another -- while keeping the same URL. After using it
+for a few days, the Ultimate Browser feels, well, very weird.
+
+You know how sometimes you'll pull down the View menu in Netscape and
+select Document Source. Or, you'll pull down the View menu in Internet
+Explorer and select Source. Both of these browsers create a new window to
+show you the same URL in a different viewer/browser. But why?
+
+In the Ultimate Browser, you switch from HTML to Source by clicking a
+button on the tool bar. You don't get a new window by accident. You get a
+new window whenever you ask for it with File/New Window...
+
+&gt;<i>1) a standardized install/uninstall api for java applications.  ala 
+</I>&gt;<i>Installshield on Win32 and sorta RPM on linux.  The installs should 
+</I>&gt;<i>actually target classfile -&gt; logical_location mappings so each 
+</I>&gt;<i>platform can map the logical_location to appropriate filesystem, 
+</I>&gt;<i>classpath, registry, database or whatever mechanisms to store the 
+</I>&gt;<i>the classfile and enable loading of the class path.
+</I>
+With the help of a bytecode cache service running as a daemon on your
+computer or network, you might skip most of the traditional
+install/uninstall process. When you use a program, it is &quot;installed&quot; in
+your bytecode cache. For packages that are &quot;transient&quot;, bytecode is
+automatically &quot;uninstalled&quot; when you haven't used it for a while. It is a
+most-recently-used bytecode cache.
+
+Sure, you can force the bytecode cache to remove a package. You can empty
+the bytecode cache if you want. But it sits quietly moving the bytecode
+around for highest possible optimization on small network or intranet.
+
+Since a bytecode cache can be daisy chained to another, you can set up a
+central bytecode cache for your department or company. The central bytecode
+cache can &quot;install&quot; bytecode seemlessly through a gateway to the Internet.
+Where is the installation step? For running pre-compiled, pre-archived
+code, you can just skip all that.
+
+What is a bytecode cache? There are plenty of options. You might install a
+bytecode cache servlet in your Java-enabled HTTP server. Configure it for
+cache size and trusted Internet websites and you're done. Everyone on the
+network can use all your applications.
+
+You might install package files on a static HTTP server. You might install
+the bytecode cache daemon on a server and skip the HTTP thing. What does it
+really mean to install an application. For everyone that just wants to take
+it for a test drive, they just run it. Distributing the bytecode -- that is
+what a network is for, isn't it?
+
+&gt;<i>3) package manager/launcher - a method to specify and group 
+</I>&gt;<i>classfiles together logically without having to do so physically (jar 
+</I>&gt;<i>them) for managament and application launching.  This gives users 
+</I>&gt;<i>a view of packages as &quot;single exe&quot; looking entities.  This is cleaner 
+</I>&gt;<i>and what I image was intended with &quot;executable jars&quot; but allows us 
+</I>&gt;<i>to continue to share code (and eliminate redundant copies of 
+</I>&gt;<i>classes).
+</I>
+I'm pretty sure there are two separate issues here. I don't like to confuse
+the issue of launching an application with the issues of packagine an
+application's bytecode. We have been talking about the .app file. This is
+something like a shortcut that starts any Java application.
+
+It doesn't make sense to put each Java application into its own archive.
+That idea is almost anti-reuse. I said &quot;almost&quot;! A jar is a container for
+lots of executable code. The starting point for your application might be
+any class and any method inside a jar. A multiple application jar is a
+great way to deal with a product line with very similar tools.
+
+The Smart API jar, for example, contains the ulitmate browser and all the
+browser plug-ins. You can run a browser plug-in on its own. It doesn't make
+sense to put multiple copies of class files in lots of different archives
+just so that I can launch a jar.
+
+Rather, the .app file &quot;explains&quot; an entry point to a browser/shell/desktop,
+so that you can jam pack hundreds of applications in a single jar. Only the
+.app files need to be one file per application.
+
+Joining these two together, you can &quot;install&quot; .app files on a
+browser/shell/desktop without the corresponding jar. By launching the .app
+file with your browser/shell/desktop, the class files are read by your
+bytecode cache. It means that you can copy very small .app files to each
+workstation on a network and get the benefit of all applications on every
+machine through the power of the network.
+
+There is no sandbox. There are few restrictions. Your JVM can run any
+bytecode you add to your application server.
+
+1. You must install a JVM on each workstation. And it looks like JOS-NC
+will be able to do all that.
+
+2. You must install applications that use native methods on each
+workstation. The bytecode cache distributes bytecode and other resources
+(like .gifs) but does not do the share library thing.
+
+&gt;<i>This I think is actually most dependent on the UI group actually 
+</I>&gt;<i>generating a desktop.  Watching printf debug messages crank gets 
+</I>&gt;<i>really tiring and is certainly not very impressive!  I think just 
+</I>&gt;<i>screenshots from a new UI would get more people more excited 
+</I>&gt;<i>about JOS than probably even a shipping kernel with no GUI 
+</I>&gt;<i>support.  And, the UI list has been ghostly silent recently.
+</I>
+Screenshots are good enough for some people. Some people want their
+operating system to look good. That *is* how Microsoft sells so many copies
+of Windows when it doesn't actually work. Sure, I'd like to get a glimps of
+JOS and what it looks like. I would like to see something -- anything --
+even printf debug messages!
+
+We have got to think about getting more people excited about JOS. The
+software industry needs JOS more than ever before, with the decline of
+JavaOS and the promotion of Windows 2000. When Windows 2000 doesn't work,
+and it won't, the mass market is going to want something that works:
+
+1. Why do you install free-license software? If it is free, why not
+distribute it seemlessly to everyone? When corporations figure out that all
+of the time they spend installing and reinstalling software is a waste of
+their time, they will find a way to cut costs.
+
+2. Why do you keep track of software you haven't used in a while? Why
+doesn't your operating system do it for you? Your HTML browser doesn't
+bother you with the details of which HTML page it is going to keep and
+which it is going to throw away, right? Since the original bytecode is
+available elsewhere, why do you care?
+
+3. Why do you upgrade your operating system at all? It has been possible
+for over ten years to install a CORE, like JOSBox that never needs to be
+upgraded. For example, when is the last time you had to upgrade your IBM PC
+bios? It happens but it is rare compared to installing an OS.
+
+Imagine how much money a corporation could save if it spent money on Linux
+and JOS instead of Microsoft Windows. Not just cash, but time spent on
+reinstallation and reinstallation and reinstallation.
+
+Since an Ultimate JOS kernel needs only to implement a decent JVM, over 80%
+of the &quot;operating system&quot; is dynamically linked. When your bytecode cache
+serves up the &quot;operating system&quot; bytecode as well as the &quot;application&quot;
+bytecode, upgrading your OS would be very rare indeed.
+
+For the network computer, you can download a new JVM from a network server
+as a boot image. Why would anyone go back to a 300MB &quot;permanent&quot;
+installation of their operating system?
+
+Imagine you have 250+ computers that need JOS. You would install JOS once
+on a network server. You would plug in a JOS boot-rom in the other 249
+computers. Your network server downloads patches to JOS directly from the
+JOS Project website. Your network server downloads applications from JOS
+and other websites. No explicit download/installation required after that.
+
+Zero administration. Zero hassle. There is only a little bit of
+configuration data that must live on your network. Windows 2000 will never
+be able to do that. Why? Because it suffers an unmistakable disadvantage:
+for-fee licensing. Because Microsoft is far more concerned about for-fee
+licensing than building high quality software, you can always expect
+Windows to be a stupid operating system.
+
+By the way, this architecture works with mobile computing, too. Your
+bytecode cache uses a dial up connection to periodically refresh its bytecode.
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000304.html">[JOS-Arch] Transitional JOS</A></li>
+	<LI> Next message: <A HREF="000300.html">[JOS-Arch] Distribution Group</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#325">[ date ]</a>
+              <a href="thread.html#325">[ thread ]</a>
+              <a href="subject.html#325">[ subject ]</a>
+              <a href="author.html#325">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

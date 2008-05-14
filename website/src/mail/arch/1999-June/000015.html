@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: [JOS] Concerning the registry...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000014.html">
+   <LINK REL="Next" HREF="000018.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: [JOS] Concerning the registry...</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS-Arch] Re: [JOS] Concerning the registry...">al@outworld.org</A><BR>
+    <I>Sat, 12 Jun 1999 12:36:54 +0300</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000014.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+        <LI> Next message: <A HREF="000018.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#15">[ date ]</a>
+              <a href="thread.html#15">[ thread ]</a>
+              <a href="subject.html#15">[ subject ]</a>
+              <a href="author.html#15">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ryan Heise wrote:
+
+&gt;<i> Although applications written specifically for JOS wouldn't
+</I>&gt;<i> automatically use the global registry. For example GUI managers would
+</I>&gt;<i> still use per user registries so that each user can configure the GUI
+</I>&gt;<i> manager how they want. But the GUI manager could read a subset of its
+</I>&gt;<i> configuration from a global registry if it makes sense to.
+</I>
+If we have a common API for GUI managers, such as
+&quot;jos.ui.gui.GUIManager&quot; which would be extended, then the registry could
+contain automatic settings, global GUI manager settings, etc. If I also
+implement linking in the registry, just as symbolic links in a FS, then
+this could prove to be a space/time saver indeed...
+
+&gt;<i> I see the advantage of handling configuration data in a more structured
+</I>&gt;<i> way. My only concern has been that a single registry that is used by
+</I>&gt;<i> multiple applications can possibly grow out of control. There at least
+</I>&gt;<i> needs to be a way to clearly see what applications depend on what parts
+</I>&gt;<i> of the registry, and which data is shared between multiple applications.
+</I>
+I was thinking of implementing quota-based handling of the registry,
+that is, specific Threads could use more &quot;time&quot; of the registry, such as
+security and system threads, and other threads (such as screen savers or
+user applications) use less time. Or, you could count the size each
+application is using. I know how to measure the time of a thread, but
+how would you measure the size of data? Is the only way to serialize it
+and count the bytes, or is there a simpler way?
+
+Anyway, I think that the registry could be split up into sections, such
+as hives for instance, each one in its own space, possibly even
+different instances. This way, you can have a System, Security, JOS, and
+User registry. We can guarantee that all but the User registries remain
+cool, and I suppose that if the User registry goes out of hand, deleting
+parts of it would not even be dangerous for the system...
+
+&gt;<i> &gt; RegistryPermission (&quot;read, write, list&quot;, &quot;//system/config/entry&quot;);
+</I>&gt;<i> 
+</I>&gt;<i> Need there be a difference between &quot;read&quot; and &quot;list&quot;? Also, don't forget
+</I>&gt;<i> to specify who the permission is granted to.
+</I>
+Well, that was just a quick example. Yeah, I suppose &quot;read&quot; permission
+on a Directory of the registry means listEntries() too...
+
+&gt;<i> &gt; In the same way many things in JOS should be, that is, servers. If not
+</I>&gt;<i> &gt; servers, then Servlets. Hmm... FileSystemServlet, RegistryServlet,
+</I>&gt;<i> &gt; sounds nice.
+</I>&gt;<i> 
+</I>&gt;<i> On a system with 400 users that might bring a large overhead. I do
+</I>&gt;<i> believe that each repository instance should work like a server so that
+</I>&gt;<i> read/writes are synchronized across multiple clients, but if the server
+</I>&gt;<i> runs in a different address space, this will incur a performance penalty
+</I>&gt;<i> of having to use Sockets to talk to it.
+</I>
+How does RMI solve this, if at all? I was assuming that the only problem
+with multiple users on an RMI connection would be speed decrease. Do you
+think that we should implement the server in such a way that it responds
+just like a HTTP server, with Thread pools, priorities, timeouts etc.?
+
+&gt;<i> If each application has its own registry then the registry can live in
+</I>&gt;<i> the same address space. But I don't know if a registry for each
+</I>&gt;<i> application is a good idea.
+</I>
+Not really, because that would mean separate files, precisely what I
+want to avoid by creating a unified config repository... If everything
+is kept in the same place, then it would not make a difference if simply
+different subdirectories in the registry were used. The searching
+algorithm takes (n Theta / 4) anyhow, in the root or near root levels,
+this is not a great performance concern. I think.
+
+&gt;<i> Then there is the issue of how long should the server be running (as a
+</I>&gt;<i> thread)? UNIX uses the concept of a super-server that fires up server
+</I>&gt;<i> processes only when they are needed. So for example, the ftp server is
+</I>&gt;<i> not running and consuming resources the whole time.
+</I>
+Would not the registry, though, be VERY frequently used? Maybe the
+overhead for creating and starting servers is too much, compared to the
+little time the registry is not used. I would propose something else, a
+registry cache. Many entries don't really have to be changed that often,
+so they could be kept in a cache. Say, a Hashtable with 100 capacity, or
+whatever. Would work like this:
+
+Registry registry = (Registry)Naming.llokup(&quot;RegistryServe&quot;);
+Address address = new Address(&quot;//system/info/user.name&quot;);
+registry.getCached(address);
+
+The registry can look for the entry in the cache first, then return it.
+If someone changes (updates) the real entry, then the cache is either
+nullified or updated (depending on preferences). The cache can have a
+timeout. It can displace old items, or even better, less used items
+(this would mean a little extra statistical processing though). Always
+depending on preferences.
+
+Opinions?
+
+&gt;<i> The model that I'm working on is not necessarily &quot;the&quot; model, but I will
+</I>&gt;<i> try to make it meet the requirements we have at this point in time. The
+</I>&gt;<i> requirements of your registry will obviously help shape how security is
+</I>&gt;<i> modelled.
+</I>
+Well, I guess I would want the following types of access:
+
+Entry
+
+read, write (delete implied), change security options
+
+Directory
+
+read, write, read entries, read subdirectories, create subdirectory,
+create entry, change security options
+
+
+The above because the Directory contains a default Entry, so it has a
+name and value.
+
+
+&gt;<i> Having a unified security mechanism would improve security IMHO. Even
+</I>&gt;<i> though a single hole gets the entire system, a single security system
+</I>&gt;<i> means a simpler security system, and the simpler it is, the more robust
+</I>&gt;<i> it is likely to be.
+</I>
+True. Do you think the registry should also have a mechanism for
+handling GuardedObjects and such seamlessly for the user? That is, for
+security while storing or retransmitting the registry?
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+___________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: <A HREF="http://www.outworld.org/people/al/]">http://www.outworld.org/people/al/]</A> [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000014.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+	<LI> Next message: <A HREF="000018.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#15">[ date ]</a>
+              <a href="thread.html#15">[ thread ]</a>
+              <a href="subject.html#15">[ subject ]</a>
+              <a href="author.html#15">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

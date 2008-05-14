@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000632.html">
+   <LINK REL="Next" HREF="000638.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs">ryan@whitewolf.com.au</A><BR>
+    <I>Sat, 20 May 2000 01:44:42 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000632.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+        <LI> Next message: <A HREF="000638.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#636">[ date ]</a>
+              <a href="thread.html#636">[ thread ]</a>
+              <a href="subject.html#636">[ subject ]</a>
+              <a href="author.html#636">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; (_Quinn, how do things look from down in the JVM trenches? You'd
+</I>&gt;<i> &gt; probably have the best idea of how this inlining problem can be solved.)
+</I>&gt;<i> 
+</I>&gt;<i>         Quite honestly, I haven't looked at optimizations at all.  This
+</I>&gt;<i> particular problem, however strikes me in two ways -- first, how often
+</I>&gt;<i> will we be trying to inline method calls across processes?
+</I>
+My feeling is that class archives will not be changed on disk very often
+and so most of the time class definitions will always match and inlining
+will not need to be done more than once in each case.
+
+The question is, when it does happen, will the model (whatever that is)
+be efficient or not?
+
+&gt;<i>  (That is, how
+</I>&gt;<i> much of a worry is this going to be?  We may just be able to ignore it
+</I>&gt;<i> without much of a penalty.)
+</I>
+It depends on whether the model/solution we choose affects performance
+even if you are not executing a cross process inlined method.
+
+&gt;<i> Second, having symbolic references mismatch
+</I>&gt;<i> across processes will not be a problem if a a shared object does lookups
+</I>&gt;<i> in the executing process's classloader. OTOH, you've made good points
+</I>&gt;<i> about where the statics for a shared object's method ought to be.
+</I>
+Statics aren't the only things involved here. If you call
+sharedObject.someMethod() and that method tries to interact with other
+classes, it should interact with the classes in its own process, and not
+the currently executing process (for the same reasons I stated for
+statics).
+
+&gt;<i>  One question I do have, though, looking at
+</I>&gt;<i> this from a UNIXy point of view.  I share two things -- a memory location
+</I>&gt;<i> (my static variable) and a function pointer (the method in question).  The
+</I>&gt;<i> function referenced by the pointer reads and writes from that global
+</I>&gt;<i> variable.  At no time should two simultaneous executions of the function
+</I>&gt;<i> find different things in that global variable -- it being shared, they're
+</I>&gt;<i> reading/writing to the same place.
+</I>
+Why must the static variable be shared (considering that I have
+explained in detail why I think it should not be)? Am I missing
+something in your explanation? (forgive me, it's 1:30am here :-)
+
+&gt;<i> If this proves to be unworkable, we may be
+</I>&gt;<i> forced to restrict shared objects to those whose classes (and parents) do
+</I>&gt;<i> not have statics.
+</I>
+An interesting idea, but consider that that shared object is an
+interface to what's going on in another process. If you call a method on
+it, it might do some talking with some objects or classes in its own
+process. When it talks, to those classes, it should be talking to the
+classes it thinks it's talking to (same argument for statics). This is
+important if only the shared object requires shared class definitions
+but the classes it depends on do not require shared class definitions.
+The shared object really does belong to that other process (it was
+created by that process) so whenever it is executing, it should behave
+as though it is linked with that process.
+
+(although I'm not giving this as much thought as I usually do. A few
+more emails and I'll be off to sleep)
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000632.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+	<LI> Next message: <A HREF="000638.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#636">[ date ]</a>
+              <a href="thread.html#636">[ thread ]</a>
+              <a href="subject.html#636">[ subject ]</a>
+              <a href="author.html#636">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

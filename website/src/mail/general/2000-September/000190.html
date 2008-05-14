@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS] Privacy and Security on JOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:peter.schuller%40infidyne.com">
+   <LINK REL="Previous"  HREF="000189.html">
+   <LINK REL="Next" HREF="000191.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS] Privacy and Security on JOS</H1>
+    <B>Peter Schuller</B> 
+    <A HREF="mailto:peter.schuller%40infidyne.com"
+       TITLE="[JOS] Privacy and Security on JOS">peter.schuller@infidyne.com</A><BR>
+    <I>Wed, 13 Sep 2000 21:25:39 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000189.html">[JOS] Privacy and Security on JOS</A></li>
+        <LI> Next message: <A HREF="000191.html">[JOS] Privacy and Security on JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#190">[ date ]</a>
+              <a href="thread.html#190">[ thread ]</a>
+              <a href="subject.html#190">[ subject ]</a>
+              <a href="author.html#190">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> A basic idea is this:
+</I>&gt;<i> 
+</I>&gt;<i> Each user has a user id (string) and a password (string-hashed). The
+</I>&gt;<i> system also stores a UID (string) and a system UID (string). It also
+</I>&gt;<i> generates a temporary ID called, say, temporary (string). Authentication
+</I>&gt;<i> is like this:
+</I>&gt;<i> 
+</I>&gt;<i> LOGON
+</I>
+[snip]
+
+&gt;<i> Use symmetric DESede key to decrypt user's profile information.
+</I>
+While I agree with what you're saying, I'd just like to point out what I
+believe to be a  flaw in the kind of profile management you seem to be
+proposing (whether by intent or not - it doesn't matter, I think this issue
+should be brought up in any case).
+
+Am I correct in thinking that the idea is that upon login, the profile
+(applications settings, etc - something like the user specific registry info
+on Windows?) gets loaded, possible changed by running programs, and then
+stored again on disk when one logs out?
+
+The problem with this is that it interferes with multiple logins. This is a
+problem one sees in a Windows environment with roaming profiles. When a
+person logs onto a NT box, the client will get update it's local profile
+with that on the server. When you log out, the server profile is
+synchronized with the client-side one. This obviously creates huge problems
+with regards to being logged in multiple times from different locations (and
+then there's the problem of re-transfering a 500 mail file on the net
+everytime it changes... but that's besides the point).
+
+So while the idea of sessions is obviously a requirement (and a great thing
+if you make them persistent across logins), I believe any &quot;profile&quot; data
+should be accessed directly on disk (or wherever the &quot;authorative&quot; copy resides).
+
+-- 
+/ Peter Schuller, InfiDyne Technologies HB
+
+PGP userID: 0x5584BD98 or 'Peter Schuller &lt;<A HREF="mailto:peter.schuller@infidyne.com">peter.schuller@infidyne.com</A>&gt;'
+Key retrival: Send an E-Mail to <A HREF="mailto:getpgpkey@scode.infidyne.com">getpgpkey@scode.infidyne.com</A>
+E-Mail: <A HREF="mailto:peter.schuller@infidyne.com">peter.schuller@infidyne.com</A> Web: <A HREF="http://scode.infidyne.com">http://scode.infidyne.com</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000189.html">[JOS] Privacy and Security on JOS</A></li>
+	<LI> Next message: <A HREF="000191.html">[JOS] Privacy and Security on JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#190">[ date ]</a>
+              <a href="thread.html#190">[ thread ]</a>
+              <a href="subject.html#190">[ subject ]</a>
+              <a href="author.html#190">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

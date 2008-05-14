@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000143.html">
+   <LINK REL="Next" HREF="000146.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Program and ProgramContext">gchii@mindspring.com</A><BR>
+    <I>Wed, 11 Aug 1999 11:22:04 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000143.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000146.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#145">[ date ]</a>
+              <a href="thread.html#145">[ thread ]</a>
+              <a href="subject.html#145">[ subject ]</a>
+              <a href="author.html#145">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 04:53 PM 8/11/99 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+&gt;<i>Actually, can you tell me the context of your definition?
+</I>
+JOS is expected to run all kinds of programs. In theory, a uniform API for
+all kinds programs is possible. This is what we're working toward.
+
+We should learn from the success and failures of other operating systems.
+Each new operating system has a brief opportunity to challenge the
+assumptions of traditional data processing models. JOS must fortify the
+strengths and minimize the weaknesses of all operating systems that have
+gone before.
+
+Are Java Beans the best model of batch data processing? What are the
+implications of running non-inherited static main()? Why are there separate
+models for Java applications, Java applets, Java servlets and Java aglets?
+Aren't all of these trying to do exactly the same thing?
+
+JOS is not UNIX(tm). JOS is not TSO(tm) or OS/400(tm). JOS is not Microsoft
+Windows(tm) or MS-DOS(tm). JOS is not Linux. JOS is not Java(tm). So, what
+is it? That's what we're trying to figure out.
+
+&gt;<i>I always thought of a program as something with a main() method.
+</I>
+An &quot;Java application&quot; is a kind-of program. It is defined as any class with
+a static main() method. While an &quot;application&quot; is always a program, a
+program is not always an &quot;application&quot;. An application is a self-contained,
+independent program. A result code is irrelevant for an &quot;application&quot;
+because it is never expected to &quot;fail&quot;.
+
+While the &quot;Java applet&quot; is a strong model for a program, an &quot;application&quot;
+is not. What is wrong with static main()? Since a static method cannot be
+inherited, an application cannot inherit the main() behavior of its
+superclass.
+
+Also, the static main() is declared as void. When one application launches
+another, a result code is not expected or desired. That's the nature of
+applications.
+
+On the other hand, a result code is critical when a program runs a
+sub-program. It is the nature of programs. If applications are used where
+programs are required, there is no result code.
+
+&gt;<i>Now, my program (with it's main method n'all), can:
+</I>&gt;<i>
+</I>&gt;<i>1. get parameters from the argument list of the main() method.
+</I>&gt;<i>2. get environment parameters from System.getProperties()
+</I>&gt;<i>3. exit with a result code using System.exit(code)
+</I>
+Yes, Java provides the perfect environment for applications. The
+application context is java.lang.System and java.lang.Runtime. An
+application is all alone inside a JVM, and should be.
+
+This is a hostile environment for programs. Each program must have its own
+unique context. Programs cannot share java.lang.System and
+java.lang.Runtime because each program has its own unique set of
+parameters. Each has its own unique result code.
+
+This model enables a program to use another program within a single JVM,
+without resorting to the Runtime/Process model. We retain the benefit of
+knowing when a program's result code.
+
+Since applications, applets, servlets and aglets are different kinds of
+&quot;programs&quot;, it becomes possible to unify all programs under a program API.
+A program browser would provide a host environment for running (and
+debugging!) all kinds of programs.
+
+&gt;&gt;<i> A program is not a process. It does not have its own System.in, System.out,
+</I>&gt;&gt;<i> and System.err. It is a well-defined interface.
+</I>&gt;<i>
+</I>&gt;<i>Ok, I think this suggests (a lot of guess work here) that the use of
+</I>&gt;<i>this Program interface is where a program wants to interact with a
+</I>&gt;<i>number of other programs to achieve a goal, all in a single process
+</I>&gt;<i>(optional).
+</I>
+Traditional runtime code reuse has always started with the program model.
+You can build many little programs, like UNIX(tm) and all other operating
+systems, an combine them with scripts (and batch files). Since JOS needs a
+program model and Java API doesn't have one, we thought we'd create it.
+
+It would be a bad thing if your shell launches a sub-program that calls
+System.exit() with a result code. Your shell would end prematurely.
+
+The make tool demonstrates the need for a program model. The make tool's
+purpose is to run sub-programs based on simple rules. It is critical to the
+make tool to &quot;know&quot; when a sub-program failed. When a sub-program fails,
+the whole make fails.
+
+It would be a bad thing if the make tool launches a sub-program that calls
+System.exit() with a result code. A make script would end prematurely.
+
+It would be a bad thing for your servlet to call System.exit() with a
+result code. It would end the servlet enviroment prematurely. Servlets are
+expected to use an &quot;honor system&quot; among serlet programmers, instead of a
+security system.
+
+&gt;<i>The concept of the main() method (and therefore, your Program interface
+</I>&gt;<i>too) is very primitive.
+</I>
+Exactly. A minimal interface is our goal. We are trying to reduce a program
+down to its barest essentials. We are not adding the complexity of multiple
+threads or multiple independent processes.
+
+&gt;<i>If you would like to achieve a higher goal by linking together several
+</I>&gt;<i>programs, the main/run() method is a very limiting solution to the problem.
+</I>&gt;<i>UNIX is about as good as it gets (UNIX consists of lots of little programs
+</I>&gt;<i>cooperating with each other by calling each other's main() methods. The shell
+</I>&gt;<i>orchestrates this with pipes and redirection symbols.
+</I>
+UNIX(tm) is as good as it gets. The reason it exists on UNIX(tm) is simply
+because it is needed. The classic data processing model has been expanded
+beyond UNIX(tm). It is available on every major operating system, except Java.
+
+&gt;<i>With the advent of Java, piping and main() arguments seem unintuitive.
+</I>
+Sun Microsystems insists that an instance of the JVM must be created for
+each application. The JVM still support piping and a result code on the
+outside. The native OS can still redirect standard in, standard out and
+standard err. The result code passed to System.exit() is returned to the
+native OS.
+
+The benefit of the program model have not been passed on to your Java code.
+It would be very difficult to get &quot;public static int main( String[] args )&quot;
+to work anyway.
+
+&gt;<i>Instead we could have JavaBeans interacting with each other.
+</I>
+Sure. I supposed you could have JavaBeans acting like programs without a
+well-defined program interface. Each bean might have a different interface.
+Parameters for a program could be thought of as properties of a bean. The
+result code from a bean would be the return value of some method.
+
+This program and program context model provides a way to use JavaBeans as
+if they were programs. A well-defined interface is used instead of
+reflection. And class, even a bean, can implement the program interface.
+
+More importantly, this gives us a unified model for JOS programs. When you
+want to run a program from a shell, the shell can check for a program
+interface. The shell can run many programs, properly, with result codes,
+within a single JVM.
+
+Further, we bring back the power of shell scripting. When the shell runs a
+shell script, it can return the result code of every program it runs. The
+shell script can handle non-zero result codes.
+
+Plus, the shell can launch a program in a separate thread or a separate
+process.
+
+&gt;<i>Given JavaBeans and (standard) programs, do we really need a third
+</I>&gt;<i>option?
+</I>
+We have Java &quot;applications&quot;, &quot;applets&quot;, &quot;servlets&quot;, &quot;aglets&quot;, &quot;browslets&quot;,
+&quot;pluglets&quot; and &quot;jarlets&quot;. We have beans, too. All these things are
+different kinds of programs. Instead of having a separate (incompatible)
+interface for each speciality, there are benefits to bringing them together.
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000143.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000146.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#145">[ date ]</a>
+              <a href="thread.html#145">[ thread ]</a>
+              <a href="subject.html#145">[ subject ]</a>
+              <a href="author.html#145">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

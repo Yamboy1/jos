@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java-Linux</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:mgangelen%40quintop.nl">
+   <LINK REL="Previous"  HREF="000748.html">
+   <LINK REL="Next" HREF="000751.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java-Linux</H1>
+    <B>mgangelen@quintop.nl</B> 
+    <A HREF="mailto:mgangelen%40quintop.nl"
+       TITLE="[JOS-Arch] Java-Linux">mgangelen@quintop.nl</A><BR>
+    <I>Mon, 19 Jun 2000 14:29:34 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000748.html">[JOS-Arch] Getting started on AWT</A></li>
+        <LI> Next message: <A HREF="000751.html">[JOS-Arch] Java-Linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#746">[ date ]</a>
+              <a href="thread.html#746">[ thread ]</a>
+              <a href="subject.html#746">[ subject ]</a>
+              <a href="author.html#746">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;&gt;<i> Currently I'm writing little &quot;routines&quot; and &quot;fragments&quot; of assembly as I
+</I>&gt;&gt;<i> implement my JIT. Sometimes however I need to call back into native C
+</I>&gt;&gt;<i> code to access some structures and stuff.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> I hope to replace this by allowing the assembler to &quot;understand&quot; a C
+</I>&gt;&gt;<i> structure and access it's members in a macro-like fashion.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> If there was object inheritance and stuff happening there it would make
+</I>&gt;&gt;<i> life very much more complicated.
+</I>
+&gt;<i> Yip, ideally I also want the JIT to &quot;inline&quot; methods which access
+</I>hardware
+&gt;<i> directly. So for example a dummy routine to write to an I/O port gets
+</I>&gt;<i> replaced by the JIT with the asm instructions to do the action. This will
+</I>&gt;<i> probably result in much less overhead than the JNI model and will allow
+</I>&gt;<i> the native code to be better optimised in the context of the Java code.
+</I>
+Sounds interesting.
+
+Currently I'm doing some research for my own VM I have in mind. This will
+be a JAVA VM and OS written completely in JAVA where only the boot process
+will be coded in ASM.
+Much of this is inspired by the following article:
+
+<A HREF="http://www-4.ibm.com/software/developer/library/jalapeno/index.html">http://www-4.ibm.com/software/developer/library/jalapeno/index.html</A>
+
+Here are some thoughts:
+
+There will be 2 VM's: VM1 and VM2
+VM1 is a JAVA bytecode to machinecode compiler, written in JAVA. It will
+compile ITSELF to a binary (elf?). It will be a fairly generic VM written
+for an unoptimized processor, eg. i386.
+
+When the machine boots, the bootloader (ASM) will load VM1, which is
+compiled for i386 code. The only job VM1 has to do is compile VM2. VM2 is
+actualy the same as VM1, but with a few exceptions.
+VM1 will test what processor the machine is on, eg i586/MMX. VM1 will now
+compile VM2 for this processor, taking into account the extra opcodes for
+the i586 and MMX.
+After that, VM1 will give control to VM2 and load itself out of memory.
+
+VM2 (the optimized one) will now compile the java class libraries
+(java.lang, etc.) and load all the OS-related stuff (memory management, IO
+routines, disk/network drivers, etc). All of these are written in JAVA.
+
+The VMs will compile the bytecode directly to machinecode.
+There are ofcourse situations where direct control over machinecode is
+preferred. Eg. device-drivers will almost certainly want that. For this I
+have the following in mind:
+
+1.) Native methods will be written in JAVA where possible.
+2.) There will be a JNI-like system (like BCNI)
+3.) When access to machinecode is neccessary, a method could be placed in a
+seperate namespace:
+
+package asm.i386;
+
+class File extends I386_Assembly
+{
+   /*
+    * Code to execute a call to byte[] java.io.File.readBytes( int n )
+    */
+   public static void readBytes()
+   {
+      asm.write( MOV, BX, SP );       // get the File object
+      asm.write( DEC, SP );
+      asm.write( MOV, AX, SP );       // get parameter n
+      asm.write( DEC, SP );
+
+      asm.write(......)               // do the IO-things
+
+      asm.write( MOV, SP, AX );       // return the byte array
+      asm.write( RET );
+   }
+}
+
+Note: this 'assembly' is just for clarification, now it's totaly bogus
+since I'm fairly new to assembler.... :)
+
+These ASM methods are actualy never really executed. They will be executed
+once when class java.io.File is being resolved, and the asm.writes will be
+used directly as machinecode.
+
+It will be needless to say that these ASM methods must be kept to a minimum
+for portability reasons.
+
+Maybe there are some people who like to brainstorm with me about this
+idea...
+
+
+Menno.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000748.html">[JOS-Arch] Getting started on AWT</A></li>
+	<LI> Next message: <A HREF="000751.html">[JOS-Arch] Java-Linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#746">[ date ]</a>
+              <a href="thread.html#746">[ thread ]</a>
+              <a href="subject.html#746">[ subject ]</a>
+              <a href="author.html#746">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

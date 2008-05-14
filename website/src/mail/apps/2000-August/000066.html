@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [eric] Smart ERIC package</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000065.html">
+   <LINK REL="Next" HREF="000067.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [eric] Smart ERIC package</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [eric] Smart ERIC package">gchii@mindspring.com</A><BR>
+    <I>Fri, 18 Aug 2000 11:16:09 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000065.html">[JOS-Apps] [data registry] x-registry:new: subscheme</A></li>
+        <LI> Next message: <A HREF="000067.html">[JOS-Apps] [Smart API] x-device: scheme</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The Smart ERIC package implements the eric: scheme and run:eric: subscheme.
+It should be available soon in distribution 10 of Smart API 2a.
+
+The name of the package is org.jos.gchii.smarteric1a. The default
+configuration of the Smart API object factory has been changed to
+dynamically load the EricFactory class. The default configuration of the
+Smart API program factory has been changed to dynamically load the
+RunEricController class.
+
+For more information, see also the SmartEricProtocol article on JOS Wiki.
+
+<A HREF="http://www.metamech.com/wiki/view/Main/SmartEricProtocol">http://www.metamech.com/wiki/view/Main/SmartEricProtocol</A>
+
+-----
+
+The eric: scheme always returns an instance of EricShortcut (or null). By
+using the eric:new: subscheme, a shortcut can be created from a query
+string. Here is an extreme example:
+
+eric:new:?debug=true&amp;path=somepath&amp;shell=someshell&amp;location=somelocation
+
+A shortcut can be stored in any data registry-compatible file. By using the
+eric: scheme, a shortcut can be loaded from disk. Here is a local example:
+
+eric:desktop.eric
+or
+eric:file:desktop.eric
+
+Here is a remote example:
+
+eric:<A HREF="http://www.mindspring.com/~gchii/eric/desktop.eric">http://www.mindspring.com/~gchii/eric/desktop.eric</A>
+
+-----
+
+The run:eric: subscheme is used to create a new process. The new process
+runs in its own address space. The new process has its own primordial class
+loader, threads and garbage collector.
+
+The run:eric: subscheme always returns an instance of Program (or null).
+The run:eric: subscheme uses the eric: scheme to get a shortcut and do
+whatever it takes to invoke it. For a foreign operating system, such as
+Linux or Windows, it specifically returns an instance of
+org.jos.gchii.osprogram1a.OSProgram. For an MPCL-compatible virtual
+machine, it is expected to return a new bytecode process. Here is a local
+example:
+
+run:eric:desktop.eric
+or
+run:eric:file:desktop.eric
+
+Here is a remote example:
+
+run:eric:<A HREF="http://www.mindspring.com/~gchii/eric/desktop.eric">http://www.mindspring.com/~gchii/eric/desktop.eric</A>
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000065.html">[JOS-Apps] [data registry] x-registry:new: subscheme</A></li>
+	<LI> Next message: <A HREF="000067.html">[JOS-Apps] [Smart API] x-device: scheme</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os - update</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000469.html">
+   <LINK REL="Next" HREF="000471.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os - update</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] rheise.os - update">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 19 Apr 2000 01:11:12 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000469.html">[JOS-Arch] Release of rheise.os - multiprocess Java layer for JOS</A></li>
+        <LI> Next message: <A HREF="000471.html">[JOS-Arch] rheise.os - update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#470">[ date ]</a>
+              <a href="thread.html#470">[ thread ]</a>
+              <a href="subject.html#470">[ subject ]</a>
+              <a href="author.html#470">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I have worked out a way to load a separate version of java.lang.System
+for each process in a host JVM environment. I am still amazed that it
+actually works, and yet it is so simple (of course, things are always
+simple in hindsight).
+
+The problem with loading a separate version of java.lang.System for each
+process is that it can no longer access its native methods. Also, it is
+difficult to move a single system class from the host primordial class
+loader to the process class loader without causing linking errors.
+
+To solve the first problem, I load my own version of java.lang.System
+into each process which delegates native method calls to the &quot;real&quot;
+java.lang.System class. You might wonder how one System class can
+communicate with another System class with exactly the same name. You
+/can/ use reflection, but I found a simpler way: I defined an additional
+class called java.lang.SystemWrapper which is loaded by the same class
+loader as the &quot;real&quot; System class (ie. the host primordial class
+loader). My System class delegates to SystemWrapper, which delegates to
+the System class that it resolves to. No reflection is needed.
+
+_quinn will be pleased to note that this passes the &quot;ultimate test&quot;
+which is to pipe the output of one program into another. In fact I have
+a demo program which does just that:
+
+$ rheise.test.Echo hello world
+hello world
+$ pipe rheise.test.Echo hello world | rheise.test.Reverse
+world hello
+
+I have released version 0.1.1 of rheise.os which contains these changes:
+
+	<A HREF="http://www.progsoc.uts.edu.au/~rheise/projects/rheise.os/">http://www.progsoc.uts.edu.au/~rheise/projects/rheise.os/</A>
+
+Note that since I have included my own version of java.lang.System, you
+should make sure rheise.os appears in your CLASSPATH _after_ your JDK
+classes.zip. My System class is not meant to replace the JDK one, it is
+dynamically loaded in at runtime and cooperates with the standard one.
+
+Also, I have assumed that your system classes are in classes.zip. If
+they are not, you need to edit a source file, as described in the docs.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000469.html">[JOS-Arch] Release of rheise.os - multiprocess Java layer for JOS</A></li>
+	<LI> Next message: <A HREF="000471.html">[JOS-Arch] rheise.os - update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#470">[ date ]</a>
+              <a href="thread.html#470">[ thread ]</a>
+              <a href="subject.html#470">[ subject ]</a>
+              <a href="author.html#470">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

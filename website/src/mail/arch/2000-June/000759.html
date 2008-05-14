@@ -1,0 +1,242 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] More on brainstorm... Project name: Black</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:mgangelen%40quintop.nl">
+   <LINK REL="Previous"  HREF="000755.html">
+   <LINK REL="Next" HREF="000762.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] More on brainstorm... Project name: Black</H1>
+    <B>mgangelen@quintop.nl</B> 
+    <A HREF="mailto:mgangelen%40quintop.nl"
+       TITLE="[JOS-Arch] More on brainstorm... Project name: Black">mgangelen@quintop.nl</A><BR>
+    <I>Wed, 21 Jun 2000 19:05:49 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000755.html">[JOS-Arch] [JOSCore] 3D picture w/ correction</A></li>
+        <LI> Next message: <A HREF="000762.html">[JOS-Arch] Java VGA driver on linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#759">[ date ]</a>
+              <a href="thread.html#759">[ thread ]</a>
+              <a href="subject.html#759">[ subject ]</a>
+              <a href="author.html#759">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>To get back on the multiple stage VMs...
+I'll try and clarify more on what I had in mind. (long update !!!)
+
+The project name I find very attractive is 'Black'.
+Black refers to the purity of JAVA: &quot;No milk or sugar added, just JAVA&quot;.
+
+But let's get back to reality.
+In my previous mail I talked about VM1 and VM2. Maybe the VMx keywords are
+a little bit too optimistic about there functionalities. I'll better call
+them JIT1 and JIT2.
+
+STAGE 1:
+
++------+
+|<i>      |
+</I>|<i> JIT1 |
+</I>|<i>      |
+</I>+------+
+
+JIT1 is a JIT compiler, written entirely in JAVA.
+JIT1 has got some modules. These modules are responsible for compiling JAVA
+bytecode to a certain processor. JIT1 can have:
+ - jos.black.jit.intel.I386Compiler
+ - jos.black.jit.intel.I486Compiler
+ - jos.black.jit.intel.I586Compiler
+ - jos.black.jit.amd.P6Compiler
+ - jos.black.jit.ibm.AS400Compiler
+ - jos.black.jit.extensions.intel.MMXCompiler
+ - jos.black.jit.extensions.amd.3DNowCompiler
+ etc.
+
+=== Iain Shigeoka &lt;<A HREF="mailto:iainshigeoka@yahoo.com">iainshigeoka@yahoo.com</A> wrote:
+
+&gt;<i> The approach seems like it would hold a lot of promise.  I'm not sure if
+</I>&gt;<i> you need to do the self-booting system for every boot of the os though...
+</I>&gt;<i> seems like you just need the process to build itself once for each
+</I>&gt;<i> platform.
+</I>
+Let's say we have an Intel 486 PC and an Intel 586MMX PC.
+If we install a distribution of Linux on these PC's, they will both get a
+kernel compiled for I386. This means that we don't use all of the
+capabilities of the processor. The only thing to get max performance is to
+recompile the Linux kernel (and ALL other Linux programs!) with a 486
+option and a 586MMX option. Now we have 2 kernels on 2 PC's.
+Things get ever worse if we upgrade (or downgrade) one of the processors.
+Then we'll have to recompile the entire kernel again!
+This procedure is absolutely a no-go for the default user (me...) and for
+network-administrators.
+
+Therefor I do think we need to go for the following construction:
+
+JIT1 will be compiled for the lowest platform in a range, say I386.
+JIT1 only has the classes in jos.black.JIT.* and beyond. NO java.*, javax.
+*, com.* or whatsoever, only classes needed to do JIT-related stuff. This
+makes JIT1 quite small.
+
+The JIT1 binary AND the classfiles from JIT1 (jos_black_jit.jar?) will be
+installed on both PC's. When booted, JIT1 will determine on what kind of
+processor it is running. When it sees a 586MMX Processor, it will recompile
+a copy of ITSELF (JIT2) to a binary for a 586 Processor with MMX extension.
+This proces will take very little time, because only the classes from
+jos_black_jit.jar (and from this only the classes needed for a 586MMX
+compiler) have to be compiled.
+
+STAGE 2:
+
++------+
+|<i>      |   +------+
+</I>|<i> JIT1 |--&gt;| JIT2 |
+</I>|<i>      |   +------+
+</I>+------+
+
+JIT2 will even be smaller than JIT1, because it won't have modules for
+processors higher or different from a 586MMX in its codebase.
+
+JIT1 will now unload itself and give control to JIT2. JIT2 can compile
+classes a lot faster now.
+
+STAGE 3:
+
+           +------+
+           | JIT2 |
+           +------+
+
+
+=== Gilbert Carl Herschberger II &lt;<A HREF="mailto:gchii@mindspring.com">gchii@mindspring.com</A>&gt; wrote:
+&gt;<i> I applaud the idea of VM1 and VM2. VM1 provides a way to load and bind
+</I>VM2
+&gt;<i> to a kernel and specific platform. While VM1 might be identical on every
+</I>&gt;<i> platform, VM2 is a plug-in. It becomes application-specific. It can be
+</I>&gt;<i> optimized for a particular application.
+</I>
+
+Well, not quite. There will be one 'real' VM: BlackVM. This will be the VM
+that handles all of the OS responsabilities: memory management,
+task-switching, iterrupts, IO, etc.
+
+STAGE 4:
+                     +---------+
+       +------+      |         |
+       | JIT2 |-----&gt;| BlackVM |
+       +------+      |         |
+                 +---+---------+------+
+                 |        |           |
+            +--------+ +--------+ +--------+
+            |   IO   | | Memory | |  Task  |
+            | Module | | Module | | Module |
+            +--------+ +--------+ +--------+
+
+BlackVM will be able to load multiple default class-libraries. It will have
+one class-library for itself (Black's own java.* classes) but it should
+also be able to load Sun's rt.jar, Microsoft's classes.zip and even
+Personal Java's classfiles (personal_classes.zip?).
+
+STAGE 5:
+
+                                            +----------------------+
+                 +---------+              +-| Black's java classes |
+   +------+      |         |              | +----------------------+
+   | JIT2 |-----&gt;| BlackVM |--------------+
+   +------+      |         |              | +----------------------+
+             +---+---------+------+       +-| Sun's java classes   |
+             |        |           |       | +----------------------+
+        +--------+ +--------+ +--------+  |            .
+        |   IO   | | Memory | |  Task  |  |            .
+        | Module | | Module | | Module |  | +----------------------+
+        +--------+ +--------+ +--------+  +-| XXX's java classes   |
+                                            +----------------------+
+
+On previous mailthreads, there was talk about that a process (or VM) only
+need different classloaders. These classloaders can now be build to ask
+Black VM for the appropriate java.* classes.
+
+
+MACHINECODE
+
+=== Gilbert Carl Herschberger II &lt;<A HREF="mailto:gchii@mindspring.com">gchii@mindspring.com</A>&gt; wrote:
+&gt;<i> Machine code can be embedded in a class file as a method attribute. The
+</I>&gt;<i> name of the attribute would be &quot;xxxMachineCode&quot;, where xxx is a
+</I>&gt;<i> platform/processor. The javac tool should recognize the asm keyword, like
+</I>&gt;<i> this:
+</I>&gt;<i>
+</I>&gt;<i>   public native void example() {
+</I>&gt;<i>     asm {
+</I>&gt;<i>       mov ax, dx
+</I>&gt;<i>       :
+</I>&gt;<i>     }
+</I>&gt;<i>   }
+</I>
+How temptive that sounds, I do not think that it is a very good idea. It
+will just contribute to fragmentation of the the java platform. Also, I
+want to be able to program JOS/Black with just my favorite editors and
+compilers (SUN/J++/IBM VA/etc.).
+Look at my previous code:
+
+package asm.i386;
+
+class File extends I386_Assembly
+{
+   /*
+    * Code to execute a call to byte[] java.io.File.readBytes( int n )
+    */
+   public static void readBytes()
+   {
+      asm.write( MOV, BX, SP );       // get the File object
+      asm.write( DEC, SP );
+      asm.write( MOV, AX, SP );       // get parameter n
+      asm.write( DEC, SP );
+
+      asm.write(......)               // do the IO-things
+
+      asm.write( MOV, SP, AX );       // return the byte array
+      asm.write( RET );
+   }
+}
+
+
+The asm object can just be some kind of OutputStream where the opcodes for
+the MOV instructions are to be written. The first call (from process A) to
+readBytes() will trigger JIT2 to execute the function once, get the
+resulting machinecodes written to the asm object, construct a methodblock
+around it, and finally redirect the call from process A to the newly
+created methodblock. All subsequent calls to readBytes() will also be
+redirected to the methodblock.
+
+This way we still maintain compatability in our java-sources and
+classfiles, only a change in the VM is needed to accomplish the on-the-fly
+assembly.
+
+
+
+Hope to hear some more of you all...
+
+Menno.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000755.html">[JOS-Arch] [JOSCore] 3D picture w/ correction</A></li>
+	<LI> Next message: <A HREF="000762.html">[JOS-Arch] Java VGA driver on linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#759">[ date ]</a>
+              <a href="thread.html#759">[ thread ]</a>
+              <a href="subject.html#759">[ subject ]</a>
+              <a href="author.html#759">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

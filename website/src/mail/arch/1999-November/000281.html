@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Smart API</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000280.html">
+   <LINK REL="Next" HREF="000282.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Smart API</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Smart API">gchii@mindspring.com</A><BR>
+    <I>Fri, 12 Nov 1999 11:22:57 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000280.html">[JOS-Arch] Package Cross-Reference</A></li>
+        <LI> Next message: <A HREF="000282.html">[JOS-Arch] Binary Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#281">[ date ]</a>
+              <a href="thread.html#281">[ thread ]</a>
+              <a href="subject.html#281">[ subject ]</a>
+              <a href="author.html#281">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Building the Smart API is just about the most ambitious project I have ever
+completed. I have been complaining for over fifteen years about the complex
+problems created by class libraries. It has only been within the last year
+that I see where class libraries can be loosely coupled for programming in
+the large. Compared to subroutine libraries and libraries with an
+object-oriented wrapper, a genuine class library is a challenge for
+backward compatibility and future orientation.
+
+If you haven't noticed the potential of the Smart API yet, you should take
+a moment to read the SmartAPIProtocols page on JOS Wiki.
+
+It is hard to pin down my favorite example of the Smart API. I certainly
+enjoyed the Connection Factory when writing Java servlets for an AS/400 and
+DB/2. It came down to requesting a connection, like this:
+
+URI uri = new URI( &quot;jdbc:<A HREF="db2://HOST/LIBRARY"">db2://HOST/LIBRARY&quot;</A> );
+Connection c = (Connection) uri.getObject();
+
+My application program did not configure any JDBC drivers. My application
+program benefits from any future JDBC drivers configured for the Connection
+Factory.
+
+And recently, I wrote a program to copy source code on a package-by-package
+basis. It was refreshing to output source code without explicitely creating
+target directories:
+
+URI uri = new URI( &quot;out:print:file:org/jos/demo/Demo.java&quot; );
+PrintStream p = (PrintStream) uri.getObject();
+
+Besides I have been using the Smart API to load all kinds of configuration
+files as registry objects, like this:
+
+URI uri = new URI( &quot;x-registry:ini:file:config&quot; );
+Registry r = (Registry) uri.getObject();
+
+Has anyone else been able to use the Smart API?
+
+I have been using it in production systems for two of my ultra-conservative
+corporate customers for a couple of months. They appreciate the benefits of
+pre-compiled and pre-configured one-stop-shopping for all digital resources.
+
+What will it take for an entire operating system to embrace the concepts of
+loosely-coupled class libraries, uniform resource identifiers, backward
+compatibilty and future orientation?
+
+For Java, it means that well-known interfaces must be kept in packages free
+from custom implementations. It also means that each release of an API must
+have a unique part of the Java namespace.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000280.html">[JOS-Arch] Package Cross-Reference</A></li>
+	<LI> Next message: <A HREF="000282.html">[JOS-Arch] Binary Distribution</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#281">[ date ]</a>
+              <a href="thread.html#281">[ thread ]</a>
+              <a href="subject.html#281">[ subject ]</a>
+              <a href="author.html#281">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

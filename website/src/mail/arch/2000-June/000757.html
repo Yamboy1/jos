@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I  hope...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000753.html">
+   <LINK REL="Next" HREF="000758.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I  hope...</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I  hope...">tmiller@haverford.edu</A><BR>
+    <I>Tue, 20 Jun 2000 19:31:28 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000753.html">[JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I
+ hope...</A></li>
+        <LI> Next message: <A HREF="000758.html">[JOS-Arch] JOSCore vis-a-vis JOSExtensions: clarity, Ihope...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#757">[ date ]</a>
+              <a href="thread.html#757">[ thread ]</a>
+              <a href="subject.html#757">[ subject ]</a>
+              <a href="author.html#757">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Why does JOSCore come before the kernel?
+</I>
+	For much the same reason that BSD comes before Mach when you're
+talking about OS X, I would think -- but I may be thinking of a different
+JOSCore than others are.
+
+	Any java platform needs a JVM.  That's one component of JOS.  Any
+operating system needs an API.  That's one component of JOS, but it gets
+(a little) tricky here.  Sun has defined an enourmous API that with which
+we must remain compatible.  That API, however, is inadequate for systems
+programming.  JOS must define its own system API for systems programming.  
+This needs name -- the SystemAPI, for now.  Very probably, we will want to
+include higher-level abstractions as part what we require of a JOS
+distribution; this, too, needs a name -- call it the ApplicationAPI.  
+Because of the vastness of Sun's library, the ApplicationAPI will probably
+be rather small.
+
+	So we have two pieces which are externally evident -- the System
+and Application APIs -- and one which is internally necessary.  These two
+APIs, for the most part, define JOS.  The parts they do not define all
+operate in support of them -- including the JVM.  The purpose of having a
+standard interface between pieces behind these APIs is to allow them to be
+replaced like one would bricks in a wall.  (Beware, incoming
+metaphor.)  It is not important to anyone aside from the bricklayer and
+the brickmaker how the wall of a museum is constructed, so long as it does
+not detract from the art hanging on it.*
+
+	Right now, the wall is only made of two bricks -- the (decaf) JVM
+and the (jJOS) kernel.**  The only interface we, at present, require, is
+the kernel/JVM interface.  This interface must exist and be consistent
+even if we don't ever use another kernel or JVM, just to make porting to a
+new architecture feasible.
+
+	As it stands, it's entirely the responsibility and problem of the
+kernel to get itself booted.  Unless anyone has a good reason to think
+that Etherboot and GRUB won't satisfy our booting needs indefinitely, I
+don't think there's a need to spend time and energy on a boot
+specification.
+
+	In general, I feel the best way to write a spec is to write an
+implementation first, and then write the spec to reflect the way it ought
+to be when you re-write the implemention to get it right...
+
+-_Quinn
+
+* It is for this reason that I haven't bothered to rewrite jJOS/decaf to
+comply with any interface specifications; since, AFAIK, there is only one
+kernel and only one VM under development for JOS, it seems rather silly to
+spend time on it when decaf needs so much work.
+
+** Though the distinction between the two could be considered rather
+arbitrary, it'll firm up with the first port off the IA32.
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000753.html">[JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I
+ hope...</A></li>
+	<LI> Next message: <A HREF="000758.html">[JOS-Arch] JOSCore vis-a-vis JOSExtensions: clarity, Ihope...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#757">[ date ]</a>
+              <a href="thread.html#757">[ thread ]</a>
+              <a href="subject.html#757">[ subject ]</a>
+              <a href="author.html#757">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

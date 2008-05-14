@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Application</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000186.html">
+   <LINK REL="Next" HREF="000189.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Application</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Application">digigod@earthling.net</A><BR>
+    <I>Sun, 15 Aug 1999 23:42:13 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000186.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000189.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#188">[ date ]</a>
+              <a href="thread.html#188">[ thread ]</a>
+              <a href="subject.html#188">[ subject ]</a>
+              <a href="author.html#188">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;&gt;<i> protected static Application app = null;
+</I>&gt;<i> Your design and my design are different. We have been working for a while
+</I>&gt;<i> to appreciate them fully and make them even more compatible. We are solving
+</I>&gt;<i> different puzzles; we have invented different solutions, as expected.
+</I>&gt;<i> 
+</I>&gt;<i> At this point, there is little difference in the functionality, except for
+</I>&gt;<i> the static app field. Are you sure you need this field? Does it have to be
+</I>&gt;<i> static? I'll explain with an example.
+</I>
+its required for backward compatability. 
+ 
+&gt;<i> With either of our designs in hand, we could write a &quot;SampleArchve&quot;
+</I>&gt;<i> program, a program that creates an archive file. SampleArchive could take
+</I>&gt;<i> two parameters: archive and path. It could creates an archive file and adds
+</I>&gt;<i> every file to an archive found along a given path.
+</I>&gt;<i> 
+</I>&gt;<i> Using the java tool, the command and its the output from this program would
+</I>&gt;<i> look like this:
+</I>&gt;<i> 
+</I>&gt;<i> $ java org.jos.demo.SampleArchive archive=text.gz path=*.java
+</I>&gt;<i> Creating text.gz archive.
+</I>&gt;<i> Adding DemoApplet.java...
+</I>&gt;<i> Adding DemoProgram.java...
+</I>&gt;<i> Adding DemoApplication.java...
+</I>&gt;<i> Done.
+</I>&gt;<i> 
+</I>&gt;<i> Or, the URI might look like this:
+</I>&gt;<i> 
+</I>&gt;<i> x-program:org.jos.demo.SampleArchive?archive=text.gz&amp;path=*.java
+</I>&gt;<i> 
+</I>&gt;<i> Here a the snippet of code for a SampleArchive program.
+</I>&gt;<i> 
+</I>&gt;<i> // SampleArchive.java
+</I>&gt;<i> public class SampleArchive
+</I>&gt;<i>     extends BaseApplication {
+</I>&gt;<i>   public SampleArchive() {
+</I>&gt;<i>   }
+</I>&gt;<i>   public void run() {
+</I>&gt;<i>     String archive = getProgramContext().getValue( &quot;archive&quot; );
+</I>&gt;<i>     String path = getProgramContext().getVavlue( &quot;path&quot; );
+</I>&gt;<i>     // call some method creates an archive
+</I>&gt;<i>     try {
+</I>&gt;<i>       create_an_archive( archive, path );
+</I>&gt;<i>     }
+</I>&gt;<i>     catch( Throwable e ) {
+</I>&gt;<i>       getProgramContext().setResultCode( 1 );
+</I>&gt;<i>     }
+</I>&gt;<i>   }
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> Both of our designs work the same way up to a point. Both run a program and
+</I>&gt;<i> create an archive, one archive at a time. But, there is another thing I
+</I>&gt;<i> look forward to doing with my programs. I look forward to running many
+</I>&gt;<i> programs in parallel. In many cases, I must run my programs in parallel as
+</I>&gt;<i> they are called by multiple users, multiple threads and from a servlet
+</I>&gt;<i> environment.
+</I>&gt;<i> 
+</I>&gt;<i> Imagine I have given my computer the task of creating 100 different archive
+</I>&gt;<i> files. My design does not depend on static main() at all. I can write a
+</I>&gt;<i> method to create 100 archives concurrently in 100 separate threads. The
+</I>&gt;<i> code looks like this:
+</I>&gt;<i> 
+</I>&gt;<i>   public void example() {
+</I>&gt;<i>     String[] args = {
+</I>&gt;<i>        &quot;archive=src.gz&amp;path=*.java&quot;,
+</I>&gt;<i>        &quot;archive=classes.gz&amp;path=*.class&quot;,
+</I>&gt;<i>        &quot;archive=config.gz&amp;path=*.ini;*.conf;*.properties&quot;;
+</I>&gt;<i>        :
+</I>&gt;<i>        };
+</I>&gt;<i>     for ( int i = 0; i &lt; 100; i++ ) {
+</I>&gt;<i>       Program p = new SampleArchive();
+</I>&gt;<i>       p.setProgramContext( new BasicProgramContext( args[ i ] ) );
+</I>&gt;<i>       new Thread( p ).start();
+</I>&gt;<i>     }
+</I>&gt;<i>   }
+</I>&gt;<i> 
+</I>&gt;<i> With a little more work, I could collect the result code from each program
+</I>&gt;<i> when all the programs are done.
+</I>&gt;<i> 
+</I>&gt;<i> This example is a little contrived, right? It's not like I made up the
+</I>&gt;<i> whole thing. I have worked on a data warehouse application that needed to
+</I>&gt;<i> launch around ~600 independent programs at exactly 5:35pm each night. Other
+</I>&gt;<i> programs are launched later in the evening, waiting for the output from
+</I>&gt;<i> these ~600.
+</I>&gt;<i> 
+</I>&gt;<i> Using Java and Linux, it would have been easier to launch these programs on
+</I>&gt;<i> a small server farm. Oh well. I'll be ready next time.
+</I>&gt;<i> 
+</I>&gt;<i> It is important for a program to use sub-programs that are not static by
+</I>&gt;<i> default. Static fields should only be used when static fields are required;
+</I>&gt;<i> and, they are rarely required.
+</I>
+the static field is only for running the app in the &quot;standard&quot; mode,
+that is off the command line (ie java TheApp)
+
+while my app class is good at running in this &quot;standard&quot; mode its not
+perfect for running otherwise, but possible...
+
+using your example:
+
+public class SampleArchive extends Application {
+ static {
+  app = new SampleArchive(); //look at the main() method in Application
+to see why this is needed
+ }
+
+ public SampleArchive() { 
+  
+ }
+
+ public void appMain() { //I actually thought about calling this method
+&quot;applicate&quot;, not that this is much better...
+  String archive = getArguments().get(1),
+         path    = getArguments().get(2); //very assuming
+  //fa la la
+ }
+}
+
+public void example() {
+ Application temp;
+ //the args thing...
+ for(int i=0;i&lt;100;i++) {
+  temp = new SampleArchive();
+  temp.setArguments(new SimpleArguments(args[i]); //actually I didnt put
+in a setArguments yet...
+  temp.appMain(); //note: this does not create a thread, which can be a
+benifit at times.
+ }
+}
+
+Im still working on Application, so stay tuned--as they say.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000186.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000189.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#188">[ date ]</a>
+              <a href="thread.html#188">[ thread ]</a>
+              <a href="subject.html#188">[ subject ]</a>
+              <a href="author.html#188">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

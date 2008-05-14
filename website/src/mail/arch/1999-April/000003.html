@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Calling for Directory Designs!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:matthew.c.albrecht%40lmco.com">
+   <LINK REL="Previous"  HREF="000002.html">
+   <LINK REL="Next" HREF="000004.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Calling for Directory Designs!</H1>
+    <B>Albrecht, Matthew C</B> 
+    <A HREF="mailto:matthew.c.albrecht%40lmco.com"
+       TITLE="[JOS-Arch] Calling for Directory Designs!">matthew.c.albrecht@lmco.com</A><BR>
+    <I>Thu, 08 Apr 1999 10:03:34 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000002.html">[JOS-Arch] Joe Shmoe Device Driver Architecture beta released!</A></li>
+        <LI> Next message: <A HREF="000004.html">[JOS-Arch] Re: [JOS-Kernel] Calling for Directory Designs!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>In my search for the driver/configuration/etc. directory, I have come across
+several designs, but none of which are really satisfactory.
+
+Here's my current wish-list for such a directory:
+   1. Able to store Java objects with a name-object binding
+   2. Names are referenced in a tree-like structure (ala Unix path
+       names, or something similar)
+   3. Each Entry (a bounded Java object) can have a set of attributes,
+       which are themselves objects.
+   4. Able to search the directory by several keys:
+          a. Exact Name
+          b. wild-card name (ala Unix again)
+          c. object class (ala Jini)
+          d. attributes
+   5. Each entry has the option to be persistent, remote, both, or neither.
+       This would specify which objects can be remotely downloaded,
+       and saved for reloading on future reboots and directory restores..
+   6. The base directory class is an interface, so any number of
+       implementations can be made compatible.
+   7. Probably an event system to announce new or removed entries, or
+changes
+       in entries' object or attributes.
+
+I envision the directory to replace the classic idea of a Kernel API with a
+configurable framework.  Sure, the other &quot;kernel&quot; parts will have their API
+being static (such as the direct hardware access and process features),
+since these are the built-in basic operations.  I also see the directory
+having several &quot;static&quot; entries which act as gateways between the Java
+&quot;static&quot; APIs (core, Java Media, whatever), and these entries are then tied
+to the directory's other entries.
+
+To support this framework idea, the middle-tier in the architecture would
+need methods to change its directory entry references, and possibly listen
+to the directory events for changes in its referenced entries.
+
+For the &quot;static&quot; gateways, we would need to define interfaces for each part,
+and implement, at a minimum, an adapter object which accepts all calls but
+does nothing.
+
+In this way a system architecture can be user-defined.  We would only supply
+(as the kernel) several foundation utilities to make it possible.  And even
+these kernel utilities are configurable with the right interfaces.
+
+Just to show that this isn't all wish with no thought, here are some example
+architectures a system architect could create:
+
+1. A Plain-Jane architecture with nothing fancy. Drivers would be registered
+in the directory, then the basic layers are added on these (file system to
+link the disk drivers together, protocol stacks built on the network
+drivers, and so on).  Then the &quot;static&quot; entries are assigned to the entry
+points for these layers (java.io.File is linked to &quot;/static/java/io/File&quot;
+for File I/O, java.net.Socket is linked to &quot;/static/java/io/TCPIPSocket&quot;,
+and so on).  After this initial setup, each application only knows about the
+Java API and acts as if it is in a standard jvm.
+
+2. A research group works with per-process architecture. They design the
+directory interface so that each process inherits a copy of the directory,
+which can be configured such that each process can make its directory
+optimized for its own task, without affecting the parent directories.  Each
+process spawns off a configuration task which restructures the directory,
+adding its own entries to optimize the to-driver layers.
+
+3. A network computer sets up the directory so that it directly references a
+Jini lookup server on the network.  All directory calls would be translated
+into Jini remote requests and calls, and all located drivers would be RMI
+stubs.
+
+
+-MattAlbrecht
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000002.html">[JOS-Arch] Joe Shmoe Device Driver Architecture beta released!</A></li>
+	<LI> Next message: <A HREF="000004.html">[JOS-Arch] Re: [JOS-Kernel] Calling for Directory Designs!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

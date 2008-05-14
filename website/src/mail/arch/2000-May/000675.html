@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000670.html">
+   <LINK REL="Next" HREF="000676.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">tmiller@haverford.edu</A><BR>
+    <I>Wed, 24 May 2000 19:06:10 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000670.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000676.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#675">[ date ]</a>
+              <a href="thread.html#675">[ thread ]</a>
+              <a href="subject.html#675">[ subject ]</a>
+              <a href="author.html#675">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Can you explain this? I thought that a non-static method call across
+</I>&gt;<i> class definitions would be resolved differently depending on the
+</I>&gt;<i> particular class of that class definition. (I admit, I'm getting to the
+</I>&gt;<i> limits of what I think I know about JVMs)
+</I>
+	The only thing different between classes sharing class definitions
+is their statics; the method code remains in exactly the same place.  If a
+class definition A has a call to method M in class B, the method offset
+will be the same every time it's called (the rationale behind the _quick
+opcodes, IIRC).  The only difference is if class B doesn't share a
+definitions everywhere class A shares definitions -- that is, if class B
+is class B' in some other process.
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000670.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000676.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#675">[ date ]</a>
+              <a href="thread.html#675">[ thread ]</a>
+              <a href="subject.html#675">[ subject ]</a>
+              <a href="author.html#675">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

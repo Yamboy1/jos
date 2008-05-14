@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os-0.1.3 released.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000543.html">
+   <LINK REL="Next" HREF="000538.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os-0.1.3 released.</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] rheise.os-0.1.3 released.">gchii@mindspring.com</A><BR>
+    <I>Mon, 01 May 2000 10:44:07 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000543.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000538.html">[JOS-Arch] rheise.os-0.1.3 released.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#530">[ date ]</a>
+              <a href="thread.html#530">[ thread ]</a>
+              <a href="subject.html#530">[ subject ]</a>
+              <a href="author.html#530">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 01:12 AM 5/1/00 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+&gt;<i>All implementation specific classes have been moved out of the main
+</I>&gt;<i>public packages and into rheise.os.impl. So, for example,
+</I>&gt;<i>rheise.os.process only contains classes that application developers
+</I>&gt;<i>might wish to use. This is similar to how java.* only contains classes
+</I>&gt;<i>application developers might use, and sun.* contains their private
+</I>&gt;<i>implementation classes.
+</I>
+At the right time, implementation should be separated from its interface.
+Also, it is a good idea to give different package names to different
+versions of a framework/API.
+
+An interface is needed to support a wide variety of implementations. A wide
+variety of implementations may be required here because there are a wide
+variety of virtual machines. The rheise.os framework can be implemented in
+both decaf and other virtual machines. The decaf-specific implementation is
+unlike other virtual machines.
+
+&gt;<i>I would imagine that if rheise.os.* is renamed to jos.*, we could have
+</I>&gt;<i>jos.process.ProcessManager, and
+</I>&gt;<i>org.jos.process.host.HostProcessManagerImpl. This implies that
+</I>&gt;<i>application developers should never use the org.jos package. I realise
+</I>&gt;<i>that the JOS project has already agreed on the exact opposite, but this
+</I>&gt;<i>seems to make more sense to me so I thought I'd raise the issue again.
+</I>
+Yes, we have agreed to the opposite for very good reason.
+
+An interface is used by applications. Applications are unconcerned (or
+should be) about the implementation. The well-known interface to the
+framework/API should be used by other applications, so it must go in
+org.jos.*. Your personal implementation of the framework/API is rheise.os,
+and should be. There is no good reason to change it, now or ever.
+
+When there is a rheise-specific implementation of org.jos.process.*, it
+should go somewhere within the rheise.* or org.jos.rheise.* packages. When
+there is a decaf-specific implementation of org.jos.process.*, it should go
+somewhere within the decaf.* or org.jos.decaf.* packages.
+
+A factory should link a framework/API to a specific implementation. A
+factory and only a factory should always provide an implementation of a
+process manager. A process manager should implement the getProcess()
+method. The process manager implementation should not contain static
+methods. If static methods are provided, they must use the factory and
+dispatch requests to the real process manager.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000543.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000538.html">[JOS-Arch] rheise.os-0.1.3 released.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#530">[ date ]</a>
+              <a href="thread.html#530">[ thread ]</a>
+              <a href="subject.html#530">[ subject ]</a>
+              <a href="author.html#530">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] RE: [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000065.html">
+   <LINK REL="Next" HREF="000037.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] RE: [JOS-UI] peer-ui mappings</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] RE: [JOS-UI] peer-ui mappings">gchii@mindspring.com</A><BR>
+    <I>Sun, 25 Jul 1999 10:31:10 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000065.html">[JOS-Arch] Multi-process VM</A></li>
+        <LI> Next message: <A HREF="000037.html">[JOS-Arch] Registries</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#52">[ date ]</a>
+              <a href="thread.html#52">[ thread ]</a>
+              <a href="subject.html#52">[ subject ]</a>
+              <a href="author.html#52">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 04:05 PM 7/22/99 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;&gt;<i> It is just around the corner!  Here's what has to happen:
+</I>&gt;&gt;<i>    * JJOS+decaf gets to the point where we can begin to integrate
+</I>&gt;&gt;<i> $Classpath.
+</I>&gt;<i>
+</I>&gt;<i>	Soon.  Maybe as early as late September.
+</I>&gt;<i>
+</I>&gt;<i>	As for modifying classpath to support processes, I'm very
+</I>&gt;<i>sincerely hoping we won't have to do much at all.  Since spawning
+</I>&gt;<i>processes would have to be handled by a separate library (jos.core.proc?)
+</I>&gt;<i>anyway, we should be able to do all the slight-of-hand necessary behind
+</I>&gt;<i>closed doors, so to speak, and thus not fork classpath, which has enough
+</I>&gt;<i>to do already.
+</I>
+High quality operating systems use &quot;partitions&quot;. Partitions are used to
+protect the operation of a machine while new applications are being built.
+Partitions prevent raw experimental code (test) from interfering with
+stable code (production). Classpath is the classic way to have two (or
+more) copies of the same code running one a processor at the same time.
+
+How do we develop JOS on JOS? We boot a primary partition with a production
+classpath. We spawn new partitions with test classpath. We should be able
+to spawn many partitions, too.
+
+[Wait just a minute. Is JOS going to be a multiple user operating system,
+or not? I hope it is. If JOS is going to be a multiple user operating
+system, it must be able to support multiple concurrent partitions/domains
+and multiple concurrent classpaths. Security is a very important part of a
+partition/domain.
+
+When someone connect to JOS through telnet, a new partition/domain (with a
+unique classpath) is created when they log in. The partition/domain
+provides a default shell for each user.
+
+When I'm compiling Java code, using the multiple user JOS operating system,
+I certainly don't want to bring down the system for all its other users.]
+
+On a large business machine, it might have all these partitions running at
+the same time:
+
+prod1
+prod2
+prod3
+test1
+test2
+test3
+test4
+
+On Wiki, these have been called domains and instances of a JVM. When
+spawning a partition, you can pass a parameter for Java 1.0, 1.1 or 1.2
+platform compatibility.
+
+public class Partition {
+  public Partition( Platform v ) {
+  :
+  }
+}
+
+public class Platform {
+  public static final Platform JAVA_10 = new Platform( 1.0 );
+  public static final Platform JAVA_11 = new Platform( 1.1 );
+  public static final Platform JAVA_12 = new Platform( 1.2 );
+  private Platform( float v ) {
+    platformID = v;
+  }
+  public getPlatformID() {
+    return platformID;
+  }
+  private float platformID;
+}
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000065.html">[JOS-Arch] Multi-process VM</A></li>
+	<LI> Next message: <A HREF="000037.html">[JOS-Arch] Registries</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#52">[ date ]</a>
+              <a href="thread.html#52">[ thread ]</a>
+              <a href="subject.html#52">[ subject ]</a>
+              <a href="author.html#52">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

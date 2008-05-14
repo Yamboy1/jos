@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [bootdisk] For Linux</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000058.html">
+   <LINK REL="Next" HREF="000051.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [bootdisk] For Linux</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [bootdisk] For Linux">gchii@mindspring.com</A><BR>
+    <I>Thu, 10 Aug 2000 12:02:39 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000058.html">[JOS-Apps] [bootdisk] Platform-independence</A></li>
+        <LI> Next message: <A HREF="000051.html">[JOS-Apps] [bootdisk] For Windows</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#50">[ date ]</a>
+              <a href="thread.html#50">[ thread ]</a>
+              <a href="subject.html#50">[ subject ]</a>
+              <a href="author.html#50">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>My first goal is to fully automate BootDisk on Linux(r), and therefore
+UNIX(r). I thought BootDisk could use the java.io.OutputStream class to
+write directly to the floppy; but, it can't. The OutputStream class seems
+to skips over the first sector of a floppy, even when opening /dev/fd0.
+BootDisk writes and verifies the boot image; but the data isn't written to
+the first sector.
+
+Option A: Using dd. This is known to work properly.
+
+dd if=stage1 of=/dev/fd0 bs=512 count=1
+dd if=stage2 of=/dev/fd0 bs=512 seek=1
+cmp bootdisk.dat /dev/fd0
+
+Option B: Using dd and cat. This is also known to work properly.
+
+dd if=stage1 of=bootdisk.dat bs=512 count=1
+dd if=stage2 of=bootdisk.dat bs=512 seek=1
+cat bootdisk.dat /dev/fd0
+cmp bootdisk.dat /dev/fd0
+
+Option C: Using cat. And this is know to work properly.
+
+cat stage1 stage2 &gt; bootdisk.dat
+cat bootdisk.dat /dev/fd0
+cmp bootdisk.dat /dev/fd0
+
+If cat can write bootdisk.dat to /dev/fd0, why can't java.io.OutputStream?
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000058.html">[JOS-Apps] [bootdisk] Platform-independence</A></li>
+	<LI> Next message: <A HREF="000051.html">[JOS-Apps] [bootdisk] For Windows</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#50">[ date ]</a>
+              <a href="thread.html#50">[ thread ]</a>
+              <a href="subject.html#50">[ subject ]</a>
+              <a href="author.html#50">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

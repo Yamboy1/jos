@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Swing peers</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:scribbs%40ida.org">
+   <LINK REL="Previous"  HREF="000047.html">
+   <LINK REL="Next" HREF="000049.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Swing peers</H1>
+    <B>Sean Cribbs</B> 
+    <A HREF="mailto:scribbs%40ida.org"
+       TITLE="[JOS-UI] Swing peers">scribbs@ida.org</A><BR>
+    <I>Tue, 20 Jul 1999 12:12:51 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000047.html">[JOS-UI] Swing peers</A></li>
+        <LI> Next message: <A HREF="000049.html">[JOS-UI] Swing peers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#48">[ date ]</a>
+              <a href="thread.html#48">[ thread ]</a>
+              <a href="subject.html#48">[ subject ]</a>
+              <a href="author.html#48">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>DigiGod Q Frasché wrote:
+&gt;<i> 
+</I>&gt;<i> I just looked at the JOSToolkit peers done by sean cribbs, currently the
+</I>&gt;<i> way its set up its like this:
+</I>&gt;<i> 
+</I>&gt;<i> (Component)-[peer]--(JComponent)-[ui]
+</I>&gt;<i> 
+</I>&gt;<i> which is good for now, but I think the optimal setup is making the peer
+</I>&gt;<i> a quasicomponent that lets the swing ui class plug directly into it,
+</I>&gt;<i> like:
+</I>&gt;<i> 
+</I>&gt;<i> (Component)-[peer]-[ui]
+</I>&gt;<i> 
+</I>&gt;<i> At the very least it would take up less memory and probably be a tad
+</I>&gt;<i> faster.
+</I>&gt;<i> 
+</I>
+I agree that a direct ui connection would be much faster, however, I
+chose to create them the first way for several reasons:
+
+1) We don't have to implement the peer-level functionality of each
+component, we only have to make wrappers to the already-implemented
+functionality of the Swing-level component.
+2) If the user decides to change the look and feel, the peers would have
+to be notified in some way so that they don't maintain links to the old
+UI delegates.
+3) Wrapping Swing components into the peers is easier than using the
+delegates (i.e. I'm lazy).  Besides, when a UI is asked to draw, it
+requires a JComponent to be passed.  Why not just leave all of the
+complications to Swing?
+
+Anyway, that's my 2c in my defense.
+
+Later,
+
+Sean
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000047.html">[JOS-UI] Swing peers</A></li>
+	<LI> Next message: <A HREF="000049.html">[JOS-UI] Swing peers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#48">[ date ]</a>
+              <a href="thread.html#48">[ thread ]</a>
+              <a href="subject.html#48">[ subject ]</a>
+              <a href="author.html#48">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

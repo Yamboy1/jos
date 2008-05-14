@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] multiple processor architecture</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000287.html">
+   <LINK REL="Next" HREF="000290.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] multiple processor architecture</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] multiple processor architecture">tmiller@haverford.edu</A><BR>
+    <I>Mon, 15 Nov 1999 16:41:22 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000287.html">[JOS-Arch] multiple processor architecture</A></li>
+        <LI> Next message: <A HREF="000290.html">[JOS-Arch] multiple processor architecture</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#289">[ date ]</a>
+              <a href="thread.html#289">[ thread ]</a>
+              <a href="subject.html#289">[ subject ]</a>
+              <a href="author.html#289">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> 	I believe that it is counterproductive in this day and age to 
+</I>&gt;<i> create an application or operating system that can only run on a 
+</I>&gt;<i> handful of processor types, ie, x86 etc...
+</I>
+	The current VM for JOS runs on a very small kernel, at about 144 K
+of C++ source (du -ac *.cc *.h in arch/i386/nativecode) and 33K of i386
+ASM (du -ac *.asm), including both boot loaders.  The C++ source is
+(AFAIK) standard ANSI code that should compile to any platform that g++
+supports without change.  The ASM, obviously, will need to be changed, but
+most of it is fairly simply stuff like preparing a flat address space and
+passing interrupts (21K) to the C++ code.  (The most complicated bits are
+extracting the location of the ramdisk from the booter, I think, but I
+didn't right so I couldn't tell you for sure.)
+
+	The reason to initially concentrate on the i386 is just that
+they're dirt cheap (comparitively) and almost everyone has one.  Since
+we've defined all our data types away from C already, I think portability
+isn't going to be much of an issue which such a small kernel, but I could
+be wrong.  Unfortunately, I don't have systems besides i386 with which to
+test, nor do I know ASM for them...
+
+-_Quinn
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000287.html">[JOS-Arch] multiple processor architecture</A></li>
+	<LI> Next message: <A HREF="000290.html">[JOS-Arch] multiple processor architecture</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#289">[ date ]</a>
+              <a href="thread.html#289">[ thread ]</a>
+              <a href="subject.html#289">[ subject ]</a>
+              <a href="author.html#289">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

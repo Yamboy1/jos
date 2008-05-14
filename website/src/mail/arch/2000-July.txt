@@ -1,0 +1,340 @@
+From jewel@pixie.co.za Sat, 01 Jul 2000 01:09:41 -0200 (GMT+2)
+Date: Sat, 01 Jul 2000 01:09:41 -0200 (GMT+2)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Arch] Java VGA driver on linux
+
+> > Today I felt like working on some graphics stuff again, so I compiled some
+> > native code to allow me to run Thomas Boceks' VGA driver on Linux. 
+> > 
+> > I had to do an iopl(3) to allow the linux process to access the IO ports.
+> > 
+> > Then I telnetted to a linux box and ran the java interpreter on there as
+> > root.
+> > 
+> > The driver seems to switch the video mode, but I don't see the jos logo as
+> > expected (the bitblt routine should show the logo). 
+> > 
+> > I suspect the problem may be that the linux graphics drivers are already
+> > running to enable the virtual text consoles. They are probably putting 
+> > the card in some mode that the driver doesn't expect. Does anyone know how
+> > I can disable these consoles, or somehow unload the graphics driver?
+> 
+> It's also possible that the driver just doesn't work right.  Todd et al
+> had stated that it was incredibly slow. 
+
+No. I have personally tested the driver on an earlier setup (not on Linux)
+and it worked consistently. It was slow, but it was also on a 486DX100. 
+
+> I personally am tempted to
+> rewrite it in mostly native code, primarily for speed reasons, and also
+> because I have sample VGA code in ASM.  This kind of defeats the purpose
+> of a Java-based driver, but we all want performance too, right?
+
+I would like to discourage you from doing that. You would just be
+rewriting what has already been done many times. We might as well just
+build an environment that supports drivers from an existing OS and use
+those. 
+
+With the JIT I'm working on the runtime will be able to generate fast
+native code without hand-coding assembler. It will also allow you to code
+something in asm if it's really necessary. But writing native JNI-type
+code is really not desirable. Invoking those methods has a lot of overhead
+and it is a pain to write. 
+
+> 
+> > Another question:
+> > 
+> > I have about 3 ATI RageII (mach64) graphics cards and I would love to
+> > write some Java drivers to use these. Probably just enabling a 1024x768x16
+> > mode would be a great achievement, but I don't really know enough about
+> > video hardware to do this easily. 
+> 
+> Somewhere there has to be information on using VESA modes.  I've looked
+> around but haven't found any.  Most newer cards (like the mach64 series)
+> use the VESA API, either directly or through an executable BIOS extension.
+> It's definitely worth looking into if we want higher resolutions.
+
+Hmm, do many cards support this? What is the name of the standard?
+ 
+> > I have the source code for the mach64 drivers from XFree86, but I need
+> > more background knowledge about how this stuff works. Can someone
+> > recommend a book or a web article that would help me out?
+> 
+> Some libraries are good about having technical information like that, but
+> many do not.  I was lucky enough to find a book about EGA/VGA programming
+> that has tons of information about the base-level architecture of graphics
+> cards.  Unfortunately, chipset-specific stuff is probably not available,
+> unless through ATI's website.  Good luck!
+
+Well I need to get familiar with the kinds of techniques used in this type
+computing. So even just understanding how a plain VGA board works will
+help me a lot.
+
+John 
+
+
+
+
+
+From Matt.Albrecht@trilogy.com Fri, 30 Jun 2000 16:44:03 -0500
+Date: Fri, 30 Jun 2000 16:44:03 -0500
+From: Matt.Albrecht@trilogy.com Matt.Albrecht@trilogy.com
+Subject: [JOS-Arch] Java VGA driver on linux
+
+>> > Another question:
+>> >
+>> > I have about 3 ATI RageII (mach64) graphics cards and I would love to
+>> > write some Java drivers to use these. Probably just enabling a
+1024x768x16
+>> > mode would be a great achievement, but I don't really know enough
+about
+>> > video hardware to do this easily.
+>>
+>> Somewhere there has to be information on using VESA modes.  I've looked
+>> around but haven't found any.  Most newer cards (like the mach64 series)
+>> use the VESA API, either directly or through an executable BIOS
+extension.
+>> It's definitely worth looking into if we want higher resolutions.
+>
+>Hmm, do many cards support this? What is the name of the standard?
+
+It's called the VESA standard :-).  It stands for Video Electronics
+Standards Association.  Most modern video cards support version 1.2 (the
+latest release, which also supports protected mode calls).  Note that the
+VESA standard requires INT 0x10 calls to be made, which I'm not sure are
+supported under a protected mode machine.  Most SVGA video driver's I've
+seen just implement a switch-to-a-mode method, and everything else seems to
+be standard.
+
+I wrote a set of VESA graphics routines in C for DOS4/GW a while back (and
+I dunno if I've told this group that or not).  I'll send it to all
+interested parties.  It supports only 256 color modes, but it might be a
+good starting point.
+
+>
+>> Some libraries are good about having technical information like that,
+but
+>> many do not.  I was lucky enough to find a book about EGA/VGA
+programming
+>> that has tons of information about the base-level architecture of
+graphics
+>> cards.  Unfortunately, chipset-specific stuff is probably not available,
+>> unless through ATI's website.  Good luck!
+>
+>Well I need to get familiar with the kinds of techniques used in this type
+>computing. So even just understanding how a plain VGA board works will
+>help me a lot.
+
+If you can find it, Addison-Wesley published a book called "Programmer's
+Guide to the EGA and VGA Cards", by Richard F. Ferraro.  I've got the
+second edition, which includes info on SVGA cards.  It's pretty old, though
+(1990).
+
+Matt
+
+President Merkin Muffley: You can't fight in here, this is the War Room!
+-- Dr. Strangelove
+
+
+
+                                                                                                                   
+                    John Leuner                                                                                    
+                    <jewel@pixie.        To:     Sean D Cribbs <sean-cribbs@utulsa.edu>                            
+                    co.za>               cc:     arch@jos.org                                                      
+                    Sent by:             Subject:     Re: [JOS-Arch] Java VGA driver on linux                      
+                    arch-admin@jo                                                                                  
+                    s.org                                                                                          
+                                                                                                                   
+                                                                                                                   
+                    06/30/2000                                                                                     
+                    10:09 PM                                                                                       
+                                                                                                                   
+                                                                                                                   
+
+
+
+> > Today I felt like working on some graphics stuff again, so I compiled
+some
+> > native code to allow me to run Thomas Boceks' VGA driver on Linux.
+> >
+> > I had to do an iopl(3) to allow the linux process to access the IO
+ports.
+> >
+> > Then I telnetted to a linux box and ran the java interpreter on there
+as
+> > root.
+> >
+> > The driver seems to switch the video mode, but I don't see the jos logo
+as
+> > expected (the bitblt routine should show the logo).
+> >
+> > I suspect the problem may be that the linux graphics drivers are
+already
+> > running to enable the virtual text consoles. They are probably putting
+> > the card in some mode that the driver doesn't expect. Does anyone know
+how
+> > I can disable these consoles, or somehow unload the graphics driver?
+>
+> It's also possible that the driver just doesn't work right.  Todd et al
+> had stated that it was incredibly slow.
+
+No. I have personally tested the driver on an earlier setup (not on Linux)
+and it worked consistently. It was slow, but it was also on a 486DX100.
+
+> I personally am tempted to
+> rewrite it in mostly native code, primarily for speed reasons, and also
+> because I have sample VGA code in ASM.  This kind of defeats the purpose
+> of a Java-based driver, but we all want performance too, right?
+
+I would like to discourage you from doing that. You would just be
+rewriting what has already been done many times. We might as well just
+build an environment that supports drivers from an existing OS and use
+those.
+
+With the JIT I'm working on the runtime will be able to generate fast
+native code without hand-coding assembler. It will also allow you to code
+something in asm if it's really necessary. But writing native JNI-type
+code is really not desirable. Invoking those methods has a lot of overhead
+and it is a pain to write.
+
+>
+> > Another question:
+> >
+> > I have about 3 ATI RageII (mach64) graphics cards and I would love to
+> > write some Java drivers to use these. Probably just enabling a
+1024x768x16
+> > mode would be a great achievement, but I don't really know enough about
+> > video hardware to do this easily.
+>
+> Somewhere there has to be information on using VESA modes.  I've looked
+> around but haven't found any.  Most newer cards (like the mach64 series)
+> use the VESA API, either directly or through an executable BIOS
+extension.
+> It's definitely worth looking into if we want higher resolutions.
+
+Hmm, do many cards support this? What is the name of the standard?
+
+> > I have the source code for the mach64 drivers from XFree86, but I need
+> > more background knowledge about how this stuff works. Can someone
+> > recommend a book or a web article that would help me out?
+>
+> Some libraries are good about having technical information like that, but
+> many do not.  I was lucky enough to find a book about EGA/VGA programming
+> that has tons of information about the base-level architecture of
+graphics
+> cards.  Unfortunately, chipset-specific stuff is probably not available,
+> unless through ATI's website.  Good luck!
+
+Well I need to get familiar with the kinds of techniques used in this type
+computing. So even just understanding how a plain VGA board works will
+help me a lot.
+
+John
+
+
+_______________________________________________
+Arch maillist  -  Arch@jos.org
+http://jos.org/mailman/listinfo/arch
+
+
+
+
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 30 Jun 2000 17:00:12 -0700 (PDT)
+Date: Fri, 30 Jun 2000 17:00:12 -0700 (PDT)
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] [boot disk] byte array
+
+--- Gilbert Carl Herschberger II <gchii@mindspring.com> wrote:
+> At 07:37 PM 6/27/00 -0700, Iain Shigeoka <iainshigeoka@yahoo.com> wrote:
+> >OK.  Well, then put it in the classpath or serve it via an httpd
+> server.
+> 
+> I wonder if the GUI application should have another field for the
+> location
+> of the external resources. If you type in the location, it can be a
+> local
+> directory or HTTP URL. That would completely separate the program from
+> its
+> data.
+
+This would be best.  Actually, it would be easiest if you had a separate
+file button so you can use the standard java file chooser dialog box.
+
+> >Well, if you want to do systems programming in java, you need to write
+> a
+> >new extension to java and a special java compiler to handle it.  It
+> >shouldn't be too big a stretch since its been done before with other
+> >languages (but could be a good amount of work).
+> 
+> A system programming language might support an extension of a native
+> method
+> with assembler or C/C++. I really don't like the idea of keeping my
+> .java
+> and .c code in separate files.
+
+Yup.  Or simply extend the java syntax with new keywords which let you
+directly access 'low level' resources.  Not a trivial task of course.  It
+would be easier to just do 'embedded' C or assembly.
+
+> If CLASSPATH is unreliable, it won't help. Maybe CLASSPATH is missing
+> from
+> a browser?
+
+Classpath is only used to 'bootup' the system.  codebase should be used
+for dynamic downloads.
+
+> The GUI application would create a boot disk image. With instructions, a
+> Windows user could manually rawwrite it to a diskette, too. The GUI
+> application is meant to reduce the complexity of creating a boot disk
+> image. There are quite a few Etherboot options.
+
+OK.  Sounds plausible.
+
+-iain
+
+__________________________________________________
+Do You Yahoo!?
+Kick off your party with Yahoo! Invites.
+http://invites.yahoo.com/
+
+
+
+
+From tmiller@haverford.edu Sat, 1 Jul 2000 00:05:10 -0400 (EDT)
+Date: Sat, 1 Jul 2000 00:05:10 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] [boot disk] byte array
+
+> A system programming language might support an extension of a native method
+> with assembler or C/C++. I really don't like the idea of keeping my .java
+> and .c code in separate files.
+
+	Java is designed to be a portable application language, so it does
+make sense to write machine-specific code in another language.  (It is, of
+course, possible to provide a library which isolates that machine code,
+and there is the beginning of such a library in the last distribution of
+jJOS/decaf.  The problem is that the code is interpreted, which makes it
+run very slowly; JIT compiling the calls to their equivalent ASM should
+not be terribly difficult, though it's quite a bit away.  At that point,
+the argument for or against drivers in Java becomes more a language
+purity issue.)  That being said, your proposal makes sense.
+
+	The first-pass approach to implementing this would be a
+pre-processor (actually, running a C preprocessor on Java source files
+could come in handy, but I digress) which sucked the C code out of native
+function blocks, rewrote the .java file to remove that code and have the
+proper syntax, wrapped the C code with JNI, and dumped it into a .c file,
+then called the appropriate compilers.  While this is a lot of grunt work,
+it also doesn't look particularly difficult; you could probably get a
+reasonable approximation done in shell script :)
+
+-_Quinn
+
+
+
+
+

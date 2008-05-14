@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Concerning the registry...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000022.html">
+   <LINK REL="Next" HREF="000017.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Concerning the registry...</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Arch] Concerning the registry...">onewith1@flash.net</A><BR>
+    <I>Sun, 13 Jun 1999 18:06:29 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000022.html">[JOS-Arch] JDK 1.1 or 1.2? ((was [JOS] Concerning the registry...))</A></li>
+        <LI> Next message: <A HREF="000017.html">[JOS-Arch] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#16">[ date ]</a>
+              <a href="thread.html#16">[ thread ]</a>
+              <a href="subject.html#16">[ subject ]</a>
+              <a href="author.html#16">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I've always liked the idea of a virtual registry namespace, where depending
+on the user and application (and maybe even process), different namespaces
+are mapped to the registry.  Let me explain in an example:
+
+User A has his hotkey preferences, but User B likes to use the system
+default preferences.  They both use application C, which is JOS registry
+aware.  Application C checks out (for example)
+&quot;//apps/com/JoeBlowInc/C/Hotkeys&quot; to get the default hotkey mappings.  The
+registry performs a virtual mapping for User A to map &quot;//usr/A/C/HotKeys&quot;
+over the app default.
+
+In this manner the user/application can override system defaults, but the
+changes are saved to a virtually mapped space, so that the real defaults are
+not altered.
+
+&gt;&gt;<i> Having a unified security mechanism would improve security IMHO. Even
+</I>&gt;&gt;<i> though a single hole gets the entire system, a single security system
+</I>&gt;&gt;<i> means a simpler security system, and the simpler it is, the more robust
+</I>&gt;&gt;<i> it is likely to be.
+</I>&gt;<i>
+</I>&gt;<i>True. Do you think the registry should also have a mechanism for
+</I>&gt;<i>handling GuardedObjects and such seamlessly for the user? That is, for
+</I>&gt;<i>security while storing or retransmitting the registry?
+</I>
+
+It sounds like what is needed is a way to send user/application information
+to the RMI server for security checking.  This would also aid with the
+virtual mapping described above.  Could this be done in the skeleton / stub
+code, so that &quot;registry login&quot; is performed once when requesting the stub?
+There may be security holes here, but I'm not sure.
+
+-MattAlbrecht
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000022.html">[JOS-Arch] JDK 1.1 or 1.2? ((was [JOS] Concerning the registry...))</A></li>
+	<LI> Next message: <A HREF="000017.html">[JOS-Arch] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#16">[ date ]</a>
+              <a href="thread.html#16">[ thread ]</a>
+              <a href="subject.html#16">[ subject ]</a>
+              <a href="author.html#16">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

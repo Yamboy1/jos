@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [jni] Registering native methods</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000059.html">
+   <LINK REL="Next" HREF="000061.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [jni] Registering native methods</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [jni] Registering native methods">gchii@mindspring.com</A><BR>
+    <I>Mon, 14 Aug 2000 12:19:12 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000059.html">[JOS-Apps] [jni] Defining system class?</A></li>
+        <LI> Next message: <A HREF="000061.html">[JOS-Apps] [eric] Linux programming question</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#60">[ date ]</a>
+              <a href="thread.html#60">[ thread ]</a>
+              <a href="subject.html#60">[ subject ]</a>
+              <a href="author.html#60">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The Java Native Interface (JNI) provides a method to bind machine code to
+native methods. Here is its prototype:
+
+  jint RegisterNatives(
+      JNIEnv *env,
+      jclass clazz,
+      const JNINativeMethod *methods,
+      jint nMethods
+      );
+
+In order to bind machine code to native methods, this mechanism requires an
+instance of java.lang.Class. Within the internal structure of a class,
+there is a native method property. Typically, a class has no native methods
+so the native method property is null (or NULL). A class with native
+methods must have a non-null native method property.
+
+Unfortunately, native methods cannot be bound prior to the loading and
+defining of a class. There should be another mechanism to bind machine code
+to native methods for system classes. The name of a system class must be
+unique and its class loader must be null. The prototype might look
+something like this:
+
+  jint RegisterSystemNatives(
+      JNIEnv *env,
+      const char *cn;
+      const JNINativeMethod *methods,
+      jint nMethods
+      );
+
+Like decaf, all native methods could be bound prior to loading the first
+byte of bytecode. When a system class is loaded, it can lookup its
+registered methods in the system natives list.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000059.html">[JOS-Apps] [jni] Defining system class?</A></li>
+	<LI> Next message: <A HREF="000061.html">[JOS-Apps] [eric] Linux programming question</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#60">[ date ]</a>
+              <a href="thread.html#60">[ thread ]</a>
+              <a href="subject.html#60">[ subject ]</a>
+              <a href="author.html#60">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

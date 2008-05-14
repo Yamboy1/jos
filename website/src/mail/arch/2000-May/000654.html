@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [subprogram] Definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000644.html">
+   <LINK REL="Next" HREF="000662.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [subprogram] Definition</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [subprogram] Definition">ryan@whitewolf.com.au</A><BR>
+    <I>Mon, 22 May 2000 00:07:31 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000644.html">[JOS-Arch] [subprogram] Definition</A></li>
+        <LI> Next message: <A HREF="000662.html">[JOS-Arch] [subprogram] Definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#654">[ date ]</a>
+              <a href="thread.html#654">[ thread ]</a>
+              <a href="subject.html#654">[ subject ]</a>
+              <a href="author.html#654">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> As I explained before, a subprogram API is critical to a process API. At
+</I>&gt;<i> least one subprogram API is necessary in order to create a process.
+</I>
+You have to understand that there are different ways of looking at it.
+For example, you /could/ consider a program defined using the main
+method (Sun's API for Java Applications) generically as a subprogram,
+but I don't. You seem to be requiring that I see things the way you do,
+but there are other ways of looking at it.
+
+I will explain why I don't see a Java application as a subprogram, but I
+do not require that you see things my way. In fact, Sun explains it best
+themselves:
+
+<A HREF="http://java.sun.com/docs/books/tutorial/getStarted/application/anatomy.html">http://java.sun.com/docs/books/tutorial/getStarted/application/anatomy.html</A>
+
+&quot;Remember that a Java application is a standalone Java program-- a
+program written in the Java language that runs independently of any
+browser. &quot;
+
+&quot;standalone&quot; implies a lot of things, including that it is not a &quot;sub&quot;
+program, but also that if application developers assume that
+applications are standalone (which should be safe to assume since Sun
+tells you this is so) then applications may not work at all as sub
+programs.
+
+Now, you could say that some programs that use this API are subprograms,
+and some are Java applications, but do you think it is right to use the
+same API for two different types of programs*? That would be the
+opposite of strongly typed. Personally, I don't think this API is a
+subprogram API (which explains why I do not think subprogram APIs are
+necessary to invoke an Application in a process)
+
+{ * If you want to use it as a subprogram API for specific programs that
+are subprograms, please do. But since Sun says that this is the API you
+use for writing applications, it is incorrect to say a subprogram API is
+needed to run a process. }
+
+&gt;<i> Any
+</I>&gt;<i> subprogram API will do. A subprogram API is not optional. It is more than
+</I>&gt;<i> useful; it is required.
+</I>
+Again, it is only required for your way of looking at it. To say it is
+required, period, is to force your views upon others. And this is
+especially unfortunate when you claim someone else's project as a
+dead-end project (ie. that rheise.os can never become a &quot;genuine&quot;
+bytecode process) simply because it does not meet &quot;your&quot; requirements.
+
+&gt;<i> The
+</I>&gt;<i> Java Native Interface does not require a C/C++ program to look for main(),
+</I>&gt;<i> nor exclusively use a primordial class loader, nor to invoke a static main().
+</I>
+I did not consider it important that I support the calling of any
+method, not just main, because Sun tells us that the standard way to do
+it is the &quot;main&quot; method.
+
+However, if you would like me to support different method names, that is
+doable. But please make it as a suggestion rather than handling it the
+way you did.
+
+&gt;<i> On the one hand, fix-up code creates four threads, sets up
+</I>&gt;<i> System.properties (etc), requires a static main() and passes additional
+</I>&gt;<i> parameters through args. And, a Java application must implement a method
+</I>&gt;<i> called &quot;main&quot;. Main must have a method access of public and static. Main
+</I>&gt;<i> must have a method descriptor equal to &quot;(L[java.lang.String;)V&quot;.
+</I>&gt;<i> 
+</I>&gt;<i> This is one way of doing it. It is not the only way.
+</I>
+I can allow the name of the method to be invoked to be passed in, but
+maybe you can give useful examples of this before I implement it. I am
+trying to keep the API simple, this being something that can always be
+added at a later stage, I'd like to know if it is worth adding it first
+before I add it.
+
+As for the other subprogram APIs (what I consider the &quot;genuine&quot;
+subprogram APIs, but you are not required to see things this way) I
+discussed on this list quite a while ago my desire to be able to run
+servlets (which are sub programs) in an environment that gives you much
+of the benefits of processes:
+
+	<A HREF="http://jos.org/pipermail/arch/2000-May/000554.html">http://jos.org/pipermail/arch/2000-May/000554.html</A>
+
+This was before you started complaining that my process API did not take
+subprograms into account. The fact is I had started considering it even
+before you brought it up. Sure, I haven't worked out the perfect way to
+do it yet, but do you claim you have?
+
+My thoughts so far have been along different lines from yours, but
+that's allowed, no? The differences include:
+
+1. I do not attempt to handle different program APIs generically, but
+let user code (which knows how to deal with the specific API) deal with
+it.
+
+2. My reason for supporting subprograms in rheise.os is to give them
+some of the advantages processes provide (separate namespaces, and
+security).
+
+For (1), I achieve this by casting the specific subprogram interface to
+a java.lang.Object and storing that in the container (whether it is a
+JavaProcess or something else I haven't yet decided). The container will
+have its own class loader (to provide separate namespaces) and UserToken
+(to provide security). I won't go into the details of how the first
+object is constructed, but it is made available to the client code which
+knows what methods to call on it to make it do its stuff.
+
+For (2), I believe that running subprograms without giving them a
+process-like environment is something that can be achieved outside the
+framework.
+
+&gt;<i> &gt;Then I don't understand your criticism of rheise.os:
+</I>&gt;<i> This thread is not about rheise.os.
+</I>
+It is related.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000644.html">[JOS-Arch] [subprogram] Definition</A></li>
+	<LI> Next message: <A HREF="000662.html">[JOS-Arch] [subprogram] Definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#654">[ date ]</a>
+              <a href="thread.html#654">[ thread ]</a>
+              <a href="subject.html#654">[ subject ]</a>
+              <a href="author.html#654">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

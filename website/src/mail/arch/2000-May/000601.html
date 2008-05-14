@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000622.html">
+   <LINK REL="Next" HREF="000606.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">gchii@mindspring.com</A><BR>
+    <I>Wed, 17 May 2000 15:28:02 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000622.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000606.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#601">[ date ]</a>
+              <a href="thread.html#601">[ thread ]</a>
+              <a href="subject.html#601">[ subject ]</a>
+              <a href="author.html#601">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 02:54 PM 5/17/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>	While it's true the each process must load its own classes, it is
+</I>&gt;<i>not because of a potentially unique CLASSPATH; it is because we cannot
+</I>&gt;<i>share statics across processes. CLASSPATH is not particularly relevant to
+</I>&gt;<i>the JVM specification -- it is an implementation-dependent mechanism for
+</I>&gt;<i>specifying the location of bytecode payloads.  Only in that those payloads
+</I>&gt;<i>may differ must we keep them, as class definitions*, separate.
+</I>
+Each process must load its own classes for two reasons: (a) static fields
+and (b) multiple primordial class loaders. Each process owns a primordial
+class loader. The primordial class loader is garbage collected (or
+discarded) when a process dies. Each primordial class loader has some
+equivalent of CLASSPATH. Each CLASSPATH is potentially different.
+
+Here is one more test case:
+
+public void example() {
+  Runtime.getRuntime().exec( &quot;java0 org.jos.demo.Demo&quot; );
+  Runtime.getRuntime().exec( &quot;java1 org.jos.demo.Demo&quot; );
+  Runtime.getRuntime().exec( &quot;java2 org.jos.demo.Demo&quot; );
+}
+
+On an MPCL-compatible virtual machine, imagine there is a &quot;switch&quot;
+statement to select an appropriate Java standard class library for each
+primoridal class loader:
+
+  switch( platform ) {
+    case 0 :
+      return &quot;java0.jar&quot;;
+
+    case 1 :
+      return &quot;java1.jar&quot;;
+
+    case 2 :
+      return &quot;java2.jar&quot;;
+
+    default :
+      return null;
+
+  }
+
+On a foreign operating system, imagine there are three shell scripts:
+
+  java0 starts JDK 1.02 with CLASSPATH=/jdk1.02/classes
+  java1 starts JDK 1.1.7 with CLASSPATH=/jdk1.1.7/lib.rt.jar
+  java2 starts JDK 1.2.2 with CLASSPATH=/jdk1.2.2/lib/rt.jar
+
+I can already run all three Java class libraries (virtual machines) at the
+same time on a foreign operating system. I should be able to run all three
+Java class libraries (processes) at the same time on an MPCL-compatible
+virtual machine.
+
+-----
+
+It has been mentioned. I'll mention it again. It is possible for a virtual
+machine to use Runtime.exec() to launch another virtual machine. It is
+possible for a virtual machine to use JNI to launch another virtual
+machine. A generic process API should work on all kinds of virtual
+machines. It should work on a classic virtual machine. It should work on a
+JNI-compatible virtual machine. It should work on decaf, too.
+
+A process API is not limited to a bytecode process. When an application
+asks for a process, a process should be created if it is possible. While a
+bytecode process is preferred, a new machine code process might be the only
+way a process can be created on a foreign virtual machine.
+
+An MPCL-compatible virtual machine should implement an internal &quot;java&quot;
+command. When the &quot;java&quot; command is passed to Runtime.exec(), the rest of
+the command line should  be parsed as if they were parameters to the java
+tool. All other commands may be invalid and return an appropriate error
+message.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000622.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000606.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#601">[ date ]</a>
+              <a href="thread.html#601">[ thread ]</a>
+              <a href="subject.html#601">[ subject ]</a>
+              <a href="author.html#601">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

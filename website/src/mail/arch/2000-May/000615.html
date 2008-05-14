@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000614.html">
+   <LINK REL="Next" HREF="000620.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 18 May 2000 13:03:05 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000614.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000620.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#615">[ date ]</a>
+              <a href="thread.html#615">[ thread ]</a>
+              <a href="subject.html#615">[ subject ]</a>
+              <a href="author.html#615">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; &gt; I have suggested that
+</I>&gt;<i> &gt; &gt; the best way to handle the inevitable conflicts between statics in the
+</I>&gt;<i> &gt; &gt; classes of shared objects is for the shared object to simply use the
+</I>&gt;<i> &gt; &gt; statics from whichever process/PCL it's currently running in.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; There are two proposals for this. Mine is to have a static reference
+</I>&gt;<i> &gt; resolved via the class loader of the caller. So, we have two &quot;best&quot; ways
+</I>&gt;<i> &gt; to do it, and one is more best than the other :-)
+</I>&gt;<i> 
+</I>&gt;<i>         I think resolving the static reference via the caller amounts to
+</I>&gt;<i> the same thing as what I suggested -- least suprise -- as the caller is
+</I>&gt;<i> always the current process, yes?
+</I>
+Not so. As pointed out in my original example, if you invoke a method on
+an object that belongs to another process (ie.
+object-&gt;class-&gt;classLoader-&gt;process is different), and that method
+internally references a static, the caller is different from the
+&quot;current&quot; process which we have defined as the owner of the executing
+thread.
+
+It is in this case that I think resolving via the class loader of the
+caller makes more sense.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000614.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000620.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#615">[ date ]</a>
+              <a href="thread.html#615">[ thread ]</a>
+              <a href="subject.html#615">[ subject ]</a>
+              <a href="author.html#615">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

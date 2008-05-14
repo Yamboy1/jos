@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Proposing archive: protocol</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000098.html">
+   <LINK REL="Next" HREF="000102.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Proposing archive: protocol</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Proposing archive: protocol">gchii@mindspring.com</A><BR>
+    <I>Wed, 04 Aug 1999 19:29:31 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000098.html">[JOS-Arch] Package files</A></li>
+        <LI> Next message: <A HREF="000102.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#100">[ date ]</a>
+              <a href="thread.html#100">[ thread ]</a>
+              <a href="subject.html#100">[ subject ]</a>
+              <a href="author.html#100">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I was disappointed in Sun Microsystems again. Jar is just another kind of
+archive. It doesn't need its own scheme.
+
+Sun is so short-sighted. They created a jar: protocol for Java-specific
+archives. And yet, what we need is a uniform URI for all archives. All
+archives are similar, right?
+
+While studying the archive scheme, it highlights an aspect of URIs that
+many people find intimidating. A URI is inherently recursive. Because
+digital resources contain other digital resources, we have to invent a
+scheme that deals with recursion properly.
+
+Proposal: With the archive: protocol, we have a number of different ways to
+approach the recursion problem. Here is my proposal:
+
+Scheme = x-jos:
+
+Sub-scheme = archive:
+
+Optional sub-sub-schemes = arc: | cab: | gz: | jar: | zip:
+
+Identify archive itself:  &lt;URI:     &gt;
+
+1. file: = &lt;URI:file:/usr/local/example.jar&gt;
+2. http: = &lt;URI:<A HREF="http://www.jos.org/download/wiki.zip">http://www.jos.org/download/wiki.zip</A>&gt;
+3. ftp: = &lt;URI:<A HREF="ftp://www.jos.org/">ftp://www.jos.org/</A>      ?        &gt;
+
+Identify &quot;file&quot; within the archive: /usr/local/example
+
+Example 1: If I put /usr/local/example.html into an archive called
+&quot;html.zip&quot;, I can display it in my HTML browser using this URI:
+
+&lt;URI:x-jos:file: &lt;URI:x-jos:archive:file:html.zip&gt; /usr/local/example.html&gt;
+
+It is automatically de-compressed and displayed as if it were a regular
+.html file.
+
+Example 2:
+If the html.zip file is stored on an Internet server, the URI becomes
+
+&lt;URI:x-jos:file: &lt;URI:x-jos:archive:<A HREF="http://www.jos.org/html.zip">http://www.jos.org/html.zip</A>&gt;
+/usr/local/example.html&gt;
+
+Example 2; If I put /usr/local/src.zip into an archive called &quot;jos-rx.zip&quot;,
+I can display a source code file called /org/jos/demo/Demo.java using this
+URI:
+
+&lt;URI:x-jos:file: &lt;URI:x-jos:archive:file: &lt;URI:x-jos:file:jos-rx.zip&gt;
+/usr/local/src.zip&gt; /org/jos/demo/Demo.java&gt;
+
+src.zip is automatically extracted from jos-rx.zip. Demo.java is
+automatically extracted from src.zip. By identifying an object, I can see
+it in my JOS browser.
+
+Plus, any JOS program has access to the smart object factory can get a
+digital resource in the same way.
+
+What about options?
+If a password is required for an archive, where does it go?
+
+&lt;URI:x-jos:file: &lt;URI:x-jos:archive:file:jos-rx.zip?password=XXX&gt;
+/usr/local/src.zip&gt;
+
+Directory listing:
+When the name of an archive is entered by itself, the browser should either
+display a list of files inside the archive or default to index.html.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000098.html">[JOS-Arch] Package files</A></li>
+	<LI> Next message: <A HREF="000102.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#100">[ date ]</a>
+              <a href="thread.html#100">[ thread ]</a>
+              <a href="subject.html#100">[ subject ]</a>
+              <a href="author.html#100">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000611.html">
+   <LINK REL="Next" HREF="000625.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">jewel@pixie.co.za</A><BR>
+    <I>Fri, 19 May 2000 02:59:43 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000611.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000625.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#624">[ date ]</a>
+              <a href="thread.html#624">[ thread ]</a>
+              <a href="subject.html#624">[ subject ]</a>
+              <a href="author.html#624">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> &quot;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&quot; wrote:
+</I>&gt;<i> 
+</I>&gt;<i> &gt; I think it would be extremely wasteful if each process had to load all
+</I>&gt;<i> &gt; it's own classes from the class library independently of the other
+</I>&gt;<i> &gt; processes.
+</I>&gt;<i> 
+</I>&gt;<i> The goal in this proposal was to minimise waste and at the same time
+</I>&gt;<i> comply with the spec. The need to resolve symbolic references is a
+</I>&gt;<i> performance penalty but doing I/O to load class files is a much bigger
+</I>&gt;<i> one (especially when reading from a jar archive). The second one can be
+</I>&gt;<i> solved through class definition caching (and to some extent, file level
+</I>&gt;<i> caching), but the first one remains because the spec requires it.
+</I>&gt;<i> References:
+</I>&gt;<i> 
+</I>&gt;<i> 	<A HREF="http://jos.org/pipermail/arch/2000-April/000449.html">http://jos.org/pipermail/arch/2000-April/000449.html</A>
+</I>&gt;<i> 	<A HREF="http://www.metamech.com/wiki/view/Main/?topic=MultipleJavaProcesses">http://www.metamech.com/wiki/view/Main/?topic=MultipleJavaProcesses</A>
+</I>
+Yes, if you accept that the JVM has to have class loaders (or disjunct
+namespaces) and implement multiple processes by use of these class
+loaders, then you can't have all processes using the same internal
+structures.
+
+But it would beneficial to reuse as many of the classes as possible. For
+example, if all the java.lang, java.io etc classes were always loaded by a
+specific class loader, we could gain the time otherwise required to load
+each system class.
+
+&gt;<i> In addition to computational efficiency, class definition sharing (which
+</I>&gt;<i> is based on class definition caching) minimises memory waste.
+</I>
+Yes class definition caching will certainly help, although I don't see how
+it has much advantage over a conventional file cache.
+
+What is definition sharing?
+ 
+&gt;<i> &gt; This makes it difficult to support different class libraries in the
+</I>&gt;<i> &gt; same OS but otherwise has great advantages.
+</I>&gt;<i> 
+</I>&gt;<i> I'd like to achieve both. True, it does mean not much can be done to
+</I>&gt;<i> remove the cost of resolution per process, but IMHO conforming with the
+</I>&gt;<i> spec is better (and the cost is not too great - it is at least much
+</I>&gt;<i> faster than the class loading process of a typical JVM).
+</I>
+I can't see any way around the spec. Unless you're going to enforce a
+single class for every name in the namespace (ie one classloader, one
+version of every class) you have to make provisions for different classes
+sharing the same name. Whether this means total separation or partial
+sharing is the tricky bit.
+
+ &gt; We can only wait and see if it actually works - I suspect
+ &gt; the performance will be significantly faster than a standard JVM.
+
+Not really. If the file system is already caching the .class files, how
+will your method be much faster?
+
+But you shouldn't be comparing to a normal JVM, you should be comparing
+the native operating environment of other OS'es. Can we compete against
+the processes in BeOS, UNIX and Win32?
+
+Will our solution be able to cope when the user starts compiling the whole
+class library and spawns hundreds of processes in quick succession?
+
+&gt;<i> (An additional note, interaction between 'ls', 'grep' and 'wc' does not
+</I>&gt;<i> necessarily need to involve multiple processes. The equivalent of this
+</I>&gt;<i> in an object oriented context might be the interaction of Java beans
+</I>&gt;<i> which need not be in separate processes. In this case, the same class
+</I>&gt;<i> loader is used and the resolution process is not an issue)
+</I>
+Yes, but if our Processes are emulating what an application expects when
+it runs on a normal JVM, then programmers are going to write to this
+specification. They are going to expect pipes, their own copy of static
+variables for all classes they are using and so on. 
+
+Perhaps it isn't such a good thing to model the traditional UNIX process
+so closely?
+
+John 
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000611.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000625.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#624">[ date ]</a>
+              <a href="thread.html#624">[ thread ]</a>
+              <a href="subject.html#624">[ subject ]</a>
+              <a href="author.html#624">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

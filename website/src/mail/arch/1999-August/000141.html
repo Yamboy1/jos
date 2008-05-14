@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000141.html">
+   <LINK REL="Next" HREF="000143.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Program and ProgramContext">gchii@mindspring.com</A><BR>
+    <I>Tue, 10 Aug 1999 22:13:46 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000141.html">[JOS-Arch] Event-driven devices</A></li>
+        <LI> Next message: <A HREF="000143.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#141">[ date ]</a>
+              <a href="thread.html#141">[ thread ]</a>
+              <a href="subject.html#141">[ subject ]</a>
+              <a href="author.html#141">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At the lowest level, we should be using an event model. Interrupts are part
+of the oldest event model. An interrupt is an event. An interrupt service
+routine (ISR) is an event listener. A hardware interrupt is an asynchronous
+hardware event. A software interrupt is modeled after a hardware interrupt
+to merge hardware and software into a unified event model.
+
+Many events are processed by your computer in order to provide you a stream
+interface to a digital resource. Sorry, streams are not real. Streams are
+only a model to mask the asynchronous events going on everywhere in your
+computer.
+
+For example, a hard drive controller and a device driver makes asynchronous
+disk requests appear to be a byte stream; but it is not.
+
+For example, a network interface card (NIC) and TCP makes asynchronous IP
+packages appear to be a byte stream; but, it is not.
+
+I suspect that it might be a good thing to expose more of the operating
+system events to application software. It might be a good thing to provide
+an almost direct connection between a mouse and a mouse listener.
+
+Asynchronous events require an event queue. You cannot interrupt a mouse
+listener while it is already handling a mouse event. You cannot interrupt a
+hard drive listener while it is handling a hard drive event. You cannnot
+interrupt a network card listener while it is handling an IP packet.
+
+What is the purpose of a driver? A driver is supposed to convert one kind
+of event into another. A TCP/IP driver turns IP packets into a TCP stream.
+
+Like a window manager, the kernel's primary responsibility is to dispatch
+events. It must manage the focus of system-wide events. Mouse events, for
+example, should not be broadcast to all applications; but, to the
+application &quot;on top&quot;. Only one application at a time can listen to mouse
+events.
+
+On one side of a kernel, a window manager taps into the virtual mouse
+driver to listen to mouse events. On the other side of the kernel, the
+mouse driver feeds all mouse events to the kernel. The kernel dispatches
+mouse events to one window manager at a time.
+
+An OS spends most of its time waiting. Many unusable CPU cycles go by. A
+lot of time passes while an application requests the first 4KB of a &quot;file&quot;
+and the time that 4KB is ready. A driver makes a &quot;file&quot; look like a stream
+of bytes, even when content is scattered across a disk.
+
+Queues are the key to bring order to asynchronous events. The request for
+the first 4KB of a file is an event. Each request to the hard drive must
+not interrupt other requests. There must be an event queue for hard drive
+requests. The response to a hard drive request is an event. Should it go
+into a queue?
+
+It turns out that the communication between your general purpose processor
+and hardware devices is the same mechanism as distributed computing. A
+program sends a request to a driver to do something. A driver generates an
+event when a  response is ready.
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000141.html">[JOS-Arch] Event-driven devices</A></li>
+	<LI> Next message: <A HREF="000143.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#141">[ date ]</a>
+              <a href="thread.html#141">[ thread ]</a>
+              <a href="subject.html#141">[ subject ]</a>
+              <a href="author.html#141">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

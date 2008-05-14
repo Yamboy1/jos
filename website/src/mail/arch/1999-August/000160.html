@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000154.html">
+   <LINK REL="Next" HREF="000165.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Program and ProgramContext">ryan@whitewolf.com.au</A><BR>
+    <I>Fri, 13 Aug 1999 10:50:39 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000154.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000165.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#160">[ date ]</a>
+              <a href="thread.html#160">[ thread ]</a>
+              <a href="subject.html#160">[ subject ]</a>
+              <a href="author.html#160">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>DigiGod Q Frasché wrote:
+&gt;<i> 
+</I>&gt;<i> Ryan Heise wrote:
+</I>&gt;<i> &gt; &gt; public abstract class Application {
+</I>&gt;<i> &gt; &gt;  private          String         arguments[];
+</I>&gt;<i> &gt; &gt;  private          BufferedReader reader      = null;
+</I>&gt;<i> &gt; &gt;  protected static Application    app         = null;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; Did you intend for Application to implement the Program interface, or is
+</I>&gt;<i> &gt; this your version of the program interface (as an abstract class
+</I>&gt;<i> &gt; instead)?
+</I>&gt;<i> 
+</I>&gt;<i> its just something I came up with to make apps easier to create, but I
+</I>&gt;<i> brought it up because it could implement the program interface in a
+</I>&gt;<i> subclass
+</I>&gt;<i> 
+</I>&gt;<i> public abstract class ApplicationProgram extends Application implements
+</I>&gt;<i> Program {...}
+</I>&gt;<i> 
+</I>&gt;<i> although Im not entirely convinced of its use
+</I>
+There is definately some useful functionality you could put in an
+abstract base class (command line parsing, for example), but I think
+this functionality is more reusable if it is provided as a library.
+Delegation is a much more flexible design than inheritance. Even more so
+in the case of Java because it does not support multiple implementation
+inheritance. So, for example, if you wanted to reuse the command-line
+processing functionality in an Applet, you couldn't extend the abstract
+base class because applets already extend Applet.
+
+Since my style of programming is to have very small main() methods, I
+personally wouldn't gain much from inheriting functionality from a
+framework-type base class, but I accept that other people have their own
+preference. The main point is that if I choose not to extend
+Application, or even implement Program, my programs should still work
+under JOS. I would think that the vast majority of programmers will
+stick to the program interface that Sun designed rather than use an
+interface that someone else wrote. I'm still not sure about the purpose
+of Gilbert's unified program interface but whatever the purpose, it
+would be (IMHO) best to achieve that purpose without making programs
+implement a non-standard interface.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000154.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000165.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#160">[ date ]</a>
+              <a href="thread.html#160">[ thread ]</a>
+              <a href="subject.html#160">[ subject ]</a>
+              <a href="author.html#160">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

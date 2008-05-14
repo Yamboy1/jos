@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000448.html">
+   <LINK REL="Next" HREF="000447.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">gchii@mindspring.com</A><BR>
+    <I>Mon, 10 Apr 2000 11:19:17 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000448.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000447.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#443">[ date ]</a>
+              <a href="thread.html#443">[ thread ]</a>
+              <a href="subject.html#443">[ subject ]</a>
+              <a href="author.html#443">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 03:25 PM 4/8/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>	Considering memory issues: Echidna takes the position that the
+</I>&gt;<i>reason for Java processes is to eliminate the need to load every
+</I>&gt;<i>(necessary) class in the library each time you start a new Java
+</I>&gt;<i>program.
+</I>
+Let's consider two scenarios. If bytecode has not changed at all, a virtual
+machine should not end up with two or more copies of the bytecode in
+memory. This is possible by intern'ing all bytecode.
+
+A application needs to have a fresh set of static fields each time it is
+loaded. There is no way around that. A custom class loader must re-load
+class files from disk every time the application is started -- just in case
+the bytecode has changed. When the CLASSPATH is changed in the creation of
+a child process, the child process must use its CLASSPATH to load bytecode.
+It must re-load class files every time the application is started -- just
+in case the bytecode has changed.
+
+When an application is downloaded across the network, a custom class loader
+must download class files every time the application is started -- just in
+case the bytecode has changed. If there is a HTTP cache between the custom
+class loader and the network service, the HTTP cache quickly determines if
+the class file has changed.
+
+The bytecode cache could be persistent, too. When the virtual machine is
+started, it should pre-cache (intern) all bytecode that has been recently
+used.
+
+&gt;<i>Writing a custom classloader, it looks like /nothing/ is shared by default,
+</I>&gt;<i>and it's the responsibility of the classloader to be efficient by using
+</I>&gt;<i>findSystemClass() if it so desires.
+</I>
+Is this true of all virtual machines?
+
+Does a virtual machine invoke loadClass() for all classes, even those
+loaded by the primordial class loader?
+
+An optimized virtual machine might not invoke the loadClass() method for
+classes that have already been loaded by the primordial class loader.
+Otherwise, I think you're right.
+
+Certainly, a virtual machine can always create a custom class loader to
+load the classes from java.applet, java.awt, java.sql, etc. A primordial
+class loader should be an actual Java class. As long as semantics are
+preserved, it is not necessary to store all class files in one big archive.
+As long as security is preserved, it is not necessary to load all classes
+in the java.* packages with a primordial class loader.
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000448.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000447.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#443">[ date ]</a>
+              <a href="thread.html#443">[ thread ]</a>
+              <a href="subject.html#443">[ subject ]</a>
+              <a href="author.html#443">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

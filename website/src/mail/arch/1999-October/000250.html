@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Registry? Or SmartAPI?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000249.html">
+   <LINK REL="Next" HREF="000251.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Registry? Or SmartAPI?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Registry? Or SmartAPI?">gchii@mindspring.com</A><BR>
+    <I>Sat, 09 Oct 1999 21:40:11 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000249.html">[JOS-Arch] Request for low-level memory layout</A></li>
+        <LI> Next message: <A HREF="000251.html">[JOS-Arch] Registry? Or SmartAPI?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#250">[ date ]</a>
+              <a href="thread.html#250">[ thread ]</a>
+              <a href="subject.html#250">[ subject ]</a>
+              <a href="author.html#250">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>It was a case of one concept with two names. You might call it a
+&quot;registry&quot;; I might call it a &quot;Smart API&quot;.
+
+I was reading the JosAPI wiki article and came across a facinating quote by
+Clark Evans:
+
+&quot;...Basically, I see a regisry object and an api package. The services are
+defined in org.jos.api by 100% Pure Interfaces. If an application (or any
+system service recursively) needs a service, it asks the registry for an
+object that implements the service. If the service is available on that
+computer, then an instantiated object is returned, otherwise a
+org.jos.api.SERVICE_NOT_AVAILABLE error would be raised.&quot; -- Clark Evans
+
+First, the SmartAPI has *already* implemented the idea of one-stop-shopping
+for any available service. Your program can ask the SmartAPI if a service
+is available on a computer, although it doesn't throw an exception; it
+simply returns true or false.
+
+boolean acceptsURI( String v );
+
+Second, the SmartAPI has already implemented what Clark is asking for in a
+registry. If an application needs a service, it asks the SmartAPI for a
+digital resource using the uniform resource identifier (URI). Instead of a
+&quot;registry&quot; with a key to services, the SmartAPI uses a URI. It doesn't
+throw an exception either; it returns null if a digital resource is
+unavailable (or missing).
+
+Object getObject( String v );
+
+And, digital resources (from their services) are defined in interface-heavy
+packages. The SmartAPI - Release 2a package is exactly that kind of
+refinement. I look forward to distributing it shortly.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000249.html">[JOS-Arch] Request for low-level memory layout</A></li>
+	<LI> Next message: <A HREF="000251.html">[JOS-Arch] Registry? Or SmartAPI?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#250">[ date ]</a>
+              <a href="thread.html#250">[ thread ]</a>
+              <a href="subject.html#250">[ subject ]</a>
+              <a href="author.html#250">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

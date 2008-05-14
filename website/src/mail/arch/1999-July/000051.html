@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Process Stuff, formally:Re: [JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE:
+ [JOS-UI] peer-ui mappings
+ [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000050.html">
+   <LINK REL="Next" HREF="000053.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Process Stuff, formally:Re: [JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE:
+ [JOS-UI] peer-ui mappings
+ [JOS-UI] peer-ui mappings</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Process Stuff, formally:Re: [JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE:
+ [JOS-UI] peer-ui mappings
+ [JOS-UI] peer-ui mappings">digigod@earthling.net</A><BR>
+    <I>Sun, 25 Jul 1999 07:17:40 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000050.html">[JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000053.html">[JOS-Arch] Re: Process Stuff, formally:Re: [JOS-Arch] Re: [JOS-UI] Re:
+ [JOS-Arch] RE:  [JOS-UI] peer-ui mappings
+ [JOS-Arch] RE:  [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#51">[ date ]</a>
+              <a href="thread.html#51">[ thread ]</a>
+              <a href="subject.html#51">[ subject ]</a>
+              <a href="author.html#51">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> But wait! This reminds me of something else that's important, too.
+</I>
+oy, here we go... :)
+ 
+&gt;<i> It really should be that easy. When we pass &quot;Navigator&quot; to
+</I>&gt;<i> JADE.getProgram(), it should be able to look up the full URI. Imagine that
+</I>&gt;<i> a program name has no scheme, no path, no query, no fragment. The
+</I>&gt;<i> getProgram() method should look it up in a short list of well-known program
+</I>&gt;<i> names. That's what short-cuts are for.
+</I>
+since Im writing the actual JADE class (and dont want it to get to damn
+big) how 'bout: JADE.getDefaultProgramManager.getProgram(String program) 
+note that I left off the second String user since it is a USER
+interface, not userS interface. I think multiple JADE's can interact
+with one system (zero to one running on it, n communicating via the
+whatever net.protocol)
+ 
+&gt;<i> It may be that our system has a system short-cut path and a user-specific
+</I>&gt;<i> short-cut path. Short-cut &quot;files&quot; we talked about would look like a
+</I>&gt;<i> registry, too. If we put the full program URI in a short-cut file, like
+</I>&gt;<i> Navigator.app, we use the name of the short-cut to load a program.
+</I>
+basically be a specialized INI file
+
+class=class:netscape.navigator.Main
+args=... bla 
+bla
+bla
+
+or 
+
+class=shortcut:Navigator.app
+bla 
+bla
+
+ 
+&gt;<i> When you do not have a short-cut for a program, you can still run it.
+</I>&gt;<i> That's when you would supply the full program URI.
+</I>
+you type in NortonUtilites for Java the UI says &quot;Im sorry I dont have
+that reference, kindly show it to me&quot; and has a
+FileChooser/search-dialog that lets you associate the name you typed
+with a class...
+ 
+&gt;<i> I still think the PATH concept is a good idea. We might list each resource
+</I>&gt;<i> where short-cuts are stored similar to the classic PATH. In other words,
+</I>&gt;<i> when we pass a program name as an ordinary string to JADE.getProgram(), we
+</I>&gt;<i> should be able to abbreviate.
+</I>&gt;<i> 
+</I>&gt;<i> These load-and-go mechanisms are in all of the classic operating systems.
+</I>&gt;<i> These are Runtime and Process classes, part of the standard API. This
+</I>&gt;<i> discussion should make it clear that a shell is not responsible for
+</I>&gt;<i> short-cuts. JADE.getProgram() is a system function that must be available
+</I>&gt;<i> for all shells _and_ all JOS applications, applets, servlets etc.
+</I>
+This would be a JADE standard feature, like the systemClipboard that is
+avaliable to every UI to let them be more uniform in behaviaor if not
+apperance.
+ 
+&gt;<i> And what about the monitoring of a child process? Should createProcess()
+</I>&gt;<i> also run (start) a process and return it's int result code? The result code
+</I>&gt;<i> is set by System.exit(). It should be passed back to the parent process (if
+</I>&gt;<i> the parent is interested).
+</I>&gt;<i> 
+</I>&gt;<i> getProgram()/createProcess() is incredibly complex. It is important. It
+</I>&gt;<i> defines the fundamental mechanism of an operating system: to load custom
+</I>&gt;<i> programs. It gets a little easier if we break it down.
+</I>
+createProcess() being part of the OS, getProgram() being part of JADE
+ 
+&gt;<i> --inside getProgram()
+</I>&gt;<i> 1. Handle short-cuts. Translate a program name for a program URI. Since one
+</I>&gt;<i> short-cut can make reference to another, repeat if necessary. If there's a
+</I>&gt;<i> circular reference, throw an exception.
+</I>&gt;<i> 2. Verify the program URI. If it is a malformed URI, throw an exception.
+</I>&gt;<i> 3. Get the class for a program. If the class cannot be found, throw an
+</I>&gt;<i> exception.
+</I>&gt;<i> 4. Verify the class implements the right interface (it can be run() in a
+</I>&gt;<i> separate process). If a class doesn't implement the right interface, throw
+</I>&gt;<i> an exception.
+</I>
+Id like it if it didnt require it to implement a different interface, we
+want to be compatabile. the Process can be the Thread if it doesnt have
+any of its own
+
+&gt;<i> 5. Verify user parameter. If the user is not authorized to use this
+</I>&gt;<i> program, throw an exception.
+</I>
+Id like it if this was in the fs/security system by that I mean if your
+not allowed to run a program you cant SEE a program. you cant covet what
+you cant see (anticrack teqniques meet Silence of tha Lambs)
+
+&gt;<i> 6. Get an object from the class. If the object cannot be created, throw an
+</I>&gt;<i> exception. A custom program must define a default constructor, right?
+</I>
+I make it a point to always define an empty constructor, it should be
+common practice
+ 
+&gt;<i> At this point, a separate process has not been created yet. (No harm done.)
+</I>&gt;<i> 
+</I>&gt;<i> --inside Program.createProcess().
+</I>&gt;<i> 1. Create a Process object so that a parent process can monitor the status
+</I>&gt;<i> of a child process.
+</I>&gt;<i> 2. Create process environment for the child process. If a process
+</I>&gt;<i> environment cannot be created, throw an exception. It is the process
+</I>&gt;<i> environment that must store command-line parameters, not a program.
+</I>&gt;<i> 3. Configure the program object with its process environment.
+</I>&gt;<i> 4. Start the program. It runs in a separate thread, right?
+</I>
+the process environment would be a thread, so that if app z doesnt have
+any threads it doesnt cause any problems and it can still spawn its own
+ 
+&gt;<i> --inside custom-program.run();
+</I>&gt;<i> 1. A base program provides a getProcessEnvironment() method. The process
+</I>&gt;<i> environment maintains the standard input stream, standard output stream,
+</I>&gt;<i> standard error stream. The process environment provides all the command
+</I>&gt;<i> line parameters. ProcessEnvironment sounds a lot like java.lang.System to me.
+</I>
+System would be wrapper for ProcessEnvironement for legacy support
+ 
+&gt;<i> JADE.getProgram() should return a Program object:
+</I>&gt;<i> public Program JADE.getProgram( String program, String user );
+</I>&gt;<i> 
+</I>&gt;<i> and Program.createProcess() should return a java.lang.Process object:
+</I>&gt;<i> public Process Program.createProcess();
+</I>&gt;<i> 
+</I>&gt;<i> While we're on the topic of process environment, I've been doing a little
+</I>&gt;<i> research. A multiple process JVM may need multiple instances of
+</I>&gt;<i> java.lang.System. According to the semantics of the static keyword, you can
+</I>&gt;<i> have one instance of java.lang.System for each class loader; but, single
+</I>&gt;<i> process JVMs won't allow it. When you have multiple instances of System,
+</I>&gt;<i> you don't have to take great pains to handle System.exit(). This is THE
+</I>&gt;<i> difference between a multiple process JVM and a single process JVM. A new
+</I>&gt;<i> instance of a class loader must be created during getProgram() inside step 3.
+</I>
+the System.exit() would only affect the current process your saying
+
+I was just looking at the code for System (see below) and System.exit()
+just calls Runtime.getRuntime().exit(); maybe thats what we should
+concentrate on.
+ 
+&gt;<i> There should be a special JOS-only JVM function to get a new
+</I>&gt;<i> PrimordialClassLoader object. There should be a new instance of
+</I>&gt;<i> PrimordialClassLoader for each process. Here is where we can reduce the
+</I>&gt;<i> demand for RAM with our multiple process JVM: Each instance of
+</I>&gt;<i> PrimordialClassLoader shares all system classes...except for a short list,
+</I>&gt;<i> like java.lang.System.
+</I>&gt;<i> 
+</I>&gt;<i> I'm not sure how...but I think java.lang.System.getClassLoader() must
+</I>&gt;<i> return the process-specific class loader, while
+</I>&gt;<i> java.lang.Object.getClassLoader() can still return null.
+</I>
+I just doublechecked with the System code and theres no getClassLoader()
+there's Object.getClass() but not Object.getClassLoader() you need to
+say Object.getClass().getClassLoader()
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000050.html">[JOS-Arch] Re: [JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000053.html">[JOS-Arch] Re: Process Stuff, formally:Re: [JOS-Arch] Re: [JOS-UI] Re:
+ [JOS-Arch] RE:  [JOS-UI] peer-ui mappings
+ [JOS-Arch] RE:  [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#51">[ date ]</a>
+              <a href="thread.html#51">[ thread ]</a>
+              <a href="subject.html#51">[ subject ]</a>
+              <a href="author.html#51">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

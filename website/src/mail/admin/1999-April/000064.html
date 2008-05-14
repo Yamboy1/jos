@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Admin] Re: [JOS] Re: [JOS-Admin] New www.jos.org Web Page...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:bkn3%40columbia.edu">
+   <LINK REL="Previous"  HREF="000062.html">
+   <LINK REL="Next" HREF="000065.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Admin] Re: [JOS] Re: [JOS-Admin] New www.jos.org Web Page...</H1>
+    <B>Bradley Keith Neuberg</B> 
+    <A HREF="mailto:bkn3%40columbia.edu"
+       TITLE="[JOS-Admin] Re: [JOS] Re: [JOS-Admin] New www.jos.org Web Page...">bkn3@columbia.edu</A><BR>
+    <I>Mon, 19 Apr 1999 00:59:37 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000062.html">[JOS-Admin] Re: [JOS] Re: [JOS-Admin] New www.jos.org Web Page...</A></li>
+        <LI> Next message: <A HREF="000065.html">[JOS-Admin] (no subject)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#64">[ date ]</a>
+              <a href="thread.html#64">[ thread ]</a>
+              <a href="subject.html#64">[ subject ]</a>
+              <a href="author.html#64">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Mon, 19 Apr 1999, Iain Shigeoka wrote:
+
+&gt;<i> &gt; Check out OpenPortal; it is like a Wiki but has nestable categories so
+</I>&gt;<i> ...
+</I>&gt;<i> &gt; www.openportal.org for the user interface templates.  OpenPortal will be
+</I>&gt;<i> &gt; released in June under the GPL, and is in 100% Pure Java using servlets.
+</I>&gt;<i> 
+</I>&gt;<i> Looks great!  I had wondered what you disappeared to do.  :)  So, 
+</I>&gt;<i> should we simply wait until OpenPortal is ready to go (and just hack the 
+</I>&gt;<i> current Wiki to hold us over)?  :)
+</I>
+It will be available in June under the GPL in 100% Pure Java.
+
+&gt;<i> 
+</I>&gt;<i> Seriously, I have some concerns regarding it:
+</I>&gt;<i> 
+</I>&gt;<i> It appears to have all the new features we've been discussing.  However, 
+</I>&gt;<i> does it have all the old features?  For instance, in Wiki you simply write 
+</I>&gt;<i> a WikiName and its automatically linked (or a link to a potential new 
+</I>&gt;<i> page is generated).
+</I>&gt;<i> 
+</I>
+Yes.  OpenPortal has extensive automagic linking services, which is what I
+call the Wiki names in Wiki.  OpenPortal has something called Easy Command
+Language (ECL), which let's you do some cool stuff.  The simplest example
+would be [&quot;Main Page&quot;], where the brackets indicate to the system that
+this is an ECL phrase.  This would be typed into a textarea box while
+editing a page.  The quotes say that this is the name of a page (this
+replaces the Wiki name idea.  So the system would automatically turn the
+phrase [&quot;Main Page&quot;] into a hyperlink that links to the page with the name
+&quot;Main Page&quot;.
+
+Here's another example of ECL.  To make your own menu along the side of a
+page in OpenPortal, you would enter the following in the html through an
+edit box or in a template file:
+
+Menu
+----
+[Edit this Page]
+[Delete this Page]
+[Clone this Page]
+[Send Email to Author of this Page]
+
+OpenPortal's automagic system would automatically turn these into the
+correct hyperlinks to tell the openportal system to initiate these
+commands when clicked on by the user.
+
+Another cool ECL command is to put your email address between brackets at
+the bottom of an OpenPortal page, such as [<A HREF="mailto:bkn3@columbia.edu">bkn3@columbia.edu</A>].  What this
+does is that every time the page is edited the OpenPortal system scans
+the page and sends email to anyone who has their email address in brackets
+on the system.  [<A HREF="mailto:bkn3@columbia.edu">bkn3@columbia.edu</A>] is shorthand Easy Command Language for
+[on change <A HREF="mailto:bkn3@columbia.edu">bkn3@columbia.edu</A>].
+
+One more cool ECL phrase is that you can use ownership terms instead of
+exact web page names.  So I could type the following into an edit form:
+
+Make sure to check out [My Home Page]
+
+and the system will convert it into the special form using whoever was
+the user who entered the MY part into the edit form:
+
+Make sure to check out [My {Brad Neuberg} Home Page]
+
+The sentence would print out on the screen as
+
+Make sure to check out _My Home Page_
+
+where the underscores are a hyperlink.  Anything between the {}s are not
+printed out.
+
+&gt;<i> Does it have facilities for easily creating FAQ's and project  
+</I>&gt;<i> news/updates/status reports?  Or are those planned?  This was one of 
+</I>&gt;<i> the &quot;new&quot; things I had wanted to add to JOS's web site.
+</I>&gt;<i> 
+</I>
+Yes.  OpenPortal supports something called weblets, which are sorta like
+server-side javabeans.  An example weblet would be a business card.  A
+weblet is a data-object that has data for certain properties, so for the
+business card this would be a Name, Organization, Phonenumber, etc.  A
+weblet also provides facilities to edit and change this data-object
+through a web interface, so that the weblet would provide an html form to
+change this data object.  One can add a new weblet to a page by using Easy
+Command Language.  To add a business card to a page I could type the
+following in the edit box:
+
+Make sure to check out my [BusinessCard].
+
+When I saved the page the page would reload with a blank business card
+embedded as html into the openportal page, with a tiny edit button next to
+it.  When I hit the edit button I would get a form with fields for the
+name, organization, phone number, etc.  One can have as many weblets on a
+page as they want:
+
+Everyone, please check out the [Schedule].  Also make sure to append your
+contact cards here:
+
+  [Brad Neuberg's Contact Card]
+  [Ward Cunningham's Contact Card]
+  [Markus Peter's Contact Card]
+
+Please read the FAQ below:
+
+[FAQ]
+
+Since weblets can be any sort of structured data, a FAQ Weblet could also
+be created.  Weblets are really just JavaBeans with a web interface to
+display and edit them.
+
+&gt;<i> Does it support versioning of pages (or is this planned)?
+</I>
+Not right now.  Eventually CVS integration is planned (this would be
+OpenPortal 3).  OpenPortal 2 is what is being released at the end of June.
+
+&gt;<i> 
+</I>&gt;<i> I know you're still building the first prototype so things are a bit shakey 
+</I>&gt;<i> and you probably have a long wish list too.  Just wanted to get as much 
+</I>&gt;<i> info as possible.  I'd hate to do a lot of work on the current JOS web site 
+</I>&gt;<i> now only to have the effort become redundant in two months.  :)
+</I>&gt;<i> 
+</I>&gt;<i> -iain
+</I>&gt;<i> 
+</I>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000062.html">[JOS-Admin] Re: [JOS] Re: [JOS-Admin] New www.jos.org Web Page...</A></li>
+	<LI> Next message: <A HREF="000065.html">[JOS-Admin] (no subject)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#64">[ date ]</a>
+              <a href="thread.html#64">[ thread ]</a>
+              <a href="subject.html#64">[ subject ]</a>
+              <a href="author.html#64">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

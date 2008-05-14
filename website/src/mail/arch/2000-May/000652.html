@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000638.html">
+   <LINK REL="Next" HREF="000659.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs">ryan@whitewolf.com.au</A><BR>
+    <I>Sun, 21 May 2000 23:34:52 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000638.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+        <LI> Next message: <A HREF="000659.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#652">[ date ]</a>
+              <a href="thread.html#652">[ thread ]</a>
+              <a href="subject.html#652">[ subject ]</a>
+              <a href="author.html#652">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; Why must the static variable be shared (considering that I have
+</I>&gt;<i> &gt; explained in detail why I think it should not be)? Am I missing
+</I>&gt;<i> &gt; something in your explanation? (forgive me, it's 1:30am here :-)
+</I>&gt;<i> 
+</I>&gt;<i>         My apologies -- if a static is a global, as I've postulated, then
+</I>&gt;<i> it is nothing more than a particular location in memory.  Then, you
+</I>&gt;<i> share this particular piece of memory by giving another process
+</I>&gt;<i> r(w) access to it.  It then follows that both processes are using the same
+</I>&gt;<i> memory location -- otherwise, they would /not/ be performing IPC.  The
+</I>&gt;<i> question is then if my first steps are correct -- are statics isomorphic
+</I>&gt;<i> to globals, and therefore to a location in memory?
+</I>
+Ok, I understand you now. My take on it is that it is the object that is
+shared, and not the class. This means that the class may still be used
+within your process as a separate entity without any interference from
+the IPC that is going on with a particular instance of that class.
+
+When talking about the shared object, there is only one memory location
+for that static. However, when talking about the class (which is not
+shared due to complexities discussed in another email to John), the
+static you find is the one that belongs to your process.
+
+If when we share an object, we also share the class, the issue
+disappears. BUT, I don't think the class should be shared for two
+reasons:
+
+- there are complexities to do with class loader references (ie. it
+doesn't make sense conceptually)
+- a process should be able to carry on IPC with two different processes
+simultaneously using the same the same class type for both shared
+objects. However, IPC with one process should not interfere with IPC
+with the other. If the Class is shared it cannot be avoided (when
+statics are involved).
+
+In your original email you wrote:
+
+&gt;<i>         Quite honestly, I haven't looked at optimizations at all.  This
+</I>&gt;<i> particular problem, however strikes me in two ways -- first, how often
+</I>&gt;<i> will we be trying to inline method calls across processes?  (That is, how
+</I>&gt;<i> much of a worry is this going to be?  We may just be able to ignore it
+</I>&gt;<i> without much of a penalty.)  Second, having symbolic references mismatch
+</I>&gt;<i> across processes will not be a problem if a a shared object does lookups
+</I>&gt;<i> in the executing process's classloader; the JVM will throw a LinkError
+</I>&gt;<i> (IIRC) if/when the shared class tries to do something it can't because the
+</I>&gt;<i> calling process is improperly set up.
+</I>
+Unfortunately, it is not a matter of ignoring it and throwing
+LinkageErrors when it happens, because this will affect applications
+even if they are not using shared objects.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000638.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+	<LI> Next message: <A HREF="000659.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#652">[ date ]</a>
+              <a href="thread.html#652">[ thread ]</a>
+              <a href="subject.html#652">[ subject ]</a>
+              <a href="author.html#652">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

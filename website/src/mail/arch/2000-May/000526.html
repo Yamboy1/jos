@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000534.html">
+   <LINK REL="Next" HREF="000527.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">ryan@whitewolf.com.au</A><BR>
+    <I>Mon, 01 May 2000 13:13:20 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000534.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000527.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#526">[ date ]</a>
+              <a href="thread.html#526">[ thread ]</a>
+              <a href="subject.html#526">[ subject ]</a>
+              <a href="author.html#526">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> The subtle difference -- the only one I've been able to find so far -- is
+</I>&gt;<i> how bytecode retains the original payload of a class file and a class
+</I>&gt;<i> definition does not. The slight difference is only an issue of how
+</I>&gt;<i> efficiently they can be intern'd, not semantics.
+</I>
+The bytecode cache idea loses out on three things:
+
+1. it must retain the original payload of the class file
+2. it must always read the class data from disk or network when defining
+a class.
+3. it must always do a byte for byte comparison to ensure class
+definition sharing is valid.
+
+But it gains these things:
+
+1. the ability to include custom loaded classes in class definition
+sharing.
+2. the ability to share class definitions between classes loaded by
+primordial class loaders even if the byte-equivalent classes are in
+different locations on disk.
+
+It is a trade-off. My class defintion sharing proposal (based on
+location and modification date) loses out to your gains, but makes up
+for where the bytecode cache falls short. If we just consider these two
+proposal, I believe equivalence determination based on location and
+modification date is more attractive. But there is a third idea:
+
+A hybrid between the two approaches is possible. It is possible to use
+my location and modification date as the first check, which will cover
+most of the cases, and use Gilbert's bytecode cache as a fallback if no
+equivalent class definition was found in the cache. If Gilbert's code
+finds a match, the location and modification date should be recorded so
+that subsequent comparisons can use the efficient location/modification
+date method.
+
+This idea has the benefits of both approaches, but retains two of the
+disadvantages with Gilbert's approach:
+
+- In the case where we must fall back on Gilbert's checking mechanism,
+it is slower.
+- bytecode payload must be retained.
+
+But again, this is a tradeoff, and a less severe tradeoff considering
+that efficiency is gained most of the time through location and
+modification date checking. As for retaining the bytecode payload, it
+depends whether we are saving more memory than we are using for the
+bytecode cache.
+
+I would propose that we implement location/date checking first, and then
+integrate Gilbert's bytecode cache at a later stage _if_ we feel we need
+to gain more memory efficiency, or if someone wants to implement it
+anyway - assuming that the tradeoff is reasonable (this needs to be
+verified). This should be transparent to user apps so it shouldn't
+matter either way.
+
+One more thought that just occurred to me: maybe we will end up
+retaining the bytecode payload anyway. Consider filesystem caching, such
+as that which is implemented in Linux. If you read a file once, the
+second read will be faster because it is actually cached in memory.
+Since the bytecode of a class is exactly the same as what the filesystem
+might cache, it might be possible to integrate the two subsystems. This
+might be tricky but it's just a thought. If we do this, only one
+disadvantage remains for the hybrid approach:
+
+- In the case where we must fall back on Gilbert's checking mechanism,
+it is slower.
+
+So, eventually, integrating Gilbert's bytecode cache might be
+beneficial. We just need to examine the tradeoff, perhaps by
+experimenting with a prototype.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000534.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000527.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#526">[ date ]</a>
+              <a href="thread.html#526">[ thread ]</a>
+              <a href="subject.html#526">[ subject ]</a>
+              <a href="author.html#526">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

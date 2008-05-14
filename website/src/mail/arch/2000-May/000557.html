@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000554.html">
+   <LINK REL="Next" HREF="000561.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Wed, 3 May 2000 11:52:16 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000554.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000561.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#557">[ date ]</a>
+              <a href="thread.html#557">[ thread ]</a>
+              <a href="subject.html#557">[ subject ]</a>
+              <a href="author.html#557">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> The key reference when talking about the GC is the reference from the
+</I>&gt;<i> shared object to its owning process (via the ProcessClassLoader).
+</I>
+	Which is maintained in the kernel.  Therefore, we can program the
+garbage collector to ignore it.  (And if we've got a GC that ignores
+reference cycles for purposes of determining liveness -- which it can do,
+when it runs a GC from the root -- we don't need this, either.)
+
+&gt;<i> A process-with-reference (or more correctly, a process running a program
+</I>&gt;<i> with a reference) to a shared object is indirectly causing the process
+</I>&gt;<i> that owns that object to hang around in memory needlessly.
+</I>
+	OK, I understand your point now.  Thanks for bearing with me :)
+
+&gt;<i> Not its entire memory tree. If another process has a reference to one of
+</I>&gt;<i> its shared objects, the memory tree of that object will hang around in
+</I>&gt;<i> memory.
+</I>
+	I should have said, its exclusive tree.  Anything shared is now in
+someone else's tree as well... which sounds alot like shared 'ownership',
+doesn't it? :)
+
+&gt;<i> Yes, weak references are a JDK 1.2 thing.
+</I>
+	Summary: probably not a good idea, for the programming annoyances
+you mentioned above, unless we can't come up with anything better.
+
+&gt;<i> Compare the concept of a hierarchical structure with a particular
+</I>&gt;<i> implementation of it. ... you say each child has an
+</I>&gt;<i> owning directory, or more commonly in this case, a parent directory.
+</I>
+	I think I'm slowly recovering from a bad case of keyboard vision
+here.  Conceptually, yes, processes contain ('own') everything in them,
+and that's where it matters.
+
+&gt;<i> You want to depend on a dead process for functionality? I think that if
+</I>&gt;<i> a process was ever alive, its purpose was to live, and any functionality
+</I>&gt;<i> you're talking about should be carried on while it is still alive.
+</I>
+	Exactly.  Therefore, something absolutely terrible should happen
+to the shared object if the process it depends on for functionality is
+killed.  The handling of such objects is an open question; weak references
+are designed to allow something awful to happen (e.g. GC), so they seemed
+like a natural answer to me.
+
+&gt;<i> However, and this is an idea I couldn't work out how to implement until
+</I>&gt;<i> you gave me the idea, it might be desirable to have processes that have
+</I>&gt;<i> no threads.
+</I>
+	The 'ObjectBroker' process comes to mind.  It may be
+cleaner/easier to implement this as a process that has a single thread
+whose run() method is &quot;sleep();&quot;, though.
+
+&gt;<i> I was never suggesting we add a reverse lookup. As you just said, the
+</I>&gt;<i> kernel already maintains ownership information. All I'm proposing is
+</I>&gt;<i> that we provide a function to reassign ownership. Multiple ownership can
+</I>&gt;<i> then be emulated without any further kernel support.
+</I>
+	I understand now.  (I think.  I sure didn't before.)  The proposal
+is that the kerne/JVM adds only ownership-reassignment, and the user
+library can provide the rest of the sharing API and implementation.  I
+like it.
+
+-_Quinn
+
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000554.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000561.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#557">[ date ]</a>
+              <a href="thread.html#557">[ thread ]</a>
+              <a href="subject.html#557">[ subject ]</a>
+              <a href="author.html#557">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

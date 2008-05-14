@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000605.html">
+   <LINK REL="Next" HREF="000617.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">tmiller@haverford.edu</A><BR>
+    <I>Wed, 17 May 2000 22:03:13 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000605.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000617.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#612">[ date ]</a>
+              <a href="thread.html#612">[ thread ]</a>
+              <a href="subject.html#612">[ subject ]</a>
+              <a href="author.html#612">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> That seems to be such a waste. Consider the classic use of processes by a
+</I>&gt;<i> UNIX shell. When the shell executes a 'ls' process and then a 'grep'
+</I>&gt;<i> process and then a 'wc' process it actually has to start all these 3
+</I>&gt;<i> processes.
+</I>
+	We have two things to discuss here -- first, the issue of class
+un/re-loading, second, the proper design for a JOS shell.  The classic
+UNIX shell had no choice but to spawn a new process; it could not execute
+an arbitrary command in any other way.  This reinforced and was reinforced
+by the drive to make process creation extremely cheap on UNIX systems.  
+(e.g. copy-on-write, etc)  A JOS shell -- and jsh/jshell/others take this
+route -- could either (a) spawn a thread to call some code or (b) execute
+the code internally, both of which avoid the costs associated with process
+creation.  The only reason to use processes is if you don't trust the code
+you're calling; this (ought?) may be true generally, but for many things
+-- e.g. ls, cd, the other two-letter names -- a shell writer can provide
+or borrow perfectly good implementations from elsewhere.  I'm not saying
+the UNIX way is not the Right Way, but we do have more options available.
+
+
+	The spec we've been working toward makes the implicit assumption
+that every PCL starts empty.  For processes to work (well?), however, we
+need certain classes that truly a system-global -- that the JVM or
+java-based process code inserts into a process before it begins to
+execute.  One idea I had quite a while ago, and haven't discussed much
+because of its complexity, had to do with the normal (a
+normal?  I guess microkernel-esque systems don't really do
+this...) parent/child relation between processes.  In many cases, it would
+extremely advantageous for the child to inherit many or all of its
+parent's class definitions.  For instance -- a shell spawning 'ls'
+(probably) already has 'ls' loaded somewhere, along with (almost) all of
+the support classes.  Why not allow it the shell to specify that its child
+will inherit all its class definitions?  Then the only costs left are the
+relatively cheap static initialization and (hoopefully) cheap thread
+creation.
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000605.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000617.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#612">[ date ]</a>
+              <a href="thread.html#612">[ thread ]</a>
+              <a href="subject.html#612">[ subject ]</a>
+              <a href="author.html#612">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

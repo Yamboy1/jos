@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] GSI (GenericScriptingInterface)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000069.html">
+   <LINK REL="Next" HREF="000071.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] GSI (GenericScriptingInterface)</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] GSI (GenericScriptingInterface)">digigod@earthling.net</A><BR>
+    <I>Sat, 31 Jul 1999 16:43:34 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000069.html">[JOS-Arch] SmartAPI - Release 1b</A></li>
+        <LI> Next message: <A HREF="000071.html">[JOS-Arch] GSI (GenericScriptingInterface)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>JOS needs a GSI (or something similiar) to be truly flexible, but what
+goes into it?
+
+I think we could have two abstract classes, a ScriptLoader class that
+acts like a ClassLoader, except it creates Script objects.
+
+ScriptLoader would be given the data and it would parse the script or
+load the bytecode (or decide which to do in some cases) Im guessing
+parsing would be handled sepreatley, but thats up to the implementation.
+the Script would be an abstract super class encapsulating the Script, it
+would probably have an abstract method interpret() or someting like it.
+
+most Scripting languages let you create language elements in the host
+language, here we would have an interface Scriptable with the method
+ScriptInfo getScriptInfo(), ScriptInfo would be just like BeanInfo, it
+would be up to the language how to handle these of course.
+
+this is just a basic outline of what we need, I think we should work on
+this. what else do we need? how would we do it? how have others done it? 
+
+we need to make it as flexible as possible, allowing scripts to be run
+as applications and in applications in a standard way so they dont even
+have to be aware of the language being used. we also need to make it
+easy to make proxy support for all the scripting languages that already
+have Java libraries
+(<A HREF="http://grunge.cs.tu-berlin.de/~tolk/vmlanguages.html">http://grunge.cs.tu-berlin.de/~tolk/vmlanguages.html</A>). it should handle
+interpreted and compiled scripts the same.
+
+any thoughts?
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000069.html">[JOS-Arch] SmartAPI - Release 1b</A></li>
+	<LI> Next message: <A HREF="000071.html">[JOS-Arch] GSI (GenericScriptingInterface)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

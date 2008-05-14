@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Getting started on AWT</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:sean-cribbs%40utulsa.edu">
+   <LINK REL="Previous"  HREF="000729.html">
+   <LINK REL="Next" HREF="000726.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Getting started on AWT</H1>
+    <B>Sean D Cribbs</B> 
+    <A HREF="mailto:sean-cribbs%40utulsa.edu"
+       TITLE="[JOS-Arch] Getting started on AWT">sean-cribbs@utulsa.edu</A><BR>
+    <I>Wed, 7 Jun 2000 16:53:39 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000729.html">[JOS-Arch] Getting started on AWT</A></li>
+        <LI> Next message: <A HREF="000726.html">[JOS-Arch] More on AWT</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#725">[ date ]</a>
+              <a href="thread.html#725">[ thread ]</a>
+              <a href="subject.html#725">[ subject ]</a>
+              <a href="author.html#725">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i>
+</I>&gt;<i> This topic is appropriate for the Architecture group, too. Some members
+</I>&gt;<i> feel that the AWT must be implemented as soon as possible. Some members
+</I>&gt;<i> feel that AWT doesn't need to be implemented at all.
+</I>&gt;<i>
+</I>&gt;<i> I always work from the bottom up. My development method includes building
+</I>&gt;<i> upon things that work. If it doesn't work, don't build upon it.
+</I>&gt;<i>
+</I>&gt;<i> Here is a question for this list: Should the AWT be standardized for JOS?
+</I>&gt;<i> If so, why?
+</I>
+I believe that it might be a good idea to standardize the AWT, but it's
+got to be extremely pluggable -- and that's a problem with the original
+AWT design.  It was made to simply latch on to already-present native
+user-interface code.  I know JADE has tried to do this (pluggability),
+but JADE was never properly defined, and so never began implementation,
+or even functional design for that matter.
+
+&gt;<i>
+</I>&gt;<i> How do we write AWT without a memory manager?
+</I>&gt;<i>
+</I>
+Good question. For now, the AWT will have to do its own memory management,
+at least w.r.t. images (oh, boy what am I getting in to? :)
+
+&gt;<i> I agree with you: a simple and limited implementation is better than
+</I>&gt;<i> nothing. With the completion of a boot-able jJOS/decaf in text mode, the
+</I>&gt;<i> next milestone on my list is the JOS-specific implementation of AWT. I
+</I>only
+&gt;<i> wish I had more time to work on it.
+</I>&gt;<i>
+</I>&gt;<i> The AWT is complicated by the fact that java.awt.Toolkit is in the
+</I>java.awt
+&gt;<i> package instead of the java.awt.peer package. It creates a mutual package
+</I>&gt;<i> dependency, where two packages depend on each other (java.awt depends on
+</I>&gt;<i> java.awt.peer and java.awt.peer depends on java.awt).
+</I>
+I completely agree.  The AWT was a kludge to quickly get Java-based UI's
+on existing systems.  It was never a good design, even after Sun
+&quot;fixed&quot; it (aka AWT1.1, Swing (blech)).  Unfortunately, in order for
+maximum compatibility, we have to support it.  That doesn't mean we can't
+improve the back-end of it, we just have to make sure it's compliant.
+
+&gt;<i> Our first goal should be exclusively to output to VGA, not interaction. We
+</I>&gt;<i> should be able to demonstrate the use of a VGA screen without a keyboard
+</I>&gt;<i> and mouse. If we write a simple demo program that draws continuously to a
+</I>&gt;<i> VGA screen, it would help us work through the simple stuff. Such a demo
+</I>&gt;<i> program would be similar to a screen saver, with only limited interaction.
+</I>
+I agree, in fact, the first thing I was going to do is figure out how to
+represent images so that I could draw a component on screen (even if it is
+just a Canvas).
+
+&gt;<i> Personally, I have only worked on blitting character-based images, in the
+</I>&gt;<i> style of Turbo Vision and Curses. I have every reason to believe that it
+</I>is
+&gt;<i> the same thing.
+</I>&gt;<i>
+</I>&gt;<i>   public void blit( Point a, Dimension d, byte[] v );
+</I>&gt;<i>   public void blit( Point a, Point b, byte[] v );
+</I>
+Right now, the VGA blit style is more like
+
+ blit(int x, int y, int[] image, int linelength)
+
+but that be changed or extended (extended is probably better).  &quot;byte&quot;s
+are more compact and economical too, although a bit harder to work
+with.  It appears that currently, int[] image simply contains a bunch of
+indices into the color palette (0-15), in left-to-right, top-to-bottom
+order.
+
+&gt;<i>
+</I>&gt;<i> In addition, it must also be able to read the screen:
+</I>&gt;<i>
+</I>&gt;<i>   public byte[] read( Point a, Dimension d );
+</I>&gt;<i>   public byte[] read( Point a, Point b );
+</I>&gt;<i>
+</I>&gt;<i> Blit and read are complementary, so that reading a region after blitting
+</I>it
+&gt;<i> should return the same image. Further discussion of AWT should be part of
+</I>&gt;<i> the User Interface group, shouldn't it? The kernel/virtual machine might
+</I>&gt;<i> plug in any implementation of AWT.
+</I>
+I think read should be almost as simple as a blit, considering the ease of
+mapping the memory into a byte array.
+
+It might be good to reawaken the UI group, considering it's had no
+messages since September (about the time I started getting busy in school
+:<i>).
+</I>-------------------------------------
+Sean Cribbs &lt;<A HREF="mailto:sean-cribbs@utulsa.edu">sean-cribbs@utulsa.edu</A>&gt;
+Computer Science
+University of Tulsa Class of 2001
+-------------------------------------
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000729.html">[JOS-Arch] Getting started on AWT</A></li>
+	<LI> Next message: <A HREF="000726.html">[JOS-Arch] More on AWT</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#725">[ date ]</a>
+              <a href="thread.html#725">[ thread ]</a>
+              <a href="subject.html#725">[ subject ]</a>
+              <a href="author.html#725">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

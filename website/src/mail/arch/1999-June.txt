@@ -1,0 +1,1603 @@
+From robfitz@geocities.com Mon, 7 Jun 1999 14:49:17 -0500
+Date: Mon, 7 Jun 1999 14:49:17 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS-Arch] JOS Kernel Interface
+
+Hello
+
+I'm now looking for input and help on the design and documentation of 
+the JOS Kernel Interface.  This interface defines the services 
+provided by the kernel to the rest of the system.
+
+You can find the current interface header files at 
+<URL:http://jos.org/cvsweb.cgi/jos/interfaces/kernel/>.
+
+I have included the a draft of the documentation for ktype.h header 
+file (Data Type Interface).  What I need now is pieces I have missed, 
+like should there be a boolean data type or a error value defined?  
+Also what about kfunction macro, which all kernel functions would 
+declare, this would allow for kernel functions to be inlined?
+
+Comments and volunteers?
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+Data Type Interface
+
+This interface defines most of the data types and values used 
+throughout the kernel interface.  Some of these data types have 
+defined sizes set by the kernel interface, and others are platform 
+specific.  
+
+These data types and values are defined in the 'ktype.h' header file.
+Note: To allow the 'ktype.h' header file to be shared by all 
+implementations of the kernel interface, the header file includes the 
+'kernel_type.h' header file from the kernel implementation.  It is 
+this file which actually defines all the data types and values.  
+
+Data types table:
+
+Name       Size                Type
+----       ----                ----
+kint       platform specific   signed two's complement integer
+kint8      8 bits              signed two's complement integer
+kint16     16 bits             signed two's complement integer
+kint32     32 bits             signed two's complement integer
+kint64     64 bits             signed two's complement integer
+kuint      platform specific   unsigned integer
+kuint8     8 bits              unsigned integer
+kuint16    16 bits             unsigned integer
+kuint32    32 bits             unsigned integer
+kuint64    64 bits             unsigned integer
+kfloat     platfrom specific   IEEE 754 floating point number
+kfloat32   32 bits             IEEE 754 floating point number
+kfloat64   64 bits             IEEE 754 floating point number
+khandle    platform specific   kernel specific
+
+Notes:
+ * The size in bits of a platform specific integer data type is
+   greater than or equal to the size in bits of a pointer on that
+   platform.
+ * The size in bits of a platform specific floating point number data
+   type is greater than or equal to the size in bits of the kfloat64
+   data type.
+ * The khandle data type is kernel implementation specific.  The only
+   operation premitted on this data type outside of the kernel
+   implementation is the printing of it's value for debugging
+   propocess.  When it's value is being printed it should be treated
+   as an unsigned integer.
+
+There are also three data values defined by this interface, ktrue,
+kfalse, and knull.
+
+Data values table:
+
+Name       Value
+----       -----
+ktrue      value when an expression elevates as true
+kfalse     value when an expression elevates as false
+knull      value of a null pointer
+
+
+
+
+From ryan@whitewolf.com.au Tue, 08 Jun 1999 13:32:31 +1000
+Date: Tue, 08 Jun 1999 13:32:31 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] Re: [JOS] Concerning the registry...
+
+Al wrote:
+
+> Although I have posted about the registry before, and nobody replied or
+> looked at the source code, I am posting again, because I made several
+> big changes (new features). Maybe this time a few people will look into
+> it...
+
+I've moved this over to the arch list.
+
+Speaking of registries, could you please explain how they would be used?
+When an application is installed, does it put entries in a global system
+registry? If so, how do you ensure that those entries are deleted when I
+remove the software from my system? (for instances, if I just delete the
+sofware directory)
+
+Thanks.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From al@outworld.org Tue, 08 Jun 1999 11:47:58 +0300
+Date: Tue, 08 Jun 1999 11:47:58 +0300
+From: Al al@outworld.org
+Subject: [JOS-Arch] Re: [JOS] Concerning the registry...
+
+Ryan Heise wrote:
+
+> Speaking of registries, could you please explain how they would be used?
+> When an application is installed, does it put entries in a global system
+> registry? If so, how do you ensure that those entries are deleted when I
+> remove the software from my system? (for instances, if I just delete the
+> sofware directory)
+
+
+My implementation of a registry has nothing to do with the JOS system's
+behaviour overall. That is, I am not supplying an
+installation/deinstallation API with the registry, I am just making a
+distributed (RMI), OO registry, that looks a lot like an inverted tree
+file system, and can do things like move, replace, merge, retain, link,
+update from remote, etc..
+
+The registry is under org.jos.registry (I also made a Wiki page!) and
+can be used by any application. If the JOS system decides to use a
+central registry (instead of a temp directory), then applications
+written for JOS will probably be able to write to a global registry. The
+good thing with the registry is that it runs as a server, and it also
+has replication capabilities (working on them now), which means that it
+assists in the development of a truly distributed JOS system.
+
+I've also included a lot of functionality in the addressing mechanism of
+the registry. That is, to access an entry, you do something like this:
+
+Address address = new Address("//dir/dir/dir/entry");
+
+This address object though could have a URI pointing to a specific RMI
+registry on any system, so functions like:
+
+registry.copy(local_address, remote_address)
+
+would have the registry copy entries from a registry in any part of the
+world...
+
+I will also start working on the security of the registry, which will
+work in a way similar to Java's security overall - that is, a CodeBase
+object is the group, a Class is the user, etc.
+
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/] [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+From ryan@whitewolf.com.au Wed, 09 Jun 1999 11:08:48 +1000
+Date: Wed, 09 Jun 1999 11:08:48 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] Re: [JOS] Concerning the registry...
+
+Al wrote:
+> 
+> Ryan Heise wrote:
+> 
+> > Speaking of registries, could you please explain how they would be used?
+> 
+> My implementation of a registry has nothing to do with the JOS system's
+> behaviour overall.
+
+I understand how the registry itself works, but I do not know the
+typical ways in which JOS can make use of a registry. Hopefully people
+can make suggestions here on the arch list.
+
+As a UNIX user, I am not familiar with the Windows registry. But I can
+see a similarity between the registry and UNIX dot-rc files (which store
+user preferences for applications). I do see the advantage in having a
+more organised system of storing per user preferences - perhaps each
+user can have their own "application preferences" registry.
+
+> If the JOS system decides to use a
+> central registry (instead of a temp directory), then applications
+> written for JOS will probably be able to write to a global registry.
+
+Do you have an ideas of what might be stored in the global registry? In
+a multi-user environment, can every user write anywhere in the registry,
+or will you use ACLs to restrict this?
+
+> The
+> good thing with the registry is that it runs as a server, and it also
+> has replication capabilities (working on them now), which means that it
+> assists in the development of a truly distributed JOS system.
+
+Replication would be very useful for maintaining network configuration
+across all computers in a network. However, network configuration data
+is a broad category that could be partitioned into data managed by
+individual network services. If for security reasons, it is desirable to
+run these network services under different user spaces (unlike UNIX
+where many services run as root), it may also be desirable to have a
+different registry for each network service, and then you would have to
+replicate each registry individually. Is it possible to group these
+registries into one replication operation?
+
+There may be more elegant was to achieve the same result.
+
+Another point is that if the registry runs as a server, does each user
+have to run their own server for their "application preferences"
+registry? Or does one server manage all the registries on the system?
+The second approach would put less load on the system but raises more
+security issues... which brings us to:
+
+> I will also start working on the security of the registry, which will
+> work in a way similar to Java's security overall - that is, a CodeBase
+> object is the group, a Class is the user, etc.
+
+If you look in java.security.* and java.security.acl.* there are
+concepts such as users, groups and ACLs. I just spent the weekend
+writing implementations of these interfaces and sketching out a user
+model and security model for JOS. This came about because my ftp server
+(org.jos.services.ftp.server) and Peter Schuller's pop server
+(org.jos.services.pop.server) require a user model to support user
+accounts, user authentication and user authorization. These are
+available from CVS in the jos/library module.
+
+The security classes have not been checked in yet, and I will start a
+discussion about various design issues before I commit them to CVS.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From al@outworld.org Wed, 09 Jun 1999 13:13:27 +0300
+Date: Wed, 09 Jun 1999 13:13:27 +0300
+From: Al al@outworld.org
+Subject: [JOS-Arch] Re: [JOS] Concerning the registry...
+
+Ryan Heise wrote:
+
+> I do see the advantage in having a
+> more organised system of storing per user preferences - perhaps each
+> user can have their own "application preferences" registry.
+
+True, each application could use the registry classes, since they are
+part of "org.jos" and not "jos.*" But if the applications are written
+specifically for JOS, such as the system, the GUI managers, the system
+applications (defrag tools, monitors, etc.), then these applications can
+utilize a standard JOS registry - merely an instance of
+org.jos.registry.RegistryServer.
+
+> Do you have an ideas of what might be stored in the global registry?
+
+Yes, actually, I started developing the registry because I had found out
+that my own applications (non related to JOS) would naturally need to
+use certain configuration files. I found the method of INI files in
+Windows very disturbing, since they are slow and need access to the disk
+hardware, and fragment the disk, etc. I also realized that some settings
+are common, such as Look & Feel preferences, custom commands, network
+settings (such as suggested speed and buffering size and methods), etc.
+
+I believe that JOS will also need a lot of these preferences, settings
+and configuration information, and a neat place to do that is the
+registry. Don't get me wrong, I call this API "registry" because it
+began as a form of registry, but in reality, it is a structured,
+tree-like, OO database, with hierarchies and data types and algorithms
+for searching, replacing, recursion, etc. The API can be used in many
+other ways, even in GUI managers (layers, etc.)
+
+> In  a multi-user environment, can every user write anywhere in the
+> registry, or will you use ACLs to restrict this?
+
+I can guarantee that access to things like [//system/config] will only
+be accessible from system classes - i.e. jos.system.* or jos.fs.* etc.
+This can easily be done with the Access Controller. I can also guarantee
+that in a networked environment, CodeBase security will be good. IF, and
+I stress *if* the JOS system is well implemented, then the system
+classes will deny reading or writing to things like [//system/config]
+unless the user is authorized to do so.
+
+Since the RegistryServer is an abstract class, the implementation can
+handle the security. For example, JOSRegistryServer extends
+RegistryServer may use the JOSSecurityManager that contains Registry
+policies and restrictions. As long as the system can detect the group
+and name of the user, then access to the registry can be monitored.
+
+Of course, the registry will use ACLs. The point is that I do not know
+if these things should be in the registry itself, or in the policy file,
+in the form of:
+
+RegistryPermission ("read, write, list", "//system/config/entry");
+
+I would suggest that the security be implemented in the registry, and it
+be accessed in a similar way to JDBC, that is:
+
+registry://localhost/system/config/entry?action=delete&user=jeeves&password=cafebabe
+
+This could possibly use SSL or PGP or whatever. If user "jeeves" is
+authenticated with the password "cafebabe" then the ACL is checked
+(possibly a second registry, as a private member of the
+JOSRegistryServer), and user jeeves is either granted or denied action
+"delete". If the concern is the URL system, then a POST request can be
+made. If firewalls are not of a problem (system could have access to
+multiple hosts, but if the computer is a public terminal, maybe not...),
+then a custom protocol could be used.
+
+> Replication would be very useful for maintaining network configuration
+> across all computers in a network. However, network configuration data
+> is a broad category that could be partitioned into data managed by
+> individual network services. If for security reasons, it is desirable
+> to run these network services under different user spaces (unlike UNIX
+> where many services run as root), it may also be desirable to have a
+> different registry for each network service, and then you would have
+> to replicate each registry individually. Is it possible to group these
+> registries into one replication operation?
+
+Well, the registry is merely a place to store information. If we deem
+more appropriate to use dedicated replication services, then so be it.
+But in many cases, having a standard and transparent mechanism for
+replicating is useful. Like this:
+
+Registry registry = (Registry)Naming.lookup("//localhost/registryserv");
+
+Address local = new Address("//system/mirrors/dir/dir/");
+Address remote = new Address("//otherdomain.org/regserve/dir/dir/");
+
+registry.copy(remote, local, true);
+
+Where Registry.copy(Address source, Address target, boolean overwrite);
+
+> There may be more elegant was to achieve the same result.
+
+True, since my replication is based on RMI and Object Serialization...
+I am not planning, though, on creating custom protocols for replication,
+or even direct access to the registry, at least not within the next few
+months.
+
+> Another point is that if the registry runs as a server, does each user
+> have to run their own server for their "application preferences"
+> registry?
+
+In the same way many things in JOS should be, that is, servers. If not
+servers, then Servlets. Hmm... FileSystemServlet, RegistryServlet,
+sounds nice.
+
+On a local system, you could do something like this:
+
+RegistryServer registry = JOSSystem.getLocalRegistryServer();
+
+On a remote, yes, you would have to use an RMI connection.
+
+> Or does one server manage all the registries on the system?
+
+I thought of making the server contain a Hashtable with multiple
+registries, and I probably will. If I don't, you can still run many
+servers in different RMI namespaces:
+
+Naming.bind("SystemRegistry", systemRegistry);
+Naming.bind("AppRegistry", appRegistry);
+etc...
+
+> The second approach would put less load on the system but raises more
+> security issues...
+
+Indeed, unless each Registry is responsible for its security, and not
+the server. The server could pass a "RegistryServerContext" to the
+registry, and the registry can thus find out things about the user, his
+domain, etc.
+
+Just have in mind that this is only an experimental API, and is not by
+any means done - I have not yet even implemented the RMI services! It
+only works locally now (but everything works normally, only RMI is under
+development).
+
+> If you look in java.security.* and java.security.acl.* there are
+> concepts such as users, groups and ACLs. I just spent the weekend
+> writing implementations of these interfaces and sketching out a user
+> model and security model for JOS.
+
+I would really like to see this model. I read a few books and article
+about Java's security nitty gritty details, but have not yet spent
+enough time (I am more involved in data types and algorithms currently,
+that's why!) I am merely familiar with Permissions and Permission groups
+and how to really implement a program that used custom permissions in
+the access controller.
+
+Do you think you could look into the registry security, or at least
+brief me in how the JOS security model will be structured, so I can
+blend in the registry? It would be nice for everything to use a unified
+security mechanism (Yeah, right! So a single hole gets the entire
+system! :)
+
+> The security classes have not been checked in yet, and I will start a
+> discussion about various design issues before I commit them to CVS.
+
+I'll be listening to the lists. :)
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/] [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+From ryan@whitewolf.com.au Thu, 10 Jun 1999 14:27:17 +1000
+Date: Thu, 10 Jun 1999 14:27:17 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] Re: [JOS] Concerning the registry...
+
+Al wrote:
+> 
+> Ryan Heise wrote:
+> 
+> > I do see the advantage in having a
+> > more organised system of storing per user preferences - perhaps each
+> > user can have their own "application preferences" registry.
+> 
+> True, each application could use the registry classes, since they are
+> part of "org.jos" and not "jos.*" But if the applications are written
+> specifically for JOS, such as the system, the GUI managers, the system
+> applications (defrag tools, monitors, etc.), then these applications can
+> utilize a standard JOS registry - merely an instance of
+> org.jos.registry.RegistryServer.
+
+Although applications written specifically for JOS wouldn't
+automatically use the global registry. For example GUI managers would
+still use per user registries so that each user can configure the GUI
+manager how they want. But the GUI manager could read a subset of its
+configuration from a global registry if it makes sense to.
+
+> > Do you have an ideas of what might be stored in the global registry?
+> 
+> Yes, actually, I started developing the registry because I had found out
+> that my own applications (non related to JOS) would naturally need to
+> use certain configuration files. I found the method of INI files in
+> Windows very disturbing, since they are slow and need access to the disk
+> hardware, and fragment the disk, etc. I also realized that some settings
+> are common, such as Look & Feel preferences, custom commands, network
+> settings (such as suggested speed and buffering size and methods), etc.
+> 
+> I believe that JOS will also need a lot of these preferences, settings
+> and configuration information, and a neat place to do that is the
+> registry. Don't get me wrong, I call this API "registry" because it
+> began as a form of registry, but in reality, it is a structured,
+> tree-like, OO database, with hierarchies and data types and algorithms
+> for searching, replacing, recursion, etc. The API can be used in many
+> other ways, even in GUI managers (layers, etc.)
+
+I see the advantage of handling configuration data in a more structured
+way. My only concern has been that a single registry that is used by
+multiple applications can possibly grow out of control. There at least
+needs to be a way to clearly see what applications depend on what parts
+of the registry, and which data is shared between multiple applications.
+
+> Of course, the registry will use ACLs. The point is that I do not know
+> if these things should be in the registry itself, or in the policy file,
+> in the form of:
+> 
+> RegistryPermission ("read, write, list", "//system/config/entry");
+
+Need there be a difference between "read" and "list"? Also, don't forget
+to specify who the permission is granted to.
+
+> Well, the registry is merely a place to store information. If we deem
+> more appropriate to use dedicated replication services, then so be it.
+
+Ok.
+
+> > Another point is that if the registry runs as a server, does each user
+> > have to run their own server for their "application preferences"
+> > registry?
+> 
+> In the same way many things in JOS should be, that is, servers. If not
+> servers, then Servlets. Hmm... FileSystemServlet, RegistryServlet,
+> sounds nice.
+
+On a system with 400 users that might bring a large overhead. I do
+believe that each repository instance should work like a server so that
+read/writes are synchronized across multiple clients, but if the server
+runs in a different address space, this will incur a performance penalty
+of having to use Sockets to talk to it.
+
+If each application has its own registry then the registry can live in
+the same address space. But I don't know if a registry for each
+application is a good idea. I hope that JOS can provide a more efficient
+IPC mechanism that effectively allows a client to talk to a server on
+the same machine as though it were in the same address space. Basically,
+if you are using RMI, then you could change the IPC mechanism to this
+more efficient mechanism without the client knowing.
+
+Then there is the issue of how long should the server be running (as a
+thread)? UNIX uses the concept of a super-server that fires up server
+processes only when they are needed. So for example, the ftp server is
+not running and consuming resources the whole time.
+
+> Do you think you could look into the registry security, or at least
+> brief me in how the JOS security model will be structured, so I can
+> blend in the registry?
+
+The model that I'm working on is not necessarily "the" model, but I will
+try to make it meet the requirements we have at this point in time. The
+requirements of your registry will obviously help shape how security is
+modelled.
+
+> It would be nice for everything to use a unified
+> security mechanism (Yeah, right! So a single hole gets the entire
+> system! :)
+
+Having a unified security mechanism would improve security IMHO. Even
+though a single hole gets the entire system, a single security system
+means a simpler security system, and the simpler it is, the more robust
+it is likely to be.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From tmiller@haverford.edu Wed, 9 Jun 1999 23:44:11 -0400 (EDT)
+Date: Wed, 9 Jun 1999 23:44:11 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Re: [JOS] Concerning the registry...
+
+	I don't see any roadblocks to extending Socket to use
+shared-memory IPC; IIRC, Socket uses a SocketFactory to generate
+SocketImpl's, one of which could be SharedMemorySocketImpl; and (again,
+IIRC), RMI uses Sockets for its communications, so the Right Thing would
+happen automagically.  As an aside, it looks like decaf will be
+implementing shared memory as an IPC primitive and writing a
+message-passing interface on top of it -- one that would use the extended
+Socket so as to be blissfully ignorant of what's Really Going On.  Both
+facilities would (probably) be available to user-space programs, though
+I'd recommend message-passing in most cases because everything would be
+gauranteed to happen the Right Way -- where shared-memory IPC is just
+asking for the programmer to do Bad Things w.r.t. locks.
+
+-_Quinn
+
+
+
+
+From ryan@whitewolf.com.au Thu, 10 Jun 1999 15:24:18 +1000
+Date: Thu, 10 Jun 1999 15:24:18 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] Re: [JOS] Concerning the registry...
+
+"Todd L. Miller" wrote:
+> 
+>         I don't see any roadblocks to extending Socket to use
+> shared-memory IPC; IIRC, Socket uses a SocketFactory to generate
+> SocketImpl's, one of which could be SharedMemorySocketImpl; and (again,
+> IIRC), RMI uses Sockets for its communications, so the Right Thing would
+> happen automagically.
+
+With CORBA it is possible in some cases to use direct object-to-object
+communication within the same address space ie. without using Sockets
+(if the ORB supports it). I don't know if RMI has the flexibility to
+support this but if someone ever writes a clone of RMI, it should be
+possible to add this functionality without changing RMI's public API.
+
+This is more efficient than writing a SocketImpl, because a SocketImpl
+still must serialize objects and method invocations, then de-serialize
+them for each invocation. Having a SharedMemorySocketImpl may still be
+useful though. And, of course, it's not like we will have a free RMI
+clone to hack any time soon...
+
+> As an aside, it looks like decaf will be
+> implementing shared memory as an IPC primitive and writing a
+> message-passing interface on top of it -- one that would use the extended
+> Socket so as to be blissfully ignorant of what's Really Going On.  Both
+> facilities would (probably) be available to user-space programs, though
+> I'd recommend message-passing in most cases because everything would be
+> gauranteed to happen the Right Way -- where shared-memory IPC is just
+> asking for the programmer to do Bad Things w.r.t. locks.
+
+I suspect that the JOS window manager will need an efficient IPC
+mechanism, preferably shared memory. This is because a window will have
+a reference to its parent window which may be in a separate process. It
+will be hard to work out a safe way to implement this.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From al@outworld.org Sat, 12 Jun 1999 12:36:54 +0300
+Date: Sat, 12 Jun 1999 12:36:54 +0300
+From: Al al@outworld.org
+Subject: [JOS-Arch] Re: [JOS] Concerning the registry...
+
+Ryan Heise wrote:
+
+> Although applications written specifically for JOS wouldn't
+> automatically use the global registry. For example GUI managers would
+> still use per user registries so that each user can configure the GUI
+> manager how they want. But the GUI manager could read a subset of its
+> configuration from a global registry if it makes sense to.
+
+If we have a common API for GUI managers, such as
+"jos.ui.gui.GUIManager" which would be extended, then the registry could
+contain automatic settings, global GUI manager settings, etc. If I also
+implement linking in the registry, just as symbolic links in a FS, then
+this could prove to be a space/time saver indeed...
+
+> I see the advantage of handling configuration data in a more structured
+> way. My only concern has been that a single registry that is used by
+> multiple applications can possibly grow out of control. There at least
+> needs to be a way to clearly see what applications depend on what parts
+> of the registry, and which data is shared between multiple applications.
+
+I was thinking of implementing quota-based handling of the registry,
+that is, specific Threads could use more "time" of the registry, such as
+security and system threads, and other threads (such as screen savers or
+user applications) use less time. Or, you could count the size each
+application is using. I know how to measure the time of a thread, but
+how would you measure the size of data? Is the only way to serialize it
+and count the bytes, or is there a simpler way?
+
+Anyway, I think that the registry could be split up into sections, such
+as hives for instance, each one in its own space, possibly even
+different instances. This way, you can have a System, Security, JOS, and
+User registry. We can guarantee that all but the User registries remain
+cool, and I suppose that if the User registry goes out of hand, deleting
+parts of it would not even be dangerous for the system...
+
+> > RegistryPermission ("read, write, list", "//system/config/entry");
+> 
+> Need there be a difference between "read" and "list"? Also, don't forget
+> to specify who the permission is granted to.
+
+Well, that was just a quick example. Yeah, I suppose "read" permission
+on a Directory of the registry means listEntries() too...
+
+> > In the same way many things in JOS should be, that is, servers. If not
+> > servers, then Servlets. Hmm... FileSystemServlet, RegistryServlet,
+> > sounds nice.
+> 
+> On a system with 400 users that might bring a large overhead. I do
+> believe that each repository instance should work like a server so that
+> read/writes are synchronized across multiple clients, but if the server
+> runs in a different address space, this will incur a performance penalty
+> of having to use Sockets to talk to it.
+
+How does RMI solve this, if at all? I was assuming that the only problem
+with multiple users on an RMI connection would be speed decrease. Do you
+think that we should implement the server in such a way that it responds
+just like a HTTP server, with Thread pools, priorities, timeouts etc.?
+
+> If each application has its own registry then the registry can live in
+> the same address space. But I don't know if a registry for each
+> application is a good idea.
+
+Not really, because that would mean separate files, precisely what I
+want to avoid by creating a unified config repository... If everything
+is kept in the same place, then it would not make a difference if simply
+different subdirectories in the registry were used. The searching
+algorithm takes (n Theta / 4) anyhow, in the root or near root levels,
+this is not a great performance concern. I think.
+
+> Then there is the issue of how long should the server be running (as a
+> thread)? UNIX uses the concept of a super-server that fires up server
+> processes only when they are needed. So for example, the ftp server is
+> not running and consuming resources the whole time.
+
+Would not the registry, though, be VERY frequently used? Maybe the
+overhead for creating and starting servers is too much, compared to the
+little time the registry is not used. I would propose something else, a
+registry cache. Many entries don't really have to be changed that often,
+so they could be kept in a cache. Say, a Hashtable with 100 capacity, or
+whatever. Would work like this:
+
+Registry registry = (Registry)Naming.llokup("RegistryServe");
+Address address = new Address("//system/info/user.name");
+registry.getCached(address);
+
+The registry can look for the entry in the cache first, then return it.
+If someone changes (updates) the real entry, then the cache is either
+nullified or updated (depending on preferences). The cache can have a
+timeout. It can displace old items, or even better, less used items
+(this would mean a little extra statistical processing though). Always
+depending on preferences.
+
+Opinions?
+
+> The model that I'm working on is not necessarily "the" model, but I will
+> try to make it meet the requirements we have at this point in time. The
+> requirements of your registry will obviously help shape how security is
+> modelled.
+
+Well, I guess I would want the following types of access:
+
+Entry
+
+read, write (delete implied), change security options
+
+Directory
+
+read, write, read entries, read subdirectories, create subdirectory,
+create entry, change security options
+
+
+The above because the Directory contains a default Entry, so it has a
+name and value.
+
+
+> Having a unified security mechanism would improve security IMHO. Even
+> though a single hole gets the entire system, a single security system
+> means a simpler security system, and the simpler it is, the more robust
+> it is likely to be.
+
+True. Do you think the registry should also have a mechanism for
+handling GuardedObjects and such seamlessly for the user? That is, for
+security while storing or retransmitting the registry?
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/] [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+From onewith1@flash.net Sun, 13 Jun 1999 18:06:29 -0500
+Date: Sun, 13 Jun 1999 18:06:29 -0500
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Arch] Concerning the registry...
+
+I've always liked the idea of a virtual registry namespace, where depending
+on the user and application (and maybe even process), different namespaces
+are mapped to the registry.  Let me explain in an example:
+
+User A has his hotkey preferences, but User B likes to use the system
+default preferences.  They both use application C, which is JOS registry
+aware.  Application C checks out (for example)
+"//apps/com/JoeBlowInc/C/Hotkeys" to get the default hotkey mappings.  The
+registry performs a virtual mapping for User A to map "//usr/A/C/HotKeys"
+over the app default.
+
+In this manner the user/application can override system defaults, but the
+changes are saved to a virtually mapped space, so that the real defaults are
+not altered.
+
+>> Having a unified security mechanism would improve security IMHO. Even
+>> though a single hole gets the entire system, a single security system
+>> means a simpler security system, and the simpler it is, the more robust
+>> it is likely to be.
+>
+>True. Do you think the registry should also have a mechanism for
+>handling GuardedObjects and such seamlessly for the user? That is, for
+>security while storing or retransmitting the registry?
+
+
+It sounds like what is needed is a way to send user/application information
+to the RMI server for security checking.  This would also aid with the
+virtual mapping described above.  Could this be done in the skeleton / stub
+code, so that "registry login" is performed once when requesting the stub?
+There may be security holes here, but I'm not sure.
+
+-MattAlbrecht
+
+
+
+
+From al@outworld.org Mon, 14 Jun 1999 14:03:39 +0300
+Date: Mon, 14 Jun 1999 14:03:39 +0300
+From: Al al@outworld.org
+Subject: [JOS-Arch] Concerning the registry...
+
+Matt Albrecht wrote:
+
+> I've always liked the idea of a virtual registry namespace
+
+This is included in my released API, I have not yet implemented it
+though (the *Impl.class files). The idea was that there is not only a
+special case mapping, but a global mapping too. Example:
+
+
+Address address1 = new Address("//system/config/");
+Address address2 = new Address("/config/");
+
+
+As you can see, address2 starts with a single slash. A double slash
+indicates root, so if the default directory were "//system/" then it
+would point to the same address as address1.
+
+Of course, you can have a unique default directory for each application,
+or better yet, for every use. Such as, server.setDefault(address); and
+then server.get(address_virtual);
+
+Although this is a bit different than what you suggest, it could serve
+the purpose.
+
+Big question: should the registry be able to handle this, or should each
+app do it on its own. I would propose the second, because if the
+registry does this, it may need an awful lot of overhead to store many
+things...
+
+> It sounds like what is needed is a way to send user/application information
+> to the RMI server for security checking.  This would also aid with the
+> virtual mapping described above.  Could this be done in the skeleton / stub
+> code, so that "registry login" is performed once when requesting the stub?
+> There may be security holes here, but I'm not sure.
+
+I honestly have no idea...
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/] [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+From ryan@whitewolf.com.au Thu, 17 Jun 1999 16:39:17 +1000
+Date: Thu, 17 Jun 1999 16:39:17 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] Re: [JOS] Concerning the registry...
+
+Al wrote:
+
+> I was thinking of implementing quota-based handling of the registry,
+> that is, specific Threads could use more "time" of the registry, such as
+> security and system threads, and other threads (such as screen savers or
+> user applications) use less time. Or, you could count the size each
+> application is using. I know how to measure the time of a thread, but
+> how would you measure the size of data? Is the only way to serialize it
+> and count the bytes, or is there a simpler way?
+
+That's like a token server where you must obtain a token to perform
+operations on the registry. The token has a lifetime and possibly other
+things. It's up to you how you make use of the token. I don't know how
+useful this would be.
+
+> Anyway, I think that the registry could be split up into sections, such
+> as hives for instance, each one in its own space, possibly even
+> different instances. This way, you can have a System, Security, JOS, and
+> User registry. We can guarantee that all but the User registries remain
+> cool, and I suppose that if the User registry goes out of hand, deleting
+> parts of it would not even be dangerous for the system...
+
+Yes, but it would still be nice to know which parts of the registry
+belong to which applications and which parts of the registry are shared
+between a number of applications. At least, this is something we should
+think about in the future.
+
+> > > In the same way many things in JOS should be, that is, servers. If not
+> > > servers, then Servlets. Hmm... FileSystemServlet, RegistryServlet,
+> > > sounds nice.
+> >
+> > On a system with 400 users that might bring a large overhead. I do
+> > believe that each repository instance should work like a server so that
+> > read/writes are synchronized across multiple clients, but if the server
+> > runs in a different address space, this will incur a performance penalty
+> > of having to use Sockets to talk to it.
+> 
+> How does RMI solve this, if at all? I was assuming that the only problem
+> with multiple users on an RMI connection would be speed decrease.
+
+Well, perhaps it is a better idea to run just one server :-) My initial
+security concerns are starting to go away now that I have put some more
+thought into how JOS might handle security (I will post my research to
+the list RSN).
+
+> Do you
+> think that we should implement the server in such a way that it responds
+> just like a HTTP server, with Thread pools, priorities, timeouts etc.?
+
+Possibly. Ideally, applications should not have to worry about thread
+pools. JOS should try to be efficient enough for it not to matter.
+
+> > Then there is the issue of how long should the server be running (as a
+> > thread)? UNIX uses the concept of a super-server that fires up server
+> > processes only when they are needed. So for example, the ftp server is
+> > not running and consuming resources the whole time.
+> 
+> Would not the registry, though, be VERY frequently used? Maybe the
+> overhead for creating and starting servers is too much, compared to the
+> little time the registry is not used.
+
+If there is only one registry server that manages all registries, yes it
+would be frequently used. I am starting to think this is the best way to
+do it anyhow.
+
+> I would propose something else, a
+> registry cache.
+<snip>
+> Opinions?
+
+If the cache is on the client side, it would improve performance a lot.
+If it is on the server side, it won't improve performance much.
+
+> Well, I guess I would want the following types of access:
+> 
+> Entry
+> 
+> read, write (delete implied), change security options
+> 
+> Directory
+> 
+> read, write, read entries, read subdirectories, create subdirectory,
+> create entry, change security options
+> 
+> The above because the Directory contains a default Entry, so it has a
+> name and value.
+
+Types of access is a generic concept that is supported in JDK 1.1, so
+yes you can have all of those types of access. I would suggest you have
+a look at the javadoc for the java.security.acl package in JDK 1.1 (JDK
+1.2 has some additional security stuff which we can't make use of unless
+we commit to using JDK 1.2). The documentation explains how you can
+define and grant types of access to individual users and groups.
+
+> > Having a unified security mechanism would improve security IMHO. Even
+> > though a single hole gets the entire system, a single security system
+> > means a simpler security system, and the simpler it is, the more robust
+> > it is likely to be.
+> 
+> True. Do you think the registry should also have a mechanism for
+> handling GuardedObjects and such seamlessly for the user? That is, for
+> security while storing or retransmitting the registry?
+
+GuardedObject is a new class in JDK 1.2. I haven't found a need for them
+in my model yet, but if I end up needing them, I can invent a similar
+class that works with JDK 1.1.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From al@outworld.org Thu, 17 Jun 1999 16:11:38 +0300
+Date: Thu, 17 Jun 1999 16:11:38 +0300
+From: Al al@outworld.org
+Subject: [JOS-Arch] Re: [JOS] Concerning the registry...
+
+Ryan Heise wrote:
+
+> GuardedObject is a new class in JDK 1.2. I haven't found a need for
+> them in my model yet, but if I end up needing them, I can invent a
+> similar class that works with JDK 1.1.
+
+Hm... But *I*, at least, am developing with JDK1.2 in mind... There was
+a small conversation a long time ago in the main list suggesting we
+stick to 1.1 and then make the transition easily when need arises. Maybe
+the need has arisen?  :)
+
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/] [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+From ryan@whitewolf.com.au Fri, 18 Jun 1999 10:16:38 +1000
+Date: Fri, 18 Jun 1999 10:16:38 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] JDK 1.1 or 1.2? ((was [JOS] Concerning the registry...))
+
+Al wrote:
+> 
+> Ryan Heise wrote:
+> 
+> > GuardedObject is a new class in JDK 1.2. I haven't found a need for
+> > them in my model yet, but if I end up needing them, I can invent a
+> > similar class that works with JDK 1.1.
+> 
+> Hm... But *I*, at least, am developing with JDK1.2 in mind... There was
+> a small conversation a long time ago in the main list suggesting we
+> stick to 1.1 and then make the transition easily when need arises. Maybe
+> the need has arisen?  :)
+
+I would also like to move to JDK 1.2 but it is yet to be ported to some
+architectures. In particular, JJOS is far from being JDK 1.2 compliant.
+It would be very useful to test JJOS against the jos architecture java
+classes, so they would have to be JDK 1.1 to do this. _Quinn/jm, do you
+have any thoughts on this?
+
+Also, a lot of people are still using JDK 1.1 because that's what
+everyone has. JDK 1.2 is a rather large download.
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From ryan@whitewolf.com.au Fri, 18 Jun 1999 10:33:37 +1000
+Date: Fri, 18 Jun 1999 10:33:37 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] JOS Security Model
+
+Click below if you want to read my thoughts on JOS security, multi-user
+issues etc.
+
+	http://www.progsoc.uts.edu.au/~rheise/jos/
+
+This is basically a brain dump revealing my current thoughts on how JOS
+might work in a multi-user environment. Each concept that I have
+explored is open to further thought but I hope this will be useful as a
+starting point for further research.
+
+The ideas are designed around JDK 1.1 but influenced by JDK 1.2.
+Interestingly, JDK 1.2 seems to be heading in the direction of having
+multiple user processes under a single JVM. Read section 8.1 in the JDK
+1.2 security spec:
+
+http://java.sun.com/products/jdk/1.2/docs/guide/security/spec/security-spec.doc8.html
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From tmiller@haverford.edu Thu, 17 Jun 1999 23:52:34 -0400 (EDT)
+Date: Thu, 17 Jun 1999 23:52:34 -0400 (EDT)
+From: Miller Todd L tmiller@haverford.edu
+Subject: [JOS-Arch] JDK 1.1 or 1.2? ((was [JOS] Concerning the registry...))
+
+> I would also like to move to JDK 1.2 but it is yet to be ported to some
+> architectures. In particular, JJOS is far from being JDK 1.2 compliant.
+> It would be very useful to test JJOS against the jos architecture java
+> classes, so they would have to be JDK 1.1 to do this. _Quinn/jm, do you
+> have any thoughts on this?
+
+	Just as soon as we get classpath integrated with JJOS, we'll let
+you know what JDK version we're supporting :)  (Hopefully this will happen
+relatively soon; the last thing on /my/ to-do list to prepare for this is
+throwing.  We'll see.)
+
+-_Quinn
+
+
+
+
+From al@outworld.org Fri, 18 Jun 1999 14:13:02 +0300
+Date: Fri, 18 Jun 1999 14:13:02 +0300
+From: Al al@outworld.org
+Subject: [JOS-Arch] JOS Security Model
+
+Ryan Heise wrote:
+
+>         http://www.progsoc.uts.edu.au/~rheise/jos/
+
+Just a question... When you say that users and groups have different
+security access to objects, such as files or sockets, this means that
+each user can inherit access from his group, except if the user himself
+is denied something from the group, right?
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/] [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+From gchii@mindspring.com Fri, 18 Jun 1999 20:41:47 -0400
+Date: Fri, 18 Jun 1999 20:41:47 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Java Compatible
+
+As architects, we must look ahead. JOS must support all fifteen versions of
+Java. JOS is expected to have a shelf life of ten to fifteen years, right?
+Over the next fifteen years, Sun Microsystems will likely create fifteen
+versions of Java at a rate of one per year. We can look forward to Java 3,
+Java 4, Java 5, and beyond.
+
+This needs to be discussed again. Many programmers have written good Java
+applications with JDK 1.1. These applications aren't going to be ported
+anytime soon to JDK 1.2.
+
+We must exclude no one. History has shown that any OS based on a premise of
+exclusion dies. How can we decide who to exclude? Should we exclude all
+those actually writing JDK 1.1? or all those potentially writing JDK 1.2?
+
+Over the next fifteen years, Sun is likely to create 15 more JDKs (or SDKs)
+for different Java platforms. Each will be annoyingly incompatible with its
+predecessor. Sun has pat answers for why incompatibility is necessary, and
+even important, when it is not.
+
+The impact of compatibility on JOS, and any big idea like JOS, is
+tremendous. If JOS must always use the latest version of the JDK, it will
+never be finished!!! We would spend more time re-writing, re-testing,
+re-designing our code that building an OS that works.
+
+My technical proposal is this. We must make JOS an operating system that is
+version independent. A good OS is independent. A great OS is as independent
+as possible. In the relationship between JOS and a JVM, JOS uses a JVM. JOS
+uses a JVM to run JOS services.
+
+The purpose of JOS is to minimize the virtual in Java virtual machine. It
+is only an academic exercise to eliminate the virtual completely. Who
+really needs it? By limiting JOS to one version of Java makes JOS
+impossible to build for the future.
+
+Since most of the JOS services will be written to run inside a JVM, all of
+the unnecessary bloat of using a foreign OS will be eliminated. Isn't that
+primarily what we're looking for?
+
+There are technical solutions to these versioning issues. For example, JOS
+should have a JVM API shared among all implementations of a JOS JVM. Like
+pluggable modules in Linux, the JVM should be a pluggable module in JOS.
+JOS should use a pluggable JOS JVM. Each person can have any JVM they want.
+
+And to take this one more step, the architecture for JOS must be oriented
+toward the inevidable future. Sun Microsystems will change their mind
+again. JOS must still remain stable. When Java 4 comes out, I must be able
+to run _both_ Java 3 and Java 4 on a single machine.
+
+As an architect, I must look ahead. I should be able to partition my
+computer resources (CPU/RAM) to run both a Java 3 and Java 4 JVM at the
+same time. There should be inter-JVM communication through a TCP/IP stack.
+
+We can save on an important resource (like RAM) because there is only a
+"few" JVMs running on a machine. We will build most of the JOS services to
+run completely inside a single primary JVM. The only program a JOS kernel
+should run is a JVM.
+
+Minimizing the virtual in Java virtual machine is a difficult thing to do.
+The rewards are great. The JOS platform can be finely tuned to run Java
+applications. It can provide a must better environment than any other
+operating system.
+
+
+
+
+From al@outworld.org Sat, 19 Jun 1999 09:57:03 +0300
+Date: Sat, 19 Jun 1999 09:57:03 +0300
+From: Al al@outworld.org
+Subject: [JOS-Arch] Java Compatible
+
+Gilbert Carl Herschberger II wrote:
+
+> We must exclude no one. History has shown that any OS based on a
+> premise of exclusion dies. How can we decide who to exclude? Should we
+> exclude all those actually writing JDK 1.1? or all those potentially
+> writing JDK 1.2?
+
+We can be as backwards compatible as Sun is, with JDK1.2... Personally,
+I have never had trouble running a JDK 1.1 compliant app in my 1.2 VM...
+My proposal is to use JDK 1.2 for the OS, since with 1.2 many things are
+easier, better, faster, etc. *Naturally* apps written for 1.1 will run.
+The only thing that would be a concern is that apps written specifically
+for JOS must be thus 1.2, but since these don't exist yet, there really
+is no problem!
+
+> The purpose of JOS is to minimize the virtual in Java virtual machine. 
+
+Of course, we should always have in mind that we can stick to the
+standard API, which is not likely to change (mainly features are added
+from version to version), and the users can simply download a new JDK
+and replace the old rt.jar file in the JOS lib directory...
+
+> The JOS platform can be finely tuned to run Java applications. It can
+> provide a must better environment than any other operating system.
+
+Amen   :)
+
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/] [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+From al@outworld.org Sat, 19 Jun 1999 10:22:01 +0300
+Date: Sat, 19 Jun 1999 10:22:01 +0300
+From: Al al@outworld.org
+Subject: [JOS-Arch] Re: JOS registry
+
+I took the liberty of posting this to arch@jos.org too.
+
+Gilbert Carl Herschberger II wrote:
+
+> I have tried to make it clear that a registry API doesn't include an
+> implementation of a registry interface.
+
+I know, I have done the same thing with my registry, just that I added
+an implementation (Impl classes) and an interface (RegistryServer) which
+do not affect the registry API at all (they could be missing from the
+classpath and nothing would go wrong if using just the registry).
+
+> In a few places, I made a point to demonstrate that a registry does
+> not have to be stored at all.
+
+True, my registry is simply an OO structure. Unless you ask for it,
+through the server, to be saved to a file (written to a Stream), it
+remains transient. My registry also has the ability to hold
+non-serializable or transient items, so all nodes and leafs in the
+registry tree have the methods:
+
+isValid();
+isSerializable();
+
+> I also made a point to demonstrate that a registry, when stored, may
+> be stored by another process (like a registry service), another
+> machine (like a registry server).
+
+This is done. Of course, it is accomplished only via RMI, which is
+something to debate about...
+
+> When a registry needs to be stored, it can be stored in a wide variety
+> of different file formats, from .conf to XML.
+
+There was an idea of having Transformation algorithms as an API in JOS.
+This way, you feed the engine bytes, and it transforms it to another
+format, such as XML. This API is not ready yet, so up to now I have only
+added a method in the registry like this:
+
+toXMLString();
+
+which really returns a String object, not an XML Document (still waiting
+for Sun's official implementation of XML in javax.xml.*) and cannot
+interpret XML registries yet.
+
+> >Also, I would not suggest the usage of primitive types.
+> 
+> Without primative types, Java would not have been possible. In theory,
+> Java should have made everything an object. Without primative types, a
+> registry is not possible. The kinds of things programmers already
+> store in registries are primative types. They are not objects. Adding
+> objects at this level of the API creates a needless redundency.
+
+True, but I think the overhead for creating Float and Blob objects less
+compared to the amount of processing required to handle different data
+types. Up to now, the registry only recognizes type Object, which is
+precisely what List, Vector, Hashtable, etc. accept...
+
+> Maybe what you want is an object store. You must be talking about a
+> high level registry. But a high level registry isn't a registry at
+> all. That would be...an object store.
+
+OK :)
+
+Basically, I am making an inverted tree that stores objects, and can
+manipulate these objects by retrieving them, replacing them, replicating
+them, etc.
+
+> >That ONLY JOS-specific applications can use these classes.
+> 
+> How is it that 100% Pure Java classes created by the JOS Project will
+> only work in the JOS JVM? Certainly, you've been running your registry
+> in a non-JOS JVM.
+
+No, no, no... I mean that if every object in the Java API is changed to
+be a registry, then this is not a 100% Java API.
+
+I am running the registry in JDK 1.2 final.
+
+> JOS-specific applications might be expected to use the registry API.
+> In fact, it might be a built-in part of the Process object where JOS
+> applications live.
+
+Or, more simply, could just be an RMI server. But true, having a method
+like this would be useful:
+
+JOSSystem.getRegistry();
+
+> The JOS Project is pioneering some of the APIs that may become the
+> next generation of industry standards. If the JOS registry API is
+> really, really great, it won't take much for Sun Microsystems to
+> provide a registry API as a built-in part of Java 3 or 4.
+
+Let's cross our fingers then! :)
+
+> My own motivation for working on the registry API is because I need to
+> use it now. I have current products held up because they have no
+> registry. I am enthusiastic about shipping a registry compatible with
+> the JOS Registry API along with each product I build. A product suite
+> only has to install a registry once. All of the products are able to
+> share the same registry through a well-known API.
+
+Well, since sharing is a keyword, security must be implemented first...
+
+> My products run on some machines where there is no TCP/IP stack. They
+> have no network at all. This is why RMI and CORBA are not an option. I
+> just want a registry, and that's all.
+
+The org.jos.registry.RegistryServer class extends UnicastRemoteObject
+and implements org.jos.registry.Server that extends java.rmi.Remote.
+
+You can simply create a local RegistryServer class and use it, without
+binding through an RMI registry. If your server and client is in the
+same process, you won't need network at all.
+
+> I have downloaded the Registry.jar. Isn't a jar just like a zip file?
+> I might be able to unzip it, right?
+
+Yup, Jar files use the ZIP inflator plus they add a cute manifest file.
+
+
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/] [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+From ryan@whitewolf.com.au Sat, 19 Jun 1999 18:50:27 +1000
+Date: Sat, 19 Jun 1999 18:50:27 +1000
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Arch] JOS Security Model
+
+Al wrote:
+
+> Just a question... When you say that users and groups have different
+> security access to objects, such as files or sockets, this means that
+> each user can inherit access from his group, except if the user himself
+> is denied something from the group, right?
+
+Yes. Permissions granted to a user always override permissions granted
+by groups to which that user belongs.
+
+If a group is denied permission X but a particular user in that group is
+granted permission X, the result is that the user is granted the
+permission.
+
+Conversely, if a user is denied permission X, but a group to which that
+user belongs grants the same permission, the user will still be denied
+permission X.
+
+Of course, if a user is neither granted nor denied permission X, but a
+group to which the user belongs is granted the permission, the user will
+be granted that permission.
+
+The algorithm is:
+
+granted permissions = (u1 + (g1 - u2)) - (u2 + (g2 - u1))
+
+where:
+
+u1 = permissions granted to user
+u2 = permissions denied to user
+g1 = permissions granted to groups containing user
+g2 = permissions denied to groups containing user
+
+
+
+
+From gchii@mindspring.com Wed, 23 Jun 1999 08:30:30 -0400
+Date: Wed, 23 Jun 1999 08:30:30 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Requirements
+
+Help Wanted: Anyone with information about .conf files, the standard file
+format for configuration information on UNIX(tm) and Linux. In order to be
+backward compatible first, we must be able to at least read .conf files
+with a single function call:
+
+Registry r = RegistryFactory.getRegistry( "x-registry:file:X1186Config" );
+
+I am at the point where I can open a .conf file and read one line at a time
+into a registry object. After reaching this point, I realise I only "know"
+the .conf file format by example; I have never seen an official
+specification. I have heard of standardization efforts for both .conf and
+.ini files.
+
+We need to find one. If it doesn't exist, we need to write one.
+
+The top priority is .conf files. Plus, we need more information on .ini and
+.inf files, too.
+
+
+
+
+From jm@mak.com Tue, 29 Jun 1999 08:30:42 -0400
+Date: Tue, 29 Jun 1999 08:30:42 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Arch] [Fwd: Alternative approach to "memory" classes...]
+
+This is a multi-part message in MIME format.
+--------------0EA8AAB78E2AB0ECE0CE09B6
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+Sorry for the broken header in my first sending attempt...
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+--------------0EA8AAB78E2AB0ECE0CE09B6
+Content-Type: message/rfc822
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Received: from alexander.mak.com (IDENT:root@alexander.mak.com [207.86.232.32])
+	by mak.com (8.9.1/8.9.0) with ESMTP id IAA26336
+	for <jm@mak.com>; Tue, 29 Jun 1999 08:26:04 -0400 (EDT)
+Received: from mak.com (jm@localhost [127.0.0.1])
+	by alexander.mak.com (8.8.7/8.8.7) with ESMTP id IAA01037;
+	Tue, 29 Jun 1999 08:25:29 -0400
+Sender: jm@alexander.mak.com
+Message-ID: <3778BB38.F249786C@mak.com>
+Date: Tue, 29 Jun 1999 08:25:28 -0400
+From: John Morrison <jm@mak.com>
+Reply-To: arch@jos.org, general@jos.org, info@jos.org
+Organization: MaK Technologies, Inc.
+X-Mailer: Mozilla 4.05 [en] (X11; I; Linux 2.0.34 i686)
+MIME-Version: 1.0
+To: kernel@jos.org, admin@jos.org
+CC: jm@mak.com
+Subject: Alternative approach to "memory" classes...
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hi All;
+
+Sorry for the wide distribution, but I am interested in hearing your
+thoughts on the following, JOS-wide, and (unfortunately) related
+issues...
+
+Issue #1:
+
+Just bought the "Inside JavaOS" book.  Haven't had time to read the
+whole thing (you know how it is).  JavaOS has a quite different (and
+much more comprehensive) approach to memory classes than any of the ones
+I wrote about in my recent message to the kernel list (those of you who
+aren't on the kernel list can check the archives if you're really
+interested, but I really need your inputs on Issue #2...)
+
+Seems they have opaque (to Java, anyways) address32 and address64
+classes.  They also have "address range" classes, DMA address space
+classes, and even (seems to me) I/O space classes (as a 16-bit address
+space).  I haven't exactly figured out and/or read far enough to know
+if/how they handle the *contents* of addresses as unsigned quantities,
+although I'm sure they can handle it also via opaque classes.  Finally,
+they even seem to have an approach to handling physical<->virtual
+mapping machinery.
+
+So, I guess this comes down to either of two options (please excuse the
+hyperbole):
+
+(1) inventing our own, unique, simplistic, must-be-upgraded-later
+approach, which will be expedient in the short term, but will never be
+able to use JavaOS drivers/software, and will be much harder for us to
+get consensus upon (e.g., agreeing upon driver, system, OS, and "kernel"
+APIs), or
+
+(2) implementing something as close as is humanly possible to the JavaOS
+API(s), which will be more work in the short term, but maybe less in the
+long term, and which will obviate the consensus-building group-grope
+problem we currently have, which makes it much harder to get anything
+done that involves more than one person...
+
+Basically, option (1) is the "let's re-invent the wheel" approach, and
+(2) is the time-honored, Open Source "chase the tail-lights" approach. 
+As much as I like designing my own APIs (of course, they would be far
+superior to and more aesthetically pleasing than the JavaOS ones --
+*N-O-T*), I'm kind of leaning towards option (2).  I mean, hell, we're
+not redesigning the Java language, the bytecodes, or the java.* classes,
+so...
+
+Issue #2:
+
+Are there any legal ramifications of cloning the JavaOS APIs?  Is
+anybody in a position to find out?  If there are issues, I'd sure like
+to know about them right now so that we can do option (1) instead...
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+--------------0EA8AAB78E2AB0ECE0CE09B6--
+
+
+
+
+From tmiller@haverford.edu Tue, 29 Jun 1999 09:24:25 -0400 (EDT)
+Date: Tue, 29 Jun 1999 09:24:25 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Re: [JOS-Admin] Alternative approach to "memory" classes...
+
+> Issue #2:
+> 
+> Are there any legal ramifications of cloning the JavaOS APIs?  Is
+> anybody in a position to find out?  If there are issues, I'd sure like
+> to know about them right now so that we can do option (1) instead...
+
+	Paired with this issue: does anyone know what the
+kind of redistribution of the JavaOS drivers is allowed?  I would guess
+that individual manufacturers don't particularly care, but Sun might have
+something against letting the drivers it ships with JavaOS spread to the
+four routers of the internet.
+
+	As for the legal ramifications of cloning the JavaOS APIs, we'll
+be engaged in an even more time-honored approach than Open Source
+"tail-light chasing" -- reverse engineering!
+
+-_Quinn
+
+
+
+
+From DearWebby@webby.com Tue, 29 Jun 1999 10:28:45 -0700
+Date: Tue, 29 Jun 1999 10:28:45 -0700
+From: Dear Webby DearWebby@webby.com
+Subject: [JOS-Arch] Re: [JOS-Admin] Alternative approach to "memory" classes...
+
+At 05:25 AM 6/29/99 , John Morrison wrote:
+>Issue #2:
+>
+>Are there any legal ramifications of cloning the JavaOS APIs?  Is
+>anybody in a position to find out?  If there are issues, I'd sure like
+>to know about them right now so that we can do option (1) instead...
+>-jm
+>==== John Morrison
+
+Yes, whenever SUN is involved, watch out! Their lawyers sue their own
+fathers for using their name, just to piss them off. Unlike M$ who goes out
+of their way to foster community spirit and will do anything to get you to
+use their stuff, with SUN you better count on their lawyers hassling you
+and trying to chase you to the M$ camp.
+
+Unless you have it in writing PRECISELY how much can be cloned in the
+interest of standardization, you better stick to clean room procedure all
+the way and re-invent the wheel. 
+
+
+DearWebby
+(Helmut)
+
+The Cardmaster's MidSummer Madness World Championship is under way
+You can now vote at
+
+http://cards.webby.com
+----------------------------------------------------------------------------
+------
+Webby, Inc  Web Marketing and high traffic web hosting
+Internet postcards and other effective marketing software
+
+
+

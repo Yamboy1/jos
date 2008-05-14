@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: [JOS-Arch] =?iso-8859-1?Q?Jos=E9?=(tm) for Windows(tm)
+ - Release 1a (with URL)Release 1a (with URL)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000234.html">
+   <LINK REL="Next" HREF="000228.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: [JOS-Arch] =?iso-8859-1?Q?Jos=E9?=(tm) for Windows(tm)
+ - Release 1a (with URL)Release 1a (with URL)</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Re: [JOS-Arch] =?iso-8859-1?Q?Jos=E9?=(tm) for Windows(tm)
+ - Release 1a (with URL)Release 1a (with URL)">digigod@earthling.net</A><BR>
+    <I>Sun, 19 Sep 1999 15:18:20 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000234.html">[JOS-Arch] =?iso-8859-1?Q?Re:_[JOS-Arch]_Jos=E9(tm)_for_Windows(tm)_-_?=
+ Release 1a (with URL)
+ Release 1a (with URL)</A></li>
+        <LI> Next message: <A HREF="000228.html">[JOS-Arch] Project Update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#239">[ date ]</a>
+              <a href="thread.html#239">[ thread ]</a>
+              <a href="subject.html#239">[ subject ]</a>
+              <a href="author.html#239">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> These layers are fuzzy, abstract and flexible, and should be. Software is
+</I>&gt;<i> software. It has been and will always be a matter of convention to put
+</I>&gt;<i> software in different layers.
+</I>&gt;<i> 
+</I>&gt;<i> Layer 1: kernel -or- JOSBox -or- sub-operating system
+</I>&gt;<i> The kernel and JOSBox are the same. They are the parts of a complete system
+</I>&gt;<i> that are below the machine interface. In classic architecture, this layer
+</I>&gt;<i> is known as the &quot;hardware&quot; layer.
+</I>&gt;<i> 
+</I>&gt;<i> Java, the virtual machine, depends on a sub-operating system. JOSBox,
+</I>&gt;<i> Linux(r) and Windows(tm) are suitable sub-operating systems, with device
+</I>&gt;<i> drivers.
+</I>
+When I talk about the JOSBox I think of the kernel and the VM, the
+JOSBox is a kind of emulator for Java. as far as JOSystem is concerned
+its running on pure hardware. I know that's impossible as the two layers
+are going to need many hooks between them, Id like to keep all the
+machine code in JOSBox, even if that means putting some bytecode in it.
+ 
+&gt;<i> Layer 2: Java API -or- JOS class libraries
+</I>&gt;<i> The virtual machine goes hand in hand with the Java class libraries. This
+</I>&gt;<i> layer turns a sub-operating system into the Java platform.
+</I>
+I think you misunderstand me, the class libraries and API's have nothing
+to do with this. this layer is the real OS, an all Java &quot;pseudo&quot; kernel
+that the JOSBox invocates, the Java device drivers the process managers
+and the like. This is the OS in the classic sense, but it needs a
+quasiOS in the JOSBox to work...
+ 
+&gt;<i> Layer 3: Applications
+</I>&gt;<i> Operating system applications are applications, too. All of the programs
+</I>&gt;<i> that come with the operating system are written on top of layer 2. A device
+</I>&gt;<i> driver may or may not be an application, depending on where/when it is
+</I>&gt;<i> plugged into Layer 1.
+</I>
+if its part of the OS and its not native its Layer 2. layer 3 isn't the
+OS, but what the OS does; JADE is an application because its not part of
+the OS, it does no operating what it does do is allow the user to run
+applications easily and modify the OS easily. most of layer 3 should be
+unaware of JOS.
+ 
+&gt;<i> These layers might be recognized by the instruction set(s) used:
+</I>&gt;<i> 
+</I>&gt;<i> Layer 1 - machine code
+</I>&gt;<i> Layer 2 - mixture of bytecode and machine code (for native methods)
+</I>&gt;<i> Layer 3 - bytecode
+</I>
+Id like to keep as much native code as possible in layer 1.
+ 
+&gt;<i> With precision, Layer 1 is markedly machine code from any programming
+</I>&gt;<i> language. Remember that even Java, the programming language, can be
+</I>&gt;<i> compiled directly into machine code.
+</I>
+good point.
+ 
+&gt;<i> With precision, Layer 3 is markedly bytecode from any programming language
+</I>&gt;<i> that can produce Java-compatible bytecode. Remember that Java, the
+</I>&gt;<i> programming language, is not the only programming language that produces
+</I>&gt;<i> bytecode.
+</I>&gt;<i> 
+</I>&gt;<i> As much of the system that can be expressed in bytecode should be expressed
+</I>&gt;<i> in bytecode. When thousands of programs need to copy (download) a file, the
+</I>&gt;<i> bytecode for the copy-one-file class should be shared, not stored once for
+</I>&gt;<i> each program. In RAM, the copy-one-file class should exist once, not once
+</I>&gt;<i> for each class loader.
+</I>
+like we have a shared memory that each VM thinks is its own?
+ 
+&gt;<i> How should JOS bytecode be stored? I believe that it must be stored in
+</I>&gt;<i> package files in order to achieve software reuse. That's an architecture
+</I>&gt;<i> question, isn't it?
+</I>
+we need to support the .class file, but Id like the libraries in
+.package files.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000234.html">[JOS-Arch] =?iso-8859-1?Q?Re:_[JOS-Arch]_Jos=E9(tm)_for_Windows(tm)_-_?=
+ Release 1a (with URL)
+ Release 1a (with URL)</A></li>
+	<LI> Next message: <A HREF="000228.html">[JOS-Arch] Project Update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#239">[ date ]</a>
+              <a href="thread.html#239">[ thread ]</a>
+              <a href="subject.html#239">[ subject ]</a>
+              <a href="author.html#239">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

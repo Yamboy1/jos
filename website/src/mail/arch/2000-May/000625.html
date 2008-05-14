@@ -1,0 +1,247 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000624.html">
+   <LINK REL="Next" HREF="000630.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">ryan@whitewolf.com.au</A><BR>
+    <I>Fri, 19 May 2000 18:08:37 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000624.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000630.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#625">[ date ]</a>
+              <a href="thread.html#625">[ thread ]</a>
+              <a href="subject.html#625">[ subject ]</a>
+              <a href="author.html#625">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>John Leuner wrote:
+
+&gt;<i> But it would beneficial to reuse as many of the classes as possible. For
+</I>&gt;<i> example, if all the java.lang, java.io etc classes were always loaded by a
+</I>&gt;<i> specific class loader, we could gain the time otherwise required to load
+</I>&gt;<i> each system class.
+</I>
+The reuseClassDefinitions() method just discussed (in another email)
+would help here somewhat.
+
+The problem with actually reusing Classes (as opposed to class
+definitions) is that a program notices the difference, in really
+disturbing ways. For example, Process A calls System.setOut(logFile),
+and Process B all of a sudden loses its output to some unknown place.
+
+There are at least 114 non-final statics in the JDK 1.1 system classes.
+Per package, they are distributed as follows:
+
+[ note: there are certainly more to be found with a smarter algorithm ]
+
+applet          0
+awt             23
+beans           5
+io              6
+lang            7
+math            5
+net             7
+rmi             15
+security        6
+sql             4
+text            16
+util            20
+
+You would need to check each one to make sure that one process cannot
+interfere with another process through manipulation of these statics. It
+is possible to work around some of them in this case, but not all of
+them. For example, System.in/out/err can be protected by simply sharing
+all system classes except for java.lang.System, causing each process to
+have their own java.lang.System statics. However, I was lucky* to be
+able to do that in this instance because java.lang.System is a purely
+static class (there can be no references to instances of that class). If
+instances can be passed around, you will not be able to cast the
+instance of the per process class to the type that a primordially loaded
+class would expect (it can only expect one type, not n different types
+for however many processes there are). Did that make sense? I may have
+left out a few crucial sentences that I thought rather than wrote...
+
+I think there are many other optimisations we can try before you resort
+to breaking the spec. I believe that the range of safe optimisations
+discussed so far will actually be sufficient and there will be no need
+to look for non-safe ones. I think it is best to wait and see at this
+stage.
+
+(*) I actually support a host implementation of rheise.os that works
+pretty much as you desired, and it attempts to work around the static
+problems on a case by case basis. Of course it is not (and cannot) be
+perfect, but it works well enough to be used until the native
+implementation is integrated with decaf. If you want to take a look at
+it, goto <A HREF="http://www.progsoc.uts.edu.au/~rheise/projects/rheise.os/">http://www.progsoc.uts.edu.au/~rheise/projects/rheise.os/</A>
+
+&gt;<i> &gt; In addition to computational efficiency, class definition sharing (which
+</I>&gt;<i> &gt; is based on class definition caching) minimises memory waste.
+</I>&gt;<i> 
+</I>&gt;<i> Yes class definition caching will certainly help, although I don't see how
+</I>&gt;<i> it has much advantage over a conventional file cache.
+</I>&gt;<i> 
+</I>&gt;<i> What is definition sharing?
+</I>
+That was discussed in those two links I referred you to in the last
+email. Class definition caching is the new term I just invented to avoid
+conflict with alternative ideas that do not depend on caching in the
+same way I do.
+
+I depend on class definition caching to avoid doing I/O twice when
+findSystemClass(&quot;java.awt.Button&quot;) is called twice. If the modification
+date of the archive hasn't changed, I simply use the class definition in
+the cache and skip the InputStream.read() and much of the
+ClassLoader.defineClass() process. This is a performance optimisation.
+
+Class definition sharing, on the other hand, is a memory optimisation,
+and a crucial part of my proposal with respect to IPC:
+
+	<A HREF="http://jos.org/pipermail/arch/2000-April/000449.html">http://jos.org/pipermail/arch/2000-April/000449.html</A>
+
+Class definition sharing simply means that if java.awt.Button.class is
+loaded twice into two separate processes, they both (ie. the
+java.lang.Class objects) can point to the common class definition
+structure rather than have their own copy of the data (_Quinn's
+insight). So, there end up being two java.lang.Class objects with
+references to the same class definition object.
+
+The way I take advantage of this for IPC is, I allow an object to be
+casted from one java.awt.Button to another java.awt.Button if those two
+classes share the same class definition (and if the two classes were
+loaded by primordial class loaders, which is implied in my specific
+proposal). It is difficult to grasp the implications of this, but it is
+explained in detail in the proposal above (some details are yet to be
+added, _Quinn has written a more recent analysis of what are the
+necessary &quot;properties&quot; of such a system and I haven't updated my
+proposal to explain how they might fit in yet)
+
+&gt;<i>  &gt; We can only wait and see if it actually works - I suspect
+</I>&gt;<i>  &gt; the performance will be significantly faster than a standard JVM.
+</I>&gt;<i> 
+</I>&gt;<i> Not really. If the file system is already caching the .class files, how
+</I>&gt;<i> will your method be much faster?
+</I>
+Yes, particularly with jar files (which is where most classes will be
+loaded from). You are asking why we need a class definition cache in
+addition to a file cache. Besides the fact that it is just as easy to
+implement, a class definition cache saves us from:
+
+- reading the class file from a stream. Even if the file is cached, we
+must loop over all the bytes via a stream (with memory as its source
+rather than disk).
+
+- interpreting the jar file. Even if the jar file is cached, we must
+find the class file within it.
+
+- interpreting the class file. This means converting the class file
+format into a class definition structure.
+
+And now we have a class definition. Not only did it take longer to
+produce, but now we can't share the class definition across different
+classes to either save memory or do IPC, unless we do even more work to
+compare the newly created class definition with ones we already have in
+memory.
+
+In summary, yes, file system caching does speed things up to some extent
+(we definately want file system caching), but class definition caching
+can easily make it much faster, as well as making shared object IPC a
+breeze.
+
+&gt;<i> But you shouldn't be comparing to a normal JVM, you should be comparing
+</I>&gt;<i> the native operating environment of other OS'es. Can we compete against
+</I>&gt;<i> the processes in BeOS, UNIX and Win32?
+</I>
+In that case, it is VERY important that we do class definition caching
+in addition to file system caching :-) 
+
+&gt;<i> Will our solution be able to cope when the user starts compiling the whole
+</I>&gt;<i> class library and spawns hundreds of processes in quick succession?
+</I>
+Spawning hundreds of processes in quick succession doesn't sound like
+the right way to get a job done to me. In UNIX the program was the item
+of reuse, so lots of programs would be spawned in quick succession to
+get a job done. But in an object oriented operating system, objects are
+the items of reuse, and they usually interact with eachother in the same
+address space.
+
+In this example, it doesn't sound like a good idea to spawn hundreds of
+separate javac processes one after another. It turns out IDE designers
+don't think so either (not just for exec latency though, mainly for
+opportunities for optimisation w.r.t. inter-class dependencies). I would
+prefer to think of the java compiler as a reusable library/package that
+can be used in a number of different contexts, eg. an IDE (so it doesn't
+have to spawn hundreds of separate processes), or your own personal
+compilation macro or Makefile equivalent which can make use of the java
+compiler without having to spawn processes.
+
+All that theory aside, javac can still be executed as a process if you
+wish, and you should get good performance with
+JavaProcess.reuseClassDefinitions() or maybe even without. Let's wait
+and see.
+
+&gt;<i> &gt; (An additional note, interaction between 'ls', 'grep' and 'wc' does not
+</I>&gt;<i> &gt; necessarily need to involve multiple processes. The equivalent of this
+</I>&gt;<i> &gt; in an object oriented context might be the interaction of Java beans
+</I>&gt;<i> &gt; which need not be in separate processes. In this case, the same class
+</I>&gt;<i> &gt; loader is used and the resolution process is not an issue)
+</I>&gt;<i> 
+</I>&gt;<i> Yes, but if our Processes are emulating what an application expects when
+</I>&gt;<i> it runs on a normal JVM, then programmers are going to write to this
+</I>&gt;<i> specification. They are going to expect pipes, their own copy of static
+</I>&gt;<i> variables for all classes they are using and so on.
+</I>
+What I meant was, the 'ls', 'grep' and 'wc' could be rewritten in an
+object-oriented context so that they can interact as reusable objects in
+the same address space. rheise.os still supports processes in all their
+glory. If you wish to write 'ls' as a program that runs in its own
+process, it will get its own version of System.in/out/err and it will be
+able to do pipes. If you download rheise.os, there is an example that
+shows one process piping its output into the input of another.
+
+&gt;<i> Perhaps it isn't such a good thing to model the traditional UNIX process
+</I>&gt;<i> so closely?
+</I>
+There is certainly no need to use processes in the same way UNIX forced
+programmers to, but we can nevertheless support the basic process model
+since it is the foundation for many different uses. You can look at a
+process as a perimeter around executing code that should not be able to
+interfere with, or be interfered by, anything else. Objects that work
+together to achieve a goal can go in the same process*.
+
+(*) Usually. The exceptions should be obvious to the developer.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000624.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000630.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#625">[ date ]</a>
+              <a href="thread.html#625">[ thread ]</a>
+              <a href="subject.html#625">[ subject ]</a>
+              <a href="author.html#625">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

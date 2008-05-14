@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000646.html">
+   <LINK REL="Next" HREF="000653.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs">tmiller@haverford.edu</A><BR>
+    <I>Sat, 20 May 2000 08:33:58 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000646.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+        <LI> Next message: <A HREF="000653.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#648">[ date ]</a>
+              <a href="thread.html#648">[ thread ]</a>
+              <a href="subject.html#648">[ subject ]</a>
+              <a href="author.html#648">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> A primordial class loader is-a class loader. So if there's a problem
+</I>&gt;<i> sharing objects between class loaders in general, there is a problem
+</I>&gt;<i> sharing objects between primordial class loaders.
+</I>
+	This is not true; a PCL can share with another PCL only because
+the sharing can be done in a fashion transparent to the JVM
+specification, and therefore the running application.  Sharing
+between non-primordial classloaders is a problem because the spec does not
+allow it.
+
+&gt;<i> This works because t knows ObjectB through the Sharable interface, which is
+</I>&gt;<i> a system class. But what if it weren't?
+</I>
+	Then it wouldn't, and in fact couldn't, work.  There are -- as you
+have demonstrated -- programattic ways to share objects.  However, you
+wouldn't be able to cast from Shareable to SharedObject, because SO was
+/not/ loaded by the PCL (== is a system class).  Reflection, OTOH, may
+work, but if you're going to need to use reflection for IPC, serialization
+is probably going to be more effective.
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000646.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+	<LI> Next message: <A HREF="000653.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#648">[ date ]</a>
+              <a href="thread.html#648">[ thread ]</a>
+              <a href="subject.html#648">[ subject ]</a>
+              <a href="author.html#648">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

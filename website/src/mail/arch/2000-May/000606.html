@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000601.html">
+   <LINK REL="Next" HREF="000613.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>jewel@pixie.co.za</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">jewel@pixie.co.za</A><BR>
+    <I>Wed, 17 May 2000 22:15:03 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000601.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000613.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#606">[ date ]</a>
+              <a href="thread.html#606">[ thread ]</a>
+              <a href="subject.html#606">[ subject ]</a>
+              <a href="author.html#606">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> discarded) when a process dies. Each primordial class loader has some
+</I>&gt;<i> equivalent of CLASSPATH. Each CLASSPATH is potentially different.
+</I>&gt;<i> 
+</I>&gt;<i> Here is one more test case:
+</I>&gt;<i> 
+</I>&gt;<i> public void example() {
+</I>&gt;<i>   Runtime.getRuntime().exec( &quot;java0 org.jos.demo.Demo&quot; );
+</I>&gt;<i>   Runtime.getRuntime().exec( &quot;java1 org.jos.demo.Demo&quot; );
+</I>&gt;<i>   Runtime.getRuntime().exec( &quot;java2 org.jos.demo.Demo&quot; );
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> On an MPCL-compatible virtual machine, imagine there is a &quot;switch&quot;
+</I>&gt;<i> statement to select an appropriate Java standard class library for each
+</I>&gt;<i> primoridal class loader:
+</I>&gt;<i> 
+</I>&gt;<i>   switch( platform ) {
+</I>&gt;<i>     case 0 :
+</I>&gt;<i>       return &quot;java0.jar&quot;;
+</I>&gt;<i> 
+</I>&gt;<i>     case 1 :
+</I>&gt;<i>       return &quot;java1.jar&quot;;
+</I>&gt;<i> 
+</I>&gt;<i>     case 2 :
+</I>&gt;<i>       return &quot;java2.jar&quot;;
+</I>&gt;<i> 
+</I>&gt;<i>     default :
+</I>&gt;<i>       return null;
+</I>&gt;<i> 
+</I>&gt;<i>   }
+</I>
+
+This looks easy from this point of view. But what about all the native
+libraries that vary for each different class library?
+
+I'ld much prefer a standardised class library for all processes running on
+the machine. It makes the implementation much simpler.
+
+John
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000601.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000613.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#606">[ date ]</a>
+              <a href="thread.html#606">[ thread ]</a>
+              <a href="subject.html#606">[ subject ]</a>
+              <a href="author.html#606">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

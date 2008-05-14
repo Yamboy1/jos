@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000176.html">
+   <LINK REL="Next" HREF="000168.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Program and ProgramContext">tmiller@haverford.edu</A><BR>
+    <I>Thu, 12 Aug 1999 22:27:23 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000176.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000168.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#166">[ date ]</a>
+              <a href="thread.html#166">[ thread ]</a>
+              <a href="subject.html#166">[ subject ]</a>
+              <a href="author.html#166">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	In the beginning, there was the source and the object code, and
+once the object code was split from its source, it withdrew within its
+'main' method shell, and lived only through its stdin/out/err tubes.  Time
+rolled by, and the dynamic-link library was developed, which allowed the
+source to declare on the object code's shell what functions it wished
+exposed.  And so applications split from libraries.  And the number of
+applications grew, forcing some to specialize in niches, habitats without
+which they were useless.
+
+	With me so far?  Enter Java, and reflection.  The boundary between
+application and library disappears; the internals of both are equally
+exposed, though the libraries are designed for this.  Emulations for the
+niches arrive.  Suddenly, we can use any chunk of code on our computer
+without compiling anything, without source to any of it; but why would you
+want to?
+
+	Yes, you can create a minimal abstraction that represents this
+ability, but what good does it do you?  The point of any given chunk of
+code is to perform its I/O.  Different chunks of code have very different
+ways of performing this I/O... the integer-returning string-array
+inputting main() method, call-with-value and return-some-single-thing or
+call-by-reference, a group of paired get/set XXX() functions (JavaBeans),
+a pair of ServletStreams... UNIX pipes operate under the assumption that
+the greatest common factor of I/O is the byte-stream.  JOS, being O-O and
+blessed with reflection, can extend the byte-stream to include not only
+any kind of data, but information on that data and methods by which to
+manipulate it.
+
+	To define a universal interface to which all extant bytecode
+chunks could be ascribed is only useful if a universal i/o protocol can
+be developed for those bytecodes.  It's truly wonderful that you can call
+any chunk of code on the system and say &quot;if it returns a non-zero result
+code, halt the script,&quot; but where does that result code come from?  How do
+you define success for a text-input box?  More importantly, how do I get
+that entered text back out?  Pipe it out?  What if I pop a dialog with
+three different text boxes?  Piping it out requires either a protocol
+(i.e. a universal i/o protocol!) or reflection (which removes the need for
+a universal i/o protocol!).
+
+	The byte-stream idea has its own problems:
+
+jpeg-picker | guassian-blur | jpeg-to-bmp &gt; /tmp/tmp.bmp
+
+	What does jpeg-picker output?  Suppose it's a main() application.
+It returns an error code, and (might) pipe (say) a file-name to stdout.
+Does gaussian-blur take the file-name as a command-line argument or expect
+the jpeg image as a bytestream on stdin, or is it a javaBean, where you
+call setBlurImage()?
+
+
+	Function (library) calls, main() applications, JavaBeans,
+servlets, applets, aglets, etc, answer all of these questions in
+well-defined and useful, albeit specialized and/or limited manners.
+Starting their execution in the same manner isn't all that helpful if it
+immedediately degenerates into a series of special cases handling each
+particular type of communication.
+
+	It might be useful for the shell program/script interperter itself
+to have to only handle two object types at the highest level -- a Program
+and its ProgramContext -- but I don't see it benefitting the scripter
+much.
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000176.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000168.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#166">[ date ]</a>
+              <a href="thread.html#166">[ thread ]</a>
+              <a href="subject.html#166">[ subject ]</a>
+              <a href="author.html#166">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: Asynchronous I/O Service and JEPS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000416.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: Asynchronous I/O Service and JEPS</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Re: Asynchronous I/O Service and JEPS">gchii@mindspring.com</A><BR>
+    <I>Mon, 27 Mar 2000 13:48:56 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000416.html">[JOS-Arch] Asynchronous I/O Service and JEPS</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#417">[ date ]</a>
+              <a href="thread.html#417">[ thread ]</a>
+              <a href="subject.html#417">[ subject ]</a>
+              <a href="author.html#417">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 07:35 PM 3/27/00 +0200, Ranieri Argentini
+&lt;<A HREF="mailto:R.Argentini@student.tudelft.nl">R.Argentini@student.tudelft.nl</A>&gt; wrote:
+&gt;<i>Thanks for the effort Gilbert! I will try and fit it in this framework when
+</I>&gt;<i>i have something working.
+</I>
+Here we need a little bit of caution. We have to think about the impact of
+this on the architecture. As an architect, I worry about this is the kind
+of thing. The asynchronous TCP service I wrote does not need to be
+JOS-specific. I can use it in any Java application. Anything that does not
+need to be JOS-specific should not be JOS-specific.
+
+It doesn't need to go inside the JEPS package, does it?
+
+When I mentioned a TCP service, I had JEPS in mind but in a different way.
+I think JEPS runs in its own user process. JEPS must run in a user process
+so that it can be started, shutdown and restarted. Typically, JOS will be
+configured to starts JEPS at start-up. It is a system-wide protocol stack.
+There is only one. Or rather, one for each network interface card.
+
+A network interface card is a limited resource. If JEPS ran in each user
+process, only one would obtain the driver for each network interface card.
+
+A service that uses JEPS runs in its own user process, too. It does not run
+in the same process with JEPS. A service must run in a user process so that
+it can be started, shutdown and restarted.
+
+Personally, I would like use a corresponding UDP service, but have no idea
+where to begin. I have never written a UDP client or daemon using the
+standard class libraries.
+
+&gt;<i>This brings us to my present dilemma: should every part of the stack that
+</I>&gt;<i>needs timing (ARP for cache expiration, route tables, TCP etc) have it's
+</I>&gt;<i>own delta queue (at the expense of one thread plus a fixed overhead per
+</I>&gt;<i>list) or should i go for the added complexity of puttign everything in one
+</I>&gt;<i>deltalist, thereby lowering the overhead?
+</I>
+Your answer might come from thinking about the extreme case. Imagine you
+have a processor that is so slow it can only process one event per second.
+If someone has scheduled three events to occur each second, spawning
+additional threads won't help.
+
+Like you said, the schedule must be updated at the beginning of each event.
+A scheduler must know when an event started. A schedule is really a
+mimimum. At least one interval must pass from the beginning of one event
+and the beginning of another.
+
+If an event takes almost one second to process and someone has scheduled it
+for once every second, the actual interval begins to depend on the
+efficiency of the scheduler. The scheduler itself takes time to schedule
+the next event.
+
+When you have three scheduled events with the same priority, the event with
+the longest delay since it should have been launched must be launched first.
+
+Write a scheduler. I imagine that one scheduler class can be written. While
+one configuration might use one instance of the scheduler for all events,
+another might use more than one. Each event scheduler should run in its own
+thread.
+
+This is a true story. Our business program was scheduled to run once each
+day. Over time, more and more features were added. We don't know exactly
+when, but at some point it ran for more than 24 hours. The original
+scheduler launched each program in a separate thread. So one Thursday
+morning in the middle of 1988, the first and second instance were running
+at the same time. On Friday morning, the first, second and third instances
+were running. The first instance didn't finish in 48 hours because both the
+first and second were competing for the same resources. The first instance
+didn't finish in 72 hours because the first, second and third were
+competing for the same resources. Needless to say, none of the data
+processed by the program could be used. Programmers didn't expect more than
+one instance to run at the same time.
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000416.html">[JOS-Arch] Asynchronous I/O Service and JEPS</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#417">[ date ]</a>
+              <a href="thread.html#417">[ thread ]</a>
+              <a href="subject.html#417">[ subject ]</a>
+              <a href="author.html#417">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

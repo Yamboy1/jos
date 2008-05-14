@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000167.html">
+   <LINK REL="Next" HREF="000178.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Program and ProgramContext">gchii@mindspring.com</A><BR>
+    <I>Fri, 13 Aug 1999 01:53:33 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000167.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000178.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#171">[ date ]</a>
+              <a href="thread.html#171">[ thread ]</a>
+              <a href="subject.html#171">[ subject ]</a>
+              <a href="author.html#171">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 07:54 PM 8/12/99 -0700, DigiGod Q Frasché &lt;<A HREF="mailto:digigod@earthling.net">digigod@earthling.net</A>&gt; wrote:
+&gt;<i>note that this static initializer &quot;trick&quot; is what I use in my app class,
+</I>&gt;<i>a workaround nesseacary for the program to run both as a regular
+</I>&gt;<i>application and have the ability to be used in another easily. 
+</I>
+Yes! I want to &quot;run&quot; most of my programs both as a regular Java application
+compatible with the java tool *and* from any other Java class. It should be
+easy. It should be direct. It shouldn't take much.
+
+Like you, I want to build an application most of the time by extending a
+powerful base class. And yet, there are times when I need to run an
+existing class as a program, too. Delegating the ProgramContext to a
+separate object reduces the amount of new code I have to write in either case.
+
+So far, this discussion has identified very important issues. I hope that
+some really good code comes out of it. I would like to use an
+implementation of ParameterParser (ArgumentParser) that parses parameters
+from ProgramContext using the UNIX(tm) way. What would a ParameterParser
+look like anyway?
+
+A program should decide for itself if it needs the assistence a parameter
+parser, and if so which one.
+
+Isn't this cool? I should be able to have properties of my program set
+automatically based on command line arguments. Could we do this?
+
+public class DemoProgram {
+:<i>
+</I>  public void set__help( boolean v ) {
+  }
+:<i>
+</I>}
+
+so that when I use java org.jos.demo.DemoProgram --help, the set__help()
+method is called automatically? We can do this once with a
+UNIXStyleParameterParser. But wait! We can pass a Program to a
+ParameterParser, not a ProgramContext. The parser needs both the program
+and context, but getProgramContext() is part of the Program interface (or
+should be).
+
+If we substitute underscores (_) for dashes (-), the names of all command
+line parameters are reflected in a program. If there's a command line
+parameter that does not match a method of a program, should the parser
+throw an exception?
+
+My head hurts to think about this any more.
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000167.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000178.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#171">[ date ]</a>
+              <a href="thread.html#171">[ thread ]</a>
+              <a href="subject.html#171">[ subject ]</a>
+              <a href="author.html#171">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

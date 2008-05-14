@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000506.html">
+   <LINK REL="Next" HREF="000521.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">gchii@mindspring.com</A><BR>
+    <I>Fri, 28 Apr 2000 21:12:40 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000506.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+        <LI> Next message: <A HREF="000521.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#520">[ date ]</a>
+              <a href="thread.html#520">[ thread ]</a>
+              <a href="subject.html#520">[ subject ]</a>
+              <a href="author.html#520">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The difference between bytecode and class definition is negligible. It's
+hardly worth mentioning. It is six of one and half dozen of another. My
+math is horrible; but, even I understand equivalence.
+
+X = Y, therefore Y = X
+
+The subtle difference -- the only one I've been able to find so far -- is
+how bytecode retains the original payload of a class file and a class
+definition does not. The slight difference is only an issue of how
+efficiently they can be intern'd, not semantics.
+
+Both bytecode and class definition are everything besides the static
+fields. These are objects, which are not quite a class.
+
+It doesn't matter so much how efficiently the comparison operator (==)
+works, as long as I have one:
+
+  class ClassDefinition {
+    public:
+      bool operator==( const ClassDefinition &amp;v );
+  :
+  };
+
+vs.
+
+  class Bytecode {
+    public:
+      bool operator==( const Bytecode &amp;v );
+  :
+  };
+
+One class definition can be compared to another. One bytecode object can be
+compared to another. Bytecode is a class definition; class definition is
+bytecode.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000506.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+	<LI> Next message: <A HREF="000521.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#520">[ date ]</a>
+              <a href="thread.html#520">[ thread ]</a>
+              <a href="subject.html#520">[ subject ]</a>
+              <a href="author.html#520">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

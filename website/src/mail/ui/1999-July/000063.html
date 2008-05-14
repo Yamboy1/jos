@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000059.html">
+   <LINK REL="Next" HREF="000061.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] peer-ui mappings</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-UI] peer-ui mappings">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Wed, 21 Jul 1999 10:54:51 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000059.html">[JOS-UI] [Fwd: [JOS-UI] peer-ui mappings]</A></li>
+        <LI> Next message: <A HREF="000061.html">[JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#63">[ date ]</a>
+              <a href="thread.html#63">[ thread ]</a>
+              <a href="subject.html#63">[ subject ]</a>
+              <a href="author.html#63">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert,
+
+That is all fine and dandy, but there is nothing we can do about the
+incompatibilities that Sun introduces.  Sun has created a standard, and
+whether that standard is flawed or perfect, we are responsible to implement
+that standard so that every application behaves like it is running in an
+environment exactly compatible with the version of the standard it was
+written to.  If we do not implement the standard, and instead try to
+'correct' it, we are ourselves introducing incompatibilities into the
+platform.  Suddenly someone writing an application on JOS doesn't
+automatically get compatibility with Java on Win32.  
+
+The best thing we can do is to work around those incompatibilities.  We can
+implement the class libraries once for each version of the JDK.  When we run
+an application written to 1.02, we run it with the 1.02 class libraries.
+When we run an application written to 1.2, we run it with 1.2 class
+libraries.  If an application was written to Swing 1.0.3, then we run it
+with Swing 1.0.3.  If the latest and greatest, then we run it with the
+latest and greatest.  It means that the user will have to configure what
+versions are to be used with what applications.  (using your registry,
+perhaps?)  It means that we have to provide mulit-process support in our JVM
+so that every application behaves like it is running alone in a seperate
+instance of the JDK, because that is the assumption the JDK makes.  This is
+the only reasonable thing we can do to solve this problem such that every
+application runs robustly as the developer expected it to when he wrote it,
+whichever JDK he wrote it for.
+
+In the meantime, we have a technical issue brought about by Sun's decisions.
+We don't have the capabliity described above yet, though we will try to work
+towards it.  Let the developers do what they need to do in the meantime to
+just make it work.
+
+Regards,
+Avery J. Regier
+
+
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Gilbert Carl Herschberger II [SMTP:<A HREF="mailto:gchii@mindspring.com">gchii@mindspring.com</A>]
+</I>&gt;<i> Sent:	Wednesday, July 21, 1999 11:17 AM
+</I>&gt;<i> To:	<A HREF="mailto:ui@jos.org">ui@jos.org</A>
+</I>&gt;<i> Subject:	Re: [JOS-UI] peer-ui mappings
+</I>&gt;<i> 
+</I>&gt;<i> At 01:31 PM 7/21/99 +1000, you wrote:
+</I>&gt;<i> &gt;Gilbert Carl Herschberger II wrote:
+</I>&gt;<i> &gt;&gt; 
+</I>&gt;<i> &gt;&gt; On Tuesday, 20 July 1999, Sean Cribbs wrote:
+</I>&gt;<i> &gt;&gt; &gt;I have Heise's code. It doesn't work on the new JDK.
+</I>&gt;<i> &gt;&gt; 
+</I>&gt;<i> &gt;&gt; Heise's code
+</I>&gt;<i> &gt;&gt; should work today on a JDK 2.0 just as it did when it was written.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;SwingToolkit isn't exactly a 100% pure Java application. The sort of
+</I>&gt;<i> &gt;task SwingToolkit is designed to do requires a lot of trickery and you
+</I>&gt;<i> &gt;can't expect it to work when Sun makes the slightest change to its
+</I>&gt;<i> &gt;libraries. This is the sort of software that needs to be updated
+</I>&gt;<i> &gt;frequently to be compatible with new JVMs. Any code that is close to the
+</I>&gt;<i> &gt;core of JOS is likely to have this same attribute.
+</I>&gt;<i> 
+</I>&gt;<i> When you build a platform, you must act responsibly. You must not
+</I>&gt;<i> undermine
+</I>&gt;<i> your own customers. I do expect it to work. I can and should expect it to
+</I>&gt;<i> work. What gives Sun the right to break all my code? What gives Sun the
+</I>&gt;<i> right to make even the slightest change to its libraries? There is no
+</I>&gt;<i> justification for it. We're all worse off because Sun imagines that it's
+</I>&gt;<i> acceptable. Why do you accept it? It doesn't have to be this way.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;I don't expect that standard JOS applications will run into the same
+</I>&gt;<i> &gt;problems. I have certainly not encountered any problems.
+</I>&gt;<i> 
+</I>&gt;<i> You need to raise your expectations. Java, with its interface mechanism
+</I>&gt;<i> and
+</I>&gt;<i> very large namespace, has the potential to maintain perfect compatibility.
+</I>&gt;<i> Java has this potential even if Sun doesn't see it.
+</I>&gt;<i> 
+</I>&gt;<i> Haven't you suffered poor quality software long enough? It is poor quality
+</I>&gt;<i> to build a platform that doesn't last. Java 1.1 is a platform. In spite of
+</I>&gt;<i> what Sun wants, that platform is going to be around for more than two
+</I>&gt;<i> years. People have invested heavily in Java 1.1. What gives Sun the right
+</I>&gt;<i> to throw all their customer's code away? Who's code is it anyway?
+</I>&gt;<i> 
+</I>&gt;<i> And I don't want JOS to become obsolete the moment that Java 3.0 is
+</I>&gt;<i> released by Sun Microsystems. Why should I waste my time?
+</I>&gt;<i> 
+</I>&gt;<i> &gt;&gt; Isn't that what Write Once really means?
+</I>&gt;<i> &gt;No. Write Once means that if you write an application against Swing
+</I>&gt;<i> &gt;1.02, it will run on any Java platform that has Swing 1.02 without
+</I>&gt;<i> &gt;having to rewrite it. If a Java platform has Swing 1.1, your application
+</I>&gt;<i> &gt;needs to be upgraded to work with the new Swing. It is possible to have
+</I>&gt;<i> &gt;both versions of Swing installed on your computer and run different
+</I>&gt;<i> &gt;applications against different versions of swing as necessary.
+</I>&gt;<i> 
+</I>&gt;<i> Think about what you're saying. You're saying that it is acceptable to
+</I>&gt;<i> port
+</I>&gt;<i> your Java applications from one version of Java to the next...when you
+</I>&gt;<i> don't have to. I think Write Once means Write Once, without qualification.
+</I>&gt;<i> It does not mean what Sun Microsystems says it means. It does not write
+</I>&gt;<i> once per version. There must be no fine print.
+</I>&gt;<i> 
+</I>&gt;<i> I don't want to write once per version. Neither do any of my customers. To
+</I>&gt;<i> hear that it was possible to write once, and only once, was an inspiration
+</I>&gt;<i> to us all. It got the whole industry excited again. Sun doesn't mean write
+</I>&gt;<i> once when they say Write Once. Sun is lost. That doesn't mean that I have
+</I>&gt;<i> to be lost just like they are.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;Having two versions of the JDK installed is another thing, though, and
+</I>&gt;<i> &gt;could be difficult to handle in JOS. Luckily, JDK 1.2 is largely
+</I>&gt;<i> &gt;backward compatible with JDK 1.1. One obvious difference is in the
+</I>&gt;<i> &gt;threads API but Java developers have had sufficient warning to stop
+</I>&gt;<i> &gt;calling stop() that there are unlikely to be many problems when
+</I>&gt;<i> &gt;upgrading to JDK 1.2.
+</I>&gt;<i> 
+</I>&gt;<i> Largely backward compatible is another way of saying incompatible. It is
+</I>&gt;<i> either compatible or it's not. If it's mostly compatible, almost
+</I>&gt;<i> compatible, slightly compatible, it is incompatible. Incompatible is
+</I>&gt;<i> unacceptable.
+</I>&gt;<i> 
+</I>&gt;<i> Sufficient warning is another way of saying insufficient architecture.
+</I>&gt;<i> There should be no reason to warn people about added functionality.
+</I>&gt;<i> Warning
+</I>&gt;<i> implies that there is some kind of threat. How could added functionality
+</I>&gt;<i> be
+</I>&gt;<i> a threat to you? When you add functionality properly, there is no warning,
+</I>&gt;<i> only good news. You can do things that you've never been able to do
+</I>&gt;<i> before.
+</I>&gt;<i> You can do things with less effort than before.
+</I>&gt;<i> 
+</I>&gt;<i> We add functionality all of the time. That is the mainstream of what we
+</I>&gt;<i> do.
+</I>&gt;<i> That may be all we do. We should not be afraid of adding functionality. It
+</I>&gt;<i> should not the enemy. If it is, there can be only one conclusion: we are
+</I>&gt;<i> doing something wrong.
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> UI maillist  -  <A HREF="mailto:UI@jos.org">UI@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/ui">http://jos.org/mailman/listinfo/ui</A>
+</I>
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000059.html">[JOS-UI] [Fwd: [JOS-UI] peer-ui mappings]</A></li>
+	<LI> Next message: <A HREF="000061.html">[JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#63">[ date ]</a>
+              <a href="thread.html#63">[ thread ]</a>
+              <a href="subject.html#63">[ subject ]</a>
+              <a href="author.html#63">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

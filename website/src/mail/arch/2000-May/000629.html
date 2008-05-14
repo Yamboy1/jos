@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [subprogram] Definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000653.html">
+   <LINK REL="Next" HREF="000633.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [subprogram] Definition</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [subprogram] Definition">gchii@mindspring.com</A><BR>
+    <I>Fri, 19 May 2000 08:51:12 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000653.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+        <LI> Next message: <A HREF="000633.html">[JOS-Arch] [subprogram] Definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#629">[ date ]</a>
+              <a href="thread.html#629">[ thread ]</a>
+              <a href="subject.html#629">[ subject ]</a>
+              <a href="author.html#629">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Both a subprogram and process API are necessary. A subprogram should be
+used when a subprogram is needed. A process should be used when a process
+is needed. A subprogram is not a process.
+
+We can further refine the definition of a subprogram. We can compare and
+contrast a subprogram with a process. We can learn more about processes by
+comparing it to what we can already do with subprograms.
+
+We already have subprograms. Subprograms are easy to use. Subprograms load
+more quickly than process because it automatically shares the bulk of the
+Java standard class library. Subprograms come in many forms.
+
+1. Within the same class loader. A subprogram can use all classes and
+static fields loaded by its parent program. A subprogram can be called to
+alter the system properties of the parent program (like cd, su). A
+subprogram can be called to write to standard out and err streams. A
+subprogram can be called to read from standard in. Or both. Such a
+subprogram's classes are loaded once and cannot be unloaded. Typically, the
+Program Browser loads and runs any arbitrary subprogram without a custom
+class loader.
+
+2. With a custom class loader. A custom class loader provides a way to
+garbage collect its classes when a subprogram dies. A subprogram's classes
+can be loaded, unloaded and reloaded with a custom class loader. This is
+how a browser typically loads applets. This is how a servlet runner
+typically loads servlets. An advanced custom class loader can provide a
+substitute for java.lang.System to run a standard Java application as a
+subprogram.
+
+Any subprogram can run inside the same thread; the parent program has to
+wait. Any subprogram can be run inside a separate thread; the parent
+program does not have to wait.
+
+Any subprogram can be run inside a separate process. A separate process
+gets a whole new instance of the Java standard class library. A new process
+has a new primordial class loader. With a new primordial class loader, a
+new process gets all new static fields. Static fields are not maintained on
+a class by class basis.
+
+A new process can reused the class definitions of another process -- if the
+details are worked out to maintain the illusion of a separate virtual
+machine. An old process has probably already loaded the Java standard class
+library from rt.jar. An old process has probably already converted each
+class file into a platform-dependent class definition. An old process has
+probably already verified the bytecode and/or compiled some of it into
+machine code.
+
+While the order of archives on &quot;CLASSPATH&quot; must be perfectly preserved,
+some optimization is possible. These optimizations may increase the
+performance (size and speed) of a virtual machine. Assuming a mechanism to
+remember where each class file came from, class files can be cached.
+Assuming a file subsystem, archive files can be cached. If some mechanism
+can guarantee that a class file or archive has not changed, additional I/O
+may not be required. Each class file already loaded from an archive, a
+class file can be reused. If the raw class file has already been converted
+to a class definition, a class definition can be reused. If it has already
+be compiled into machine code, the compiled code can be reused.
+
+-----
+
+Many kinds of subprograms are already possible.
+
+A. Applet - By extending java.lang.Applet, your custom class can run as a
+subprogram in an applet environment, like Applet Browser.
+
+B. Servlet - By extending javax.servlet.Servlet, your custom class can run
+as a subprogram in a servlet environment.
+
+C. Runnable - By implementing java.lang.Runnable, java.lang.Thread,
+jose.Application and/or program.Program, your custom class can run as a
+subprogram in Program Browser.
+
+D. Component - By extending java.awt.Component, your custom class can run
+as a subprogram in Program Browser. Any component is automatically wrapped
+in a frame. All visual beans are components, too. If a component is a
+dialog box or frame or applet, it is used directly.
+
+E. URL - Any stringified URL can be converted to a java.net.URL and run as
+a subprogram in Universal Browser. This includes a JDBC URL for an SQL
+connection, along with the classic World Wide Web schemes.
+
+-----
+
+If you want to write a custom program for the JOS Project, you should write
+it as a subprogram, not a Java application. A Java application is only for
+backward compatibility. Compatibility with the Java application model is
+only for programs that others have already written and continue to write.
+Many applications, like javac, can be run successfully as a subprogram. No
+bytecode process is needed.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000653.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+	<LI> Next message: <A HREF="000633.html">[JOS-Arch] [subprogram] Definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#629">[ date ]</a>
+              <a href="thread.html#629">[ thread ]</a>
+              <a href="subject.html#629">[ subject ]</a>
+              <a href="author.html#629">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

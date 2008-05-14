@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000449.html">
+   <LINK REL="Next" HREF="000461.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">gchii@mindspring.com</A><BR>
+    <I>Tue, 11 Apr 2000 20:32:26 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000449.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000461.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#452">[ date ]</a>
+              <a href="thread.html#452">[ thread ]</a>
+              <a href="subject.html#452">[ subject ]</a>
+              <a href="author.html#452">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 02:35 PM 4/11/00 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+&gt;<i>Each process will have its own primordial class loader. As in a single
+</I>&gt;<i>process JVM, the primordial class loader will have a copy of
+</I>&gt;<i>java.lang.Object, and any other system and library classes that are
+</I>&gt;<i>directly referenced by the main class of the program being executed.
+</I>&gt;<i>Each primordial class loader will appear to work exactly like it would
+</I>&gt;<i>in a single process JVM.
+</I>
+This is exactly right. We need one primordial class loader for each process.
+
+For more information, see also ProcessAndPrimordialClassLoader on JOS Wiki.
+
+The JNI design provides a primordial class loader for each bytecode
+process. It also provides one garbage collector, one finalizer thread, one
+user interface thread for each bytecode process. It does this by creating a
+new instance of an entire virtual machine. A new instance of an entire
+virtual machine is not required. Only a new instance of the primordial
+class loader is required.
+
+A. Through private property of a class, a primordial class loader could be
+100% internal to a virtual machine. For perfect compatibility, the
+getClassLoader() method can still return null at the bytecode level. While
+we know an application is running in a separate process, this does not need
+to be explained to the application.
+
+B. Actually, process ID could become a private property of an instance of
+java.lang.Class. When a new instance of systemprocess (in C++) is created,
+it gets a system-wide unique ID. Every class created by that process is
+tagged as part of that process. The getCurrentProcess() method uses the
+private property of a class to return a SystemProcess (in bytecode), a
+proxy for systemprocess.
+
+&gt;<i>A process's primordial class loader will always load classes which
+</I>&gt;<i>represent class files found in its CLASSPATH.
+</I>
+A conventional primordial class loader uses CLASSPATH. CLASSPATH depends on
+a file subsystem. In the startup sequence, the primordial class loader must
+be available /before/ the file subsystem is installed.
+
+The ERIC Project proves that CLASSPATH is not required. Its custom class
+loader never uses CLASSPATH. It uses a &quot;package&quot; path. It loads classes
+from the local file subsystem. It downloads bytecode from an HTTP service.
+It downloads package files. It could download .jars. It could download
+.class files.
+
+Absolutely. I am strongly recommending a byte-by-byte comparision on each
+class file. The machine code version of memncmp() is not expensive when
+compared to the large quanitity of wasted resources cause by duplication of
+bytecode.
+
+1. This optimization would help all class loaders across the board. It
+would help our own primordial class loader and all user-defined custom
+class loaders.
+
+2. The alternative is, well, exactly what I already have. I don't want more
+of what I already have. The alternative lends itself to the same
+mismanagement of resources as a conventional virtual machine on a foreign
+operating system.
+
+A. Through the public ClassLoader property of a class, a primordial class
+loader could be (1) implemented in bytecode, (2) extendable, and (3)
+customizable. It would not be perfectly compatible because the
+getClassLoader() method can still return a primordial class loader at the
+bytecode level. An application could easily determine if it was running in
+a multiple process virtual machine:
+
+  public void example() {
+    if ( System.getClass().getClassLoader() == null ) {
+      println( &quot;Running in a conventional virtual machine.&quot; );
+    }
+
+    println( &quot;Running in an alternative virtual machine.&quot; );
+  }
+
+B. Process (or process ID) becomes a public property of
+PrimordialClassLoader. PrimordialClassLoader is a class derived from
+java.lang.ClassLoader. It is likely that PrimordialClassLoader has native
+methods, too. When a new instance of systemprocess (in C++) is created, it
+gets a system-wide unique ID. All instances of systemprocess are &quot;owned&quot; by
+the virtual machine. Every class created by that process is tagged as part
+of that process. The getCurrentProcess() method uses the public property of
+the class loader for a class to return a SystemProcess (in bytecode), a
+proxy for systemprocess.
+
+  public Process getCurrentProcess() {
+    Object o = this;
+    for (;;) {
+      ClassLoader loader = o.getClassLoader();
+      if ( loader instanceof PrimordialClassLoader ) {
+        return ((PrimordialClassLoader) loader).getProcess();
+      }
+      o = loader;
+    }
+  }
+
+No matter how many custom class loaders are creating classes, eventually
+the above method has to find a primordial class loader. The virtual machine
+creates a primordial class loader /first/ before loading anything else.
+
+-----
+
+I agree with the work of Avery Regier. Avery wrote a number of articles on
+JOS Wiki, such as WhyMultiProcessJVM. Here is a quote:
+
+&quot;With this type of VM, you can load a single version of a class's bytecodes
+into memory once and share the bytecodes amongst all of the processes. Each
+process will need its own stack and static variables (otherwise they would
+conflict with each other) but bytecodes can be shared.&quot;
+
+3. If a getBytecode() method were able to return bytecode for a class, here
+is how a virtual machine can test the compatibility of two arbitrary
+classes for class conversion:
+
+  public boolean isCompatible( Class x, Class y ) {
+    /* *L!
+    if ( x.getBytecode() == y.getBytecode() ) {
+      return true;
+    }
+    else {
+      return false;
+    }
+    */
+    return ( x.getBytecode() == y.getBytecode() );
+  }
+
+Once bytecode has been intern'd, all compatible classes have an object
+reference to exactly the same bytecode. If the bytecode is an exact match,
+it does not matter where the bytecode came from. An object can be copied
+from one process to another.
+
+4. Possibly, the worst way to convert a raw class file to java.lang.Class
+is by using the equivalent of an input stream. That's why the pure
+reflection API does not use an input stream to parse a bytecode. Again from
+the bottom up: (1) pure reflection comes before bytecode verification; (2)
+bytecode verification comes before a bytecode interpreter; and (3) a
+bytecode interpreter comes before a virtual machine.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000449.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000461.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#452">[ date ]</a>
+              <a href="thread.html#452">[ thread ]</a>
+              <a href="subject.html#452">[ subject ]</a>
+              <a href="author.html#452">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

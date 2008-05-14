@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [bytecode resource] Status report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000585.html">
+   <LINK REL="Next" HREF="000584.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [bytecode resource] Status report</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [bytecode resource] Status report">gchii@mindspring.com</A><BR>
+    <I>Mon, 15 May 2000 18:30:48 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000585.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+        <LI> Next message: <A HREF="000584.html">[JOS-Arch] [bytecode resource] Update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#586">[ date ]</a>
+              <a href="thread.html#586">[ thread ]</a>
+              <a href="subject.html#586">[ subject ]</a>
+              <a href="author.html#586">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 07:18 PM 5/15/00 -0200, &quot;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&quot; &lt;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&gt; wrote:
+&gt;<i>Ok, so you are only planning to put vm-specific classes in this image?
+</I>
+I'm planning to put &quot;boot&quot; classes inside this image. This includes some
+vm-specific classes and part of the standard class library. I do not intend
+to put all java.* and javax.* into the executable image.
+
+&gt;<i>Ok, there is a big difference between the vm-specific classes and the
+</I>&gt;<i>class library. The class library (including swing, database extensions etc
+</I>&gt;<i>etc) could run into multiple megabytes, in which case it would definitely
+</I>&gt;<i>not belong in that image.
+</I>
+I only wanted to provide one example of a virtual machine that conforms to
+the Java Virtual Machine Specification and yet does not find rt.jar through
+CLASSPATH.
+
+&gt;<i>I agree with you. The only problem is that you are wasting some space. You
+</I>&gt;<i>are keeping the bytecode in the image (which is loaded into memory), and
+</I>&gt;<i>then you are going to build the internal class structure (which will have
+</I>&gt;<i>a copy of the bytecode again, and the results of resolving the constant
+</I>&gt;<i>pool). The intial raw class data is going to stay in memory &quot;forever&quot; but
+</I>&gt;<i>it is only needed for a short period of time (at startup).
+</I>
+Again, the wasted space you mention doesn't exist (yet). Your idea of an
+internal class structure is obviously different than mine. Your idea of
+resolving the constant pool is obviously different than mine. Whenever the
+original can be used, the original should be used. Hopefully, the raw class
+data for boot classes will stay in memory because a virtual machine
+interprets the original opcodes, not a copy.
+
+A primordial class loader is an implementation of the findSystemClass()
+method of java.lang.ClassLoader. All of this is internal to a virtual machine.
+
+&gt;<i>I don't see where this is really an advantage. Once you you've loaded,
+</I>&gt;<i>linked and resolved a class you don't need the bytecode anymore. You can
+</I>&gt;<i>flag the actual method code to be interpreted as read-only anyway.
+</I>
+When a method is invoked, the Code attribute will be interpreted. It is
+still needed.
+
+Constants in a DATA segment are loaded as needed when an executable image
+is mapped by a virtual memory manager. It is easy for a VMM to discard a
+constant when it is no longer &quot;used&quot;.
+
+&gt;<i>I'm assuming the whole image gets loaded into memory before execution, and
+</I>&gt;<i>also stays there until parts get paged out. In this case it makes sense to
+</I>&gt;<i>have the image as small as possible.
+</I>
+The whole image does may not load completely before execution. A virtual
+memory manager can map an executable image. Then, constant data is loaded
+only through page faults.
+
+&gt;<i>This is a very elegant approach. Writing the file-system reader in Java
+</I>&gt;<i>(as opposed to C/C++) and having it available immediately on startup. 
+</I>&gt;<i>
+</I>&gt;<i>Another way of doing this would be to compile that file-system reader to
+</I>&gt;<i>native-code (assuming you have the tools to do this), and then just
+</I>&gt;<i>firing off that to load whatever is needed from disk to get the VM going.
+</I>
+Yes, it is a clean design. Whatever can be written in bytecode should be
+written in bytecode. This part must be written in bytecode because the file
+subsystem is a plug-in. Anyone can write a file subsystem. As long as it
+implements the well-known interfaces, it can work in this virtual machine.
+
+The start up sequence and boot classes provide a way to load the file
+subsystem plug-in. A file subsystem might be specified as a &quot;module&quot; in
+GRUB, instead of the boot classes.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000585.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+	<LI> Next message: <A HREF="000584.html">[JOS-Arch] [bytecode resource] Update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#586">[ date ]</a>
+              <a href="thread.html#586">[ thread ]</a>
+              <a href="subject.html#586">[ subject ]</a>
+              <a href="author.html#586">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

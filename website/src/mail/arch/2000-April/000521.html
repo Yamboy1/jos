@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000520.html">
+   <LINK REL="Next" HREF="000522.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">tmiller@haverford.edu</A><BR>
+    <I>Fri, 28 Apr 2000 21:40:14 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000520.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000522.html">[JOS-Arch] rheise.os-0.1.3 released.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#521">[ date ]</a>
+              <a href="thread.html#521">[ thread ]</a>
+              <a href="subject.html#521">[ subject ]</a>
+              <a href="author.html#521">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> The subtle difference -- the only one I've been able to find so far -- is
+</I>&gt;<i> how bytecode retains the original payload of a class file and a class
+</I>&gt;<i> definition does not. The slight difference is only an issue of how
+</I>&gt;<i> efficiently they can be intern'd, not semantics.
+</I>
+	There are -- I believe -- other efficiency benefits to class
+definitions, but I also can't come up with a reason why you couldn't wrap
+bytecode in the same interface as you do a class definition and have
+everything happen correctly.  It may be worthwhile at some point to write
+such a class and see; it would become painfully clear, as well, where
+efficiency gains could be made.  For instance, constant pool look up --
+which happens all the time -- doesn't lend itself to O(1) (constant-time)
+lookups, because the constants in the pool aren't the same size.  
+Converting (or maintaining) to a list of pointers to constant pool entries
+changes the algorithm from O(n) (linear-time search) to O(1), while
+increasing the space bound by n.  Given that our target platform is a PC,
+I think we can afford that.  Similar issues occur w.r.t. encoded values,
+especially UTF-8 to (wide) character strings.
+
+	There is analogy between a compressed zip archive of classfiles
+and the exploded directory tree, and the classfile and the class
+definition.
+
+-_Quinn
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000520.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000522.html">[JOS-Arch] rheise.os-0.1.3 released.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#521">[ date ]</a>
+              <a href="thread.html#521">[ thread ]</a>
+              <a href="subject.html#521">[ subject ]</a>
+              <a href="author.html#521">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

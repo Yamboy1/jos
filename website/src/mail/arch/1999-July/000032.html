@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] JOS: SmartAPI/Object Factory</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   
+   <LINK REL="Next" HREF="000033.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] JOS: SmartAPI/Object Factory</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] JOS: SmartAPI/Object Factory">gchii@mindspring.com</A><BR>
+    <I>Sun, 18 Jul 1999 14:14:40 -0400</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000033.html">[JOS-Arch] Design</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#32">[ date ]</a>
+              <a href="thread.html#32">[ thread ]</a>
+              <a href="subject.html#32">[ subject ]</a>
+              <a href="author.html#32">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>What is the difference between an object factory and a class factory?
+
+We have two fundamentally different factories. I am sorry if I am confused
+between the two. It is hard to keep them straight.
+
+The protocol for an object factory should be &quot;object:&quot;. An object factory
+creates objects. A class factory creates classes. An object factory creates
+any object derived from the java.lang.Object class.
+
+The protocol for a class factory should be &quot;class:&quot;. A class factory
+creates any object derived from the java.lang.Class class. If
+java.lang.Class is a final class, java.lang.Class is it; there can be no
+other kinds of objects created by the class factory.
+
+And here is the difficult part: A class factory can use an object factory
+because classes are a kind of object. But this is a circular reference.
+
+When I want an object, I should ask for an object:
+
+&lt;URL:object:?class=java.awt.Button&gt;
+
+When I want a class, I should ask for a class:
+
+&lt;URL:class:java.awt.Button&gt;
+
+The object returned from the class: protocol is always going to be an
+instance of java.lang.Class.
+
+When the object factory needs to create an object, it first needs to create
+a class. So the object factory uses the class factory.
+
+When I want a class, I should not ask for an object, right?
+
+&lt;URL:object:?class=java.lang.class+name=java.awt.Button&gt;
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000033.html">[JOS-Arch] Design</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#32">[ date ]</a>
+              <a href="thread.html#32">[ thread ]</a>
+              <a href="subject.html#32">[ subject ]</a>
+              <a href="author.html#32">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Admin] machine aliasing/progress</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000238.html">
+   <LINK REL="Next" HREF="000240.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Admin] machine aliasing/progress</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Admin] machine aliasing/progress">tmiller@haverford.edu</A><BR>
+    <I>Tue, 25 Apr 2000 18:54:33 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000238.html">[JOS-Admin] machine aliasing/progress</A></li>
+        <LI> Next message: <A HREF="000240.html">[JOS-Admin] machine aliasing/progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#239">[ date ]</a>
+              <a href="thread.html#239">[ thread ]</a>
+              <a href="subject.html#239">[ subject ]</a>
+              <a href="author.html#239">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> 1) it will suffer from the same problems that makes Helmut kick us 
+</I>&gt;<i> off every quarter or so... highly experimental code with long periods 
+</I>&gt;<i> of neglect.
+</I>&gt;<i> 2) tweaking and adjusting code running on SourceForge's http 
+</I>&gt;<i> server is a major pain (at least for me).  I can't use their ssh file 
+</I>&gt;<i> transfer program so I'd have to hand edit everything over ssh.
+</I>
+	scp doesn't work for you?  Strange.  (Are you using openssh?)  I'm
+not dead-set on running the wiki on SourceForge's servers, but my
+understanding was the experimental PHP wouldn't be as much a problem as
+experimental perl; the other advantage being, of course, that they take
+care of a good bit of the administration for us.  OTOH, since our wiki
+isn't getting an enourmous number of hits (that I'm aware of), clark's box
+would work just fine.
+
+&gt;<i> Why not point it at sourceforge and use their mailman setup?
+</I>
+	The jos-* prefixing means we'd have to do address aliasing if we
+don't want to change anything, and we lose continuity in the
+archives.  Helmut doesn't seem to mind mailman, so I don't see any reason
+to inconvenience ourselves to move it.
+
+&gt;<i> I like it.  True ftp sites like cdrom.com, download.com, or some 
+</I>&gt;<i> other personal sites can mirror our stuff for ftp functionality if it 
+</I>&gt;<i> becomes an issue.
+</I>
+	Very true.  Let's go with it, then.
+
+&gt;<i> I think this can either be cron job or simply ask someone to do this 
+</I>&gt;<i> as a weekly task.  Anyone with a CDR can burn quarterly copies 
+</I>&gt;<i> and archive it in a safe somewhere to be really paranoid.
+</I>
+	I've got one of those :)
+
+&gt;<i> So perhaps Todd better take it.  Or I guess we both can...  I would 
+</I>&gt;<i> anticipate the two of us could work together without problems.
+</I>
+	Ditto.  I'll be very busy for the next two weeks or so, then have
+a nice two-week vacation.  After that, I should have more free time.
+
+&gt;<i> Yeah, but can't we &quot;invisibly&quot; alias the lists?  So email to 
+</I>&gt;<i> <A HREF="mailto:admin@jos.org">admin@jos.org</A> goes to helmut's machine, gets automaticaly 
+</I>&gt;<i> forwarded to <A HREF="mailto:jos-admin@listst.sourceforge.net">jos-admin@listst.sourceforge.net</A> and hits the list 
+</I>&gt;<i> normally....
+</I>
+	*shrug*  Then we're still dependent on Helmut's machine being up,
+which defeats the point of migrating the lists to SourceForge.  (Although
+I guess we could always manually adjust our headers until his server came
+back up.)
+
+&gt;<i> It is not setup.  Helmut does not want MySQL on his machine (he 
+</I>&gt;<i> suggests we use a commercial db) and was highly opposed to 
+</I>&gt;<i> putting PHP on his machine as well.  I'd say any active pages of 
+</I>&gt;<i> any sort should be kept off Helmut's machine until they are 
+</I>&gt;<i> absolutely bulletproofed and coded in C.  We've killed his box and 
+</I>&gt;<i> pissed him off enough.
+</I>
+	This is probably very wise.  I'll just shut up now and go hack :)
+
+&gt;<i> The tarballs are posted automatically I think.  I'm still unconvinced 
+</I>&gt;<i> that we'll need a running backup of the CVS on another machine...  
+</I>&gt;<i> i think just storing tarball archives is enough.
+</I>
+	As long as we have a plan for setting one up if we need it.
+
+Summary?
+
+	current plan:
+
+cvs.jos.org -- at SourceForge
+wiki.jos.org -- at clark's box
+lists.jos.org -- at Helmut's box, which may redirect them to
+	SourceForge lists.  (awaiting commentary)
+ftp.jos.org -- unecessary for now.  Redirect to sourceforge anyway? (just
+	so something will be there)
+www.jos.org -- Helmut's machine
+
+	backups:
+
+cvs.jos.org -- none for now; could run on Clark's box.  keep CVS tarballs
+	archived to Clark's box with a cron job.
+wiki.jos.org -- none for now; me and Iain are discussing what to do with
+	the wiki -- if we get clark's box, running the enhydra application
+	server and doing the whole thing in Java.  We lean on SourceForge
+	(nicely!) to handle servelets when they get stable.
+lists.jos.org -- the other of whichever server ends up handling them
+	now, or Clark's box.
+ftp.jos.org -- since we don't really need it, none at all -- redirects
+	to ftp.cdrom.com (et al) if/when we ever do.
+www.jos.org -- SourceForge
+
+-_Quinn
+
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000238.html">[JOS-Admin] machine aliasing/progress</A></li>
+	<LI> Next message: <A HREF="000240.html">[JOS-Admin] machine aliasing/progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#239">[ date ]</a>
+              <a href="thread.html#239">[ thread ]</a>
+              <a href="subject.html#239">[ subject ]</a>
+              <a href="author.html#239">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

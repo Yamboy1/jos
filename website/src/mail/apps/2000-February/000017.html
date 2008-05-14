@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] RunEricApplication</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000016.html">
+   <LINK REL="Next" HREF="000015.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] RunEricApplication</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] RunEricApplication">gchii@mindspring.com</A><BR>
+    <I>Sun, 27 Feb 2000 18:16:44 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000016.html">[JOS-Apps] RunEricApplication</A></li>
+        <LI> Next message: <A HREF="000015.html">[JOS-Apps] Universal Browser</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#17">[ date ]</a>
+              <a href="thread.html#17">[ thread ]</a>
+              <a href="subject.html#17">[ subject ]</a>
+              <a href="author.html#17">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 01:01 PM 2/27/00 -0500, you wrote:
+&gt;&gt;<i> path=v
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> The path parameter identifies the package path. The v parameter is a
+</I>&gt;&gt;<i> semi-colon separated list of package directories.
+</I>&gt;<i>
+</I>&gt;<i>I would recommend using File.pathSeparator instead of hard-coding on
+</I>&gt;<i>semi-colon.  This would allow users of different platforms to do what feels
+</I>&gt;<i>natural.  This is of course assuming that you intend for the ERIC
+</I>applications
+&gt;<i>to be run on different platforms, and not just JOS.
+</I>
+Thank you for your direct observation. How compatible should a JOS
+application be with foreign operating systems? This is a complex issue.
+
+I like the mechanism HTML uses. No matter what platform you're on, an HTML
+page always uses the forward slash to separate the parts of a URL. That's
+one way to achieve platform independence.
+
+Typically, the path comes from an ERIC shortcut. An ERIC shortcut is
+binary-compatible across all Java-based platforms. You can copy an ERIC
+shortcut from JOS to Linux to Windows to a Mac. The shortcut itself remains
+the same. It work without modification.
+
+On the other hand, the semi-colon is more compatible with a foreign OS that
+already happens to use it. It might be easier for others to teach
+themselves how to manually edit a shortcut.
+
+I would much rather see a platform-independent tool that helps you create
+an ERIC shortcut. Such a GUI tool would not require you to know about the
+semi-colon. Alas, I am not a gifted GUI person. I haven't got a clue what
+an ERIC shortcut editor might look like.
+
+&gt;<i>Have you considerred using java system properties instead?
+</I>&gt;<i>
+</I>&gt;<i>Example: java -Deric.cache=cachev -Deric.path=pathv -Deric.shell=shellv
+</I>&gt;<i>-Deric.location=locationv RunEricApplication
+</I>&gt;<i>
+</I>&gt;<i>This would then allow these values to be accessible to any application
+</I>running
+&gt;<i>within the same VM.  Additionally, by creating a ~/.ericrc properties file,
+</I>&gt;<i>which could be parsed at startup, a user could be able to customize the ERIC
+</I>&gt;<i>suite to their own personal preferences.
+</I>
+From a foreign operating system, the eric tool uses a configuration file
+for system-wide settings and ERIC shortcut for localize, application
+specific settings. The eric tool uses JNI to create a virtual machine and
+invoke RunEricApplication.
+
+But, that's not the only way to invoke RunEricApplication. Once an
+application is running it can invoke another. Parameters are passed
+directly from a parent process to a child, without going through system
+properties.
+
+ERIC is leaning heavily toward a single virtual machine/multiple process
+idea. ERIC doesn't use system properties for the second and third
+application. With two or more applications running in a single virtual
+machine with only one class loader, system properties don't allow more than
+one instance of cache, path, shell and location.
+
+Thanks,
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000016.html">[JOS-Apps] RunEricApplication</A></li>
+	<LI> Next message: <A HREF="000015.html">[JOS-Apps] Universal Browser</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#17">[ date ]</a>
+              <a href="thread.html#17">[ thread ]</a>
+              <a href="subject.html#17">[ subject ]</a>
+              <a href="author.html#17">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,267 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] JOSCore and JOSExtensions (fwd)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000744.html">
+   <LINK REL="Next" HREF="000743.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] JOSCore and JOSExtensions (fwd)</H1>
+    <B>DigiGod</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] JOSCore and JOSExtensions (fwd)">digigod@earthling.net</A><BR>
+    <I>Fri, 16 Jun 2000 23:34:48 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000744.html">[JOS-Arch] Java-Linux</A></li>
+        <LI> Next message: <A HREF="000743.html">[JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I hope...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#742">[ date ]</a>
+              <a href="thread.html#742">[ thread ]</a>
+              <a href="subject.html#742">[ subject ]</a>
+              <a href="author.html#742">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> JOSCore is probably a issue of distribution, rather than namespace. How
+</I>&gt;<i> much must be distributed in order to say that it is JOS? or JOS-compatible?
+</I>
+To me, JOSCore isn't a matter of distribution or namespace it is an idea
+and no more. It is the abstract, simple form of JOS: the bare minimum of
+bytes required to fill the definition of &quot;JOS&quot; in the literal OS sense.
+JOSCore isn't much of an OS, what it is is the platform on which the
+various, compatible, JOS platforms are built upon. JOSCore requires
+/some/ JOSExtensions before it can be an OS in the traditional sense.
+All distributions of JOS are going to be various mixtures of JOSCore,
+JOSExtensions and Applications each targeted to a different market,
+i.e.: DeskJOS, JOServer, MicroJOS, etc. JOSCore isn't just bytecode,
+it's also the kernel and the VM of the JOSBox (although many JOSBox
+components are JOSCore, some qualify as extensions) it is also some of
+the more abstract mechanisms of JOSystem (the mechanisms mechanisms,
+probably not the most efficient design but its the easiest, most
+balanced way to produce the desired flexibility.) JOSCore is the
+bootstrap, the metamechanisms (and the statically linked default
+implementation: necessary bloat) JOSExtensions are built on this either
+by implementing a solution or adding an extra level of gradation or
+abstraction (i.e.: the file system abstraction -- a JOSExtension that is
+a port for extension itself, an extensible extension)
+ 
+&gt;<i> Very little is absolutely required. A file subsystem is not required. A
+</I>&gt;<i> protocol stack is not required. Process management is not required. A
+</I>&gt;<i> kernel and virtual machine, linked together statically, might be a
+</I>&gt;<i> JOS-compatible operating system.
+</I>
+JOSCore is the abstractions abstractions, the meta-abstractions for
+loading the file subsystem and the process manager and all the stuff
+that makes the JOS, well, usable. The goal of JOSCore is to /ideally/
+make all of the various incarnations of JOS JOS-compatible (practically
+you'd, of course, hit support walls like this app requires this resource
+or this library and what not) which is why I think we should reserve the
+term &quot;JOS-compatible&quot; for something else entirely, something we wont
+create (except as a stepping-stone to JOS.)
+ 
+&gt;<i> JOS is a computer operating system, not limited to a IBM PC-compatible
+</I>&gt;<i> computer. Why? Because JOS is so scaleable that, at the small end, it can
+</I>&gt;<i> fit in ROM on an embedded or consumer device. It can fit inside a IDE, SCSI
+</I>&gt;<i> or CD-ROM drive. It can fit inside a 104-key keyboard, a monitor or mouse.
+</I>&gt;<i> It can fit in a cell phone. It can fit inside ISA, PCI or PCMCIA card. JOS
+</I>&gt;<i> can be small enough that an entire TCP/IP protocol stack can be implemented
+</I>&gt;<i> /inside/ of a network interface card. The smallest JOS enables programmers
+</I>&gt;<i> to write their smallest devices in a processor-independent way.
+</I>&gt;<i> 
+</I>&gt;<i> 1. None of these consumer devices need a file subsystem.
+</I>&gt;<i> 
+</I>&gt;<i> 2. JOS is ROM-able; classes that are used in a specific application should
+</I>&gt;<i> be added to a ROM image.
+</I>&gt;<i> 
+</I>&gt;<i> JOS is so scaleable that, at the big end, it can fit inside a personal
+</I>&gt;<i> computer, mini-computer, mainframe or supercomputer. It can fit inside a
+</I>&gt;<i> server farm or computer cluster.
+</I>
+exactly.
+ 
+&gt;<i> JOSystem is a kernel and virtual machine. A virtual machine on the low end
+</I>&gt;<i> is functionally equivalent to a virtual machine on the high end. Of course,
+</I>&gt;<i> a virtual machine on the high end might have greater optimization and
+</I>&gt;<i> virtual memory management.
+</I>
+JOSBox is the kernel+VM, JOSystem is the higher level junk like the
+process manager and the installation/update/uninstall
+framework/library/manager and things of that ilk.
+ 
+&gt;<i> &gt;Does JOSCore needs the Java API, or the JAva API needs JOSCore?
+</I>&gt;<i> 
+</I>&gt;<i> JOSCore does not depend on the Java API; Java API does not depend JOSCore.
+</I>&gt;<i> JOSCore is a concern when distributing JOSystem. We encourage you to
+</I>&gt;<i> distribute only the packages an application uses. When an application
+</I>&gt;<i> requires the entire Java 2 standard class library, distribute the entire
+</I>&gt;<i> Java 2 standard class library. You might put the entire Java API and
+</I>&gt;<i> JOSCore into your distribution. When your application requires only a few
+</I>&gt;<i> packages from the Java 0 standard class library, distribute only the
+</I>&gt;<i> packages it uses. You might put java.lang, java.util and java.io and
+</I>&gt;<i> JOSCore into your distribution.
+</I>&gt;<i> 
+</I>&gt;<i> I wish I had concrete examples to use. It might be easier to understand
+</I>&gt;<i> with examples taken from experience. JOS is going to be a little confusing
+</I>&gt;<i> and uncertain until someone implements a consumer device. Except, I don't
+</I>&gt;<i> know of any consumer device that uses the JOS architecture.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;I mean how can you program JOSCore in Java, if you can't use the API?
+</I>&gt;<i> 
+</I>&gt;<i> A team of programmers have been working on JOS for a few years. They write
+</I>&gt;<i> programs using off-the-shelf virtual machines from a variety of vendors. In
+</I>&gt;<i> the experimental programs that have been written, programmers use
+</I>&gt;<i> everything from the Java API. These experimental programs are not yet
+</I>&gt;<i> concerned with the real cost to a consumer device of using a class from an
+</I>&gt;<i> non-essential API.
+</I>&gt;<i> 
+</I>&gt;<i> If you have a project with a a 34MB ROM image and 32MB or 64MB ROMs, you
+</I>&gt;<i> might like to know if you could eliminate any non-essential classes from
+</I>&gt;<i> your ROM image. If you find a package that you really do not have to
+</I>&gt;<i> include, you can remove it and ship with 32MB ROMs. (Assuming 32MB ROMs are
+</I>&gt;<i> less expensive than 64MB ROMs.)
+</I>&gt;<i> 
+</I>&gt;<i> &gt;Can you produce bytecode without the Java API?
+</I>&gt;<i> 
+</I>&gt;<i> When you write your own virtual machine, you can do anything. In theory,
+</I>&gt;<i> you /can/ produce bytecode without the Java API. The Java API is not
+</I>&gt;<i> required at &quot;compile-time&quot;. Bytecode can be assembled with a Java assembler
+</I>&gt;<i> like Jasmin.
+</I>&gt;<i> 
+</I>&gt;<i> In theory, you can create more special-case objects like java.lang.Object.
+</I>&gt;<i> In the Alt Package project, I've been working on alt.lang.Object as a new
+</I>&gt;<i> anchor for alternative packages. If I write a virtual machine, it does not
+</I>&gt;<i> have to be compatible with the Java Virtual Machine Specification.
+</I>&gt;<i> 
+</I>&gt;<i> In practice, this is a research project. It helps clarify what can and
+</I>&gt;<i> cannot be done in a Java Virtual Machine. When you write a Java Virtual
+</I>&gt;<i> Machine, you must follow one of the Java Virtual Machine Specifications.
+</I>&gt;<i> 
+</I>&gt;<i> The JOS Project aims to implement the Java Virtual Machine Specification as
+</I>&gt;<i> much as possible. We want to build a host for standard Java applications.
+</I>&gt;<i> We must extend the specification where it does not provide for things we
+</I>&gt;<i> need, like a bytecode native interface and multiple primordial class
+</I>&gt;<i> loaders. Being practical, we would like very much to extend the
+</I>&gt;<i> specification a little as possible.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;It's just a little confusing...
+</I>&gt;<i> 
+</I>&gt;<i> Yes, it is confusing. JOSystem and JOSBox should be revisited in the
+</I>&gt;<i> architecture discussion.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;So you also don't need JOSExtensions (they are superfulous). But what
+</I>&gt;<i> &gt;could be in Extensions? Maybe a web server? Or is such an application
+</I>&gt;<i> &gt;running on top of the Java API, as a user program?
+</I>&gt;<i> 
+</I>&gt;<i> JOS extensions might include a file subsystem, protocol stack, process
+</I>&gt;<i> manager and things like these. Likely, a web server is an application, not
+</I>&gt;<i> an extension. A device manager might be an extension, too.
+</I>
+a web server and a device manager are both borderline cases, the most
+efficient way to implement them might be to have the bulk of the code as
+an OS extension with a configuration/manager application. That is
+somewhat off the point.
+ 
+&gt;<i> &gt;And JOSCore is not org.jos.core.*, but org.jos.core.* is in JOSCore, isn't
+</I>&gt;<i> &gt;it? Can a service run on JOSCore (just bytecode) w/o the Java API?
+</I>&gt;<i> 
+</I>&gt;<i> No, JOSCore is not org.jos.core. It is unfortunate that two completely
+</I>&gt;<i> different things were accidentally given similar names. For a while, I
+</I>&gt;<i> mistakenly thought they were the same. They sound the same, don't they?
+</I>&gt;<i> 
+</I>&gt;<i> JOSCore is not limited to a single package. Meanwhile, org.jos.core
+</I>&gt;<i> namespace should not be reused.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;Why do you compare the JOSCore (or org.jos.core.*) to sun.* or
+</I>&gt;<i> &gt;netscape.*. I thing these are just some libraries, writen as JNI,to serve
+</I>&gt;<i> &gt;the Java API of Sun / Netscape. But they are writen in C / C++, and are
+</I>&gt;<i> &gt;native code, not bytecode. How do you thing, you can create something in
+</I>&gt;<i> &gt;bytecode to serve the JOS Java API? Or better, I can thing of JOSCore
+</I>&gt;<i> &gt;being in bytecode, but _HOW_ do you create this bytecode (tell me a java
+</I>&gt;<i> &gt;program to produce bytecode without using a 
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;class yzx {
+</I>&gt;<i> &gt;} 
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;statment. Since Class is a subclass of Object, and Object is defined in
+</I>&gt;<i> &gt;the Java API, how can you program the JOSCore without the java API?
+</I>&gt;<i> 
+</I>&gt;<i> Today, I am working on the assumption that java.lang, java.util, java.io
+</I>&gt;<i> and java.net are statically linked to a virtual machine. Instead of adding
+</I>&gt;<i> these boot packages to an archive file, such as classes.zip or rt.jar, they
+</I>&gt;<i> are part of the virtual machine executable image.
+</I>&gt;<i> 
+</I>&gt;<i> The rest of the JOS/Java API is a radically different matter. From this I
+</I>&gt;<i> mean that I split the Java standard class libraries into two parts: boot
+</I>&gt;<i> and system packages. Boot packages depend on the virtual machine. The JOS
+</I>&gt;<i> platform API depends on boot packages. JOS applications depend on JOS API
+</I>&gt;<i> and boot packages. The Java standard class library depends on JOS API and
+</I>&gt;<i> boot packages. Java applications depend on the Java standard class library.
+</I>&gt;<i> 
+</I>&gt;<i> Since boot packages includes java.lang, there doesn't seem to be a problem.
+</I>&gt;<i> 
+</I>&gt;<i> Sun Microsystems' definition of &quot;core&quot; packages does not coincide with
+</I>&gt;<i> mine. Sun puts a lot of unnecessary stuff in the &quot;core&quot; packages. They have
+</I>&gt;<i> turned Java 2 into an exclusively server-side platform.
+</I>&gt;<i> 
+</I>&gt;<i> Even something as popular as a file subsystem is unnecessary on a consumer
+</I>&gt;<i> device. A file subsystem is optional. If a file subsystem is implemented in
+</I>&gt;<i> a JOS machine, it must be compatible with the JOS Platform API. If it is
+</I>&gt;<i> not implemented, it does not have to be (re)distributed.
+</I>
+Conflicts like this need to be resolved before JOS can be considered,
+well, JOS.
+
+I hope this message makes sense, I've had plenty of time to crystallize
+my thoughts but I haven't put much effort into attempting to communicate
+the said crystallization. I'll try to do some work on that over the
+weekend as its a problem that crops up every now and then which is way
+to much for me.
+
+Cheers,
+DigiGod
+_____________________________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_____________________________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_____________________________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+
+O-
+
+_____________________________________________
+NetZero - Defenders of the Free World
+Click here for FREE Internet Access and Email
+<A HREF="http://www.netzero.net/download/index.html">http://www.netzero.net/download/index.html</A>
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000744.html">[JOS-Arch] Java-Linux</A></li>
+	<LI> Next message: <A HREF="000743.html">[JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I hope...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#742">[ date ]</a>
+              <a href="thread.html#742">[ thread ]</a>
+              <a href="subject.html#742">[ subject ]</a>
+              <a href="author.html#742">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

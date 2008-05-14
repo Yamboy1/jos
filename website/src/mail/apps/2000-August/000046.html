@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [dd] Opening /dev/fd0 on Linux</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000044.html">
+   <LINK REL="Next" HREF="000047.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [dd] Opening /dev/fd0 on Linux</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [dd] Opening /dev/fd0 on Linux">gchii@mindspring.com</A><BR>
+    <I>Wed, 09 Aug 2000 13:19:04 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000044.html">[JOS-Apps] [dd] Opening /dev/fd0 on Linux</A></li>
+        <LI> Next message: <A HREF="000047.html">[JOS-Apps] [bulkmake] New release 2b-2</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#46">[ date ]</a>
+              <a href="thread.html#46">[ thread ]</a>
+              <a href="subject.html#46">[ subject ]</a>
+              <a href="author.html#46">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I can create an Etherboot boot disk with the cat command. I assume I can
+create a GRUB boot disk with the cat command, too. And if cat is capable of
+creating a boot disk, an OutputStream should be.
+
+When I use an OutputStream, bytes are written to the floppy. But the floppy
+won't boot. The boot sector does not contain the required data. I am logged
+in as root.
+
+I should be verifying the output to the floppy disk. The cmp command is new
+to me. Thanks to Peter Schuller. I'll use it to verify a GRUB boot disk
+that works and then the boot disk created by my Java program.
+
+# cmp /dev/fd0 stage1
+
+If I create grub.image, like this:
+
+# cat stage1 stage2 &gt; grub.image
+
+then I should be able to do something like this:
+
+# cat grub.image /dev/fd0
+# cmp /dev/fd0 grub.image
+
+I've re-written BootDiskProgram to read from /dev/fd0 after writing. If the
+method writes /and/ verifies, this would mean -- oops! -- there has been a
+bug inside loadStage1() or loadStage2() all along.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000044.html">[JOS-Apps] [dd] Opening /dev/fd0 on Linux</A></li>
+	<LI> Next message: <A HREF="000047.html">[JOS-Apps] [bulkmake] New release 2b-2</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#46">[ date ]</a>
+              <a href="thread.html#46">[ thread ]</a>
+              <a href="subject.html#46">[ subject ]</a>
+              <a href="author.html#46">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

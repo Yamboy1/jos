@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] RE: [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000048.html">
+   <LINK REL="Next" HREF="000054.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] RE: [JOS-UI] peer-ui mappings</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] RE: [JOS-UI] peer-ui mappings">digigod@earthling.net</A><BR>
+    <I>Sat, 24 Jul 1999 23:33:17 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000048.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000054.html">[JOS-Arch] Re: Java Versions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#49">[ date ]</a>
+              <a href="thread.html#49">[ thread ]</a>
+              <a href="subject.html#49">[ subject ]</a>
+              <a href="author.html#49">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i>         Just a note: while you can't get around using java.lang.* (at
+</I>&gt;<i> least, not without your own rather oddly written compiler), decaf
+</I>&gt;<i> shouldn't have any problems supporting more than one instance of those
+</I>&gt;<i> classes distributed over multiple processes, thought the native calls
+</I>&gt;<i> could get quite messy.
+</I>
+ugh, that would take up more memorty then Id like to think. its a good
+start mind you, but we could create a &quot;multiprocess aware&quot; java.lang
+(changing nothing of course) that is maintained by the master process
+(the kernel) and accesed by all its children.
+ 
+&gt;<i>         Another note: it's rather important to bear in my the distinction
+</I>&gt;<i> between the java language and the java platform.  The problem is that Sun
+</I>&gt;<i> doesn't keep this distinction terribly sharp... JOS is its own platform.
+</I>&gt;<i> The question standing before us is: should we make JOS a superset of the
+</I>&gt;<i> Java platform, or should we ignore the Java platform so far as possible
+</I>&gt;<i> and write a jBCS* module up later?
+</I>&gt;<i> 
+</I>&gt;<i> * jBCS: the notional equivalent of Linux's (et al) intel Binary
+</I>&gt;<i> Compatiblity System.
+</I>
+Im not entirely clear of what this would mean but Im guessing more
+native code then Id like anyone to have to port to all the
+machine-platforms Id like us to support (people on macs should be able
+to use it too) and its just going to confuse the issue more anyway
+ 
+&gt;<i>         There are important ramifications.  (Warning: the previous was an
+</I>&gt;<i> understatement of epic proportions.  You may wish to adjust your scale of
+</I>&gt;<i> thinking. :))  The first one that comes to *my* mind is the question of
+</I>&gt;<i> difficulty: would it be substantially more difficult to write jBCS modules
+</I>&gt;<i> for a system that may or may not substantially resemble Sun's Java
+</I>&gt;<i> platform(s) than it would be to write a superset of Sun's Java platform
+</I>&gt;<i> (pick one) that has a mysterious way of running what amounts
+</I>&gt;<i> incompabitbile binaries?  The initial response in my mind is: the Right
+</I>&gt;<i> Way to write such a superset would be with jBCS modules.  Therefore, the
+</I>&gt;<i> difficulties come down to which notional JOS platform (our own, or some
+</I>&gt;<i> superset) would be more amenable to jBCS modules.
+</I>&gt;<i> 
+</I>&gt;<i>         [ Sidebar: an application of the jBCS modules, if they really do
+</I>&gt;<i> need to end up modifying the way in which certain bytecodes are executed,
+</I>&gt;<i> and that this is done well, would be automagic support the binfmt_* idea
+</I>&gt;<i> from linux.  This would include things like _perl, _tcltk, _javascript,
+</I>&gt;<i> and so on.  At any rate... ]
+</I>
+its not my area, but Im going to say superset (+ a line to sun telling
+them they should put it in Java anyway)
+ 
+&gt;<i>         It might be worthwhile to investigate how the WINE project is
+</I>&gt;<i> handling its Win3.1/Win95/Win98 problems, which amount to almost the same
+</I>&gt;<i> thing: the platform (i386) is the same, but with large differences in the
+</I>&gt;<i> libraries, and (perhaps) subtle differences in the way that the libraries
+</I>&gt;<i> are understood (by the applications.)
+</I>
+WINE?
+ 
+&gt;<i>         As for modifying classpath to support processes, I'm very
+</I>&gt;<i> sincerely hoping we won't have to do much at all.  Since spawning
+</I>&gt;<i> processes would have to be handled by a separate library (jos.core.proc?)
+</I>&gt;<i> anyway, we should be able to do all the slight-of-hand necessary behind
+</I>&gt;<i> closed doors, so to speak, and thus not fork classpath, which has enough
+</I>&gt;<i> to do already.
+</I>
+jos.process?
+
+someone should change the subject on this thread, this doesnt sound like
+peer-ui mapping to me ;)
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000048.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000054.html">[JOS-Arch] Re: Java Versions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#49">[ date ]</a>
+              <a href="thread.html#49">[ thread ]</a>
+              <a href="subject.html#49">[ subject ]</a>
+              <a href="author.html#49">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

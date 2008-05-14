@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS] Re: [JOS-Arch] Re: [JOS] Concerning the registry...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000070.html">
+   <LINK REL="Next" HREF="000071.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS] Re: [JOS-Arch] Re: [JOS] Concerning the registry...</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS] Re: [JOS-Arch] Re: [JOS] Concerning the registry...">al@outworld.org</A><BR>
+    <I>Tue, 08 Jun 1999 11:47:58 +0300</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000070.html">[JOS] Concerning the registry...</A></li>
+        <LI> Next message: <A HREF="000071.html">[JOS] IRC Meeting - June 1999</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#72">[ date ]</a>
+              <a href="thread.html#72">[ thread ]</a>
+              <a href="subject.html#72">[ subject ]</a>
+              <a href="author.html#72">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ryan Heise wrote:
+
+&gt;<i> Speaking of registries, could you please explain how they would be used?
+</I>&gt;<i> When an application is installed, does it put entries in a global system
+</I>&gt;<i> registry? If so, how do you ensure that those entries are deleted when I
+</I>&gt;<i> remove the software from my system? (for instances, if I just delete the
+</I>&gt;<i> sofware directory)
+</I>
+
+My implementation of a registry has nothing to do with the JOS system's
+behaviour overall. That is, I am not supplying an
+installation/deinstallation API with the registry, I am just making a
+distributed (RMI), OO registry, that looks a lot like an inverted tree
+file system, and can do things like move, replace, merge, retain, link,
+update from remote, etc..
+
+The registry is under org.jos.registry (I also made a Wiki page!) and
+can be used by any application. If the JOS system decides to use a
+central registry (instead of a temp directory), then applications
+written for JOS will probably be able to write to a global registry. The
+good thing with the registry is that it runs as a server, and it also
+has replication capabilities (working on them now), which means that it
+assists in the development of a truly distributed JOS system.
+
+I've also included a lot of functionality in the addressing mechanism of
+the registry. That is, to access an entry, you do something like this:
+
+Address address = new Address(&quot;//dir/dir/dir/entry&quot;);
+
+This address object though could have a URI pointing to a specific RMI
+registry on any system, so functions like:
+
+registry.copy(local_address, remote_address)
+
+would have the registry copy entries from a registry in any part of the
+world...
+
+I will also start working on the security of the registry, which will
+work in a way similar to Java's security overall - that is, a CodeBase
+object is the group, a Class is the user, etc.
+
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+___________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: <A HREF="http://www.outworld.org/people/al/]">http://www.outworld.org/people/al/]</A> [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000070.html">[JOS] Concerning the registry...</A></li>
+	<LI> Next message: <A HREF="000071.html">[JOS] IRC Meeting - June 1999</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#72">[ date ]</a>
+              <a href="thread.html#72">[ thread ]</a>
+              <a href="subject.html#72">[ subject ]</a>
+              <a href="author.html#72">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Static fields/object sharing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000696.html">
+   <LINK REL="Next" HREF="000699.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Static fields/object sharing</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Static fields/object sharing">tmiller@haverford.edu</A><BR>
+    <I>Tue, 30 May 2000 18:43:13 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000696.html">[JOS-Arch] Static fields/object sharing</A></li>
+        <LI> Next message: <A HREF="000699.html">[JOS-Arch] Object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#698">[ date ]</a>
+              <a href="thread.html#698">[ thread ]</a>
+              <a href="subject.html#698">[ subject ]</a>
+              <a href="author.html#698">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> A protocol stack needs a mechanism of shared data.
+</I>
+	Strictly speaking, you only a need IPC, not shared data.  (Unless
+I'm accidentally/incorrectly conflating shared data and shared memory.)  
+Message-passing will work just fine.  (In the work I've been doing,
+message passing is usually the preferred API for data concurrency because
+it can be implemented very efficiently for 'inside the box' computing, and
+translates very cleanly to the network model for 'outside the box'
+computing.  It is, however, more work than data sharing.)
+
+&gt;<i> Data sharing (shared memory) is easy. Object sharing is not so easy.
+</I>
+	From the programmers P.O.V., I must disagree entirely.  I would
+find it much easier to share an object than write de/serialization methods
+for it.  If I'm making good use of OOP, I'm working with objects, not
+data.
+
+&gt;<i> Objects can be shared by proxy. A proxy mechanism reduces the puzzle
+</I>&gt;<i> to data sharing again.
+</I>
+	What happens if we generate a JavaObject on the share, as if a
+'new' instruction were executed, but with its instance variable pointer
+the same as the shared object's?  Clearly, the proxy would automatically
+synchronize with the shared object.  The type safety of each JVM is
+guaranteed because neither JVM uses the other's class(es).  (Though their
+definitions/bytecode may be shared.)  The only requirement imposed by
+sharing instance data is that the two classes have identical fields in
+identical locations; otherwise, the JVM's behavior will be erroneous.
+
+	We could then consider ensuring 'correct' behavior across the two
+processes the domain of library or application code.  (However one might
+ensure that the classes (methods) loaded by two different process are the
+same; the API is still indeterminate/undecided.)  This would include
+ensuring 'proper' parent classes.
+
+	Two questions remain.  First, what about objects whose fields are
+in turn objects?  Second, what about statics?
+
+	Shared objects must recurse if they are to be transparent.  
+Before an operation can be performed with or on an object, its reference
+must be pushed onto the operand stack.  This provides an opportunity to
+check if that reference is inside the current process.  (That is, if it
+has the same (primordial) classloader as the method's class.)  If it's
+not, we execute an implicit share.  (Yes, this means our security model
+can't be as tight as would be otherwise, since this share must succeed.)  
+Otherwise, since objects and (these) proxies are indistinguishable, we
+just carry on.
+
+	This does, however, mean that the proxy will be accessing the
+statics within its process.  We may be able to work around this; I wanted
+to get the idea out and checked for big gaping holes before I spent too
+much time on it.  The key thing that makes this look like a good idea may
+be that it's less restrictive than the object sharing we had been
+discussing, but less objectionable than an explicity proxy approach.
+
+	Gilbert, if you've been advocating an implicit proxy approach, my
+apologies.  It would, however, make your positions on what to do more
+clear (and convincing) if they included how to do, as well.
+
+-_Quinn
+
+* By which I mean, once the object is acquired, it behaves identically to
+a non-shared object.
+
+** RMI uses by-value rather than by-reference parameter
+passing; additional exceptions are defined for RMI method invocations; RMI
+only works for interfaces; and there are limitations on remote objects
+passed as arguments to an RMI invocation.
+
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000696.html">[JOS-Arch] Static fields/object sharing</A></li>
+	<LI> Next message: <A HREF="000699.html">[JOS-Arch] Object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#698">[ date ]</a>
+              <a href="thread.html#698">[ thread ]</a>
+              <a href="subject.html#698">[ subject ]</a>
+              <a href="author.html#698">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

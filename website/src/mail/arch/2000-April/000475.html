@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os questions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000474.html">
+   <LINK REL="Next" HREF="000476.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os questions</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] rheise.os questions">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 19 Apr 2000 15:56:35 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000474.html">[JOS-Arch] rheise.os questions</A></li>
+        <LI> Next message: <A HREF="000476.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#475">[ date ]</a>
+              <a href="thread.html#475">[ thread ]</a>
+              <a href="subject.html#475">[ subject ]</a>
+              <a href="author.html#475">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> ( Not entirely on topic -- the Blackdown 1.1.8 JDK doesn't come with
+</I>&gt;<i> Swing, does it? )
+</I>
+I don't think so. Swing is an add-on for JDK 1.1, whereas it is a part
+of JDK 1.2.
+
+&gt;<i>         Clarification: the SystemObjects argument to createProcess is the
+</I>&gt;<i> set of statics in java.lang.System that must be replaced from process to
+</I>&gt;<i> process, right?
+</I>
+Correct. Sort of like the optional envp argument to exec() on UNIX.
+
+&gt;<i>         In HostInit, why are you generating an instance and then
+</I>&gt;<i> immediately resetting it to the corresponding static?  Does this have
+</I>&gt;<i> something to do with references/classloading?
+</I>
+No, that line is not necessary - it returns exactly the same instance in
+this case. The line is present just for the sake of consistency - the
+process manager is always obtained through the get() method before it is
+used. I can remove it if you think it's misleading (or maybe I could
+even put a comment in!!! :-)
+
+&gt;<i>         The 'nativ' stuff doesn't ever seem to touch System -- is this
+</I>&gt;<i> just not coded?  Or am I missing something?
+</I>
+No, it's incomplete because we have not yet written our JOS version of
+the System class. This native implementation of java.lang.System needs
+to provide a way to be initialised and I cannot initialise the System
+class in the new process unless I know how to initialise it. Since I
+wrote the java.lang.System class for the host implementation, I know how
+to initialise it.
+
+This is one of the things we need to do to hook up rheise.os to the JOS
+kernel. We need to grab CLASSPATH and add all the support it needs to
+work with JOS. Then we can modify NativeJavaProcess to make use of this
+support.
+
+&gt;<i>         Is this summary correct?  rheise.os needs two things from the
+</I>&gt;<i> native code before we can call it jos.os -- a completely empty classloader
+</I>&gt;<i> so that code can't call classes loaded in the primordial classloader and
+</I>&gt;<i> thereby bypass our rewriting of the statics;
+</I>
+This is how the NativeProcessClassLoader is at the moment. There are
+other native specific ProcessClassLoader issues which I'll need your
+help to solve:
+
+NativeJavaProcess.createClassLoader() should construct an instance of
+NativeProcessClassLoader, but what class loader should /it/ belong to?
+The class loader of the new process, or the class loader of the current
+process? If it should belong to the new process (that is where it will
+be referenced from the most), then we'll need some native code to set
+that up. In other words, NativeJavaProcess.createClassLoader() should be
+defined as a native method.
+
+And the same goes for NativeProcessManager.constructProcess() which
+should perhaps return a NativeJavaProcess that belongs to the new
+process's class loader. Since this is impossible (chicken and egg), we
+might provide a native call to assign the class loader to the process's
+class later on in the sequence (and maybe reuse this technique for
+assigning the class loader to the new class loader itself).
+
+Notice that if we do this, we are demonstrating the first use of
+inter-process object sharing. The calling process needs a reference to
+the process it is creating, and the program running in the new process
+will need to be able to reference itself too.
+
+Now, the alternative is to define processes so that their class loaders
+are not completely disjoint, but always share java.lang.Class,
+ClassLoader and Object so that the instance of the process's class
+loader can be shared between the calling process and the new process
+without any special JVM support. But we still need a way to share the
+JavaProcess instance. In the host implementation, I share the
+JavaProcess Class too, but the host implementation doesn't particularly
+care about doing this properly anyway.
+
+To consider the issues involved here, it helps to look at the
+ClassLoader.loadClass() method:
+
+	public Class loadClass(String name)
+		throws ClassNotFoundException;
+
+This method is returning an instance of java.lang.Class - the same
+java.lang.Class Class seems to be used by both class loaders meaning
+that in a standard JVM, class loaders can't be completely disjoint as
+well as being at all useful. With our JVM, which will support
+interprocess object sharing, this will be possible.
+
+&gt;<i> and the ability to correctly
+</I>&gt;<i> handle native calls wrapper classes don't have to be written for every
+</I>&gt;<i> static native method.
+</I>
+Native wrappers are only needed for the host implementation. The native
+implementation should allow native method invocations for any class
+loaded by any ProcessClassLoader. But this is more a responsibility of
+decaf than of rheise.os, so it's not really something rheise.os needs
+support before it can be considered renameable to jos.*.
+
+Of course, the native implementation of rheise.os isn't complete, but
+the structure is in place to support decaf/JJOS on one side, and the
+Java layer on the other side. It's a matter of deciding whether or not
+we want to use this as the structure to build around.
+
+&gt;<i>         Otherwise, I'm very impressed.
+</I>
+Likewise with decaf, which is like Jupiter to my Pluto :-)
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000474.html">[JOS-Arch] rheise.os questions</A></li>
+	<LI> Next message: <A HREF="000476.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#475">[ date ]</a>
+              <a href="thread.html#475">[ thread ]</a>
+              <a href="subject.html#475">[ subject ]</a>
+              <a href="author.html#475">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

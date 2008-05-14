@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Admin] (no subject)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000127.html">
+   <LINK REL="Next" HREF="000133.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Admin] (no subject)</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Admin] (no subject)">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Mon, 9 Aug 1999 15:34:33 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000127.html">[JOS-Admin] Wrong IP address</A></li>
+        <LI> Next message: <A HREF="000133.html">[JOS-Admin] SWAT Team</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#132">[ date ]</a>
+              <a href="thread.html#132">[ thread ]</a>
+              <a href="subject.html#132">[ subject ]</a>
+              <a href="author.html#132">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ok, here is what I have been able to determine:
+* A webbot has hit our site.  1200 of those &gt;1400 hits on August 2nd are
+from a single IP address.
+* That IP address hit each wiki page.  It hit each page with the 'view',
+'attach', 'edit', 'rdiff', and 'search' cgi scripts.  Why?  There are links
+to each of those scripts in each 'view' of a wiki page.
+* Of those five scripts, 'search' is extremely resource intensive.  The wiki
+page which has a form for using the search script has a warning to this
+effect.
+* In the ten minutes from 13:30 to 13:40, ~55 searches were done.  That also
+approximately how many were done in each ten minute increment in that hour
+before that. That is one every 11 seconds.  Searching for my WikiName takes
+40 seconds.  Thus, on average, there were 3 or 4 searches going on at all
+times.
+* Here is the current robots.txt file:
+	User-agent: *
+	Disallow: /wiki/edit/
+	Disallow: /wiki/save/
+	Disallow: /wiki/preview/
+* These searches weren't the only thing being asked of the server.  The
+searches only account for a small percentage of the hits on the jos.org
+server from that IP.  While the server was trying to do all of those
+searches, it was working on a bunch of less-intensive requests as well.
+*  The errors log for JOS starts two hours after the problem was stopped by
+Helmut.  Thus, I wasn't able to be sure exactly when the server restarts
+occurred.  Any idea why the data is missing Helmut?  Is it archived
+anywhere?
+
+I agree with Helmut that the 'view' script shouldn't be a problem.  It isn't
+doing anything processor intensive enough to cause those kinds of loads.
+The searches, though, seem to be the problem.
+
+Here is the solution I suggest:
+* Everything but the 'search' script can be turned back on without danger of
+problems or need for further discussion.  The 'search' script requires
+further discussion.
+* Add 
+	Disallow: /wiki/search/ 
+	Disallow: /wiki/rdiff/ 
+			
+	# Rover is a bad dog &lt;<A HREF="http://www.roverbot.com">http://www.roverbot.com</A>&gt;
+	User-agent: Roverbot
+	Disallow: /
+
+to the robots.txt file.  Well-behaved webbots will not call the search
+script.  The Rover stuff is from Yahoo's robots.txt.  We may want to add
+some combinations of upper/lower case in the URL's to disallow.  IBM's
+robots.txt does this.
+
+The 'search' script is a valuable tool for us, and I hate to see it go away.
+Here are a few things we can do to mitigate the risk of it being available
+to be abused by search engines while still having it available for JOS
+members to use:
+* Short Term:  Remove the 'Search on this topic' link from the bottom of
+every wiki page.  This way search engines won't have the URL's to do all of
+these searches hand given to them, as was the case this time.
+* Long Term:  Rewrite our searching such that it is pre-indexed.  If we had
+access to a database we could add all possible WikiNames from the files into
+the database, then when we do a search, we just do a SQL query instead of
+parsing *every* wiki file for every search.  When a wiki edit is saved, that
+page has its possible wiki links parsed into the database.
+		
+Regards,
+Avery J. Regier
+
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000127.html">[JOS-Admin] Wrong IP address</A></li>
+	<LI> Next message: <A HREF="000133.html">[JOS-Admin] SWAT Team</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#132">[ date ]</a>
+              <a href="thread.html#132">[ thread ]</a>
+              <a href="subject.html#132">[ subject ]</a>
+              <a href="author.html#132">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

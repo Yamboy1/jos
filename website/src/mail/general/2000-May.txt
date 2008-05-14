@@ -1,0 +1,145 @@
+From robfitz@geocities.com Wed, 10 May 2000 15:42:58 +0000 (UTC)
+Date: Wed, 10 May 2000 15:42:58 +0000 (UTC)
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS] JOS news on JavaLobby
+
+Hi all
+
+There seems to have been a post on JavaLobby yesterday
+<URL:http://www.javalobby.org/servlet/News?action=displayStories&xsl=comment.xsl&format=full&id=510100000000663>.  It's
+about the progress of the project, and the good news is that it is good
+news.  :)
+
+There is a request for an update about the project, i'm going to try and
+post something about this.  But it would be good if some of the other
+developers could post something want's going on, ie the move
+to sourceforge, multipule java process, etc.
+
+I've haven't been taken part in any of the discussions over the last few
+months, so don't leave this up to me. ;)
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+
+
+
+From ryan@whitewolf.com.au Thu, 11 May 2000 11:30:18 +1000 (EST)
+Date: Thu, 11 May 2000 11:30:18 +1000 (EST)
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS] Re: [JOS-Arch] JOS news on JavaLobby
+
+On Wed, 10 May 2000, Todd L. Miller wrote:
+
+> 	Likewise, Ryan should discuss SwingToolkit and rheise.os -- which
+> means it ought to have its new name soon, huh?
+
+Here's my write-up. It's a bit higher level than your bit. It starts off
+by talking about the basic architecture: kernel -> JVM -> Java layer.
+I've created my javalobby account so I can post it whenever (the sooner
+the better since our story is scrolling off the front page already).
+
+====
+
+In addition to Robert's introduction, I would like to give a brief
+overview of the parts of JOS which I have been working on. An important
+goal of JOS is to provide a highly efficient kernel so that most of the
+operating system code can be written in the Java language itself. I use
+the term kernel to refer collectively to the actual kernel and the JVM.
+Our JVM is written by _Quinn (Todd Miller) and is currently built on top
+of the JJOS kernel, written by John Morrison.
+
+My focus is on the Java layer of JOS which implements the user/security
+model and much of the process architecture, including inter-process
+communication. My research so far has mainly revolved around how to
+implement multiple processes, how to save memory when different
+processes are using the same class files (without violating the spec),
+and how to support inter-process communication using object sharing as a
+primitive. My original proposal, which is old but still relevant, is at:
+
+	http://www.progsoc.uts.edu.au/~rheise/jos/java_processes.txt
+
+_Quinn (a major participant in the brainstorming phase) will give a more
+up to date perspective on processes as it relates to his Virtual
+Machine.
+
+Since all people ask is "show me the code!", yes, I do have some code
+available. rheise.os (name change pending :-) is a multiple process Java
+execution environment designed to handle processes on top of _Quinn's
+JVM, but based on a flexible architecture that also supports execution
+on top of a standard JVM (to the extent that is possible). A screenshot
+of the next release is available at:
+
+	http://www.progsoc.uts.edu.au/~rheise/projects/rheise.os/rheise.os-0.1.4-pre1-screenshot.gif
+
+Yes, that's a pure Java window manager (replacement AWT Toolkit using
+Swing as its backend). I have not yet released the code to this version
+(wait 'till the weekend), but the current version is available at:
+
+	http://www.progsoc.uts.edu.au/~rheise/projects/rheise.os/
+
+Be warned that it is only known to work on JDK 1.1.x for Linux with
+Swing 1.1.x. If you notice anything not working in release 0.1.3,
+version 0.1.4 will be a vast improvement (for instance, SwingToolkit
+(the replacement AWT Toolkit) actually sort of works in 0.1.4, as
+demonstrated in the screenshot).
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+
+
+From clemens@informatik.tu-muenchen.de Thu, 11 May 2000 20:38:24 +0000
+Date: Thu, 11 May 2000 20:38:24 +0000
+From: Claudio Clemens clemens@informatik.tu-muenchen.de
+Subject: [JOS] What is JOS actually
+
+So I read already a lot, but seams not enought. From the FAQ and
+JOSWiki.Main.JOS there is
+1.Kernel
+2.JVM
+3.J API
+4.OS Services
+5.UI
+6.Utilities
+
+There is also a listing of some projects, whith _I_ think they are
+Kernel-JJOS
+JVM-decaf
+J API-Classpath
+OS Services- JOSCore
+UI-Jade
+Utilities-Jext and everything else.
+
+So now, what of this is JOS? Alltogether? Or just JOSCore? Or maybe
+classpath, joscore, an jade?
+
+Thanx for the support. I'm trying to write a digested report about JOS for
+my university, and I could translate that to be one of the introducings
+_missing_ tutorials. But for that I need your help. Hope to get some...
+
+Até
+
+Claudio
+
+-- 
++-----| http://linux.brasileiro.net - Seu site de informações |-----+
+|     Claudio Clemens at Home   -   Informatik   -   TU-München     |
+|         clemens@in.tum.de         http://www.in.tum.de/~clemens   |
+Digite algo para continuar ou outra tecla p/ abortar...
+
+
+
+
+

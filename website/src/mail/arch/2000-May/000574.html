@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] JOS news on JavaLobby</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000573.html">
+   <LINK REL="Next" HREF="000575.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] JOS news on JavaLobby</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] JOS news on JavaLobby">tmiller@haverford.edu</A><BR>
+    <I>Wed, 10 May 2000 18:11:43 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000573.html">[JOS-Arch] JOS news on JavaLobby</A></li>
+        <LI> Next message: <A HREF="000575.html">[JOS-Arch] JOS news on JavaLobby</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#574">[ date ]</a>
+              <a href="thread.html#574">[ thread ]</a>
+              <a href="subject.html#574">[ subject ]</a>
+              <a href="author.html#574">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Gilbert should discuss what he's been doing w.r.t. continous
+source releases and his new packages, because I don't really know much
+about them.
+
+	Likewise, Ryan should discuss SwingToolkit and rheise.os -- which
+means it ought to have its new name soon, huh?
+
+	I'll talk a little about multiple java processes and the move to
+SourceForge here.
+
+	Multi-processing is a necessity for a modern operating
+system.  Conventional JVMs and O/S's team up to run multiple java
+processes by running multiple JVMs.  This is not particularly
+efficient; the class library must be reloaded and stored separately for
+each JVM.  While it may be possible to write a JVM such that it could
+share class definitions between instances of itself, we have chosen to
+implement multiple Java processes in a single JVM.*
+
+	The idea is relatively straightforward, starting with the
+observation that processes are processes because they posses their own
+address space.  Typically, this is handled in the hardware MMU, which
+allows a program to poke at any virtaul memory address and have it
+transparently translated to the physical address.  In Java, because there
+are no (arbitrary) pointers, it is not necessary to involve the hardware;
+a given process can only point at things it already owns.  The two
+pictures are as follows: imagine a process as a transparency, with used
+memory being dots on it.  Normally, you have a stack of such
+transparencies, and the MMU shuffles them around so that the light from
+the projector passes through no more than one dot on its way to the screen
+-- the mapping of virtual to physical memory.  (Virtual memory/swap space
+adds a larger and slower light.)  Multiple Java processes in a single JVM
+-- that is, on a single sheet -- are possibly because the JVM can just
+tile the sheet with dots, as the processes can't ask for a dot in a random
+memory location; since there is only one sheet, we don't have to worry
+about contending for the light.  For more on this, please see
+<A HREF="http://www.metamech.com/wiki/view/Main/?topic=MultipleJavaProcesses.">http://www.metamech.com/wiki/view/Main/?topic=MultipleJavaProcesses.</A>
+
+
+* In part because our current kernel does not support native multitasking.
+
+
+	Our move to SourceForge is part of more general project, still
+underway, of reorganizing JOS's presence on the web.  Primarily, we're
+SourceForge for its cvs and cvsweb services, both of which were
+administrative headaches.  Once it's ready, we'll be adopting the sfWiki
+project and using it host our Wiki on SourceForge as well.  (Thanks to the
+kind folks at metamech for hosting it for so long!)  sfWiki uses PHP and
+MySQL, so we should be able to reactivate several features we had
+deactivated (searching among them) because they used too many resources
+with our current implementation for metamech to host them.  (IIRC, of
+course.)  We'll also be adding some aliases to simplify links to and
+within our website, and improve our ability to correct machine problems
+that may occur.  We want to roll out cvs.jos.org, lists.jos.org,
+ftp.jos.org, and wiki.jos.org sometime soon.
+
+-_Quinn
+
+
+
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000573.html">[JOS-Arch] JOS news on JavaLobby</A></li>
+	<LI> Next message: <A HREF="000575.html">[JOS-Arch] JOS news on JavaLobby</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#574">[ date ]</a>
+              <a href="thread.html#574">[ thread ]</a>
+              <a href="subject.html#574">[ subject ]</a>
+              <a href="author.html#574">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

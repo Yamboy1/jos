@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000514.html">
+   <LINK REL="Next" HREF="000519.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">gchii@mindspring.com</A><BR>
+    <I>Fri, 28 Apr 2000 08:59:17 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000514.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000519.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#517">[ date ]</a>
+              <a href="thread.html#517">[ thread ]</a>
+              <a href="subject.html#517">[ subject ]</a>
+              <a href="author.html#517">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 02:18 PM 4/27/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>	I just wrote some example code and realized something: the
+</I>&gt;<i>efficiency benefit I was considering is actually rather small, because you
+</I>&gt;<i>could code the instanceof/checkcast stuff to call a function to compare if
+</I>&gt;<i>two classes/interfaces are the same, like so:
+</I>&gt;<i>
+</I>&gt;<i>bool classEQ( dst, src ) {
+</I>&gt;<i>	if ( dst-&gt;classdefinition == src-&gt;classdefinition ) {
+</I>&gt;<i>		return true;
+</I>&gt;<i>		}
+</I>&gt;<i>	else if ( dst == src &amp;&amp; dst-&gt;classloader == src-&gt;classloader ) {
+</I>&gt;<i>		return true;
+</I>&gt;<i>		}
+</I>&gt;<i>	else {
+</I>&gt;<i>		return classEQ( dst-&gt;parentclass, src );
+</I>&gt;<i>		}
+</I>&gt;<i>	}
+</I>
+Exactly! Earlier, I offered an equivalent example in the Java programming
+language and used bytecode instead of class definition. Bytecode and class
+definition are the same thing.
+
+Class definitions (or bytecode) can be intern'd. If the primordial class
+loader is the only class loader that can intern a class definition,
+checking for equal class loaders is redundent. An object can be shared if
+its class definition is the same.
+
+bool classEQ( dst, src ) {
+	if ( dst-&gt;classdefinition == src-&gt;classdefinition ) {
+		return true;
+		}
+	else {
+		return classEQ( dst-&gt;parentclass, src );
+		}
+	}
+
+
+If a primordial class loader is written in bytecode, it needs to intern
+class definitions too. Any class definition could be intern'd by any class
+loader. If both primordial and custom class loaders can intern a class
+definition, an object can be shared if its class definition is the same.
+
+bool classEQ( dst, src ) {
+	if ( dst-&gt;classdefinition == src-&gt;classdefinition ) {
+		return true;
+		}
+	else {
+		return classEQ( dst-&gt;parentclass, src );
+		}
+	}
+
+If the Java standard class library is broken into two parts, boot packages
+and standard packages, only part of the standard class library will be
+loaded by a machine code class loader. Boot packages are loaded by a
+primordial class loader. Standard packages will be loaded by a custom class
+loader.
+
+I'm pretty sure I cannot make use of an operating system that exclusively
+intern's system classes. Most of the reusable classes in my applications
+are /not/ system classes. JEPS, JADE and JSDK and other javax.* packages
+are big; but, they are /not/ system classes. Even their class definitions
+should be intern'd.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000514.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000519.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#517">[ date ]</a>
+              <a href="thread.html#517">[ thread ]</a>
+              <a href="subject.html#517">[ subject ]</a>
+              <a href="author.html#517">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Out-of-sync w/ Source Code</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   
+   <LINK REL="Next" HREF="000267.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Out-of-sync w/ Source Code</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Out-of-sync w/ Source Code">gchii@mindspring.com</A><BR>
+    <I>Sat, 06 Nov 1999 09:34:11 -0500</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000267.html">[JOS-Arch] Out-of-sync w/ Source Code</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#266">[ date ]</a>
+              <a href="thread.html#266">[ thread ]</a>
+              <a href="subject.html#266">[ subject ]</a>
+              <a href="author.html#266">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>There are two things that snuck up on me and gave me a big surprise.
+
+1. The first thing is that my development process has not been able to
+guarantee all of the class files are up-to-date with their corresponding
+source code. I use make on a project-by-project basis. As a ritual, I make
+or rebuild a project at the end of a development session.
+
+While working on a bulk make program to compile all of the JOS Project
+source code, I wrote a program to scan all packages and show when
+out-of-sync class files. When a class file does not exist, it is
+out-of-sync. When source code was saved after the class file was compiled,
+it is out-of-sync.
+
+I make a few simple assumptions:
+
+(1) all .java files should be compiled;
+(2) all directories with .java files are packages
+
+What was the surprise? Many of my class files were out-of-sync even while I
+use a make program. It seems that some of my .java files aren't compile-able.
+
+The first program in bulk make showed me which packages needed to be made.
+I made the packages in the usual way, with make. Eventually, bulk make will
+call the javac tool when a class is out-of-sync.
+
+2. The second surprise is that I forgot to publish a few of the JOS Project
+packages. For example, the smartregistry1a package contains the connection
+between a registry and the Smart API. While I have been using the Smart API
+to fetch a registry in my own programs, I had the mistaken impression other
+programmers could, too.
+
+While working through the binary distribution of the Java-based part of the
+JOS Project, I found that there is a lot of source code that cannot be
+recompiled. While some packages depend on com.sun.java.swing.*, others
+depend on javax.swing.*. This concerns me. While I have voice my concern
+before, let me explain the impact of this on JOS architecture.
+
+1. JOS is an operating system. As an operating system, it is expected to be
+a general purpose mechanism to operate the computer. It must be able to
+launch and run with success any program written in Java, with few exceptions.
+
+2. The condition of the source code inside the JOS Project proves that Java
+is a hostile environment for open source projects. The purpose of an open
+source project is to demonstrate good code, working code. When we build an
+open source program that can't be compiled after 90 days, it proves that
+Java is a hostile environment for software that lasts.
+
+3. Fixing the source code which has already been collected by the JOS
+Project is going to be a monumental task. There are so many different
+things that this source code depends on.
+
+(a) Where is the Pizza compiler? The URL that I have doesn't work any more.
+Has it moved? Without the Pizza compiler, the FreeBuilder application for
+JOS cannot be compiled.
+
+(b) Where is the JOS development of the java.* packages?
+
+(c) What is the status of the FreeSwing project?
+
+My recommendation is this: We need to form a distribution group. It should
+be a special interest group under architecture (continuing to use the
+architecture mailing list).
+
+Should we drop FreeBuilder for JOS? When FreeBuilder for Java will run
+unchanged on JOS, does there need to be a JOS-specific release?
+
+The 'classfile' package is significant to the development of a virtual
+machine. And yet, there are major problems with the 'classfile' package as
+a pure reflection library. For example, the core components of the
+'classfile' package must not throw a ClassFormatError. Only a class file
+that is loaded for the purpose of running inside the virtual machine should
+&quot;throw&quot; an error.
+
+Do you know there are two org.jos.util packages? There are two packages
+with the same name and (fortunately) a different set of classes.
+
+In order to make the JOS worthwhile as an open source project, all its code
+must be compile-able on other programmer's machines. We should be able to
+demonstrate frequently how easy it is to download and recompile the whole
+collection of source code.
+
+Many people would prefer a binary distribution. I am working toward
+building a binary distribution to prove that the Java source code can be
+compiled and used in working Java programs.
+
+What will it take to reach this goal?
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000267.html">[JOS-Arch] Out-of-sync w/ Source Code</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#266">[ date ]</a>
+              <a href="thread.html#266">[ thread ]</a>
+              <a href="subject.html#266">[ subject ]</a>
+              <a href="author.html#266">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

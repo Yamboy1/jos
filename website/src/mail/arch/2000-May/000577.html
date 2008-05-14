@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000576.html">
+   <LINK REL="Next" HREF="000581.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">gchii@mindspring.com</A><BR>
+    <I>Thu, 11 May 2000 10:45:24 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000576.html">[JOS-Arch] JOS news on JavaLobby</A></li>
+        <LI> Next message: <A HREF="000581.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#577">[ date ]</a>
+              <a href="thread.html#577">[ thread ]</a>
+              <a href="subject.html#577">[ subject ]</a>
+              <a href="author.html#577">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 06:11 PM 5/10/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>	Multi-processing is a necessity for a modern operating
+</I>&gt;<i>system.  Conventional JVMs and O/S's team up to run multiple java
+</I>&gt;<i>processes by running multiple JVMs.  This is not particularly
+</I>&gt;<i>efficient; the class library must be reloaded and stored separately for
+</I>&gt;<i>each JVM.  While it may be possible to write a JVM such that it could
+</I>&gt;<i>share class definitions between instances of itself, we have chosen to
+</I>&gt;<i>implement multiple Java processes in a single JVM.*
+</I>
+What is the critical difference between JNI and MPCL? It is not the
+reloading of classes. It is not the sharing class definitions. It is not
+the implementing of multiple Java processes in a single machine code
+process. The critical difference between JNI and MPCL is this:
+
+1. JNI is supported by hundreds of organizations; MPCL is not. Both conform
+to the same Java Virtual Machine Specifications. Both manage multiple
+bytecode processes in a single machine code process.
+
+2. JNI automatically creates four threads per bytecode process; MPCL might
+create only three. The four threads are main thread, UI thread, garbage
+collection thread and finalizer thread. Of the four threads, only garbage
+collection thread is different. JNI creates a process-wide garbage
+collection thread. MPLC creates a vm-wide garbage collection thread.
+
+Otherwise, JNI and MPCL are the same.
+
+Efficiency is beyond the scope of the Java Virtual Machine Specification. A
+highly efficient virtual machine comes from the hard work of a virtual
+machine designer. There are already many highly efficient virtual machines
+using both the classic and JNI design.
+
+Some programmers have written a obviously poor implementation of
+ClassLoader.findSystemClass(). We can't dismiss the entire classic design
+just because of that. The greatest inefficiency of some virtual machines
+comes from their primordial class loader. The specification does not
+require a virtual machine to implement a inefficient primordial class
+loader. Any primordial class loader will do. A class loader could obtain
+all of its classes from bytecode as a resource. A class loader can obtain
+all of its classes through a dynamic shared library or a primordial class
+service. It does not need a local file subsystem. An efficient class loader
+does not need to keep track of where classes came from.
+
+No matter how fast it is, it still exists. Each new class must be loaded,
+verified and resolved. The creation, verification and resolution of classes
+cannot be removed successfully and maintain compatibility with the
+specification. Every virtual machine must create and resolve every class in
+the standard class library for every independent process. This step cannot
+be skipped, only made more efficient.
+
+A cache of platform-independent bytecode would make it more efficient. A
+cache of platform-dependent class definitions would make it more efficient.
+In the end, a virtual machine must create a unique class that is owned
+exclusively by a process. Even if that class is a proxy for some hidden
+component, it still exists and must be created. Even if a class is a shared
+object, it still exists and must be shared.
+
+Conventional JVMs use either a classic or JNI design. The classic design
+should not be confused with the JNI design. The primordial class loader in
+the classic design is not particularly efficient. For example, a poor
+implementation of CLASSPATH enables someone to run a virtual machine with
+the wrong standard class libraries. The virtual machine specification does
+not require this. You /can't/ get it wrong on IBM's JVM for OS/400.
+
+The JNI design is far more efficient. The JNI design enables many JVMs in a
+single machine code process. An highly efficient virtual machine for OS/400
+has been available from IBM for at least a year, maybe longer. IBM chose to
+implement multiple Java processes in a single JVM.
+
+Multiple primordial class loader is a research project. It is only a little
+different than the classic and JNI design. A MPCL-compatible virtual
+machine is an extension of the classic design, not JNI. It enables a
+virtual machine to run multiple bytecode processes by enabling multiple
+primordial class loaders. A combination of JNI and MPCL is possible.
+
+While a JNI-compatible design assumes at least four threads for each
+bytecode process, an MPCL-compatible design does not. With all four threads
+it becomes only slightly more efficient than JNI.
+
+Without three threads for each bytecode process, the MPCL is incompatible
+with the specification. Even MPCL needs a finalizer thread, so that the
+finalize() method runs in the correct bytecode process. You wouldn't want
+code in a finalize() method to run in some other process, would you?
+
+All three designs can be made more efficient with bytecode as a resource
+and/or a bytecode cache and/or a class definition cache. There is nothing
+inherent in MPCL that always makes it better than classic or JNI designs.
+
+Look at JNI. There is nothing inherent in multiple virtual machines that
+requires more than a single machine code process.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000576.html">[JOS-Arch] JOS news on JavaLobby</A></li>
+	<LI> Next message: <A HREF="000581.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#577">[ date ]</a>
+              <a href="thread.html#577">[ thread ]</a>
+              <a href="subject.html#577">[ subject ]</a>
+              <a href="author.html#577">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

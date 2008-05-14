@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [program] Runtime options</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000069.html">
+   <LINK REL="Next" HREF="000071.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [program] Runtime options</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [program] Runtime options">gchii@mindspring.com</A><BR>
+    <I>Mon, 21 Aug 2000 18:12:15 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000069.html">[JOS-Apps] [redirection] Request for program</A></li>
+        <LI> Next message: <A HREF="000071.html">[JOS-Apps] [Smart API] Release 10</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Together, the Smart API and Subprogram API provide a simple mechanism to
+describe the target program in a string, a uniform resource identifier. A
+string is easily passed on the command line to a java tool. A string is
+easily passed from client to server, from server to server. A string is
+easily stored in a log file or message queue. A string is easily stored in
+a desktop or shortcut file. Additional options, such as custom class loader
+and primordial class loader, can easily be supported in a uniform resource
+identifier. These are good reasons to use a &quot;primative&quot; string instead of
+an instance of some elaborate Java class.
+
+The Subprogram API is found in the org.jos.program2a package. By default,
+programs share a single class loader. When the same program is invoked
+multiple times, desireable things happen:
+
+- its classes are reused (loads very fast);
+- its static fields are available across invocations;
+- objects can be easily shared across multiple programs.
+
+A custom class loader is an option, too. When a program is invoked with a
+new class loader, desireable things happen:
+
+- its classes are loaded again (they may have changed)
+- its static fields are reset with each invocation;
+- objects can be shared across multiple programs.
+
+With an MPCL-compatible virtual machine, a new primordial class loader is
+an option. When a program is invoked this way, desirable things happen:
+
+- establish custom java.class.path (CLASSPATH);
+- &quot;system&quot; classes are loaded again (they may have changed);
+- static fields of system classes are reset;
+- its classes are loaded again;
+- its static fields are reset;
+- objects must be shared through normal IPC.
+
+A bytecode process is an option, too. When a program is invoked this way,
+desirable things happen:
+
+- creates a new process ID;
+- logon with another user account;
+- all files are closed automatically at exit;
+- establish custom java.class.path (CLASSPATH);
+- system classes are loaded again;
+- static fields of system classes are reset;
+- its classes are loaded again;
+- its static fields are reset;
+- objects must be shared through normal IPC.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000069.html">[JOS-Apps] [redirection] Request for program</A></li>
+	<LI> Next message: <A HREF="000071.html">[JOS-Apps] [Smart API] Release 10</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

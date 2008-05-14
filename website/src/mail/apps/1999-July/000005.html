@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] Application</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] Application</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Apps] Application">digigod@earthling.net</A><BR>
+    <I>Thu, 22 Jul 1999 16:36:33 -0700</I>
+    <P><UL>
+        
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#5">[ date ]</a>
+              <a href="thread.html#5">[ thread ]</a>
+              <a href="subject.html#5">[ subject ]</a>
+              <a href="author.html#5">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>public static void main(String args[]);
+
+I dont like typing that. I made a little workaround thats fully
+compatiable with Java that makes it a tad easier to write apps quickly,
+it has its drawbacks but Id say 90% of the time its easier. let the code
+speack for its self:
+
+/////////////
+package digigod.apps;
+
+import java.io.*;
+
+public abstract class Application {
+ private          String         arguments[];
+ private          BufferedReader reader      = null;
+ private          boolean        debug       = false;
+ protected static Application    app         = null;
+
+ public static void main(String args[]) {
+  if(app==null)
+   System.exit(255);
+  app.parseArgs(args);
+  app.appMain();
+ }
+
+ public int getArgsLength() {
+  return arguments.length;
+ }
+
+ public String getArg(int idx) {
+  return arguments[idx];
+ }
+
+ public String[] getArgs() {
+  return arguments;
+ }
+ 
+ public void exit() {
+  exit(0);
+ }
+
+ public void exit(int code) {
+  System.exit(code);
+ }
+
+ public boolean isDebug() {
+  return debug;
+ }
+
+ public void enableDebug(boolean b) {
+  debug = b;
+ }
+
+ public void print(String str) {
+  System.out.print(str);
+ }
+
+ public void println(String str) {
+  System.out.println(str);
+ }
+
+ public void printerr(String str) {
+  System.err.println(str);
+ }
+
+ public String readln() throws IOException {
+  if(reader==null)
+   reader = new BufferedReader(new InputStreamReader(System.in));
+  return reader.readLine();
+ }
+
+ public void debug(String str) {
+  if(debug)
+   System.out.println(str);
+ }
+
+ // only these methods below should be altered by a child, and only the
+first required to be
+ 
+ public abstract void appMain();
+
+ public void parseArgs(String args[]) { //can be overridden to add extra
+parsing functionality
+  arguments = args;
+ }
+ 
+ public String getApplicationInfo() {
+  return &quot;&quot;;
+ } 
+}
+/////////////
+
+ok, lets look at what we got here. the standard main function checks to
+see if there is an instance of app, if not it exits; this means
+subclasses (like the example below) need to create an instance of
+themselves in a static intilizer block. Subclasses, obviosly, also need
+to create the method public void appMain() (I couldnt think of anything
+better) this is where your code goes, notice that parsing is handled in
+parseArgs(String args[]) this lets you seperate that drudgery from your
+main method, if you want it could set class variables then in your main
+method if they were null to set them to the default (you should also
+notice there is nothing preventing one from parsing in the appMain
+method if one would like-to/need-to). other then all the required
+methods there are a handful of helper methods, these are just meant to
+make things easier and can be ignored. getApplicationInfo() is just like
+getAppletInfo() and can be ignored as well.
+
+here is an example: (which I didnt bother testing btw (it /looks/ like
+it'll work))
+
+/////////////
+public class TestApp extends Application {
+ static {
+  app = new TestApp();
+ }
+
+ public void appMain() {
+  print(&quot;hello cruel world&quot;);
+  try {
+   Thread.currentThread().wait(30000);
+  } catch(Exception e) {
+   if(isDebug())
+    e.printStackTrace();
+  }
+  print(&quot;goodbye cruel world&quot;);
+  exit();
+ }
+
+}
+/////////////
+
+Check this out:
+
+/////////////
+package digigod.apps;
+
+public abstract class JOSApplication extends Application {
+ public static void main(String args[]) {
+  if(System.getProperty(&quot;os.name&quot;).equals(&quot;JOS&quot;))
+   System.out.println(&quot;Requires JOS (www.jos.org)&quot;);
+  if(app==null)
+   System.exit(255);
+  app.parseArgs(args);
+  app.appMain();
+ }
+
+ //add methods for easy access to JOS specific things like registry
+access
+
+ public abstract void appMain();
+}
+/////////////
+
+its the same as Application but it'll quit if its not run on JOS (this
+should only be used if something really requires to be on JOS, otherwise
+Application should be used) when we have more JOS stuff easy access
+methods could easily be added to make it easier to interface with JOS,
+like:
+
+public void loadRegistry(String loc) throws IOException
+publiv String getProccessName()
+
+et al.
+
+---
+
+This is 100% compatiable with the standard Java way, it does mean the
+main class cant subclass anything but Application, but since subclassing
+Application isnt required it doesnt really matter, its only meant to
+make things easy. Also Ive always thought it bad form to put your main
+in a subclass of [J]Frame, but maybe thats just me....
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#5">[ date ]</a>
+              <a href="thread.html#5">[ thread ]</a>
+              <a href="subject.html#5">[ subject ]</a>
+              <a href="author.html#5">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

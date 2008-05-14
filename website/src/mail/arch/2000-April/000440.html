@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000430.html">
+   <LINK REL="Next" HREF="000428.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">gchii@mindspring.com</A><BR>
+    <I>Sat, 08 Apr 2000 11:42:49 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000430.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000428.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#440">[ date ]</a>
+              <a href="thread.html#440">[ thread ]</a>
+              <a href="subject.html#440">[ subject ]</a>
+              <a href="author.html#440">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 01:02 AM 4/8/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;&gt;<i> 1. It needs no native calls.
+</I>&gt;<i>
+</I>&gt;<i>	Well, Runtime.exec() does, but I do see your point.  A
+</I>&gt;<i>JOS-specific way would allow finer-grained control, so it would be worth
+</I>&gt;<i>doing.
+</I>
+With a custom implementation of java.lang.Runtime and a simple shell,
+jJOS/decaf could enable us to type in an arbitrary class name to run a
+class as a process.
+
+Most virtual machines run on top of a foreign operating system. That's why
+it is popular to implement the Runtime.exec() method as a native method.
+
+JOS is not like most virtual machines. The Java Virtual Machine
+specification does not require exec() to be native. It only requires exec()
+to be defined with a compatible signature. All four of these signatures
+would be acceptable:
+
+public java.lang.Process exec( String[] cmd, String[] env );
+public synchronized java.lang.Process exec( String[] cmd, String[] env );
+public native java.lang.Process exec( String[] cmd, String[] env );
+public native synchronized java.lang.Process exec( String[] cmd, String[]
+env );
+
+JavaDoc pages give programmers the wrong impression. It is defective when
+it incorporates the native attribute in documentation of an API.
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000430.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000428.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#440">[ date ]</a>
+              <a href="thread.html#440">[ thread ]</a>
+              <a href="subject.html#440">[ subject ]</a>
+              <a href="author.html#440">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

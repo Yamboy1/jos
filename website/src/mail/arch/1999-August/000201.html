@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Source-Doc vs. JavaDoc</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000221.html">
+   <LINK REL="Next" HREF="000202.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Source-Doc vs. JavaDoc</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Source-Doc vs. JavaDoc">gchii@mindspring.com</A><BR>
+    <I>Thu, 19 Aug 1999 16:00:51 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000221.html">[JOS-Arch] GSI</A></li>
+        <LI> Next message: <A HREF="000202.html">[JOS-Arch] Re: PrettyPrint</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#201">[ date ]</a>
+              <a href="thread.html#201">[ thread ]</a>
+              <a href="subject.html#201">[ subject ]</a>
+              <a href="author.html#201">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>You want to know how that method is implemented? Click once and you'll know.
+
+Source-Doc will have a radically different architecture from JavaDoc.
+Source-Doc assumes you are writing for an open source project and want
+everyone to see the source code. Source-Doc will be powerful enough to
+provide source code and documentation to 100,000+ packages. It will
+provides multiple-level index for packages, fields, methods, interfaces and
+classes.
+
+Source-Doc is based on an idea of *any* progamming language should have
+cross-reference documentation. It works for Java. It will work for C/C++.
+
+JavaDoc only works with Java, not the C/C++ code you write for native
+methods. JavaDoc architecture is a dead end. It works only in snap-shot
+mode, where all packages must be passed on the command line. It creates
+static HTML files and writes them to disk. Ugh.
+
+Source-Doc has the potential to *execute* any class. Do you want to see
+what that Java Bean looks like? Click once and you'll know.
+
+Source-Doc is based on three loosely-coupled components:
+ - syntax highlighter
+ - pretty printer
+ - document tool
+
+The syntax highlighter will provide color syntax highlighting for any
+programming language. How do you do that? Each language must have a unique
+file extension. The file extension is used as a key into a
+registry-compatible keyword file:
+
+// keyword.ini
+[extension]
+c
+cpp
+java
+
+[java]
+if
+goto
+return
+
+[c]
+if
+goto
+return
+
+[cpp]
+if
+goto
+return
+
+The pretty printer is responsible for two things: width and style. The
+width required by a client agent is variable, so it must be passed as a
+parameter to the pretty printer. The style required by an end-user is
+variable, so it must also be passed as a parameter. With this pretty
+printer, everybody can see the code in the style they prefer, not the style
+preferred by the author. The pretty printer does not do syntax highlighting.
+
+// prettyprint.ini
+[styles]
+k&amp;r
+jos
+
+[k&amp;r]
+braceonseparateline=true
+
+[jos]
+braceonseparateline=true
+
+Sometimes you want to see the documentation, not the source code. The
+documentor extracts the document-compatible comments from the source code,
+similar to JavaDoc.
+
+But, there is a huge and powerful difference. The documentor is not a huge
+batch process. It documents one source file at a time.
+
+When Source-Doc is implemented as a servlet, the original source code
+should be stored in an archive file. That's it. The source code is
+automatically highlighted and pretty-printed dynamically by the servlet
+without storing temporary files. Each request can choose a different width
+and style. The source code is read-only.
+
+What about dynamic JavaDoc? The servlet extracts documentation as the
+servlet is used. It maintains a cross-reference index to all the source
+code that has been read. When the servlet &quot;sees&quot; a source file for the
+first time, it extracts the documentation to a cache. The cache enables the
+servlet to generate an index of packages, methods, fields, interfaces and
+classes efficiently.
+
+In other words, you write the source code. Source-Doc automatically does
+the rest. This is the perfect companion to an open source project. Both the
+&quot;JavaDoc&quot; and source code are cross-referenced.
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000221.html">[JOS-Arch] GSI</A></li>
+	<LI> Next message: <A HREF="000202.html">[JOS-Arch] Re: PrettyPrint</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#201">[ date ]</a>
+              <a href="thread.html#201">[ thread ]</a>
+              <a href="subject.html#201">[ subject ]</a>
+              <a href="author.html#201">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

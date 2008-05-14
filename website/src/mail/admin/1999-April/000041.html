@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Admin] Re: The jos web site</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ajregier%40earthlink.net">
+   <LINK REL="Previous"  HREF="000039.html">
+   <LINK REL="Next" HREF="000042.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Admin] Re: The jos web site</H1>
+    <B>Avery J. Regier</B> 
+    <A HREF="mailto:ajregier%40earthlink.net"
+       TITLE="[JOS-Admin] Re: The jos web site">ajregier@earthlink.net</A><BR>
+    <I>Fri, 2 Apr 1999 14:42:37 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000039.html">[JOS-Admin] Re: The jos web site</A></li>
+        <LI> Next message: <A HREF="000042.html">[JOS-Admin] Re: The jos web site</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#41">[ date ]</a>
+              <a href="thread.html#41">[ thread ]</a>
+              <a href="subject.html#41">[ subject ]</a>
+              <a href="author.html#41">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Helmut,
+
+&gt;<i>Well, show me !
+</I>&gt;<i>WE use Java, but so far all JOS is noticed for is for putting extremely
+</I>&gt;<i>disproportionate loads on the server with archaic relics like PERL and.
+</I>&gt;<i>Python. Just look at TOP next time you go in with telnet. You don't see 
+</I>the
+&gt;<i>sites that use Java, SSI, XXSSI and SHTML to process a thousand dynamic
+</I>&gt;<i>multimedia pages per hour lingering on TOP. Their processes just zip right
+</I>&gt;<i>through. The only ones that are lingering are  your &quot;view&quot;, your &quot;python&quot;,
+</I>&gt;<i>etc.
+</I>&gt;<i>
+</I>&gt;<i>I had hoped we would be learning from you,  that you would contribute
+</I>&gt;<i>something new and better, or at the very least come up with a decent 
+</I>applet
+&gt;<i>now and then.
+</I>
+You have a chance to learn from us.  You're not taking it.  There have been 
+repeated requests for servlets by various people within the JOS project 
+over the course of time.
+
+Here are some of the reasons why you haven't been learning from us:
+* PERL and Python are not the core competencies of the majority of JOS 
+members.  By nature, Java is.  It is of no surprise to me that some of the 
+tools we have built to support what we are trying to accomplish are poor 
+performers.  There have only been a few people who knew those languages and 
+technologies well enough to write those tools, and some of those people did 
+not stay with the project or got too busy to support the tools and make 
+improvements anymore.  We don't necessarily have people to take up the 
+slack because the core competency of our members is Java.
+* We haven't had much need for writing client side Java.  For those things 
+which we do need (such as the Chat applet) they required server-side 
+processes.  I don't know what the server portion of the Chat applet was 
+written in, but it certainly didn't stay running for long.  There isn't 
+much that people will be willing to do for the client-side Java piece if it 
+can't be used anyways.  Instead we have reverted to tried and true IRC.
+
+I work for an international, fortune 500 (at least) company and was the 
+technical person who spearheaded bringing servlets into our computing 
+environment and tested, recommended, implemented, and supported the servlet 
+runner.  It took a little bleeding to get the bugs worked out, but that 
+didn't take long.  Now the servlet applications we have are the most stable 
+and well behaving on the whole.  They are fast because a new process does 
+not have to be created for every hit like CGI.  Not only that but because 
+of their architecture, the only cost to starting execution of a normal 
+servlet hit is to create a new thread (depending on the servlet runner, 
+some of them even pool the threads).  We have been amazed at how many 
+applications we could fit onto one NT box.  (We had thought the limit of 
+manageability would be about ten per box, but we have already tripled that 
+with more to come.  The overhead on that box is not from the servlets, but 
+from our choice to have each application (each of which can be a rather 
+large number of servlets) in a seperate web server instance.  The web 
+servers are taking up far more memory than the well-writtten servlets.)  If 
+that can be done on a Windows machine, imagine what we can do on a Unix 
+box!
+
+Granted, we do have a very stable JIT compiler for our platform.  I don't 
+know what the status is of JIT compilers for the platform JOS is on (I'm 
+not even sure what that is.)  If there is no JIT compiler for the platform, 
+then we may be better off just waiting to go the servlet route until there 
+is a good one.  You can expect a 10X performance gain over plain 
+interpreted.
+
+Your apparent perception that servlets are not being used cannot be farther 
+from the truth.   They are being used all over the place and far more than 
+applets anymore.  It is kind of hard to see because they are all server 
+side, and there are many ways of masking their tell-tale sign in the URL.
+
+Servlets can and do have some drawbacks.  They are not good for everything, 
+and a good deal of what it sounds like you do they are not likely better 
+for.  There are, for instance, some problems with having to embed HTML in 
+your servlet code.  There are ways around this obstacle such as creating 
+reusable frameworks and tools for this purpose, such as many devlelopers 
+have done at my company.  There are also technologies such as page 
+compilation and JSP to help with that too.  However, the flexibility and 
+performance you gain over other technologies makes that pain worthwhile for 
+many a project.  Also, if you have a stupid developer, you can have memory 
+problems with servlets, but that is just like any other technology.
+
+If the JOS members are given the ability to develop the JOS site with the 
+technology that is their core competency, you will quite likely start 
+seeing some very interesting things come out of the project which will be 
+of a help to you.  I wouldn't expect much too fast, because site 
+development is not our primary focus.  Writing an operating system is.  We 
+will write the tools that are necessary for us to better communicate to 
+help us reach that goal.  If you decide that it isn't worh it, then we will 
+make do with what we have.
+
+We are appreciative of what you have contributed to us and the support you 
+give us.  I'm going to try and get back to studying Todd's code now...
+
+Thanks,
+Avery J. Regier
+
+-----Original Message-----
+From:	Helmut [SMTP:<A HREF="mailto:DearWebby@webby.com">DearWebby@webby.com</A>]
+Sent:	Friday, April 02, 1999 5:19 AM
+To:	Ryan Heise
+Cc:	<A HREF="mailto:shigeoka@ukans.edu">shigeoka@ukans.edu</A>; Regier Avery J; <A HREF="mailto:admin@jos.org">admin@jos.org</A>
+Subject:	Re: [JOS-Admin] Re: The jos web site
+
+At 01:41 AM 10/18/98 , Ryan Heise wrote:
+&gt;<i>Helmut wrote:
+</I>&gt;<i>
+</I>&gt;&gt;<i> Anything that is better or faster or easier than what we currently use,
+</I>&gt;&gt;<i> will be eagerly and quickly installed.
+</I>
+&gt;<i>The obvious reason to go with Java, though, is that we can be sure to
+</I>&gt;<i>find a Java programmer to write any code that is required :-) {{ This
+</I>&gt;<i>being a Java project and all }}
+</I>&gt;<i>Ryan Heise
+</I>
+Well, show me !
+WE use Java, but so far all JOS is noticed for is for putting extremely
+disproportionate loads on the server with archaic relics like PERL and
+Python. Just look at TOP next time you go in with telnet. You don't see the
+sites that use Java, SSI, XXSSI and SHTML to process a thousand dynamic
+multimedia pages per hour lingering on TOP. Their processes just zip right
+through. The only ones that are lingering are  your &quot;view&quot;, your &quot;python&quot;,
+etc.
+
+I had hoped we would be learning from you,  that you would contribute
+something new and better, or at the very least come up with a decent applet
+now and then.
+
+If you can &quot;write any code that is required&quot;, SHOW me on that example I
+mentioned:
+
+<A HREF="http://hicards.com">http://hicards.com</A>
+Between all of you you should be able to come up with at least one tiny
+little token improvement !
+
+
+btw. The Cardmasters Spring World Championship has
+started and YOU are one of the judges who determines
+who the new World Champion is. Your voting booth is at
+
+<A HREF="http://cards.webby.com">http://cards.webby.com</A>
+So, check out the competitors and make your opinion count. Thanks for 
+voting !
+
+DearWebby
+(Helmut)
+------------------------------------------------------------------------  
+----
+------
+Webby, Inc  Web Marketing and high traffic web hosting
+Internet postcards and other effective marketing software
+
+_______________________________________________
+Admin maillist  -  <A HREF="mailto:Admin@jos.org">Admin@jos.org</A>
+<A HREF="http://jos.org/mailman/listinfo/admin">http://jos.org/mailman/listinfo/admin</A>
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000039.html">[JOS-Admin] Re: The jos web site</A></li>
+	<LI> Next message: <A HREF="000042.html">[JOS-Admin] Re: The jos web site</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#41">[ date ]</a>
+              <a href="thread.html#41">[ thread ]</a>
+              <a href="subject.html#41">[ subject ]</a>
+              <a href="author.html#41">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,281 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Admin] SWAT Team</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000124.html">
+   <LINK REL="Next" HREF="000128.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Admin] SWAT Team</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Admin] SWAT Team">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Thu, 5 Aug 1999 07:43:46 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000124.html">[JOS-Admin] SWAT Team</A></li>
+        <LI> Next message: <A HREF="000128.html">[JOS-Admin] SWAT Team</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#125">[ date ]</a>
+              <a href="thread.html#125">[ thread ]</a>
+              <a href="subject.html#125">[ subject ]</a>
+              <a href="author.html#125">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Helmut,
+
+If you will tell me at what time all of this happenned, It might help us
+figure out *what* happenned.  Thank you for the detail on exactly how you
+went about stopping the problem.
+
+The webbot doesn't have to be intentially malicious, just stupid.  It
+doesn't take much code anymore for a person to create a simple web bot that
+will open, say 20 or more threads each getting an URL over the network and
+parsing to find more URL's.  If they don't bother to parse the robots.txt
+file, there is nothing to stop them from doing that.  The wiki's 'view'
+script essentially does nothing but parse a text file into HTML.  This takes
+a bit of processing time for each request.  If a web bot was hitting the
+wiki with that much concurrency, it is possible to run up processor
+utilization that high.
+
+I did a quick check yesterday of the jos-access.log file.  By day the number
+of entries in the file were approximately:
+01 Aug:   ~5000
+02 Aug: ~15000
+03 Aug   ~4000
+04 Aug   ~3000
+
+Did this problem occur on the second of august, machine time?  If so, it is
+quite possible this problem was driven by outside hits to the wiki.  Again,
+knowing the exact date and time when all of this happenned is the first step
+towards ruling anything out.  If it was instead a loop in the wiki, I would
+then be able to narrow down what wiki page may have started such a loop.
+
+Regards,
+Avery J. Regier
+
+
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Dear Webby [SMTP:<A HREF="mailto:DearWebby@webby.com">DearWebby@webby.com</A>]
+</I>&gt;<i> Sent:	Wednesday, August 04, 1999 6:42 PM
+</I>&gt;<i> To:	Regier Avery J
+</I>&gt;<i> Subject:	RE: [JOS-Admin] SWAT Team
+</I>&gt;<i> 
+</I>&gt;<i> Hi Avery
+</I>&gt;<i> If Wiki is so wide open that web-bots can execute scripts, then you got a
+</I>&gt;<i> huge security problem and should rethink the whole set-up. However, I
+</I>&gt;<i> think
+</I>&gt;<i> that is highly unlikely. To set up a malicious web-bot to accomplish what
+</I>&gt;<i> it did, would require a lot more inside knowledge of how your wiki is set
+</I>&gt;<i> up than anybody in the current membership seems to have.
+</I>&gt;<i> 
+</I>&gt;<i> Btw., the CHMOD did not FIX the problem. It stopped the overload due to
+</I>&gt;<i> calls coming out of wiki. I have no clue about whether that load was due
+</I>&gt;<i> to
+</I>&gt;<i> a wiki malfunction or due to malicious abuse by somebody entering the wiki
+</I>&gt;<i> through it's own web interface. 
+</I>&gt;<i> 
+</I>&gt;<i> When restarting Apache did not stop that nonsense, that stuff was CHMODed
+</I>&gt;<i> and apache restarted again.  No problem since then.
+</I>&gt;<i> 
+</I>&gt;<i> That is why you first have to identify what happened inside wiki and tell
+</I>&gt;<i> us what steps you have taken to prevent that before we can allow it to run
+</I>&gt;<i> again.
+</I>&gt;<i> 
+</I>&gt;<i> Helmut
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> At 02:10 PM 8/4/99 Wednesday , you wrote:
+</I>&gt;<i> &gt;Helmut,
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;In order to do a log analyses, it would be helpful to know the exact (or
+</I>&gt;<i> at
+</I>&gt;<i> &gt;least as close as you can get) date and times that the problem occurred.
+</I>&gt;<i> I
+</I>&gt;<i> &gt;find it interesting that you solved the immediate resource problem
+</I>&gt;<i> initially
+</I>&gt;<i> &gt;by changing the permissions on the file.  If it were an infinite loop,
+</I>&gt;<i> such
+</I>&gt;<i> &gt;a change would not have stopped the problem, because the process would
+</I>&gt;<i> &gt;already be running in memory.  You would have to do a 'kill' to stop it
+</I>&gt;<i> in
+</I>&gt;<i> &gt;that situation.  That the CHMOD fixed the problem says that the script
+</I>&gt;<i> was
+</I>&gt;<i> &gt;being called repeatedly.  To my knowledge, no other scripts call the
+</I>&gt;<i> 'view'
+</I>&gt;<i> &gt;and 'search' scripts.  If this is true, then it most likely was an
+</I>&gt;<i> outside
+</I>&gt;<i> &gt;entity calling one of those scripts repeatedly, such as an ill-behaved
+</I>&gt;<i> &gt;web-bot.  If this is the problem, then the best we could do is to make
+</I>&gt;<i> sure
+</I>&gt;<i> &gt;the robots.txt file is up-to-date.  If a web-bot ignores that, there is
+</I>&gt;<i> &gt;nothing that we can do.  Anyways, knowing the date and time will help us
+</I>&gt;<i> to
+</I>&gt;<i> &gt;know if this is the case in short order.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;Feel free to poke holes in my logic.  :)
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;Thanks,
+</I>&gt;<i> &gt;Avery J. Regier
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;&gt; -----Original Message-----
+</I>&gt;<i> &gt;&gt; From:	Dear Webby [SMTP:<A HREF="mailto:DearWebby@webby.com">DearWebby@webby.com</A>]
+</I>&gt;<i> &gt;&gt; Sent:	Wednesday, August 04, 1999 4:34 PM
+</I>&gt;<i> &gt;&gt; To:	Regier Avery J
+</I>&gt;<i> &gt;&gt; Cc:	<A HREF="mailto:admin@jos.org">admin@jos.org</A>
+</I>&gt;<i> &gt;&gt; Subject:	RE: [JOS-Admin] SWAT Team
+</I>&gt;<i> &gt;&gt; 
+</I>&gt;<i> &gt;&gt; You should do more than just move a problem.
+</I>&gt;<i> &gt;&gt; If a script is malfunctioning so badly that it runs a Spark20 with dual
+</I>&gt;<i> &gt;&gt; processors and 256 MB of RAM up to a load of 107, just moving that
+</I>&gt;<i> &gt;&gt; malfunction is not likely to help you. It will just repeat the
+</I>&gt;<i> malfunction
+</I>&gt;<i> &gt;&gt; or attack-invitation at the new location.
+</I>&gt;<i> &gt;&gt; 
+</I>&gt;<i> &gt;&gt; I don't know if some member deliberately or accidentally tried to smoke
+</I>&gt;<i> a
+</I>&gt;<i> &gt;&gt; server, or if a bug in Wiki put it into a loop that hogged processes
+</I>&gt;<i> &gt;&gt; without releasing them. All we know is that Wiki drove the server load
+</I>&gt;<i> to
+</I>&gt;<i> &gt;&gt; 107, and when Wiki was CHMODed to READ-ONLY, the load instantly dropped
+</I>&gt;<i> to
+</I>&gt;<i> &gt;&gt; below 1  (1= normal load).
+</I>&gt;<i> &gt;&gt; 
+</I>&gt;<i> &gt;&gt; As I mentioned to Clark a few days ago, until 
+</I>&gt;<i> &gt;&gt; 1) the CAUSE of that problem has been found, identified, 
+</I>&gt;<i> &gt;&gt; and 
+</I>&gt;<i> &gt;&gt; 2) steps taken to guarantee that there won't be a repeat, 
+</I>&gt;<i> &gt;&gt; we can not risk a repeat of that.
+</I>&gt;<i> &gt;&gt; 
+</I>&gt;<i> &gt;&gt; Just like we would lock the executables of any other site that was
+</I>&gt;<i> running
+</I>&gt;<i> &gt;&gt; amok and preventing YOU from operating normally, the same thing applies
+</I>&gt;<i> to
+</I>&gt;<i> &gt;&gt; JOS.
+</I>&gt;<i> &gt;&gt; 
+</I>&gt;<i> &gt;&gt; Helmut
+</I>&gt;<i> &gt;&gt; 
+</I>&gt;<i> &gt;&gt; 
+</I>&gt;<i> &gt;&gt; At 07:05 AM 8/4/99 Wednesday , you wrote:
+</I>&gt;<i> &gt;&gt; &gt;Gilbert, 
+</I>&gt;<i> &gt;&gt; &gt;
+</I>&gt;<i> &gt;&gt; &gt;You are exactly right, the wiki is not running because the execute
+</I>&gt;<i> &gt;&gt; &gt;permissions on the view and search scripts have been taken away, and
+</I>&gt;<i> the
+</I>&gt;<i> &gt;&gt; &gt;ownership of the script is now 'root'.  Helmut did this because the
+</I>&gt;<i> wiki
+</I>&gt;<i> &gt;&gt; &gt;apparently was taking 100% of the CPU on a box that is shared with
+</I>&gt;<i> other
+</I>&gt;<i> &gt;&gt; web
+</I>&gt;<i> &gt;&gt; &gt;sites.  He does not want to risk this happening again.  Therefore, in
+</I>&gt;<i> &gt;&gt; order
+</I>&gt;<i> &gt;&gt; &gt;to get the wiki operational, we must move it to another box.
+</I>&gt;<i> &gt;&gt; &gt;
+</I>&gt;<i> &gt;&gt; &gt;Regards,
+</I>&gt;<i> &gt;&gt; &gt;Avery J. Regier
+</I>&gt;<i> &gt;&gt; &gt;
+</I>&gt;<i> &gt;&gt; &gt;
+</I>&gt;<i> &gt;&gt; &gt;&gt; -----Original Message-----
+</I>&gt;<i> &gt;&gt; &gt;&gt; From:	Gilbert Carl Herschberger II [SMTP:<A HREF="mailto:gchii@mindspring.com">gchii@mindspring.com</A>]
+</I>&gt;<i> &gt;&gt; &gt;&gt; Sent:	Wednesday, August 04, 1999 9:32 AM
+</I>&gt;<i> 
+</I>&gt;<i> &gt;&gt; &gt;&gt; To:	<A HREF="mailto:admin@jos.org">admin@jos.org</A>
+</I>&gt;<i> &gt;&gt; &gt;&gt; Subject:	[JOS-Admin] SWAT Team
+</I>&gt;<i> &gt;&gt; &gt;&gt; 
+</I>&gt;<i> &gt;&gt; &gt;&gt; Could permissions on files be the global wiki problem?
+</I>&gt;<i> &gt;&gt; &gt;&gt; 
+</I>&gt;<i> &gt;&gt; &gt;&gt; From my own website, I get this message when my httpd program does
+</I>&gt;<i> not
+</I>&gt;<i> &gt;&gt; &gt;&gt; have
+</I>&gt;<i> &gt;&gt; &gt;&gt; permissions according to Linux. Since the httpd program cannot read
+</I>&gt;<i> a
+</I>&gt;<i> &gt;&gt; &gt;&gt; file,
+</I>&gt;<i> &gt;&gt; &gt;&gt; I cannot read a file either.
+</I>&gt;<i> &gt;&gt; &gt;&gt; 
+</I>&gt;<i> &gt;&gt; &gt;&gt; What was the solution? I had to change the permissions on files in
+</I>&gt;<i> the
+</I>&gt;<i> &gt;&gt; &gt;&gt; htdocs directory. If wiki is CGI, the httpd program must have
+</I>&gt;<i> execute
+</I>&gt;<i> &gt;&gt; &gt;&gt; permissions on the CGI program. Without execute permission, all
+</I>&gt;<i> &gt;&gt; requests
+</I>&gt;<i> &gt;&gt; &gt;&gt; to
+</I>&gt;<i> &gt;&gt; &gt;&gt; the CGI program return that &quot;forbidden&quot; message.
+</I>&gt;<i> &gt;&gt; &gt;&gt; 
+</I>&gt;<i> &gt;&gt; &gt;&gt; I imagine that the CGI program could have been uploaded/replaced on
+</I>&gt;<i> &gt;&gt; Sunday
+</I>&gt;<i> &gt;&gt; &gt;&gt; night or Monday morning. Did someone forget to set the permissions
+</I>&gt;<i> of
+</I>&gt;<i> &gt;&gt; the
+</I>&gt;<i> &gt;&gt; &gt;&gt; CGI program?
+</I>&gt;<i> &gt;&gt; &gt;&gt; 
+</I>&gt;<i> &gt;&gt; &gt;&gt; Unfortunately, there is no way to *prevent* someone from
+</I>&gt;<i> interactively
+</I>&gt;<i> &gt;&gt; &gt;&gt; setting the wrong permissions. You can encourage people to set the
+</I>&gt;<i> &gt;&gt; right
+</I>&gt;<i> &gt;&gt; &gt;&gt; permissions.
+</I>&gt;<i> &gt;&gt; &gt;&gt; 
+</I>&gt;<i> &gt;&gt; &gt;&gt; 
+</I>&gt;<i> &gt;&gt; &gt;&gt; _______________________________________________
+</I>&gt;<i> &gt;&gt; &gt;&gt; Admin maillist  -  <A HREF="mailto:Admin@jos.org">Admin@jos.org</A>
+</I>&gt;<i> &gt;&gt; &gt;&gt; <A HREF="http://jos.org/mailman/listinfo/admin">http://jos.org/mailman/listinfo/admin</A>
+</I>&gt;<i> &gt;&gt; &gt;
+</I>&gt;<i> &gt;&gt; &gt;_______________________________________________
+</I>&gt;<i> &gt;&gt; &gt;Admin maillist  -  <A HREF="mailto:Admin@jos.org">Admin@jos.org</A>
+</I>&gt;<i> &gt;&gt; &gt;<A HREF="http://jos.org/mailman/listinfo/admin">http://jos.org/mailman/listinfo/admin</A>
+</I>&gt;<i> &gt;&gt; &gt; 
+</I>&gt;<i> &gt;&gt; DearWebby
+</I>&gt;<i> &gt;&gt; (Helmut)
+</I>&gt;<i> &gt;&gt; 
+</I>&gt;<i> &gt;&gt; The Cardmaster's MidSummer Madness World Championship is under way
+</I>&gt;<i> &gt;&gt; You can now vote at
+</I>&gt;<i> &gt;&gt; 
+</I>&gt;<i> &gt;&gt; <A HREF="http://cards.webby.com">http://cards.webby.com</A>
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> --------------------------------------------------------------------------
+</I>&gt;<i> &gt;&gt; --
+</I>&gt;<i> &gt;&gt; ------
+</I>&gt;<i> &gt;&gt; Webby, Inc  Web Marketing and high traffic web hosting
+</I>&gt;<i> &gt;&gt; Internet postcards and other effective marketing software
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;_______________________________________________
+</I>&gt;<i> &gt;Admin maillist  -  <A HREF="mailto:Admin@jos.org">Admin@jos.org</A>
+</I>&gt;<i> &gt;<A HREF="http://jos.org/mailman/listinfo/admin">http://jos.org/mailman/listinfo/admin</A>
+</I>&gt;<i> &gt; 
+</I>&gt;<i> DearWebby
+</I>&gt;<i> (Helmut)
+</I>&gt;<i> 
+</I>&gt;<i> The Cardmaster's MidSummer Madness World Championship is under way
+</I>&gt;<i> You can now vote at
+</I>&gt;<i> 
+</I>&gt;<i> <A HREF="http://cards.webby.com">http://cards.webby.com</A>
+</I>&gt;<i> --------------------------------------------------------------------------
+</I>&gt;<i> --
+</I>&gt;<i> ------
+</I>&gt;<i> Webby, Inc  Web Marketing and high traffic web hosting
+</I>&gt;<i> Internet postcards and other effective marketing software
+</I>
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000124.html">[JOS-Admin] SWAT Team</A></li>
+	<LI> Next message: <A HREF="000128.html">[JOS-Admin] SWAT Team</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#125">[ date ]</a>
+              <a href="thread.html#125">[ thread ]</a>
+              <a href="subject.html#125">[ subject ]</a>
+              <a href="author.html#125">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

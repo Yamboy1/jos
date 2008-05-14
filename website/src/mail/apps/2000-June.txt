@@ -1,0 +1,101 @@
+From gchii@mindspring.com Wed, 28 Jun 2000 12:03:33 -0400
+Date: Wed, 28 Jun 2000 12:03:33 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [boot disk] Installation?
+
+A Java Development Kit (JDK) and Java Runtime Environment (JRE) is
+distributed with SuSE Linux 6.0. It cannot use compressed archives. This
+presents a problem when distributing a Java application for use on this
+popular platform.
+
+Boot Disk, for example, has a runtime edition. The idea behind a runtime
+edition is to install it without recompiling. How should it be distributed
+to those with and without compressed archives?
+
+I am distributing compressed archives. For those with "older" versions of
+the JDK or JRE, it should be something like this:
+
+mkdir rejar
+cd rejar
+jar xvf bootdisk1a.jar
+jar cv0f bootdisk1a.jar *.class
+
+Once again, this gives us different "platforms" within the Java family of
+platforms. A classic Internet distribution includes "platform" in the name
+of an archive. Should I distribute a different archive for each "platform"?
+
+Boot Disk is not a classic Java application. It does not implement a static
+main() method. Rather, it is a subprogram. Start the Universal Browser,
+which is part of Smart API, and use the Universal Browser to start
+BootDisk, BootDiskProgram, EtherbootProgram and/or GrubProgram. Universal
+Browser implements a static main() method.
+
+I haven't yet figured out how to distribute a non-visual shell. Until then,
+the Universal Browser is the easiest mechanism for me. With the Universal
+Browser, you can start any of the hundreds of subprograms in the Smart API.
+The interface between your foreign operating system and the subprogram
+environment is simple. You can set it up once and forget it.
+
+// browser1b for Linux
+java -classpath $CLASSPATH org.jos.gchii.browser1b.UniversalBrowser
+
+I am unfamiliar with shell scripts on Linux. I am trying to learn. If I
+want to pass a location to the UniversalBrowser, how do I do that? Here is
+the equivalent in a batch file from Microsoft DOS:
+
+// browser1b.bat for MS-DOS
+set CP=%CLASSPATH%;.
+java -classpath %CP% org.jos.gchii.browser1b.UniversalBrowser %1
+
+
+
+
+
+From gchii@mindspring.com Wed, 28 Jun 2000 12:15:23 -0400
+Date: Wed, 28 Jun 2000 12:15:23 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Apps] [eric] Package file cache
+
+The ERIC Project has been very good to me. It enables me to install my
+application bytecode on a central HTTP service and run a Java application
+on any machine on the 'net. While there is a place for a package cache, the
+eric tool does not yet cache package files automatically.
+
+Here is what I've been thinking. I could upgrade the deric tool to write a
+package file catalog. The deric tool already creates package files. It
+automatically detects when class files in a package are "newer" than the
+package file. It only makes the package files that need to be made.
+
+If the deric tool automatically maintained a package file catalog and the
+package file catalog was distributed along with those packages, it would be
+possible to automatically refresh a package file cache.
+
+[packages]
+package-name-1=serial-number-1
+package-name-2=serial-number-2
+package-name-3=serial-number-3
+
+I was thinking of something compatible with the data registry from the
+Smart API. Each package file is assigned a serial number by the deric tool.
+The erica tool downloads the package file catalog and compares it to a
+local copy of the catalog. If serial numbers are different, erica downloads
+the package file from the HTTP service. The erica tool copies package files
+from one path to another.
+
+The eric tool could /always/ load package files from the local package file
+cache. The erica tool could be configured for "silent" operation or "ask
+before refreshing".
+
+This mechanism would work with jars, too. A new tool could "scan" a
+directory and automatically detect new jars. It would maintain a jar
+catalog in a file compatible with the data registry. Like erica, a
+client-side tool could automatically download new jars when their serial
+number has changed.
+
+I have been working to use the network to distribute Java applications and
+servlets, not just applets and agents. It is a good idea whose time has come.
+
+
+
+
+

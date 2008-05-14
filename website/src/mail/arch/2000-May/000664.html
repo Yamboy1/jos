@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000663.html">
+   <LINK REL="Next" HREF="000665.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">tmiller@haverford.edu</A><BR>
+    <I>Mon, 22 May 2000 23:39:56 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000663.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000665.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#664">[ date ]</a>
+              <a href="thread.html#664">[ thread ]</a>
+              <a href="subject.html#664">[ subject ]</a>
+              <a href="author.html#664">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> It sounds like you're putting the native info into the java.lang.Class
+</I>&gt;<i> object in decaf? This is probably why I'm a bit confused, in my JVM the
+</I>&gt;<i> native structure (a tClass structure) has an optional pointer to a
+</I>&gt;<i> pstClassObject, but it isn't neccessary to have such an object.
+</I>
+	decaf has a class called JavaClass (misnamed) which is the
+VM-specific representation of a .class file; that is, it is a java class
+definition.  Every JavaClassInstance points to one of these (its class
+definition) and to a ClassVariables (?) C++ class which manages the
+statics.  Because decaf has not been integrated with a class library as
+yet, I don't have a native class which explicitly represents the Java
+class java.lang.Class.  When I do, it will be linked in some fashion to
+the appropriate JavaClassInstance instance.  (Boy, I /really/ need some
+better names.)
+
+&gt;<i> Because basically they just point to other classes, which have
+</I>&gt;<i> undetermined origins ...
+</I>
+	Exactly.  Where do symbolic references resolve to for a shared
+object?
+
+-_Quinn
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000663.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000665.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#664">[ date ]</a>
+              <a href="thread.html#664">[ thread ]</a>
+              <a href="subject.html#664">[ subject ]</a>
+              <a href="author.html#664">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

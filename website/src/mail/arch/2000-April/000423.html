@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] URL cache</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000422.html">
+   <LINK REL="Next" HREF="000424.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] URL cache</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] URL cache">gchii@mindspring.com</A><BR>
+    <I>Wed, 05 Apr 2000 11:27:03 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000422.html">[JOS-Arch] WebSource 3b - Release 1</A></li>
+        <LI> Next message: <A HREF="000424.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#423">[ date ]</a>
+              <a href="thread.html#423">[ thread ]</a>
+              <a href="subject.html#423">[ subject ]</a>
+              <a href="author.html#423">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Many applications use the URL class. The URL class can always benefit from
+an automatic URL cache.
+
+1. Every virtual machine should use a system-wide URL cache.
+
+If I have 100 virtual machines, I only want one cache. It should be a
+system-wide cache. Even if all 100 virtual machines put in a request for
+the same page at the same time, the URL cache would download the resource
+only once.
+
+I don't want a URL cache limited to my web browser. Applets aren't the only
+Java program that uses a URL class. If that requires a virtual machine
+provides a HTTP proxy, that sounds like a good idea.
+
+If it were implemented as a HTTP proxy service, there would only be one
+HTTP proxy service listening on a specific TCP port. Each virtual machine
+might automatically start an HTTP proxy service (in a separate process) if
+there is no response from the TCP port. Rather than modifying each
+application to use the proxy service, the virtual machine must redirect
+URLs to the HTTP proxy service automatically.
+
+The HTTP proxy itself should use a different implementation of
+java.net.URL. Otherwise, the HTTP proxy would become recursive.
+
+This is what we're experimenting with inside the Alt Package project.
+Imagine there is a real URL class called alt.resource.URL, an HTTP proxy
+would use it to download documents from a real HTTP service. Imagine there
+is java.net.URL class that always connects to the HTTP proxy service. The
+HTTP proxy service maintains its own URL cache. By refining the
+java.net.URL class, every program benefits from a system-wide URL cache.
+
+When there is only one virtual machine, like Ultimate JOS, there might be
+no machine code methods bound to java.net.URL.
+
+2. Downloading class, package or jar files from a HTTP service should be
+optimized with a URL cache.
+
+The URL-aware class loader benefits automatically from a system-wide URL
+cache. When a class file is already in the URL cache, a HTTP proxy does not
+have to download it again -- unless the file has changed on the real HTTP
+service.
+
+I was thinking about priority. Does a virtual machine need a URL cache more
+than it needs a bytecode cache? I think a URL cache comes first. A URL
+cache can excellerate all kinds of applications that use a URL. A bytecode
+cache should depend on a pre-existing URL cache. A bytecode cache should
+use a URL cache to download additional bytecode.
+
+A fully optimized bytecode cache could compile each package ahead of time
+into a machine code shared library. A virtual machine doesn't need a
+bytecode interpreter after all.
+
+3. I want the benefit of a URL cache without rewriting any Java application.
+
+My applications create the same URLs. They always point to the real HTTP
+service. But within the virtual machine, URL *always* go to the system-wide
+URL cache. The URL cache should be enabled by default. It might take a
+command line parameter to turn it off.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000422.html">[JOS-Arch] WebSource 3b - Release 1</A></li>
+	<LI> Next message: <A HREF="000424.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#423">[ date ]</a>
+              <a href="thread.html#423">[ thread ]</a>
+              <a href="subject.html#423">[ subject ]</a>
+              <a href="author.html#423">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

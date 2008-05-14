@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] RunEricApplication</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:idstewart%40softhome.net">
+   <LINK REL="Previous"  HREF="000014.html">
+   <LINK REL="Next" HREF="000017.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] RunEricApplication</H1>
+    <B>Ian D. Stewart</B> 
+    <A HREF="mailto:idstewart%40softhome.net"
+       TITLE="[JOS-Apps] RunEricApplication">idstewart@softhome.net</A><BR>
+    <I>Sun, 27 Feb 2000 13:01:59 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000014.html">[JOS-Apps] RunEricApplication</A></li>
+        <LI> Next message: <A HREF="000017.html">[JOS-Apps] RunEricApplication</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#16">[ date ]</a>
+              <a href="thread.html#16">[ thread ]</a>
+              <a href="subject.html#16">[ subject ]</a>
+              <a href="author.html#16">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> The RunEricApplication is part of the org.jos.gchii.eric1c package. It
+</I>&gt;<i> invokes an ERIC Shell using both jars and package files.
+</I>&gt;<i>
+</I>&gt;<i> cache=v
+</I>&gt;<i>
+</I>&gt;<i> The cache parameter identifies a read-write directory. The v parameter is a
+</I>&gt;<i> OS directory name. ERIC uses this directory to cache volatile package
+</I>&gt;<i> files. If a recent package file is found in the cache, it is preferred to
+</I>&gt;<i> downloading a package file across the 'net.
+</I>&gt;<i>
+</I>&gt;<i> path=v
+</I>&gt;<i>
+</I>&gt;<i> The path parameter identifies the package path. The v parameter is a
+</I>&gt;<i> semi-colon separated list of package directories.
+</I>
+I would recommend using File.pathSeparator instead of hard-coding on
+semi-colon.  This would allow users of different platforms to do what feels
+natural.  This is of course assuming that you intend for the ERIC applications
+to be run on different platforms, and not just JOS.
+
+&gt;<i> A package directory is
+</I>&gt;<i> either local or an HTTP URL.
+</I>&gt;<i>
+</I>&gt;<i> shell=v
+</I>&gt;<i>
+</I>&gt;<i> The shell parameter identifies the ERIC Shell. The v parameter is a class
+</I>&gt;<i> name. ERIC supports a number of &quot;shell&quot;s besides
+</I>&gt;<i> org.jos.gchii.eric1c.Shell. See the source code for RunEricApplication.
+</I>&gt;<i>
+</I>&gt;<i> location=v
+</I>&gt;<i>
+</I>&gt;<i> The location parameter identifies the digital resource invoked by the
+</I>&gt;<i> shell. The v parameter is a URI.
+</I>
+Have you considerred using java system properties instead?
+
+Example: java -Deric.cache=cachev -Deric.path=pathv -Deric.shell=shellv
+-Deric.location=locationv RunEricApplication
+
+This would then allow these values to be accessible to any application running
+within the same VM.  Additionally, by creating a ~/.ericrc properties file,
+which could be parsed at startup, a user could be able to customize the ERIC
+suite to their own personal preferences.
+
+
+Ian
+
+&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i> Of course, the eric tool passes all these parameter to RunEricApplication
+</I>&gt;<i> according to an ERIC shortcut. The cache parameter is automatic. The path
+</I>&gt;<i> parameter is automatic; although you can add additional package
+</I>&gt;<i> directories. The shell parameter is Universal Browser by default. A
+</I>&gt;<i> shortcut can call any shell. The default location parameter is determined
+</I>&gt;<i> by each shell. The Universal Browser defaults to
+</I>&gt;<i> &quot;desktop:ini:file:default.desktop&quot;.
+</I>&gt;<i>
+</I>&gt;<i> Without the eric tool, you can use the java tool to do the same thing. In
+</I>&gt;<i> fact, the RunEricApplication uses URI-style parameters (which are easier to
+</I>&gt;<i> pass through Java Native Interface). It uses one and only one argument to
+</I>&gt;<i> main(), a query string.
+</I>&gt;<i>
+</I>&gt;<i> $ java RunEricApplication cache=v&amp;path=v&amp;shell=v&amp;location=v
+</I>&gt;<i>
+</I>&gt;<i> Named parameters are passed in any order. Additional parameters are ignored.
+</I>&gt;<i>
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Apps maillist  -  <A HREF="mailto:Apps@jos.org">Apps@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/apps">http://jos.org/mailman/listinfo/apps</A>
+</I>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000014.html">[JOS-Apps] RunEricApplication</A></li>
+	<LI> Next message: <A HREF="000017.html">[JOS-Apps] RunEricApplication</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#16">[ date ]</a>
+              <a href="thread.html#16">[ thread ]</a>
+              <a href="subject.html#16">[ subject ]</a>
+              <a href="author.html#16">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

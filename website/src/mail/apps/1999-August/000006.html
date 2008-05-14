@@ -1,0 +1,248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] Application</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] Application</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Apps] Application">digigod@earthling.net</A><BR>
+    <I>Fri, 13 Aug 1999 16:17:17 -0700</I>
+    <P><UL>
+        
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#6">[ date ]</a>
+              <a href="thread.html#6">[ thread ]</a>
+              <a href="subject.html#6">[ subject ]</a>
+              <a href="author.html#6">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>here is the latest update on my Application class, here are our basic
+classes:
+
+Application - the abstract super class that wraps the standard main()
+Arguments - an abstract super class that wraps a programs arguments (a
+&quot;fancy&quot; String[])
+
+Arguemtns has a simple child aptly called SimpleArguments that does no
+parsing on the command line, it is the default.
+
+there are two ways to set your own arguments class: A) in the clint,
+after setting the required app; or B) in your appMain()
+
+a)
+static {
+ app = new AnApplication();
+ app.arguments = new ACustomArguments();
+}
+
+b)
+public void appMain() {
+ arguments = new ACustomArguments();
+}
+
+arguments is a protected variable in Application and can hence be used
+like any other variable within your class, but I recommend using
+Application's getArguments() (you need to use it outside of application
+anyway)
+
+making an Application is easy:
+
+public class test extends Application {
+ static {
+  app = new test(); //nessecary :(
+ }
+ public void appMain() {
+  println(&quot;hello&quot;);
+  println(getArguments.getLength()); // no reason
+ }
+}
+
+extending it is also easy:
+
+public class newtest extends test {
+ static {
+  app = new newtest();
+ }
+ public void appMain() {
+  super.appMain();
+  Iterator i = getArguments().iterator();
+  while(i.hasNext())
+   println(i.next());
+  println(&quot;goodbye.);
+ }
+}
+
+Application
+ main(String[]) -ye olde main method (Application is run just like
+ordinary stand alones)
+ getArguments() -return the arguments object for this instance
+ print(String) -just an &quot;alias&quot; method to System.out.print()
+ println(String) - same as above
+ exit(int) -same as above
+ exit() - calls exit(0)
+ readln() - return a line of input from the console
+ getApplicationInfo - rets a String, like getAppletInfo in applet
+ abstract appMain() - neo-main
+
+Argument 
+ abstract parse(String[]) - where you handle the parsing (or lack of)
+ length() - the length of the argument array
+ get(int) - returns the string for the argument at said index
+ iterator() - return a collections iterator (internally builds an
+arraylist whenever called, so use wisely)
+
+I was going to have a method to return all the arguments in a String[],
+but decided not to as I had no idea what to call it, decided iterator()
+would be more useful anyway...
+
+////
+package digigod.apps;
+
+import java.io.*;
+
+public abstract class Application {
+ private          BufferedReader reader      = null;
+ protected        Arguments      arguments   = new SimpleArguments();
+ protected static Application    app         = null;
+
+ public static void main(String args[]) {
+  if(app==null)
+   System.exit(255);
+  app.arguments.parse(args);
+  app.appMain();
+ }
+
+ public Arguments getArguments() {
+  return arguments;
+ }
+
+ public void exit() {
+  exit(0);
+ }
+
+ public void exit(int code) {
+  System.exit(code);
+ }
+
+ public void print(String str) {
+  System.out.print(str);
+ }
+
+ public void println(String str) {
+  System.out.println(str);
+ }
+
+ public void printerr(String str) {
+  System.err.println(str);
+ }
+
+ public String readln() throws IOException {
+  if(reader==null)
+   reader = new BufferedReader(new InputStreamReader(System.in));
+  return reader.readLine();
+ }
+
+ public abstract void appMain();
+
+ public String getApplicationInfo() {
+  return &quot;&quot;;
+ } 
+}
+////
+////
+package digigod.apps;
+
+import java.util.*;
+
+public abstract class Arguments {
+ protected String arguments[];
+  
+ public Arguments() { 
+   
+ }
+  
+ public abstract void parse(String args[]);
+  
+ public int length() {
+  if(arguments==null)
+   return 0;
+  return arguments.length;
+ }
+  
+ public String get(int idx) {
+  if(arguments==null)
+   return null;
+  return arguments[idx];
+ }
+  
+ public Iterator iterator() {
+  ArrayList ret = new ArrayList();
+  for(int i = 0; i &gt;= arguments.length; i++)
+   ret.add(arguments[i]);
+  return ret.iterator();
+ }
+}
+////
+////
+package digigod.apps;
+
+public class SimpleArguments extends Arguments {
+ public SimpleArguments() {
+  
+ }
+ 
+ public void parse(String args[]) {
+  arguments = new String[args.length];
+  System.arraycopy(args, 0, arguments, 0, args.length);
+ }
+}
+////
+
+you by no means have to use this, only if you want to and only if you
+like to. it requires no special runners as it has a classic &quot;main()&quot;
+method that runs the new one.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#6">[ date ]</a>
+              <a href="thread.html#6">[ thread ]</a>
+              <a href="subject.html#6">[ subject ]</a>
+              <a href="author.html#6">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

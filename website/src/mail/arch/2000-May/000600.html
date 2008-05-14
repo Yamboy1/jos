@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000598.html">
+   <LINK REL="Next" HREF="000610.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">tmiller@haverford.edu</A><BR>
+    <I>Wed, 17 May 2000 14:54:42 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000598.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000610.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#600">[ date ]</a>
+              <a href="thread.html#600">[ thread ]</a>
+              <a href="subject.html#600">[ subject ]</a>
+              <a href="author.html#600">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Let's get back to the discussion. The reloading of classes cannot be
+</I>&gt;<i> ignored. Each process has its own potentially unique CLASSPATH. So, each
+</I>&gt;<i> process must load its own classes.
+</I>
+	While it's true the each process must load its own classes, it is
+not because of a potentially unique CLASSPATH; it is because we cannot
+share statics across processes.  CLASSPATH is not particularly relevant to
+the JVM specification -- it is an implementation-dependent mechanism for
+specifying the location of bytecode payloads.  Only in that those payloads
+may differ must we keep them, as class definitions*, separate.
+
+*: class definition is any way in which you may specify a class completely
+enough for a JVM to execute it.
+
+&gt;<i> All classes must be unique to a bytecode process. None can be shared
+</I>&gt;<i> without a proxy.
+</I>
+	No classes need ever be shared to achieve object sharing.  If the
+class definitions matches, the oject may be shared.  I have suggested that
+the best way to handle the inevitable conflicts between statics in the
+classes of shared objects is for the shared object to simply use the
+statics from whichever process/PCL it's currently running in.  I think
+this also holds to the principle of least suprise -- some other method
+may not know the object it's operating on is shared.  (That is, the static
+it gets should be the same as the static the shared object does.)
+
+&gt;<i> Everything owned by a process is discarded when the process dies.
+</I>
+	This may be the useful definition of ownership I've been looking
+for -- the set of things which are garbage collected when a process
+terminates.  I will think about this.  (Apologies to Ryan if he said this
+before and I missed it.)
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000598.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000610.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#600">[ date ]</a>
+              <a href="thread.html#600">[ thread ]</a>
+              <a href="subject.html#600">[ subject ]</a>
+              <a href="author.html#600">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] MVC ((was Re: [JOS-UI] ScreenSaver))</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000076.html">
+   <LINK REL="Next" HREF="000078.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] MVC ((was Re: [JOS-UI] ScreenSaver))</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-UI] MVC ((was Re: [JOS-UI] ScreenSaver))">ryan@whitewolf.com.au</A><BR>
+    <I>Tue, 27 Jul 1999 16:28:02 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000076.html">[JOS-UI] ScreenSaver</A></li>
+        <LI> Next message: <A HREF="000078.html">[JOS-UI] Re: MVC</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#77">[ date ]</a>
+              <a href="thread.html#77">[ thread ]</a>
+              <a href="subject.html#77">[ subject ]</a>
+              <a href="author.html#77">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>DigiGod Q Frasché wrote:
+
+&gt;<i> A CLI isnt going to have a taskbar, a XUI might not. JADE cant assume
+</I>&gt;<i> there is a taskbar, if there was a taskbar its only interaction would be
+</I>&gt;<i> that it uses JADE to get things like the process manager (to create the
+</I>&gt;<i> list of tasks)
+</I>
+This issue can be easily solved using a Model/View/Controller model. We
+explored MVC in some detail about a year ago on this list. The idea of a
+process manager matches the concept of a &quot;model&quot;, while the taskbar is
+an example of a &quot;view&quot;. You may have already been aware of the
+similarity, but speaking in terms of MVC will probably lead to a clearer
+design.
+
+For those who missed the discussion way back then, I think we decided on
+a combination of Java Beans and MVC, where model beans maintained data
+structures such as process lists and window lists, while view beans
+implemented displays or user interfaces of those data structures.
+
+For example, there may be a view that displays the list of open windows
+- the user could click on a window item to raise that window on the
+desktop (yes, like that significant component of the taskbar). There
+could be another &quot;view&quot; of the same window list &quot;model&quot; that shows your
+miniature virtual desktops. This view would mirror the exact window
+positions of each window on a smaller scale but allow you to select
+windows in the same way as the taskbar. The most interesting view is
+actually the window manager itself. It should also be a view of the
+window list.
+
+&quot;Window list&quot; is not necessarily the best way to divide the model space
+but it is enough to demonstrate the concept.
+
+&gt;<i> the answer is all the
+</I>&gt;<i> desktop widgets must be designed via interface.
+</I>&gt;<i> 
+</I>&gt;<i> public interface Taskbar extends DesktopWidget {
+</I>&gt;<i>  //bla bla bla
+</I>&gt;<i> }
+</I>
+This corresponds to a view. I have no objection to the term &quot;widget&quot;,
+but you should also think up a term that corresponds to &quot;model&quot;. I know
+I haven't mentioned &quot;controller&quot; yet. Typically a controller is
+responsible for handling a use case in a system. Swing uses a modified
+MVC model where the controller is combined with the view. The argument
+is that creating a separate controller class for everything can be an
+overkill. This is probably the way to go unless we can foresee a
+specific need to have controllers separate.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000076.html">[JOS-UI] ScreenSaver</A></li>
+	<LI> Next message: <A HREF="000078.html">[JOS-UI] Re: MVC</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#77">[ date ]</a>
+              <a href="thread.html#77">[ thread ]</a>
+              <a href="subject.html#77">[ subject ]</a>
+              <a href="author.html#77">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

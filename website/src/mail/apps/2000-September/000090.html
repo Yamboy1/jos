@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [programservice] New article on JOS Wiki</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000089.html">
+   <LINK REL="Next" HREF="000091.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [programservice] New article on JOS Wiki</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [programservice] New article on JOS Wiki">gchii@mindspring.com</A><BR>
+    <I>Thu, 14 Sep 2000 11:44:56 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000089.html">[JOS-Apps] [smartapi] New release</A></li>
+        <LI> Next message: <A HREF="000091.html">[JOS-Apps] Universal Browser</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#90">[ date ]</a>
+              <a href="thread.html#90">[ thread ]</a>
+              <a href="subject.html#90">[ subject ]</a>
+              <a href="author.html#90">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The Program Service utility provides a program service environment. It is a
+simple demonstration of how to run programs using a service on the network.
+Any TELNET-compatible client is used to connect to the program service and
+run programs. For more information, see also the following article on JOS
+Wiki:
+
+<A HREF="http://www.metamech.com/wiki/view/Main/ProgramService">http://www.metamech.com/wiki/view/Main/ProgramService</A>
+
+Since the java.net.Socket class is a TELNET-compatible client, any method
+can invoke a program on a program service. Here is a very simple example
+which invokes a demo program and prints its output to system out:
+
+  public void example() {
+    try {
+      exec( &quot;run:program:org.jos.demo.DemoProgram&quot; );
+    }
+    catch( IOException e ) {
+    }
+  }
+  public void exec( String v ) {
+    Socket s = new Socket( &quot;localhost&quot;, 8023 );
+    PrintStream output = new PrintStream( s.getOutputStream() );
+    output.println( v );
+    DataInputStream input = new DataInputStream( s.getInputStream() );
+    for (;;) {
+      String line = input.readLine();
+      if ( line == null ) {
+        break;
+      }
+      System.out.println( line );
+    }
+    input.close();
+    output.close();
+    s.close();
+  }
+
+This behavior should be encapsulated in a program-service: scheme,
+something like this:
+
+program-<A HREF="service://localhost:8080/run:program:org.jos.demo.DemoProgram">service://localhost:8080/run:program:org.jos.demo.DemoProgram</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000089.html">[JOS-Apps] [smartapi] New release</A></li>
+	<LI> Next message: <A HREF="000091.html">[JOS-Apps] Universal Browser</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#90">[ date ]</a>
+              <a href="thread.html#90">[ thread ]</a>
+              <a href="subject.html#90">[ subject ]</a>
+              <a href="author.html#90">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

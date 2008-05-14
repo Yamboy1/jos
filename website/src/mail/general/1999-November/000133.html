@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS] JDK incompatibility solutions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000135.html">
+   <LINK REL="Next" HREF="000134.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS] JDK incompatibility solutions</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS] JDK incompatibility solutions">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Wed, 17 Nov 1999 15:55:27 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000135.html">[JOS] JDK incompatibility solutions</A></li>
+        <LI> Next message: <A HREF="000134.html">[JOS] What is JOS?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#133">[ date ]</a>
+              <a href="thread.html#133">[ thread ]</a>
+              <a href="subject.html#133">[ subject ]</a>
+              <a href="author.html#133">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Max,
+
+In the JOSCore project work I've been doing, I've done some thinking in this
+area.
+
+As part of the installation process, each 'Program' would get a series of
+entries in the JOS Registry.  Among these entries would be packages and
+versions of those packages that the program relies on.  If none were there,
+JOS would assume to use the latest versions.  Do to the multiple-primitive
+ClassLoaders and other ideas we will one day implement in decaf, each
+process can have a different version of class libraries, even if two or more
+processes are using different versions of the same class.  
+
+In order to make this all work, a lot of things need to be very well
+integrated.  The ClassLoading process will rely on the Registry, and since
+Security will rely on the ClassLoading process, the Registry will need to be
+quite secure.  (The Registry willl likely be the weakest security link in
+JOS.)  All of this also means that there is a need for some kind of a
+ClassRepository, which keeps track of package versions.  That begs the
+question:  can we allow classes to be placed anywhere they want on the
+filesystem?  Or do they need to be a central place?  How we answer that
+question is going to have a huge effect on the installation process.
+
+It is a lot of code to write, and all I have so far is really a skeleton of
+some of the core interfaces.  I'm starting to get back to work on it,
+though.  Anyone want to volunteer to write a ClassRepository?  :)
+
+Regards,
+Avery J. Regier
+
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Max Gilead [SMTP:<A HREF="mailto:gilead@linart.pl">gilead@linart.pl</A>]
+</I>&gt;<i> Sent:	Friday, November 12, 1999 6:16 PM
+</I>&gt;<i> To:	JOS General group
+</I>&gt;<i> Subject:	[JOS] JDK incompatibility solutions
+</I>&gt;<i> 
+</I>&gt;<i> Hi, all!
+</I>&gt;<i> 
+</I>&gt;<i> I have read JOS mailing lists archives. On UI group there were a thread
+</I>&gt;<i> some time ago about this. Although I think that making different JDK
+</I>&gt;<i> releases fully compatible (even if only backward compatible) would be a
+</I>&gt;<i> very useful thing but I doubt this will happen soon. The bad thing is
+</I>&gt;<i> that JDK is so monolithic piece of software. It would be much better
+</I>&gt;<i> IMHO if instead of one JDK we would have separate libraries - eg.
+</I>&gt;<i> Utility library, AWT library etc. It's just an example and I'm not sure
+</I>&gt;<i> but security issues of JDK1.2 rather don't affect AWT ;-), am I right?
+</I>&gt;<i> So why release it in one piece? If it won't happen the whole system
+</I>&gt;<i> would be more flexible. But these are just my wishes :-(. Even libraries
+</I>&gt;<i> for languages that are on market for much longer than Java, for example
+</I>&gt;<i> C++ are undergoing changes, sometimes breaking any compatibility
+</I>&gt;<i> (libc&lt;-&gt;glibc change in GNU libraries, recent change in C++ specs which
+</I>&gt;<i> causes many problems with compilers).
+</I>&gt;<i> 
+</I>&gt;<i> These are my thoughts about possible solutions to problem with
+</I>&gt;<i> incompatible JDK releases:
+</I>&gt;<i> 
+</I>&gt;<i> 1. Static linking.
+</I>&gt;<i> Let's take a look at C++ applications (I'm talking about such basic
+</I>&gt;<i> things to make me clear). They can be dynamically or statically linked.
+</I>&gt;<i> Dynamically means that they use some external libraries, in fact a
+</I>&gt;<i> specific version of these libraries. They are smaller than statically
+</I>&gt;<i> linked versions but suffer from possible incompatibility problems.
+</I>&gt;<i> Statically linked applications does not use external libraries - they
+</I>&gt;<i> have all of them compiled into executable file.
+</I>&gt;<i> In Java, all applications are 'dynamically linked'. Possible solution is
+</I>&gt;<i> to package classes it uses with program. But this is not possible for
+</I>&gt;<i> native classes and doesn't solve VM incompatibility problems.
+</I>&gt;<i> 
+</I>&gt;<i> 2. JDK for JOS (much better solution)
+</I>&gt;<i> Some people think that JOS should mimic JDK. I think it should not (at
+</I>&gt;<i> least not its core). I think that JOS core should provide VM to run
+</I>&gt;<i> bytecode and its own hardwired system classes (jos.org.* and below?) -
+</I>&gt;<i> that's all. This way it would be possible to run applications compiled
+</I>&gt;<i> for different JDKs (even ancient ones) without any problems. Which JDK
+</I>&gt;<i> to run under could be choosen from some property panel or detected at
+</I>&gt;<i> runtime(?).
+</I>&gt;<i> 
+</I>&gt;<i> Incompatibility problem can be breaked into two smaller problems:
+</I>&gt;<i> - VM incompatibility.
+</I>&gt;<i> As VM functionality is provided by system, system should have
+</I>&gt;<i> possibility to run applications in different VM versions. It would not
+</I>&gt;<i> be a problem since VM changes should be very rare (I hope :-)
+</I>&gt;<i> - Core classes incompatibility.
+</I>&gt;<i> As JDKs are mostly backward compatible, providing older class library
+</I>&gt;<i> would require substituting incompatible classes only. Say, application
+</I>&gt;<i> was compiled for JDK 1.1 and current standard JOS classpath is 1.2. So
+</I>&gt;<i> an imaginary classpath would look like:
+</I>&gt;<i> ./application.jar:/classpath/ver1.1.jar:/classpath/ver1.2.jar
+</I>&gt;<i> As JOS is a _Java_ OS I think that native classes problem would go away,
+</I>&gt;<i> too, as they could be implemented as JOS system calls in Java.
+</I>&gt;<i> Easy enough, I think. And very flexible. If user doesn't want to run any
+</I>&gt;<i> older applications, he does not install compatibility libraries. But he
+</I>&gt;<i> may do so at any time.
+</I>&gt;<i> 
+</I>&gt;<i> These are just my thoughts, so let people criticise (or express awe ;-)
+</I>&gt;<i> 
+</I>&gt;<i> Bye,
+</I>&gt;<i> Max
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> -------
+</I>&gt;<i> -- Max Gilead (<A HREF="mailto:gilead@linart.pl">gilead@linart.pl</A>) ----------
+</I>&gt;<i> | <A HREF="http://3d.linart.krakow.pl/OfficinaArtificialis">http://3d.linart.krakow.pl/OfficinaArtificialis</A> |
+</I>&gt;<i> ---------------------------------------------------
+</I>&gt;<i> {EOF}
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> General maillist  -  <A HREF="mailto:General@jos.org">General@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/general">http://jos.org/mailman/listinfo/general</A>
+</I>
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000135.html">[JOS] JDK incompatibility solutions</A></li>
+	<LI> Next message: <A HREF="000134.html">[JOS] What is JOS?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#133">[ date ]</a>
+              <a href="thread.html#133">[ thread ]</a>
+              <a href="subject.html#133">[ subject ]</a>
+              <a href="author.html#133">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

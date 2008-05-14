@@ -1,0 +1,233 @@
+From gchii@mindspring.com Thu, 23 Mar 2000 08:29:32 -0500
+Date: Thu, 23 Mar 2000 08:29:32 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Admin] Source Server
+
+I have been thinking about this:
+
+What prevents us from replacing the Source Server?
+
+1. We cannot shutdown Source Server until we have a corresponding
+replacement. We don't have one yet. On the publishing side, we almost have
+a feature-for-feature replacement for Source Server. On the contribution
+side, we don't have anything.
+
+2. Source Server sorts for interfaces, exceptions, errors, abstract classes
+and classes. WebSource does not. How does Source Server do it? We should
+put this feature in WebSource.
+
+3. When we shutdown Source Server, there must be a corresponding /source
+page that points to its replacement. Could requests for
+http://www.jos.org/source be redirected?
+
+4. Source Server enables you to download one source file at a time.
+WebSource does not. WebSource does not yet publish a plain-text, non-HTML
+version of each source file. An entire product is download-able as an archive.
+
+5. The scope of the WebSource project has exceeded the Source Server. I
+have included source code that has been submitted through CVS, Source
+Server and individual archives.
+
+6. Any member of the JOS Project can publish a product. If it is announced
+on a mailing list or JOS Wiki page, it should be published on the
+www.jos.org server, shouldn't it?
+
+-----
+
+It is easy to browse the Java source code for the Java project. The "home"
+page for browsing is
+
+<URL:http://www.jos.org/redist/src/>
+
+I have been contacting individual authors to let them know their source
+code is published on-line. Many have been glad to see it. They have been
+working on their code but can't publish it on the www.jos.org server
+because Source Server is "broken".
+
+-----
+
+Just announced on the JOS Project website, WebSource is available for
+immediate download. It is free-license and open-source. It created these
+static source pages.
+
+WebSource is compatible with Java servlet technology, too. A servlet is
+planned. Source code in its original form (.java) can be published
+dynamically as syntax-highlighted HTML pages. The WebSource servlet
+requires Java 1 Platform and the Java Servlet Development Kit (JSDK).
+
+If the WebSource servlet is running on the same machine with
+/redist/mirror, it is possible to dynamically publish directly from .zip or
+.jar archives.
+
+
+
+
+From ryan@whitewolf.com.au Fri, 24 Mar 2000 09:47:45 +1100
+Date: Fri, 24 Mar 2000 09:47:45 +1100
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Admin] Source Server
+
+Gilbert Carl Herschberger II wrote:
+> 
+> I have been thinking about this:
+> 
+> What prevents us from replacing the Source Server?
+
+There have been two ideas for this so far (that I know of):
+
+1. Iain and I were going to write a user-friendly wrapper around CVS.
+2. Someone proposed that we move to SourceForge. 
+
+I am no longer sure how I would prefer to do it.
+
+Let's look at some requirements:
+
+1. Serious developers need full CVS capabilities and control over who
+can edit their files.
+2. The rest would just like to upload their changes without any hassles.
+
+So, it looks like whichever proposal we choose, we are going to need two
+separate repositories with different levels of security and different
+management tools.
+
+I am imagining a system in which serious/trusted developers are given
+write access to selected parts of the developers' repository, while
+everyone has write access to the contributors' repository. Some how,
+official updates to the developers' repository are propagated to the
+contributors' repository while leaving contributors' changes intact. CVS
+(indirectly) provides the ability to do this.
+
+If a contributor has contributed something that they think should be
+integrated into the official version, an official developer will copy
+the changes made to the contributors' tree and apply them to the
+developers' tree.
+
+In order to support automatic synchronisation of the two repositories,
+the new SourceServer (the public contributors' repository) should be
+based on CVS.
+
+This is just a half-baked idea as yet. I need to think more before I
+know it will work.
+
+> 2. Source Server sorts for interfaces, exceptions, errors, abstract classes
+> and classes. WebSource does not. How does Source Server do it? We should
+> put this feature in WebSource.
+
+The changes I'm making to your parser might make that easier to
+implement.
+
+> 4. Source Server enables you to download one source file at a time.
+> WebSource does not. WebSource does not yet publish a plain-text, non-HTML
+> version of each source file. An entire product is download-able as an archive.
+
+I see a number cooperating components:
+
+1. The developers' repository
+2. The contributors' repository
+3. Publishing tools for (2)
+4. cvsweb (serves text/plain source files in CVS over HTTP)
+5. WebSource (converting source files to HTML)
+6. Javadoc
+
+If WebSource needs to display plain text, it can link to cvsweb. If it
+wants inline publishing and downloading capabilities, it can link to the
+other systems, written in other programming languages.
+
+SourceServer itself does not HTML'ify java files, it cooperates with
+PrettyPrinter to do that. In the same way, WebSource does not need to
+implement all of the functionality; Other components can take care of
+that.
+
+> 5. The scope of the WebSource project has exceeded the Source Server. I
+> have included source code that has been submitted through CVS, Source
+> Server and individual archives.
+
+See above.
+
+> WebSource is compatible with Java servlet technology, too. A servlet is
+> planned. Source code in its original form (.java) can be published
+> dynamically as syntax-highlighted HTML pages.
+
+Do you mean java->HTML conversion on the fly?
+
+-- 
+Ryan Heise
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+From gchii@mindspring.com Mon, 27 Mar 2000 14:04:42 -0500
+Date: Mon, 27 Mar 2000 14:04:42 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Admin] [Wiki] Article Names
+
+Once again, it is time to update pages A-Z. Pages A-Z are intended to be a
+complete list of all Wiki articles.
+
+Where can I find a list of all Wiki Article names?
+
+As I read through the Wiki pages, I wrote down the names of every article I
+read. And since October, I have been monitoring the changes page and
+writing down all of the articles that have changed. That's how I updated
+the pages A-Z.
+
+Articles are missing. How many are missing? What are they? If I had a list
+of all articles, I could manually update pages A-Z.
+
+
+
+
+From Sales@StopThePress.Com Fri, 31 Mar 2000 05:35:28 -0500
+Date: Fri, 31 Mar 2000 05:35:28 -0500
+From: StopThePress Sales@StopThePress.Com
+Subject: [JOS-Admin] StopThePress - Breaking News!
+
+StopThePress.com is a unique new website for the graphic arts industry.
+We provide a central, simplified location to buy and sell graphic arts
+equipment online. StopThePress allows members to list their items in our
+growing keyword searchable database - placing your inventory into the
+largest online marketplace for the graphic arts industry.
+
+Some of the StopThePress' many advantages:
+
+* Free Registration
+  Our members pay nothing to use our service. List and find items with no
+membership charges or fees. Let us become your first plunge into the world
+of eCommerce by making us YOUR new website!
+
+* Free Listings For Any Item You Can Imagine!
+  List items, services or supplies that you have for sale for absolutely
+free! List your inventory in our interactive keyword searchable database.
+Let customers find you in a centrally located database containing
+thousands of items worldwide! List one or one thousand items - we only ask
+a reasonable ONE PERCENT fee when the item is sold!
+
+* Free Want Ad Posts!
+  Looking for a unique piece of equipment? Want Ads let members post
+descriptions of items they would like to purchase for other members to
+search through. Find prospective buyers quickly and easily searching
+through the Want Ads.
+
+* Unique Headlines Page!
+  Your personalized Headlines page organizes your tasks on the system.
+Headlines provide a one-stop location for finding the latest items entered
+into our database, a listing of your current items available, and much,
+much more!
+
+
+
+Thank You!
+Sales@StopThePress.com
+
+http://www.StopThePress.com
+
+
+If you would rather not receive future news or updates on the
+www.StopThePress.com website,  please let us know by replying to
+unsubscribe@StopThePress.com and simply type UNSUBSCRIBE in  subject. No
+further email will be sent.
+
+
+
+

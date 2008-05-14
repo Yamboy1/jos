@@ -1,0 +1,1464 @@
+From gchii@mindspring.com Wed, 01 Dec 1999 08:49:29 -0500
+Date: Wed, 01 Dec 1999 08:49:29 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [DistributionGroup] Planning for next release
+
+Let's think about the next distribution of JOS.
+
+When the kernel group reaches a concensus that jJOS is GRUB-bootable, it
+gives us an opportunity to create the next distribution of JOS.
+
+Is it a major new release? I don't think so. I think we might call it "1e",
+as in
+
+"Announcing JOS Distribution 1e"
+
+We should distribute a runtime-only version, where someone can download JOS
+and boot it with the minimum of fuss.
+
+1. Like the binary distribution of JOS 1d, a runtime-only distribution must
+not require a Linux compiler.
+
+2. If JOS is GRUB-bootable, we should emphasize a step-by-step description
+of booting up JOS with GRUB.
+
+3. A GRUB-bootable version does not require a network interface card (does
+it?). So, requirements for a "JOS machine" should eliminate a network
+interface card.
+
+We should plan ahead for what we consider to be "in" vs. "out" for this
+release. While the experimental TCP/IP stuff needs to be distributed, it
+might not make it into a runtime-only distribution. It goes into a
+source-only distribution.
+
+We also need to refine the definition of a technical distribution. A
+technical distribution requires Linux (doesn't it?). A technical
+distribution includes tools (or links to tools) so that you can (re)build
+the JOS runtime distribution from the JOS source distribution. Are there
+new tools required to build JOS? The tools.tgz archive does not include
+GRUB and other tools recently mentioned by the kernel group. And yet, a
+GRUB-bootable runtime edition needs something from GRUB.
+
+Your comments would be appreciated.
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Wed, 1 Dec 1999 16:53:56 +0100
+Date: Wed, 1 Dec 1999 16:53:56 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Arch] Planning for next   release (fwd)
+
+On Wed, 01 Dec 1999, you wrote:
+> Quinn wrote:
+> 		Anyone having any luck with booting jJOS from GRUB?  (I can
+> boot
+> 	it, but it dies almost immediately with a corrupt VM error.  I
+> suspect
+> 	this is a timing problem with respect to static initialization, but
+> I
+> 	could be wrong -- I haven't looked into it, because I'm running it
+> with
+> 	the new interrupt code currently.)
+> 
+> I'm getting the exact same behaviour when booting from GRUB when compiling
+> with -DNEW_INTERUPT_HANDLING.  When I compile without it, the run ends with
+> something like:
+> ************00000009***************
+> 
+> I've done System.out.println's such that I know decaf is initializing (ie
+> the constructor is run) but I haven't had time to delve any deeper.
+> 
+> Avery J. Regier
+> 
+
+........... I have the same problem!
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From iainshigeoka@yahoo.com Wed, 1 Dec 1999 13:08:14 -0600
+Date: Wed, 1 Dec 1999 13:08:14 -0600
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] [DistributionGroup] Planning for next release
+
+On 1 Dec 99, at 8:49, Gilbert Carl Herschberger II wrote:
+
+> When the kernel group reaches a concensus that jJOS is GRUB-bootable, it
+> gives us an opportunity to create the next distribution of JOS.
+> 
+> Is it a major new release? I don't think so. I think we might call it "1e",
+> as in
+> 
+> "Announcing JOS Distribution 1e"
+
+Sounds reasonable.  I'm a bit concerned with our use of the 1x 
+versioning because it seems to imply that we're actually at a 1.x 
+stage (post major release).  When in reality we're more in a ".01x 
+release" or "1.0 pre-alpha x release" stage...  Just something to 
+consider.
+
+> We should distribute a runtime-only version, where someone can download JOS
+> and boot it with the minimum of fuss.
+> 
+> 1. Like the binary distribution of JOS 1d, a runtime-only distribution must
+> not require a Linux compiler.
+> 
+> 2. If JOS is GRUB-bootable, we should emphasize a step-by-step description
+> of booting up JOS with GRUB.
+> 
+> 3. A GRUB-bootable version does not require a network interface card (does
+> it?). So, requirements for a "JOS machine" should eliminate a network
+> interface card.
+
+I like these requirements.  Actually, I think a binary only release at 
+this time should only require the following:
+
+ibm pc compatible 386 or higher
+4mb ram (or was it 8?)
+keyboard
+vga video
+3.5" floppy drive
+Access to a disk image program like rawwrite.
+
+The binary release at this point is a single rawwrite compatible 
+image file (what's the equivilent image copier on unix?).  You 
+download the image, use rawwrite to blast it onto a floppy, boot the 
+floppy and see the tests run, the video stressed, and allow any 
+user input you want (test the keyboard, maybe provide a menu 
+driven set of options like running optional (potentially fatal) tests 
+like perhaps a rudimentary tcpip stack or ethernet driver, etc).  
+That's it.  Just a quick demo that it boots on a wide range of 
+machines, it does stuff, and we can distribute a bootable copy that 
+anyone can use.
+
+This will give us experience with the kernel on multiple machines, 
+workout some distribution issues, and see about integrating GRUB 
+and the kernel and building bootable floppy disk images.
+
+-iain
+
+
+
+From gchii@mindspring.com Wed, 01 Dec 1999 17:33:31 -0500
+Date: Wed, 01 Dec 1999 17:33:31 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [DistributionGroup] Planning for next release
+
+At 01:08 PM 12/1/99 -0600, "Iain Shigeoka" <iainshigeoka@yahoo.com> wrote:
+>I'm a bit concerned with our use of the 1x versioning because it seems to
+>imply that we're actually at a 1.x stage (post major release).  When in
+>reality we're more in a ".01x release" or "1.0 pre-alpha x release" stage...
+>Just something to consider.
+
+Attention: Everyone in the distribution group should consider the
+implications of 1x versioning. We need some naming convention to make it
+unmistake-able that one distribution came after another. I suggested "JOS
+Distribution 1e" because it comes after "JOS Distribution 1d".
+
+The world of software is changing. The version number for a distribution
+explains the order in which distributions -- not programs -- were made. You
+have to look inside a distribution to see which program versions.
+
+I look to Linux distribution as an example. SuSE Linux Distribution 6.0 has
+a 2.x Linux kernel. SuSE started with Linux Distribution 1.0 as their first
+distribution. From what I understand of distribution numbers, the first
+distribution of an "0.001" product is still distribution 1.
+
+JOS has the greatest potential of any operating system yet devised to reach
+the mass market of non-technical people. The mass-market would appreciate
+it if we, like them, used 1 as the first distribution. Only programmers
+start counting at zero. Programmers make up such a small percentage of the
+total population of JOS target market. While we have to impress programmers
+more than any other market segment, we should be concerned with the total
+market when selecting a distribution name.
+
+From my informal survey, my customers have responded favorably to "joss"
+for an operating system name. It reminds them of "doss". And sense "j"
+comes after "d", they thing "joss" might be an improvement. People
+"correct" me when I pronounced "JOS" like "jay-oss" or "jay-oh-ess".
+
+Something as complex as an operating system has no chance at all of
+settling on a version number for the whole OS. We should not confuse the
+version of a distribution with things like the version of any kernel or the
+version of any Java virtual machine.
+
+Furthermore, The significance of version "1.0" has been abused and lost to
+a new generation of customers. Some vendors, aware of the stigma of version
+"1.0" have adopted a insane policy. They use version "2.0" for their first
+version of a product.
+
+The issue of significant difference is under discussion. While I think the
+difference is not significant enough to call it "JOS Distribution 2", you
+might disagree. Maybe it would be simpler to call it "JOS Distribution 2",
+since it might be the first distribution that boots from BOOTP/TFTP and
+GRUB. Is that a significant difference?
+
+The operating system as a whole needs no number. Parts of an operating
+system are individually numbered. The distribution is individually
+numbered. The architecture or platform API is individually numbered. I feel
+strongly that JOS itself should not be given a version number in the style
+and consequence of, say, "Windows 95".
+
+People want to have their operating system last longer than the
+applications they build on top of it. Using a "model year" for software in
+the style of the automobile industry is just plain dumb. It wouldn't even
+work if you *could* produce a brand new operating system every year. It
+sends the wrong message to create an operating system that's guaranteed to
+be obsolete by this time next year.
+
+A name like "Windows 95" sounds like it is obsolete in 1996. It feels old
+in 1997. It feels embarrasing in 1998. Microsoft made a marketing mistake
+on the scale of New Coke. Who will want to install a product called
+"Windows 2000" in the year 2000, 2001, 2002, etc. That reminds people of
+something they don't want to be reminded of: low quality software has
+obsolesence built in. Only high quality software is built to last.
+
+As I think about it, a serial number for distributions could be
+accomplished in a number of different ways. Personally, I like "1e" (and
+"2a") because it is different, just as JOS is different. "1e" is easy to
+remember, write down and pronounce (or enunciate) over the phone.
+
+- a number from 1 to n
+- a letter from a to z
+
+
+
+
+From gchii@mindspring.com Wed, 01 Dec 1999 17:48:00 -0500
+Date: Wed, 01 Dec 1999 17:48:00 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] [DistributionGroup] Planning for next release
+
+At 01:08 PM 12/1/99 -0600, "Iain Shigeoka" <iainshigeoka@yahoo.com> wrote:
+>That's it.  Just a quick demo that it boots on a wide range of 
+>machines, it does stuff, and we can distribute a bootable copy that 
+>anyone can use.
+
+That's what gets me excited. That's exactly what I would like to have on my
+own JOS machine. No muss. No fuss. Just the bytes I need to run JOS. And I
+think we're so close to it, too.
+
+System requirements, like those you provided, should be distributed someday
+inside a "readme" file with the binary distribution. When everybody has the
+standard distribution of JOS-that-boots-from-GRUB, we can verify those
+requirements.
+
+Here's an idea out of nowhere: Why not call JOS-that-boots-from-GRUB
+something like JOS/GX? Java-Operating System-Boots-GRUB. Going backward,
+JOS-that-boots-from-Etherboot should be JOS/EX.
+
+>This will give us experience with the kernel on multiple machines, 
+>workout some distribution issues, and see about integrating GRUB 
+>and the kernel and building bootable floppy disk images.
+
+Distribution is something you have to practice. The earlier you get in the
+habit of distribution, the smoother the finished product is installed on
+the desk of the end-user.
+
+I agree. I think we should focus on distributing ONE copy of JOS that boots
+the same for every member of the JOS Project. Just as messages from the
+kernal group indicate, different people are booting different things --
+even though they have CVS in common. Sure, CVS works. But a binary
+distribution of JOS lets everyone compare what they custom build to a
+standard distribution.
+
+After that has been accomplished, I think we'll have learned something in
+the process. The next distribution will be easier.
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 2 Dec 1999 00:56:13 -0600
+Date: Thu, 2 Dec 1999 00:56:13 -0600
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Arch] [DistributionGroup] Planning for next release
+
+From:           	Gilbert Carl Herschberger II <gchii@mindspring.com>
+
+> At 01:08 PM 12/1/99 -0600, "Iain Shigeoka" <iainshigeoka@yahoo.com> wrote:
+> >I'm a bit concerned with our use of the 1x versioning because it seems to
+> >imply that we're actually at a 1.x stage (post major release).  When in
+> >reality we're more in a ".01x release" or "1.0 pre-alpha x release" stage...
+> >Just something to consider.
+> 
+> Attention: Everyone in the distribution group should consider the
+> implications of 1x versioning. We need some naming convention to make it
+> unmistake-able that one distribution came after another. I suggested "JOS
+> Distribution 1e" because it comes after "JOS Distribution 1d".
+
+Yes.  Since the previous was 1d, 1e seems the logical next 
+choice.  That wasn't really my problem with the name.
+
+> The world of software is changing. The version number for a distribution
+> explains the order in which distributions -- not programs -- were made. You
+> have to look inside a distribution to see which program versions.
+> 
+> I look to Linux distribution as an example. SuSE Linux Distribution 6.0 has
+> a 2.x Linux kernel. SuSE started with Linux Distribution 1.0 as their first
+> distribution. From what I understand of distribution numbers, the first
+> distribution of an "0.001" product is still distribution 1.
+
+Yeah.  But my problem is that distribution 1 would imply to me that 
+its got something that runs in it.  Now I know that there are 
+programs in it that do run in any jvm, but since its a "JOS" 
+distribution and not a "JOS Application" distribution, I would 
+assume that its really a dist centered around an OS.  I'd hate to 
+see us get all the way to say distribution 12m before we're shipping 
+something that resembles a running, usable OS.  Just naming 
+wise, it seems weird.
+
+> JOS has the greatest potential of any operating system yet devised to reach
+> the mass market of non-technical people. The mass-market would appreciate
+> it if we, like them, used 1 as the first distribution. Only programmers
+> start counting at zero. Programmers make up such a small percentage of the
+> total population of JOS target market. While we have to impress programmers
+> more than any other market segment, we should be concerned with the total
+> market when selecting a distribution name.
+
+Yes.  And so, since this is a programmers only release, we should 
+stress it with a 0 release....
+
+> Something as complex as an operating system has no chance at all of
+> settling on a version number for the whole OS. We should not confuse the
+> version of a distribution with things like the version of any kernel or the
+> version of any Java virtual machine.
+
+Agreed.
+ 
+> The issue of significant difference is under discussion. While I think the
+> difference is not significant enough to call it "JOS Distribution 2", you
+> might disagree. Maybe it would be simpler to call it "JOS Distribution 2",
+> since it might be the first distribution that boots from BOOTP/TFTP and
+> GRUB. Is that a significant difference?
+
+I would consider it a pretty big difference that the earlier dist was 
+source and required building software to get things going.  This one 
+would include a bootable disk image that only requires a simply 
+image copy tool to get going.  If not a 2x release, at least a 1.1a 
+release... or is 1.1a before 1b... do you count 1a 1.1a 1.2a 1.3a... 
+1b 1.1b 1.2b or is there no minor versions allowed?
+
+> The operating system as a whole needs no number. Parts of an operating
+> system are individually numbered. The distribution is individually
+> numbered. The architecture or platform API is individually numbered. I feel
+> strongly that JOS itself should not be given a version number in the style
+> and consequence of, say, "Windows 95".
+
+Agreed.  The os itself should be traditionally numbered 1.0 1.1 
+1.1.1 1.2 1.3 1.4 2.0, etc.
+
+> A name like "Windows 95" sounds like it is obsolete in 1996. It feels old
+
+Yes, but for _distributions_, it might actually be a good system.  
+Whether the os revs or not, you'll want to be using a recent 
+_distribution_ and using year number as part of the system would 
+make sense... even months.  I imagine that patches, security 
+fixes, and new tools should be frequent enough to warrant at least 
+a yearly update no matter what.  And a monthly update doesn't 
+seem ridiculous.  Most of the dist stays the same of course, but 
+the patches etc can be bundled up on a regular basis and added to 
+the dist.  Wouldn't it be easy to remember if you need to get the 
+latest dist if its name was "JOS Distribution 2000, October release 
+(featuring the JOS 1.3 Kernel)" and it was October 2000?  And 
+when someone asks for support and say they've got a version 
+number that's "JOS 2000, July release" and its now Jan 2001... 
+you know exactly (without having to know anything about what's 
+the current arbitrary distribution number) how far out of date you are.
+
+> As I think about it, a serial number for distributions could be
+> accomplished in a number of different ways. Personally, I like "1e" (and
+> "2a") because it is different, just as JOS is different. "1e" is easy to
+> remember, write down and pronounce (or enunciate) over the phone.
+
+Agreed.  But for a distribution, its also easy to say "JOS 99, 
+November release" and something like jos_1999_nov.jar is pretty 
+intuitive and conveys more information than just what particular 
+distribution you're talking about (it also has an implicit date).
+
+Of course, it must be stressed that this is a distribution 
+designation, and not a version number for any particular product 
+that is part of that distribution.
+
+Just something to think about.
+
+-iain
+
+
+
+From gchii@mindspring.com Sun, 05 Dec 1999 18:57:01 -0500
+Date: Sun, 05 Dec 1999 18:57:01 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] JVM Handle
+
+After further research on the Java Native Interface, it occurs to me that
+the interface should expose a JVM handle, not a pointer to a JVM. This
+breaks out the construction/destruction of JVMs to a internal-only
+function, like a JOS kernel.
+
+The form a JVM takes is entirely up to the implementation of the JVM. It
+must not be exposed through the native interface.
+
+CreateJavaVM( const ENV *env, JVM *&jvm );
+
+should be
+
+JVMHANDLE CreateJavaVM( const ENV *env );
+
+Instead of passing a pointer to the JVM to each subroutine in the JNI, an
+application should pass a JVMHANDLE. Of course, JVMHANDLE is an index into
+an linked list of JVMHolders.
+
+JVMHolder *top;
+
+A JVM plugs into a JVM holder. The JVM holder has only a few methods
+defined, including timeslice(). When a JVM is destroyed, its holder can be
+reused. When a JVM holder is empty, it returns from timeslice() immediately.
+
+
+
+
+From 915602@candseek.com Mon, 20 Dec 1999 11:56:07 -0500 (EST)
+Date: Mon, 20 Dec 1999 11:56:07 -0500 (EST)
+From: 915602@candseek.com 915602@candseek.com
+Subject: [JOS-Arch] JOBOP Sales Representative
+
+Since your email address was listed on a related web site 
+page or database, I thought you might help. I am seeking 
+an individual within the following conditions:
+
+I represent an IBM and Oracle Solutions provider in the 
+United States. Currently, they are looking for a Sales 
+Representative for the Southern Florida office. In this role, an 
+individual will be responsible for selling E-business, ERP, and 
+Networking Solutions to companies throughout the United 
+States. The ideal candidate will have a minimum of 2 years of 
+experience selling solutions. Any experience with IBM or 
+Oracle services is highly preferred. Salary is a base plus 
+commission and earnings are unlimited. 
+
+Geographic Location of Position: Southern Florida
+
+If you know anyone that might be interested, please forward 
+this to them or contact:
+
+Megan McCullough
+Diedre Moire Corporation 
+Fax: 609-584-9575
+Email: 915602@candseek.com
+
+To permanently discontinue receiving employment 
+opportunity notices from any and all help wanted 
+advertisers using the Candidate Seeker system, 
+click your "Reply" button and type the word "re-
+move" without spaces between the letters 
+into the SUBJECT field then click the "Send" 
+button. Your email address will be permanently 
+filtered from ALL future job opportunity 
+notifications sent via the Candidate Seeker 
+system.
+
+To temporarily filter employment opportunity 
+notices sent via the Candidate Seeker system, 
+type the acronym "JOBOP" into your subject 
+filter. All employment opportunity notices sent 
+via the Candidate Seeker system contain the 
+acronym "JOBOP" in the subject so they may be 
+easily filtered or blocked if so desired.
+
+Other email addresses may be permanently deleted 
+from future contact by emailing a single blank 
+message from the desired address to 
+nomail@candseek.com. Enter additional addresses 
+into the body of the message and they will also 
+be added to the "nomail" list
+
+
+Please feel free to contact the candidateseeker.com 
+feedback line at 609-584-5499. Do not use this 
+number for job related questions. All job related 
+questions should be directed to the employer by 
+replying to contact addresses or phone numbers 
+indicated at the end of the job description message.
+
+
+
+Mailed By:
+
+candseek.com
+510 Horizon Center
+Robbinsville, NJ 08691
+
+
+
+
+From gchii@mindspring.com Mon, 27 Dec 1999 16:41:42 -0500
+Date: Mon, 27 Dec 1999 16:41:42 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Classpath Project
+
+I believe that most of the source code from the Classpath Project can be
+salvaged. A program can be written to change the namespace of all those
+classes to what it should be (and should have been). The C++ code is
+greatly affected because java_awt_peer_gjt..() would become
+org_classpath_peer_gjt..().
+
+And yet, most of the translation is one-for-one. In theory, it can be
+mapped and automated. If the Classpath Project is unwilling or unable to do
+this, the JOS Project should do it. Everything in JOS hinges on a cleanroom
+implementation of the Java class libraries.
+
+We might not be able to wait for Classpath to provide something appropriate
+for JOS. We need to contact their organizers and let them know how much
+we're counting on perfect compatibility with Java 2 Platform.
+
+If the download from CVS is a preview of the things to come, we cannot
+reach the Java 2 Platform based on Classpath. Classpath needs to change
+their direction or we need to come up with anotehr plan. I analysed
+anonymous Java source code from the Classpath Project
+<URL:http://www.classpath.org/>.
+
+1. Contributors are using java.* packages for their own personal extension
+to the Java class libraries. While they have good ideas about the strengths
+and weaknesses of Sun Microsystems' API, they cross the line when adding
+and subtracting whimsically from the specification.
+
+2. Contributors have expressed their contempt for the deprecated methods
+and have not implemented them in Java 2 Platform. While I sympathize, I
+cannot agreed.
+
+3. I expected to find code in the org.classpath namespace. Instead of using
+the org.classpath namespace, contributors have put their code inside java.*
+or the default package.
+
+4. Much of the effort cannot be reused in an off-the-shelf virtual machine
+from Sun Microsystems or others.
+
+5. The Classpath Project has not solved the puzzle of JVM-specific classes
+or native methods. Instead, they have added JVM-specific classes to the
+java.* namespace.
+
+Here is my proposal. We need a liason between JOS and Classpath. In order
+for us to reuse the software created by the Classpath Project, it must be
+perfectly compatible with the Java specification or it must not be added to
+the java.* namespace.
+
+A. It is perfectly legal -- it breaks no technical rule -- if contributors
+create class libraries that do not match the Java specification. If so,
+they use their own namespace, like this:
+
+org.classpath.applet
+org.classpath.awt
+org.classpath.awt.peer
+org.classpath.awt.peer.gtk
+org.classpath.io
+org.classpath.lang
+org.classpath.net
+org.classpath.util
+
+B. JOS and Classpath Projects must work together in a methodical and
+positive manner so that JOS might benefit from Classpath. The JOS Project
+should be able to share the Bytecode Native Interface (BCNI) and build
+perfectly compatible Java class libraries from the functionality found in
+Classpath.
+
+
+
+
+From gchii@mindspring.com Mon, 27 Dec 1999 17:11:06 -0500
+Date: Mon, 27 Dec 1999 17:11:06 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Smart API Distribution
+
+I have completed a runtime (binary), source and technical distribution of
+Smart API - Release 2a - Distribution 5. For more information, see also the
+JOSDistribution1d page on JOS Wiki.
+
+Distribution 5 includes Application Studio - Release 2a (in other words,
+the org.jos.gchii.appstudio2a package). Inside the Application Studio is an
+ExitFrame, a AWT-compatible frame with an Exit property. When exit is true,
+closing the frame calls System.exit().
+
+It also contains GUIAppication, an AWT-compatible frame that implements the
+Program interface (org.jos.program2a.Program). Any extension of
+GUIApplication is immediately compatible with the Program Browser.
+
+For example, I created a DericApplication class. DericApplication extends
+GUIApplication. I can start the Deric application using this URI:
+
+run:program:org.jos.gchii.deric1c.DericApplication
+
+What more could you want? Because the Program interface is an interface,
+you can easily create a Swing-compatible frame available from the Program
+Browser.
+
+-----
+
+About the Desktop Browser
+
+It might not be clear in the documentation...but the Desktop Browser is
+functional in distributions 4 and 5. The Desktop Browser enables you to
+click an icon instead of manually typing a URI. Since the desktop browser
+implements the desktop: scheme, desktop files can be loaded and linked like
+HTML pages.
+
+-----
+
+About the future
+
+I expect multiple, concurrent desktops and server-farm-in-a-box to be the
+"norm" in the future. When you buy a "computer" for your office, you won't
+buy one CPU with one desktop. You'll buy a box the size of a PC; but, it
+won't be the PC you're used to. It might have 256 hacked PCs inside. A
+server-farm-in-a-box contains a TCP/IP subnet:
+
+ - 256 swappable units
+ - Each unit has at least one CPU and a network interface card.
+ - Each unit uses BOOTP/TFTP to boot from a single JOS boot image.
+ - Each unit only executes mostly-bytecode applications.
+ - Packages are downloaded on-demand through HTTP using package files.
+ - Only one unit "needs" a video adapter, a second network interface card,
+a keyboard and mouse.
+
+A server-farm-in-a-box needs a new kind of operating system (like JOS) in
+order to bring the power of many general purpose computers together with
+one version of the executable bytecode.
+
+When you operate such a computer, you need multiple, concurrent desktops.
+You should have at least one desktop for each unit. Visually, you open the
+desktop for a unit in order to invoke applications on that unit.
+
+
+
+
+From tmiller@haverford.edu Tue, 28 Dec 1999 23:09:35 -0500 (EST)
+Date: Tue, 28 Dec 1999 23:09:35 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Smart API Distribution
+
+> When you operate such a computer, you need multiple, concurrent desktops.
+> You should have at least one desktop for each unit. Visually, you open the
+> desktop for a unit in order to invoke applications on that unit.
+
+	If you've got 256 processors in that box, you should have better
+control over them than that -- you should be able to group them arbitrary
+(overlapping) ways, where that group then gains a pair of desktops, one
+where the desired task is run on the least-loaded (or whatever) processor,
+and one where it's run on every one of those processors (assuming it
+conforms to whatever parellel API Java has by then/we provide).  The
+default mode of operation would, I think, be automagic load-balancing from
+a single (set of) desktop(s), where the highly-threaded nature of the
+applications lends itself to parellel processing.
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Tue, 28 Dec 1999 23:10:50 -0500 (EST)
+Date: Tue, 28 Dec 1999 23:10:50 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Classpath Project
+
+	I'll agree with point 1 and 2, but I can't agree with 3.  java.*
+has to be there if we want normal java 1.x/2.x applications to run.  
+
+> 4. Much of the effort cannot be reused in an off-the-shelf virtual machine
+> from Sun Microsystems or others.
+
+	Unfortunately, I think this will be true for any class
+library.  The phrase 'class library' is misleading in a way that suggests
+it's not an integral part of the VM; it doesn't (AFAIK) /have/ to be, but
+Sun seems to have designed it that way.
+
+> 5. The Classpath Project has not solved the puzzle of JVM-specific classes
+> or native methods. Instead, they have added JVM-specific classes to the
+> java.* namespace.
+
+	On the other hand, they /did/ break the JVM-specific classes off
+into a separate tree from the rest of them.  This would suggest converting
+them to BCNI wouldn't be terribly difficult.
+
+> Here is my proposal. We need a liason between JOS and Classpath. In order
+> for us to reuse the software created by the Classpath Project, it must be
+> perfectly compatible with the Java specification or it must not be added to
+> the java.* namespace.
+
+	Oh, BTW, classpath is going to merge with gcj, (native java
+compiler front-end to gcc), so it looks like they're going to add another
+'primary' (i.e. japhar) platform for their class library and merge in a
+good chunk of new code.  Whoever this liason might be should definitely
+get in on the action soon -- as long as the codebase is undergoing big
+changes, it will be easier to to get our changes in.
+
+
+	I'm working on getting classpath to work with the host build of
+jJOS right now.  It looks like decaf has a bug when working with
+classfiles generated by compilers other than javac, in that it expects the
+compiler to have gone ahead and chased down the actual class/interface to
+which the field/method belongs -- that is, it does NOT check the parents
+of the class to which a Fieldref_info points, because it should be (?)
+pointing to the right one.  This might require some fairly substantial
+changes to a part of the back-end, because I'm not sure the field-table
+structure I set up will work for what amounts to multiple
+inheritance.  (Sigh.)
+
+-_Quinn
+
+
+
+
+
+
+
+From gchii@mindspring.com Wed, 29 Dec 1999 09:37:48 -0500
+Date: Wed, 29 Dec 1999 09:37:48 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Smart API Distribution
+
+At 11:09 PM 12/28/99 -0500, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>	If you've got 256 processors in that box, you should have better
+>control over them than that -- you should be able to group them arbitrary
+>(overlapping) ways, where that group then gains a pair of desktops, one
+>where the desired task is run on the least-loaded (or whatever) processor,
+>and one where it's run on every one of those processors (assuming it
+>conforms to whatever parellel API Java has by then/we provide).  The
+>default mode of operation would, I think, be automagic load-balancing from
+>a single (set of) desktop(s), where the highly-threaded nature of the
+>applications lends itself to parellel processing.
+
+If you've got a server farm, you need a new operating system. If you have
+many processors and only one console (monitor-keyboard-mouse), you need a
+new way of thinking about the human interaction with this machine. The
+human must operate this machine, the whole machine. Traditional operating
+systems are tied to a obsolete single processor/single console model. You
+simply cannot run a traditional operating system efficiently on a server farm.
+
+Yes, you should be able to group them arbitrary ways. I would prefer a
+classic approach to grouping, like agent and cluster technology. Java
+agents are the first to be platform-independent enough to roam from one
+machine to the next.
+
+A new OS must be more platform independent so that agents can roam without
+concern for the foreign operating system. It is possible to maintain a mix
+of JOS, Linux and Windows on a server farm. I am free to use one copy of
+Windows 95 for my console and use Linux for my servers. I would like to use
+JOS, too.
+
+-----
+
+After forming a reply, I wonder if your definition of "parallel" processing
+is the same as mine. Parallel processing is where one program is running,
+with only one "thread of control", and parts of the program are
+automatically divided among more than one processor on a motherboard. A
+network is not part of this kind of parallel processing.
+
+What is distributed processing anyway? The Internet is one of the best
+examples of successful distributed processing in the software industry. The
+model is simple. All the work gets done. Each machines perform their own
+dedicated task. Many machines contribute to the processing power of the
+network.
+
+-----
+
+A server-farm-in-a-box does not need to be fancy. It does not need its
+software to do much beyond what has already been done. The first step is to
+organize the hardware in an off-the-shelf package so that it out performs
+the value of buying one processor at a time. Imagine the economy of scale
+when you can buy a four or sixteen unit motherboard. Only sixteen
+motherboards are needed to make a 256 unit server farm.
+
+Second, I would like to see JOS as the operating system of choice. Why?
+Because only a bytecode-based operating system can provide a single
+"executable image" for all 256 machines.
+
+Third, I would like to have an agent environment available for some of
+those processors. I would prefer using the successful "agent" and "cluster"
+technologies, rather than parallel processing.
+
+I cannot turn the administration of my server farm over to a machine. I
+cannot justify automatic load-balancing across all 256 processors. A few of
+these machines can be used as if they were one, using "cluster" technology.
+Agents are free to roam from one machine in a cluster to another.
+
+In general, people must choose to set up specific services on specific
+machines. That's what a network engineer does. When I look at the
+successful model used throughout the Internet/intranet network, I see
+people getting involved in configuring their own network. I get involved in
+configuring my server farm. I have given each machine in my server farm a
+unique name.
+
+The entire server farm is a domain. Each machine in the domain has a unique
+name.
+
+quest: This machine is also known as www and ftp. I set aside quest as a
+"security" server. It runs Linux, BOOTP, TFTP, TELNET, FTP, HTTP, SMB
+(master). 
+
+world: I set aside world to be a very-large-disk file server. It runs
+Linux, SMB, TELNET, FTP and that's it.
+
+josx: I set aside the next machine to be an experimental JOS machine.
+
+Each machine can be dedicated to SMTP, print service, file service, backup
+services, CORBA services, RMI services, XDC services and more.
+
+-----
+
+While one server-farm-in-a-box might be configured to the max, an entry
+level server-farm-in-a-box might come with only one CPU pre-installed.
+
+Each motherboard uses as many CPUs as you have installed. If the CPU "slot"
+is empty, the unit is disabled somehow. A sixteen unit motherboard does not
+have to include sixteen CPUs all at one time. Instead, you buy them as you
+need them. Rather than buying all 256 CPUs at one time, you can buy a few
+CPUs each year until you have collected the whole set.
+
+
+
+
+From tmiller@haverford.edu Wed, 29 Dec 1999 15:22:26 -0500 (EST)
+Date: Wed, 29 Dec 1999 15:22:26 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Smart API Distribution
+
+> If you've got a server farm, you need a new operating system. ... You
+> simply cannot run a traditional operating system efficiently on a server farm.
+
+	I'll agree to that.
+
+> Yes, you should be able to group them arbitrary ways. I would prefer a
+> classic approach to grouping, like agent and cluster technology. Java
+> agents are the first to be platform-independent enough to roam from one
+> machine to the next.
+
+	Agents -- to my understanding -- normally run only on the machine
+where they were started, for the reason that migrating an agent to run on
+some other machine is the same problem as migrating code, which hadn't
+been solved when agents were designed.  Moving an agent from processor to
+processor, as to gain the best performance, should be the responibility of
+the operating system, and not the agent.  The exact mechanism for grouping
+them -- some variety of clustering technology -- was not what I was
+addressing.  Most clustering solutions today are not so dynamic as the one
+that would be required to make efficient use out of a 256-processor server
+farm.
+
+> After forming a reply, I wonder if your definition of "parallel" processing
+> is the same as mine. Parallel processing is where one program is running,
+> with only one "thread of control", and parts of the program are
+> automatically divided among more than one processor on a motherboard. A
+> network is not part of this kind of parallel processing.
+
+	Parallel processing takes many forms.  Strictly speaking, we're
+looking at concurrent processing, that is, processing where parts of the
+work (calculations) of the program are time/order independent of the
+others.  (Concurrency may or may not be exploited in a strictly parallel
+fashion depending on the available hardware.)  In general, the best
+performance is gained from explicit concurrency -- using systems such as
+PVM or MPI to explicitly code the parallel portions of a
+program.  Performance will also benefit from heavy threading and light
+synchronization, where different threads can execute simultaneously on
+different processors.  Parallelism such as you describe is typically the
+least efficient, where the hardware (or, for fork()ing programs, the
+OS) has to decide how to parallelize the program.
+
+	Parallel processing typically has two hardware forms: symmetric
+multi-processing and clusters.  SMP is N processors per motherboard,
+tightly linked (e.g. very high bandwith interconnects), typically sharing
+the same RAM.  Clustering can use SMP boxes/mobos, or single processor
+boxes/mobos, and combine them with slower interconnects, typically
+off-the-shelf networking like 100baseT ethernet.  Naturally, SMP performs
+better for tightly-coupled processing (where alot of data is shared) and
+clustering is more efficient for loosely-coupled processing (where almost
+no data is shared).  The seti@home and rc5-crack attempts are good
+examples of clustered computing.
+
+	They are not, however, distributed computing in the sense that I
+understand it, because both report their results back to a single 'master'
+node that then hands work units back out.  Distributed processing is more
+like the IRC network, a large group of peers each doing what needs to be
+done locally to generate a global effect -- that is, distributed systems
+do NOT have a single 'master' node.
+
+
+	A server-farm-in-a-box, according to your description, will be an
+16-way cluster of 16-way SMPs.  The way you seem to want to do things, you
+want to maintain all 256 of those processors as separate machines -- to
+me, that just seems like a great deal of extra work.
+
+> I cannot justify automatic load-balancing across all 256 processors.
+
+	Why not?  It's free (almost) in the operating system / daemons
+running on those processors.  It makes /your/ life that much simpler,
+because you don't have to worry about balancing the load by hand.  If you
+want, you'd be able to exclude certain processors/motherboards from the
+'processing pool' and manage them manually -- presumambly to dedicate them
+to web serving, or file serving, etc.  But when userA logs in, it doesn't
+matter which of the other processors userA's jobs run on, so why bother to
+decide by hand when the load-balancing daemons/kernels ask each other
+whose not busy.  It results in better performance for everyone using the
+farm.  If you have a large processing job that you /know/ is tightly
+bound, you can dedicate a motherboard and its processors to the job,
+setting it to realease that group to the pool when the job is done.  For a
+more loosely-coupled job, you might want to specify that it uses no more
+than two processors per motherboard.
+
+> In general, people must choose to set up specific services on specific
+> machines.
+
+	That used to be true; it no longer is, and that's the idea behind
+most clustering technologies.  N machines can 'hide' behind one
+net-address and split the work up amonst themselves.  There's no reason to
+not to treat net-addresses as logical addresses, rather than physically
+correspsonding to a particular machine.
+
+	The key need for one-console to many-machines will not be
+communicating with those machines.  (Right now, I'm managing 8 machines
+250 miles away without any problems at all, with one
+keyboard/mouse/monitor.  I'm using xterms, because I'm hooking up over a
+modem, but if I were on something faster, I could run X programs remotely
+just as easily.)  The problem will be making efficient use of those
+machines.  (Even right now, with one-to-one the primary mode, the vast
+majority of processing power on the average desktop goes to waste waiting
+for the user to do something; for example, this particular machine is
+spending 55% of its time cranking seti@home, and 30% of its time running
+desktop animations.  Only 15% of it is concerned with anything that I'm
+doing.)  Historically, the most common mode of interaction was many
+consoles to one machine, so one typically didn't have cycles to
+burn.  The shift to one-to-one was not terribly worrisome, because the
+single machines behind the single consoles weren't powerful or connected
+enought to be worthwhile.  They are now -- as the rc5 crack/seti@home
+groups and other similar ones -- have shown.
+
+	The situation only gets worse as the ratio of consoles (users) to
+machines rises.  For servers, if the limiting resource is bandwidth, then
+it's a true shame to let all those extra cycles go to waste -- and if it's
+an interactive server (i.e. shell account), then you need load-balancing
+to any kind of reasonable performance.  If the limiting resource is CPU
+time, it's even /more/ important that the limited resources at hand are
+used most efficiently -- which, IMHO, would point to an automated system.
+
+-_Quinn
+	
+
+
+
+
+
+
+From gchii@mindspring.com Thu, 30 Dec 1999 10:24:41 -0500
+Date: Thu, 30 Dec 1999 10:24:41 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Classpath Project
+
+At 11:10 PM 12/28/99 -0500, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>	I'll agree with point 1 and 2, but I can't agree with 3.  java.*
+>has to be there if we want normal java 1.x/2.x applications to run.
+
+Point 3 is a procedural issue. Understanding this point is critical to the
+success of any cleanroom implementation of Java class libraries. Building
+classes directly in the java.* namespace has always been the obvious thing
+to do and yet it has never worked. Design, develop and debug Java class
+libraries requires an alternative namespace.
+
+Think about how Sun Microsystems did it. It is no secret. They used JDK 0.0
+(Oak) to develop the class libraries for JDK 1.0. They use JDK 1.0 to
+develop the class libraries for JDK 1.1. They used JDK 1.1 to develop the
+class libraries for JDK 1.2. The alternative namespace at Sun Microsystems
+is javax.*. The original purpose of the javax.* namespace comes from the
+need to develop classes for a new virtual machine using an old one. 
+
+There is a very good reason why I expected to find code in the
+org.classpath namespace. Sun Microsystems "owns" the java.*, javax.*, sun.*
+and com.sun.* namespaces. No organization should put new designs there. The
+strengths and weakness of Sun Microsystems' namespaces is theirs and theirs
+alone.
+
+ - According to cleanroom rules, we can put exactly the same design in
+java.* and javax.*. We must match a specification exactly. We can put new
+design in org.classpath (or org.jos). Sun Microsystems has made it clear
+that we cannot put anything in sun.* or com.sun.*.
+
+An alternative namespace is required for the design, development and
+debugging of the original bytecode. So, where did the java.* libraries come
+from? At the "last minute", the source code for the alternative namespace
+is copied to java.* and compiled. At the time the Java class libraries are
+compiled, they have already been thoroughly tested.
+
+What are the implications? It means that you can write a class called
+alt.io.ByteArrayInputStream and test it immediately in any JDK. You can run
+down a check list to make certain your awt.io.ByteArrayInputStream matches
+the specification of java.io.ByteArrayInputStream. You have two classes
+side-by-side that you can systematically compare, feature for feature.
+
+While a test program is written to test a class alternative namespace, it
+can depend on existing, fully debugged and reliable classes in the java.*
+namespace. When you write a test program framework, you're free to use any
+and all existing classes. By using an existing JDK, you have a reliable
+virtual machine to run on.
+
+>> 4. Much of the effort cannot be reused in an off-the-shelf virtual machine
+>> from Sun Microsystems or others.
+>
+>	Unfortunately, I think this will be true for any class
+>library.  The phrase 'class library' is misleading in a way that suggests
+>it's not an integral part of the VM; it doesn't (AFAIK) /have/ to be, but
+>Sun seems to have designed it that way.
+
+Developing classes in an alternative namespace has many advantages. One
+advantage is the reuse of the class library immediately in any
+off-the-shelf virtual machine. It is not at all necessary to wait until the
+alternative class libraries have been copied into java.* namespace. They
+are immediately available for use in any application.
+
+I use 'class library' to mean any class library. A class library is a
+collection of classes. In Java-speak, a class library is a "package". The
+Java class libraries are found in java.* namespace.
+
+A class library is not an integral part of the virtual machine. From a
+purely technical viewpoint, few classes in the Java class libraries are an
+integral part of a virtual machine.
+
+Most of the class libraries in Java 2 Platform are not integral to the
+virtual machine. I call them class libraries because most class libraries
+are optional. There are only a few, like java.lang, that put "Java" in
+"Java Virtual Machine".
+
+I do not wish to misrepresent bytecode technologies. I want people to
+understand that too many of Sun's products have been coerced into the Java
+2 Platofrm when, in fact, they are optional. You can run a bytecode virtual
+machine without them.
+
+Adding things to the java.* packages that are not an integral part of the
+virtual machine undermines competition. Sun Microsystems does not worry
+about competition on JDBC and Swing. They threw it into the core to
+discourage innovation and competition. While it makes some people happy in
+the short term, it undermines the development of open source software in
+the long term.
+
+Instead of producing a straight forward implementation of a Java-compatible
+virtual machine, designers are thrown into confusion. They must maintain
+competence on JDBC, RMI, JFC/Swing and all of these non-essencial
+technologies. With my proposal, you only design a virtual machine when you
+want to develop a Java-compatible virtual machine. Non-essencial class
+libraries are developed once and all Java-compatible virtual machines can
+use them -- verbatim.
+
+It is a double standard. There is a fake core and a true core. Sun
+Microsystems promotes the idea of a fake core. They define "core" as the
+packages that an application depends on. Frankly, that's stupid. My
+application depends on javax.servlet. Why would that be left out of the
+core? My application depends on javax.swing. Why would that be that part of
+the core?
+
+A true core is defined as the packages that all virtual machines depends
+on. The true core is very small. There are only a few packages and few
+class that all virtual machines depends on.
+
+This does not include JVM-specific classes either. One virtual machine
+depends on a JVM-specific class.
+
+Everything else is non-essential. While it might be nice to have all these
+packages in one namespace, it is unnecessary and undesireable to put
+non-essencial classes into the virtual machine specification.
+
+I continue to use JDK 1.0. Does JDK 1.0 contain a Java Virtual Machine, or
+not? Even JDK 1.0 contains non-essencial packages, like java.applet and
+java.awt.
+
+>> 5. The Classpath Project has not solved the puzzle of JVM-specific classes
+>> or native methods. Instead, they have added JVM-specific classes to the
+>> java.* namespace.
+>
+>	On the other hand, they /did/ break the JVM-specific classes off
+>into a separate tree from the rest of them.  This would suggest converting
+>them to BCNI wouldn't be terribly difficult.
+>
+>> Here is my proposal. We need a liason between JOS and Classpath. In order
+>> for us to reuse the software created by the Classpath Project, it must be
+>> perfectly compatible with the Java specification or it must not be added to
+>> the java.* namespace.
+>
+>	Oh, BTW, classpath is going to merge with gcj, (native java
+>compiler front-end to gcc), so it looks like they're going to add another
+>'primary' (i.e. japhar) platform for their class library and merge in a
+>good chunk of new code.  Whoever this liason might be should definitely
+>get in on the action soon -- as long as the codebase is undergoing big
+>changes, it will be easier to to get our changes in.
+
+You understand what classpath means to us. What approach should we use?
+What plan should we have to help classpath put together the best cleanroom
+implementation of Java class libraries?
+
+On the one hand, bad habits are hard to break. Classpath has already set
+precedent by developing their classes in the java.* namespace. How will
+they learn there's an easier way?
+
+What are the implications of merging with gcj? Does it mean that I will be
+able to use C/C++ pre-processor with Java source code?
+
+>	I'm working on getting classpath to work with the host build of
+>jJOS right now.  It looks like decaf has a bug when working with
+>classfiles generated by compilers other than javac, in that it expects the
+>compiler to have gone ahead and chased down the actual class/interface to
+>which the field/method belongs -- that is, it does NOT check the parents
+>of the class to which a Fieldref_info points, because it should be (?)
+>pointing to the right one.  This might require some fairly substantial
+>changes to a part of the back-end, because I'm not sure the field-table
+>structure I set up will work for what amounts to multiple
+>inheritance.  (Sigh.)
+
+A bytecode verifier is important to the success of a Java-compatible
+virtual machine. I am still looking for the bytecode verifier in decaf.
+Once I knew about the need for a bytecode verifier, I went about creating a
+pure reflection package. It is a separate package, written in Java, to
+decode "class files". This Java-based prototype was written for the purpose
+of implementing it eventually in C++.
+
+A bytecode verifier is a stand-alone subsystem. Like pure reflection, it is
+independent of any virtual machine. The bytecode verifier exposes
+variations between different javac tools. When integrated into decaf, for
+example, it would "protect" decaf from bytecode you describe (until decaf
+can handle it).
+
+
+
+
+From gchii@mindspring.com Thu, 30 Dec 1999 10:55:35 -0500
+Date: Thu, 30 Dec 1999 10:55:35 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Smart API Distribution
+
+At 03:22 PM 12/29/99 -0500, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>(Right now, I'm managing 8 machines 250 miles away without any problems at
+>all, with one keyboard/mouse/monitor.  I'm using xterms, because I'm hooking
+>up over a modem, but if I were on something faster, I could run X programs
+>remotely just as easily.)
+
+You are representative of all kinds of people. You manage 8 machines. You
+get involved in configuring and optimizing those eight machines. And yet,
+you only have one keyboard/mouse/monitor.
+
+In an evolutionary first step, I would like you to continue doing what you
+are already doing. Even with 8 machines were in the next room, it is easier
+to maintain them with one keyboard/mouse/monitor.
+
+-----
+
+From my viewpoint, a server-farm-in-a-box must never be a 16-way cluster of
+16-way SMPs. By my definition, a 16-CPU SMP would only be one "unit".
+
+Units always use a network interface card for inter-machine communication
+-- just like all other serverfarms. Each unit in a serverfarm-in-a-box must
+be a wholy independent general purpose processor, like a PC. It never uses
+"shared memory" to communicate between processors.
+
+You have 8 machines that are 250 miles away. Are all 8 machine in the same
+server closet? Are all 8 in close physical proximity?
+
+Imagine I have 8 machines in a room next door. Why do these 8 machines need
+8 separate power supplies. Why do they need 8 separate cases? Why did I
+need to purchase 8 separate motherboards, with one CPU on each motherboard?
+
+A serverfarm-in-a-box is useful if I would normally go out and buy eight
+(or more) separate PCs and put them together in a serverfarm. I would buy
+one case, with one power supply. I could buy all 8 PCs at once, one box,
+one transaction.
+
+Between these 8 machines, I would have no network cabling exposed. By
+optimizing such a design, I could eliminate the need for 8 separate
+"motherboards". Optimization would combine 8 PCs on single card, while
+maintaining indepdendence.
+
+It might be possible to engineer "network interface cards" for a
+serverfarm-in-a-box that does not physically have an ethernet cable.
+Network interface cards can be integrated into the motherboard.
+
+-----
+
+With one computer, I am always waiting. I type in a command to recompile
+something like the source code from Source Server. Then I have to wait for
+what seems like an eternity to type in the next command. My computer is
+never fast enough to do all the things I want to do. Programmers use
+computers, too.
+
+I want a hardware architecture that frees us from the idea that speed comes
+from faster and faster CPUs. The Internet is proof that large scale
+distributed processing is possible with "slow" CPUs. A serverfarm-in-a-box
+takes the successful model of the Internet and brings it "home" to a small
+or medium sized office. Where else can hardware manufacturers go?
+
+I believe the only "thing" missing from a serverfarm-in-a-box is a suitable
+operating system. None of these other "stand-alone" operating systems will
+do because they are not scaleable.
+
+-----
+
+I have experimented with "agents" in my lab. An agent cooperates with its
+agent environment to move around from one agent environment to another.
+Typically, an agent is serialized on one agent environment and deserialized
+on another.
+
+On a single machine, I can have two agent environments, each in its own
+process, connected by TCP/IP. Through a priority scheme, I designed an
+agent that changes its own priority. The "high priority" environment has
+one and only one agent running at a time. The "low priority" environment
+has more than one agent running, each in its own thread. A change in
+priority might cause the agent environment to "move" it to the other
+environment.
+
+
+
+
+From tmiller@haverford.edu Thu, 30 Dec 1999 13:20:54 -0500 (EST)
+Date: Thu, 30 Dec 1999 13:20:54 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Classpath Project
+
+	Okay, I understand the desire for the org.classpath namespace
+now; my apologies for being obtuse.  Nonetheless, their system is intended
+as a drop-in class library for japhar (and kaffe), so it makes sense from
+their p.o.v. to just go ahead and name their stuff 'right' the first
+time.  I don't think we'll be able to change their minds...
+
+	Regarding the class library as not strictly integrated with the
+Virtual Machine, you're quite right: technically, only a very few classes
+have anything at all to do with the virtual machine, and that it's the
+java.lang.* and company packages that make it a /java/ virtual
+machine.  A better phrasing would be "the class library is an integral
+part of the java platform." 
+
+> A true core is defined as the packages that all virtual machines depends
+> on. The true core is very small. There are only a few packages and few
+> class that all virtual machines depends on.
+
+	Yes.  Everything else -- aside from the native methods -- is or
+should be directly portable from library to library.
+
+> This does not include JVM-specific classes either. One virtual machine
+> depends on a JVM-specific class.
+
+	I believe Sun designed their library so that the overlap between
+this and the above is nearly complete, but I haven't checked.
+
+> Everything else is non-essential. While it might be nice to have all these
+> packages in one namespace, it is unnecessary and undesireable to put
+> non-essencial classes into the virtual machine specification.
+
+	It is, unfortunately, what we're stuck with.
+
+> You understand what classpath means to us. What approach should we use?
+> What plan should we have to help classpath put together the best cleanroom
+> implementation of Java class libraries?
+> 
+> On the one hand, bad habits are hard to break. Classpath has already set
+> precedent by developing their classes in the java.* namespace. How will
+> they learn there's an easier way?
+> 
+> What are the implications of merging with gcj? Does it mean that I will be
+> able to use C/C++ pre-processor with Java source code?
+
+	While that would be nice, I'm not sure if it's the
+case.  (Actually, you can run java code through the C preprocessor by hand
+right now: cpp code.java.cpp | sed -e 's/#.*//' > code.java; javac
+code.java -- where the sed removes the leading '# 1 <filename>' that cpp
+inserts.  YMMV.)
+
+> A bytecode verifier is important to the success of a Java-compatible
+> virtual machine. I am still looking for the bytecode verifier in decaf.
+
+	It's not there.  The only verification I perform what's implicit
+in checking for proper operation of the VM and clean .class files.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Thu, 30 Dec 1999 13:44:43 -0500 (EST)
+Date: Thu, 30 Dec 1999 13:44:43 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Arch] Smart API Distribution
+
+> Units always use a network interface card for inter-machine communication
+> -- just like all other serverfarms. Each unit in a serverfarm-in-a-box must
+> be a wholy independent general purpose processor, like a PC. It never uses
+> "shared memory" to communicate between processors.
+
+	Ah, but why not?  If it's on the same motherboard, you can get all
+sorts of speed advantages with shared memory -- not to mention cost
+advantages.  The only requirement for it is an operating system aware of
+it, one whose virtual memory system can handle it.
+
+> Between these 8 machines, I would have no network cabling exposed. By
+> optimizing such a design, I could eliminate the need for 8 separate
+> "motherboards". Optimization would combine 8 PCs on single card, while
+> maintaining indepdendence.
+
+	On the other hand, by putting them on a single card/box, you're
+creating a single point of failure for yourself -- which eliminates one of
+the advantages of server farms.  If one power supply fails, you only lose
+1/8 of your computing power.  If your in-a-box supply fails, you lose all
+of it.
+
+> I want a hardware architecture that frees us from the idea that speed comes
+> from faster and faster CPUs. The Internet is proof that large scale
+> distributed processing is possible with "slow" CPUs. A serverfarm-in-a-box
+> takes the successful model of the Internet and brings it "home" to a small
+> or medium sized office. Where else can hardware manufacturers go?
+
+	Ah!  You're tired of waiting.  So am I.  Automatic load-balancing
+is one of those things that will produce better response time -- type in a
+command, and when the shell fork()s it, it fork()s it to another processor
+(on the same mobo, usually, to avoid network traffic when it loads,
+etc) -- freeing its processor up to return to it immediately.
+
+
+	The case where a server-farm-in-a-box is different than something
+that's being done today is where it's dedicated to a single user and is a
+cluster, not an SMP (though it may a cluster of SMPs).  Most cluster
+design today focuses on scientific/high-speed computing (e.g. get
+this(these) job(s) done ASAP, and more or less ignore the user) or
+many->one interactions (e.g. webserving).
+
+	Typically, operating systems themselves scale fairly well, though
+some can do it better than others, like any OS task.  The bottleneck is
+usually with the applications.  An IDE for example, has a trivial scaling
+in that the compiler can run on a separate processor than the the
+editor.  And you might be able to run the tool and menubars on a separate
+processor from the documents, but you reach the point of diminishing
+returns quite rapidly, as the bandwidth and latency of the processor
+interconnects offets the benefits of parallelism.  A non-trivial -- and
+perhaps non-obvious -- paralellization would be to fire off N-1 (N =
+number of processors) compiler runs, instead of doing them sequentially,
+since, aside from the headers, compiling on C/C++ file is independent of
+the rest.  Then a final job to the linking.  This, however, would require
+an effort on the part of the IDE's programmer -- the OS can't help
+here.  It's a simple example, but I think it'll get the point across.
+
+	The hardware manufacturers have good reasons for the single
+processor-single box tradition.  There are technical reasons (which I've
+outlined above) why (up to a certain point) a faster single processor is
+better than a pair of half-speed ones, especially for programs designed
+for a single processor -- and that the OS these machines will ship with
+doesn't support SMP.  (And, of course, one 700 MHz p3 has much larger
+margin than a pair of 400 MHz celerons. (700 MHz celeron != 700 MHz p3))
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Thu, 30 Dec 1999 17:22:13 -0500
+Date: Thu, 30 Dec 1999 17:22:13 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Arch] Smart API Distribution
+
+At 01:44 PM 12/30/99 -0500, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>A non-trivial -- and perhaps non-obvious -- paralellization would be to
+>fire off N-1 (N = number of processors) compiler runs, instead of doing
+>them sequentially, since, aside from the headers, compiling on C/C++ file
+>is independent of the rest.
+
+Here is the kind of programming environment I want:
+
+I want my "compiler" like gcc, javac, javadoc, bulkmake and sourcedoc to
+run 24 hours a day, 7 days a week -- as services on one or more machines. I
+want my compiler to search out new code, seek out changed code, and compile
+it automatically when it finds it. I do not want to be bothered to
+explicitely start the compile or link process.
+
+While it might "waste" a few CPU cycles trying to build code with a syntax
+error, a serverfarm should have more than enough capacity. If I know what I
+am doing, I'll be rewarded with new executable programs in the least amount
+of time possible.
+
+I want my compile-and-link services to produce many different builds
+(prototype vs. production) without prompting. When I want to debug a
+program, I want to debug a program, not wait for the explicit
+compile-and-link step. If I have explained the rules of compilation and
+linking to the compile-and-link service, an executable file simply
+"appears" as soon as possible.
+
+Even as two or more programmers on a team edit and add code to the project,
+the compiler builds new files as needed. Each programmer is insulated from
+others by writing code in their personal space. Code is distributed from
+one member to another only after it compiles perfectly (according to the
+compile-and-link service).
+
+An Internet-based compile-and-link service might work like this. Many
+programmers working on a JOS project would upload source code to the JOS
+compile-and-link service. The compile-and-link service would (1) put it
+through version control, (2) determine how many targets need to be rebuilt,
+(3) choose a new build name, (4) compile and link a new target that
+everyone on the JOS project can download (as soon as its ready).
+
+Not only does the compile-and-link service produce .class files (and .jar
+files). It also produces JavaDoc and SourceDoc and other cross-reference
+and analysis files. When source code is "compiled" into JavaDoc, the HTML
+is available to members as soon as its ready. With sophisticated rules, the
+compile-and-link services are distribute-able. If there are many targets
+affected by one source file, each target can be compiled in parallel on a
+different process.
+
+I only want to know when the computer is finished with the results of my
+editing. When I build a Java product, for example, I wish all the .class
+files, .html files, and archives were "compiled" and "distributed" in
+parallel. I wish it were automatic, by a project file. I would rather not
+spend my nights and weekends watching one computer compile these products
+serially.
+
+It is the same with database applications. I run one query script and then
+wait. My single-CPU computer -- even at 700MHz -- does not have the
+capacity to finish my query script in an instant.
+
+I do not care about "idle" time. I don't care if 256 processors spend all
+night invoking no-ops. I only care about my immediate request to affect a
+new product distribution after I make a source-level change. I would like
+to compress the time it takes to get a new distribution once I have saved a
+.java file.
+
+Here is yet another example. After I have changed a .java file, it must be
+compiled into a .class file. After a .class file is saved, the entire
+regression test suite must be run, starting with test #1. I would like each
+CPUs to run one test suite at a time until all the regression tests are
+completed. The results of the regression test should be presented to me (in
+HTML) as soon as possible.
+
+When a .java file is written into the alternative namespace, the "make"
+process should simultaneously broadcast the .java file to the Java 0, 1 and
+2 Platform subdirectories. Each platform subdirectory should be recompiled
+in parallel, using tools appropriate to the task. If Java 2 takes more CPU
+cycles to recompile, it might be possible to assign the Java 2 project more
+CPUs in the serverfarm.
+
+I take pictures to the drugstore to have them developed. I think I would be
+happy on a very large (100+ million lines of code) project to write source
+code today and run the executable program(s) tomorrow.
+
+I have lots of work for my computer to do. I could certainly use the extra
+processing power in crunch time, when a new distribution is needed as soon
+as possible. I am not alone.
+
+
+
+

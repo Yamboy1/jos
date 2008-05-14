@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000020.html">
+   <LINK REL="Next" HREF="000017.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] peer-ui mappings</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-UI] peer-ui mappings">digigod@earthling.net</A><BR>
+    <I>Fri, 16 Jul 1999 09:47:29 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000020.html">[JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000017.html">[JOS-UI] CVS Server</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#24">[ date ]</a>
+              <a href="thread.html#24">[ thread ]</a>
+              <a href="subject.html#24">[ subject ]</a>
+              <a href="author.html#24">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Sean Cribbs wrote:
+&gt;<i> OK, but we will have to make an assumption at this point that the
+</I>&gt;<i> simplest peers, i.e. Component, Container,
+</I>&gt;<i> Window, etc. will not have calls to native libraries and will instead
+</I>&gt;<i> call some Java-abstracted graphics hardware device.  I don't know if
+</I>&gt;<i> that part of the project has been finalized yet.  Also, it would be
+</I>&gt;<i> useful to have some spec on the Shell interface.  In trying to create a
+</I>&gt;<i> skeleton for the JOSToolkit, I realized that some of the functionality
+</I>&gt;<i> there should be things that could be accessible from any UI (e.g.
+</I>&gt;<i> beep()).
+</I>&gt;<i> 
+</I>&gt;<i> Some thought should definitely go into the interface to graphics devices
+</I>&gt;<i> soon, because with a spec for the graphics device, we could create the
+</I>&gt;<i> Toolkit, peers, and everything in a matter of weeks.  For now, we can
+</I>&gt;<i> settle with relegating the most fundamental component/graphics stuff to
+</I>&gt;<i> a default toolkit.
+</I>
+exactly, although I think window is the only one that should have to talk to the graphics device directly, the way AWT/Swing draws that would be the only thing nessecary. also, and Ive said it before,
+we should have swappable titlebars (that is a Swing FrameComponentUI) in our quasicomponent/peer for the frame class (since not all plafs would support this we should have it change to the default
+(that is JOS) L&amp;F's titlebar so you dont have something like a window titlebar on a mac window (because you know they'd just get into a fight)).
+
+But maybe the window quasicomponent/peer shouldnt talk directly to the graphics device but instead to a handy abstraction called Screen, this would encaps. the Screen (duh), provide stuff like the
+colorModel and screensize to the toolkit. it could handle stuff like window drawing (all that boring redraw crap no one wants to do) via a &quot;default&quot; child (DesktopScreen?). And as I said before the
+screensaver would be passed this directly so it could play with the desktop.
+
+Another point of buisness, all this stuff is lowlevel JADE (if you dont know what Im talking about see JADE on the Wiki) and JADE, being the UI, isnt really part of the OS so should it be in org.jos?
+I dont think so, org.jade would be more appropriate since it is a JOS-only app and it would be a pretty big, no point getting it all mixed up with JOS (its easier for everyone this way)
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000020.html">[JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000017.html">[JOS-UI] CVS Server</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#24">[ date ]</a>
+              <a href="thread.html#24">[ thread ]</a>
+              <a href="subject.html#24">[ subject ]</a>
+              <a href="author.html#24">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

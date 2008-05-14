@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] About Generic Driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000127.html">
+   <LINK REL="Next" HREF="000132.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] About Generic Driver</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Arch] About Generic Driver">onewith1@flash.net</A><BR>
+    <I>Sun, 8 Aug 1999 13:41:28 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000127.html">[JOS-Arch] About Generic Driver</A></li>
+        <LI> Next message: <A HREF="000132.html">[JOS-Arch] About Generic Driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#128">[ date ]</a>
+              <a href="thread.html#128">[ thread ]</a>
+              <a href="subject.html#128">[ subject ]</a>
+              <a href="author.html#128">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Once again, I prove that I can't get my point across in the first cut.
+
+Also, it remindes me to remember to put up examples to help others as well
+as myself understand the problem.
+
+
+DigiGod wrote:
+
+
+&gt;<i>Matt Albrecht wrote:
+</I>&gt;&gt;<i> I divided the idea of a Driver into two pieces: a Device and a Driver.
+</I>The
+&gt;&gt;<i> Device knows how to configure the actual physical/virtual device, while
+</I>the
+&gt;&gt;<i> Driver interfaces with the actual device to accomplish something.
+</I>&gt;<i>
+</I>&gt;<i>so JOS would know the ScannerDevice but the manufacturer would need to
+</I>&gt;<i>provide a ScannerDriver
+</I>
+This was meant to separate the discovery/setup functionality from the
+operational use.  Also, it enables the Device to store its state in a device
+registry for easy recovery.  So, to answer your question: the ScannerDevice
+would need a ScannerUSBDevice, ScannerSCSIDevice, ScannerParallelDevice, and
+so on.  Each of these devices would subclass from the USBDevice, SCSIDevice,
+&amp;c, and implement the ScannerDeviceInterface (or possibly the other way
+around - SCSIDevice is an interface, and ScannerDevice is a class.  I
+haven't played around with this, so we'll have to see what works best).
+
+When I wrote the KeyboardDevice, it had the discovery/setup code, as well as
+the very basic methods to get scancodes from the device.  The KeyboardDriver
+translated these scancodes into usable data.  So we could have a
+ISAKeyboardDevice, linked to a ISAKeyboardTranslator (which translates
+scancodes into VA_? keycodes; this is a &quot;pass-through&quot; driver), which is
+linked to KeyboardPressedSet (monitors the press/release state of each VA_?
+key) and USAKeyboardDriver (which translates the VA_? push/release keycodes
+into uppercase, lowercase, special shift combinations, and num-pad character
+creation).
+
+So I guess we can look at a Device simplisticly as a standard I/O Device
+which inputs a byte stream, and outputs a byte stream.  Of course,
+specialized subclasses (like the KeyboardDevice, with its specialized
+implementations) do a tad bit more than that.  Or maybe we could look at a
+Device as either a stream device (like a hard drive), or as an event device
+(like a keyboard or mouse), or as both (like a modem or ethernet card).
+
+&lt;snip&gt;
+
+
+&gt;&gt;<i> For instance, I pegged the video driver type to have a change mode
+</I>method,
+&gt;&gt;<i> and a method to collect the java.awt.GraphicsContext for the different
+</I>modes
+&gt;&gt;<i> (we may need a special method/context class for returning text modes).
+</I>&gt;<i>
+</I>&gt;<i>it should be vetoable by the OS(|UI).
+</I>
+Yes!!!  Thus, we really will have bean devices!
+
+&gt;<i>firstly its GraphicsConfiguration that your thinking of, and it should
+</I>&gt;<i>be able to describe text mode (after reviewing the source)
+</I>
+That was off the top of my head, so I'll take your word for it.
+
+&gt;<i>whats the PrimaryHardwareManager (and why's it primary? shouldnt it be
+</I>&gt;<i>static HardwareManager PrimaryHardwareManager; in the HM class? with a
+</I>&gt;<i>getPrimaryHardwareManager()?)
+</I>
+Ah.  That was a beast unto itself.  That was my cut at handling platform
+resources (like I/O Addresses, Memory, DMA, interrupts, and so on).  The
+primary hardware manager handled routing the resource request to the
+appropriate manager.  It was interesting in that it handled plug-n-play
+well, where a device may request the best fit for a set of resources (for
+instance, a Sound Blaster Pro needs one of IRQ 2, 5, 7, or 10).
+
+I didn't use a static primary hardware manager, because I have a natural
+aversion to using static data.  It leads to nasty situations where one
+thread may need one kind of a class, and another thread needs a slightly
+different class, or someone decides to use a different implementation in the
+middle of runtime.  I was *especially* weary of this with a system level
+variable.
+
+&gt;<i>is name its device name? or its HRF name? (getHRName() also if its the
+</I>&gt;<i>former), how about a getDescription() so a DeviceManager (config app)
+</I>&gt;<i>can give some info.
+</I>
+Name for the Device would be the unique name for the device, such as PNP0600
+(Generic ESDI/IDE/ATA hard disk controller), PNP0102 (MCA timers), and so
+on.
+
+&gt;<i>what about some state info, like isLoaded(), isActive() or hasDriver()?
+</I>
+Sure.  This was my first cut, where I wanted to leave it as open as
+possible.  I would say isLoaded() is the only one really necessary.
+
+&gt;<i>maybe a driver should plug into a device (setDriver(Driver d)) or can
+</I>&gt;<i>there be more than one driver at a time?
+</I>
+I was pondering the other direction: MyDriver.setDevice( Device d ) so that
+multiple drivers can use a single device.  Here's where Device.veto() would
+come in handy, to prevent its use.  This would allow real-time upgrades to a
+better Driver.
+
+
+&lt;snip Driver.java&gt;
+&gt;<i>the same goes for this with the getDescription() and all...
+</I>
+getDescription would be a human-readable string to indicate the operation of
+the Driver.  We could use this method as well in the Device.
+
+&gt;<i>speaking of descriptions, whats this a driver for? how about: Device
+</I>&gt;<i>getDevice()?
+</I>&gt;<i>some state info for this would be good too, like hasControlOfDevice()
+</I>
+Good points.
+
+&gt;<i>You should also have an abstract DeviceAdaptor and DriverAdaptor for
+</I>&gt;<i>faster impl.
+</I>
+You mean like java.awt.WindowAdapter which is a concrete class
+implementation of java.awt.WindowListener?  Good idea.
+
+
+-Matt
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000127.html">[JOS-Arch] About Generic Driver</A></li>
+	<LI> Next message: <A HREF="000132.html">[JOS-Arch] About Generic Driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#128">[ date ]</a>
+              <a href="thread.html#128">[ thread ]</a>
+              <a href="subject.html#128">[ subject ]</a>
+              <a href="author.html#128">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

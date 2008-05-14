@@ -1,0 +1,340 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000177.html">
+   <LINK REL="Next" HREF="000179.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Program and ProgramContext">digigod@earthling.net</A><BR>
+    <I>Thu, 12 Aug 1999 23:22:11 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000177.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000179.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#172">[ date ]</a>
+              <a href="thread.html#172">[ thread ]</a>
+              <a href="subject.html#172">[ subject ]</a>
+              <a href="author.html#172">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> &gt;whats wrong with just making applications that act as a &quot;default&quot;
+</I>&gt;<i> &gt;environment for these?
+</I>&gt;<i> 
+</I>&gt;<i> In an object-oriented world, a program is an object, not a class. A JOS
+</I>&gt;<i> program should be an object, too. You should be able to use a program like
+</I>&gt;<i> other objects.
+</I>&gt;<i> 
+</I>&gt;<i> A smart object factory should be able to return an object--not a
+</I>&gt;<i> class--when you want to load a JOS program. Let's go back to the
+</I>&gt;<i> DemoProgram, again. When I type this URI into my program browser, it should
+</I>&gt;<i> return an instance of the DemoProgram.
+</I>&gt;<i> 
+</I>&gt;<i> x-program:org.jos.demo.DemoProgram
+</I>&gt;<i> 
+</I>&gt;<i>   public void example() {
+</I>&gt;<i>     exec( &quot;x-program:org.jos.demo.DemoProgram&quot; );
+</I>&gt;<i>   }
+</I>&gt;<i>   public int exec( String uri ) {
+</I>&gt;<i>     try {
+</I>&gt;<i>       Program p = (Program) new URI( uri ).getObject();
+</I>&gt;<i>     }
+</I>&gt;<i>     catch( ClassCastException e ) {
+</I>&gt;<i>       return;
+</I>&gt;<i>     }
+</I>&gt;<i>     p.setProgramContext( whatever );
+</I>&gt;<i>     p.run();
+</I>&gt;<i>     return whatever.getResultCode();
+</I>&gt;<i>   }
+</I>&gt;<i> 
+</I>&gt;<i> When we have a smart object factory that can create all kinds of digital
+</I>&gt;<i> resources, it would be straight forward to create a smart program factory.
+</I>&gt;<i> 
+</I>&gt;<i> - If I pass the name of a class that implements the Program interface, the
+</I>&gt;<i> factory returns a Program object.
+</I>&gt;<i> 
+</I>&gt;<i> - If I pass the name of a class that implements the java.awt.Applet
+</I>&gt;<i> interface, the factory returns a Program object.
+</I>&gt;<i> 
+</I>&gt;<i> - If I pass the name of a class that implements the javax.servlet.Servlet
+</I>&gt;<i> interface, the factory returns a Program object.
+</I>&gt;<i> 
+</I>&gt;<i> - In Java 1.1 and higher, if I pass the name of a class that declares
+</I>&gt;<i> static main(), the factory returns a Program object.
+</I>
+ok, why not just do this. the Program interface can have a
+ServletProgram an AppletProgram and all it creates these internally in
+your browser as a generic way to handle them, theres no reason to use it
+system wide that I can see
+ 
+&gt;<i> Our uniform browser would be much simpler. Given any URI, the uniform
+</I>&gt;<i> browser would able to do handle it:
+</I>&gt;<i> 
+</I>&gt;<i> :
+</I>&gt;<i> Object o = new URI( uri ).getObject();
+</I>&gt;<i> 
+</I>&gt;<i> if ( o instanceof Program ) {
+</I>&gt;<i>   runProgram( (Program) o );
+</I>&gt;<i> }
+</I>&gt;<i> if ( o instanceof InputStream ) {
+</I>&gt;<i>   displayInput( (InputStream) o );
+</I>&gt;<i> }
+</I>&gt;<i> :
+</I>&gt;<i> 
+</I>&gt;<i> I propose the Program and ProgramContext as a simple way to write programs
+</I>&gt;<i> now that will run on JOS through a consistent in-process mechanism. I
+</I>&gt;<i> believe that implementations of Program is more object-oriented than static
+</I>&gt;<i> main() and provides better support for inheritence. Program and
+</I>&gt;<i> ProgramContext do not depend on the reflection API.
+</I>
+no one should be forced to do this though
+ 
+&gt;<i> &gt;ok, you made a good point about how one should be able to test ones
+</I>&gt;<i> &gt;servlet; but how does this argue that they HAVE to be a Program?
+</I>&gt;<i> 
+</I>&gt;<i> A servlet does not have to implement the Program interface. A servlet
+</I>&gt;<i> should be able to run any program. The output from any program should be
+</I>&gt;<i> piped through the response output stream. You can create a generic servlet
+</I>&gt;<i> that can run programs by program name. You can pass parameters to the
+</I>&gt;<i> program with a query string.
+</I>&gt;<i> 
+</I>&gt;<i> An HTML browser should be able to run any program, including the
+</I>&gt;<i> ServletProgram. In the marketplace, people might use a JOS browser
+</I>&gt;<i> *because* it can run servlets without an HTTP service.
+</I>
+your HTML browser seems to be a &quot;do everything&quot; app, at least your doing
+it right by not trying to do it all at once... but why not just make the
+OS/UI an OO version of unix (that is a buncha small things that are
+dynamically thrown together to create &quot;sponteneous applications&quot; from
+beans and the like based on the current situations needs)
+ 
+&gt;<i> &gt;isnt a Servlet (at the very top) just an interface (what they should
+</I>&gt;<i> &gt;have done with Applet, btw) and isnt it unasuming about HTTP, that is
+</I>&gt;<i> &gt;not locked to it? Ive always thought of a Servlet as a service-let not a
+</I>&gt;<i> &gt;server-let, just a handy stream based IPO plugin.
+</I>&gt;<i> 
+</I>&gt;<i> Yes, thankfully. Servlet is an interface. It seems that Sun Microsystems
+</I>&gt;<i> may have learned something after all. It is unassuming about HTTP, too. I'm
+</I>&gt;<i> not sure what to call it. It is something like a Java I/O Bean.
+</I>
+I think SUN bashing isnt going to help anything, they didnt do it
+perfect; but nobodys perfect. the JavaLobby is the yin to their yang so
+that kinda talk should go on there; otherwise we should just worry about
+JOS.
+
+I think IPO plugin is more accurate then I/O Bean (but maybe thats just
+because I said it ;)
+ 
+&gt;<i> &gt;(&quot;JOS putting the U in URI&quot; --how market does that sound?)
+</I>&gt;<i> 
+</I>&gt;<i> JOS is a future-oriented operating system. We are trying to make JOS more
+</I>&gt;<i> uniform than any other operating system. In a sense, we are re-defining the
+</I>&gt;<i> U in URI.
+</I>
+not redefing it, just using it :)
+ 
+&gt;<i> &gt;I can see Programs being an internal abstraction used to work with all
+</I>&gt;<i> &gt;programs uniformly (with proxies like ServletProgram) but I dont see
+</I>&gt;<i> &gt;making people use them.
+</I>&gt;<i> 
+</I>&gt;<i> You're right. I'm not trying to change the way everybody else writes code.
+</I>&gt;<i> I'm trying to change the way I write code. I would like all my Java
+</I>&gt;<i> programs to run inside a strong OO model. Could there will be more
+</I>&gt;<i> &quot;programs&quot; in JOS?
+</I>
+ok, that last sentence didnt translate well. but, I think I see what
+your saying...
+you have a ProgramRunner that your app uses to interface with programs,
+all programs, but you dont need to implement program because the
+ProgramRunner creates an appropriate proxy (for a servlet it creates a
+ServletProgram, etc). any program can use the program runner as it is
+part of the program library; no one needs to use it.
+ 
+&gt;<i> &gt;this, again, is an argument for URI's and smart browsers but not
+</I>&gt;<i> &gt;Programs (although again I can see its use internally, especially by
+</I>&gt;<i> &gt;your browser)
+</I>&gt;<i> 
+</I>&gt;<i> I want a ProgramFactory plugged into the ObjectFactory. Each object
+</I>&gt;<i> returned by the ProgramFactory must be an implementation of Program. That's
+</I>&gt;<i> what makes the smart browser possible. Otherwise, the smart browser would
+</I>&gt;<i> be complicated with having to too much.
+</I>&gt;<i> 
+</I>&gt;<i> And probably more important for architecture, I want any Java object to be
+</I>&gt;<i> able to run any JOS program the minimum number of lines of code.
+</I>&gt;<i> 
+</I>&gt;<i> Think about what it takes to learn how to run a program using the
+</I>&gt;<i> reflection API. Many Java programmers won't want to learn all that just to
+</I>&gt;<i> run a program.
+</I>
+its pretty simple... and I can see this as an argument for internal use
+ 
+&gt;<i> Think about how easy it will be to write a scripting language to run one
+</I>&gt;<i> JOS program after another. It does not have the overhead of separate
+</I>&gt;<i> processes. It works without a modified JVM. It even works in Java 1.0.2.
+</I>&gt;<i> 
+</I>&gt;<i> What does a JOS batch file look like? It looks a lot like a URI list. If
+</I>&gt;<i> one of these programs returns a non-zero result code, the script is shut down.
+</I>
+I dont think we should have a &quot;JOS batch file&quot; just the GSI.
+ 
+&gt;<i> #org.jos.shellscript.Script
+</I>&gt;<i> x-program:org.jos.demo.DemoProgram
+</I>&gt;<i> x-program:org.jos.demo.DemoServlet
+</I>&gt;<i> run:os:mkdir temp
+</I>&gt;<i> run:os:cp * .
+</I>&gt;<i> x-program:org.jos.demo.DemoApplet
+</I>&gt;<i> 
+</I>&gt;<i> For those working on a generic scripting API, a script is a kind of
+</I>&gt;<i> program, too.
+</I>
+well a script is a plugin to GSI kinda, theres a ScriptRunner
+Application but you could make a ScriptProgram for internal use in your
+browser easily (although using GSI directly would offer many benifts)
+ 
+&gt;<i> We should build a JOS demonstration script. It should show off all of the
+</I>&gt;<i> things you can do with JOS that all the other operating systems can only
+</I>&gt;<i> dream about. Wouldn't you be impressed with an operating system that runs
+</I>&gt;<i> all of the Java applications, applets and servlets you already wrote? I would.
+</I>
+this is the goal, alright
+ 
+&gt;<i> Oh, and did I mention piping? You can do it.
+</I>&gt;<i> 
+</I>&gt;<i> x-program:org.jos.demo.DemoProgram &gt; temp/log.txt
+</I>&gt;<i> 
+</I>&gt;<i> &gt;you can do that now though, add a main() to your servlet. implementing
+</I>&gt;<i> &gt;program is pointless... (except on a IS-A basis, but then the interface
+</I>&gt;<i> &gt;might just as well be empty)
+</I>&gt;<i> 
+</I>&gt;<i> Why should I go back and add main() to my old applets and servlets when I
+</I>&gt;<i> don't have to? It doesn't have to be that way. Once I have AppletProgram
+</I>&gt;<i> and ServletProgram and ApplicationProgram, I'm done. Further, I can use
+</I>&gt;<i> (and test) all those Java applications, applets and servlets that other
+</I>&gt;<i> people write.
+</I>
+this is an argument for Program, /internally/
+ 
+&gt;<i> And I keep forgetting to mention this. You can &quot;run&quot; any Java class that
+</I>&gt;<i> implements java.awt.Component. You can also &quot;run&quot; any Java class that is a
+</I>&gt;<i> Java Bean. The uniform browser uses URIs in the location field. It also
+</I>&gt;<i> uses shortcuts and shortcut editor so that you don't have to create a URI
+</I>&gt;<i> manually.
+</I>
+this sounds kinda like BeanBox on angel dust
+ 
+&gt;<i> What is a shortcut? It might as well be any registry-compatible file with a
+</I>&gt;<i> uri property.
+</I>&gt;<i> 
+</I>&gt;<i> uri=x-component:java.awt.Button?label=&quot;Hello, World!&quot;
+</I>&gt;<i> 
+</I>&gt;<i> It might help to &quot;browse&quot; around a new component library to see what
+</I>&gt;<i> everything looks like. When you want to learn the AWT or Swing, would you
+</I>&gt;<i> like to see each component as it works at runtime? Would you like to see
+</I>&gt;<i> all components within the same component browser? When other programmers
+</I>&gt;<i> receive a copy of our JOS distribution (someday), they will want to see
+</I>&gt;<i> what's there. I think we can easily put together a point-and-click tour of
+</I>&gt;<i> all kinds of components, even those components added at the &quot;last minute&quot;.
+</I>&gt;<i> And more, when other people ship component librarys for JOS, all those
+</I>&gt;<i> components will be assimilated into the JOS demo program.
+</I>&gt;<i> 
+</I>&gt;<i> Think about the JOS out-of-box experience. Based on the strengh of Java, we
+</I>&gt;<i> can re-define the concept of &quot;try before you buy&quot;. We can create a JOS
+</I>&gt;<i> distribution that people can run components--before they are installed--to
+</I>&gt;<i> see what they look like. They can download the uniform browser and take JOS
+</I>&gt;<i> for a test drive before downloading a JOS distribution. They start the
+</I>&gt;<i> uniform browser from a CD-ROM and start browsing around.
+</I>
+why not just put the JOS installer on the CD and have it setup so you
+can run the browser to test it, it would be nice if we could give these
+CD's out for free; unless you have broadband noones downloading an OS 
+ 
+&gt;<i> Our installation/configuration programs are written in Java and run
+</I>&gt;<i> unchanged on 22 platforms. The Linux community could use JOS to make Linux
+</I>&gt;<i> easier to install.
+</I>
+I could imagine that would be somewhat emasculating for Linux
+ 
+&gt;<i> When we reach higher than a high level third generation language like Java,
+</I>&gt;<i> we need a strong model for programs. Using an interactive, visual IDE, you
+</I>&gt;<i> should be able to configure even the most complicated program. The
+</I>&gt;<i> configuration of a single step program is reduced to a single URI. A
+</I>&gt;<i> step-by-step script is reduced to a URI list.
+</I>
+you should make your shortcut file so it can run a URI, a list of URI's
+a script or any combination. now that would be cool
+ 
+&gt;<i> A uniform browser puts any digital resource within your reach. You can
+</I>&gt;<i> create a shortcut for it. You can write a program that uses it. You can do
+</I>&gt;<i> whatever you want.
+</I>
+why have a browser though? why not just build most of this into JADE?
+say you click on a HTML file on your desktop, it sends the URI to the
+launcher which locates the right JavaBean and opens it up, if the HTML
+file has JavaScript in it the HTML bean tells the OS which hands it a
+GSI interface for JavaScript. a sponteneus application, of sorts.
+ 
+&gt;<i> We need to reduce a program to its bare essentials. It must be platform
+</I>&gt;<i> independent. It must assume neither UNIX(tm)-style or MS-DOS-style command
+</I>&gt;<i> line parameters. That's better left to an abstract base class.
+</I>&gt;<i> 
+</I>&gt;<i> Sun Microsystems went too far. They reduced it to pre-object oriented
+</I>&gt;<i> static main() from C. It must have been reassuring to C programmers that
+</I>&gt;<i> started writing Java code.
+</I>
+it was, another way around this is to make your apps all OO, and have a
+script to launch them. outsourcing main() basically.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000177.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000179.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#172">[ date ]</a>
+              <a href="thread.html#172">[ thread ]</a>
+              <a href="subject.html#172">[ subject ]</a>
+              <a href="author.html#172">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

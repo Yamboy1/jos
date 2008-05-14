@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] More Trouble with jeps!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:R.Argentini%40student.tudelft.nl">
+   <LINK REL="Previous"  HREF="000372.html">
+   <LINK REL="Next" HREF="000374.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] More Trouble with jeps!</H1>
+    <B>Ranieri Argentini</B> 
+    <A HREF="mailto:R.Argentini%40student.tudelft.nl"
+       TITLE="[JOS-Arch] More Trouble with jeps!">R.Argentini@student.tudelft.nl</A><BR>
+    <I>Thu, 06 Jan 2000 16:11:33 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000372.html">[JOS-Arch] More Trouble with jeps!</A></li>
+        <LI> Next message: <A HREF="000374.html">[JOS-Arch] More Trouble with jeps!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#373">[ date ]</a>
+              <a href="thread.html#373">[ thread ]</a>
+              <a href="subject.html#373">[ subject ]</a>
+              <a href="author.html#373">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i>I've put in the right directory the Device.java provided by Hilary and the
+</I>java
+&gt;<i>part compiles well. However I have some problems with the native part
+</I>&gt;<i>(EtherHostDriver.c). 
+</I>
+I should start out by saying that this hardly surprises me as i throwed the
+native part together fairly rapidly in order to get onto the &quot;real stuff&quot; :\
+As far as i know using the PF_PACKET socket and derived structs is the
+reccomended mode to obtain a raw socket connection on linux as of kernel
+2.2.xx. Some of the additional tricks i pull may need glibc 2.1 though. I
+thought that these were widespread enough that they could be assumed, at
+least in a developer community.
+If i rely on something else i'm not aware of, please someone tell me :)
+
+I know there is an older way to open sockets for raw data exchange that
+goes like this:
+
+fd=socket(AF_INET, SOCK_PACKET, htons(ETH_P_ALL));
+
+instead of
+
+packet_socket = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+
+but all the documentation on my machine suggested it was way better to use
+the newer interface. If this is a problem to many of you i suppose i could
+implement them both with a compiler directive of sorts.
+
+The offending part of code (sockaddr_ll etc.) binds the socket to a
+particular network device. I presume there should also be a
+backward-compatible way of doing that, but i would need to do more
+research. I presume it would entail using &quot;sockaddr&quot; instead of the
+link-level specific &quot;sockaddr_ll&quot;.
+I fear that making a &quot;general&quot; unix ethhost.c would entail using libpcap
+and libnet to capture and transmit raw frames.
+
+&gt;<i>Ranieri, any suggestion ? 
+</I>
+Unfortunately not right now. What are your kernel and glibc versions?
+
+&gt;<i>Have you used the sample code provided by Stevens (in
+</I>&gt;<i>Internetworking with TCP/IP) to open a socket in raw mode ?
+</I>
+Hmm, no. I only own volume two of the series and in this volume he uses a
+phantomatical write() function that communicates with some sort of a driver.
+Would you mind posting the relevant portion of that code? It might be
+interesting ..
+If the code is too big or anything just say so and i'll get my lazy butt
+down to the library :)
+
+Ranieri.
+
+PS: Did anyone else (besides me) get this to work? Or am i just writing
+code that will only compile on my machine? I'm using a mostly unaltered
+slackware7 with 2.2.10 and a blackdown.org 1.1.xx java sdk. Come on! I know
+that at least 13 of you have the latest version! :)
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000372.html">[JOS-Arch] More Trouble with jeps!</A></li>
+	<LI> Next message: <A HREF="000374.html">[JOS-Arch] More Trouble with jeps!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#373">[ date ]</a>
+              <a href="thread.html#373">[ thread ]</a>
+              <a href="subject.html#373">[ subject ]</a>
+              <a href="author.html#373">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

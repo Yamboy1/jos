@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] jjos+decaf status/update</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   
+   <LINK REL="Next" HREF="000006.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] jjos+decaf status/update</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Arch] jjos+decaf status/update">jm@mak.com</A><BR>
+    <I>Fri, 30 Apr 1999 20:42:20 -0400</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000006.html">[JOS-Arch] An idea for increasing the number of code-writers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#5">[ date ]</a>
+              <a href="thread.html#5">[ thread ]</a>
+              <a href="subject.html#5">[ subject ]</a>
+              <a href="author.html#5">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi All;
+
+(Sorry for the wide distribution, but I think this might be of general
+interest.)
+
+No, Todd and I have neither dropped dead nor given up.  So, what the
+heck *have* we been up to, then?
+
+(1)  We have re-written large segments of the guts of the JVM in order
+to implement 64-bit Java types.  This involved substantial changes to
+the representations of basic JVM objects.
+
+(2) We have added an (incomplete) trace facility so you can watch the
+Java opcodes run.
+
+(3) We have fixed some bugs in the java array code.
+
+(4) We have added &quot;#ifdef PARANOID&quot; subscript-checking array templates
+which are now used throughout the code (e.g., the Java arrays).
+
+(5) We have added inspector and mutator member functions to create
+places one can set breakpoints to track down the places where
+C++ instances get read/written (ah, to have a &quot;who calls&quot; facility).
+
+(6) We have (incompletely) put in protection for member variables
+(however, where we have done so, and where it is appropriate, we have
+put in inspectors/mutators).
+
+(7) We have (incompletely) put in &quot;const&quot; declarations.
+
+(8) We have (incompletely) replaced explicit memory allocation calls
+with C++ allocator calls (so constructors get fired up) so as to avoid
+memory-initialization problems.
+
+(9) We have (probably incompletely) inspected code to make sure
+constructors actually initialize member variables to reasonable values.
+
+(10) We have cleaned up lots of random things too numerous to mention.
+
+(11) We have discussed coding conventions to enhance comprehensibility
+of the code.
+
+Currently in-process:
+
+(1) We are reconciling our respective changes, and testing them a little
+more thoroughly before committing the new sources to CVS.
+
+(2) We are about to make some changes to the main JVM opcode-parsing
+function to turn it into a method (probably) of the basic C++ class
+which represents a Java thread.
+
+(3) We are debating the &quot;right&quot; class hierarchy for java class
+instances, java class objects, and java array objects (we think we're
+converging).
+
+Still to-do:
+
+(1) We noticed that the basic 64-bit integer type we support is UNsigned
+(whoops).  This needs to be changed for the java longs to work right.
+If anybody feels so inclined, feel free to tackle this fairly
+self-contained problem!
+
+(2) We have discussed the relationship/identity of resolved vs.
+unresolved Java classes, and we think we're converging on an approach.
+
+(3) Sheesh, there are SO many other things, I'll just point you at the
+&quot;doc/TODO&quot; file (once it's checked-in).
+
+Sorry to be taking so long, but, hey, we're working as fast as we can
+and yet still remain in good academic standing, employed, and married
+(not necessarily in that order).
+
+Very Truly Yours,
+
+-jm
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000006.html">[JOS-Arch] An idea for increasing the number of code-writers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#5">[ date ]</a>
+              <a href="thread.html#5">[ thread ]</a>
+              <a href="subject.html#5">[ subject ]</a>
+              <a href="author.html#5">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

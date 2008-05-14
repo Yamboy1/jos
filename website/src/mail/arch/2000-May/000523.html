@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   
+   <LINK REL="Next" HREF="000533.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Mon, 01 May 2000 12:55:31 +1000</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000533.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#523">[ date ]</a>
+              <a href="thread.html#523">[ thread ]</a>
+              <a href="subject.html#523">[ subject ]</a>
+              <a href="author.html#523">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> With a certain level of redirection, a system-wide object might be &quot;owned&quot;
+</I>&gt;<i> by one or more processes if a list inside the object holds a reference to
+</I>&gt;<i> each process. At the machine code level, all objects are owned by a virtual
+</I>&gt;<i> machine.
+</I>
+This points out the problem with this approach. The JVM spec says that
+an Object has a reference to exactly one java.lang.Class, and a Class
+has a reference to exactly one java.lang.ClassLoader. 
+
+&gt;<i> This is the best thing I've heard all week. We can provide a function to
+</I>&gt;<i> &quot;move&quot; an object from one user process to another. In other words, an
+</I>&gt;<i> object can be passed to another process simply by modifying its Process
+</I>&gt;<i> property.
+</I>
+Or more likely, by modifying the class loader reference (to a class
+loader that shares the same class definition for that object). This will
+be a primordial class loader, so this will provide an indirect reference
+to the process if you need it.
+
+&gt;<i> I can imagine that a DatagramPacket can be &quot;sent&quot; to another user process
+</I>&gt;<i> by updating its Process property from a protocol stack to a user process.
+</I>&gt;<i> Since the protocol stack no longer owns the object, it can be garbage
+</I>&gt;<i> collected in the usual way.
+</I>
+These protocol stack optimisations do not, however, depend on changing
+the ownership of an object (ie. the datagram). The datagram will still
+be garbage collected when there are no more references to it.
+
+&gt;<i> The idea of moving an object around, from process to process, is a strong
+</I>&gt;<i> point of Java technologies. The same function could move an object from one
+</I>&gt;<i> machine to another.
+</I>
+And &quot;sharing objects&quot; is an extension of this concept. Rather than
+changing the owner, you can *add* an owner. Well, there are two ways you
+might share an object: a) share ownership, and b) have a single owner
+but share access. The latter is easier to implement and less
+controversial, so we will probably do that first (down below, I point
+out that they may actually both be the same thing, implementation-wise).
+
+&gt;<i> There is only one catch. A complex object could not be moved from one
+</I>&gt;<i> process to another without moving all of its dependent objects. While it
+</I>&gt;<i> might be good for shallow moves, it could not be automatic for deep moves.
+</I>
+Although a partial move is not illegal. For example, if we only move the
+root object, then it is considered to simply have a reference to an
+object in another process, which we have already discussed as being ok.
+
+&gt;<i> &gt;Sharing by proxy is another idea again. But we can share an object
+</I>&gt;<i> &gt;between multiple processes and still have a single owner.
+</I>&gt;<i> 
+</I>&gt;<i> A directory entry is a proxy for a file's payload. A directory and payload
+</I>&gt;<i> are separate. An object proxy is like a directory entry. A proxy is owned
+</I>&gt;<i> by exactly one process. Behind the scenes, a proxy has an object property.
+</I>&gt;<i> The object property always points to an object owned by the system process.
+</I>
+This is the approach I like, but I'd replace &quot;the system process&quot; with
+&quot;a system process&quot;, sort of like a shared object broker process. So,
+shared ownership can be emulated by taking ownership away all of the
+participating processes and giving it to a single, independent master
+process: the shared object broker.
+
+This is not to say that processes are forced to share ownership when
+sharing processes; They can still share access but retain sole ownership
+(ie. the original process is taking on the responsibility of the shared
+object broker for this particular object).
+
+Also, whether or not the shared object reference is a proxy or not is a
+different question.
+
+&gt;<i> I believe a proxy will be more efficient than direct references. When the
+</I>&gt;<i> Process property of each object is an item, it is very easy for the process
+</I>&gt;<i> to be de-referenced. It is straight forward.
+</I>&gt;<i> 
+</I>&gt;<i> The idea of maintaining a list (see above) of processes makes it simple to
+</I>&gt;<i> maintain process information but makes it difficult to de-reference. The
+</I>&gt;<i> complexity is this: a process object returned from getProcessList() belongs
+</I>&gt;<i> to another process. The implications of this are incomprehensible.
+</I>
+I think I comprehend them. :=) Let's make an analogy with Threads. One
+thread has a reference to another thread running in the same process,
+but when that thread terminates, the first thread still has a reference
+to that thread. All that has happened is that the referenced thread has
+moved into the DEAD state, and it has been removed from the scheduler.
+As soon as the first thread releases its reference, the garbage (that's
+what it is) can be collected.
+
+I don't see a problem with handling references to processes in the same
+way. If the referenced process exits, it moves into the DEAD state. When
+a process is dead, the object does not need to be thrown away
+immediately. In fact, it needs to hang around so the caller can call
+java.lang.Process.exitValue().
+
+So, I see both direct sharing and proxy sharing as useful. Proxy sharing
+would be implemented on top of the primitive direct sharing
+functionality.
+
+BTW, in the case of sharing JavaProcesses, the user-space shared object
+broker will probably not be the one to manage the shared instances.
+JavaProcesses will probably be owned by the KernelClassLoader. Same
+principle but different broker.
+
+&gt;<i> When each object belongs to exactly one process, the implications are easy
+</I>&gt;<i> to understand (easy to code) and limit the object sharing to a centralized API.
+</I>
+I agree that it is simpler. And shared object ownership can be emulated
+by having a broker process.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000533.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#523">[ date ]</a>
+              <a href="thread.html#523">[ thread ]</a>
+              <a href="subject.html#523">[ subject ]</a>
+              <a href="author.html#523">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

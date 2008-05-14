@@ -1,0 +1,255 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000597.html">
+   <LINK REL="Next" HREF="000598.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 17 May 2000 14:23:22 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000597.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000598.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#595">[ date ]</a>
+              <a href="thread.html#595">[ thread ]</a>
+              <a href="subject.html#595">[ subject ]</a>
+              <a href="author.html#595">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> &gt;Ryan's 'os' package is the standard (albiet informal) interface to this
+</I>&gt;<i> &gt;ability.
+</I>&gt;<i> 
+</I>&gt;<i> Ryan's rheise.os product is one member's implementation. It demonstrates a
+</I>&gt;<i> small fraction of what is understood about multiple bytecode processes so
+</I>&gt;<i> far. It is far too premature to adopt rheise.os as a standard for the JOS
+</I>&gt;<i> Project. It might lead us to a standard. It may be a useful model. It
+</I>&gt;<i> cannot be taken literally.
+</I>
+I agree with Gilbert that it is not yet a standard. It is more a
+proposal and an implementation of that proposal.
+
+&gt;<i> Give me something I can use. I can't use rheise.os. Running a Java
+</I>&gt;<i> application as a subprogram is not equivalent to running a Java application
+</I>&gt;<i> as a process.
+</I>
+Sorry, but I will not give you something you can use for running your
+subprograms. You can do that. rheise.os was not designed to provide that
+functionality because subprograms are outside the process framework.
+
+You could be a little less demanding and a little more supportive if you
+ask me...
+
+&gt;<i> If we think of ourselves as finished, we will miss the
+</I>&gt;<i> greatest opportunity to find the best solution.
+</I>&gt;<i> 
+</I>&gt;<i> For example, a process has no concept of a parent. There is no parent
+</I>&gt;<i> property inside a process. Only a subprogram has a parent. Only a
+</I>&gt;<i> subprogram can share real objects with its parent.
+</I>
+- POSIX compliant operating systems have the concept of parent processes
+(however, this does not imply anything about object sharing).
+
+- In the process model _Quinn and I have been proposing, any two
+processes can share objects independently of parent-child relationships
+(ie. a superset)
+
+Given the above object sharing model as a primitive, subprograms can
+only be appropriate if it makes sense to run a program in the same
+namespace as the parent. Sharing the parent namespace can be desirable
+in some instances. However, subprograms are only one way to achieve
+this. There are two ways that I know of:
+
+1. subprograms, which are procedural based, and
+2. subobjects, which are object-oriented based
+
+Which one a programmer prefers is a matter of taste. For example, I
+would always* choose (2) over (1), but others may choose the exact
+opposite. Therefore, I do not consider either way a primitive in
+rheise.os. Objects themselves are a primitive because this is an
+object-oriented operating system, but I do not assume which way a
+programmer wishes to run sub-code in-process. That is an application
+design issue, and we application writers all come from different design
+backgrounds.
+
+(*) I like the object-oriented paradigm.
+
+&gt;<i> And, a basic process has no concept of a user. There is no user property
+</I>&gt;<i> inside a process. Only a multiple user operating system has a user.
+</I>
+I have assumed that this is the general direction of operating systems*,
+so I built users into the rheise.os model. In fact, the user model was
+the prime motivation for starting rheise.os. It turned out later that my
+work would be a useful starting point for multiple processes, enabling
+higher level JOS developers to contribute something to the project.
+
+(*) In fact the Java specification already relates users to processes
+(assuming a JVM instance is a process). A Java process may obtain its
+user by reading the user.name system property. This is obviously very
+basic at the moment, but their future plans are available at
+<A HREF="http://java.sun.com/products/jdk/1.2/docs/guide/security/spec/security-spec.doc8.html#21605">http://java.sun.com/products/jdk/1.2/docs/guide/security/spec/security-spec.doc8.html#21605</A>
+
+&gt;<i> The rheise.os product demonstrates many different ideas at the same time.
+</I>&gt;<i> It is not focused on the bare essentials of creating a bytecode process. We
+</I>&gt;<i> need a focused, bare essential demonstration of a bytecode process.
+</I>
+I find I can make better design decisions when I consider how one system
+interacts with another, especially when they are interrelated. Consider
+the current package structure (with the exclusion of jos.system):
+
+jos
+ + process
+ + user
+ + security
+
+And consider some of the dependencies I have modeled:
+
+- process  -&gt; user
+- security -&gt; user
+- process  -&gt; security 
+
+(where -&gt; means &quot;depends on&quot;)
+
+What I am trying to work out now is the best API for these packages. I
+am still not happy with the current API and I am constantly changing it.
+If you don't consider how these three systems interact, you will never
+arrive at the best solution.
+
+Right now, the process package works well. It is now a matter of API
+refinement. The fundamental functionality is in place. I just need to
+work out where methods should go and what they should be named.
+
+True, some methods are unimplemented or commented out (or un-thought of)
+but they don't seem to be fundamental. This means I can turn my
+attention to them later, AFTER I give the user and security packages
+their fair share of attention. If you think the process package alone
+needs more focus, that will require additional man power since I would
+like to make progress in all three packages simultaneously. Rather than
+criticising rheise.os for lack of effort in one particular area, why not
+help increase the man power and give the process package the amount of
+focus you think it needs?
+
+&gt;<i> We need to create a better test. The test of a genuine bytecode process is
+</I>&gt;<i> not, as others have said, piping the output from one process to another.
+</I>&gt;<i> The acid test is far more complicated than that. Piping from one Java
+</I>&gt;<i> application to another doesn't prove much.
+</I>
+I have been working on test cases for rheise.os which demonstrate all
+the functionality it provides. They are intended to demonstrate that
+processes behave correctly, among other things. The test cases are
+incomplete, though. Maybe you could specify the perfect test cases I
+should implement? The pipe test alone is a pretty good test because it
+demonstrates separate namespaces, the main distinction between plain
+threads and processes. But I have other test cases to demonstrate
+System.exit() and process.waitFor(). I would welcome your contributions
+here (and anywhere else).
+
+&gt;<i> Don't be distracted by rheise.os. It is only a small step along a path that
+</I>&gt;<i> will lead us to a genuine bytecode process.
+</I>
+Ok everyone, sorry for distracting you. It was a good try though, don't
+you think? You see, rheise.os is not what I pretended it to be. I tried
+to make it &quot;appear&quot; as though rheise.os was cleanly designed, and you
+fell for it! Now, as Gilbert said, it's time to move on, because
+rheise.os (the joke that it is) will never make it as a genuine bytecode
+process model. How can it... possibly? I mean, come on! What, with all
+the problems Gilbert pointed out which couldn't possibly be fixed, even
+if Gilbert himself helped.
+
+If I were actually serious about rheise.os I'd probably be really
+discouraged, but that not being the case, I have to laugh at you. Hah!
+(suckers :-)
+
+&lt;/sarcasm&gt;
+
+PS. is rheise.os really a dead-end project?
+
+&gt;<i> Examine the following code. What should happen?
+</I>&gt;<i> 
+</I>&gt;<i> // Demo.java
+</I>&gt;<i> public class Demo1 {
+</I>&gt;<i>   public static void main( String[] args ) {
+</I>&gt;<i>     String cmd = &quot;java Demo2&quot;;
+</I>&gt;<i>     Runtime.getRuntime().exec( cmd );
+</I>&gt;<i>     System.exit( 0 );
+</I>&gt;<i>   }
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> If Demo2 defines a static main() method, it must continue running long
+</I>&gt;<i> after Demo1 is gone. Demo2 is not accidentally destroyed when a Demo1
+</I>&gt;<i> invokes System.exit().
+</I>
+I agree. This is in fact how rheise.os behaves.
+
+&gt;<i> The java.lang.Process object is always a proxy to
+</I>&gt;<i> the real process that's running.
+</I>
+Incorrect. rheise.os proves that a proxy is not necessary.
+java.lang.Process does not reflect the need for a proxy, nor does
+jos.process.JavaProcess which is a direct subclass.
+
+Of course, in the bridge between the Java layer and the native JVM,
+there will need to be some natively usable representation of a
+JavaProcess. It doesn't matter to me what that representation is.
+Regardless of how the JVM represents it internally, it is quite possible
+to represent each process in the Java layer by unique instances of the
+JavaProcess class. There is no need to create a proxy of a process in
+each process that wishes to reference it, except in the intermediate
+stages of getting JOS working before shared object IPC exists.
+
+Evidence suggests that the more common way to do this in Java is through
+references to unique instances, not proxies. For example, references to
+instances of all of these classes refer to unique instances:
+
+        java.lang.Thread
+        java.lang.Class
+        java.lang.ClassLoader
+        java.lang.Object
+
+Granted, Process is different because we are talking about referencing
+it from different processes which are typically meant to be in separate
+memory spaces, but with shared object IPC, we are not forced to use
+proxies. We can do it either way. I like the direct approach, because
+that is the goal of shared object IPC: to allow one process to interact
+directly with another process - in the most direct way possible. For
+example:
+
+Process otherProcess = getSomeOtherProcess();
+otherProcess.destroy(); // may throw SecurityException
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000597.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000598.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#595">[ date ]</a>
+              <a href="thread.html#595">[ thread ]</a>
+              <a href="subject.html#595">[ subject ]</a>
+              <a href="author.html#595">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

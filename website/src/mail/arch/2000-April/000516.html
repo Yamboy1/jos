@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000513.html">
+   <LINK REL="Next" HREF="000518.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">gchii@mindspring.com</A><BR>
+    <I>Fri, 28 Apr 2000 08:40:37 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000513.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000518.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#516">[ date ]</a>
+              <a href="thread.html#516">[ thread ]</a>
+              <a href="subject.html#516">[ subject ]</a>
+              <a href="author.html#516">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 05:48 PM 4/28/00 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+&gt;<i>Although I would personally choose to adopt the semantics of object
+</I>&gt;<i>ownership you just described, I wouldn't rule out &quot;changing&quot; them. It is
+</I>&gt;<i>similar to the concept of a UNIX hard link. You could say a file is
+</I>&gt;<i>owned by a directory, but as soon as you make a hard link in UNIX, the
+</I>&gt;<i>ownership is truly shared between all parent directories (UNIX hackers
+</I>&gt;<i>will spot that I'm oversimplifying a little here).
+</I>
+A link in a file subsystem is a useful analogy to the object graph in a
+MPCL-compatible virtual machine. In a non-linked file, there must be two
+parts: the actual payload (which exists once regardless of how many links)
+and a directory entry. The payload exists for a while after the directory
+entry is garbage collected. In a linked file, there are more than two
+parts: the actual payload and one directory entry for each link.
+
+In a virtual machine, it is hard to think about the object in the same way.
+On the one hand, a system-wide object (without its class loader property)
+is just like a payload. A process-specific object (with its class loader
+property) is normally what we think of as an instance of java.lang.Object.
+
+With a certain level of redirection, a system-wide object might be &quot;owned&quot;
+by one or more processes if a list inside the object holds a reference to
+each process. At the machine code level, all objects are owned by a virtual
+machine.
+
+In other words, the Process property is a list, not an item.
+
+  public Process[] getProcessList() {
+  :
+  }
+  public void addProcess( Process v ) {
+  :
+  }
+  public void removeProcess( Process v ) {
+  :
+  }
+
+When an object is &quot;shared&quot; it has more than one process in its process
+list. During garbage collection, an object is destroyed when there are no
+more processes in its process list.
+
+&gt;<i>But for the moment, suppose we state that an object is only 'owned' by
+</I>&gt;<i>one process, it still may be useful to change the ownership of an object
+</I>&gt;<i>to another process (eg. when the original owner dies, but other peers in
+</I>&gt;<i>the distributed system want to keep on working with eachother). All I'm
+</I>&gt;<i>saying is, I'm not ready to rule out ideas like this, although I don't
+</I>&gt;<i>see the need to implement controversial ideas such as this right now. We
+</I>&gt;<i>are in the early stages of development so we don't know what we will
+</I>&gt;<i>need when we start to put JOS to use.
+</I>
+This is the best thing I've heard all week. We can provide a function to
+&quot;move&quot; an object from one user process to another. In other words, an
+object can be passed to another process simply by modifying its Process
+property.
+
+I can imagine that a DatagramPacket can be &quot;sent&quot; to another user process
+by updating its Process property from a protocol stack to a user process.
+Since the protocol stack no longer owns the object, it can be garbage
+collected in the usual way.
+
+The idea of moving an object around, from process to process, is a strong
+point of Java technologies. The same function could move an object from one
+machine to another.
+
+There is only one catch. A complex object could not be moved from one
+process to another without moving all of its dependent objects. While it
+might be good for shallow moves, it could not be automatic for deep moves.
+
+&gt;<i>Sharing by proxy is another idea again. But we can share an object
+</I>&gt;<i>between multiple processes and still have a single owner.
+</I>
+A directory entry is a proxy for a file's payload. A directory and payload
+are separate. An object proxy is like a directory entry. A proxy is owned
+by exactly one process. Behind the scenes, a proxy has an object property.
+The object property always points to an object owned by the system process.
+
+&gt;<i>Sharing by proxy means that rather than sharing a direct reference to
+</I>&gt;<i>the object you want to share, a proxy/wrapper object is shared which
+</I>&gt;<i>provides a level of protection for the owning process. However, to
+</I>&gt;<i>implement this, we still need direct object sharing under the hood. I
+</I>&gt;<i>think both types of sharing will be useful.
+</I>
+I believe a proxy will be more efficient than direct references. When the
+Process property of each object is an item, it is very easy for the process
+to be de-referenced. It is straight forward.
+
+The idea of maintaining a list (see above) of processes makes it simple to
+maintain process information but makes it difficult to de-reference. The
+complexity is this: a process object returned from getProcessList() belongs
+to another process. The implications of this are incomprehensible.
+
+When each object belongs to exactly one process, the implications are easy
+to understand (easy to code) and limit the object sharing to a centralized API.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000513.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000518.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#516">[ date ]</a>
+              <a href="thread.html#516">[ thread ]</a>
+              <a href="subject.html#516">[ subject ]</a>
+              <a href="author.html#516">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

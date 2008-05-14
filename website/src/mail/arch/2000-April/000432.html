@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000431.html">
+   <LINK REL="Next" HREF="000433.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">ryan@whitewolf.com.au</A><BR>
+    <I>Sun, 9 Apr 2000 02:19:49 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000431.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000433.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#432">[ date ]</a>
+              <a href="thread.html#432">[ thread ]</a>
+              <a href="subject.html#432">[ subject ]</a>
+              <a href="author.html#432">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Sat, 8 Apr 2000, Todd L. Miller wrote:
+
+&gt;<i> PS -- I looked at the code for jshell, and it doesn't do redirects for
+</I>&gt;<i> programs invoked with main(String[]) -- which is the prime example we've
+</I>&gt;<i> been talking about w.r.t. rewriting statics.  I checked and can no longer
+</I>&gt;<i> find Echnida/Enchida on the web anywhere -- anyone have a URL?
+</I>
+	<A HREF="http://www.javagroup.org/echidna/">http://www.javagroup.org/echidna/</A>
+
+I think they do something with statics, but I don't remember for sure.
+
+&gt;<i> 	Section 5.3.4 of the JVM spec explicitly states that no two
+</I>&gt;<i> classloaders may attempt to define the same class differently: &quot;It is
+</I>&gt;<i> essential that any type name N mentioned in the field or method descriptor
+</I>&gt;<i> denote the same class or interface when loaded by L1 and when loaded by
+</I>&gt;<i> L2.&quot;
+</I>
+Only if, for example, class A (L1) tries to pass a variable of type N
+into a method of class B (L2) - anything where N is mentioned in the
+field or method descriptor. If it is not, then it is quite possible for
+two classloaders to define the same class differently.
+
+Actually, the terminology is a bit tricky here. What I mean is, it is
+possible to define two classes of the same type differently in two
+different classloaders on the condition described above. And to modify
+your original statement, no two classloaders may attempt to define the
+same class at all (I should think).
+
+&gt;<i> 	The issue of type-safety (and correctness!) /requires/ that
+</I>&gt;<i> processes which wish to share Java objects either via direct references or
+</I>&gt;<i> via the Serializable interface share class definitions for the shared
+</I>&gt;<i> objects' classes /and every class referenced in its resolution/.
+</I>
+Ideally, you want to limit access to another process's objects to &quot;as
+much as is required and no more&quot;. This could be a matter of programming
+style. When message passing between processes, the arguments and return
+values can be of simple Classes intended only to carry data.
+
+&gt;<i>  This is
+</I>&gt;<i> where you begin to want finer control over what classes your child process
+</I>&gt;<i> starts with in its classloader.  In general, there will be a subset of
+</I>&gt;<i> classes whose proper functioning /requires/ that the JVM rewrite their
+</I>&gt;<i> classloader (e.g. System.in/out/err; though this can be done by cloning
+</I>&gt;<i> and calling setIn/Out/Err, it amounts to the same thing) caches.  Except
+</I>&gt;<i> for these, the default ought to be to share everything else, with the
+</I>&gt;<i> application specifically mentioning the exceptions -- e.g. classes it
+</I>&gt;<i> loaded which have statics.
+</I>
+Hmm, I see your goal is to minimise memory consumption, but this sounds
+like a security risk. If an application must specifically mention which
+classes should be protected, that leaves existing Java applications open
+to security holes. Ignoring memory for the moment, it seems to me that
+the default should be to share nothing apart from what is explicitly
+requested.
+
+As for memory saving, a solution might be:
+
+- share classes which are loaded from the same version of the same
+  archive
+- always maintain separate statics for different classloaders
+
+Note that we will effectively have a primordial classloader for every
+process, each under the control of the JVM. Since nearly every class
+will be loaded by one of these classloaders, the JVM can check if they
+are coming from the same archive.
+
+When might they come from different archives? If you change your
+CLASSPATH in a particular shell. If you are a programmer, you will
+likely have many different versions of the same class on your system and
+you would like to be able to run each one, potentially all at the same
+time. The JVM can't just assume that it can share the same
+implementation of the class among each process.
+
+Just as well the JVM allows you to define the same class differently in
+different classloaders! (see my clarification of section 5.3.4 of the
+JVM spec, above)
+
+(Note, I hope I'm not way out of context since I entered this thread
+late :-)
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000431.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000433.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#432">[ date ]</a>
+              <a href="thread.html#432">[ thread ]</a>
+              <a href="subject.html#432">[ subject ]</a>
+              <a href="author.html#432">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

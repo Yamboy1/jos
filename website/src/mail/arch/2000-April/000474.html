@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os questions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000473.html">
+   <LINK REL="Next" HREF="000475.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os questions</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] rheise.os questions">tmiller@haverford.edu</A><BR>
+    <I>Wed, 19 Apr 2000 00:07:44 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000473.html">[JOS-Arch] rheise.os - update</A></li>
+        <LI> Next message: <A HREF="000475.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#474">[ date ]</a>
+              <a href="thread.html#474">[ thread ]</a>
+              <a href="subject.html#474">[ subject ]</a>
+              <a href="author.html#474">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>( Not entirely on topic -- the Blackdown 1.1.8 JDK doesn't come with
+Swing, does it? )
+
+	Clarification: the SystemObjects argument to createProcess is the
+set of statics in java.lang.System that must be replaced from process to
+process, right?
+
+	In HostInit, why are you generating an instance and then
+immediately resetting it to the corresponding static?  Does this have
+something to do with references/classloading?
+
+	The 'nativ' stuff doesn't ever seem to touch System -- is this
+just not coded?  Or am I missing something?
+
+
+	Is this summary correct?  rheise.os needs two things from the
+native code before we can call it jos.os -- a completely empty classloader
+so that code can't call classes loaded in the primordial classloader and
+thereby bypass our rewriting of the statics; and the ability to correctly
+handle native calls wrapper classes don't have to be written for every
+static native method.
+
+
+	Otherwise, I'm very impressed.
+
+-_Quinn
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000473.html">[JOS-Arch] rheise.os - update</A></li>
+	<LI> Next message: <A HREF="000475.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#474">[ date ]</a>
+              <a href="thread.html#474">[ thread ]</a>
+              <a href="subject.html#474">[ subject ]</a>
+              <a href="author.html#474">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

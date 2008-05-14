@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000609.html">
+   <LINK REL="Next" HREF="000612.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>jewel@pixie.co.za</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">jewel@pixie.co.za</A><BR>
+    <I>Wed, 17 May 2000 22:08:12 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000609.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000612.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#605">[ date ]</a>
+              <a href="thread.html#605">[ thread ]</a>
+              <a href="subject.html#605">[ subject ]</a>
+              <a href="author.html#605">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Let's get back to the discussion. The reloading of classes cannot be
+</I>&gt;<i> ignored. Each process has its own potentially unique CLASSPATH. So, each
+</I>&gt;<i> process must load its own classes.
+</I>
+That seems to be such a waste. Consider the classic use of processes by a
+UNIX shell. When the shell executes a 'ls' process and then a 'grep'
+process and then a 'wc' process it actually has to start all these 3
+processes.
+
+Now in UNIX creating these processes has to be cheap (precisely because of
+this), and the executable code for these processes can be shared by many
+instances.
+
+The JVM model is different. Before the JVM can execute a &quot;Process&quot;, which
+for me means the &quot;main&quot; method in some class, it has to load that class.
+Loading that class means resolving the constant pool and loading all the
+classes that it depends on. These are typically classes like
+java.lang.System, java.lang.Thread, java.lang.String,
+java.lang.StringBuffer and so on.
+
+This whole loading process is not trivial. Some classes might call native
+methods while they are initializing (like setting up the file descriptors
+for System.in, System.out etc).
+
+This all takes time, much more time than executing a UNIX process like
+&quot;ls&quot;.
+
+So if the intention is to model a JOS Process on a UNIX process, we have
+to think very carefully about what class definitions we are going to share
+across processes.
+
+I think it would be extremely wasteful if each process had to load all
+it's own classes from the class library independently of the other
+processes.
+
+This makes it difficult to support different class libraries in the
+same OS but otherwise has great advantages.
+
+Processes then would also not be able to use a different version of a
+class already used by another process.
+
+The solution may be to use ClassLoaders to separate classes that
+processes use (but not the class library classes).
+
+John 
+
+&gt;<i> All classes must be unique to a bytecode process. None can
+</I>be shared
+&gt;<i> without a proxy. Each class in process A must be different than each class
+</I>&gt;<i> in process B. When the process is garbage collected, all of its classes are
+</I>&gt;<i> garbage collected.
+</I>&gt;<i> 
+</I>&gt;<i> In a classic design, all classes in a virtual machine are discarded when a
+</I>&gt;<i> virtual machine dies. In a JNI design, all classes in a virtual machine are
+</I>&gt;<i> discarded when a virtual machine dies. Sometimes, these classes are not
+</I>&gt;<i> even finalized.
+</I>&gt;<i> 
+</I>&gt;<i> When a Java application runs inside a MPCL-compatible virtual machine, all
+</I>&gt;<i> of its classes must be discarded when a process dies. All classes created
+</I>&gt;<i> by a process are owned by a process. Everything owned by a process is
+</I>&gt;<i> discarded when the process dies.
+</I>&gt;<i> 
+</I>&gt;<i> A process can share objects with any other process, not just the process
+</I>&gt;<i> that created it. For more information, see also ParentProcess article on
+</I>&gt;<i> JOS Wiki.
+</I>&gt;<i> 
+</I>&gt;<i> -----
+</I>&gt;<i> 
+</I>&gt;<i> Here again are processes A and B. Because each process might have its own
+</I>&gt;<i> CLASSPATH, the superclass of a class can change from one process to another.
+</I>&gt;<i> 
+</I>&gt;<i> In one process, I can have this:
+</I>&gt;<i> 
+</I>&gt;<i> public abstract class AbstractWidget {
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> public class CustomWidget
+</I>&gt;<i>     extends AbstractWidget {
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> while in another, I can have this:
+</I>&gt;<i> 
+</I>&gt;<i> public abstract class AbstractWidget {
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> public class BasicWidget 
+</I>&gt;<i>     extends AbstractWidget {
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> public class CustomWidget
+</I>&gt;<i>     extends BasicWidget {
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> Both are valid and appropriate within their own process. The CLASSPATH of
+</I>&gt;<i> process A can be different than the CLASSPATH of process B.
+</I>&gt;<i> 
+</I>&gt;<i> -----
+</I>&gt;<i> 
+</I>&gt;<i> A versionless virtual machine is able to adapt at runtime to different
+</I>&gt;<i> versions of the Java standard class libraries. The class library is plugged
+</I>&gt;<i> into a versionless virtual machine through CLASSPATH. Within a single
+</I>&gt;<i> virtual machine, each process is built upon a different platform. One
+</I>&gt;<i> process can run Java 2 platform while another runs Java 1.
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Arch maillist  -  <A HREF="mailto:Arch@jos.org">Arch@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/arch">http://jos.org/mailman/listinfo/arch</A>
+</I>&gt;<i> 
+</I>
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000609.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000612.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#605">[ date ]</a>
+              <a href="thread.html#605">[ thread ]</a>
+              <a href="subject.html#605">[ subject ]</a>
+              <a href="author.html#605">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

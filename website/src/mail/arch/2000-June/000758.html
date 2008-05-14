@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] JOSCore vis-a-vis JOSExtensions: clarity, Ihope...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000757.html">
+   <LINK REL="Next" HREF="000747.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] JOSCore vis-a-vis JOSExtensions: clarity, Ihope...</H1>
+    <B>DigiGod</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] JOSCore vis-a-vis JOSExtensions: clarity, Ihope...">digigod@earthling.net</A><BR>
+    <I>Tue, 20 Jun 2000 16:57:59 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000757.html">[JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I  hope...</A></li>
+        <LI> Next message: <A HREF="000747.html">[JOS-Arch] Getting started on AWT</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#758">[ date ]</a>
+              <a href="thread.html#758">[ thread ]</a>
+              <a href="subject.html#758">[ subject ]</a>
+              <a href="author.html#758">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> &gt;JOSCore is a minimalists dream, it is a pure OS unfettered by concerns
+</I>&gt;<i> &gt;of the user and only remotely interested in the concerns of the computer
+</I>&gt;<i> &gt;it is the first domino to fall when the computer is powered on, JOSCore
+</I>&gt;<i> &gt;is the method for loading JOSExtensions it is the /base/ of the /base/
+</I>&gt;<i> &gt;of JOS, it is both the abstractions for all JOSExtensions and the
+</I>&gt;<i> &gt;mechanism for attaching them to itself. It is the nexus of the Gestalt
+</I>&gt;<i> &gt;(if you wanna get real wordy.)
+</I>&gt;<i> 
+</I>&gt;<i> I am trying to make sense of your latest definition JOSCore. Are you saying
+</I>&gt;<i> that JOSCore is written in machine code? JOSCore would be written in
+</I>&gt;<i> machine code if it is first and comes before a kernel and virtual machine.
+</I>
+I'm saying that JOSCore isn't written in any code (metaphorically,) it
+is just a division to help us design JOS and a seed to base all of our
+distributions on. JOSCore may never be distributed, but it would both
+be-in and be-the-same-in every distribution.
+ 
+&gt;<i> Why does JOSCore come before the kernel?
+</I>
+It doesn't, it /includes/ the kernel. As I said, I thought
+JOSCore/JOSExtensions were _just_ divisions of JOSystem but now I think
+they are more abstract then that and that they are divisions of _both_
+JOSystem and JOSBox.
+ 
+&gt;<i> Are you saying that we can write a platform-independent kernel on top of a
+</I>&gt;<i> platform-dependent JOSCore?
+</I>
+No, but I do think the JOSCore section of JOSystem should act as a
+platform-independent kernel on top of JOSBox (as it is, basically
+virtual hardware)
+ 
+&gt;<i> Are JOSExtensions written in machine code too?
+</I>
+You mean to ask if JOSExtensions will be written entirely in machine
+code like JOSCore *but* JOSCore isn't written entirely in machine code,
+the JOSBox section of JOSCore is while the JOSystem section is not. So
+JOSExtensions will be written in machine code also, but not exclusively.
+ 
+&gt;<i> We have defined a kernel and its kernel modules. Both a kernel and its
+</I>&gt;<i> kernel modules are compiled to machine code and, at runtime, are
+</I>&gt;<i> platform-dependent. A JOS-compatible kernel would be able to load
+</I>&gt;<i> JOS-compatible kernel modules. Loading a JOS-compatible kernel modules must
+</I>&gt;<i> include fix-up, or binding a kernel module to the kernel.
+</I>
+I don't know much about such things, but from my understanding I'd say
+the kernel modules are JOSExtensions. In other words the kernel /core/
+is made up of two parts the kernel (bootstrap) and the abstractions and
+binding methods (builder) for the modules, or /extensions/. You may have
+also noticed that I broke my definition of core into two elements: The
+bootstrap, the part of core that initializes its self and the builder,
+the part that glues the necessary extensions on. I see a bootstrap and a
+builder in the JOSBox-JOSCore and one in the JOSystem-JOSCore.
+ 
+&gt;<i> At least, we can agree that JOSCore is neither jos.core nor org.jos.core.
+</I>
+Almost to the point where it doesn't have to be said.
+ 
+&gt;<i> We have defined a kernel interface. RJK has consistently called the layer
+</I>&gt;<i> between a portable kernel and non-portable kernel as a kernel interface. A
+</I>&gt;<i> portable kernel is made platform-specific at compile-time. A JOS-compatible
+</I>&gt;<i> kernel might load JOS-compatible kernel modules, all written in machine code.
+</I>&gt;<i> 
+</I>&gt;<i> When a virtual machine is a JOS-compatible kernel module, any
+</I>&gt;<i> JOS-compatible kernel can load it, bind it and run it. A virtual machine
+</I>&gt;<i> becomes a plug-in to the kernel.
+</I>&gt;<i> 
+</I>&gt;<i> I believe we have run &quot;JOSCore&quot; into the ground by giving it too many
+</I>&gt;<i> incompatible definitions. Can't we invent a new name for the JOS start-up
+</I>&gt;<i> sequence? Can't we define a new term for the four or five concepts
+</I>&gt;<i> previously known as JOSCore?
+</I>
+This may be a necessity, but it may also prove useful -- we all being
+fastidious people (mentally at least) will be forced to think of what
+something is before we can think of what we call it.
+ 
+&gt;<i> There is an issue of distribution. If JOSCore is not an issue of
+</I>&gt;<i> distribution, what shall we call the minimum distribution of JOS? How much
+</I>&gt;<i> needs to exist before an operating system is called JOS? Does jJOS/decaf
+</I>&gt;<i> qualify as a JOS-compatible operating system?
+</I>
+It both is and isn't the minimum distribution, in the sense that JOSCore
+by itself is useless and would only make a technical distribution (I'm
+guessing with the platform-specific code uncompiled since none but true
+experimenters would want it...). A minimal distribution would be close
+to a minimal JOS but it would probably still have such things as a file
+system and JADE (albeit with a small CLI.)
+ 
+&gt;<i> For example, the start-up sequence might be known as JOSBoot. At JOSBoot, a
+</I>&gt;<i> kernel and virtual machine need to be loaded, forming the JOSBox. I
+</I>&gt;<i> understood the mechanism to work this way: JOSBoot loads a kernel. JOSBoot
+</I>&gt;<i> instructs the kernel to load, bind and run a virtual machine. Both
+</I>&gt;<i> Etherboot and GRUB qualify as JOSBoot.
+</I>
+This is what I called the &quot;bootstrap element of JOSBox's JOSCore
+section,&quot; as always over-intellectulization has created uncomprehensible
+complex neologisms; or, in other words, I'm happy with calling it
+JOSBoot if everyone else is.
+ 
+&gt;<i> jJOS/decaf are statically linked. When jJOS/decaf are loaded with Etherboot
+</I>&gt;<i> or GRUB, there is no distinction between kernel and virtual machine. The
+</I>&gt;<i> entire JOSBox is loaded together. What is needed to make jJOS/decaf more
+</I>&gt;<i> JOS-compatible?
+</I>&gt;<i> 
+</I>&gt;<i> With kernel modules, kernel interface, a start-up sequence and
+</I>&gt;<i> distribution, what is left for JOSCore?
+</I>&gt;<i>
+</I>&gt;<i> Might JOSCore be too abstract for me to understand today because we don't
+</I>&gt;<i> have more than one JOS-compatible operating system?
+</I>
+Possibly, but I'd like to give it one more try.... First of all let me
+say that by my definition a JOS-compatible OS is any OS with JOSCore
+(even if you couldn't run the same apps on them or even have them
+communicate together) it was thinking about what &quot;JOS-compatible&quot; meant
+that led me to extend my previous definition. 
+
+My old way of thinking was a bit clearer, it divided JOSystem into
+JOSCore and JOSExtensions -- perhaps this is a better way to think about
+it, and perhaps Ill return to this old mode of thinking.
+
+My new way of thinking is that when we add something to JOS we should
+ask ourselves &quot;is this, really truly necessary? is it more
+compatible/economical to add an extra layer of abstraction?&quot; or &quot;is this
+part of JOSCore, or should it be a JOSExtension?&quot; Maybe I don't
+understand the design of JOSBox well enough, but I think the
+core/extension classification applies to it as well.
+
+Then I realized that JOSBox/JOSystem and JOSCore/JOSExtensions were two
+different ways of dividing the same thing, two different perspectives,
+the former from a system-level, the latter from a design level. I also
+noticed how perfectly they overlap:
+
+If imagine JOS as a square:
+
++-----+
+|<i>     |
+</I>|<i> JOS |
+</I>|<i>     |
+</I>+-----+
+
+
+And you draw a horizontal line in the middle of the square (the
+machine-/byte-code boundary) you get this:
+
++--------+
+|<i>JOSystem|
+</I>+--------+
+|<i>JOSBox  |
+</I>+--------+
+
+If you redrew the square then drew a vertical line down its center (the
+need/want boundary) you get this:
+
++---------+---------------+
+|<i>         |               |
+</I>|<i> JOSCore | JOSExtensions |
+</I>|<i>         |               |
+</I>+---------+---------------+
+
+It's still the same square, just two different ways of looking at it,
+now if we overlay the two diagrams, we get this:
+
++------------------+------------------------+
+|<i> JOSystem-JOSCore | JOSystem-JOSExtensions |
+</I>+------------------+------------------------+
+|<i> JOSBox-JOSCore   | JOSBox-JOSExtensions   |
+</I>+------------------+------------------------+
+
+Or perhaps a bit more clearly:
+
++-----------------------+
+|<i>JOSystem               |
+</I>|<i>JOSCore | JOSExtensions|
+</I>+-----------------------+
+|<i>JOSBox                 |
+</I>|<i>JOSCore | JOSExtensions|
+</I>+--------+--------------+
+
+
+Even if I'm wrong, I hope at least was able to explain my self (I'm
+getting ASCII-box cramp)
+ 
+&gt;<i> I would like to see a three-dimensional view of JOSBox and JOSystem. It
+</I>&gt;<i> might help us better understand JOSCore.
+</I>
+I posted a really rotten (Image creation is harder then I thought it
+would be) 3D description, but I think the above makes more sense 
+
+Cheers,
+DigiGod
+_____________________________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_____________________________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_____________________________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+
+O-
+_____________________________________________
+NetZero - Defenders of the Free World
+Click here for FREE Internet Access and Email
+<A HREF="http://www.netzero.net/download/index.html">http://www.netzero.net/download/index.html</A>
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000757.html">[JOS-Arch] JOSCore vis-avis JOSExtensions: clarity, I  hope...</A></li>
+	<LI> Next message: <A HREF="000747.html">[JOS-Arch] Getting started on AWT</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#758">[ date ]</a>
+              <a href="thread.html#758">[ thread ]</a>
+              <a href="subject.html#758">[ subject ]</a>
+              <a href="author.html#758">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

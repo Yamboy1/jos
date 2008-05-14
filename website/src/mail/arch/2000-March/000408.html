@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Optimistic reflection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000407.html">
+   <LINK REL="Next" HREF="000409.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Optimistic reflection</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Optimistic reflection">gchii@mindspring.com</A><BR>
+    <I>Sun, 12 Mar 2000 10:31:28 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000407.html">[JOS-Arch] Registry 100</A></li>
+        <LI> Next message: <A HREF="000409.html">[JOS-Arch] Optimistic reflection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#408">[ date ]</a>
+              <a href="thread.html#408">[ thread ]</a>
+              <a href="subject.html#408">[ subject ]</a>
+              <a href="author.html#408">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Try this on your off-the-shelf virtual machine:
+
+  public void example() {
+    throw new NoSuchFieldError();
+  }
+
+What happens? What should happen? When any method throws an extension of
+&quot;java.lang.Error&quot;, what happens to your virtual machine? Can an applet
+throw an error? Can a servlet?
+
+There are two kinds of class file reflection: pure and practical. The first
+kind is pure reflection as demonstrated in the com.realignsoft.reflection2a
+package. The second kind is practical reflection as demonstrated in
+java.lang and java.lang.reflect.
+
+As of this morning, I have a simple, step-by-step procedure that you can
+perform on your own computer to demonstrate for yourself the difference
+between pure and practical reflection. This demonstrates that practical
+reflection is very optimistic. It does not anticipate that anything might
+go wrong in the reflection of a class. It assumes a class file is valid and
+passes verification.
+
+With any binary editor, create an incomplete class file:
+
+1. Call it 'Sample.class'.
+2. Store four bytes, 0xCA, 0xFE, 0xBE and 0xBE, at the beginning of the file.
+3. Save it.
+4. Check the size of the new file; it must be 4.
+
+With pure reflection, load the 'Sample.class' file as a Bytecode object.
+The Bytecode object will be created successfully, without shutting down
+your virtual machine.
+
+  public void example() {
+    Bytecode bc;
+    try {
+      bc = new BasicBytecode( &quot;Sample.class&quot; );
+    }
+    catch( Throwable e ) {
+    }
+  }
+
+With practical reflection, load 'Sample.class' as an instance of
+java.lang.Class, with something like this:
+
+  public void example() {
+    Class c;
+    try {
+      c = Class.forName( &quot;Sample&quot; );
+    }
+    catch( Throwable e ) {
+    }
+  }
+
+
+What happens to your virtual machine? Practical reflection is a bit
+optimistic, isn't it? It expects all the class files to be perfect.
+
+About jJOS/decaf:
+How does jJOS/decaf handle an error? Will an error bring down the whole
+operating system? As shown, any application that uses practical reflection
+has the potential to throw an error. If I have 50+ applications running on
+jJOS/decaf and one of them loads a malformed class file, does that bring
+down my operating system?
+
+While I might desire JOS to load many applications inside one virtual
+machine, I cannot use an operating system that fails when one of its hosted
+application fails. I believe the architecture of JOS should be slightly
+different than jJOS/decaf in the following way:
+
+For optimization, all bytecode should be intern'd. The virtual machine
+class must maintain the list of intern'd bytecode across all virtual machines.
+
+Each virtual machine is an *instance* of decaf. Each virtual machine has
+its own object space. Each virtual machine has its own garbage collector.
+When an error is thrown inside one virtual machine, it shuts down one
+virtual machine. All other instances of a virtual machine are independent.
+
+This says nothing of preemptive or non-preemptive multi-tasking. More than
+one instance of decaf can be created without moving to preemptive
+multi-tasking. The virtual machine class becomes responsible for
+maintaining a list of all the bytecode that has every been used
+(virtually). Each instance of the virtual machine uses the internBytecode()
+method to get the bytecode it uses.
+
+JOS must be a robust, reliable, dependable, rock solid, stable, hard
+working operating system. If it fails just because an error is thrown, an
+operating system will be none of that.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000407.html">[JOS-Arch] Registry 100</A></li>
+	<LI> Next message: <A HREF="000409.html">[JOS-Arch] Optimistic reflection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#408">[ date ]</a>
+              <a href="thread.html#408">[ thread ]</a>
+              <a href="subject.html#408">[ subject ]</a>
+              <a href="author.html#408">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

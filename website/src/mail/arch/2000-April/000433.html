@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000432.html">
+   <LINK REL="Next" HREF="000434.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">tmiller@haverford.edu</A><BR>
+    <I>Sat, 8 Apr 2000 15:25:22 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000432.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000434.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#433">[ date ]</a>
+              <a href="thread.html#433">[ thread ]</a>
+              <a href="subject.html#433">[ subject ]</a>
+              <a href="author.html#433">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I think they do something with statics, but I don't remember for sure.
+</I>
+	Yes, Echidna creates wrapper classes for the System.in/out/err
+statics and threads that both register with a namespace manager, so that
+the wrapped in/out/err classes read/write to a stream specified by their
+namespace.  I didn't find anything relating to rewriting statics in
+general.  Reloading of classes is accomplished by associating a specific
+classloader with each 'process' and garbage collecting it on process
+termination, so that the JVM unloads that classloader's classes.
+
+&gt;<i> Only if, for example, class A (L1) tries to pass a variable of type N
+</I>&gt;<i> into a method of class B (L2) - anything where N is mentioned in the
+</I>&gt;<i> field or method descriptor. If it is not, then it is quite possible for
+</I>&gt;<i> two classloaders to define the same class differently.
+</I>
+	Re-reading the spec, it does in fact always indicate that classes
+are defined by the union of their classloaders and name, and must in fact
+be considered loaded or not only on the basis of both the ClassLoader used
+and the name.  (When a class is explicitly loaded through a classloader,
+every operation on that class must go through that classloader, from
+section 5.3 in the spec.)  It is clear that the situation you described is
+the situation in which an error must be thrown, and in fact this is
+described as a loading constraint in the section on field resolution.  
+(That is, the type of a field as defined by its name and its class's
+classloader must be the same of the type name of the reference and the
+referrer's classloader.)  Likewise for parameter types in a method
+invocation.
+
+	My apologies; in summary, classloaders do define independent
+namespaces.
+
+	Considering memory issues: Echidna takes the position that the
+reason for Java processes is to eliminate the need to load every
+(necessary) class in the library each time you start a new Java
+program.  Since I so badly misread the spec regarding classloaders before,
+I decided to determine how independent the classloader's namespaces were
+experimentally -- as this bears on how much work the JVM has to do to
+support processes, and how much /must/ be shared.  Writing a custom
+classloader, it looks like /nothing/ is shared by default, and it's the
+responsibility of the classloader to be efficient by using
+findSystemClass() if it so desires.
+
+	This agrees with my interpretation of the spec, that the JVM
+checks its tables for a classname/classloader /pair/ before deciding if a
+classloader gets a chance to load classname; if the classloader is new,
+one would expect it not to have any entries at all in the table.
+
+	This would suggest that Echidna doesn't actually need to wrap
+java.lang.System.  In fact, it would suggest the following code in its
+custom classloaders would be sufficient:
+
+if ( className == &quot;java.lang.System&quot; ) {
+	/* fetch java.lang.System from the filesystem... */
+
+	Class c = defineClass( className, buffer, 0, buffer.length );
+
+	/* shorthand */
+	Method setIn = c.getMethod( setIn, { java.io.InputStream } );
+	setIn.invoke( null, { theInputStreamAsRedirectedByTheShell } );
+
+	/* repeat for setOut, setErr... */
+
+	return c;
+	}
+
+	and would allow redirection of /any/ java application.
+
+	Generically, one's custom classloader would never call
+findSystemClass(), instead always defining those classes by itself, so
+that they get new statics.  Efficiency improvements would require native
+support, something like setClassLoader( Class c ), so that the class
+loader could use system class definitions (e.g. JavaClass) and have an
+independent Class object (e.g. JavaClassInstance), where setClassLoader
+would set the class loader and redirect the static fields pointer*.
+
+	If one unzipped the class library**, it should be relatively easy
+to write a proof-of-concept shell/classloader combination that could
+handle redirecting normal main()-method java applications.  (It would need
+a pair of classes like OutputToInputStream and InputToOutputStream.)  
+Create a new classloader for each process, get, from that classloader, a
+Class of java.lang.System, set its in/out/err streams as appropriate; also
+from that classloader, fetch your run-a-main-method Thread subclass,
+instantiate it, and run it.  Because it lives in the same classloader as
+the System class you've defined (and, of course, the classloader instance
+caches its classes), it will use the System class you've defined.  If
+people feel is worthwhile, I'll give it a shot.
+
+&gt;<i> Ideally, you want to limit access to another process's objects to &quot;as
+</I>&gt;<i> much as is required and no more&quot;. This could be a matter of programming
+</I>&gt;<i> style. When message passing between processes, the arguments and return
+</I>&gt;<i> values can be of simple Classes intended only to carry data.
+</I>
+	True.  The question then becomes whether or not we want to forbid
+direct object sharing or not; and to do so, I think, would be extremely
+unfortunate.  Direct object sharing is like CORBA, except more so, and KDE
+and GNOME are putting CORBA to work for them in good and interesting
+ways...
+
+&gt;<i> (Note, I hope I'm not way out of context since I entered this thread
+</I>&gt;<i> late :-)
+</I>
+	No, not at all.  You're quite right to correct me when I'm so
+dangerously wrong.  Thank you.
+
+-_Quinn
+
+* As it stands, the primordial classloader returns JavaClassInstances,
+which have pointers to ClassFields in them.  There's no reason to expect
+that the JCI generated by a custom classloader would have the same
+ClassFields pointer, unless it's returning a java.lang.Class it got from
+findSystemClass, which is the case I'm discussing.
+
+** So that you don't have to mucking about in .zip/.jar files, just
+subsitute '.' in names with '/'.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000432.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000434.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#433">[ date ]</a>
+              <a href="thread.html#433">[ thread ]</a>
+              <a href="subject.html#433">[ subject ]</a>
+              <a href="author.html#433">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

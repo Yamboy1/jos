@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000676.html">
+   <LINK REL="Next" HREF="000671.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">gchii@mindspring.com</A><BR>
+    <I>Wed, 24 May 2000 09:10:00 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000676.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000671.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#673">[ date ]</a>
+              <a href="thread.html#673">[ thread ]</a>
+              <a href="subject.html#673">[ subject ]</a>
+              <a href="author.html#673">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 01:00 PM 5/24/00 -0200, John Leuner &lt;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&gt; wrote:
+&gt;<i>A bit off-topic, but does the class definition sharing include the
+</I>&gt;<i>bytecode for the methods?
+</I>
+This is an important part of the discussion about reloading classes.
+Understanding a class definition is critical to understanding if class
+definitions need to be reloaded and, if so, how often. What is a class
+definition? We need to know more.
+
+A bytecode cache includes all the raw bytecode. Therefore, a bytecode cache
+shares the original bytecode for methods.
+
+&gt;<i>Reason being that when you overwrite instructions in the bytecode with
+</I>&gt;<i>_quick variants you might also run into trouble with sharing.
+</I>
+A virtual machine is not required to implement the _quick variants.  A
+_quick variant must never be stored in raw bytecode, like in a class file.
+
+In addition, a &quot;copy-on-write&quot; premise means that each class might convert
+the original bytecode into a class-specific form one method at a time. For
+a basic implementation of a bytecode interpreter or ahead-of-time compiler,
+_quick variants may not be used at all. There are other mechanisms to
+optimize methods.
+
+When a class is resolved, it can do whatever conversion it finds necessary.
+In MPCL, the original bytecode is never thrown away. It is preserved so
+that the same class in another class loader can convert original bytecode
+into its class-specific form. It is also preserved so that raw bytecode can
+be intern'd for many class loaders. Even while bytecode is shared, a class
+is unique. It must be resolved for each class loader.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000676.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000671.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#673">[ date ]</a>
+              <a href="thread.html#673">[ thread ]</a>
+              <a href="subject.html#673">[ subject ]</a>
+              <a href="author.html#673">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

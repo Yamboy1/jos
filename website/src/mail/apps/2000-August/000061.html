@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [eric] Linux programming question</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000060.html">
+   <LINK REL="Next" HREF="000062.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [eric] Linux programming question</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [eric] Linux programming question">gchii@mindspring.com</A><BR>
+    <I>Thu, 17 Aug 2000 07:49:41 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000060.html">[JOS-Apps] [jni] Registering native methods</A></li>
+        <LI> Next message: <A HREF="000062.html">[JOS-Apps] [bulkmake] Release 3</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#61">[ date ]</a>
+              <a href="thread.html#61">[ thread ]</a>
+              <a href="subject.html#61">[ subject ]</a>
+              <a href="author.html#61">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>For now, I am implementing the eric tool as an execuable program, so that I
+can learn more about executable programs on Linux. The eric tool is not a
+shell script.
+
+Here is my Linux programming question:
+
+At runtime, how does a C program determine where it is stored?
+
+Usually, the executable is /not/ in the current directory. I understand
+that argv[ 0 ] on Linux contains the short name of the program, but not the
+fully qualified name. I'm not sure if this is because the program is loaded
+through PATH.
+
+Here is an example:
+
+$ cd ~/eric1c
+$ ls
+eric
+eric.conf
+$ cd /usr/local/share
+$ eric
+
+argv[ 0 ] is equal to &quot;eric&quot;. But I'd like to call some function which
+returns &quot;~/eric1c/eric&quot;, so that the eric tool can load &quot;~/eric1c/eric.conf&quot;.
+
+The eric tool needs to open eric.conf, which is always stored in the same
+directory with the eric tool. When renamed, the eric tool must find a
+matching configuration file. I'd like the eric tool to /always/ find itself
+and its configuration, no matter what it is named.
+
+$ cd ~/minisrv1a
+$ cp ~/eric1c/eric* minisrv*
+$ ls
+minisrv
+minisrv.conf
+$ cd /usr/local/share
+$ minisrv
+
+argv[ 0 ] is equal to &quot;minisrv&quot;. But I'd like to call the same function as
+before. This time it is expected to return &quot;~/minisrv1a/minisrv&quot;, so that
+the eric tool can load &quot;~/minisrv1a/minisrv.conf&quot;.
+
+I couldn't find a standard C library function that does this. Any suggestions?
+
+-----
+
+If your experienced in C/C++ on another platform and interested in how to
+start programming for Linux, I might recommend a book called &quot;Linux
+Programmer's Reference&quot; by Richard Petersen, Osborne/McGraw Hill. The first
+section of the book is about shell scripts and nothing but shell scripts.
+It also contains brief information on shared libraries, make and other
+programming tools.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000060.html">[JOS-Apps] [jni] Registering native methods</A></li>
+	<LI> Next message: <A HREF="000062.html">[JOS-Apps] [bulkmake] Release 3</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#61">[ date ]</a>
+              <a href="thread.html#61">[ thread ]</a>
+              <a href="subject.html#61">[ subject ]</a>
+              <a href="author.html#61">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

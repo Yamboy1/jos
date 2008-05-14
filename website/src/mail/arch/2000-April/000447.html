@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000443.html">
+   <LINK REL="Next" HREF="000429.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">tmiller@haverford.edu</A><BR>
+    <I>Mon, 10 Apr 2000 14:30:09 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000443.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000429.html">[JOS-Arch] [startup sequence] scripted</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#447">[ date ]</a>
+              <a href="thread.html#447">[ thread ]</a>
+              <a href="subject.html#447">[ subject ]</a>
+              <a href="author.html#447">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> &gt;Writing a custom classloader, it looks like /nothing/ is shared by default,
+</I>&gt;<i> &gt;and it's the responsibility of the classloader to be efficient by using
+</I>&gt;<i> &gt;findSystemClass() if it so desires.
+</I>
+&gt;<i> Is this true of all virtual machines?
+</I>
+	I believe so, and it matches my interpretation of the JVM
+spec.  In addition, if the custom classloader does NOT use
+findSystemClass() for things like java.lang.Object or String, the
+application halts almost immediately with a linkage error.
+
+&gt;<i> Does a virtual machine invoke loadClass() for all classes, even those
+</I>&gt;<i> loaded by the primordial class loader?
+</I>
+	I believe it is required by the specification; the JVM-maintained
+cached appears to distinguish between classes loaded in different
+classloaders, as it must to ensure type-safety.
+
+&gt;<i> An optimized virtual machine might not invoke the loadClass() method for
+</I>&gt;<i> classes that have already been loaded by the primordial class loader.
+</I>&gt;<i> Otherwise, I think you're right.
+</I>
+	I'm not sure if this is strictly to-spec, but since we're writing
+our own, it won't do this :)
+
+&gt;<i> Certainly, a virtual machine can always create a custom class loader to
+</I>&gt;<i> load the classes from java.applet, java.awt, java.sql, etc. A primordial
+</I>&gt;<i> class loader should be an actual Java class. As long as semantics are
+</I>&gt;<i> preserved, it is not necessary to store all class files in one big archive.
+</I>&gt;<i> As long as security is preserved, it is not necessary to load all classes
+</I>&gt;<i> in the java.* packages with a primordial class loader.
+</I>
+	Yup.  It may be worthwhile to implement your class-rewriting idea
+to allow more of the process/classloader control systems to be written in
+Java.
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000443.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000429.html">[JOS-Arch] [startup sequence] scripted</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#447">[ date ]</a>
+              <a href="thread.html#447">[ thread ]</a>
+              <a href="subject.html#447">[ subject ]</a>
+              <a href="author.html#447">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

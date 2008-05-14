@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000510.html">
+   <LINK REL="Next" HREF="000515.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Fri, 28 Apr 2000 17:20:14 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000510.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000515.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#512">[ date ]</a>
+              <a href="thread.html#512">[ thread ]</a>
+              <a href="subject.html#512">[ subject ]</a>
+              <a href="author.html#512">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> Streams, RPC, IPC, RMI and CORBA are fundamental building blocks of shared
+</I>&gt;<i> objects.
+</I>
+I see it the other way around. Shared objects and streams are
+fundamental building blocks of RPC, IPC, RMI and CORBA.
+
+Optimising the protocol stack requires shared objects as a fundamental
+building block. 
+
+&gt;<i> &quot;Flagging&quot; an object as shared is un-definable. Very quickly
+</I>&gt;<i> flagging shared objects gets very complicated. Why re-invent the wheel? We
+</I>&gt;<i> already have a well-refined inter-machine communication that solves the
+</I>&gt;<i> inter-process communication problem.
+</I>
+While flagging has its problems, that doesn't rule out having object
+sharing as a fundamental primitive. The existing inter-machine IPC
+solution satisfies us for inter-machine IPC but not inter-process IPC on
+the same machine. Raw object sharing is *much* faster. Even with an
+optimised protocol stack as you described (even though this is a good
+idea, as far as optimising the operation of existing RMI and CORBA
+implementations goes), the very nature of this style of IPC means it has
+to do much more additional work. Even if you optimise the transfer of a
+packet from one process to another, the data in that packet needs to be
+serialised and un-serialised. Using raw shared objects (either directly
+or via a proxy) means that objects do not need to be serialised and read
+back in to construct a new object.
+
+&gt;<i> An object is by definition 'shared' when it is found in an RMI or CORBA
+</I>&gt;<i> registry.
+</I>
+Not in the sense that of the term 'object sharing' that we have used so
+far. RMI and CORBA provide a way to effectively share objects when you
+don't have (or can't have) true object sharing.
+
+&gt;<i> &gt;Another point occurred to me: efficiency may not be that important since
+</I>&gt;<i> &gt;access to shared objects will be rare (compared with access to objects
+</I>&gt;<i> &gt;that are in the same process).
+</I>&gt;<i> 
+</I>&gt;<i> Exactly! The greatest positive impact comes from a protocol stack that
+</I>&gt;<i> takes advantage of a MPCL-compatible virtual machine. By making the
+</I>&gt;<i> protocol stack more efficient, we make all applications more efficient,
+</I>&gt;<i> even RMI and CORBA.
+</I>
+Yes we do, but we could make RMI and CORBA more efficient (for IPC on
+the same machine) by writing our own versions that use true object
+sharing.
+
+&gt;<i> &gt;On the topic of JDK 1.1.x vs. JDK 1.2, rheise.os is currently based on
+</I>&gt;<i> &gt;JDK 1.1 (which is convenient for decaf). Al &lt;<A HREF="mailto:al@outworld.org">al@outworld.org</A>&gt; pointed
+</I>&gt;<i> &gt;out to me that his registry depends on JDK 1.2, and to integrate his
+</I>&gt;<i> &gt;work with mine we will need to either move our base level support to JDK
+</I>&gt;<i> &gt;1.2, or rewrite his registry to support JDK 1.1. I'm a bit nervous about
+</I>&gt;<i> &gt;moving to JDK 1.2 just yet, but I'm wondering whether you have a
+</I>&gt;<i> &gt;different opinion. Is JDK 1.2 realistic for you?
+</I>&gt;<i> 
+</I>&gt;<i> The multiple primordial class loader (MPCL) design is not limited to one
+</I>&gt;<i> Java platform. A kernel is not tied to one virtual machine, is it? On one
+</I>&gt;<i> machine I could run decaf on top of jJOS. On another, I could run an
+</I>&gt;<i> experimental version of decaf on top of jJOS, right? A kernel is not
+</I>&gt;<i> reusable if it only runs one virtual machine.
+</I>
+The JJOS kernel is not the issue since it has nothing directly to do
+with any particular version of Java. JJOS can support any version of
+Java because it doesn't handle Java directly.
+
+The layer on top of JJOS (decaf/classpath) is what supports the
+different versions of Java, and currently JDK 1.2 seems like a long way
+off. That doesn't mean we can't use JDK 1.2 for the host version of
+rheise.os, but my question is whether we should start writing core
+system components of JOS to depend on JDK 1.2 when other parts (eg.
+decaf) can't support it yet.
+
+One option is to take the parts of classpath that support JDK 1.2 and
+use them as libraries linked in to JOS running against JDK 1.1. For
+example, classpath has an implementation of the collection APIs that we
+can reuse under JDK 1.1 if we want to use them.
+
+&gt;<i> &gt;I must have missed it. We are talking about access to statics of shared
+</I>&gt;<i> &gt;objects, right?
+</I>&gt;<i> 
+</I>&gt;<i> We should not tamper with the simplicity of the Java Virtual Machine
+</I>&gt;<i> Specification. We should not change the semantics of object ownership
+</I>
+--snip--
+
+I'm out of time here, so I'll answer this later (in a couple of hours).
+Sorry.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000510.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000515.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#512">[ date ]</a>
+              <a href="thread.html#512">[ thread ]</a>
+              <a href="subject.html#512">[ subject ]</a>
+              <a href="author.html#512">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

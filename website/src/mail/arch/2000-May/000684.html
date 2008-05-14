@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Static fields/object sharing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000697.html">
+   <LINK REL="Next" HREF="000678.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Static fields/object sharing</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Arch] Static fields/object sharing">jewel@pixie.co.za</A><BR>
+    <I>Fri, 26 May 2000 17:10:23 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000697.html">[JOS-Arch] Approaches to Object Sharing</A></li>
+        <LI> Next message: <A HREF="000678.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#684">[ date ]</a>
+              <a href="thread.html#684">[ thread ]</a>
+              <a href="subject.html#684">[ subject ]</a>
+              <a href="author.html#684">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I've followed some of your discussion on sharing objects and the
+</I>&gt;<i> implications of static fields.  For perspective, one might look at
+</I>&gt;<i> Serialization, which is, in a way, a method of sharing
+</I>&gt;<i> objects.  Serialization disregards all static and transient fields of an
+</I>&gt;<i> object.  This prevents the serialized object from changing the static
+</I>&gt;<i> fields of other instances when it is deserialized.  So shared objects
+</I>&gt;<i> could basically have their static fields dependent on the current
+</I>&gt;<i> process.  This essentially treats shared objects as deserialized objects.
+</I>
+It is of course possible to use existing Java IPC methods such as TCP/IP
+streams with Serialization or RMI, but these mechanisms are much slower
+than sharing a class directly in the JVM.
+
+&gt;<i> How one gets an instance of a shared object is another story. IMO, the
+</I>&gt;<i> most elegant way is through an object broker of some kind (whether an ORB
+</I>&gt;<i> or subscription of some kind).  That way, the broker could manage the
+</I>&gt;<i> sharing and synchronization problems. The broker could exist outside of
+</I>&gt;<i> &quot;processes&quot; per se, and could be accessed through JNDI or some other
+</I>&gt;<i> interface.  
+</I>
+That's the problem, you need quite a bit of complexity to support it, and
+the speed won't be great.
+
+&gt;<i>I don't know if these last comments apply, they're just some
+</I>&gt;<i> random speculation on my part.  Since I am not intimately familiar with
+</I>&gt;<i> the kernel and VM, I cannot make a precise judgement.
+</I>
+John
+
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000697.html">[JOS-Arch] Approaches to Object Sharing</A></li>
+	<LI> Next message: <A HREF="000678.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#684">[ date ]</a>
+              <a href="thread.html#684">[ thread ]</a>
+              <a href="subject.html#684">[ subject ]</a>
+              <a href="author.html#684">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

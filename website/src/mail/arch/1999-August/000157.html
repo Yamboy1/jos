@@ -1,0 +1,343 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000156.html">
+   <LINK REL="Next" HREF="000162.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Program and ProgramContext">digigod@earthling.net</A><BR>
+    <I>Thu, 12 Aug 1999 10:47:52 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000156.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000162.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#157">[ date ]</a>
+              <a href="thread.html#157">[ thread ]</a>
+              <a href="subject.html#157">[ subject ]</a>
+              <a href="author.html#157">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> &gt;Applications, applets and servlets are each used in entirely different
+</I>&gt;<i> &gt;situations, hence they have different interfaces that reflect how they
+</I>&gt;<i> &gt;are used:
+</I>&gt;<i> 
+</I>&gt;<i> You are correct. Applications, applets and servlets are used in different
+</I>&gt;<i> environments today. That is going change. We, members of the JOS Project,
+</I>&gt;<i> should anticipate this change, embracing it.
+</I>
+whats wrong with just making applications that act as a &quot;default&quot;
+environment for these?
+ 
+&gt;<i> It has been difficult for Sun Microsystems and others to see how much all
+</I>&gt;<i> these programs have in common. All of these run Java bytecode inside a JVM.
+</I>&gt;<i> That means that all of these have more in common than it may at first appear.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;- A servlet can only be run from within a servlet engine because it
+</I>&gt;<i> &gt;relies on a very unique environment. For example, an HTTP servlet relies
+</I>&gt;<i> &gt;on the fact that it can access various information in the HTTP header of
+</I>&gt;<i> &gt;a request. It relies on the fact that its instance can persist between
+</I>&gt;<i> &gt;invocations, so it can keep a database connection open (for example).
+</I>&gt;<i> &gt;Both of these dependencies bar servlets from being invoked in a uniform
+</I>&gt;<i> &gt;manner with other types of programs. For example, you just can't run a
+</I>&gt;<i> &gt;servlet from the command-line. It doesn't make any sense.
+</I>&gt;<i> 
+</I>&gt;<i> Yes, well, sort of. Servlets run inside a servlet engine. Sun provides a
+</I>&gt;<i> servletrunner, so you don't have to have a separate HTTP service.
+</I>&gt;<i> 
+</I>&gt;<i> Warning: This information might be shocking to all those who follow Sun
+</I>&gt;<i> Microsystems wherever they go. Sun's website very clearly states that this
+</I>&gt;<i> can't be done.
+</I>&gt;<i> 
+</I>&gt;<i> First, you run servlets from a command line. When I run this command from
+</I>&gt;<i> my HTML browser, or rather its location field, it invokes a servlet. The
+</I>&gt;<i> location field is-a command line.
+</I>&gt;<i> 
+</I>&gt;<i> <A HREF="http://localhost:8080/servlet/org.jos.demo.DemoServlet">http://localhost:8080/servlet/org.jos.demo.DemoServlet</A>
+</I>&gt;<i> 
+</I>&gt;<i> Second, servlets are based exclusively on *streams*, not TCP/IP. A
+</I>&gt;<i> servletrunner provides ServletInputStreams and ServletOutputStream to a
+</I>&gt;<i> servlet, so that a servlet doesn't need to know about TCP/IP connections.
+</I>&gt;<i> There are no dependencies that prevent servlets from running elsewhere.
+</I>&gt;<i> There is no need for a servlet engine to use TCP/IP--even for HTTP servlets.
+</I>&gt;<i> 
+</I>&gt;<i> Your servlet get HTTP header information from a ServletInputStream. It
+</I>&gt;<i> writes HTTP header information to a ServletOutputStream. It doesn't need to
+</I>&gt;<i> connect with a requestor using a TCP/IP connection.
+</I>&gt;<i> 
+</I>&gt;<i> Why would anyone want to? As a Java programmer, I need to build servlets in
+</I>&gt;<i> the shortest amount of time possible. Debugging a servlet *inside* the
+</I>&gt;<i> servletrunner is less than optimum for debugging servlets. You can set
+</I>&gt;<i> break-points inside your servlet code. Yes, you can even create debugging
+</I>&gt;<i> frames and dialog boxes (only used during testing). I would rather debug my
+</I>&gt;<i> servlets in a plain-text browser. Hey, that's what I'm doing.
+</I>&gt;<i> 
+</I>&gt;<i> In the location field of my plain-text browser, I type the following URI:
+</I>&gt;<i> 
+</I>&gt;<i> x-servlet:org.jos.demo.DemoServlet
+</I>&gt;<i> 
+</I>&gt;<i> My plain-text browser will provide a servlet environment completely free of
+</I>&gt;<i> TCP/IP connections. It will load and run any servlet, just like the servlet
+</I>&gt;<i> specification says. The output from the servlet is displayed in plain text,
+</I>&gt;<i> so that I can look at the raw HTML, to make sure the servlet produces the
+</I>&gt;<i> HTML code that I want it to. It will be fast. It will be direct. My
+</I>&gt;<i> plain-text browser will be easy to restart (with a restart button) so that
+</I>&gt;<i> I can recompile my servlet frequently and start a new &quot;session&quot; whenever I
+</I>&gt;<i> want.
+</I>&gt;<i> 
+</I>&gt;<i> After I get the servlet working, then I move to a more complicated
+</I>&gt;<i> environment, using an HTML browser, a servletrunner tool, and TCP/IP.
+</I>&gt;<i> 
+</I>&gt;<i> x-servlet:org.jos.demo.DemoServlet
+</I>&gt;<i> 
+</I>&gt;<i> is equivalent to
+</I>&gt;<i> 
+</I>&gt;<i> <A HREF="http://localhost:8080/servlet/org.jos.demo.DemoServlet">http://localhost:8080/servlet/org.jos.demo.DemoServlet</A>
+</I>&gt;<i> 
+</I>&gt;<i> Parameters are passed with a standard query string. I can quickly test
+</I>&gt;<i> different combinations of parameters and instantly see the results. When I
+</I>&gt;<i> pause a servlet right in the middle of building an HTML file, I see all
+</I>&gt;<i> output that has been written so far.
+</I>&gt;<i> 
+</I>&gt;<i> Sidebar: You can run servlets on the client-side. Every machine that has a
+</I>&gt;<i> JVM is capable of being a &quot;server&quot;. If you integrate servletrunner into
+</I>&gt;<i> your client-side Java application, you can run servlets on the client-side.
+</I>&gt;<i> Sounds strange only because Sun mis-named them &quot;servlets&quot;, giving everyone
+</I>&gt;<i> the mistaken impression that they only run on the server-side.
+</I>
+ok, you made a good point about how one should be able to test ones
+servlet; but how does this argue that they HAVE to be a Program?
+
+isnt a Servlet (at the very top) just an interface (what they should
+have done with Applet, btw) and isnt it unasuming about HTTP, that is
+not locked to it? Ive always thought of a Servlet as a service-let not a
+server-let, just a handy stream based IPO plugin.
+ 
+&gt;<i> &gt;- An applet is also very different from a command-line program. The key
+</I>&gt;<i> &gt;quality of an Applet is that it is a part of a larger entity. It
+</I>&gt;<i> &gt;requires this entity to be useful. An applet cannot be executed unless
+</I>&gt;<i> &gt;it is in a web page. The applet is very aware that it is in a web page.
+</I>&gt;<i> &gt;It can read its applet parameters which are defined in the web page, it
+</I>&gt;<i> &gt;can communicate with other applets that are in the web page, it can even
+</I>&gt;<i> &gt;make another web page load. Because of its different nature, it can't be
+</I>&gt;<i> &gt;treated in a similar way to applications or servlets. Another point is
+</I>&gt;<i> &gt;that you don't really invoke an applet (as you do with the programs you
+</I>&gt;<i> &gt;speak of), you &quot;embed&quot; it in an application specific way that is
+</I>&gt;<i> &gt;provided by the applet itself.
+</I>&gt;<i> 
+</I>&gt;<i> Yes, well, sort of. Applets run inside an applet engine. Sun provides a
+</I>&gt;<i> appletrunner, so you don't have to have a separate HTML browser.
+</I>&gt;<i> 
+</I>&gt;<i> First, you can definitely run applets outside a browser. You can run the
+</I>&gt;<i> appletrunner, right?
+</I>&gt;<i> 
+</I>&gt;<i> Second, you can definitely run applets without HTML. This might be a
+</I>&gt;<i> surprise to all those who use Sun's brain-dead appletrunner tool. But, it
+</I>&gt;<i> is no surprise to those using JavaBee. Check out the wonderful JavaBee
+</I>&gt;<i> product at &lt;URL:<A HREF="http://www.javabee.com/">http://www.javabee.com/</A>&gt;.
+</I>&gt;<i> 
+</I>&gt;<i> My applet browser provides a simple way to run applets with support for
+</I>&gt;<i> parameters. In the location field of my applet browser, I type the
+</I>&gt;<i> following URI:
+</I>&gt;<i> 
+</I>&gt;<i> x-applet:org.jos.demo.DemoApplet
+</I>&gt;<i> 
+</I>&gt;<i> My applet browser provides an applet environment completely free of HTML.
+</I>&gt;<i> It loads and runs an applet, just like the applet specification says. The
+</I>&gt;<i> output from the applet is displayed in a frame, so that I reside the applet
+</I>&gt;<i> and interact with its visual components, to make sure the applet behaves
+</I>&gt;<i> the way I want it to. It is fast. It is direct. My applet browser is easy
+</I>&gt;<i> to restart (with a restart button) so that I can recompile my applet
+</I>&gt;<i> frequently. I invoke an applet with exactly the same mechanism as I invoke
+</I>&gt;<i> a servlet.
+</I>&gt;<i> 
+</I>&gt;<i> Parameters are passed with a standard query string. I can test different
+</I>&gt;<i> combinations of parameters. Feedback is immediate. No bulky HTML browser is
+</I>&gt;<i> required.
+</I>&gt;<i> 
+</I>&gt;<i> My applet browser supports the showDocument() and showStatus() methods
+</I>&gt;<i> required by the applet environment. The showDocument() method overwrites
+</I>&gt;<i> the location field with a new URI, but does not automatically run it. I can
+</I>&gt;<i> look at the output from showDocument() to see if looks right.
+</I>&gt;<i> 
+</I>&gt;<i> Then, I move up to embedding an applet on an HTML page.
+</I>
+ok, these arguemnts are definitley good for using URI's for everything
+(&quot;JOS putting the U in URI&quot; --how market does that sound?) but still not
+so much an argument for Program.
+ 
+&gt;<i> &gt;- Applications (both gui and command-line) are intended to be invoked.
+</I>&gt;<i> &gt;Applications are a unique type of program that are designed to carry out
+</I>&gt;<i> &gt;a task and return to the shell, or carry out tasks given through a user
+</I>&gt;<i> &gt;interface until the user wishes to exit the application. These types of
+</I>&gt;<i> &gt;programs are the only programs that are suitable for shells because they
+</I>&gt;<i> &gt;can be invoked, they have a clearly defined lifespan, and a definite way
+</I>&gt;<i> &gt;of returning to the shell.
+</I>&gt;<i> 
+</I>&gt;<i> Exactly! Applications &quot;carry out tasks given through a user interface until
+</I>&gt;<i> the user wishes to exit the application.&quot; That's a key difference between
+</I>&gt;<i> &quot;applications&quot; and &quot;programs&quot;.
+</I>&gt;<i> 
+</I>&gt;<i> My program browser--you guessed it--runs programs. It provides a simple way
+</I>&gt;<i> to run programs with full support for parameters. In the location field of
+</I>&gt;<i> my program browser, I type the following URI:
+</I>&gt;<i> 
+</I>&gt;<i> x-program:org.jos.demo.DemoProgram
+</I>&gt;<i> 
+</I>&gt;<i> The standard output from the DemoProgram is display just like the
+</I>&gt;<i> plain-text browser.
+</I>
+I can see Programs being an internal abstraction used to work with all
+programs uniformly (with proxies like ServletProgram) but I dont see
+making people use them.
+ 
+&gt;<i> &gt;Not surprisingly, I am interested in the use of what you are proposing.
+</I>&gt;<i> &gt;Debugging was something that caught my eye. I don't yet understand how a
+</I>&gt;<i> &gt;unified API is useful for debugging, but if you can explain it to me,
+</I>&gt;<i> &gt;there might be a use for this unified API after all.
+</I>&gt;<i> 
+</I>&gt;<i> In the end, I wish to combine all specialized browsers into a unified JOS
+</I>&gt;<i> browser. Here is what you'll be able to debug and demonstrate within a
+</I>&gt;<i> single application:
+</I>&gt;<i> 
+</I>&gt;<i> Protocol - Program Type - Status
+</I>&gt;<i> 
+</I>&gt;<i> run:os: - native OS processes - complete
+</I>&gt;<i> run:jose: - José applications - complete
+</I>&gt;<i> multi - (file:, http:, x-registry:, in:*, out:*) - complete
+</I>&gt;<i> x-applet: - Java applets - almost complete
+</I>&gt;<i> x-archive - JOS archive browser (.cab, .gz, .jar, .zip) - not started yet
+</I>&gt;<i> x-servlet: - Java servlets - needs more work
+</I>&gt;<i> x-program: - JOS programs - needs more work
+</I>&gt;<i> x-aglet: - Java aglets - not started yet
+</I>&gt;<i> 
+</I>&gt;<i> What does this mean? It means that you can build a servlet that dynamically
+</I>&gt;<i> creates an HTML index of all your applications, applets, programs, native
+</I>&gt;<i> programs, archives, and other servlets. You click on the digital resource
+</I>&gt;<i> you want to invoke. Ta-da! You get one.
+</I>&gt;<i> 
+</I>&gt;<i> Do you want it all? You can have it all. You can mix and match until you
+</I>&gt;<i> get dizzy and your head hurts. We live in a brave new world where programs
+</I>&gt;<i> are multiply connected.
+</I>&gt;<i> 
+</I>&gt;<i> - You can download and run Java bytecode from anywhere (if that's what you
+</I>&gt;<i> really want).
+</I>&gt;<i> - You can build a program that runs as a program...and a servlet.
+</I>&gt;<i> - You can build a Java application that runs as a Java application...or a
+</I>&gt;<i> program or servlet.
+</I>&gt;<i> - You can build an applet that runs as an applet...and a program.
+</I>&gt;<i> - You can run a servlet that runs as a servlet...and a program.
+</I>&gt;<i> - You can run a native program as a native program...and a servlet.
+</I>&gt;<i> - Your aglet can roam around and bring back its search results as a
+</I>&gt;<i> program, applet, or servlet.
+</I>&gt;<i> 
+</I>&gt;<i> - It is recursive, too. So that you can launch an applet that starts a
+</I>&gt;<i> program that uses servlets that use native programs. You can do anything
+</I>&gt;<i> you want.
+</I>
+this, again, is an argument for URI's and smart browsers but not
+Programs (although again I can see its use internally, especially by
+your browser)
+ 
+&gt;<i> As an operating system, JOS should take advantage of some of the
+</I>&gt;<i> combinations that make the most sense. For example, the ls command should
+</I>&gt;<i> be available as a program, a Java application, and a servlet. When you
+</I>&gt;<i> invoke the ls command from within your HTML browser, the results should be
+</I>&gt;<i> returned as (1) plain-text or (2) full HTML code. Here is where program
+</I>&gt;<i> inheritence becomes critically important.
+</I>
+you can do that now though, add a main() to your servlet. implementing
+program is pointless... (except on a IS-A basis, but then the interface
+might just as well be empty)
+ 
+&gt;<i> We should have a plain-text ls program. The HTML version of the ls program
+</I>&gt;<i> should extend the plain-text version. Both have identical functionality.
+</I>&gt;<i> While one runs as a program or Java application, the other runs as a
+</I>&gt;<i> servlet. You can browse around your JOS OS file subsystem using your HTML
+</I>&gt;<i> browser on a local machine or across the Internet.
+</I>
+you could do that now
+ 
+&gt;<i> We can be compatible with other names for ls. The dir command can use the
+</I>&gt;<i> ls program. The dir command takes much different command line parameters
+</I>&gt;<i> than ls. The dir command should translate command line parameters, for
+</I>&gt;<i> example, and then call the ls command. See, that's why we need to run
+</I>&gt;<i> programs within the same process.
+</I>&gt;<i> 
+</I>&gt;<i> Or, the ls and dir commands could use a brand-new JOS program with a new
+</I>&gt;<i> name that does file-listing better than any other operating system.
+</I>
+the LS command could also be extended to open as a window (you know the
+little windows on the desktop with all the icons of the current
+directory, not explorer but you know what Im talking about)
+ 
+&gt;<i> Here is one for the road. JOS command-line utilities should consistently
+</I>&gt;<i> recognize the -html option. This command-line parameter tells a program
+</I>&gt;<i> when it should output HTML code to standard out. When the servletrunner
+</I>&gt;<i> runs a program as a servlet, it should automatically pass the -html option
+</I>&gt;<i> to all of our JOS command-line utilities.
+</I>
+well HTML is to C++ what XML is to Java if you get my meaning, but i can
+see how this would be useful (also still not an argument for Program)
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000156.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000162.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#157">[ date ]</a>
+              <a href="thread.html#157">[ thread ]</a>
+              <a href="subject.html#157">[ subject ]</a>
+              <a href="author.html#157">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

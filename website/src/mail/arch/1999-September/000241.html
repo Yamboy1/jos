@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] GSI update</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000240.html">
+   <LINK REL="Next" HREF="000242.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] GSI update</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] GSI update">gchii@mindspring.com</A><BR>
+    <I>Mon, 27 Sep 1999 09:22:18 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000240.html">[JOS-Arch] GSI update</A></li>
+        <LI> Next message: <A HREF="000242.html">[JOS-Arch] GSI update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#241">[ date ]</a>
+              <a href="thread.html#241">[ thread ]</a>
+              <a href="subject.html#241">[ subject ]</a>
+              <a href="author.html#241">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 06:23 PM 9/26/99 -0700, DigiGod Q Frasché &lt;<A HREF="mailto:digigod@earthling.net">digigod@earthling.net</A>&gt; wrote:
+&gt;<i>after reading a JavaWorld article about a similar framework I spent
+</I>&gt;<i>sometime working on GSI. I came to the conclusion that it was up to the
+</I>&gt;<i>scripting engine not the interface (GSI) to do Java-to-script (and vice
+</I>&gt;<i>versa) communication. So GSI will be complete as soon as I add event
+</I>&gt;<i>support and get ScriptLoader working. Which brings me to the biggest
+</I>&gt;<i>class/problem: the ScriptLoader. it takes a script from an input and
+</I>&gt;<i>creates an, appropriate, Script object for an app to interact with. does
+</I>&gt;<i>anyone have any ideas on the structure of that? any additons/comments on
+</I>&gt;<i>anything else? fire away.
+</I>
+José includes the Master Compiler. It is a translator/interpreter/compiler
+based on a plug-in translator architecture. Last year, I have wrote about
+30+ plug-ins for the Master Compiler, like ISQL and webfile.
+
+Source code is a digital resource if it is stored somewhere. The Master
+Compiler reads source code. It converts all source code into a SourceCode
+object. The SourceCode object is passed to a plug-in translator. The
+plug-in is run and must throw a CompilerException if it cannot complete the
+request.
+
+The SourceCode object has a source URL property and lines property. The
+lines property is a container for lines of code. Each line of code has a
+text property and an original line number property. The text property
+contains the text of the source code. The line number property is important
+for symbolic debugging. The original line number is retained even while
+source code is passed from one pre-processor to another.
+
+In this architecture, source code is not passed by default as an input
+stream. A SourceCode object has a getLineNumberInputStream() method for
+those plug-ins that prefer the input stream format.
+
+The role of the Master Compiler itself is to select a plug-in. For
+automatic plug-in selection, the name of a plug-in must be stored in the
+source code. The plug-in selection statement is a translator directive, and
+looks like this:
+
+#class-name
+
+The class with a given class-name must implement a plug-in interface.
+
+The Master Compiler is the first pre-processor, so it is the only component
+which has to deal with a source code URI. It uses the smart object factory
+to obtain an input stream. Source code can be stored on a local or remote
+machine. In other words, you can run a script directly off an HTTP service.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000240.html">[JOS-Arch] GSI update</A></li>
+	<LI> Next message: <A HREF="000242.html">[JOS-Arch] GSI update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#241">[ date ]</a>
+              <a href="thread.html#241">[ thread ]</a>
+              <a href="subject.html#241">[ subject ]</a>
+              <a href="author.html#241">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

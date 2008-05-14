@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Concerning the registry...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000016.html">
+   <LINK REL="Next" HREF="000021.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Concerning the registry...</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS-Arch] Concerning the registry...">al@outworld.org</A><BR>
+    <I>Mon, 14 Jun 1999 14:03:39 +0300</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000016.html">[JOS-Arch] Concerning the registry...</A></li>
+        <LI> Next message: <A HREF="000021.html">[JOS-Arch] JOS Security Model</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#17">[ date ]</a>
+              <a href="thread.html#17">[ thread ]</a>
+              <a href="subject.html#17">[ subject ]</a>
+              <a href="author.html#17">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Matt Albrecht wrote:
+
+&gt;<i> I've always liked the idea of a virtual registry namespace
+</I>
+This is included in my released API, I have not yet implemented it
+though (the *Impl.class files). The idea was that there is not only a
+special case mapping, but a global mapping too. Example:
+
+
+Address address1 = new Address(&quot;//system/config/&quot;);
+Address address2 = new Address(&quot;/config/&quot;);
+
+
+As you can see, address2 starts with a single slash. A double slash
+indicates root, so if the default directory were &quot;//system/&quot; then it
+would point to the same address as address1.
+
+Of course, you can have a unique default directory for each application,
+or better yet, for every use. Such as, server.setDefault(address); and
+then server.get(address_virtual);
+
+Although this is a bit different than what you suggest, it could serve
+the purpose.
+
+Big question: should the registry be able to handle this, or should each
+app do it on its own. I would propose the second, because if the
+registry does this, it may need an awful lot of overhead to store many
+things...
+
+&gt;<i> It sounds like what is needed is a way to send user/application information
+</I>&gt;<i> to the RMI server for security checking.  This would also aid with the
+</I>&gt;<i> virtual mapping described above.  Could this be done in the skeleton / stub
+</I>&gt;<i> code, so that &quot;registry login&quot; is performed once when requesting the stub?
+</I>&gt;<i> There may be security holes here, but I'm not sure.
+</I>
+I honestly have no idea...
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+___________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: <A HREF="http://www.outworld.org/people/al/]">http://www.outworld.org/people/al/]</A> [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000016.html">[JOS-Arch] Concerning the registry...</A></li>
+	<LI> Next message: <A HREF="000021.html">[JOS-Arch] JOS Security Model</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#17">[ date ]</a>
+              <a href="thread.html#17">[ thread ]</a>
+              <a href="subject.html#17">[ subject ]</a>
+              <a href="author.html#17">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

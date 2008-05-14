@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000438.html">
+   <LINK REL="Next" HREF="000441.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">tmiller@haverford.edu</A><BR>
+    <I>Sun, 9 Apr 2000 23:36:36 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000438.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000441.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#439">[ date ]</a>
+              <a href="thread.html#439">[ thread ]</a>
+              <a href="subject.html#439">[ subject ]</a>
+              <a href="author.html#439">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Is this an accurate summary?
+
+	We agree then -- for Java processes, we need native support to
+handle 'illegal' class casts; I proposed a mechanism where only class
+definitions that are explicitly shared -- quite possibly by default -- are
+considered the same for 'illegal' casts, because byte-for-byte checks are
+grossly expensive.  For effiency, we need a mechanism to share class
+definitions while maintaining disjoint statics.  These two mechanisms
+could be one, where explicitly shared classes share class definitions but
+have disjoint statics*, and the default for sharing classes between a
+process and its parent will be generous, with separate classloaders, for
+maxixum interoperability and utility.  That is, you can allow application
+classes to re-load on the fly by garbage collecting that process's
+ClassLoader on exit, and if the two processes communicate with Java
+objects -- e.g. via Serializable objects and a standard networking layer
+-- the classes for the objects will cast to each other.
+
+-_Quinn
+
+* The decaf JVM has explicit support for this.  JavaClass -- the class
+definition as derived from its classfile -- is not JavaClassInstance,
+which is a JavaClass and a pointer to its static fields (and some other,
+irrelevant, things).  (And no, it's not currently coded that a JCI points
+to a JC rather than inheriting from it, but that shouldn't be too hard to
+put in once I'm sure decaf works -- move the code and data in JC down to a
+JC implementation.)
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000438.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000441.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#439">[ date ]</a>
+              <a href="thread.html#439">[ thread ]</a>
+              <a href="subject.html#439">[ subject ]</a>
+              <a href="author.html#439">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

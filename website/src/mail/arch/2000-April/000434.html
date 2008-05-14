@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000433.html">
+   <LINK REL="Next" HREF="000435.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">ryan@whitewolf.com.au</A><BR>
+    <I>Sun, 9 Apr 2000 21:24:52 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000433.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000435.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#434">[ date ]</a>
+              <a href="thread.html#434">[ thread ]</a>
+              <a href="subject.html#434">[ subject ]</a>
+              <a href="author.html#434">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Sat, 8 Apr 2000, Todd L. Miller wrote:
+
+&gt;<i> 	Considering memory issues: Echidna takes the position that the
+</I>&gt;<i> reason for Java processes is to eliminate the need to load every
+</I>&gt;<i> (necessary) class in the library each time you start a new Java
+</I>&gt;<i> program.  Since I so badly misread the spec regarding classloaders before,
+</I>&gt;<i> I decided to determine how independent the classloader's namespaces were
+</I>&gt;<i> experimentally -- as this bears on how much work the JVM has to do to
+</I>&gt;<i> support processes, and how much /must/ be shared.  Writing a custom
+</I>&gt;<i> classloader, it looks like /nothing/ is shared by default, and it's the
+</I>&gt;<i> responsibility of the classloader to be efficient by using
+</I>&gt;<i> findSystemClass() if it so desires.
+</I>
+findSystemClass() isn't just called to save memory. You *must* call
+findSystemClass() on all the linked classes which are to be referenced
+by the calling code.
+
+For example, suppose you are loading an applet across a network:
+
+Class appletClass = appletClassLoader.loadClass(className, true);
+Applet applet = (Applet)appletClass.newInstance();
+
+When the classloader attempts to define class 'className', it will
+attempt to resolve the link to its supperclass Applet. Here, you *must*
+load the Applet class using findSystemClass() to ensure that the calling
+code is dealing with the same Applet class. If you do not, the next line
+will fail. You cannot cast the return value of newInstance() from
+Applet(L2) to Applet(L1). You must ensure that Applet in each case is
+the *same* class.
+
+Note that there is no second line in Echidna as there is in the above
+example. It uses reflection to invoke the main method directly on the
+class. This means the two namespaces can be more independent, but the
+String array argument means that the String class must be in common (and
+all the classes it references, including Object). Also, any exceptions
+which the main() method might throw need to be cast to a known type for
+the caller to catch. So, at least Throwable needs to be in common, too.
+
+Also, when you consider that it is a security risk to allow user defined
+classes to invoke native system methods (eg. you could bypass the
+sandbox), various system classes (eg. System) must always be loaded by
+the(/a) primordial class loader in order to make use of their native
+methods. Of course, in JOS we might have an effective primordial class
+loader for each process, so it's ok to reload the System class in each
+primordial (JOS-controlled) classloader.
+
+Ideally, separate namespaces should be completely separate, apart from
+the classes we *want* to share. Would it be possible to provide a native
+method to invoke a program in a new process without requiring any
+classes to be in common? It seems that all it needs to do is convert
+the String array argument from String(L1) to String(L2). This would seem
+safe given that L1 and L2 are primordial class loaders for process 1 and
+process 2, and String is a system class.
+
+Now that each process has its own version of EVERY class, we can
+consider some memory optimisations. The approach outlined in my last
+email might work.
+
+One final thought: if namespaces should be completely separate except
+for the classes we *want* to share, then we should consider how we are
+going to share those classes. I don't particularly like the method we've
+discussed so far because as soon as you share one class, it starts
+dragging in everything else with it. Maybe it's possible to convert
+SomeClass(L1) to SomeClass(L2) in the same way as I described above for
+invoking the main method in a new process. You just need to ensure that
+SomeClass(L1) and SomeClass(L2) can be treated as the same class (eg.
+check that they were loaded from the same file). I'm not sure whether
+&quot;convert&quot; is the right word here. I'd like to &quot;treat&quot; SomeClass(L1) as
+SomeClass(L2), sort of like an illegal cast that is approved by the JVM.
+
+&gt;<i> 	This would suggest that Echidna doesn't actually need to wrap
+</I>&gt;<i> java.lang.System.  In fact, it would suggest the following code in its
+</I>&gt;<i> custom classloaders would be sufficient:
+</I>&gt;<i> 
+</I>&gt;<i> if ( className == &quot;java.lang.System&quot; ) {
+</I>&gt;<i> 	/* fetch java.lang.System from the filesystem... */
+</I>
+I suspect this won't work (see above) - at least not in a normal JVM.
+
+&gt;<i> &gt; Ideally, you want to limit access to another process's objects to &quot;as
+</I>&gt;<i> &gt; much as is required and no more&quot;. This could be a matter of programming
+</I>&gt;<i> &gt; style. When message passing between processes, the arguments and return
+</I>&gt;<i> &gt; values can be of simple Classes intended only to carry data.
+</I>&gt;<i> 
+</I>&gt;<i> 	True.  The question then becomes whether or not we want to forbid
+</I>&gt;<i> direct object sharing or not; and to do so, I think, would be extremely
+</I>&gt;<i> unfortunate.  Direct object sharing is like CORBA, except more so, and KDE
+</I>&gt;<i> and GNOME are putting CORBA to work for them in good and interesting
+</I>&gt;<i> ways...
+</I>
+Yes, it is definately useful. I hope the &quot;approved illegal casts&quot; idea
+is a way to solve this.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000433.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000435.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#434">[ date ]</a>
+              <a href="thread.html#434">[ thread ]</a>
+              <a href="subject.html#434">[ subject ]</a>
+              <a href="author.html#434">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

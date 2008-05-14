@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Matt.Albrecht%40trilogy.com">
+   <LINK REL="Previous"  HREF="000549.html">
+   <LINK REL="Next" HREF="000560.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Matt.Albrecht@trilogy.com</B> 
+    <A HREF="mailto:Matt.Albrecht%40trilogy.com"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">Matt.Albrecht@trilogy.com</A><BR>
+    <I>Wed, 3 May 2000 09:44:04 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000549.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000560.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#555">[ date ]</a>
+              <a href="thread.html#555">[ thread ]</a>
+              <a href="subject.html#555">[ subject ]</a>
+              <a href="author.html#555">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i>Requiring superclasses to share class definitions for illegal casts to
+</I>&gt;<i>work is clearly the most correct way to handle it. But as _Quinn pointed
+</I>&gt;<i>out, things might work out by themselves anyway. If they do, we can save
+</I>&gt;<i>ourselves from having to do a more expensive check to allow illegal
+</I>&gt;<i>casts.
+</I>
+Here's my thoughts on the subject so far, muddy as hell as always.
+
+1. For &quot;class definition&quot;/&quot;bytecode&quot; sharing for memory compression, it is
+my personal belief that only a &quot;rough combination of the two&quot; should be
+allowed to be shared.  Let me elaborate.  The JVM should of course take the
+bytecode and transform it into its internal optimized version.  Usually (as
+it seems), this also includes defining the superclass / interface pointers
+as well.  IMHO, only the &quot;internal optimized version&quot; should be shared,
+while the pointers to superclass / interfaces need to be tacked to the
+static data associated with the class instance.  For performance purposes,
+we could have a low-priority thread in memory which does bytecode/internal
+version checking for each newly added class.  This means that two instances
+of the same class file can be at different memory positions.
+
+2. If we only allow illegal casts with classes loaded by the primordial
+class loader, then all we need to check is if the two class instances
+indeed were loaded by that class loader, and have the same name, since
+class loaders should only allow one class instance per class name.  This
+also implies that the class' superclasses should be identical as well.
+
+Or is that what everyone's already been saying?
+
+
+&quot;If it works, it's not advanced enough.&quot;
+-Matt
+
+
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000549.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000560.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#555">[ date ]</a>
+              <a href="thread.html#555">[ thread ]</a>
+              <a href="subject.html#555">[ subject ]</a>
+              <a href="author.html#555">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

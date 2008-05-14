@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [subprogram] Definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000654.html">
+   <LINK REL="Next" HREF="000668.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [subprogram] Definition</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [subprogram] Definition">gchii@mindspring.com</A><BR>
+    <I>Mon, 22 May 2000 12:03:44 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000654.html">[JOS-Arch] [subprogram] Definition</A></li>
+        <LI> Next message: <A HREF="000668.html">[JOS-Arch] [subprogram] Definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#662">[ date ]</a>
+              <a href="thread.html#662">[ thread ]</a>
+              <a href="subject.html#662">[ subject ]</a>
+              <a href="author.html#662">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 12:07 AM 5/22/00 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+&gt;<i>You have to understand that there are different ways of looking at it.
+</I>&gt;<i>For example, you /could/ consider a program defined using the main
+</I>&gt;<i>method (Sun's API for Java Applications) generically as a subprogram,
+</I>&gt;<i>but I don't. You seem to be requiring that I see things the way you do,
+</I>&gt;<i>but there are other ways of looking at it.
+</I>
+In this thread, I am focused on the definition a subprogram and illustrate
+a subprogram through its API. If you would like to contribute to the
+definition of a subprogram, please do so.
+
+&gt;<i>I will explain why I don't see a Java application as a subprogram, but I
+</I>&gt;<i>do not require that you see things my way. In fact, Sun explains it best
+</I>&gt;<i>themselves:
+</I>
+Sun Microsystems has done a fine job describing a Java application. They
+have clearly defined a standard subprogram API for Java applications. Here
+is how the classic JDK works:
+
+1. The top-most program is usually a BIOS. It might always be a form of
+BIOS, even when it is microcode.
+
+2. The BIOS uses a subprogram API to launch a foreign operating system
+kernel. As we have seen, the start-up sequence for an IBM PC is tedious. It
+is this subprogram API which defines a boot sector format. A boot sector
+wouldn't work at all without a subprogram API.
+
+3. By whatever means necessary, an end user launches the java tool as a
+kernel subprogram. It is this subprogram API which defines an executable
+image format, like ELF. A java tool could not be launched without a
+subprogram API.
+
+4. The java tool creates a virtual machine. Starting with JDK 1.1.x, the
+java tool uses the Java Native Interface (JNI) to run a virtual machine as
+a dynamic shared library. By design, a dynamic shared library usually
+shares the subprogram API of an executable image format. On Windows, the
+java tool and virtual machine share a single machine code process. On
+Linux, the java tool and virtual machine might share memory across many
+machine code processes, one process for each Java thread.
+
+5. In turn, the classic java tool launches a Java application as a
+subprogram. By ignoring how the Java application runs inside a machine code
+process, one might think the Java application is the first program running
+when, in fact, it is not. Inthe classic model, a Java application is hardly
+comparable to a BIOS or kernel.
+
+&gt;<i>Now, you could say that some programs that use this API are subprograms,
+</I>&gt;<i>and some are Java applications, but do you think it is right to use the
+</I>&gt;<i>same API for two different types of programs*? That would be the
+</I>&gt;<i>opposite of strongly typed. Personally, I don't think this API is a
+</I>&gt;<i>subprogram API (which explains why I do not think subprogram APIs are
+</I>&gt;<i>necessary to invoke an Application in a process)
+</I>
+In the context of a subprogram, all programs that use the Java application
+API are subprograms. The definition of a Java application is weak. Any
+class that implements static main() is-a Java application.
+
+A subprogram is not a process. In the context of a process, it is something
+like what you have said. Most Java applications are designed to run in
+their own process. Others are not.
+
+As for using the same API for two different types of programs, we have
+talked about this before. When Java programmers write a subprogram, they
+should have lots of base classes to choose from. Implement an interface or
+extend a base class for that kind of subprogram. This is already true for
+applets and servlets. It should be true for daemons, services, etc..
+
+By implementing a well-known interface, a subprogram manager can invoke the
+right environment for a subprogram automatically.
+
+For example, the Java application API could be extended to match the
+MPCL-compatible virtual machine. Any Java application that does not need a
+new process could implement static main() /and/ the subprogram interface.
+Then, we can safely assume that every Java application that does not
+implement the subprogram interface requires a new process.
+
+&gt;<i>{ * If you want to use it as a subprogram API for specific programs that
+</I>&gt;<i>are subprograms, please do. But since Sun says that this is the API you
+</I>&gt;<i>use for writing applications, it is incorrect to say a subprogram API is
+</I>&gt;<i>needed to run a process. }
+</I>
+A foreign operating system cannot create a machine code process without a
+subprogram API. A subprogram API is the defining moment in the life of a
+kernel. Without a subprogram API, programmers wouldn't know how to build an
+executable image. Without a subprogram API, a kernel would not know how to
+fix-up an executable image or what method to invoke after the executable
+image had been loaded. A subprogram API determines what method(s) will be
+invoked after a new process is created.
+
+In a C program on Linux, there is no mystery. The Linux kernel uses fork()
+to &quot;load&quot; an executable. A new process/thread structure is created first,
+which affects the kernel's scheduler. Then, a process/thread loads a
+subprogram. When oversimplified, a new subprogram seems to load itself. The
+kernel expects executables to use the ELF format, fixes up the executable
+image, looks for a method called _main() and invokes it.
+
+In contrast, a single-process operating system might create a new process
+without creating a new thread. A new &quot;process&quot; is created and a subprogram
+is loaded. Here, the equivalent exec() method is a blocking I/O call. The
+calling process does not resume until the called process dies.
+
+When Sun Microsystems defined the subprogram API for Java applications,
+they made a few well-known assumptions.
+
+1. With a partnership between a virtual machine and a java tool, a virtual
+machine would create an environment for a Java application. The environment
+of a virtual machine would be equal to the environment of a Java
+application. Sun Microsystems created a rule that there must be exactly one
+Java application per virtual machine. Also, Sun created a rule that there
+must be exactly one primordial class loader per virtual machine.
+
+2. A java tool would expect an arbitrary class name as a command line
+parameter. Additional parameters to a java tool would be passed to the
+arbitrary class as an array of strings.
+
+3. A java tool would load the arbitrary class and look for a static main()
+method. Finally, we get to the subprogram API from the Java programmer's
+point of view. When oversimplified, a static main() method of an arbitrary
+class is the &quot;first&quot; method invoked by the java tool.
+
+Of course, we know that this oversimplification is not entirely true.
+Behind the scenes, the &quot;static&quot; method (&lt;clinit&gt;) for every related class
+would be invoked before the first statement inside static main() is invoked.
+
+&gt;<i>Again, it is only required for your way of looking at it. To say it is
+</I>&gt;<i>required, period, is to force your views upon others. And this is
+</I>&gt;<i>especially unfortunate when you claim someone else's project as a
+</I>&gt;<i>dead-end project (ie. that rheise.os can never become a &quot;genuine&quot;
+</I>&gt;<i>bytecode process) simply because it does not meet &quot;your&quot; requirements.
+</I>
+Something is required. Something must sit between a process and an
+arbitrary subprogram. What else would you have us call it? How would you
+explain it? The purpose of this thread is to define it. We need to define
+it well enough so that when a programmer writes a JOS-compatible
+subprogram, it will run on any implementation of JOS.
+
+Across 50+ years, from the earliest work in machine code to extreme
+object-oriented programming of today, &quot;program&quot; and &quot;subprograms&quot; have
+become widely accepted terms. Most of the time, precision is not required
+and they are used interchangeably. In a &quot;kind-of&quot; relationship, a program
+is a kind of subprogram. A Java application is a kind-of program, which is
+a kind-of subprogram.
+
+In a structural relationship, a subprogram is &quot;part of&quot; a program. In turn,
+that program, as a subprogram, is part of some other program.
+
+A Java application is a subprogram, typically part of a virtual machine. In
+turn, a virtual machine is a subprogram, typically part of a java tool. In
+turn, a java tool is a subprogram, typically part of a machine code
+process. In turn, a machine code process is a subprogram, typically part of
+an OS kernel.
+
+A Java applet is a subprogram, typically part of a virtual machine. In
+turn, a virtual machine is a subprogram, typically part of a HTML browser.
+In turn, an HTML browser is a subprogram, typically part of a machine code
+process. In turn, a machine code process is a subprogram, typically part of
+an OS kernel.
+
+A Java servlet is a subprogram, typically part of a virtual machine. In
+turn, a virtual machine is a subprogram, typically part of an HTTP service.
+In turn, an HTTP service is a subprogram, typically part of a machine code
+process. In turn, a machine code process is a subprogram, typically part of
+an OS kernel.
+
+Now, the structural relationship between a program and subprogram are often
+recursive. In theory, a virtual machine simulator and/or prototype can be
+written in bytecode. Hang on. It gets weird.
+
+If I write one virtual machine (MC) in machine code and another virtual
+machine (BC) in bytecode, I can use MC to invoke BC. In turn, since BC is
+written in bytecode, BC can invoke another instance of BC. And so on.
+
+&gt;<i>I did not consider it important that I support the calling of any
+</I>&gt;<i>method, not just main, because Sun tells us that the standard way to do
+</I>&gt;<i>it is the &quot;main&quot; method.
+</I>
+Sun Microsystems describes how their java tool works. It is a standard way
+for a tool called &quot;java&quot; to work.
+
+Within the Java Native Interface Specification, Sun describes this as an
+important feature of JNI: the ability to define any method of any class as
+the starting point of your JNI-compatible program. Most importantly, this
+method does not have to be static.
+
+&gt;<i>I can allow the name of the method to be invoked to be passed in, but
+</I>&gt;<i>maybe you can give useful examples of this before I implement it.
+</I>
+There are plenty of examples shown on this mailing list and JOS Wiki. Here
+are my favorites.
+
+1. java.lang.Runnable. The simplest instance method for a Java subprogram
+is run(). Run is a blocking call. Any class that implements the Runnable
+interface can be arbitrarily invoked as a subprogram. In the Java
+programming language, it is something like this:
+
+  public void example( String className ) {
+    Runnable r = Class.forName( className ).newInstance();
+    r.run();
+  }
+
+2. java.lang.Component. In a extensive library of components, any class
+that extends Component can be arbitrarily invoked as a subprogram. In the
+Java programming language, it is something like this:
+
+  public void example( String className ) {
+    Component c = Class.forName( className ).newInstance();
+    if ( c instanceof Applet ) {
+      ShowApplet( (Applet) c );
+      return;
+    }
+    if ( c instanceof Window ) {
+      ((Window) c).show();
+      return;
+    }
+
+    :
+
+    ShowComponent( c );
+  }
+
+3. The classes in my subprogram APIs have been explicitly designed with
+subprograms in mind. My subprogram APIs has been plugged into the Smart
+API, so that any shell can invoke many different kind of subprograms,
+including foreign OS subprograms and Java applications. All this and more
+is documented on the Smart API pages of JOS Wiki.
+
+A subprogram is not a process. A subprogram API is separate from a process
+API, and should be. Subprogram APIs can be used even without new threads,
+new class loaders and a new virtual machine.
+
+A process API should create a process first and then invoke any arbitrary
+subprogram. A process API should use a subprogram API to invoke any kind of
+subprogram once a process has been created. It is my goal to define a
+subprogram and sometimes contrast a subprogram and process.
+
+Here are examples of what I would like to do with a process:
+
+  public void example() {
+    Runtime.exec( &quot;jrew -classpath ~/debug:$CLASSPATH MyApp&quot; );
+    Runtime.exec( &quot;java.awt.Button&quot; );
+    Runtime.exec( &quot;MyCustomApplet height=10 width=60&quot; );
+    Runtime.exec( &quot;<A HREF="http://www.jos.org/"">http://www.jos.org/&quot;</A> );
+    Runtime.exec( &quot;<A HREF="ftp://mindspring.com/"">ftp://mindspring.com/&quot;</A> );
+  }
+
+Runtime.exec() might always create a new bytecode process and pass a
+command line (a string) to the new process. A &quot;command line&quot; can load any
+kind of arbitrary subprogram. When oversimplified, a subprogram would seem
+to load itself.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000654.html">[JOS-Arch] [subprogram] Definition</A></li>
+	<LI> Next message: <A HREF="000668.html">[JOS-Arch] [subprogram] Definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#662">[ date ]</a>
+              <a href="thread.html#662">[ thread ]</a>
+              <a href="subject.html#662">[ subject ]</a>
+              <a href="author.html#662">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

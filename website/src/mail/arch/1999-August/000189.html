@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Console for Program</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000188.html">
+   <LINK REL="Next" HREF="000192.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Console for Program</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Console for Program">digigod@earthling.net</A><BR>
+    <I>Sun, 15 Aug 1999 23:45:57 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000188.html">[JOS-Arch] Application</A></li>
+        <LI> Next message: <A HREF="000192.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#189">[ date ]</a>
+              <a href="thread.html#189">[ thread ]</a>
+              <a href="subject.html#189">[ subject ]</a>
+              <a href="author.html#189">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> While testing Program and ProgramContext for compatibility with piping and
+</I>&gt;<i> redirection and for multiple, concurrent threads, I found a problem. While
+</I>&gt;<i> a program can be written, it has a severe limitation. There is a problem
+</I>&gt;<i> with singletons System.in and System.out.
+</I>&gt;<i> 
+</I>&gt;<i> While I have a few recommendations for System.out, I stuck on System.in.
+</I>&gt;<i> Each program needs to have its own input/output device. Otherwise, there is
+</I>&gt;<i> no easy way to make sense of the messages appearing on System.out.
+</I>&gt;<i> 
+</I>&gt;<i> public interface Console {
+</I>&gt;<i>   public void println( String v );
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> That's it. That's the whole interface. There is no support for printing a
+</I>&gt;<i> partial line with a Console. And our Console has no additional support for
+</I>&gt;<i> reading from System.in. Within our José product, we have been successfully
+</I>&gt;<i> using a Console interface. We are working on a new release of our console
+</I>&gt;<i> studio, compatible with the smart object factory.
+</I>&gt;<i> 
+</I>&gt;<i> We have been struggling with a Terminal interface as a read-write device.
+</I>&gt;<i> It isn't very far along. A &quot;terminal&quot; would be able to read from an input
+</I>&gt;<i> stream and write to a Console.
+</I>&gt;<i> 
+</I>&gt;<i> Since writing this e-mail, I starting thinking about a input and output
+</I>&gt;<i> class called IOStream. That might be a literal solution, providing input
+</I>&gt;<i> and output to each Program.
+</I>&gt;<i> 
+</I>&gt;<i> // IOStream.java
+</I>&gt;<i> public interface IOStream {
+</I>&gt;<i>   public InputStream getInputStream();
+</I>&gt;<i>   public OutputStream getOutputStream();
+</I>&gt;<i>   public void flush();
+</I>&gt;<i>   public void close();
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> // ProgramContext.java, with modifications
+</I>&gt;<i> public interface ProgramContext {
+</I>&gt;<i>   :
+</I>&gt;<i>   public IOStream getIOStream();
+</I>&gt;<i>   public void setIOStream( IOStream v );
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> I'm floundering here. What do you think?
+</I>
+in Application I created an ApplicationContext class (seperate from the
+Arguments class) that definese these methods:
+
+public abstract void print(String)
+public abstract void println(String)
+public abstract void printerr(String)
+public abstract String readln()
+
+then I made a default SystemApplicationContext, Im going to make a
+SwingApplicationContext that uses textpanes to emulate a console...
+anyway, thats how I did it. leave it up to the children.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000188.html">[JOS-Arch] Application</A></li>
+	<LI> Next message: <A HREF="000192.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#189">[ date ]</a>
+              <a href="thread.html#189">[ thread ]</a>
+              <a href="subject.html#189">[ subject ]</a>
+              <a href="author.html#189">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

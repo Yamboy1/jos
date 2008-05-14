@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000652.html">
+   <LINK REL="Next" HREF="000660.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs">tmiller@haverford.edu</A><BR>
+    <I>Sun, 21 May 2000 14:15:08 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000652.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+        <LI> Next message: <A HREF="000660.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#659">[ date ]</a>
+              <a href="thread.html#659">[ thread ]</a>
+              <a href="subject.html#659">[ subject ]</a>
+              <a href="author.html#659">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> When talking about the shared object, there is only one memory location
+</I>&gt;<i> for that static. However, when talking about the class (which is not
+</I>&gt;<i> shared due to complexities discussed in another email to John), the
+</I>&gt;<i> static you find is the one that belongs to your process.
+</I>
+	I'm missing something here.  A shared object's static is in its
+class.  If there is a single memory location for that static, how can the
+class find something other than the object?  It makes no sense to me that
+one object of type A could be shared, and another not, and that this
+difference would cause them to find different values in their statics.  
+(As an aside, I'm reasonably sure that this would violate spec.)
+
+&gt;<i> - a process should be able to carry on IPC with two different processes
+</I>&gt;<i> simultaneously using the same the same class type for both shared
+</I>&gt;<i> objects. However, IPC with one process should not interfere with IPC
+</I>&gt;<i> with the other. If the Class is shared it cannot be avoided (when
+</I>&gt;<i> statics are involved).
+</I>
+	This is a very good point.  Unfortunately, it opens an enourmous
+can of worms dealing with point I mentioned above; how many different
+statics for one class can you have?  I would think one!  But in this
+scenario, you need at least three -- one for the process-local class, one
+for A-B share, and one for the B-C share.  If C and A share another object
+of the same type, what happens?  If they share the object shared with B?
+
+	OTOH, looking at the *nix-equivalent scenario, if I share a global
+with one process, and then another, it /must/ be share between the two
+other processes as well; that is, sharing is transitive in conventional
+systems.  (Which is not to say it must be in JOS, but...)
+
+&gt;<i> Unfortunately, it is not a matter of ignoring it and throwing
+</I>&gt;<i> LinkageErrors when it happens, because this will affect applications
+</I>&gt;<i> even if they are not using shared objects.
+</I>
+	Urg.  You're right.
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000652.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+	<LI> Next message: <A HREF="000660.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#659">[ date ]</a>
+              <a href="thread.html#659">[ thread ]</a>
+              <a href="subject.html#659">[ subject ]</a>
+              <a href="author.html#659">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

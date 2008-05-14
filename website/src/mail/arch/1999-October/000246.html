@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Request for low-level memory layout</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000245.html">
+   <LINK REL="Next" HREF="000248.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Request for low-level memory layout</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Request for low-level memory layout">gchii@mindspring.com</A><BR>
+    <I>Thu, 07 Oct 1999 09:55:15 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000245.html">[JOS-Arch] Migration</A></li>
+        <LI> Next message: <A HREF="000248.html">[JOS-Arch] Request for low-level memory layout</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#246">[ date ]</a>
+              <a href="thread.html#246">[ thread ]</a>
+              <a href="subject.html#246">[ subject ]</a>
+              <a href="author.html#246">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The Intel 80486 is a &quot;foreign&quot; processor, foreign from the viewpoint of a
+program running on top of a Java virtual machine. A JOS kernel runs &quot;on top
+of&quot; a real microprocessor and a Java virtual machine runs &quot;on top of&quot; a
+kernel.
+
+What is the JOS memory layout? Where is it defined? Where is it discussed?
+
+Does a JOS kernel make its services available through standard interrupts?
+If so, how? A real microprocessor uses interrupts for low-level
+inter-process communication. What is the standard definition of these
+interrupts (0-255)?
+
+When using Linux as a prototype, we adopt standard definition of these
+interrupts directly from Linux for a JOS kernel. It is a quick fix. And
+yet, it must be documented with precision.
+
+Inside the architecture of JOS, it is not yet clear to me how a JOS kernel
+supports a Java virtual machine. When writing a virtual machine, how does a
+virtual machine communicate with a JOS kernel? Is it through interrupts? or
+direct calls to a kernel interface?
+
+Java applications run &quot;on top of&quot; a Java virtual machine. A perfectly
+compatible Java virtual machine will run all Java applications without
+modification. So, the architecture of JOS could be described in the
+following layers, too.
+
+Layer 1 - Real Microprocessor
+Layer 2 - JOS Kernel
+Layer 3 - Java virtual machine
+Layer 4 - Java application(s)
+
+What memory addresses would be useful to each layer?
+
+Interrupt table - A real microprocessor typically needs an interrupt table.
+Low-memory - A JOS kernel is loaded once and only once into low memory and
+is a main thread. A kernel must be able to allocate RAM -- even after the
+virtual machine is loaded.
+
+? - Where are device drivers loaded?
+
+? - Where is a Java virtual machine loaded?
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000245.html">[JOS-Arch] Migration</A></li>
+	<LI> Next message: <A HREF="000248.html">[JOS-Arch] Request for low-level memory layout</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#246">[ date ]</a>
+              <a href="thread.html#246">[ thread ]</a>
+              <a href="subject.html#246">[ subject ]</a>
+              <a href="author.html#246">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

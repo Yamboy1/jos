@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] About Generic Driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000136.html">
+   <LINK REL="Next" HREF="000139.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] About Generic Driver</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] About Generic Driver">digigod@earthling.net</A><BR>
+    <I>Mon, 09 Aug 1999 20:01:53 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000136.html">[JOS-Arch] About Generic Driver</A></li>
+        <LI> Next message: <A HREF="000139.html">[JOS-Arch] Re: [JOS-Kernel] Priority List</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#138">[ date ]</a>
+              <a href="thread.html#138">[ thread ]</a>
+              <a href="subject.html#138">[ subject ]</a>
+              <a href="author.html#138">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Matt Albrecht wrote:
+&gt;<i> Hilary Cheng wrote:
+</I>&gt;<i> &gt;   Writing a good Generic Driver Model in i386-pc is very hard. IMO, I
+</I>&gt;<i> would
+</I>&gt;<i> &gt;better to keep
+</I>&gt;<i> &gt;all the drivers as simple as they can. We can divided PC Device in two
+</I>&gt;<i> catalogs.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;1. Stream and Event Type Driver ( Keyboard, HD, Floppy, etc )
+</I>&gt;<i> &gt;2. Non-Stream Type Driver ( Graphics Adaptor )
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;Since HD can have event from DMA Processor. Keyboard and Mouse also can &gt;be
+</I>&gt;<i> a stream.
+</I>&gt;<i> &gt;So I would like to join these into same group. For Graphics Adaptor, it is
+</I>&gt;<i> a
+</I>&gt;<i> &gt;Memory/IO/IRQ Device. But it would not be a stream type driver.
+</I>&gt;<i> 
+</I>&gt;<i> So, then the absolute Generic Device is a non-stream, then an immediate (or
+</I>&gt;<i> close to immediate) subclass would be Stream Device and Event Device?  Works
+</I>&gt;<i> for me.
+</I>
+Device
+ |
+StreamDevice
+
+but why event device? wouldnt it be more economical for the drivers to
+produce events?
+like the mouse event has a hasMoved() function the device waits for,
+when it reads positive it creates the event; a different driver could
+create a different event
+ 
+&gt;<i> &gt;For those isLoaded(), hasDriver() methods, these methods should be put it
+</I>&gt;<i> into a
+</I>&gt;<i> &gt;Generic Device Manager to control how many instances should be keep. If we
+</I>&gt;<i> put
+</I>&gt;<i> &gt;these things to driver and let them to control it, it would be little bit
+</I>&gt;<i> dangerous.
+</I>&gt;<i> 
+</I>&gt;<i> hasDriver() *may* be appropriate for many devices (like HardDrive device - I
+</I>&gt;<i> wouldn't like multiple drivers, unaware of each other, messing around at
+</I>&gt;<i> low-level at the same time, but I don't care how many drivers listen to the
+</I>&gt;<i> MouseDevice).  isLoaded(), I feel, may be a reiterative method: if the
+</I>&gt;<i> Driver can find the device, it has been loaded.  Or maybe I'm not seeing
+</I>&gt;<i> something with this.  I dunno.
+</I>
+hasDriver could throw OperationUnsupportedException or it could be in a
+UniDriver interface (horrid name, but you get the idea).
+
+couldnt isLoaded() be for a device like a zip drive that you can plug
+and unplug at runtime, for speed the user sets it up to always have the
+device loaded (since he only takes it off to transfer data on a friends
+computer, for an example)
+ 
+&gt;<i> Ok.  Last time.  This is your class.  This is your class on JOS.  Any
+</I>&gt;<i> questions?  But seriously, here's snippets from my old code for a clearer
+</I>&gt;<i> statement, followed by an overview of the design:
+</I>&gt;<i> 
+</I>&gt;<i> *** WARNING *** The following text has extremely long class names.
+</I>&gt;<i> 
+</I>&gt;<i> /**
+</I>&gt;<i>  * &lt;P&gt;Manages all hardware managers for a particular bus.  Each
+</I>&gt;<i>  * HardwareRequest is assumed to be sent for a particular
+</I>&gt;<i>  * HardwareResourceManager, so that a request
+</I>&gt;<i>  * does not mix different kinds of resources together.  This may be changed
+</I>&gt;<i> later
+</I>&gt;<i>  * on if a need (or want) arises, but for now it is the easiest way to do
+</I>&gt;<i> things.
+</I>&gt;<i>  *
+</I>&gt;<i>  * @author    Matt Albrecht
+</I>&gt;<i>  * @version   1.0
+</I>&gt;<i>  */
+</I>&gt;<i> public class PrimaryHardwareManager extends HardwareResourceManager;
+</I>&gt;<i> 
+</I>&gt;<i> /**
+</I>&gt;<i>  * &lt;P&gt;Allocates and deallocates hardware resources for a specific type of
+</I>&gt;<i>  * resource.  Checks if the resource allocation requests request already
+</I>&gt;<i> allocated
+</I>&gt;<i>  *  resources :-)   (it's a pseudo-palendrome)
+</I>&gt;<i>  *
+</I>&gt;<i>  * &lt;P&gt;A unique &quot;type&quot; name needs to created, under the name _typeName:
+</I>&gt;<i>  * &lt;PRE&gt;
+</I>&gt;<i>  *       public final static String _typeName = &quot;MyUniqueTypeName&quot;
+</I>&gt;<i>  * &lt;/PRE&gt;
+</I>&gt;<i>  * Usually, this is the same as the class name.
+</I>&gt;<i>  *
+</I>&gt;<i>  * @author    Matt Albrecht
+</I>&gt;<i>  * @version   1.0
+</I>&gt;<i>  */
+</I>&gt;<i> public abstract class HardwareResourceManager;
+</I>&gt;<i> 
+</I>&gt;<i> In this model, a &quot;HardwareResourceRequest&quot; is sent to the
+</I>&gt;<i> PrimaryHardwareResourceManager (to which every known specific
+</I>&gt;<i> HardwareResourceManager has registered itself with, or more accurately, the
+</I>&gt;<i> PrimaryHardwareResourceManager has registered all known
+</I>&gt;<i> HardwareResourceManagers to itself).  A request consists of a set of
+</I>&gt;<i> &quot;HardwareResourceSetting&quot;s dedicated for a specific HardwareResourceManager
+</I>&gt;<i> (like IOAddressHardwareResourceSetting is intended for
+</I>&gt;<i> IOAddressHardwareResourceManager).  The PrimaryHardwareResourceManager
+</I>&gt;<i> routes the request to the specific HardwareResourceManager, which analyzes
+</I>&gt;<i> the request, and allocates the best fit HardwareResourceSetting (if there is
+</I>&gt;<i> one), and creates a HardwareResourceInterface based on that setting for the
+</I>&gt;<i> Driver to use.  This interface has the native code ties.
+</I>&gt;<i> 
+</I>&gt;<i> Is it any wonder no one volunteered to use it?
+</I>
+I think my brain melted, jeez
+ 
+&gt;<i> &gt;&gt; &gt;maybe a driver should plug into a device (setDriver(Driver d)) or can
+</I>&gt;<i> &gt;&gt; &gt;there be more than one driver at a time?
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt; I was pondering the other direction: MyDriver.setDevice( Device d ) so
+</I>&gt;<i> that
+</I>&gt;<i> &gt;&gt; multiple drivers can use a single device.  Here's where Device.veto()
+</I>&gt;<i> would
+</I>&gt;<i> &gt;&gt; come in handy, to prevent its use.  This would allow real-time upgrades
+</I>&gt;<i> to a
+</I>&gt;<i> &gt;&gt; better Driver.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt; &lt;snip Driver.java&gt;
+</I>&gt;<i> &gt;&gt; &gt;the same goes for this with the getDescription() and all...
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;&gt; getDescription would be a human-readable string to indicate the operation
+</I>&gt;<i> of
+</I>&gt;<i> &gt;&gt; the Driver.  We could use this method as well in the Device.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;you should have a getDescription() and a getHRName(), if you make a tree
+</I>&gt;<i> &gt;of all of them you need getHRName for the name on the tree node, PNP6000
+</I>&gt;<i> &gt;(or whatever) will hardly make sense to the average person.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;or better yet getName() is the HR one and you have a
+</I>&gt;<i> &gt;get[Device|Driver]Name() for the ID
+</I>&gt;<i> 
+</I>&gt;<i> Great.  After typing those enormous class names above, I'll believe
+</I>&gt;<i> anything.  But really, that sounds like the way to go.
+</I>
+be easier for creating a visual device tree at the very least...
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000136.html">[JOS-Arch] About Generic Driver</A></li>
+	<LI> Next message: <A HREF="000139.html">[JOS-Arch] Re: [JOS-Kernel] Priority List</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#138">[ date ]</a>
+              <a href="thread.html#138">[ thread ]</a>
+              <a href="subject.html#138">[ subject ]</a>
+              <a href="author.html#138">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

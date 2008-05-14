@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000080.html">
+   <LINK REL="Next" HREF="000072.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-UI] Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings">digigod@earthling.net</A><BR>
+    <I>Fri, 23 Jul 1999 22:46:44 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000080.html">[JOS-UI] ScreenSaver</A></li>
+        <LI> Next message: <A HREF="000072.html">[JOS-UI] Re: [JOS-Kernel] Etherboot</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Regier Avery J wrote:
+&gt;<i> Not necessarily.  I envision the possibility of there being many toolkits
+</I>&gt;<i> available just as there are many X window manager available.   Each shell
+</I>&gt;<i> (which extends off of JADE) may implement the Toolkit differently.  I
+</I>&gt;<i> personally think it is a mistake to embed the Toolkit into JADE.  I had
+</I>&gt;<i> envisioned JADE as being flexible enough to be the base both TUI's and
+</I>&gt;<i> GUI's.  Most TUI's won't have a Toolkit at all.  There will be some GUI's
+</I>&gt;<i> which don't want to use Swing as their peers.  We need to give the shell
+</I>&gt;<i> writers the flexibility to do whatever they please.
+</I>
+Your absolutley right, what ever I was thinking when I said that is...
+well.
+
+What we should do is have a JOSToolkit that provides all the base
+functionality, like getSystemClipboard() isnt going to change, then have
+various subclasses like SwingToolkit to provide the default
+implementations. I think we could use the Toolkit in a CLI anyway for
+stuff like beep() and that just throw something akin to a
+GraphicsNotSupportedException.
+
+Now that I think about it we could define the default JADE toolkit to
+get a HashMap from the registry and create the peers from that... (the
+default being the Swing ones)
+
+&gt;<i> I'm thinking that the Registry is the prime opportunity for hackers to get
+</I>&gt;<i> around the security model we implement.  We require a Registry for
+</I>&gt;<i> configurability, but it will also have to contain settings that directly
+</I>&gt;<i> specify security.  For instance, if we set in the Registry as a default that
+</I>&gt;<i> applets may only take up to 30% of the CPU and 1/4 of the System's RAM, and
+</I>&gt;<i> we didn't secure the Registry such that those settings cannot be changed by
+</I>&gt;<i> hostile applets, we have failed.  If the system administrator sets the
+</I>&gt;<i> settings such that a user 'guest' may only access certain files, and the
+</I>&gt;<i> guest is able to get in and hack the registry to give himself more
+</I>&gt;<i> permissions, then we have failed.  One way to ensure that the registry is
+</I>&gt;<i> only changed by those with permissions to change it, is to encrypt it.  Not
+</I>&gt;<i> just that, but make sure the decryption routines are secure as well.
+</I>
+or we could follow KOH (the DOS virus people intentinally let on their
+systems to encrypt all their disks) with extra security of course, and
+just for the hell of it encrypt the security section of the registry and
+require superuser access just to be asked for the pass phrase (you'd
+need a small nuclear weapon to get throught that ;)
+ 
+&gt;<i> Glad you asked!  I'm not really sure!  Right now the system I'm playing with
+</I>&gt;<i> is that it is all controlled via the shell.  For instance any process can
+</I>&gt;<i> also be a parent process.  It can spawn other processes.  If the parent
+</I>&gt;<i> process decides that it is willing to share {x} static data with the child,
+</I>&gt;<i> it may.  If the parent spawns two processes, and gives both permissions to
+</I>&gt;<i> its statics, then WALAH!  IPC.  Shells are the parent process for most every
+</I>&gt;<i> application in the system.  The shell would check the registry to determine
+</I>&gt;<i> what static class data, if any should be shared with that process.  The data
+</I>&gt;<i> may not come from the registry, but also could come from user commands, be
+</I>&gt;<i> they GUI in nature or text commands.  If a GUI shell spawns a text command
+</I>&gt;<i> shell, then it is possible that an app launched from the GUI and an app
+</I>&gt;<i> launched from the command shell can do IPC.  This is a simple explanation of
+</I>&gt;<i> a tough problem, but from JADE's point of view I'm hoping that it will be
+</I>&gt;<i> just that simple.  It is not so simple from the kernel/JVM point of view.
+</I>&gt;<i> This complicates the memory and process management tasks a lot.  Figuring
+</I>&gt;<i> all of this out is really what the org.jos.core.* project is all about.
+</I>&gt;<i> This is also why I want JADE to be more generic.  Its job is to make all of
+</I>&gt;<i> this process stuff easy as pie for shells.  All shells should really have to
+</I>&gt;<i> worry about is human interaction.  JADE takes care of interacting with the
+</I>&gt;<i> system, as this is what must be consistent across all shells, otherwise our
+</I>&gt;<i> users would go batty trying to keep it all straight.
+</I>
+exatcly!
+
+system &lt;&gt; JADE &lt;&gt; UI
+
+couldnt have said it better myself
+
+the system is considered with doing... um, system stuff not looking
+pretty and making a noise telling you you cant click there
+
+&gt;<i> The definition of a process must be consistent accross all shells.  You
+</I>&gt;<i> start and stop and kill processes with the same API into the jvm+kernel.  A
+</I>&gt;<i> process whether started from a TUI or GUI is defined the same way for
+</I>&gt;<i> security and configuration in the registry.  JADE should make it simple to
+</I>&gt;<i> pull all of that information together so that when a user clicks on an icon
+</I>&gt;<i> for Netscape, the shell just says to JADE, &quot;JADE.getProgram(&quot;Netscape&quot;,
+</I>&gt;<i> &quot;Avery&quot;).createProcess();&quot; and it all just works.
+</I>
+I imagine this getProgram method to be incredibly complex and Im sure as
+hell not writing it, but Id like it.
+
+before Gilbert brings it up though it should except a URI as the program
+
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000080.html">[JOS-UI] ScreenSaver</A></li>
+	<LI> Next message: <A HREF="000072.html">[JOS-UI] Re: [JOS-Kernel] Etherboot</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

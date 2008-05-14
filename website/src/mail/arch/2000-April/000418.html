@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] process: scheme vs. process: subscheme</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   
+   <LINK REL="Next" HREF="000419.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] process: scheme vs. process: subscheme</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] process: scheme vs. process: subscheme">gchii@mindspring.com</A><BR>
+    <I>Sat, 01 Apr 2000 11:48:28 -0500</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000419.html">[JOS-Arch] Process Diagrams</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#418">[ date ]</a>
+              <a href="thread.html#418">[ thread ]</a>
+              <a href="subject.html#418">[ subject ]</a>
+              <a href="author.html#418">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The latest design for Smart API defines a process: scheme. This scheme
+always returns an instance of java.lang.Process (or null). An instance of
+java.lang.Process uses streams for stardard in, out and error.
+
+Today, a new browser must be developed to display processes. The input and
+output from a process should be browse-able in the UniversalBrowser.
+Keystrokes entered into the process browser should be passed to the
+process. Characters from the process should be displayed in the browser.
+The ProcessBrowser might be constructed from an AWT canvas. When a URI
+starts with &quot;process:&quot;, the ProcessBrowser is selected. It should create
+the process. It should display the output from a process. For input,
+keystrokes should be converted to ASCII characters and sent to the process.
+
+The run: scheme is intended to run all kinds of programs, including threads
+and processes. The run: scheme support scheme chaining. The process:
+subscheme returns an instance of org.jos.program2a.Program. It is
+compatible with the ProgramBrowser. The subscheme returns a program, not a
+process.
+
+The Find application can be created in the current thread. The program is
+started when Program.run() is invoked.
+  run:program:org.jos.gchii.find2a.Find
+
+The Find application can be created in a separate thread. The thread is
+created and started when Program.run() is invoked:
+  run:thread:program:org.jos.gchii.find2a.Find
+
+The Find application can be created in a separate process. The process is
+created and started when Program.run() method is invoked:
+  run:process:program:org.jos.gchii.find2a.FindProgram
+
+This subscheme does not use embedded URIs. Therefore, the priority of a new
+thread is normal and a child process inherits the environment of its parent
+(CLASSPATH,etc).
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000419.html">[JOS-Arch] Process Diagrams</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#418">[ date ]</a>
+              <a href="thread.html#418">[ thread ]</a>
+              <a href="subject.html#418">[ subject ]</a>
+              <a href="author.html#418">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

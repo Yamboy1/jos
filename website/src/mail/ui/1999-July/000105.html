@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] general idea</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000103.html">
+   <LINK REL="Next" HREF="000106.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] general idea</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-UI] general idea">digigod@earthling.net</A><BR>
+    <I>Thu, 29 Jul 1999 12:50:36 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000103.html">[JOS-UI] general idea</A></li>
+        <LI> Next message: <A HREF="000106.html">[JOS-UI] general idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#105">[ date ]</a>
+              <a href="thread.html#105">[ thread ]</a>
+              <a href="subject.html#105">[ subject ]</a>
+              <a href="author.html#105">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Sean Cribbs wrote:
+&gt;<i> 
+</I>&gt;<i> Corevisions wrote:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; hi .. i just read the ui discussion about widgets and have some
+</I>&gt;<i> &gt; questions and ideas about it ..(think they are not really finished so
+</I>&gt;<i> &gt; excuse me).
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; first i want to give you my idea of how JOS should work ...
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; - the first thing JOS should do on bootup is to initialize the desktop
+</I>&gt;<i> &gt; (like MacOS) so you have no text based views
+</I>&gt;<i> 
+</I>&gt;<i> I disagree.  While I believe that a gui-only system is nice, many people
+</I>&gt;<i> prefer text-based user interfaces or command-line interfaces.  Plus,
+</I>&gt;<i> they are much simpler to create and will give us something to test our
+</I>&gt;<i> code on once the bare-bones system is ready.
+</I>
+If the UI for JADE is graphical it should start in graphical mode, if
+its text then it should start in text mode. 
+ 
+&gt;<i> &gt; - with a special keycombination you can now enter the system-setup where
+</I>&gt;<i> &gt; you can add/remove drivers etc
+</I>&gt;<i> 
+</I>&gt;<i> Hmm... I don't know if this is necessary because JOS is supposed to
+</I>&gt;<i> allow users to specify drivers while the system (gui/cli/etc) is
+</I>&gt;<i> running.  Most driver changes should not require a reboot or special
+</I>&gt;<i> startup selection procedures.
+</I>
+Hopefully, of course this isnt our tier of the architecture exactly
+ 
+&gt;<i> &gt; i think of a fully plugable system :
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;   ROOT
+</I>&gt;<i> &gt;    |- driver
+</I>&gt;<i> &gt;    |  |- sound
+</I>&gt;<i> &gt;    |  |  |- (driver) soundblaster
+</I>&gt;<i> &gt;    |  |  |- (driver) MPU401 comp
+</I>&gt;<i> &gt;    |  |  .
+</I>&gt;<i> &gt;    |  |
+</I>&gt;<i> &gt;    |  |- video
+</I>&gt;<i> &gt;    |  |  |- (driver) VESA gfx
+</I>&gt;<i> &gt;    |  |  |- (driver) OpenGL
+</I>&gt;<i> &gt;    |  |  .
+</I>&gt;<i> &gt;    |  |
+</I>&gt;<i> &gt;    |  |- filesystem
+</I>&gt;<i> &gt;    |  |  |- (driver) JOSFs
+</I>&gt;<i> &gt;    |  |  |- (driver) FAT
+</I>&gt;<i> &gt;    |  |  |- (driver) Amiga FFS
+</I>&gt;<i> &gt;    |  |  .
+</I>&gt;<i> &gt;    |  .
+</I>&gt;<i> &gt;    |
+</I>&gt;<i> &gt;    |- ui
+</I>&gt;<i> &gt;    |  |- desktop
+</I>&gt;<i> &gt;    |  |  |- (desktop) standard JOS desktop _OR_ (desktop) experimental
+</I>&gt;<i> &gt; 3D desktop
+</I>&gt;<i> &gt;    |  |  .
+</I>&gt;<i> &gt;    |  |
+</I>&gt;<i> &gt;    |  |- l&amp;f
+</I>&gt;<i> &gt;    |  |  |- (l&amp;f) Swing _OR_ (l&amp;f) MacOS X Server _OR_ ...
+</I>&gt;<i> &gt;    |  |  .
+</I>&gt;<i> &gt;    |  |
+</I>&gt;<i> &gt;    |  .
+</I>&gt;<i> &gt;    .
+</I>&gt;<i> 
+</I>&gt;<i> There are already many packages specified... see the Packages page on
+</I>&gt;<i> the JOS Wiki.
+</I>
+are these supposed to be packages or a registry tree?
+ 
+&gt;<i> &gt; this should be stored somewhere and all things should be implemented on
+</I>&gt;<i> &gt; startup
+</I>&gt;<i> 
+</I>&gt;<i> What are you trying to say?  If you're referring to a registry, there is
+</I>&gt;<i> already one in the making.
+</I>
+two or three more accuratley
+ 
+&gt;<i> &gt;
+</I>&gt;<i> &gt; of couse you will need interfaces like
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;   public class W9XlikeDesktop extends JOSDesktop
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; or
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;   public class JOSFS_AmigaFFS extends JOSFileSystem
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; - this should be the maximum the system should provide to the user. all
+</I>&gt;<i> &gt; other things should be plugged into it to asure
+</I>&gt;<i> &gt;   a maximum of configurability
+</I>&gt;<i> 
+</I>&gt;<i> I agree that it should be maximally configurable, but I think it's a
+</I>&gt;<i> little early to say what initial OOB configuration should be.
+</I>
+well the default should be the JOS UI/subsystems and filesystems and the
+like are more for the arch mailing list
+ 
+&gt;<i> &gt; sorry if it is not really part of the ui section.
+</I>&gt;<i> &gt; please give me a response and more of your ideas ...
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; btw how exactly shold JADE work ? are there any links on the JOS page ?
+</I>&gt;<i> 
+</I>&gt;<i> AFAIK from discussions with Digigod, JADE is the underlying system upon
+</I>&gt;<i> which all UIs rest.  It provides things that are common among the UIs,
+</I>&gt;<i> like receiving keystrokes, handling graphics devices, input devices, and
+</I>&gt;<i> other output devices.  The other UIs can be then defined using JADE as
+</I>&gt;<i> the workbeast.  For example, a Traditional GUI would ask JADE to put the
+</I>&gt;<i> video card in graphics mode, and ask for a specific part of the screen
+</I>&gt;<i> to draw on.  It would not have to know how all of this is being done.
+</I>&gt;<i> JADE is for UIs what OO is for imperative programming -- hiding all the
+</I>&gt;<i> work behind a nice interface, and making it reusable.
+</I>
+exactly! I think we should also be careful to seperate JADE and JOSystem
+as much as possible. JADE is not part of JOS in the traditional sense,
+it is more akin to an application (since some systems wont have a UI at
+all)
+
+as far as pages go:
+
+JosPlatform --an old page that gives you the basic gist (or is that with
+a 'j'?) of how JOS should be structured
+JOSystem    --whats in JOS the OS vs. whats in...
+JADE        --the page on JADE also see JADEProjectUpdate
+
+Corevisions wrote:
+&gt;<i> 
+</I>&gt;<i> Sean Cribbs wrote:
+</I>&gt;<i> 
+</I>&gt;<i> &gt; I disagree.  While I believe that a gui-only system is nice, many
+</I>&gt;<i> people
+</I>&gt;<i> &gt; prefer text-based user interfaces or command-line interfaces.  Plus,
+</I>&gt;<i> &gt; they are much simpler to create and will give us something to test our
+</I>&gt;<i> 
+</I>&gt;<i> &gt; code on once the bare-bones system is ready.
+</I>&gt;<i> 
+</I>&gt;<i> i did not mean JOS should not have a CLI but it should be implemented in
+</I>&gt;<i> a
+</I>&gt;<i> graphic environment
+</I>&gt;<i> but i accept the fact that they are easier to create.
+</I>
+there should be a graphics CLI, but there should also be a text one.
+some systems might need a text-only CLI, its the same reason we should
+have TUI. the point of JADE is to be unassuming and hence flexible.
+ 
+&gt;<i> &gt; Hmm... I don't know if this is necessary because JOS is supposed to
+</I>&gt;<i> &gt; allow users to specify drivers while the system (gui/cli/etc) is
+</I>&gt;<i> &gt; running.  Most driver changes should not require a reboot or special
+</I>&gt;<i> &gt; startup selection procedures.
+</I>&gt;<i> 
+</I>&gt;<i> again i just meant that this gives you a startup configuration .. i
+</I>&gt;<i> _hope_
+</I>&gt;<i> that driver implementation is realtime ;)
+</I>
+If you mean we should allow prestartup configuration AND runtime
+configuration I say we should just have one or the other, and by that I
+mean runtime configuration
+ 
+&gt;<i> &gt; AFAIK from discussions with Digigod, JADE is the underlying system
+</I>&gt;<i> upon
+</I>&gt;<i> &gt; which all UIs rest.  It provides things that are common among the UIs,
+</I>&gt;<i> 
+</I>&gt;<i> &gt; like receiving keystrokes, handling graphics devices, input devices,
+</I>&gt;<i> and
+</I>&gt;<i> &gt; other output devices.  The other UIs can be then defined using JADE as
+</I>&gt;<i> 
+</I>&gt;<i> &gt; the workbeast.  For example, a Traditional GUI would ask JADE to put
+</I>&gt;<i> the
+</I>&gt;<i> &gt; video card in graphics mode, and ask for a specific part of the screen
+</I>&gt;<i> 
+</I>&gt;<i> &gt; to draw on.  It would not have to know how all of this is being done.
+</I>&gt;<i> &gt; JADE is for UIs what OO is for imperative programming -- hiding all
+</I>&gt;<i> the
+</I>&gt;<i> &gt; work behind a nice interface, and making it reusable.
+</I>&gt;<i> 
+</I>&gt;<i> i agree in this concept ... it should be easy to port to other platforms
+</I>&gt;<i> (not
+</I>&gt;<i> just x86)
+</I>
+the entire OS is meant to be easily ported from one platform to another,
+thats the whole point of making it in Java afterall. the UI can look
+like anything anywhere; it could have a mac UI on an intel machine (if
+for nothing other then humor)
+
+I think the biggest benefit of a super portable OS like this is in
+hardware of all things. when someone makes a revolutionary hardware
+architecture they have to code the entire OS and all the apps and then
+no ones going to use it since they like there old apps. with JOS all
+they have to do is port the JOSBox and possibly slap together some
+drivers and such and they have a new architecture that runs every Java
+app and has a robust OS that people know how to use from the get go.
+ 
+Sean Cribbs wrote:
+&gt;<i> Again, I disagree.  There is no reason why a plain, vga text mode
+</I>&gt;<i> command line interface should not be available.  What if the user is
+</I>&gt;<i> trying to test an experimental graphics driver?  Certainly it doesn't
+</I>&gt;<i> make sense to have a GUI already loaded with a graphics-based CLI in
+</I>&gt;<i> it.  There might be conflicts with the current graphics device (maybe
+</I>&gt;<i> it's a standard VGA or other driver).
+</I>
+even if we dont provide one it should at least be able to be made (we
+cant do *everything* afterall)
+ 
+&gt;<i> The startup configuration should only be specified at install time.
+</I>&gt;<i> After that, all driver changes should be made through tools that access
+</I>&gt;<i> the registry.  I see no point for a startup configuration change unless
+</I>&gt;<i> it is to use a minimal configuration (like Windows safe mode).
+</I>
+the whole thing should be dynamic and persistent. if you change UI's and
+your system crashes (hopefully from a power out and not JOS) when you
+restart the new UI should be loaded since it altered the JADE registry
+ 
+&gt;<i> &gt; all in one it was just an idea and i wanted you all to know about it ...
+</I>&gt;<i> &gt; i would really like to join you work but i think that i dont know enough to
+</I>&gt;<i> &gt; help you much but i start learning ;)
+</I>&gt;<i> &gt; (first thing is to get cvs running to download the source ...)
+</I>&gt;<i> 
+</I>&gt;<i> We would be glad to have you on.  More important than experience is to
+</I>&gt;<i> have an interest in what you're doing.  If you have the interest, then
+</I>&gt;<i> you will have the impetus to learn when necessary.
+</I>
+I wholeheartedly agree with that (even if I did have to look up impetus
+:<i>)
+</I>
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000103.html">[JOS-UI] general idea</A></li>
+	<LI> Next message: <A HREF="000106.html">[JOS-UI] general idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#105">[ date ]</a>
+              <a href="thread.html#105">[ thread ]</a>
+              <a href="subject.html#105">[ subject ]</a>
+              <a href="author.html#105">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

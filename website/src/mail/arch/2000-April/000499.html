@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os-0.1.2 released</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000491.html">
+   <LINK REL="Next" HREF="000501.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os-0.1.2 released</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] rheise.os-0.1.2 released">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 26 Apr 2000 00:50:31 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000491.html">[JOS-Arch] [distribution] JOS Distribution 1f</A></li>
+        <LI> Next message: <A HREF="000501.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#499">[ date ]</a>
+              <a href="thread.html#499">[ thread ]</a>
+              <a href="subject.html#499">[ subject ]</a>
+              <a href="author.html#499">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This will be the last combined rheise.os/SwingToolkit release. In future
+these will be released separately.
+
+	<A HREF="http://www.progsoc.uts.edu.au/~rheise/projects/rheise.os/">http://www.progsoc.uts.edu.au/~rheise/projects/rheise.os/</A>
+
+Specific changes in this release are as follows (scroll to the end of
+this email for additional notes):
+
+Changes to rheise.os:
+
+        - Implemented System.exit() - sort of.
+        - Implemented HostProcessClassLoader.getResourceAsStream()
+        - Assigned delegators to kernel-space System statics.
+        - Provided method to construct UserThreadGroup before User is
+          known.
+        - SystemObjects are created through
+          ProcessManager.createSystemObjects()
+        - Created &quot;basic&quot; implementation of process package.
+
+Changes to SwingToolkit:
+
+        - Frame.pack() works properly.
+        - Added new peers:
+                - CheckboxMenuItemPeer
+                - ChoicePeer
+                - MenuBarPeer
+                - MenuItemPeer
+                - MenuPeer
+                - TextAreaPeer
+        - Reorganised packages, created new package for swing widgets.
+
+
+- Additional notes:
+
+I looked at SwingToolkit for the first time in a year and noticed that
+much of it didn't work. For example, if your application doesn't call
+Frame.setSize() explicitly, you don't see the Frame at all (oops!). With
+that fixed, it should be /much/ closer to being useful but without
+actually being useful - it's work in progress.
+
+One thing I noticed is that, with or without the SwingToolkit, both AWT
+and Swing menus don't work under rheise.os (at least on Linux). It is
+probably to do with assumptions on class loading which I'm breaking. I
+created a new implementation of the process package called &quot;basic&quot; which
+runs all processes in the same namespace. Menus work under this
+implementation. To test this environment, run:
+
+	java rheise.os.process.basic.BasicInit
+
+Also in this release, I think I have the other 0.01% of System statics
+working, ie. if a kernel space class accesses a System static, the
+request will still be forwarded to the current process through
+delegators.
+
+- How you can help:
+
+Since some people have shown an interest in helping, here are the main
+areas that need attention:
+
+	- Get other platforms working (eg. JDK 1.2 and Windows)
+	- Expand on security APIs.
+	- Fix remaining bugs in SwingToolkit.
+
+There is too much for one person to do, so any help would be greatly
+appreciated. If you're interested, check out the release notes for more
+information on what's missing, and email me to see how you can help.
+
+Thanks.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000491.html">[JOS-Arch] [distribution] JOS Distribution 1f</A></li>
+	<LI> Next message: <A HREF="000501.html">[JOS-Arch] rheise.os-0.1.2 released</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#499">[ date ]</a>
+              <a href="thread.html#499">[ thread ]</a>
+              <a href="subject.html#499">[ subject ]</a>
+              <a href="author.html#499">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

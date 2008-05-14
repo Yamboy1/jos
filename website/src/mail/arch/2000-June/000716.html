@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [interface] Better design?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000715.html">
+   <LINK REL="Next" HREF="000719.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [interface] Better design?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [interface] Better design?">gchii@mindspring.com</A><BR>
+    <I>Sun, 04 Jun 2000 11:12:52 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000715.html">[JOS-Arch] Static fields/object sharing (fwd)</A></li>
+        <LI> Next message: <A HREF="000719.html">[JOS-Arch] JOSCore and JOSExtensions (fwd)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#716">[ date ]</a>
+              <a href="thread.html#716">[ thread ]</a>
+              <a href="subject.html#716">[ subject ]</a>
+              <a href="author.html#716">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I am sure that a dynamic interface approach to object sharing is better
+than otherwise. A dynamic interface approach goes something like this:
+
+Process A creates object X. X is owned exclusively by process A.
+
+Later, process B comes along and asks process A for object X. Of course,
+process A doesn't want to give process B a direct object reference because
+it wants to exclusively own object X. So what does process A do?
+
+Process A uses some native method to create an interface for object X. The
+native method /dynamically/ creates a class file and passes it and a
+orthogonal handle to process B. Process B defines the interface by turning
+a class file into a class. The class is owned exclusively by process B. In
+turn, the interface class is turned into an object using the handle. The
+interface class and handle are owned exclusively by process B.
+
+-----
+
+Every public method in the class of object X is added to the signature of
+an interface. Therefore, methods are shared, never fields. It means that
+any class can be shared at any time by any process. Obviously, beans are
+easier to share.
+
+Reflection on the dynamic interface will reveal all of the methods of the
+original class. This shared method approach would eliminate the need to
+compare class definitions to see if they are compatible. Every interface
+that is created through this mechanism would be guaranteed to be
+compatible...because when a thread &quot;virtuallly invokes&quot; an interface
+method, the original method of the original class will be invoked. Since
+the original method is invoked, there can be no casting errors.
+
+When process A grants B access to X, process A returns a shared interface
+definition. Later, because of the handle, process A can revoke access to X
+without disturbing process B.
+
+It would bother me to come up with a design that slows down non-shared
+performance within a virtual machine. Although it might be functional, I do
+not see how creating two objects (JavaObject and InstanceFields) for every
+Java object would be effective.
+
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000715.html">[JOS-Arch] Static fields/object sharing (fwd)</A></li>
+	<LI> Next message: <A HREF="000719.html">[JOS-Arch] JOSCore and JOSExtensions (fwd)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#716">[ date ]</a>
+              <a href="thread.html#716">[ thread ]</a>
+              <a href="subject.html#716">[ subject ]</a>
+              <a href="author.html#716">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

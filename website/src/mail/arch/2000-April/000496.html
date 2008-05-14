@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os questions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000493.html">
+   <LINK REL="Next" HREF="000497.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os questions</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] rheise.os questions">gchii@mindspring.com</A><BR>
+    <I>Fri, 21 Apr 2000 10:46:02 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000493.html">[JOS-Arch] rheise.os questions</A></li>
+        <LI> Next message: <A HREF="000497.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#496">[ date ]</a>
+              <a href="thread.html#496">[ thread ]</a>
+              <a href="subject.html#496">[ subject ]</a>
+              <a href="author.html#496">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 03:39 PM 4/20/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>Considering the AWT: the AWT is only an interface.  How we choose
+</I>&gt;<i>to implement it is completely up to us.
+</I>
+In theory, we can run all AWT-dependent applications on JOS /because/ the
+implementation details are completely up to us. We must implement the AWT
+peers. We can implement the AWT peers without any native methods.
+
+The AWT peers are an interface, or API. On the other hand, AWT is a
+framework, not an API. Swing is a framework. Swing uses AWT.
+
+&gt;<i>Current AWT implementations must use native peers because the windowing
+</I>&gt;<i>system, graphics libraries, etc, aren't written in Java.
+</I>
+Native methods are quite popular with C/C++ programmers. Native methods
+might feel better than bytecode for someone trained in the art of C/C++.
+Programmers have used native methods even when native methods are not
+required. AWT peers are a good example.
+
+After reviewing the Java Virtual Machine Specification again, I make the
+following assertion:
+
+
+AWT peers are not required to implement native methods. As always, native
+methods are optional in the implementation of the Java standard class
+libraries.
+
+
+Many, but not all, foreign operating systems have a bit-mapped windowing
+system. A bit-mapped windowing system for many mainframe, midrange and
+microcomputer servers is simply not an option. For the server itself, it is
+neither necessary nor desireable for these computers to have a bit-mapped
+windowing system. People sit in front of a local or remote console; nobody
+sits in front of the server itself.
+
+On a server farm (or serverfarm-in-a-box), most of the general purpose
+processors do not have a bit-mapped windowing system. They have no support
+for bit-mapped graphics. They have no monitor, no keyboard, no mouse.
+People sit in front of a local or remote console; nobody sits in front of
+the server itself.
+
+Any yet, AWT runs successfully on all these machines. A bit-mapped
+windowing system is obviously not required to run a virtual machine. While
+many virtual machines use them, native peers are not required. For those
+without a bit-mapped windowing system, a foreign operating system cannot
+provide native peers for a windowing system it does not have.
+
+Peers for JOS are more like peers on OS/400. For example, a pure bytecode
+version of the AWT on OS/400 is necessary to separate the process-wide
+components in java.awt.* with the session-wide components of
+java.awt.peer.*. The OS/400 redirects all AWT &quot;peers&quot; across a TCP/IP
+connection. Peers are never displayed on the OS/400 itself.
+
+Peers for JOS are more like peers for X. A native library might be useful
+to redirect I/O from a process to the X server. Peers for JOS might skip
+the native library altogether and, within bytecode, redirect I/O from a
+process to the X server.
+
+Current AWT implementations must use peers because the windowing system is
+a system-wide object and AWT is process-wide. Native peers are useful to
+cross over from a virtual machine to a foreign operating system. This has
+little to do with machine code vs. bytecode.
+
+An AWT peer is a proxy. An AWT peer runs in one process while the real
+bit-mapped component runs in another. Let's consider running 100 AWT-based
+applications. Each AWT-based application runs in its own process. Each AWT
+peer is created in the same process as its application.
+
+A windowing system simultaneously display the output from many other
+processes. Like an X service, our windowing system runs in a separate
+process, isolated from all other processes. It must be a separate process
+in order for a windowing system to be loaded, reloaded, shutdown and
+restarted.
+
+When an AWT peer is created, it creates a corresponding component in
+service process. An AWT peer must use some form of inter-process
+communication to tell the windowing system to create a component. Once a
+corresponding component has been created, an AWT peer must continue to use
+some form of inter-process communication to paint the display owned by the
+windowing system.
+
+To suitably illustrate this, imagine 100 servers and 1 console are wired in
+a server farm. For simplicity, imagine each server is running one AWT-based
+application. It is desireable to redirect I/O from all 100 servers to a
+master console. The master console is the only machine that runs a
+bit-mapped windowing service. It can simultaneously display components
+created by AWT peers on all 100 servers.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000493.html">[JOS-Arch] rheise.os questions</A></li>
+	<LI> Next message: <A HREF="000497.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#496">[ date ]</a>
+              <a href="thread.html#496">[ thread ]</a>
+              <a href="subject.html#496">[ subject ]</a>
+              <a href="author.html#496">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

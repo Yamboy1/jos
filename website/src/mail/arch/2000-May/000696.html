@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Static fields/object sharing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000693.html">
+   <LINK REL="Next" HREF="000698.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Static fields/object sharing</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Static fields/object sharing">gchii@mindspring.com</A><BR>
+    <I>Tue, 30 May 2000 11:15:27 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000693.html">[JOS-Arch] Static fields/object sharing</A></li>
+        <LI> Next message: <A HREF="000698.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#696">[ date ]</a>
+              <a href="thread.html#696">[ thread ]</a>
+              <a href="subject.html#696">[ subject ]</a>
+              <a href="author.html#696">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 09:34 AM 5/29/00 -0500, <A HREF="mailto:Matt.Albrecht@trilogy.com">Matt.Albrecht@trilogy.com</A> wrote:
+&gt;<i>Just a small point regarding this.  Yes, we need a protocol stack, but
+</I>&gt;<i>that's a shared resource for the OS.  How will we share the protocol stack
+</I>&gt;<i>between processes, when we need a shared protocol stack to share objects?
+</I>
+Let's clarify the difference between data sharing and object sharing. Data
+sharing is the sharing of (in Java) primative values. Both primatives and
+primative arrays can be shared among virtual machines with impunity. Why?
+Because the well-known &quot;classes&quot; for primatives are written in machine
+code. Data sharing is very easy. Data sharing is akin to shared memory.
+
+A protocol stack needs a mechanism of shared data. It uses the same model
+that already exists in a classic virtual machine. A user process sends data
+to the protocol stack through the native methods of java.net. A unique copy
+of java.net is owned by each bytecode process. A &quot;packet&quot; is an array of
+bytes. It is easy to send a packet within a MPCL-compatible virtual
+machine. A packet is copied from a user process to the system process, from
+the system process to a user process. The implementation of a function like
+arraycopy() of the java.lang.System class is implemented the same way no
+matter how many primordial class loaders there are.
+
+Data sharing (shared memory) is easy. Object sharing is not so easy.
+
+Objects can be shared by proxy. A proxy mechanism reduces the puzzle to
+data sharing again. State informaiton is &quot;shared&quot; -- just like
+serialization -- by encoding and decoding primatives. By proxy, the object
+&quot;type&quot; remains the same even though the &quot;class&quot; can be different. A class
+is an implementation of a type. Each class must be compatible with its
+type. A proxy always uses a primative, like an int or long, as a handle to
+the real object.
+
+&gt;<i>Maybe I'm missing something, but it seems to me that there needs to be a
+</I>&gt;<i>bare minimum object sharing mechanism built into the kernel / process
+</I>&gt;<i>system, so that more robust sharing models can be built up from that.  We
+</I>&gt;<i>can always make that low-level object sharing mechanism highly protected so
+</I>&gt;<i>only &quot;process 0&quot; can have access to it.  But still, there needs to be a
+</I>&gt;<i>basic, built-in system to start everything out right.
+</I>
+The protocol stack is a bare minimum data sharing mechanism. Once you have
+data sharing, you automatically get object sharing by proxy. We can run a
+standard CORBA or RMI service on top of a protocol stack. Nothing else is
+needed.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000693.html">[JOS-Arch] Static fields/object sharing</A></li>
+	<LI> Next message: <A HREF="000698.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#696">[ date ]</a>
+              <a href="thread.html#696">[ thread ]</a>
+              <a href="subject.html#696">[ subject ]</a>
+              <a href="author.html#696">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

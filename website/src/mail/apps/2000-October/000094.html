@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [pure reflection] Class consistency</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000093.html">
+   <LINK REL="Next" HREF="000095.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [pure reflection] Class consistency</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [pure reflection] Class consistency">gchii@mindspring.com</A><BR>
+    <I>Sat, 30 Sep 2000 14:27:32 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000093.html">[JOS-Apps] [pure reflection] GUI/Browser Reflection</A></li>
+        <LI> Next message: <A HREF="000095.html">[JOS-Apps] [bulkmake] Release 4</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#94">[ date ]</a>
+              <a href="thread.html#94">[ thread ]</a>
+              <a href="subject.html#94">[ subject ]</a>
+              <a href="author.html#94">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Sometimes classes are not stored in a directory (folder) consistent with
+their package name. A package name is embedded in a class file. Pure
+reflection is useful to get a package name from a class file, like this:
+
+  // converts a class name (cn) to a package name (pn).
+  public String cn2pn( String cn ) {
+    if ( cn == null ) {
+      return null;
+    }
+    int pos = cn.lastInstanceOf( &quot;.&quot; );
+    /* *L!
+    if ( pos &lt; 0 ) {
+      return &quot;&quot;;
+    }
+    */
+    return cn.substring( 0, pos );
+  }
+  // convert from package name (pn) to package directory (pf)
+  public String pn2pf( String pn ) {
+    if ( pn == null ) {
+      return null;
+    }
+    return pn.replace( '.', File.separator.charAt( 0 ) );
+  }
+
+A typical class loader converts a class name to a package name and then
+from a package name to a directory name. For example, the
+org.jos.demo.DemoApplet class file is consistently stored in a directory
+called org/jos/demo. Otherwise, a class file is inconsistent with its
+package. An inconsistent class file cannot be used by a typical class loader.
+
+To check the consistency of your classes, you might load a class file and
+check the package against what the package should be.
+
+For example, /usr/local/shared/org/jos/demo/DemoApplet.class is a class
+file. By loading the class, any of the following packages would be consistent:
+
+usr.local.shared.org.jos.demo
+local.shared.org.jos.demo
+shared.org.jos.demo
+org.jos.demo
+jos.demo
+demo
+
+
+Using pure reflection, the DemoApplet.class file is loaded. The class name
+is converted to a package name and then to a package directory. If the
+original directory name &quot;ends with&quot; the package directory, the class is
+consistent. Otherwise, the .class file is probably in the wrong directory.
+
+The getThisClassName() method returns &quot;org.jos.demo.DemoApplet&quot;. Passing
+this to cn2pn() returns &quot;org.jos.demo&quot;. In turn, passing this to pn2pf()
+returns &quot;org/jos/demo&quot; (platform-specific). In this case, the package is
+consistent because &quot;/usr/local/shared/org/jos/demo&quot; ends with &quot;org/jos/demo&quot;.
+
+Note: Pure reflection for Java should be used by the erica tool to make
+sure classes are consistent before adding them to a package file. The erica
+tool is part of the ERIC subproject.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000093.html">[JOS-Apps] [pure reflection] GUI/Browser Reflection</A></li>
+	<LI> Next message: <A HREF="000095.html">[JOS-Apps] [bulkmake] Release 4</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#94">[ date ]</a>
+              <a href="thread.html#94">[ thread ]</a>
+              <a href="subject.html#94">[ subject ]</a>
+              <a href="author.html#94">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

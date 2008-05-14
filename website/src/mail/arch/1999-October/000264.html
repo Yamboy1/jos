@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] JOS NC vs. PC</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000264.html">
+   <LINK REL="Next" HREF="000265.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] JOS NC vs. PC</H1>
+    <B>digigod@earthling.net</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] JOS NC vs. PC">digigod@earthling.net</A><BR>
+    <I>Wed, 27 Oct 1999 14:33:50 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000264.html">[JOS-Arch] JOS NC vs. PC</A></li>
+        <LI> Next message: <A HREF="000265.html">[JOS-Arch] Package status</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#264">[ date ]</a>
+              <a href="thread.html#264">[ thread ]</a>
+              <a href="subject.html#264">[ subject ]</a>
+              <a href="author.html#264">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Did you intend to post this to the <A HREF="mailto:arch@jos.org">arch@jos.org</A> list? I think you sent it
+</I>&gt;<i> directly to me.
+</I>
+I think you are right, sorry about that (getting used to new mail software...)
+ 
+&gt;<i> &gt;it should return dependencies also, that way you can download everything
+</I>&gt;<i> &gt;you need without having to know what you need...
+</I>&gt;<i> 
+</I>&gt;<i> Always starting from the bottom, I am building only the most basic bytecode
+</I>&gt;<i> service. It does not automatically return dependencies, and here is why.
+</I>&gt;<i> 
+</I>&gt;<i> 1. A bytecode service cannot anticipate the purpose of a request. It cannot
+</I>&gt;<i> determine the intent of a requestor. Sure, a package is typically
+</I>&gt;<i> downloaded for the purpose of resolving. And yes, a custom class loader is
+</I>&gt;<i> a frequest requestor. On the other hand, when bytecode services are daisy
+</I>&gt;<i> chained, one service must make a simple request to another service.
+</I>&gt;<i> 
+</I>&gt;<i> 2. Determining dependencies makes an application service more complex. A
+</I>&gt;<i> bytecode service provides the package requested and only the package
+</I>&gt;<i> requested. At the primative level, the client-side is always responsible
+</I>&gt;<i> for resolving classes and their dependencies.
+</I>
+on the other hand if you wait until the package is needed you'll slow the application down, if each package was stored in an XML file (not the package itself but its name location and dependencies) you could A) let the server be told what the dependices are rather then having to divine them with a pure-reflector and B) you wouldn't have to force the dependices on the downloader just list them and let them worry about it... 
+
+but from what your saying that would be in a later version anyway...
+ 
+&gt;<i> 3. Good class design puts tightly coupled classes in a single package. When
+</I>&gt;<i> a request is made for a package, all of the classes in a package are
+</I>&gt;<i> transferred across a connection. An application becomes efficient when
+</I>&gt;<i> classes are organized properly into reusable packages, and should be.
+</I>
+not that you can expect everyone to do that (SUN still has some problems with it)
+ 
+&gt;<i> A more advanced bytecode cache is possible. A full-blown application
+</I>&gt;<i> service might be able to respond to an explicit dependency request:
+</I>&gt;<i> 
+</I>&gt;<i> DEPENDENCY &lt;package-name&gt; PACKAGE/1e CR
+</I>&gt;<i> CR
+</I>&gt;<i> 
+</I>&gt;<i> When a service receives a depency request, it would be helpful to (1) list
+</I>&gt;<i> the name of each package and (2) the size of each package.
+</I>&gt;<i> 
+</I>&gt;<i> Eventually, a bytecode service must embrace multiple Java platforms. A
+</I>&gt;<i> bytecode cache must be able to provide the platform information for each
+</I>&gt;<i> package. When a custom class loader on a Java 3 Platform makes a request,
+</I>&gt;<i> the bytecode service should serve up only Java 3 Platform-compatible
+</I>&gt;<i> bytecode. A request for a list of all packages might look something like this:
+</I>&gt;<i> 
+</I>&gt;<i> LIST CR
+</I>&gt;<i> CR
+</I>&gt;<i> 
+</I>&gt;<i> The bytecode cache might respond with a list of each package and the
+</I>&gt;<i> implementations it can serve.
+</I>&gt;<i> 
+</I>&gt;<i> &lt;package-name&gt; +0
+</I>&gt;<i> &lt;package-name&gt; +1 +2
+</I>&gt;<i> &lt;package-name&gt; +3 +3d
+</I>&gt;<i> 
+</I>&gt;<i> &quot;+&quot; - only Java n is available; but, it is upward-compatible
+</I>&gt;<i> &quot;-&quot; - package is not compatible with platform n.
+</I>&gt;<i> &quot;d&quot; - a suffix of d is a debug version of a package.
+</I>&gt;<i> 
+</I>&gt;<i> When more than one version is listed, a separate package for each version
+</I>&gt;<i> is available.
+</I>
+I like the idea, but have been thinking we should use XML for our protocols; instead of what you wrote it would look like:
+
+&lt;Packages&gt;
+ &lt;Package Name=&quot;pname&quot;&gt;
+  &lt;Version Upward=&quot;0&quot;/&gt;
+ &lt;/Package&gt;
+ &lt;Package Name=&quot;pname&quot;&gt;
+  &lt;Version Upward=&quot;1&quot;/&gt;
+  &lt;Version Upward=&quot;2&quot;/&gt;
+ &lt;/Package&gt;
+ &lt;Package Name=&quot;pname&quot;&gt;
+  &lt;Version Upward=&quot;3&quot;/&gt;
+  &lt;Version Upward=&quot;3&quot; DEBUG/&gt;
+ &lt;/Package&gt;
+&lt;/Packages&gt;
+
+thats of course formated for readability, it could return the whole thing as one line. but thats my point using XML streams allow fast parsing and code reusability/extensibility, all you have to do is save it to a file and slap on .xml to log it and it adds some extra standardization.
+
+I'm not saying you have to do that now, mind you...
+ 
+&gt;<i> &gt;maybe it should be a resource cache, it would need to store stuff like
+</I>&gt;<i> &gt;the media a package/application needs. it could even cache &quot;live&quot;
+</I>&gt;<i> &gt;resources like sockets (for the OS, it shouldn't store them for an
+</I>&gt;<i> &gt;application; to risky)
+</I>&gt;<i> 
+</I>&gt;<i> Again, I'm building a cache limited to bytecode. I have ignored all other
+</I>&gt;<i> digital resources, including images, property files, and &quot;live&quot; objects.
+</I>&gt;<i> When I get the bytecode cache working, I can think about using its parts to
+</I>&gt;<i> build an HTTP service. Wouldn't an HTTP service be able to serve up lots of
+</I>&gt;<i> other digital resources?
+</I>
+I think this should be built on top of the HTTP service (framework?) so people can use the HTTP sans classloader baggage.
+ 
+&gt;<i> Do you think it might be possible to by-pass a bytecode service and use an
+</I>&gt;<i> HTTP service for package files? When package files are stored on my HTTP
+</I>&gt;<i> service, along with HTML/XML files and graphic images, my custom class
+</I>&gt;<i> loader has been able to download them. Unfortunately, it remains
+</I>&gt;<i> unfinished. My configuration of a HTTP-based custom class loader looks
+</I>&gt;<i> something like this:
+</I>&gt;<i> 
+</I>&gt;<i> url=<A HREF="http://dmrquest.com/jpkg">http://dmrquest.com/jpkg</A>
+</I>
+couldnt get it to work.
+
+&gt;<i> Each class requested by the JVM is handled by my custom class loader. It
+</I>&gt;<i> looks in its local cache. If the package is in the local cache, it is used
+</I>&gt;<i> -- without contacting the HTTP service.
+</I>&gt;<i> 
+</I>&gt;<i> That is my original problem which I could not solve. Using HTTP and
+</I>&gt;<i> java.net.URL, how does a program perform a conditional download -- asking
+</I>&gt;<i> the HTTP service to compare the timestamp on a local file with the file on
+</I>&gt;<i> the HTTP service? I was thinking that my program reads the timestamp off
+</I>&gt;<i> the local file and sends it to the HTTP service. But how? Where do you
+</I>&gt;<i> *put* the timestamp in a java.net.URL?
+</I>
+I think your problem is java.net.URL, theres some HTTP thing (I haven't had do anything with it recently, a bit fuzzy...) that you can request the timestamp of a file on the server, but I think you have to design your own protocol handler to access it (again, not sure).
+
+Now that I'm thinking about it, why not have an XML-based metaprotocol... that way its easily extended by any application by adding more markup, as I said before XML-streams are a great way to communicate...
+
+XMTP (eXtensible Markup Transfer Protocol)?
+
+Cheers,
+DigiGod
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+----------------------------------------------------------------
+Get your free email from AltaVista at <A HREF="http://altavista.iname.com">http://altavista.iname.com</A>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000264.html">[JOS-Arch] JOS NC vs. PC</A></li>
+	<LI> Next message: <A HREF="000265.html">[JOS-Arch] Package status</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#264">[ date ]</a>
+              <a href="thread.html#264">[ thread ]</a>
+              <a href="subject.html#264">[ subject ]</a>
+              <a href="author.html#264">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

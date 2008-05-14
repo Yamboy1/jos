@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000623.html">
+   <LINK REL="Next" HREF="000624.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 18 May 2000 12:40:58 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000623.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+        <LI> Next message: <A HREF="000624.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#611">[ date ]</a>
+              <a href="thread.html#611">[ thread ]</a>
+              <a href="subject.html#611">[ subject ]</a>
+              <a href="author.html#611">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&quot; wrote:
+
+&gt;<i> I think it would be extremely wasteful if each process had to load all
+</I>&gt;<i> it's own classes from the class library independently of the other
+</I>&gt;<i> processes.
+</I>
+The goal in this proposal was to minimise waste and at the same time
+comply with the spec. The need to resolve symbolic references is a
+performance penalty but doing I/O to load class files is a much bigger
+one (especially when reading from a jar archive). The second one can be
+solved through class definition caching (and to some extent, file level
+caching), but the first one remains because the spec requires it.
+References:
+
+	<A HREF="http://jos.org/pipermail/arch/2000-April/000449.html">http://jos.org/pipermail/arch/2000-April/000449.html</A>
+	<A HREF="http://www.metamech.com/wiki/view/Main/?topic=MultipleJavaProcesses">http://www.metamech.com/wiki/view/Main/?topic=MultipleJavaProcesses</A>
+
+In addition to computational efficiency, class definition sharing (which
+is based on class definition caching) minimises memory waste.
+
+Some more memory can be saved by doing more I/O (a tradeoff), as Gilbert
+pointed out (references?)
+
+&gt;<i> This makes it difficult to support different class libraries in the
+</I>&gt;<i> same OS but otherwise has great advantages.
+</I>
+I'd like to achieve both. True, it does mean not much can be done to
+remove the cost of resolution per process, but IMHO conforming with the
+spec is better (and the cost is not too great - it is at least much
+faster than the class loading process of a typical JVM).
+
+We can only wait and see if it actually works - I suspect the
+performance will be significantly faster than a standard JVM.
+
+(An additional note, interaction between 'ls', 'grep' and 'wc' does not
+necessarily need to involve multiple processes. The equivalent of this
+in an object oriented context might be the interaction of Java beans
+which need not be in separate processes. In this case, the same class
+loader is used and the resolution process is not an issue)
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000623.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+	<LI> Next message: <A HREF="000624.html">[JOS-Arch] [vm efficiency] &quot;Reloading&quot; classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#611">[ date ]</a>
+              <a href="thread.html#611">[ thread ]</a>
+              <a href="subject.html#611">[ subject ]</a>
+              <a href="author.html#611">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

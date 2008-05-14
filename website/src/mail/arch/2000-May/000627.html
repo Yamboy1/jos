@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000626.html">
+   <LINK REL="Next" HREF="000628.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs">ryan@whitewolf.com.au</A><BR>
+    <I>Fri, 19 May 2000 21:28:08 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000626.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+        <LI> Next message: <A HREF="000628.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#627">[ date ]</a>
+              <a href="thread.html#627">[ thread ]</a>
+              <a href="subject.html#627">[ subject ]</a>
+              <a href="author.html#627">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Peter Donald wrote:
+&gt;<i> 
+</I>&gt;<i> Hi,
+</I>&gt;<i> 
+</I>&gt;<i> Just joined the list if I say something stupid ignore me :P.
+</I>
+not stupid on all points!
+
+&gt;<i> There is also an arguement for allowing a single user to have multiple
+</I>&gt;<i> permission sets depending on a number of factors. For example, source of
+</I>&gt;<i> code is an important factor
+</I>
+We think alike here. I have experimented with a number of security ideas
+with rheise.os, most derived from research I did a year ago. I see two
+ways of controlling running code:
+
+1. Privileges based on what code is running. Permissions are associated
+with code through a policy file.
+
+2. Privileges based on what thread is running.
+
+(1) is introduced by Sun in JDK 1.2. (2) is provided by rheise.os and
+depends on (1). For a description of (2), you might want to check out:
+
+	<A HREF="http://www.progsoc.uts.edu.au/~rheise/jos/jos-security.html">http://www.progsoc.uts.edu.au/~rheise/jos/jos-security.html</A>
+
+which is my original paper, way out of date now with respect to
+rheise.os. The terminology is certainly different, so please make any
+comments based on the rheise.os source code. UserDomain is now called
+UserThreadGroup, per thread permission sets are now granted through
+UserTokens which are associated with a user and a permission set.
+
+Since that paper is out of date, I will try to explain the main concepts
+as they exist today.
+
+At the most basic level, a process and all threads within it are
+associated with what I call a UserToken. That UserToken gives threads a
+set of permissions based on the User for that UserToken. You can request
+a UserToken from the system for a particular user and start executing
+code on behalf of that user. There are two ways to ask for a UserToken:
+
+UserToken SecuritySystem.assumeUser(User user)
+UserToken SecuritySystem.assumeUser(User user, Credentials credentials)
+
+In the first approach, no credentials are given, so the extent of what
+you can do as that new user is limited to what the policy file says your
+code is able to do as that user without knowing that user's password.
+
+In the second approach, valid credentials mean that the resulting
+UserToken will have the full privileges of that User. This is the method
+you would use to implement the login program, for example.
+
+When you create a new process, by default the UserToken for that process
+is inherited from the parent process. When you create a new Thread
+within a process, the UserToken is inherited from the parent
+ThreadGroup. In fact, the implementaiton details are such that
+UserTokens are only associated with ThreadGroups (only they have the
+parent/child concept).
+
+When all threads inherit the UserToken from the main thread group, what
+you have is a standard process. When you create a subthread with a new
+UserToken, you have a powerful way to implement servers such as mail
+transfer agents, ftp servers, and anything else that needs to be able to
+write to certain files owned by each user. Sendmail needs to be able to
+write to /var/spool/mail/ryan, but it should not be able to write to
+/home/ryan/.bashrc. On UNIX, Sendmail must be root so that it can do
+everything, even though it should only be able to do a little bit as
+each user. Not surprisingly there have been many security holes in
+Sendmail over the years that allow people to gain unauthorised access to
+the root account!
+
+The goal of the UserToken is that a process can only gain the subset of
+permissions of another user it needs to do its job.
+
+(For an explanation of why threads running as different users in the
+SAME process is safe, please read the out of date paper)
+
+&gt;<i> &gt;This means it would be useful to invent something to contain a servlet.
+</I>&gt;<i> &gt;It could be a threadless process (contradiction?), or it could be
+</I>&gt;<i> &gt;something else.
+</I>&gt;<i> 
+</I>&gt;<i> How about something like unix su command that changes the permissions of
+</I>&gt;<i> running process to appropriate individual. The permissions could then be
+</I>&gt;<i> changed back after that particular servlet had serviced it's client.
+</I>
+Ideally, different code or threads running as different users could
+coexist without having to switch back and forth. With threads it's
+actually necessary because two threads run at the same time - su will
+require state information per thread. With &quot;different code&quot;, su could
+handle that so long as it switched back on exiting, but a more elegant
+solution exists which is provided by sun (ProtectionDomains) so we don't
+need to think about that aspect. The other issues to do with these
+threadless processes(?) remain.
+
+A point about su (well, setuid()), it useful in its own right, and there
+is an equivalent of this in rheise.os called setUserToken().
+
+&gt;<i> * JIT either is forced to only optimise code that is inside class but can
+</I>&gt;<i> never inline code from other classes. For instance if in class A you use
+</I>&gt;<i> String objects. The method calls can never be inlined because another
+</I>&gt;<i> process may load a different version of String.
+</I>
+This comment is relevant to the implications of sharing class
+definitions between processes (correct?)
+
+I think you have stumbled across something very important here. We made
+a similar oversight with superclasses where if the superclass
+definitions were different, interprocess object sharing would be
+invalid. We discovered that when we share class definitions between
+processes, we must also ensure that the corresponding super class
+definitions are also shared with eachother (thanks Matt Albrecht!).
+
+If we ensure a similar thing for all symbolic references, then we can
+ensure that it is safe to inline code from other classes. HOWEVER,
+ensuring this for all symbolic references is something I was hoping to
+avoid because if just one class definition is different, a whole
+interconnection of classes (probably the entire process) will not be
+able to share their class definitions (all or nothing) meaning we lose
+the advantage of saving memory. Instead I was hoping such
+incompatibilities could be detected on the fly rather than ensuring they
+are ok at link time.
+
+So, we have two options:
+
+1. Ensure all symblic references share class definitions, or no class
+definitions may be shared. This /may/ be ok if it turns out that it is
+only rarely the case that the interconnection of classes don't entirely
+match another process. In this case, we can live with the small loss in
+memory saving opportunity.
+
+2. Check these referenced class definitions on the fly. If we want to
+inline code, invent some way to maintain different inlined versions for
+each process (more specifically, each (primordial) class loader).
+Difficult... That is a generic statement of the problem so there will be
+many ways to achieve the desired result. Some focused on performance,
+and some focused on memory. In the end (if we pursue this direction) we
+may fuse the best ideas developed on both sides.
+
+Are there any other options? If we ignore inlining in the short term,
+either way is just as easy to implement, and just as effective. This
+means we have plenty of time to work out how to do (2) with inlining. If
+we haven't worked anything out by then, (1) will always work.
+
+(_Quinn, how do things look from down in the JVM trenches? You'd
+probably have the best idea of how this inlining problem can be solved)
+
+&gt;<i> Thus you only really end up sharing the raw bytecode and constant pool
+</I>
+This is one solution for option (2) to support inlining. It's advantages
+include that it has optimal runtime performance. It's disadvantages
+include that it requires much more memory.
+
+Thanks for pointing this out!
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000626.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+	<LI> Next message: <A HREF="000628.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#627">[ date ]</a>
+              <a href="thread.html#627">[ thread ]</a>
+              <a href="subject.html#627">[ subject ]</a>
+              <a href="author.html#627">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000537.html">
+   <LINK REL="Next" HREF="000536.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">gchii@mindspring.com</A><BR>
+    <I>Mon, 01 May 2000 10:22:50 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000537.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000536.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#528">[ date ]</a>
+              <a href="thread.html#528">[ thread ]</a>
+              <a href="subject.html#528">[ subject ]</a>
+              <a href="author.html#528">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 01:13 PM 5/1/00 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+&gt;<i>The bytecode cache idea loses out on three things:
+</I>&gt;<i>
+</I>&gt;<i>1. it must retain the original payload of the class file
+</I>&gt;<i>2. it must always read the class data from disk or network when defining
+</I>&gt;<i>a class.
+</I>&gt;<i>3. it must always do a byte for byte comparison to ensure class
+</I>&gt;<i>definition sharing is valid.
+</I>
+1. Yes, a bytecode cache must retain the original payload. This means that
+a class definition can point to the original Code attribute of a method,
+rather than copy it. It means a class definition can point to the original
+class access, field access and method access, not copy it.
+
+A class definition cache must retain something, a conversion of the
+original payload to something else. A class definition might make a copy of
+Code attributes for each method. This means a class definition may require
+multiple calls to alloc(), one for each Code attribute.
+
+2. No, not at all. When defining a class, a bytecode cache has little to do
+with a disk or network. A bytecode cache is plugged into the
+ClassLoader.defineClass() method. It does not know and does not care where
+the payload came from. It works across the board for both primordial and
+custom class loaders.
+
+A bytecode cache may or may not be virtualized. A virtual bytecode cache is
+connected to a swap partition, like virtual memory. If a bytecode cache is
+connected to a swap partition on a local or remote machine, it uses a disk
+or network after a class has been defined by ClassLoader.defineClass(). A
+virtual cache can discard all of the class definitions that are not being
+used.
+
+3. Not exactly. If the payload is retained, a byte-for-byte comparison of
+one payload to another is the most efficient comparison I can think of. But
+the implementation of the comparison operator is left up to the
+implementor. If there is a safer or faster way to compare two class
+definitions, find it and use it.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000537.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000536.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#528">[ date ]</a>
+              <a href="thread.html#528">[ thread ]</a>
+              <a href="subject.html#528">[ subject ]</a>
+              <a href="author.html#528">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: [JOS] Concerning the registry...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000011.html">
+   <LINK REL="Next" HREF="000013.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: [JOS] Concerning the registry...</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Re: [JOS] Concerning the registry...">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 10 Jun 1999 14:27:17 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000011.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+        <LI> Next message: <A HREF="000013.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#12">[ date ]</a>
+              <a href="thread.html#12">[ thread ]</a>
+              <a href="subject.html#12">[ subject ]</a>
+              <a href="author.html#12">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Al wrote:
+&gt;<i> 
+</I>&gt;<i> Ryan Heise wrote:
+</I>&gt;<i> 
+</I>&gt;<i> &gt; I do see the advantage in having a
+</I>&gt;<i> &gt; more organised system of storing per user preferences - perhaps each
+</I>&gt;<i> &gt; user can have their own &quot;application preferences&quot; registry.
+</I>&gt;<i> 
+</I>&gt;<i> True, each application could use the registry classes, since they are
+</I>&gt;<i> part of &quot;org.jos&quot; and not &quot;jos.*&quot; But if the applications are written
+</I>&gt;<i> specifically for JOS, such as the system, the GUI managers, the system
+</I>&gt;<i> applications (defrag tools, monitors, etc.), then these applications can
+</I>&gt;<i> utilize a standard JOS registry - merely an instance of
+</I>&gt;<i> org.jos.registry.RegistryServer.
+</I>
+Although applications written specifically for JOS wouldn't
+automatically use the global registry. For example GUI managers would
+still use per user registries so that each user can configure the GUI
+manager how they want. But the GUI manager could read a subset of its
+configuration from a global registry if it makes sense to.
+
+&gt;<i> &gt; Do you have an ideas of what might be stored in the global registry?
+</I>&gt;<i> 
+</I>&gt;<i> Yes, actually, I started developing the registry because I had found out
+</I>&gt;<i> that my own applications (non related to JOS) would naturally need to
+</I>&gt;<i> use certain configuration files. I found the method of INI files in
+</I>&gt;<i> Windows very disturbing, since they are slow and need access to the disk
+</I>&gt;<i> hardware, and fragment the disk, etc. I also realized that some settings
+</I>&gt;<i> are common, such as Look &amp; Feel preferences, custom commands, network
+</I>&gt;<i> settings (such as suggested speed and buffering size and methods), etc.
+</I>&gt;<i> 
+</I>&gt;<i> I believe that JOS will also need a lot of these preferences, settings
+</I>&gt;<i> and configuration information, and a neat place to do that is the
+</I>&gt;<i> registry. Don't get me wrong, I call this API &quot;registry&quot; because it
+</I>&gt;<i> began as a form of registry, but in reality, it is a structured,
+</I>&gt;<i> tree-like, OO database, with hierarchies and data types and algorithms
+</I>&gt;<i> for searching, replacing, recursion, etc. The API can be used in many
+</I>&gt;<i> other ways, even in GUI managers (layers, etc.)
+</I>
+I see the advantage of handling configuration data in a more structured
+way. My only concern has been that a single registry that is used by
+multiple applications can possibly grow out of control. There at least
+needs to be a way to clearly see what applications depend on what parts
+of the registry, and which data is shared between multiple applications.
+
+&gt;<i> Of course, the registry will use ACLs. The point is that I do not know
+</I>&gt;<i> if these things should be in the registry itself, or in the policy file,
+</I>&gt;<i> in the form of:
+</I>&gt;<i> 
+</I>&gt;<i> RegistryPermission (&quot;read, write, list&quot;, &quot;//system/config/entry&quot;);
+</I>
+Need there be a difference between &quot;read&quot; and &quot;list&quot;? Also, don't forget
+to specify who the permission is granted to.
+
+&gt;<i> Well, the registry is merely a place to store information. If we deem
+</I>&gt;<i> more appropriate to use dedicated replication services, then so be it.
+</I>
+Ok.
+
+&gt;<i> &gt; Another point is that if the registry runs as a server, does each user
+</I>&gt;<i> &gt; have to run their own server for their &quot;application preferences&quot;
+</I>&gt;<i> &gt; registry?
+</I>&gt;<i> 
+</I>&gt;<i> In the same way many things in JOS should be, that is, servers. If not
+</I>&gt;<i> servers, then Servlets. Hmm... FileSystemServlet, RegistryServlet,
+</I>&gt;<i> sounds nice.
+</I>
+On a system with 400 users that might bring a large overhead. I do
+believe that each repository instance should work like a server so that
+read/writes are synchronized across multiple clients, but if the server
+runs in a different address space, this will incur a performance penalty
+of having to use Sockets to talk to it.
+
+If each application has its own registry then the registry can live in
+the same address space. But I don't know if a registry for each
+application is a good idea. I hope that JOS can provide a more efficient
+IPC mechanism that effectively allows a client to talk to a server on
+the same machine as though it were in the same address space. Basically,
+if you are using RMI, then you could change the IPC mechanism to this
+more efficient mechanism without the client knowing.
+
+Then there is the issue of how long should the server be running (as a
+thread)? UNIX uses the concept of a super-server that fires up server
+processes only when they are needed. So for example, the ftp server is
+not running and consuming resources the whole time.
+
+&gt;<i> Do you think you could look into the registry security, or at least
+</I>&gt;<i> brief me in how the JOS security model will be structured, so I can
+</I>&gt;<i> blend in the registry?
+</I>
+The model that I'm working on is not necessarily &quot;the&quot; model, but I will
+try to make it meet the requirements we have at this point in time. The
+requirements of your registry will obviously help shape how security is
+modelled.
+
+&gt;<i> It would be nice for everything to use a unified
+</I>&gt;<i> security mechanism (Yeah, right! So a single hole gets the entire
+</I>&gt;<i> system! :)
+</I>
+Having a unified security mechanism would improve security IMHO. Even
+though a single hole gets the entire system, a single security system
+means a simpler security system, and the simpler it is, the more robust
+it is likely to be.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000011.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+	<LI> Next message: <A HREF="000013.html">[JOS-Arch] Re: [JOS] Concerning the registry...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#12">[ date ]</a>
+              <a href="thread.html#12">[ thread ]</a>
+              <a href="subject.html#12">[ subject ]</a>
+              <a href="author.html#12">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

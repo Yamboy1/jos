@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000185.html">
+   <LINK REL="Next" HREF="000188.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Arch] Program and ProgramContext">onewith1@flash.net</A><BR>
+    <I>Sat, 14 Aug 1999 18:17:32 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000185.html">[JOS-Arch] Application</A></li>
+        <LI> Next message: <A HREF="000188.html">[JOS-Arch] Application</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#186">[ date ]</a>
+              <a href="thread.html#186">[ thread ]</a>
+              <a href="subject.html#186">[ subject ]</a>
+              <a href="author.html#186">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Well, maybe we shouldn't have full bean support to begin with (you'll see
+why below), but its an option for a &quot;behind-the-scenes&quot; for a general
+scripting support system.
+
+Reiger Avery J wrote:
+
+&gt;<i>Matt,
+</I>&gt;<i>
+</I>&gt;<i>I had a similar idea last year, that I still want to do sometime.  I wrote
+</I>&gt;<i>about in on the old apps list, and is archived here:
+</I>&gt;<i><A HREF="http://www.eGroups.com/group/jos-apps/209.html?">http://www.eGroups.com/group/jos-apps/209.html?</A>
+</I>&gt;<i>My own priorities are to work on Processes first, then this.  We can always
+</I>&gt;<i>do requirements, though!
+</I>&gt;<i>
+</I>&gt;<i>Is it about what you were thinking of, or more limited, or even more
+</I>&gt;<i>powerful?  Is there a way that we can simplify the interface for such a GUI
+</I>&gt;<i>scripter so that it is even more powerful, or is the wiring pardigm as
+</I>&gt;<i>powerful as a beanish interface gets?
+</I>&gt;<i>
+</I>&gt;<i>Avery J. Regier
+</I>&gt;<i>
+</I>
+
+I was more or less thinking of replacing the stdin/stdout/stderr piping with
+the beans event handling.  Sure, we can have a generic &quot;StreamListener&quot; to
+emulate standard Unix/DOS filters, but we can go beyond that.
+
+Also, instead of having just a method in a bean to call (we can have that
+too), an event driven system would allow for branching (calling one event
+instead of another).  This may help reduce some of the syntax developed in
+shells to get the same result.
+
+So, instead of (using ksh):
+(cc mycode.c -o mycode 2&gt; errlog) || (more errlog; rm errlog; exit)
+echo &quot;Compiled Ok&quot;
+
+which would output the compilation errors from the c compiler to errlog, and
+on an error would display a paged version of the errors, remove that file,
+then exit from the script.  If the compilation went ok, then the message is
+displayed.
+
+Instead, we could have (to use a made up language, which would/could
+probably be done on a visual GUI):
+let a = new ccBean()  // create a new bean interface to the compiler
+let b = new pagedStreamBean() // create a new bean which pages the output of
+its given stream, in the &quot;StreamListener&quot; event.
+let c = new echoBean( &quot;Compiled Ok&quot; ) // echos &quot;Compiled Ok&quot; to the screen
+on the event.
+a.addErrorStreamListener( b ) // set b as the StreamListener for error text
+a.addErrorListener( b ) // set b as the &quot;next event&quot; to be called when an
+error happens
+a.addSucceedListener( c ) // set c as the successful &quot;next event&quot; listener.
+run a // or whatever we decide on to execute the bean
+
+Ok, sure, I added a *ton* of typing to a simple command line, and I had to
+really think about how to chain it together.  If I had to do this scripting
+full time, I would need to know the methods of my beans before I script,
+which would be like looking at the JDK documents all the time.  But then,
+I've never typed bean-script before (I doubt that very many people have :),
+and this is a off-the-top-of-my-head language.
+
+So, maybe this isn't the way to go.  But perhaps we can generalize this so
+that it can be a framework from which any scripting language is tied to.
+Perhaps.  That's why this is still under Arch.
+
+-Matt
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000185.html">[JOS-Arch] Application</A></li>
+	<LI> Next message: <A HREF="000188.html">[JOS-Arch] Application</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#186">[ date ]</a>
+              <a href="thread.html#186">[ thread ]</a>
+              <a href="subject.html#186">[ subject ]</a>
+              <a href="author.html#186">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

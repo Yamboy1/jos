@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Approaches to Object Sharing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000677.html">
+   <LINK REL="Next" HREF="000681.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Approaches to Object Sharing</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Approaches to Object Sharing">ryan@whitewolf.com.au</A><BR>
+    <I>Fri, 26 May 2000 14:00:11 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000677.html">[JOS-Arch] Static fields/object sharing</A></li>
+        <LI> Next message: <A HREF="000681.html">[JOS-Arch] Approaches to Object Sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#679">[ date ]</a>
+              <a href="thread.html#679">[ thread ]</a>
+              <a href="subject.html#679">[ subject ]</a>
+              <a href="author.html#679">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Sean D Cribbs wrote:
+
+&gt;<i> For perspective, one might look at
+</I>&gt;<i> Serialization, which is, in a way, a method of sharing
+</I>&gt;<i> objects.
+</I>
+There are some differences. Consider that object sharing is intended as
+a means of collaboration between two or more processes. In the OO sense,
+the ultimate in collaboration is the interaction between objects (where
+an object groups methods and data). Unfortunately, serialization focuses
+only on the data part of an object, and is therefore closer to message
+passing where you can pass data objects between two processes by
+serializing them. Once an object is deserialized, invoking a method on
+it does not allow you to interact with the other process, it only allows
+you to access or operate on the data that was sent to you.
+
+This doesn't mean message passing hasn't been proven to be useful. It
+has. But in an object-oriented operating system we can aim much higher.
+
+That said, you're right in that serialization may give us some
+perspective on the matter. The interesting thing is what to do with
+statics and method calls. Serialization means to restrict the full use
+of statics and method calls, focussing only on the data in the object.
+As a result, we have message passing. Interestingly, we found exactly
+the same restrictions in the discussion on how to resolve symbolic
+references in true shared objects (in the case that we use the class
+loader of the calling thread). More interestingly, in both cases this
+restriction occurred because we were trying to pretend that the shared
+object belonged to the borrowing process.
+
+There are typically two ways to overcome these restrictions. One is
+through direct sharing (with proper object ownership), and the other is
+through proxies (RMI uses proxies to provide &quot;almost&quot; complete method
+interaction support across processes, and serialization to pass data
+arguments to those methods, although RMI could use direct sharing as
+well (on a single machine) if we implemented that as a primitive in the
+operating system (*) ).
+
+Both direct sharing and proxies have advantages. In terms of elegance,
+direct sharing allows true object interaction, meaning that standard OO
+programming techniques are not affected in any way. Proxies can provide
+a solution that looks &quot;close&quot; to true object interaction, but anyone who
+has used RMI will have noticed certain visible difference with proxies
+that are hard to ignore.
+
+On the other hand, proxies provide an easy way to deal with process
+termination and cleanup because processes are completely separated from
+each other. This is not to say that cleanup after termination cannot be
+done with a direct sharing model (I have several incomplete ideas), but
+proxies certainly provide a way not to have to deal with the problem at
+all.
+
+I don't want to discourage further research on proxies, but I should at
+least make those interested aware of some of the issues I found when I
+was researching proxies.
+
+Simply adding a level of indirection (like weak references) is not
+sufficient to ensure that processes remain separate. So things like this
+won't work:
+
+class SharedObject
+	{
+	Object get();
+	void put(Object o);
+	}
+
+This would work if the client always called
+sharedObject.get().someMethod() to maintain the indirection, but a
+programmer can always call sharedObject.get() and keep a hold of the
+value.
+
+What we can conclude from this is that for proxies to work, the client
+process MUST NOT be able to obtain a reference to the real object in the
+server process. This means that a proxy class must redefine all the
+public methods of the real class, and have them forward method
+invocations to the corresponding object in the server process. This is
+what RMI does, although it makes it easier by providing a compiler that
+can generate the proxy classes for you. It is conceivable that such
+proxies could even be generated at runtime in our case by constructing
+the byte array on the fly according to the class file format, and
+defining a runtime class from it. Still, you have the same problem with
+method arguments that you do with RMI. If you serialize them, it does
+the client no good if the server updates the state of the method
+argument objects. If you want complete object-oriented style
+interaction, you need to even generate proxies for these method
+arguments.
+
+Since about a month ago, I diverted my attention to using direct object
+sharing instead. It has its own share of issues, but they are more
+subtle. Restricting access to shared objects is fairly easy to deal
+with. Process cleanup is quite complicated (note that the host
+implementation of rheise.os intentionally handles process cleanup the
+wrong way because it cannot do it the right way. This not a problem with
+my design - the native implementation will do things the/a right way).
+The more difficult issue has to do a process not being able to be
+cleaned up and garbage collected until all other processes let go of its
+shared objects. One approach which I have already mentioned is to
+reassign ownership of shared objects to a third party (a shared object
+broker) so that the initial process can terminate freely. There are also
+subtle issues with this (which I think I may have worked out, but I'm
+still thinking on it), but my latest thoughts lead me to believe that a
+third party may not be required at all (although it would be a good
+design choice in many applications).
+
+I hope now I have made clear that proxies are not required, or at least
+they have not been proven to be required yet. There are many issues
+surrounding shared objects, but there is much to be gained from them if
+we can overcome these issues, and that means being able to consider
+possibilities that at first seem impossible.
+
+(*) since the behaviour of such an implementation of RMI would be
+different from a proxy based one (it would allow you to do more things),
+the side effects should probably be clearly documented for that
+implementation, ie. you get faster object sharing, but remember that
+this is real object interaction - clients are not dealing with a copy,
+they are dealing with the real thing. While normal software applications
+are designed with this in mind, existing RMI applications might not be.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000677.html">[JOS-Arch] Static fields/object sharing</A></li>
+	<LI> Next message: <A HREF="000681.html">[JOS-Arch] Approaches to Object Sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#679">[ date ]</a>
+              <a href="thread.html#679">[ thread ]</a>
+              <a href="subject.html#679">[ subject ]</a>
+              <a href="author.html#679">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

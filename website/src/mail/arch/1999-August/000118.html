@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Proposing archive: protocol</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000103.html">
+   <LINK REL="Next" HREF="000123.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Proposing archive: protocol</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Proposing archive: protocol">digigod@earthling.net</A><BR>
+    <I>Fri, 06 Aug 1999 07:39:06 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000103.html">[JOS-Arch] Proposing archive: protocol</A></li>
+        <LI> Next message: <A HREF="000123.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#118">[ date ]</a>
+              <a href="thread.html#118">[ thread ]</a>
+              <a href="subject.html#118">[ subject ]</a>
+              <a href="author.html#118">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> The RFC says that the client agent must be responsible for the fragment
+</I>&gt;<i> part. By using the fragment for a URI pipe, the client agent must be
+</I>&gt;<i> responsible for the entire pipe. I like that.
+</I>&gt;<i> 
+</I>&gt;<i> I have tried to use the fragment part to create an embedded URI. It works
+</I>&gt;<i> up to a point. Using the fragment provides compatible syntax, but
+</I>&gt;<i> semantically produces entirely wrong results. A client agent that's unaware
+</I>&gt;<i> of the extended syntax would return an archive, instead of throwing an
+</I>&gt;<i> exception.
+</I>&gt;<i> 
+</I>&gt;<i> The fragment part may itself be embedded in a URI. I am unable to come up
+</I>&gt;<i> with an example. The closest thing is the x-registry scheme. It uses the
+</I>&gt;<i> fragment to locate a sub-registry within a larger registry. If we want to
+</I>&gt;<i> pipe a registry to some other scheme, the fragment has already been used.
+</I>
+x-registry:archive:<A HREF="http://www.jos.org/registry.jar#/xml-registry#/system/toggles/sound">http://www.jos.org/registry.jar#/xml-registry#/system/toggles/sound</A>
+
+with spaces:
+
+x-registry: archive: <A HREF="http://www.jos.org/registry.jar">http://www.jos.org/registry.jar</A> #/xml-registry
+#/system/toggles/sound
+
+shown hierarchially split:
+
+x-registry: 
+ archive: 
+  <A HREF="http://www.jos.org/registry.jar">http://www.jos.org/registry.jar</A>
+ #/xml-registry
+#/system/toggles/sound
+
+first we do http, so:
+
+<A HREF="http://www.jos.org/registry.jar">http://www.jos.org/registry.jar</A>
+
+then archive:
+
+archive:...#/xml-registry
+
+then x-registry:
+
+x-registry:...#/system/toggles/sound
+
+it would require a smart parser to figure this out, so maybe it is
+better to use identifiers, how about []'s doesnt mess up XML/HTML
+
+x-registry:[archive:[<A HREF="http://www.jos.org/registry.jar]#/xml-registry]#/system/toggles/sound">http://www.jos.org/registry.jar]#/xml-registry]#/system/toggles/sound</A>
+
+seems to work
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000103.html">[JOS-Arch] Proposing archive: protocol</A></li>
+	<LI> Next message: <A HREF="000123.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#118">[ date ]</a>
+              <a href="thread.html#118">[ thread ]</a>
+              <a href="subject.html#118">[ subject ]</a>
+              <a href="author.html#118">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

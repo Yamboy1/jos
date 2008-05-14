@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] GSI</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000220.html">
+   <LINK REL="Next" HREF="000201.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] GSI</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] GSI">digigod@earthling.net</A><BR>
+    <I>Mon, 30 Aug 1999 12:09:43 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000220.html">[JOS-Arch] GSI</A></li>
+        <LI> Next message: <A HREF="000201.html">[JOS-Arch] Source-Doc vs. JavaDoc</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#221">[ date ]</a>
+              <a href="thread.html#221">[ thread ]</a>
+              <a href="subject.html#221">[ subject ]</a>
+              <a href="author.html#221">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i>         Okay, we talked right by each other again.  getScriptInfo() should
+</I>&gt;<i> use reflection to return parts of its implementing class which should be
+</I>&gt;<i> exposed to the Script.  We may need/want to wrap those reflections because
+</I>&gt;<i> they're being used in a script, viz. ScriptMethod extends Element, where
+</I>&gt;<i> JavaReflectionMethod extends ScriptMethod, and includes a
+</I>&gt;<i> java.lang.reflect.Method instance (function pointer).  Then TCLMethod
+</I>&gt;<i> (etc) could extend ScriptMethod, and 'point' to whatever method it was
+</I>&gt;<i> that the script exported, in whatever fashion it wished.
+</I>
+ok, I see what your saying. But Script.Element is for reflection from
+the script to java not java to the script. that is a Scriptable wouldn't
+return arrays of Script.Elements (but a Script could generate those
+Elements--assuming support--after the Scriptable was plugged in) I mean
+I suppose it could, but that still gets into my general problem of how
+to do it generically...  But your right, reflection would be required
+for access to the Scriptable... but that should be taken care of in
+Script so the children dont have to be bothered by it and the code
+should be hidden...
+
+something like:
+
+get the Scriptables ScriptInfo...
+add the methods into the scripts namespace(?)...
+when its called do (and cache) the reflection in the background...
+
+that doesnt really get the idea across, but I cant think of how to
+better explain it
+ 
+
+&gt;<i> &gt; I read an article on a &quot;generic listner&quot; that used reflection to accept
+</I>&gt;<i> &gt; events of any type... maybe we could make our own, it'd be more generic
+</I>&gt;<i> &gt; then ScriptManager that serves the same --but broader-- purpose.
+</I>&gt;<i>         That would be the way to do it, definitely.
+</I>
+I'll have to reread the article then, I think I d'loaded the source...
+
+where would something like that go? org.jos.util.genericlistner?
+(digigod.util.genericlistner for now)
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000220.html">[JOS-Arch] GSI</A></li>
+	<LI> Next message: <A HREF="000201.html">[JOS-Arch] Source-Doc vs. JavaDoc</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#221">[ date ]</a>
+              <a href="thread.html#221">[ thread ]</a>
+              <a href="subject.html#221">[ subject ]</a>
+              <a href="author.html#221">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

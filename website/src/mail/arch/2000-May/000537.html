@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000529.html">
+   <LINK REL="Next" HREF="000528.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">ryan@whitewolf.com.au</A><BR>
+    <I>Tue, 02 May 2000 13:09:49 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000529.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000528.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#537">[ date ]</a>
+              <a href="thread.html#537">[ thread ]</a>
+              <a href="subject.html#537">[ subject ]</a>
+              <a href="author.html#537">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> 
+</I>&gt;<i> At 03:05 PM 5/1/00 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+</I>&gt;<i> &gt;&gt; But again, this is a tradeoff, and a less severe tradeoff considering
+</I>&gt;<i> &gt;&gt; that efficiency is gained most of the time through location and
+</I>&gt;<i> &gt;&gt; modification date checking.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;I should clarify this. Obviously the first time classes are loaded it is
+</I>&gt;<i> &gt;more expensive, but subsequent loads will be more efficient because they
+</I>&gt;<i> &gt;will be able to take advantage of location/date most of the time.
+</I>&gt;<i> 
+</I>&gt;<i> This efficiency should not be built into each class loader when it does not
+</I>&gt;<i> have to be. With a system-wide URL cache, this efficiency is automatic for
+</I>&gt;<i> both primordial and custom class loaders. The URL cache concentrates the
+</I>&gt;<i> optimization of downloading the same document twice, including class,
+</I>&gt;<i> archive and package files. Everybody wins.
+</I>
+You do realise that the URL cache is based on the same principles I have
+been pushing all along for class loading efficiency? That is, location
+(the URL reference itself), and *optionally* the last modified date
+which it discovers when it reads the first few bytes from the socket
+(it's the first line in the header for efficiency).
+
+I'm glad you see the benefits of this algorithm, if only at the URL
+cache level. It's the same algorithm used by the filesystem cache too
+(except in this case, the version information is *not* optional), and
+I'm sure you see the benefit here too. I am proposing that we use the
+same algorithm for determining whether a class definition is already in
+decaf's cache.
+
+You're point was, why bother when we can implement an optimisation at a
+lower level (disk and url cache) which benefits all upper layers? My
+answer is the same answer to a similar question you had about optimising
+the protocol stack to benefit all implementations of IPC in the upper
+layers. We have the potential to make things *much* faster. The lower
+level optimisations (eg. disk cache) will still be beneficial to all
+upper layers, but both direct object sharing and internal location/date
+checking (inside findSystemClass()) provide significant *additional*
+speed improvements for the parts of the system that use it.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000529.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000528.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#537">[ date ]</a>
+              <a href="thread.html#537">[ thread ]</a>
+              <a href="subject.html#537">[ subject ]</a>
+              <a href="author.html#537">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

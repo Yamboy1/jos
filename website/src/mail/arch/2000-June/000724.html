@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Getting started on AWT</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000723.html">
+   <LINK REL="Next" HREF="000727.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Getting started on AWT</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Getting started on AWT">gchii@mindspring.com</A><BR>
+    <I>Wed, 07 Jun 2000 09:50:38 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000723.html">[JOS-Arch] Getting started on AWT</A></li>
+        <LI> Next message: <A HREF="000727.html">[JOS-Arch] Getting started on AWT</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#724">[ date ]</a>
+              <a href="thread.html#724">[ thread ]</a>
+              <a href="subject.html#724">[ subject ]</a>
+              <a href="author.html#724">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:53 PM 6/6/00 -0500, &quot;Sean D Cribbs&quot; &lt;<A HREF="mailto:sean-cribbs@utulsa.edu">sean-cribbs@utulsa.edu</A>&gt; wrote:
+&gt;<i>Perhaps this topic is more appropriate for the Kernel group, but I was
+</I>&gt;<i>looking at the JOS1f dist the other day and realized that only a few more
+</I>&gt;<i>parts need to be in place in order to start working on an AWT
+</I>&gt;<i>implementation.  Is this assumption correct (Todd, Matt, Gilbert, et al)?
+</I>
+This topic is appropriate for the Architecture group, too. Some members
+feel that the AWT must be implemented as soon as possible. Some members
+feel that AWT doesn't need to be implemented at all.
+
+I always work from the bottom up. My development method includes building
+upon things that work. If it doesn't work, don't build upon it.
+
+Here is a question for this list: Should the AWT be standardized for JOS?
+If so, why?
+
+How do we write AWT without a memory manager?
+
+&gt;<i>The first AWT implementation may be simply VGA 640x480x16, but the only
+</I>&gt;<i>things that seem to be missing are hooks for the keyboard and mouse input.
+</I>&gt;<i>Or is there more work to be done that I just have not comprehended yet?
+</I>&gt;<i>Anyway, I believe that a simple and limited implementation is better than
+</I>&gt;<i>nothing, it at least serves as a starting point for more complex and
+</I>&gt;<i>advanced implementations.  And honestly, the only thing an AWT needs is a
+</I>&gt;<i>way to receive input and to bitblt images onto the screen (thanks to the
+</I>&gt;<i>standardVGA driver).  Anyway, I'm rambling.  Please tell me if the kernel/VM
+</I>&gt;<i>is in a state where this might be reasonable to start working on (i.e. does
+</I>&gt;<i>the VGA driver work as advertised, is the VM stable enough, etc).
+</I>
+I agree with you: a simple and limited implementation is better than
+nothing. With the completion of a boot-able jJOS/decaf in text mode, the
+next milestone on my list is the JOS-specific implementation of AWT. I only
+wish I had more time to work on it.
+
+The AWT is complicated by the fact that java.awt.Toolkit is in the java.awt
+package instead of the java.awt.peer package. It creates a mutual package
+dependency, where two packages depend on each other (java.awt depends on
+java.awt.peer and java.awt.peer depends on java.awt).
+
+Our first goal should be exclusively to output to VGA, not interaction. We
+should be able to demonstrate the use of a VGA screen without a keyboard
+and mouse. If we write a simple demo program that draws continuously to a
+VGA screen, it would help us work through the simple stuff. Such a demo
+program would be similar to a screen saver, with only limited interaction.
+
+Personally, I have only worked on blitting character-based images, in the
+style of Turbo Vision and Curses. I have every reason to believe that it is
+the same thing.
+
+  public void blit( Point a, Dimension d, byte[] v );
+  public void blit( Point a, Point b, byte[] v );
+
+In addition, it must also be able to read the screen:
+
+  public byte[] read( Point a, Dimension d );
+  public byte[] read( Point a, Point b );
+
+Blit and read are complementary, so that reading a region after blitting it
+should return the same image. Further discussion of AWT should be part of
+the User Interface group, shouldn't it? The kernel/virtual machine might
+plug in any implementation of AWT.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000723.html">[JOS-Arch] Getting started on AWT</A></li>
+	<LI> Next message: <A HREF="000727.html">[JOS-Arch] Getting started on AWT</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#724">[ date ]</a>
+              <a href="thread.html#724">[ thread ]</a>
+              <a href="subject.html#724">[ subject ]</a>
+              <a href="author.html#724">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Proposing archive: protocol</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000102.html">
+   <LINK REL="Next" HREF="000118.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Proposing archive: protocol</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Proposing archive: protocol">digigod@earthling.net</A><BR>
+    <I>Thu, 05 Aug 1999 07:25:19 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000102.html">[JOS-Arch] Proposing archive: protocol</A></li>
+        <LI> Next message: <A HREF="000118.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#103">[ date ]</a>
+              <a href="thread.html#103">[ thread ]</a>
+              <a href="subject.html#103">[ subject ]</a>
+              <a href="author.html#103">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Al wrote:
+&gt;<i> The following scheme could be useful; it uses the pipe (|) to
+</I>&gt;<i> distinguish between embedded resources. An example would be this:
+</I>
+why not just use the # fragment, can you have more then one? I can see
+no reason not to (the RFC doesnt say you CANT anyway)
+
+<A HREF="ftp://database.server.net/archives/images/contents.jar|/update/latest.zip|/acquired/foo.jpg?username=jeeves&password=cafebabe">ftp://database.server.net/archives/images/contents.jar|/update/latest.zip|/acquired/foo.jpg?username=jeeves&amp;password=cafebabe</A>
+
+&gt;<i> The above URI would authenticate with the FTP protocol and open the
+</I>&gt;<i> foo.jpg image in the latest.zip archive in the contents.jar archive in
+</I>&gt;<i> the specified directory of the specific server. Using installed MIME
+</I>&gt;<i> types, or possibly extensions, the software can automatically decode
+</I>&gt;<i> (ZIP, JAR and JPG here for examples are required).
+</I>
+I like the idea of using mime to differentiate file types, but this URI
+tells ftp to download contents.jar; so it has d'loaded content.jar and
+it has a left over fragment it has no idea what to do with.
+
+in gilberts scheme (to my understanding) the OS processes the URI
+recursively. so: (note that the fragment is after the query as according
+to the RFC)
+
+archive:archive:<A HREF="ftp://database.server.net/archives/images/contents.jar?username=jeeves&password=cafebabe#/update/latest.zip#/aquired/foo.jpg">ftp://database.server.net/archives/images/contents.jar?username=jeeves&amp;password=cafebabe#/update/latest.zip#/aquired/foo.jpg</A>
+
+first ftp is processed by the ftp daemon, it is passed the following
+URI:
+
+<A HREF="ftp://database.server.net/archives/images/contents.jar?username=jeeves&password=cafebabe">ftp://database.server.net/archives/images/contents.jar?username=jeeves&amp;password=cafebabe</A>
+
+it returns a file to the next URI:
+
+archive:&lt;file&gt;#/update/latest.zip
+
+this processes contents.jar and extracts latests.zip as per the fragment
+
+then it passes this file up to:
+
+archive:&lt;file&gt;#/aquired/foo.jpg
+
+which extracts foo.jpg as per the fragment
+
+&lt;file&gt; is a placeholder for the object returned by the other URI's
+
+ 
+&gt;<i> I don't believe that the pipe is reserved in URI's up to now, so maybe
+</I>&gt;<i> we could use it, at least JOS internally?
+</I>
+its not.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000102.html">[JOS-Arch] Proposing archive: protocol</A></li>
+	<LI> Next message: <A HREF="000118.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#103">[ date ]</a>
+              <a href="thread.html#103">[ thread ]</a>
+              <a href="subject.html#103">[ subject ]</a>
+              <a href="author.html#103">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

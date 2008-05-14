@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Change the sequence</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000442.html">
+   <LINK REL="Next" HREF="000450.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Change the sequence</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [multiple process] Change the sequence">tmiller@haverford.edu</A><BR>
+    <I>Mon, 10 Apr 2000 14:26:52 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000442.html">[JOS-Arch] [multiple process] Saving memory</A></li>
+        <LI> Next message: <A HREF="000450.html">[JOS-Arch] arch list a bit flaky at the moment</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#446">[ date ]</a>
+              <a href="thread.html#446">[ thread ]</a>
+              <a href="subject.html#446">[ subject ]</a>
+              <a href="author.html#446">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Every (user-space) process is started by some other process,
+except for init, which is started by the kernel.  Efficiency and common
+sense would seem to indicate that processes which do not want to share
+class definitions are the exception, rather than the rule.  This, in turn,
+would suggest that the default classloader ought not to define classes if
+there's already a definition available.  The combination of these implies
+that the classloaders should organize their caches (== shared definitions)  
+in the same heirarchy as the processes, that is, as a tree rooted with
+init's classloader.  That is, when a new process is requested, a new
+classloader is generated which has a pointer to its parent and nothing in
+its cache.  When it receives a loadClass() request, it ought to, then,
+check its cache (no) and ask its parent to return a new class from the
+parent's definition cache, and so on; something like
+loadClassFromDefinition(), a final native method defined on
+java.lang.ClassLoader that walks the tree looking for cached class
+definitions (JavaClass) to generate a new class instance ==
+java.lang.Class instance (JavaClassInstance) from.  If
+loadClassFromDefition() finds and generates a class, it returns that clas,
+which the classloader caches and returns.  If loadClassFromDefinition()
+can't find a cached definitoin, it returns null, and the classloader asks
+the system (findSystemClass()) to find it; findSystemClass() must then
+update the classloader's definition cache if it's successful.  Likewise,
+for custom classloaders, defineClass() must cache new definitions.  This
+scheme means 'illegal' casts must be allowed in general, as Ryan proposed.
+
+	Custom classloaders are, of course, welcome to ignore their
+parents.  The question then becomes what to do if they load a class which
+happens to be indentical to some other, cached (and therefore identified
+as legal to 'illegally' cast) class.  Gilbert suggests we maintain a large
+cache of all bytecode in order to determine if two class definitions are,
+in fact, the same.  This is going to be brutally inefficient.  I'm
+strongly tempted to say that if you don't get the class from the system or
+your parent, it can't be 'illegally' cast to a class from the system or
+your parent.  This fits with what a programmer working with a conventional
+JVM would expect -- that a custom classloader is only interoperable with
+other classloaders so far as they got their java.lang.Classes from the
+same place.  It also makes our job tremendously easier :)  I am, of
+course, open to arguments to the contrary.
+
+-_Quinn
+
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000442.html">[JOS-Arch] [multiple process] Saving memory</A></li>
+	<LI> Next message: <A HREF="000450.html">[JOS-Arch] arch list a bit flaky at the moment</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#446">[ date ]</a>
+              <a href="thread.html#446">[ thread ]</a>
+              <a href="subject.html#446">[ subject ]</a>
+              <a href="author.html#446">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

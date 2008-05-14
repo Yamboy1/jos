@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-UI] Widgets</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000094.html">
+   <LINK REL="Next" HREF="000096.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-UI] Widgets</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-UI] Widgets">digigod@earthling.net</A><BR>
+    <I>Wed, 28 Jul 1999 21:15:31 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000094.html">[JOS-UI] Widgets</A></li>
+        <LI> Next message: <A HREF="000096.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#95">[ date ]</a>
+              <a href="thread.html#95">[ thread ]</a>
+              <a href="subject.html#95">[ subject ]</a>
+              <a href="author.html#95">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ryan Heise wrote:
+&gt;<i> I don't quite see the usefulness of this. For example, when you
+</I>&gt;<i> implement the Swing or AWT widgets, they will handle rectangles and
+</I>&gt;<i> z-ordering in their own way.
+</I>&gt;<i> 
+</I>&gt;<i> If you were suggesting the idea in response to my observation that there
+</I>&gt;<i> needs to be some view &lt;-&gt; view interactions, are you trying to eliminate
+</I>&gt;<i> these interactions? I think when you get around to implementing your
+</I>&gt;<i> Swing widgets, you will find that the most sensible thing to do is to
+</I>&gt;<i> have direct view &lt;-&gt; view interactions when they are needed. For
+</I>&gt;<i> example, when a JComponent needs to be graphically added to a JPanel.
+</I>&gt;<i> Just keep in mind that these view &lt;-&gt; view methods are internal
+</I>&gt;<i> implementation methods, and the real methods to add a ToolbarWidget to a
+</I>&gt;<i> DesktopWidget are in the controller and model classes.
+</I>
+no, no this isnt what I meant at all. I was reffereing to the windows on
+the desktop.
+
+the Model is a collection of rectangles each with a z-order the
+&quot;screens&quot; rectangle being a constant last. each window on the desktop is
+represented as a rectangle.
+
+the controller is implementation specefic in this case, AWT (which Im
+betting would be 99.99% all cases, if not more) it mediates between the
+view (the desktop) and the &quot;genderless&quot; model (the rectangles),
+translateing the Windows.
+
+the desktop draws itself according to the commands of the controller
+which is a translator for the model. (of course the desktop also has to
+handle drawing the background and the icons and the screensaver if your
+inactive long enough)
+
+I see the benifit not being to us but to those who can use the same
+Model since they need, for X reason, to use a different set of
+components then AWT. And both the model and controller (and possibly
+even the view if done properly) can be reused by the standard Swing/AWT
+TGUI's
+ 
+&gt;<i> PagerWidget - control for virtual desktops
+</I>&gt;<i> MenuWidget - for example, you could dock a start menu to the
+</I>&gt;<i> TaskBarWidget.
+</I>&gt;<i> 
+</I>&gt;<i> I'm thinking we should call it a system menu, not a start menu.
+</I>
+PagerWidget is a good widget but not to be included in JADE, we decided
+awhile ago that a UI/extension to JADE was to be provided that handled
+virtual desktops by proxing itself (in the guise of a PUI) between JADE
+and the real UI's. the coolest benifit of this being the ability (if
+done properly) to plug in X different UI's (assuming support for all) in
+the vw's
+
+win95 style context menus would implememnt MenuWidget's too, as would
+the menubar thingy on macs (which would also be a toolbar since its
+attached to the desktop btw (what is that thing called again?)).
+
+system menu, here here. start menu? start what? at least when you call
+it system menu people know what your talking about.
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        Thus spake the master Ninjei:
+         &quot;To the intelligent man, one word, to the fleet horse
+          one whip, to the well-written program, a single
+          command&quot;
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000094.html">[JOS-UI] Widgets</A></li>
+	<LI> Next message: <A HREF="000096.html">[JOS-UI] Widgets</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#95">[ date ]</a>
+              <a href="thread.html#95">[ thread ]</a>
+              <a href="subject.html#95">[ subject ]</a>
+              <a href="author.html#95">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

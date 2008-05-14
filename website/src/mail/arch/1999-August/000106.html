@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Proposing archive: protocol</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000104.html">
+   <LINK REL="Next" HREF="000110.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Proposing archive: protocol</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS-Arch] Proposing archive: protocol">al@outworld.org</A><BR>
+    <I>Thu, 05 Aug 1999 23:58:00 +0300</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000104.html">[JOS-Arch] Proposing archive: protocol</A></li>
+        <LI> Next message: <A HREF="000110.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#106">[ date ]</a>
+              <a href="thread.html#106">[ thread ]</a>
+              <a href="subject.html#106">[ subject ]</a>
+              <a href="author.html#106">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i>
+</I>&gt;<i> &lt;snip&gt;
+</I>&gt;<i>
+</I>&gt;<i> Imagine, though, that I have made up my mind and really want to see
+</I>&gt;<i> the contents of an JPEG file in hexidecimal notation. I want the
+</I>&gt;<i> default MIME type to be *ignored*. My decision should be reflected in
+</I>&gt;<i> the URI. Maybe it should be like this:
+</I>&gt;<i> 
+</I>&gt;<i> <A HREF="ftp://database.server.net/archives/images/contents.jar">ftp://database.server.net/archives/images/contents.jar</A>
+</I>&gt;<i> ?username=jeeves&amp;password=cafebabe | archive:zip:/update/latest.zip |
+</I>&gt;<i> file:hex:/acquired/foo.jpg
+</I>
+
+Should not the hex: be in the beginning? Like hex:<A HREF="ftp://etc...">ftp://etc...</A>
+Since converting to HEX is not part of the retrieval of information,
+just a displaying aspect to it.
+
+hex:<A HREF="ftp://ftp.server.org/pub/images/jeeves/surfing.jpg?user=,">ftp://ftp.server.org/pub/images/jeeves/surfing.jpg?user=,</A> etc...
+
+This would retrieve the JPEG image, and *then* hex it. In a more
+elaborate archiving system, it could be like this:
+
+hex:zip:<A HREF="ftp://ftpusername:ftpuserpassword@ftp.server.org/">ftp://ftpusername:ftpuserpassword@ftp.server.org/</A>
+pub/images.zip?username=jeeves&amp;password=cafebabe
+|<i>gzip:/jeeves/surfing.gzip?username=foo&amp;password=bar
+</I>|<i>jpeg:image:/cool/image1.jpg?width=100&amp;height=50
+</I>
+Or maybe the internal protocol handlers should be followed by a double
+slash (//)?
+
+Maybe then the original zip: should be omitted and added *after* the
+server specification? Remember, this URI won't be sent to the ftp server
+to confuse it, it will be used by the internal system content handlers.
+
+&gt;<i> From RFC 2396, the verticle bar (|) is considered an &quot;unwise&quot;
+</I>&gt;<i> character. We're supposed to be careful not to think about JOS as an
+</I>&gt;<i> island. JOS will interact with all other operating systems. How can we
+</I>&gt;<i> limit URIs to internal use only?
+</I>
+I'm not quite sure, but if we need something not yet implemented, should
+we not implement it?
+
+&gt;<i> Hey, what about this:
+</I>&gt;<i> 
+</I>&gt;<i> uri-pipe := uri &quot;&gt;&gt;&quot; uri &quot;&gt;&gt;&quot; uri
+</I>
+I would *strongly* suggest using single characters for delimiters. We
+can use the backslash maybe (\)? Or the $ sign? Or the ! sign which is
+already used in JAR files? Or the ~ sign? I think # should be left for
+anchors, since we do want URIs to point to XML/HTML documents.
+
+&gt;<i> I suppose it is possible for an FTP service to extract the latest.zip,
+</I>&gt;<i> then extract foo.jpg and return only foo.jpg to the client agent.
+</I>
+This could be very easily achieved as follows:
+
+<A HREF="ftp://jeeves:cafebabe@ftp.server.org/pub/archives/images.zip!/jeeves/">ftp://jeeves:cafebabe@ftp.server.org/pub/archives/images.zip!/jeeves/</A>
+surfing/image1.jpg
+
+The client can query the server to find out if the server can perform
+such an operation, and if it cannot, then the client should do it (just
+as it is done currently in JAR files).
+
+&gt;<i> When running bytecode for an applet or servlet across the Internet, it
+</I>&gt;<i> is more efficient to download the whole archive once rather than
+</I>&gt;<i> download one class file at a time from the archive. That's yet another
+</I>&gt;<i> reason to have the client agent handle the URI pipe and/or embedded
+</I>&gt;<i> URIs.
+</I>
+True, although I would like to see this done automatically: the class
+loader knows when to download an entire JAR file or a portion of it. For
+example, if the class needed to be loaded resides in a JAR file, then
+the entire JAR should be downloaded, since it will most probably contain
+other classes also required by the original class. Though, if it is to
+download a resource from a JAR file, such as a sound or and image or an
+icon, then it could just ask for that particular item.
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+___________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: <A HREF="http://www.outworld.org/people/al/]">http://www.outworld.org/people/al/]</A> [TEL: (0030) +31 422 392]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000104.html">[JOS-Arch] Proposing archive: protocol</A></li>
+	<LI> Next message: <A HREF="000110.html">[JOS-Arch] Proposing archive: protocol</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#106">[ date ]</a>
+              <a href="thread.html#106">[ thread ]</a>
+              <a href="subject.html#106">[ subject ]</a>
+              <a href="author.html#106">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

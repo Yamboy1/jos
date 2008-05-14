@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000558.html">
+   <LINK REL="Next" HREF="000532.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">ryan@whitewolf.com.au</A><BR>
+    <I>Mon, 01 May 2000 13:00:42 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000558.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000532.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#524">[ date ]</a>
+              <a href="thread.html#524">[ thread ]</a>
+              <a href="subject.html#524">[ subject ]</a>
+              <a href="author.html#524">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i>         w.r.t. to the ownership of JavaProcess objects, it has occured to
+</I>&gt;<i> me that we could do things the UNIX way.  getJavaProcess() does not return
+</I>&gt;<i> the process object used by the VM, but an object wrapping a pid with
+</I>&gt;<i> whatever functions we feel are appropriate.
+</I>
+Proxies are not required to do this (as I explained in response to
+Gilbert's email). JavaProcesses would still be owned by the system, but
+access does not need to be through proxy (in fact, this is the way I've
+currently implemented it in rheise.os).
+
+&gt;<i> With the process identified
+</I>&gt;<i> with a by-value variable (e.g. the pid), we don't have to worry about who
+</I>&gt;<i> owns what; we just return the pid by-value, or create a new pid wrapper
+</I>&gt;<i> every time getJavaProcess() is called.  (&quot;Those who forget UNIX are doomed
+</I>&gt;<i> to re-write it, poorly.&quot;)
+</I>
+That saying might not apply here - I hope we can base JOS around
+object-oriented principles, and that hopefully means having references
+to objects rather than passing around id numbers (as UNIX does with
+files and sockets).
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000558.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000532.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#524">[ date ]</a>
+              <a href="thread.html#524">[ thread ]</a>
+              <a href="subject.html#524">[ subject ]</a>
+              <a href="author.html#524">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] rheise.os questions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000496.html">
+   <LINK REL="Next" HREF="000479.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] rheise.os questions</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] rheise.os questions">ryan@whitewolf.com.au</A><BR>
+    <I>Sat, 22 Apr 2000 01:43:43 +1000 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000496.html">[JOS-Arch] rheise.os questions</A></li>
+        <LI> Next message: <A HREF="000479.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#497">[ date ]</a>
+              <a href="thread.html#497">[ thread ]</a>
+              <a href="subject.html#497">[ subject ]</a>
+              <a href="author.html#497">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Fri, 21 Apr 2000, Gilbert Carl Herschberger II wrote:
+
+&gt;<i> AWT peers are not required to implement native methods.
+</I>
+We even have proof of that, with SwingToolkit :-)
+
+Although control must switch over to native code at some point, and the
+deeper the better. At the deepest level there could be an implementation
+of java.awt.Graphics that draws directly to the screen, and perhaps has
+a few more methods than its superclass to be more efficient for certain
+types of operations (eg. g.drawPixel()).
+
+&gt;<i> Current AWT implementations must use peers because the windowing system is
+</I>&gt;<i> a system-wide object and AWT is process-wide.
+</I>
+For an implementation of AWT without peers, take a look at Kaffe (I
+don't know if it's changed since I last looked).
+
+&gt;<i> An AWT peer is a proxy. An AWT peer runs in one process while the real
+</I>&gt;<i> bit-mapped component runs in another.
+</I>
+Right, I see the distinction you're trying to make now. The Toolkit is
+built on top of the windowing system, whereas I was treating them both
+collectively as &quot;the windowing system&quot;. This actually maps to how I've
+done it in SwingToolkit (hey, I wrote it a year ago! :-), where the peer
+objects are considered part of the Toolkit and the swing components they
+operate are considered part of the windowing system (as you described),
+which runs in a separate process.
+
+It makes sense now why you think there should be an AWT thread per
+process. So, basic events originate from the windowing system and are
+reposted by the AWT system of the interested process on its own AWT
+thread.
+
+The question is, do you call the windowing system JADE? I think I was
+slightly confused because I thought JADE was a desktop environment that
+ran on top of the windowing system.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000496.html">[JOS-Arch] rheise.os questions</A></li>
+	<LI> Next message: <A HREF="000479.html">[JOS-Arch] rheise.os questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#497">[ date ]</a>
+              <a href="thread.html#497">[ thread ]</a>
+              <a href="subject.html#497">[ subject ]</a>
+              <a href="author.html#497">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

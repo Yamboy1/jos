@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] multiple processor architecture</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000295.html">
+   <LINK REL="Next" HREF="000322.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] multiple processor architecture</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] multiple processor architecture">tmiller@haverford.edu</A><BR>
+    <I>Tue, 16 Nov 1999 16:24:02 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000295.html">[JOS-Arch] multiple processor architecture</A></li>
+        <LI> Next message: <A HREF="000322.html">[JOS-Arch] multiple processor architecture</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#301">[ date ]</a>
+              <a href="thread.html#301">[ thread ]</a>
+              <a href="subject.html#301">[ subject ]</a>
+              <a href="author.html#301">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Misconceptions don't go away by themselves. It requires a great deal of
+</I>&gt;<i> discussion to put a misconception to rest. The architecture mailing list is
+</I>&gt;<i> a forum for discussing the possible architecture of JOS. Cutting short a
+</I>&gt;<i> discussion about alternative architectures isn't helpful.
+</I>
+	This issue has been discussed in both the architecture and the
+kernel list before.  Certain things that are absolutely necessary to
+what you refer to as 'Ultimate JOS' require our own JVM, one with the
+necessary hardware accesses.  The jJOS kernel on which the decaf JVM runs
+is simple enough that a close approximation of it is already running on
+Linux -- sans h/w access.  If someone more skilled in Linux kernel hackery
+than I were willing to provide the necessary kernel mods to allow the host
+build of jJOS to access the hardware, I would have no objection -- and it
+would probably be very helpful for debugging until JOS is into the
+bootstrap phase. (Likewise Bochs or VMWare, neither of which I've been
+able to try.)
+	I do not object to writing JOS in parallel; but when you say 'JOS
+does not require a native kernel' and I read (your phrasing) 'Ultimate
+JOS' -- well, that statement is a dangerous misconception, one that will
+lead to the crippling of the JOS platform.  I think we agree with each
+other more than we initially realised.  I am in favor of parallel
+development -- the more the merrier.  However, I will not advocate the
+development of emulators of the JOS kernel/VM, because I feel very
+strongly that the efforts of programmers suited to this type of work would
+be better spent on implementing those featurs on the JOS kernel/VM --
+which right now appears to be jJOS and decaf.  This may end up being
+sheerest optimism; I could be dramatically underestimating the gestation
+time for jJOS/decaf.
+
+	I think we both have only the highest of hopes for JOS; and
+(forward referencing other mail in my inbox) that a distribution groups is
+Good Idea.  I had been looking forward and seeing a disaster when
+jJOS/decaf was ready for 'general consumption' and I had to put together
+what amounts to the vast majority of the OS code -- so this puts my mind
+much at ease.
+
+	Your point that a 'transitional JOS' (though it's not an
+operating system by many definitions) not needing its own
+kernel/JVM is a good one; you say,
+
+&gt;<i> You're talking about the future. I'm talking about the present.
+</I>
+	and you're quite correct.  My most major concern -- and it seems I
+over-reacted -- is that you don't shortchange the future for the present.
+
+&gt;<i> JOS cannot live up to its potential if you eliminate every consumer
+</I>&gt;<i> that wants to benefit from their investment in their native OS.
+</I>
+	What is the investment that consumers make in their operating
+systems?  I see two major sections: time investment in training and
+familiarity and investment in software.  Time investment in training can
+be addressed with work-alikes, to a certain extent, but if JOS is better,
+it's going to be different, and we shouldn't worry about it too much --
+aside from keeping the learning curve low in general.  Investment in
+software there's just not anything we can do about; software running on X
+native system isn't going to work on JOS, unless it's already Java.  (That
+is, one primary goal of the JOS VM is to run extant Java bytecode w/o
+modification.)
+
+&gt;<i> The Transitional JOS runs Java applications just like Ultimate JOS.
+</I>
+	Okay, here's the problem: my contention is that the 'Transitional
+JOS' can not run some of the applications which will comprise the
+'Ultimate JOS'.  The question here is if the applications which provide
+the maximal benefit to the user -- the ones we want to write -- can be
+written without those sub-applications (libraries/APIs/etc).
+
+	I suppose I should step back here.  I am not writing the
+components of the 'Ultimate JOS' that you and others on the architecture
+list are; I can't truly tell you about what is and is not possible with
+respect to any particular application you're developing.  (continued
+below)
+
+&gt;<i> Java is worthwhile. It provides an excellent architecture for
+</I>&gt;<i> platform-independence. You can run the same application on NT as you run on
+</I>&gt;<i> a Mac or Linux.
+</I>
+&gt;<i> JOS is self-contained. JOS is extendable, network-aware and portable.
+</I>&gt;<i> Unlike Java, JOS provides the greatest level of backward compatibility
+</I>&gt;<i> and future orientation. It provides all of the OS-related things that
+</I>&gt;<i> are missing from the Java class libraries.
+</I>
+	What you seem to be saying here is that the upper edge of JOS --
+the applications/libraries/APIs which compose its interface -- can be
+completely separated from their implementation; that the 'Ultimate JOS'
+would be this upper edge running on an implementation that best supports
+it, and applies its precepts to the management of the hardware.  My
+concern is to the realization of this dream, that this upper edge is not
+restricted by the restrictions imposed by a 'non-Ultimate' lower edge.
+
+&gt;<i> We can learn from Lotus' experience. We should offer full featured,
+</I>&gt;<i> comparable applications that run on JOS, both Transitional JOS and
+</I>&gt;<i> Ultimate JOS.
+</I>
+	The same question crops up here.  Can applications that are as
+good or better than the competition be written without the aid of the
+'Ultimate JOS'?
+
+&gt;<i> While you might feel strongly that Utlimate JOS is the best operating
+</I>&gt;<i> system ever created (and I would agree), consumers must deal with issues of
+</I>&gt;<i> here and now. They already bought a native OS. Why should they learn
+</I>&gt;<i> another one?
+</I>
+	Because JOS /and its applications/ will be better.  That's all we
+can offer -- see my question above.  The best thing to do at this point
+might just be to try.  If a JOS application won't work without our own
+JVM (which, in turn, will almost certainly work best on our own kernel),
+or will work better with support from the JVM, then the debate is pretty
+much settled, no?  The hard part is not to be trapped by the mindset a
+devloper might develop from working on a lesser system.  (That is, the why
+should I bother to make my app any more stable than the system on which it
+runs? mentality applies to innovation as well, I think -- if it's harder
+to get something innovative to work, it's less likely to get done...)
+
+&gt;<i> JOS is Microsoft's worst nightmare come true. Microsoft hopes that we don't
+</I>&gt;<i> figure out how to make JOS run on Windows. Once JOS runs on top of Windows,
+</I>&gt;<i> consumers can run Windows and JOS. Consumers will have the best of both
+</I>&gt;<i> worlds.
+</I>
+	Microsoft killed Netscape because they promised the same thing.
+Luckily, we don't have a revenue stream to attack :)
+
+
+	I pretty much have to trust your (JOS application programmers)
+judgment about the portability of JOS APIs, but applications are not the
+only thing make an O/S worthwhile.  As we've agreed, there are issues
+about running 'Transitional JOS' -- even one that's a full peer of the
+'Ultimate JOS' on the user (top-edge) side -- on a system which wasn't
+designed to support it.
+	However, JOS should also provide things like uniform models for
+the various facets of multimedia, resource location and allocation,
+hardware awareness -- all things that will need massive amounts of
+platform-specific code to support.  jJOS and decaf form a kernel/JVM pair
+written from the ground up to support things like this, and I think,
+despite the value of writing applications for conventional JVMs (i.e.
+those on other platforms), that this type of work would be better used on
+the jJOS/decaf itself.
+
+-_Quinn
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000295.html">[JOS-Arch] multiple processor architecture</A></li>
+	<LI> Next message: <A HREF="000322.html">[JOS-Arch] multiple processor architecture</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#301">[ date ]</a>
+              <a href="thread.html#301">[ thread ]</a>
+              <a href="subject.html#301">[ subject ]</a>
+              <a href="author.html#301">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

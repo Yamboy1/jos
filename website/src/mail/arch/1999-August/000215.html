@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] GSI</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000203.html">
+   <LINK REL="Next" HREF="000216.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] GSI</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] GSI">digigod@earthling.net</A><BR>
+    <I>Thu, 26 Aug 1999 13:01:05 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000203.html">[JOS-Arch] GSI</A></li>
+        <LI> Next message: <A HREF="000216.html">[JOS-Arch] GSI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#215">[ date ]</a>
+              <a href="thread.html#215">[ thread ]</a>
+              <a href="subject.html#215">[ subject ]</a>
+              <a href="author.html#215">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+&gt;<i> &gt; we have the ScriptLoader thats like a ClassLoader for scripts, should we
+</I>&gt;<i> &gt; have a SCRIPTPATH?
+</I>&gt;<i>         If necessary.  I can't shake the feeling that There Ought To Be A
+</I>&gt;<i> Better Way, though.
+</I>
+I know what you mean...
+ 
+&gt;<i> &gt; an Object can be Scriptable if it has a ScriptInfo getScriptInfo(), but
+</I>&gt;<i> &gt; what goes in ScriptInfo? (I'd just use BeanInfo but its to different)
+</I>&gt;<i>         If I'm scripting an object, I'm either writing intra-program
+</I>&gt;<i> (IRC scripts) or inter-program (shell scripts).  Typically, intra-program
+</I>&gt;<i> scripts are event-fired (in the form of well-defined &quot;callbacks&quot; to the
+</I>&gt;<i> scripts), and inter-program scripts are more like standard sequential
+</I>&gt;<i> programming, thought there are plenty of exceptions.  Since we can embed
+</I>&gt;<i> sequential programs in event-fired ones, event-fired scripts should be the
+</I>&gt;<i> norm.  Therefore, getScriptInfo() should return the events that the
+</I>&gt;<i> Scriptable Object will generate.
+</I>
+what if we want to make our java object an element in the script though?
+like an add-on library, say we have a LuaMathLib object that has X math
+methods that we want to map into the Lua interpreter as X fucntions...
+how would we handle that? 
+ 
+&gt;<i> &gt; we have Script, how do we allow interaction generically? and its
+</I>&gt;<i> &gt; top-level inner class Element, we have an element what do we do with it?
+</I>&gt;<i> &gt; (goes with genric interaction above)
+</I>&gt;<i>         I'd imagine the non-script-interperting classes can safely ignore
+</I>&gt;<i> (or should be able to safely ignore) the components of a script.  As for
+</I>&gt;<i> generic interactions, as above, I'd suggest that the code simply fire
+</I>&gt;<i> events to a ScriptCollection, which would in turn handle distributing thos
+</I>&gt;<i> events to the proper Scripts for handling; last (or first), it could
+</I>&gt;<i> return that event to the program, so a default behavior could be included.
+</I>&gt;<i> In the shell-script case, the only event would be script_begin (or
+</I>&gt;<i> whatever).
+</I>
+my purpose in defining the Element top-level class was to allow a java
+program to use parts of the script; say we have a reinit() function in
+our script that we need to call... we get the Element for it to use
+it... but what does Element look like?
+ 
+&gt;<i> &gt; ScriptLoader is asked to load a script, it finds the appropriate child
+</I>&gt;<i> &gt; (ie LuaScriptLoader for a lua script) and calls load (returning a Script
+</I>&gt;<i> &gt; object cast up from, using my previous example, a LuaScript). Gilbert,
+</I>&gt;<i> &gt; how could your SmartFactory be used here?
+</I>&gt;<i>         Wouldn't ScriptLoader /be/ a SmartFactory?
+</I>
+this is what I was thinking, but I havent --admittedtly-- looked the
+SmartAPI over with what one would call a fine-toothed comb...
+ 
+&gt;<i> &gt; Our program now has a Script, to run it calls execute(). is there a
+</I>&gt;<i> &gt; better way? how does it interact with the script when its executing?
+</I>&gt;<i> &gt; what happens when its done? if we call execute() again what happens,
+</I>&gt;<i> &gt; what should?
+</I>&gt;<i>         See above -- execute() is a bad idea, for the problems you've
+</I>&gt;<i> mentioned.  Interacting with the script would be responding to events it
+</I>&gt;<i> generates, as moderated by the ScriptCollection (or whatever) and/or the
+</I>&gt;<i> scripts themselves.  If you fire off two script_begin events, the behavior
+</I>&gt;<i> should be the scripts choice: it can ignore it, spawn a new thread, queue
+</I>&gt;<i> it up, etc...
+</I>
+if its left up to the script we should have a way to tell what its
+action is going to be...
+
+ok, when does the interpreter start and when does the script start? if
+we have BOB (which is a C/C++ish type script) which has a main like C,
+does the interpreter start the script when its loaded by calling main,
+or does it wait until we tell it to start? what if its a library you
+created to make programming your app easier and doesnt have a main as
+its just a collection of functions... does it return a
+NotARunnableScriptEvent?
+ 
+&gt;<i> &gt; what if we have two seperate implementations from different authours,
+</I>&gt;<i> &gt; how do we determine which to use?
+</I>&gt;<i>         The SmartRegistry?  I think we can safely punt on this one for
+</I>&gt;<i> now, because it's more a UI decision than an archictecture choice.
+</I>
+I guess...
+ 
+&gt;<i> &gt; how do we tell what type of script a file is? MIME? attributes builtin
+</I>&gt;<i> &gt; to the fs? a per directtoy DB containg info the files (I like it,
+</I>&gt;<i> &gt; cross-fs. doesnt Jigsaw do this?)?
+</I>&gt;<i>         Again, I'm tempted to punt on the problem for now.  I think
+</I>&gt;<i> whatever method is chosen could be safely enscapulated accross fs's --
+</I>&gt;<i> those don't have per-file attributes of the necessary kind get
+</I>&gt;<i> per-directory DBs or MIME or a central registry, depending.
+</I>
+Id like a nice standard, fs-independent way; like the perdirectory
+miniDB's since it can be copied across fs without alot of hassle... (and
+hassle is one thing you dont want in coding or using an OS)
+ 
+&gt;<i> &gt; in langauges already written-for/ported-to Java work? are there
+</I>&gt;<i> &gt; languages you can think of that wouldnt work in this GSI?
+</I>&gt;<i>         JaCL (tcl interperter in java) is the one I'm most familiar with,
+</I>&gt;<i> and it's not as nearly advanced as what I'm proposing here.  (BTW: the
+</I>&gt;<i> event-based system would be translated by the respective Script objects to
+</I>&gt;<i> whatever is most appropriate to the source language; shell script, for
+</I>&gt;<i> instance, would get signals instead of events (which means most events
+</I>&gt;<i> would be ignored), or (possibly) only if the event name matched a method
+</I>&gt;<i> name, etc...
+</I>
+yea, we need it to be: stable, generic and simple (as possible);
+otherwise theres no point in bothering with it...
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000203.html">[JOS-Arch] GSI</A></li>
+	<LI> Next message: <A HREF="000216.html">[JOS-Arch] GSI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#215">[ date ]</a>
+              <a href="thread.html#215">[ thread ]</a>
+              <a href="subject.html#215">[ subject ]</a>
+              <a href="author.html#215">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

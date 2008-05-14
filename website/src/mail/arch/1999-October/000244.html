@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Migration</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000243.html">
+   <LINK REL="Next" HREF="000245.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Migration</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Migration">gchii@mindspring.com</A><BR>
+    <I>Mon, 04 Oct 1999 11:45:04 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000243.html">[JOS-Arch] JOS Distribution - Release 1d</A></li>
+        <LI> Next message: <A HREF="000245.html">[JOS-Arch] Migration</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#244">[ date ]</a>
+              <a href="thread.html#244">[ thread ]</a>
+              <a href="subject.html#244">[ subject ]</a>
+              <a href="author.html#244">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>After working with the URI class for a while, it seems to me than the URI
+class is the *only* class that needs to be well-known. Even the smart
+object factory and smart stream factories are plug-ins.
+
+So, I think the entire scope of the Smart API package might be something
+like this:
+
+org.jos.smartapi2a.URI
+org.jos.smartapi2a.Controller
+org.jos.smartapi2a.ObjectController
+org.jos.smartapi2a.BaseController (or AbstractController)
+org.jos.smartapi2a.SmartFactory
+
+And furthermore, the URI class can be reduced to something like this:
+
+public class URI {
+  public static Controller getFactory() {
+    if ( factory == null ) {
+      return ObjectFactory.getFactory();
+    }
+    return factory;
+  }
+  public static void setFactory( Controller v ) {
+    if ( factory == null ) { 
+      factory = v;
+    }
+  }
+  private static Controller factory = null;
+  public URI( String v ) {
+    uriSpec = v;
+  }
+  public boolean acceptsURI() {
+    factory.acceptsURI( uriSpec );
+  }
+  public Object getObject() {
+    getFactory().getObject( uriSpec );
+  }
+  private String uriSpec;
+}
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000243.html">[JOS-Arch] JOS Distribution - Release 1d</A></li>
+	<LI> Next message: <A HREF="000245.html">[JOS-Arch] Migration</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#244">[ date ]</a>
+              <a href="thread.html#244">[ thread ]</a>
+              <a href="subject.html#244">[ subject ]</a>
+              <a href="author.html#244">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] More Trouble with jeps!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Corrado.Santoro%40iit.unict.it">
+   <LINK REL="Previous"  HREF="000373.html">
+   <LINK REL="Next" HREF="000375.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] More Trouble with jeps!</H1>
+    <B>csanto</B> 
+    <A HREF="mailto:Corrado.Santoro%40iit.unict.it"
+       TITLE="[JOS-Arch] More Trouble with jeps!">Corrado.Santoro@iit.unict.it</A><BR>
+    <I>Thu, 6 Jan 2000 16:42:36 +0100 (GMT+0100)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000373.html">[JOS-Arch] More Trouble with jeps!</A></li>
+        <LI> Next message: <A HREF="000375.html">[JOS-Arch] More Trouble with jeps!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#374">[ date ]</a>
+              <a href="thread.html#374">[ thread ]</a>
+              <a href="subject.html#374">[ subject ]</a>
+              <a href="author.html#374">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Thu, 6 Jan 2000, Ranieri Argentini wrote:
+&gt;<i> 
+</I>&gt;<i> fd=socket(AF_INET, SOCK_PACKET, htons(ETH_P_ALL));
+</I>&gt;<i> 
+</I>&gt;<i> instead of
+</I>&gt;<i> 
+</I>&gt;<i> packet_socket = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+</I>&gt;<i> 
+</I>&gt;<i> but all the documentation on my machine suggested it was way better to use
+</I>&gt;<i> the newer interface. If this is a problem to many of you i suppose i could
+</I>&gt;<i> implement them both with a compiler directive of sorts.
+</I>You're right, but someone (like me) could have an old version of linux,
+thus i think the code should be patched including a compiler directive (i
+have kernel 2.0.36 and glibc2.0). Anyway, tomorrow i'll try to apply the
+patch you provided in opening socket.
+&gt;<i> 
+</I>&gt;<i> The offending part of code (sockaddr_ll etc.) binds the socket to a
+</I>&gt;<i> particular network device. I presume there should also be a
+</I>&gt;<i> backward-compatible way of doing that, but i would need to do more
+</I>&gt;<i> research. I presume it would entail using &quot;sockaddr&quot; instead of the
+</I>&gt;<i> link-level specific &quot;sockaddr_ll&quot;.
+</I>&gt;<i> I fear that making a &quot;general&quot; unix ethhost.c would entail using libpcap
+</I>&gt;<i> and libnet to capture and transmit raw frames.
+</I>&gt;<i> 
+</I>.. no,no... not a &quot;general unix&quot; ethhost.c but, at least, a &quot;general
+linux&quot; one! I think that looking the source code of &quot;tcpdump&quot; or &quot;sniffer&quot;
+could help us!
+
+Cheers,
+	Corrado
+
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+Personal Home Page:
+            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+
+ARCA Mobile Agent Framework Home Page:
+            <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+======================================================
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000373.html">[JOS-Arch] More Trouble with jeps!</A></li>
+	<LI> Next message: <A HREF="000375.html">[JOS-Arch] More Trouble with jeps!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#374">[ date ]</a>
+              <a href="thread.html#374">[ thread ]</a>
+              <a href="subject.html#374">[ subject ]</a>
+              <a href="author.html#374">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] RE: [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000034.html">
+   <LINK REL="Next" HREF="000038.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] RE: [JOS-UI] peer-ui mappings</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Arch] RE: [JOS-UI] peer-ui mappings">hilarycheng@usa.net</A><BR>
+    <I>Thu, 22 Jul 1999 09:24:10 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000034.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000038.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#35">[ date ]</a>
+              <a href="thread.html#35">[ thread ]</a>
+              <a href="subject.html#35">[ subject ]</a>
+              <a href="author.html#35">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi,
+
+Hm, after reading ur email, I got some questions.
+
+1. What's the different between JVM of JDK1.0, JDK1.1, JDK2.0 ?
+    As far as I know, JVM itself hasn't changed a lot. The Library/Classes
+of JDK
+    has changed a lot from 1.0 to 2.0. If this is true, it isn't affected
+JOS Kernel a lots.
+
+2. Will JOS use classes directly from Sun JDK ? Sun JDK got lots of things
+that
+    are depends on the platform. On Win32, it got Windows Peer, etc. On
+Linux
+    , it got Motif Peer. Should we think about using the classes from
+www.classpath.org ?
+    and then we added some JOS feature into it just like the Sun JDK ?
+
+3. About Sun, IMO, after JDK2.0, Sun will decrease rate of introducing new
+JDK. Since lots
+    of people are blaming Java. Sun will put all of their effect making Java
+much faster and
+    stable. I don't think we need to think about the future JDK version
+comptability. Keep on
+    our work.
+
+Regards,
+
+Hilary
+
+&gt;<i>
+</I>&gt;<i>I truely believe this. This is what everybody thinks when they hear write
+</I>&gt;<i>once. It runs on the version of the standard it was written to. I see
+</I>&gt;<i>nothing wrong with running three (or more) JVMs on top of the JOS kernel.
+</I>&gt;<i>If only we have the resources to do it, this is exactly what we should do.
+</I>&gt;<i>
+</I>&gt;<i>What does it mean for JOS architecture? It means that there is one JOS
+</I>&gt;<i>kernel and three (or more) JVMs. Now that would be asking a lot, except for
+</I>&gt;<i>one thing. I know that Java 1.0, 1.1 and 2.0 (1.2) are mostly compatible.
+</I>&gt;<i>While they are incompatible with running a Java 1.0 application inside a
+</I>&gt;<i>1.2 JVM, it is possible to build an architecture that our three JVMs share
+</I>&gt;<i>most of their infrastructure.
+</I>&gt;<i>
+</I>&gt;<i>All three JVMs must implement an OS file subsystem; but, there will be only
+</I>&gt;<i>version of the source. All three JVMs must implement a peer-ui package;
+</I>&gt;<i>but, there will be only one version of the source.
+</I>&gt;<i>
+</I>&gt;<i>The problem was porting. Nobody wants to port. It has been a necessary
+</I>&gt;<i>evil. Sun has re-introduced the evils of porting again by creating three
+</I>&gt;<i>versions of Java. It didn't have to be this way.
+</I>&gt;<i>
+</I>&gt;<i>We can do something about it. We can build a JOS platform that has one JOS
+</I>&gt;<i>kernel. The JOS kernel loads and runs one or more JVMs, each in a separate
+</I>&gt;<i>process. You can start and stop JVMs. There should be three JVMs to choose
+</I>&gt;<i>from. Java 1.0, 1.1 or 2.0 (1.2). And when Java 3.0 is available, there
+</I>&gt;<i>will be four. You can run multiple copies of Java 1.0 JVM...but only one
+</I>&gt;<i>copy of its bytecode will be loaded. Same with 1.1 and 1.2.
+</I>&gt;<i>
+</I>&gt;<i>Why...we'll be more compatible with Java than Sun.
+</I>&gt;<i>
+</I>&gt;&gt;<i>In the meantime, we have a technical issue brought about by Sun's
+</I>decisions.
+&gt;&gt;<i>We don't have the capabliity described above yet, though we will try to
+</I>work
+&gt;&gt;<i>towards it.  Let the developers do what they need to do in the meantime to
+</I>&gt;&gt;<i>just make it work.
+</I>&gt;<i>
+</I>&gt;<i>I'm thinking long term. That's what I do. I think the capability is just
+</I>&gt;<i>around the corner. I wish there was some way for JOS to take advantage of
+</I>it.
+&gt;<i>
+</I>&gt;<i>I am disgusted with Sun Microsystems because, everywhere I look, they are
+</I>&gt;<i>the same. They doing the same kind of things that lead Microsoft Windows
+</I>&gt;<i>down a dead-end road. Here is what Microsoft (and Sun) have done: Ignore
+</I>&gt;<i>compatiblity. Frustrate their customers. Trash all of their customer's
+</I>&gt;<i>code. Offend people they haven't met. Mindlessly upgrade. Mindlessly
+</I>&gt;<i>upgrade. Mindlessly upgrade. Throw their products away. Shrink the software
+</I>&gt;<i>industry.
+</I>
+Well, that's we called &quot;Business&quot;. It is much different from Open Source
+World.
+
+&gt;<i>
+</I>&gt;<i>I want a new OS because these organizations are incapable of building an
+</I>&gt;<i>operating system that lasts.
+</I>&gt;<i>
+</I>
+me2, I want a new OS that would be build on Java. :D
+
+Regards,
+
+Hilary
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000034.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000038.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#35">[ date ]</a>
+              <a href="thread.html#35">[ thread ]</a>
+              <a href="subject.html#35">[ subject ]</a>
+              <a href="author.html#35">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

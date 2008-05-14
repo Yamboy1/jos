@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] StreamFactory passed URL test</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000046.html">
+   <LINK REL="Next" HREF="000061.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] StreamFactory passed URL test</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] StreamFactory passed URL test">gchii@mindspring.com</A><BR>
+    <I>Sun, 25 Jul 1999 20:06:58 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000046.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000061.html">[JOS-Arch] SmartAPI - Release 1a</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Just moments ago, the stream factory has passed its URL test. I should have
+the release of the SmartAPI and the StreamFactory ready for download by
+next weekend. Although you might not be able to see all it yet, it is very
+easy to use.
+
+Once you experience the SmartAPI and StreamFactory, you'll never go back.
+
+If you want a buffered data input stream, change
+    String uri = &quot;data:<A HREF="http://www.realignsoft.com/";">http://www.realignsoft.com/&quot;;</A>
+to
+    String uri = &quot;data:buffer:<A HREF="http://www.realignsoft.com/";">http://www.realignsoft.com/&quot;;</A>
+
+
+----- URL_Test.java
+/*
+
+  Installation : Realign Software Inc.
+                 Copyright (C) 1999 Realign Software Inc.
+                 All rights reserved.
+  Date Written : GCHII July 25, 1999
+
+*/
+package com.realignsoft.streamfactory1a.test;
+
+import com.realignsoft.jose1d.TestException;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+
+import com.realignsoft.smartapi1a.Factory;
+
+import com.realignsoft.streamfactory1a.InputStreamFactory;
+
+/**
+ * Downloads a webpage from the internet.
+ */
+public class URL_Test
+    extends UnitTest {
+  /**
+   * Creates an application.
+   */
+  public URL_Test() {
+    super();
+  }
+
+  /**
+   * Runs a best-case scenario test.
+   */
+  protected void runTest()
+      throws TestException {
+    println( &quot;Running URL test...&quot; );
+
+    String uri = &quot;data:<A HREF="http://www.realignsoft.com/";">http://www.realignsoft.com/&quot;;</A>
+
+    Factory factory = InputStreamFactory.getFactory();
+    DataInputStream input = (DataInputStream) factory.getObject( uri );
+
+    TestException exception = null;
+    try {
+      printFile( input );
+    }
+    catch( TestException e ) {
+      exception = e;
+    }
+
+    try {
+      input.close();
+    }
+    catch( IOException e ) {
+      _print( e );
+      throw _TEX( &quot;input.close()&quot; );
+    }
+
+    if ( exception != null ) {
+      throw exception;
+    }
+  }
+
+  protected void printFile( DataInputStream input )
+      throws TestException {
+    String line;
+
+    for (;;) {
+      try {
+        line = input.readLine();
+      }
+      catch( IOException e ) {
+        _print( e );
+        throw _TEX( &quot;input.readLine();&quot; );
+      }
+      
+      if ( line == null ) {
+        break;
+      }
+
+      println( line );
+    }
+  }
+}
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000046.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000061.html">[JOS-Arch] SmartAPI - Release 1a</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] WikiServlet</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000202.html">
+   <LINK REL="Next" HREF="000207.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] WikiServlet</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] WikiServlet">gchii@mindspring.com</A><BR>
+    <I>Fri, 20 Aug 1999 10:11:43 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000202.html">[JOS-Arch] Re: PrettyPrint</A></li>
+        <LI> Next message: <A HREF="000207.html">[JOS-Arch] Free CDs?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#206">[ date ]</a>
+              <a href="thread.html#206">[ thread ]</a>
+              <a href="subject.html#206">[ subject ]</a>
+              <a href="author.html#206">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>When installed, a request to a WikiServlet might looks something like this:
+
+<A HREF="http://www.jos.org/servlet/wiki">http://www.jos.org/servlet/wiki</A>
+
+When configured to run in a specific servlet environment, the &quot;name&quot; of a
+servlet can be changed. The servlet environment might map &quot;wiki&quot; to
+org.jos.wiki1a.WikiServlet. Later, it's remapped -- without changing
+external URIs -- when upgrading to org.jos.wiki1b.WikiServlet.
+
+When a simple servlet creates HTML code with links back to itself, it
+should use the getRequestURI(). The return value of getRequestURI() looks
+like this:
+
+/servlet/wiki
+
+When writing HREFs in servlet generated pages, each of the components must
+consistently use the request URI. If a keyword program checks all keywords
+for wiki, the self parameter should be created by WikiServlet and passed to
+KeywordProgram:
+
+String self = &quot;self=&quot; + getRequestURI();
+exec( new KeywordProgram(), self + &quot;&amp;&quot; + request.getQueryString() );
+
+The keyword program gets the value of self like this:
+
+String self = getProgramContext().getValue( &quot;self&quot; );
+
+Then, the keyword program can generate a HREF like this:
+
+println( &quot;&lt;A HREF=\&quot;&quot; + self + &quot;?option=view&amp;forum=main&amp;article=WebHome\&quot;&gt;&quot; );
+println( &quot;WebHome&quot; );
+println( &quot;&lt;/A&gt;&quot; );
+
+Like a generic registry, a generic parameter list has properties. These
+properties are not known in advance, so a derived class for each kind of
+parameter list would be wasteful. It would be a naming convention to always
+pass the self property to sub-programs that produce HREFs.
+
+Also, java.lang.System has generic properties. Soon, you'll be able to
+bring up a property viewer to examine all of the properties of
+java.lang.System.
+
+When installed, a request to the Source-Doc servlet might look like this:
+
+<A HREF="http://www.jos.org/servlet/sourcedoc">http://www.jos.org/servlet/sourcedoc</A>
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000202.html">[JOS-Arch] Re: PrettyPrint</A></li>
+	<LI> Next message: <A HREF="000207.html">[JOS-Arch] Free CDs?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#206">[ date ]</a>
+              <a href="thread.html#206">[ thread ]</a>
+              <a href="subject.html#206">[ subject ]</a>
+              <a href="author.html#206">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

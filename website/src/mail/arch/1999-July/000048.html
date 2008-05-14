@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] RE: [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000036.html">
+   <LINK REL="Next" HREF="000049.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] RE: [JOS-UI] peer-ui mappings</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] RE: [JOS-UI] peer-ui mappings">tmiller@haverford.edu</A><BR>
+    <I>Thu, 22 Jul 1999 16:05:12 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000036.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000049.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#48">[ date ]</a>
+              <a href="thread.html#48">[ thread ]</a>
+              <a href="subject.html#48">[ subject ]</a>
+              <a href="author.html#48">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Just a note: while you can't get around using java.lang.* (at
+least, not without your own rather oddly written compiler), decaf
+shouldn't have any problems supporting more than one instance of those
+classes distributed over multiple processes, thought the native calls
+could get quite messy.
+
+	Another note: it's rather important to bear in my the distinction
+between the java language and the java platform.  The problem is that Sun
+doesn't keep this distinction terribly sharp... JOS is its own platform.
+The question standing before us is: should we make JOS a superset of the
+Java platform, or should we ignore the Java platform so far as possible
+and write a jBCS* module up later?
+
+
+* jBCS: the notional equivalent of Linux's (et al) intel Binary
+Compatiblity System.
+
+	There are important ramifications.  (Warning: the previous was an
+understatement of epic proportions.  You may wish to adjust your scale of
+thinking. :))  The first one that comes to *my* mind is the question of
+difficulty: would it be substantially more difficult to write jBCS modules
+for a system that may or may not substantially resemble Sun's Java
+platform(s) than it would be to write a superset of Sun's Java platform
+(pick one) that has a mysterious way of running what amounts
+incompabitbile binaries?  The initial response in my mind is: the Right
+Way to write such a superset would be with jBCS modules.  Therefore, the
+difficulties come down to which notional JOS platform (our own, or some
+superset) would be more amenable to jBCS modules.
+
+	[ Sidebar: an application of the jBCS modules, if they really do
+need to end up modifying the way in which certain bytecodes are executed,
+and that this is done well, would be automagic support the binfmt_* idea
+from linux.  This would include things like _perl, _tcltk, _javascript,
+and so on.  At any rate... ]
+
+	It might be worthwhile to investigate how the WINE project is
+handling its Win3.1/Win95/Win98 problems, which amount to almost the same
+thing: the platform (i386) is the same, but with large differences in the
+libraries, and (perhaps) subtle differences in the way that the libraries
+are understood (by the applications.)
+
+&gt;<i> It is just around the corner!  Here's what has to happen:
+</I>&gt;<i>    * JJOS+decaf gets to the point where we can begin to integrate
+</I>&gt;<i> $Classpath.
+</I>
+	Soon.  Maybe as early as late September.
+
+	As for modifying classpath to support processes, I'm very
+sincerely hoping we won't have to do much at all.  Since spawning
+processes would have to be handled by a separate library (jos.core.proc?)
+anyway, we should be able to do all the slight-of-hand necessary behind
+closed doors, so to speak, and thus not fork classpath, which has enough
+to do already.
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000036.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000049.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#48">[ date ]</a>
+              <a href="thread.html#48">[ thread ]</a>
+              <a href="subject.html#48">[ subject ]</a>
+              <a href="author.html#48">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000669.html">
+   <LINK REL="Next" HREF="000639.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs">gchii@mindspring.com</A><BR>
+    <I>Fri, 19 May 2000 11:09:53 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000669.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+        <LI> Next message: <A HREF="000639.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#634">[ date ]</a>
+              <a href="thread.html#634">[ thread ]</a>
+              <a href="subject.html#634">[ subject ]</a>
+              <a href="author.html#634">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:21 AM 5/19/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>This would suggest to me that we need, in fact, to share the statics of a
+</I>&gt;<i>class (only) when an object of that type is shared.  If this proves to be
+</I>&gt;<i>unworkable, we may be forced to restrict shared objects to those whose
+</I>&gt;<i>classes (and parents) do not have statics.
+</I>
+Exactly. It has proven to be unworkable. Static fields of a class include
+those fields that are hidden and/or vm-specific. All classes have static
+fields. Since all classes have static fields, we can share no classes.
+
+With a single primordial class loader, the class loader property (a static
+field) is null -- implying THE primordial class loader. With multiple
+primordial class loaders, the primordial class loader property (a static
+field) contains a reference to its primordial class loader. Someone
+suggested and I concur that the class loader property cannot be used for
+the primordial class loader property, so that getClassLoader() returns null
+for &quot;system&quot; classes.
+
+Even final static fields cannot be shared. Final is shallow and applies to
+only the direct object reference. For example, a hashtable can be final and
+yet objects added to it, like this:
+
+public interface Demo {
+  public static final Hashtable cache = new Hashtable();
+}
+
+  public void example1() {
+    Demo.cache.put( &quot;name-1&quot;, &quot;value-1&quot; );
+    Demo.cache.put( &quot;name-2&quot;, &quot;value-2&quot; );
+    Demo.cache.put( &quot;name-3&quot;, &quot;value-3&quot; );
+  }
+
+And therefore, it is possible to do something like this:
+
+  public void example2() {
+    int iMax = 1000;
+    for ( int i = 0; i &lt; iMax; i++ ) {
+      Thread t = new CustomThread();
+      t.start();
+      Demo.cache.put( &quot;thread.&quot; + i, t );
+    }
+  }
+
+If Process A starts 1000 threads and adds them to a hashtable owned by
+Process B, all of the threads are stopped() when Process A dies. That is
+another reason why Process B cannot own an object created by Process A,
+except by proxy.
+
+Therefore, the easiest object sharing may be performed by subprograms, not
+processes. With what we know so far, it might be possible to share objects
+across custom class loaders (with limitations). It is definitely possible
+to share raw bytecode. It is possible to share class definitions within a
+virtual machine. This kind of intra-process object sharing may be important
+and goes beyond the Java Virtual Machine Specification.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000669.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+	<LI> Next message: <A HREF="000639.html">[JOS-Arch] Re: Arch digest, Vol 1 #185 - 7 msgs</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#634">[ date ]</a>
+              <a href="thread.html#634">[ thread ]</a>
+              <a href="subject.html#634">[ subject ]</a>
+              <a href="author.html#634">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

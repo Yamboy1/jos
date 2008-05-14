@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000555.html">
+   <LINK REL="Next" HREF="000559.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 04 May 2000 09:25:06 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000555.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000559.html">[JOS-Arch] [bytecode resource] Status Report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#560">[ date ]</a>
+              <a href="thread.html#560">[ thread ]</a>
+              <a href="subject.html#560">[ subject ]</a>
+              <a href="author.html#560">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE><A HREF="mailto:Matt.Albrecht@trilogy.com">Matt.Albrecht@trilogy.com</A> wrote:
+
+&gt;<i> The JVM should of course take the
+</I>&gt;<i> bytecode and transform it into its internal optimized version.  Usually (as
+</I>&gt;<i> it seems), this also includes defining the superclass / interface pointers
+</I>&gt;<i> as well.  IMHO, only the &quot;internal optimized version&quot; should be shared,
+</I>&gt;<i> while the pointers to superclass / interfaces need to be tacked to the
+</I>&gt;<i> static data associated with the class instance.
+</I>
+Another interesting point. If we share class definitions without caring
+which version of the superclass is being loaded (as we have apparently
+been discussing), then the class definitions need tack on the
+superclasses with the static data.
+
+On the other hand, if we include the superclass pointers with the class
+definition, we are saying that a class definition may only be shared
+between two classes if their superclasses also share class definitions.
+And if we do this, we don't have to worry about checking that
+superclasses match when performing illegal casts.
+
+However, if we do this, we don't get to share class definitions when the
+superclasses are different versions. BUT, as I pointed out in my last
+email, it is very rarely the case that the superclasses will be
+different (the inheritance chain would have to go through a number of
+different archives to even allow the possibility). So, my vote is for
+keeping superclass pointers with the class definition. This allows us to
+do illegal cast checks the way you wanted (ie. the &quot;most correct&quot; way)
+at minimal computational expense.
+
+&gt;<i> 2. If we only allow illegal casts with classes loaded by the primordial
+</I>&gt;<i> class loader, then all we need to check is if the two class instances
+</I>&gt;<i> indeed were loaded by that class loader, and have the same name, since
+</I>&gt;<i> class loaders should only allow one class instance per class name.
+</I>
+Note that there are multiple primordial class loaders: one per process.
+If you are only considering a single primordial class loader, you are in
+fact talking about &quot;legal&quot; casts, not &quot;illegal&quot; casts. &quot;Illegal&quot; casts
+refers to casts between processes.
+
+{{ BTW, Matt, you seem to be CC'ing the admin list automatically. Is
+this something to do with your mail client? }}
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000555.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000559.html">[JOS-Arch] [bytecode resource] Status Report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#560">[ date ]</a>
+              <a href="thread.html#560">[ thread ]</a>
+              <a href="subject.html#560">[ subject ]</a>
+              <a href="author.html#560">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

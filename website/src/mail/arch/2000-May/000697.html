@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Approaches to Object Sharing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000694.html">
+   <LINK REL="Next" HREF="000684.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Approaches to Object Sharing</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Approaches to Object Sharing">gchii@mindspring.com</A><BR>
+    <I>Tue, 30 May 2000 12:09:16 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000694.html">[JOS-Arch] Approaches to Object Sharing</A></li>
+        <LI> Next message: <A HREF="000684.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#697">[ date ]</a>
+              <a href="thread.html#697">[ thread ]</a>
+              <a href="subject.html#697">[ subject ]</a>
+              <a href="author.html#697">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 12:15 PM 5/30/00 +1000, Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+&gt;<i>If you want to break the &quot;persistence barrier&quot; it helps to think of it
+</I>&gt;<i>in different ways. As long as you think of it as a &quot;persistence barrier&quot;
+</I>&gt;<i>it is going to remain a barrier.
+</I>
+Through my experience with distributed computing, I have learned to treat
+the persistence barrier with great respect. Like a ten foot thick brick
+wall, I only hurt myself to think it isn't really there. Thinking of it as
+a barrier helps me identify workable solutions.
+
+-----
+
+Imagine we have two stand-alone computers.
+
+Let's put a physical barrier between these two machines. We build a brick
+wall between them. We make it ten feet thick.
+
+Now, we have two stand alone computers, separated by physical space.
+Nothing from the one computer comes in contact with the other. (No network;
+no modem; no USB; no serial, parallel or fiber optic cable; nothing
+cellular; nothing infrared; etc., etc..)
+
+It is safe to say that software running on one machine could not possible
+affect the software running on the other. When this is what we want, this
+is a good thing.
+
+-----
+
+Imagine we have two stand-alone Java applications.
+
+We could run a stand-alone Java application on each machine. A Java
+application running on one machine could not possible affect a Java
+application running on the other. When this is what we want, this is a good
+thing.
+
+-----
+
+Imagine we have two stand-alone Java applications again, but this time,
+have only one stand-alone computer. When this is what we want, this is a
+good thing.
+
+How can we do it? We need a virtual machine. In this case, I'm saying
+&quot;virtual machine&quot; in the generic sense, not a Java Virtual Machine.
+
+Let's put a conceptual barrier between these two virtual machines. We must
+work hard to maintain the illusion of two stand-alone machines. We build a
+machine code wall between them. We make it &quot;thick&quot; so that there can be no
+accidental or malicious contact between them. As a rule, no data is shared
+and objects are not share-able. A Java application running on one virtual
+machine could not possible affect a Java application running on the other.
+
+The persistence barrier is a conceptual barrier between physical machines.
+It is not imaginary. Its properties are not an illusion. Like a brick wall,
+it exists between every kind of computing device ever made. Many mechanisms
+have been invented to punch &quot;holes&quot; through the persistence barrier. No
+mechanism can tear it down. For more information, see also the
+PersistenceBarrier article on JOS Wiki.
+
+As always, a multiple tasking system must (1) put up a complete persistence
+barrier and then (2) carefully punch &quot;holes&quot; through it. A protocol stack
+is a widely accepted way to punch a hole through a persistence barrier. It
+works. It is simple. It is fully test-able and therefore, can be made
+highly reliable. Since data is always piped through a FIFO queue, it is
+very predictable. It made the Internet possible.
+
+MPCL was designed to put up a complete persistence barrier between bytecode
+processes. MPCL is a brick wall, ten feet thick. If we start with the
+assumption that Java primatives and only Java primatives can shared between
+bytecode processes, we can immediately build a useful MPCL-compatible
+machine. A primordial class loader seems to be the cornerstone of the
+illusion of a Java application running on its own stand-alone machine.
+
+Let's punch one &quot;hole&quot; for a protocol stack. When we implement the native
+methods of java.io, it forms a hole in the persistence barrier so that
+&quot;packets&quot; can pass through. Since CORBA and RMI already run on top of a
+protocol stack, we automatically inherit industry-standard object sharing.
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000694.html">[JOS-Arch] Approaches to Object Sharing</A></li>
+	<LI> Next message: <A HREF="000684.html">[JOS-Arch] Static fields/object sharing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#697">[ date ]</a>
+              <a href="thread.html#697">[ thread ]</a>
+              <a href="subject.html#697">[ subject ]</a>
+              <a href="author.html#697">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

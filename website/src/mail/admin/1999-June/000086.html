@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Admin] cvs permissions fix</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:iainshigeoka%40yahoo.com">
+   <LINK REL="Previous"  HREF="000088.html">
+   <LINK REL="Next" HREF="000087.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Admin] cvs permissions fix</H1>
+    <B>Iain Shigeoka</B> 
+    <A HREF="mailto:iainshigeoka%40yahoo.com"
+       TITLE="[JOS-Admin] cvs permissions fix">iainshigeoka@yahoo.com</A><BR>
+    <I>Tue, 29 Jun 1999 08:55:47 -0700 (PDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000088.html">[JOS-Admin] Alternative approach to &quot;memory&quot; classes...</A></li>
+        <LI> Next message: <A HREF="000087.html">[JOS-Admin] cvs permissions fix</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#86">[ date ]</a>
+              <a href="thread.html#86">[ thread ]</a>
+              <a href="subject.html#86">[ subject ]</a>
+              <a href="author.html#86">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>--- Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; wrote:
+&gt;<i> Iain Shigeoka wrote:
+</I>&gt;<i> 
+</I>&gt;<i> &gt; Who is &quot;in charge&quot; of CVS?  I'm starting to get
+</I>&gt;<i> 
+</I>&gt;<i> CVS admin requests should be sent to this list. As
+</I>&gt;<i> 
+</I>&gt;<i> However, I would be what you would call the &quot;cvs
+</I>&gt;<i> admin guy&quot; - if you
+</I>&gt;<i> need to know.
+</I>
+OK. Despite our excellent community process, its nice
+in some situations to be able to point to someone when 
+told &quot;Take me to your leader!&quot;.  :)  
+
+&gt;<i> handle general cvs administration tasks including:
+</I>&gt;<i> 
+</I>&gt;<i> - cvs configuration and maintenance
+</I>&gt;<i> - creation of top-level modules and any modules
+</I>&gt;<i> under jos/* (including
+</I>&gt;<i> account creation for new developers under those
+</I>&gt;<i> modules)
+</I>
+OK.  Could you (Ryan) please contact <A HREF="mailto:kevinr@spin.com.mx">kevinr@spin.com.mx</A>
+KevenRaul.  He's writing the CommandLineUtilities
+and wants to put them into the CVS and use that
+for development.  I've Cc'd him so he may contact
+you...
+
+Also, speaking of adding/maintaining CVS accounts,
+how hard would it be to automate the process?  I think
+we're &quot;scaring&quot; away developers because there are so
+many things you need to do to get started.  First 
+you need a WikiName and password, then you need to
+add yourself to the MemberList, and join the right
+mailing lists, and then get a separate CVS account.
+I was thinking about trying to create a central
+&quot;account&quot; management page/script that will allow
+a person to manage all account information in a
+single place.  Ideally choose/edit one WikiName,
+account info, and password, set some check marks, and everything is
+configured.  CVS commit access would have 
+to be &quot;approved&quot; by module &quot;owners&quot; for pre-existing
+CVS modules, but creating new modules (following
+certain rules) should be easy/automatic.  Do you
+think this is possible?
+
+&gt;<i> &gt; Of primary importance, is anyone in charge of, or
+</I>&gt;<i> interested in being
+</I>&gt;<i> &gt; in charge of SourceServer?
+</I>&gt;<i> 
+</I>&gt;<i> I think Thomas Winzig wrote that. I'm not sure who
+</I>&gt;<i> took over. Does
+</I>&gt;<i> anyone here know **anything** about SourceServer?
+</I>&gt;<i> (Clark?)
+</I>
+I hope someone does!  At present it appears broken.
+It can read files but can't add any.  
+ 
+&gt;<i> I would like to know one thing about it ...
+</I>&gt;<i> 
+</I>&gt;<i> Some people have proposed that everything in
+</I>&gt;<i> SourceServer be moved
+</I>&gt;<i> across to CVS. 
+</I>
+I'm one of the more vocal in this group.  It's 
+confusing where to put source and why.  Once again, 
+a finger pointing problem.  When asked, &quot;Where do I 
+put my source I want to contribute to JOS&quot;, I'd like 
+to have one place to point...
+
+&gt;<i> To do this I need to know how to
+</I>&gt;<i> access plain source
+</I>&gt;<i> files from SourceServer. I don't think it is
+</I>&gt;<i> feasible to move everything
+</I>&gt;<i> across in one go - we would need to chase up each
+</I>&gt;<i> individual developer
+</I>&gt;<i> and create accounts for them. I'd rather create the
+</I>&gt;<i> appropriate
+</I>&gt;<i> directories in jos/library as developers are ready
+</I>&gt;<i> to move across.
+</I>
+All the source is in the /source dir of the jos.org
+account.  The dir structure is arranged per package
+name I believe.  There is a raw (as submitted java
+source), java source (pretty printed), and html version 
+of each file.  If we could move them over to CVS,
+it may be best to do so (just to remove the confusion
+of having two source repositories, with no correlation
+between what's in which).  I propose simply putting
+them in the CVS (the pretty printed version of the
+source) with only the CVS admin having commit access
+to them.  Then as the authors start contributing,
+they can be granted commit access.  Since SourceServer
+has been broken since, I believe March 1999, and I
+have only had one person ask why its broken, I don't
+think the source in the SourceServer is currently
+under active development (or if it is, its being
+developed outside of JOS).
+
+&gt;<i> &gt; Ideally, we could use the PrettyPrinting code to
+</I>&gt;<i> modify
+</I>&gt;<i> &gt; the webcvs.cgi interface and not have two separate
+</I>&gt;<i> &gt; (redundant?) source repositories.
+</I>&gt;<i> 
+</I>&gt;<i> This is something I have been working on. The latest
+</I>&gt;<i> version of
+</I>&gt;<i> PrettyPrinter does hyperlinking but I still have a
+</I>&gt;<i> few bugs to iron out.
+</I>&gt;<i> After that I can integrate it into cvsweb.
+</I>
+Very cool.  Let me know when that's done so I can
+announce it on the front page.  I also would like to 
+modify the HowToSubmitSoftware and related pages if you 
+think that we can move 100% of JOS source to CVS.
+Basically, when SourceServer is fully &quot;replaced&quot;.
+
+-iain (self-appointed jos webmaster)
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at <A HREF="http://mail.yahoo.com">http://mail.yahoo.com</A>
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000088.html">[JOS-Admin] Alternative approach to &quot;memory&quot; classes...</A></li>
+	<LI> Next message: <A HREF="000087.html">[JOS-Admin] cvs permissions fix</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#86">[ date ]</a>
+              <a href="thread.html#86">[ thread ]</a>
+              <a href="subject.html#86">[ subject ]</a>
+              <a href="author.html#86">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

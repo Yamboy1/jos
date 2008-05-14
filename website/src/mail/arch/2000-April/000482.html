@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [bytecode resource] Status report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000481.html">
+   <LINK REL="Next" HREF="000485.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [bytecode resource] Status report</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [bytecode resource] Status report">gchii@mindspring.com</A><BR>
+    <I>Wed, 19 Apr 2000 12:26:14 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000481.html">[JOS-Arch] [multiple process] Terminology</A></li>
+        <LI> Next message: <A HREF="000485.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#482">[ date ]</a>
+              <a href="thread.html#482">[ thread ]</a>
+              <a href="subject.html#482">[ subject ]</a>
+              <a href="author.html#482">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I have finished a BytecodeResource application using the Java programming
+language. It searches a directory tree for .class files and generates the
+corresponding C++ source code. Basically, this puts the raw data from a
+.class file into the DATA segment of your C++ program.
+
+Instead of raw data in a ReadOnlyByteArray class, it uses a Bytecode
+object. The rc_Bytecode class in C++ is a pure virtual class that, so far,
+looks like this:
+
+class rc_Bytecode {
+  public:
+    virtual const void *getPayload() const = 0;
+    virtual size_t getSize() const = 0;
+
+    virtual bool isError() = 0;
+    virtual int getError() = 0;
+    virtual void setError( int v ) = 0;
+
+    virtual void compact() = 0;
+
+    virtual unsigned short getConstantPoolCount() = 0;
+    virtual const void *getConstantPool( unsigned short index ) = 0;
+    virtual CharBuffer getThisClassSpec() = 0;
+    virtual CharBuffer getSuperClassSpec() = 0;
+};
+
+The BytecodeResourse application (in Java) uses the same model as WebSource
+3b (and therefore, can't find files on Linux). Once WebSource 3b runs on
+Linux, BytecodeResource will run on Linux, too.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000481.html">[JOS-Arch] [multiple process] Terminology</A></li>
+	<LI> Next message: <A HREF="000485.html">[JOS-Arch] [bytecode resource] Status report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#482">[ date ]</a>
+              <a href="thread.html#482">[ thread ]</a>
+              <a href="subject.html#482">[ subject ]</a>
+              <a href="author.html#482">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

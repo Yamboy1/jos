@@ -1,0 +1,208 @@
+From jm@mak.com Thu, 05 Aug 1999 09:35:05 -0400
+Date: Thu, 05 Aug 1999 09:35:05 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-UI] Re: [JOS-Kernel] Garbage collection
+
+Hi George (and others);
+
+George.Marrows@Smallworld.co.uk wrote:
+>         [GAM]  Hmm.. plenty of warnings about doing arithmetic with void*.
+> I'll sort them out.
+
+Yeah, this particular embarrassment is my fault, not Todd's.  It worked, so I
+focussed upon new functionality, not cleaning it up.  If you have already done
+so, please let me know.  If not, this would be a good time to also put in Robert
+Fitzsimons' (Hi, Robert!) code to enable booting via GRUB (I seem to recall
+that, amongst the worst offenders in generating warnings, was the code which
+looked for the Etherboot-specific data structures located in various bits of
+memory...)
+
+>         [GAM]  I propose to put the gc code in a separate directory:
+> common/nativecode/gc. How does that sound? It's currently in
+> common/nativecode, but it bloats that directory somewhat. Now I've just got
+> to sort out the accursed makefile :-(
+
+OK.  Works for me.  Sorry about the makefile trouble.  If there's a better way
+to do this, I'd sure be interested...  I think we have similar problems in the
+bytecode directory, in that we have no platform-specific bytecode files (e.g.,
+VGA driver) yet.
+
+Hmm... this also brings up the issue of debugging this stuff under UNIX.  Should
+we try and build the host version with libVGA (or whatever it's called)? 
+libGGI?  I don't know either of them.  Anybody out there with any ideas ("Hi"
+and "help," UI@jos.org guys -- check out recent kernel postings about a VGA
+driver working)...
+
+>         [GAM]  I'll see if I can work out a modified interface for jbheap
+> earlier than the 14th. It needs to allow the rest of JJOS pass back
+> information about roots and kick off an on-demand garbage collect, in
+> addition to jbheap's current allocate functionality.
+
+Fabulous!  I look forward to this with great anticipation.  It'll enable us to
+keep jjos+decaf running long enough to be interesting!
+
+> > > with this: do we need to look in registers; how to find top and bottom
+> > of
+> > > the native code stack for scanning.
+> >
+> > I'm thinking with green threads we won't have to, but that's based upon a
+> > whole
+> > 10 seconds of thought...  Todd, what sayest thou?
+> >
+>         [GAM]  But if I'm also doing gc for the C++ code, and the only ref
+> to some C++ heap object is in a local variable somewhere on the native code
+> stack, I'll need to find that ref. Otherwise that object is gone (or rather,
+> the memory for it doesn't get marked as in use and could end up being reused
+> for something else, which in turn could lead to some very nasty bugs).
+
+The location of the sole native-code stack (sole because we're not doing
+multithreading yet in the kernel) is easily-computable at the point where you
+need to scan for the GC roots.  Right now (I don't have the sources in front of
+me, so this is from memory), I think there's a magic value that gets crammed
+into the stack pointer register (2MB?), but I don't think this is saved into any
+easily-accessible-from-C++ variable, although the heap-initialization code
+*does* avoid stepping on the stack.  Sorry...  I can fix this...  Really!
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== jm@mak.com               ==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+
+
+
+From digigod@earthling.net Thu, 26 Aug 1999 12:43:30 -0700
+Date: Thu, 26 Aug 1999 12:43:30 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-UI] Mac L&F
+
+http://www.ing.unitn.it/~luttero/javaonMac/index.html is a page where
+they are working a more realistic Mac L&F. when we get the wiki in
+better shape we sould find an appropriate place to put that link. Also
+anyone interested in making L&F's should consider joining them. 
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From langston2001@worldnet.att.net 26 Aug 99 16:23:36 -0600
+Date: 26 Aug 99 16:23:36 -0600
+From: Jacob Langston langston2001@worldnet.att.net
+Subject: [JOS-UI] user interface
+
+hello,
+
+I'm new to this project(in fact, I'm still waiting for my user name validation). I was wondering 
+what type of user interface was currently being designed for JOS, and how it's progress is 
+going. I mean, is the interface like dos, or more like a windows gui?
+
+-Jacob
+
+
+
+
+
+
+From digigod@earthling.net Thu, 26 Aug 1999 19:30:38 -0700
+Date: Thu, 26 Aug 1999 19:30:38 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-UI] user interface
+
+Jacob Langston wrote:
+> I'm new to this project(in fact, I'm still waiting for my user name validation). I was wondering
+> what type of user interface was currently being designed for JOS, and how it's progress is
+> going. I mean, is the interface like dos, or more like a windows gui?
+
+Yes. And by that I mean both and neither; to make it less confusing I'll
+explain the whole thing.
+
+The UI is not--technically speaking--part of the OS, its an application.
+The application/UI we are designing is called JADE
+(JavaApplication&DesktopEnvironment) it is a socket, so to speak, for
+the actual UI. JADE consists of a minimal framework that the actual UI
+plugs into. It also has convience framework extensions* for CLI's
+(CommandLineInterfaces, or a "dos ui") and for TGUI's (TraditionalGUI
+aka a "windows gui"). This way the user can select the best UI for
+his/her skill-level/requirments/tastes. Id est, someone who only does
+word proccessing could have a UI that is "docucentric" (or
+document-oriented) while someone who is familiar with macintoshes could
+have a MAC UI while a server admin can put in a UNIX like CLI...
+
+Cheers,
+DigiGod
+_________________________
+*/framework extension/ is actually a plug to JADE's socket
+  that acts as a plug itself, thus becoming a kind of 
+  "extending proxy".
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+From gchii@mindspring.com Thu, 26 Aug 1999 22:29:50 -0400
+Date: Thu, 26 Aug 1999 22:29:50 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-UI] user interface
+
+At 04:23 PM 8/26/99 -0600, Jacob Langston <langston2001@worldnet.att.net>
+wrote:
+>I was wondering what type of user interface was currently being designed
+>for JOS, and how it's progress is going. I mean, is the interface like dos,
+>or more like a windows gui?
+
+JOS has a unique architecture. The "user interface" for JOS is an optional
+plug-in. Like a salad bar, you can have anything you want. While some
+operating systems are built upon the premise of one-size-fits-all, JOS is
+open-ended and gives you choice. What user interface do you want to use
+this time? No problem.
+
+JOS will support the graphical user interface for everyone who wants one,
+through video drivers, JADE, and plug-in window managers. JOS is equally at
+home on a desktop PC as it is on a serverfarm in a closet, with no monitor,
+no video graphics card, no mouse, no keyboard.
+
+JOS builds on the strength of Java's interfaces to make many seemingly
+incompatible presentation managers work well together. With multiple domain
+support, it provides a mechanism to switch among domains. Each domain can
+have a character-based or bitmapped user interface.
+
+Well, that's the plan. There are special interests groups working on each
+user interface. They're all here on the JOS-UI discussion.
+
+
+
+

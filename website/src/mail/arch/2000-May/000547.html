@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000546.html">
+   <LINK REL="Next" HREF="000550.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">gchii@mindspring.com</A><BR>
+    <I>Tue, 02 May 2000 19:25:55 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000546.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000550.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#547">[ date ]</a>
+              <a href="thread.html#547">[ thread ]</a>
+              <a href="subject.html#547">[ subject ]</a>
+              <a href="author.html#547">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 09:37 AM 5/2/00 -0500, <A HREF="mailto:Matt.Albrecht@trilogy.com">Matt.Albrecht@trilogy.com</A> wrote:
+&gt;<i>For Bytecode (bytecode A vs. bytecode B):
+</I>&gt;<i>   1. The bytes within the bytecode must match exactly between A and B.
+</I>&gt;<i>   I believe this is the only requirement.
+</I>
+Exactly! The raw payload of A must match the raw payload of B.
+
+  memcmp( A.getPayload(), B.getPayload() );
+
+&gt;<i>For Class Definitions (class def C vs. class def D)
+</I>&gt;<i>   1. Internal bytecodes of C and D must match.
+</I>&gt;<i>   2. The Class Definitions for their parent classes must match (superclass
+</I>&gt;<i>of C must match superclass of D, and all interfaces must match as well).
+</I>&gt;<i>
+</I>&gt;<i>So, if two processes E and F load the exact same bytecode for class
+</I>&gt;<i>&quot;MyClass&quot;, that doesn't mean that their classes match.  Process E may load
+</I>&gt;<i>a completely different version of the superclass than process F.  Variables
+</I>&gt;<i>may not match, method invocation may not be the same, and so on.
+</I>
+Wait! I thought a class definition has no static fields. If it has no
+static fields, it has no link to any superclass. A class definition only
+knows the name of its superclass, not the class definition of its superclass.
+
+Otherwise, both a class definition and a class would be the same thing.
+
+Let's talk about resolving a class. A class can be resolved. It has static
+fields, like ClassLoader, that help resolve the class. A class definition
+cannot be resolved because that requires static fields. A class definition
+can pre-convert UTF8 fields and convert the external representation of
+other constants to a vm-specific form. It can even pre-compile the Code
+attribute of methods. The pre-compiled code would be platform- and vm-specific.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000546.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000550.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#547">[ date ]</a>
+              <a href="thread.html#547">[ thread ]</a>
+              <a href="subject.html#547">[ subject ]</a>
+              <a href="author.html#547">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

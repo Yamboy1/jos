@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Apps] [bulkmake] Release 3</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000061.html">
+   <LINK REL="Next" HREF="000063.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Apps] [bulkmake] Release 3</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Apps] [bulkmake] Release 3">gchii@mindspring.com</A><BR>
+    <I>Fri, 18 Aug 2000 10:15:29 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000061.html">[JOS-Apps] [eric] Linux programming question</A></li>
+        <LI> Next message: <A HREF="000063.html">[JOS-Apps] Purpose of this mailing list?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#62">[ date ]</a>
+              <a href="thread.html#62">[ thread ]</a>
+              <a href="subject.html#62">[ subject ]</a>
+              <a href="author.html#62">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Release 3 of BulkMake(tm) 2b is available for immediate download. For more
+information, see also the following articles on JOS Wiki:
+
+<A HREF="http://www.metamech.com/wiki/view/Main/BulkMake">http://www.metamech.com/wiki/view/Main/BulkMake</A>
+
+BulkMake
+DownloadBulkMake
+PackageArchive
+
+In this release, the package archive tool was upgraded from version 2a to
+2b. The new version implements a &quot;patch mode&quot; so that an incremental
+archive can be created. Source code or bytecode which has changed (since
+the full archive) are added to archive-patch.zip and archive-src-patch.zip.
+
+And there's more.
+
+1. The new version of this tool uses a reusable AbstractProgram from
+gchii.library.abstractprogram1a instead of its own.
+
+2. The new version uses the StringList class in org.jos.gchii.find2a
+instead of managing two string lists inside the PackageArchiveProgram class.
+
+3. The new version uses an experimental FileTool and FileLastModifiedTool.
+Both tools do not use asynchonous I/O and always read a single directory.
+The FileTool class returns all files which have a specific suffix. The
+FileLastModifiedTool class returns all files which have a last modified
+time greater than a given time /and/ have a specific suffix.
+
+4. The new version uses an experimental supplement to
+java.io.FilenameFilter, so that filename filters can be daisy-chained to
+support multiple independent filters. (The FilenameFilter interface does
+not support chaining.) The FileLastModifiedTool uses something like the
+following chain:
+
+  public void example( String suffix, Date d ) {
+    FilenameFilter filter =
+        new LastModifiedFilter( d.getTime(),
+        new SuffixFilter( suffix,
+        new FileFilter() ) );
+
+    File f = new File( &quot;.&quot; );
+    String[] list = f.list( filter );
+  }
+
+5. And this version implements the DirectoryListener interface for a more
+package-oriented design, rather than the FileListener interface.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000061.html">[JOS-Apps] [eric] Linux programming question</A></li>
+	<LI> Next message: <A HREF="000063.html">[JOS-Apps] Purpose of this mailing list?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#62">[ date ]</a>
+              <a href="thread.html#62">[ thread ]</a>
+              <a href="subject.html#62">[ subject ]</a>
+              <a href="author.html#62">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

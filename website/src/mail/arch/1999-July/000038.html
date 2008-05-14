@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] RE: [JOS-UI] peer-ui mappings</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000035.html">
+   <LINK REL="Next" HREF="000036.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] RE: [JOS-UI] peer-ui mappings</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] RE: [JOS-UI] peer-ui mappings">tmiller@haverford.edu</A><BR>
+    <I>Thu, 22 Jul 1999 15:32:39 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000035.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000036.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#38">[ date ]</a>
+              <a href="thread.html#38">[ thread ]</a>
+              <a href="subject.html#38">[ subject ]</a>
+              <a href="author.html#38">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> 1. What's the different between JVM of JDK1.0, JDK1.1, JDK2.0 ?
+</I>&gt;<i>     As far as I know, JVM itself hasn't changed a lot. The Library/Classes of JDK
+</I>&gt;<i>     has changed a lot from 1.0 to 2.0. If this is true, it isn't affected JOS Kernel a lots.
+</I>
+	Mostly, the JVM spec has changed in how it addresses various bits
+and pieces that were broken either in the original spec or in the original
+implementation(s) of the JVM from Sun (quite frequently both, and in
+incompatible ways).  It's a horrible mess, and I have a great desire to
+wash my hands of the whole thing.  Since I'm not writing the class
+libraries ( classpath is! ), I can basically take the position that I'm
+writing to Rev 2 of the JVM spec, which, AFAIK, is the spec equivalent to
+the &quot;Java 2&quot; platform, and that classpath is (will be) the Canonical Code,
+that is, I won't 'fix' anything broken in the spec if it will break
+classpath.  This will undoubtedly make me rather unpopular with a great
+number of people, but since even the Rev 2 JVM/Java Language spec is
+*still* broken in many horribly fascinating ways, the temptation to sit it
+out and wait for the academics to fix it is very strong.  (Notably, Java's
+official memory model is, to my understanding, a standing joke to JVM
+designers; a similar example is the classloader-spoof attack, which can be
+fixed in one of two mutually incompatible ways; one of which is the Right
+Thing from a language-design perspective, and the other the Right Thing
+from the platform-design perspective.)
+
+	Currently, enourmous chunks of the JVM spec in decaf are missing,
+and, in fact, the compatibility in decaf most closely resembles jdk 1.0.2.
+Of course, since Sun charges for the JCK, I couldn't tell you how well 
+I'm actually doing.	
+
+	Summary: the coder at the keyboard (me) is going to write
+something that works with classpath, unless the JOS project has a whole
+lot of extra coders lying around that I'm unfamiliar with who have
+mysteriously generated our own (more-)correct class library.  I rather
+suspect we won't hash out the Right Thing regarding compatibility for
+quite a while yet anyway...
+
+-_Quinn
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000035.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000036.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#38">[ date ]</a>
+              <a href="thread.html#38">[ thread ]</a>
+              <a href="subject.html#38">[ subject ]</a>
+              <a href="author.html#38">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

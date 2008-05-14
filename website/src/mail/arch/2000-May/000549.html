@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Bytecode vs. class definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000548.html">
+   <LINK REL="Next" HREF="000555.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Bytecode vs. class definition</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Bytecode vs. class definition">tmiller@haverford.edu</A><BR>
+    <I>Tue, 2 May 2000 20:30:48 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000548.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+        <LI> Next message: <A HREF="000555.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#549">[ date ]</a>
+              <a href="thread.html#549">[ thread ]</a>
+              <a href="subject.html#549">[ subject ]</a>
+              <a href="author.html#549">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Ah.  Here's the heart of the matter for me.  I wasn't understanding what
+</I>&gt;<i> exactly was meant by &quot;class definition&quot;.  I was under the impression that
+</I>&gt;<i> this was a kind of intermediate phase in the loading of the Class.  From
+</I>&gt;<i> the sound of it, a class definition is bytecode which has been loaded by a
+</I>&gt;<i> class loader and passed to the JVM, but has not yet been resolved (via a
+</I>&gt;<i> native method).  So then I hear you saying that a class definition is
+</I>&gt;<i> bytecode associated with a class loader.
+</I>
+	Yes, no, and maybe.  Yes, a byte-array in class file format, as
+defined in the VM spec, is a 'class definition' in the sense that you pass
+one to defineClass().  No, a 'class definition' is not bytecode; it is the
+machine-and-vm specific translation of the 'bytecode class definition'
+into something more efficient to use internally.  Maybe, in that /I/ try
+to always say 'bytecode' when I mean 'an array of bytes in class file
+format defining a legal class', and 'class definition' when I mean
+'instances of the C++ classes decaf uses internally which are distinct
+from the statics associated with a native java.lang.Class'; but I don't
+always succeed, and it may not be clear from context.
+
+	Most specifically, when I distinguish between a class definition
+and bytecode, I mean, an instance of the decaf C++ class
+'JavaClass'.  Because the data in this instance is immutable under
+legal Java operations to the class, it may safely be shared accross
+multiple Java processes.
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000548.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+	<LI> Next message: <A HREF="000555.html">[JOS-Arch] Bytecode vs. class definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#549">[ date ]</a>
+              <a href="thread.html#549">[ thread ]</a>
+              <a href="subject.html#549">[ subject ]</a>
+              <a href="author.html#549">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

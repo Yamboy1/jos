@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Program and ProgramContext</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000170.html">
+   <LINK REL="Next" HREF="000172.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Program and ProgramContext</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] Program and ProgramContext">digigod@earthling.net</A><BR>
+    <I>Thu, 12 Aug 1999 23:48:58 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000170.html">[JOS-Arch] Program and ProgramContext</A></li>
+        <LI> Next message: <A HREF="000172.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#177">[ date ]</a>
+              <a href="thread.html#177">[ thread ]</a>
+              <a href="subject.html#177">[ subject ]</a>
+              <a href="author.html#177">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> My main method looks either like
+</I>&gt;<i> 
+</I>&gt;<i> public class DemoApplication {
+</I>&gt;<i>   public static main( String[] args ) {
+</I>&gt;<i>     new DemoApplication().run();
+</I>&gt;<i>   }
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> or
+</I>&gt;<i> 
+</I>&gt;<i> public class DemoProgram {
+</I>&gt;<i>   public static void main( String[] args ) {
+</I>&gt;<i>     new DemoProgram( args ).run();
+</I>&gt;<i>   }
+</I>&gt;<i> }
+</I>
+ugh, no offense but I hate this.
+
+at the bare miniumum I do:
+
+{
+ DemoProgram app = new DemoProgram();
+ app.parseCommands(args);
+ app.run();
+}
+
+just a preference though, I also seperate that into a Main class for no
+reason other then I dont like it &quot;touching&quot;
+ 
+&gt;<i> I don't have a lot of fun writing pretty much the same static main() for
+</I>&gt;<i> each Java application. But, I'm sure you'll agree that instances of
+</I>&gt;<i> DemoApplication and DemoProgram are objects.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;Reuse at the Program interface level is how things work in the
+</I>&gt;<i> &gt;&quot;procedural&quot; world.
+</I>&gt;<i> 
+</I>&gt;<i> What is a &quot;procedural&quot; world? Is object-oriented not procedural? Are you
+</I>&gt;<i> contrasting a step-by-step batch process to an event-driven one?
+</I>&gt;<i> 
+</I>&gt;<i> I understand that a OO scripting language should be able to coordinate the
+</I>&gt;<i> activity of a collection of JavaBeans. One JavaBean should be able to load
+</I>&gt;<i> and use another. Many beans can be developed into one new bean. It is
+</I>&gt;<i> recursive as well as reusable. A huge and complex bean is still an object.
+</I>&gt;<i> 
+</I>&gt;<i> If I want to, I can create a custom JavaBean that reads a collection of
+</I>&gt;<i> beans from an object stream. To configure my custom bean, it only has one
+</I>&gt;<i> &quot;property&quot;, an object stream. That would be a pretty powerful bean. It
+</I>&gt;<i> could reuse any beans that have been serialized.
+</I>
+I think you can do this with a BeanContext
+ 
+&gt;<i> At some point, a requestor must initialize my custom JavaBean and set its
+</I>&gt;<i> object stream property. And at some point, this bean must be finalized.
+</I>&gt;<i> Maybe it shuts down when the JVM shuts down, like a static property of a
+</I>&gt;<i> class. Maybe it &quot;listens&quot; for a shut down request. In the big picture, the
+</I>&gt;<i> lifetime of a bean has a beginning and end. It is initialized and then
+</I>&gt;<i> finalized. While the specific steps between initialization and finalization
+</I>&gt;<i> are unplanned, this is a predictable, step-by-step batch process.
+</I>
+Id like to use a script to run setup and the beans to dispose of
+themselves.
+ 
+&gt;<i> An event driven model builds upon a procedural one. Without procedures
+</I>&gt;<i> (methods), there are no events.
+</I>
+exactly
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000170.html">[JOS-Arch] Program and ProgramContext</A></li>
+	<LI> Next message: <A HREF="000172.html">[JOS-Arch] Program and ProgramContext</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#177">[ date ]</a>
+              <a href="thread.html#177">[ thread ]</a>
+              <a href="subject.html#177">[ subject ]</a>
+              <a href="author.html#177">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

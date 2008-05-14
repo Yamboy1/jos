@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java VGA driver on linux</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000763.html">
+   <LINK REL="Next" HREF="000761.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java VGA driver on linux</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Arch] Java VGA driver on linux">jewel@pixie.co.za</A><BR>
+    <I>Tue, 27 Jun 2000 16:53:11 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000763.html">[JOS-Arch] [boot disk] byte array</A></li>
+        <LI> Next message: <A HREF="000761.html">[JOS-Arch] Java VGA driver on linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#760">[ date ]</a>
+              <a href="thread.html#760">[ thread ]</a>
+              <a href="subject.html#760">[ subject ]</a>
+              <a href="author.html#760">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Today I felt like working on some graphics stuff again, so I compiled some
+native code to allow me to run Thomas Boceks' VGA driver on Linux. 
+
+I had to do an iopl(3) to allow the linux process to access the IO ports.
+
+Then I telnetted to a linux box and ran the java interpreter on there as
+root.
+
+The driver seems to switch the video mode, but I don't see the jos logo as
+expected (the bitblt routine should show the logo). 
+
+I suspect the problem may be that the linux graphics drivers are already
+running to enable the virtual text consoles. They are probably putting 
+the card in some mode that the driver doesn't expect. Does anyone know how
+I can disable these consoles, or somehow unload the graphics driver?
+
+Another question:
+
+I have about 3 ATI RageII (mach64) graphics cards and I would love to
+write some Java drivers to use these. Probably just enabling a 1024x768x16
+mode would be a great achievement, but I don't really know enough about
+video hardware to do this easily. 
+
+I have the source code for the mach64 drivers from XFree86, but I need
+more background knowledge about how this stuff works. Can someone
+recommend a book or a web article that would help me out?
+
+John Leuner
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000763.html">[JOS-Arch] [boot disk] byte array</A></li>
+	<LI> Next message: <A HREF="000761.html">[JOS-Arch] Java VGA driver on linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#760">[ date ]</a>
+              <a href="thread.html#760">[ thread ]</a>
+              <a href="subject.html#760">[ subject ]</a>
+              <a href="author.html#760">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

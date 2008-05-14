@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] GSI</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:digigod%40earthling.net">
+   <LINK REL="Previous"  HREF="000199.html">
+   <LINK REL="Next" HREF="000203.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] GSI</H1>
+    <B>DigiGod Q =?iso-8859-1?Q?Frasch=E9?=</B> 
+    <A HREF="mailto:digigod%40earthling.net"
+       TITLE="[JOS-Arch] GSI">digigod@earthling.net</A><BR>
+    <I>Thu, 19 Aug 1999 12:50:10 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000199.html">[JOS-Arch] IBM AS/400 Java-server</A></li>
+        <LI> Next message: <A HREF="000203.html">[JOS-Arch] GSI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#200">[ date ]</a>
+              <a href="thread.html#200">[ thread ]</a>
+              <a href="subject.html#200">[ subject ]</a>
+              <a href="author.html#200">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>well, I decieded to do some more work on GSI. I have a pretty solid
+class of classes, but until now they were basically method-free.
+
+to refresh your memory/bring-up-problems-I've-encountered-so-far:
+
+we have the ScriptLoader thats like a ClassLoader for scripts, should we
+have a SCRIPTPATH?
+
+we have Script, how do we allow interaction generically? and its
+top-level inner class Element, we have an element what do we do with it?
+(goes with genric interaction above)
+
+an Object can be Scriptable if it has a ScriptInfo getScriptInfo(), but
+what goes in ScriptInfo? (I'd just use BeanInfo but its to different)
+
+lets look at the life of the script to reflect on these problems:
+
+ScriptLoader is asked to load a script, it finds the appropriate child
+(ie LuaScriptLoader for a lua script) and calls load (returning a Script
+object cast up from, using my previous example, a LuaScript). Gilbert,
+how could your SmartFactory be used here?
+
+Our program now has a Script, to run it calls execute(). is there a
+better way? how does it interact with the script when its executing?
+what happens when its done? if we call execute() again what happens,
+what should?
+
+and for the miscellany:
+
+what if we have two seperate implementations from different authours,
+how do we determine which to use? 
+
+how do we tell what type of script a file is? MIME? attributes builtin
+to the fs? a per directtoy DB containg info the files (I like it,
+cross-fs. doesnt Jigsaw do this?)?
+
+how do other systems like this work?
+
+in langauges already written-for/ported-to Java work? are there
+languages you can think of that wouldnt work in this GSI?
+
+how many more questions can I ask before I run out? ...oh, thats it
+then....
+
+Cheers,
+DigiGod
+_________________________
+<A HREF="mailto:DigiGod@earthling.net">DigiGod@earthling.net</A>
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000199.html">[JOS-Arch] IBM AS/400 Java-server</A></li>
+	<LI> Next message: <A HREF="000203.html">[JOS-Arch] GSI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#200">[ date ]</a>
+              <a href="thread.html#200">[ thread ]</a>
+              <a href="subject.html#200">[ subject ]</a>
+              <a href="author.html#200">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

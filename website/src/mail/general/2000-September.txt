@@ -1,0 +1,4354 @@
+From al@outworld.org Fri, 08 Sep 2000 22:17:46 +0300
+Date: Fri, 08 Sep 2000 22:17:46 +0300
+From: Al al@outworld.org
+Subject: [JOS] Privacy and Security on JOS
+
+I have been a member of project JOS for nearly two years, and have
+witnessed many conversations (either through these mailing lists or on
+the wiki) regarding security on JOS; platform security, higher-level
+security, cryptography and authentication, and other details.
+
+Many times someone has argued that JOS is an OS targeted at end users.
+This means that someone can use JOS without having to be a developer.
+Taken on a further step, JOS has to be developed *and* supported in such
+a way that these end users can feel comfortable installing it.
+
+It is obvious that installation, runtime and upgrade must be easy, and
+very automated, so that they can be accomplished by people that do not
+know how JOS works, nor can find out how it works by looking at the
+source code (or looking at it in general, for that matter).
+
+Apart from that, I would like to bring to your attention another matter
+that should interest end users, and that's his (her) on-line privacy. By
+privacy, at least at an OS level, I would mean the capability of a user
+choosing who will have what access to the resources on his JOS system.
+
+I have knowledge of two basic OS's which fail, at various levels, to
+accomplish this: Linux and Windows.
+
+Linux is very often found on a multi-user system, which means that a
+user is at risk of attacks he cannot know about, and cannot counter. A
+user on a remote Linux system is as vulnerable as his administrator is,
+which is not secure enough: he does not control the security of his
+system. On JOS, given the use of Java, virtual little sandboxes can be
+created, so that each user can control the security of his own
+resources, no matter what mistakes someone else might make.
+
+Windows generally sucks, and being an NT user (not my choice) I have had
+to install tens of components to secure (really?) my ports, disks, keys,
+etc. That is unacceptable for an OS: security should be controlled by
+the OS' security subsystem, not by user applications filling up ports
+and holes here and there.
+
+That is why I wish to point out the importance of "advertising" JOS as
+not only a secure OS, but a very private one. The workstation, server,
+distributed network node and game machine tend to co-exist in systems,
+and I can't see why they will cease in the future; thus, it is best that
+a user knows he is - and feels - that his privacy is respected by the OS
+and the network it is connected to.
+
+
+
+-- 
+
+        "Though this be madness, yet there is method in't."
+                                          - William Shakespeare
+________________________________________________________________________
+[MAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al/]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT +2.00 H]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS E-MAIL
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 11 Sep 2000 10:15:33 -0500
+Date: Mon, 11 Sep 2000 10:15:33 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Privacy and Security on JOS
+
+At 10:17 PM 9/8/00 +0300, Al wrote:
+
+>That is why I wish to point out the importance of "advertising" JOS as
+>not only a secure OS, but a very private one. The workstation, server,
+>distributed network node and game machine tend to co-exist in systems,
+>and I can't see why they will cease in the future; thus, it is best that
+>a user knows he is - and feels - that his privacy is respected by the OS
+>and the network it is connected to.
+
+Very interesting.  Can you elaborate or is there a wiki article on how jos 
+could be used to create such a private computing environment?  I think I 
+know what you're talking about but can't be sure.
+
+-iain
+
+
+
+
+
+From al@outworld.org Tue, 12 Sep 2000 00:32:04 +0300
+Date: Tue, 12 Sep 2000 00:32:04 +0300
+From: Al al@outworld.org
+Subject: [JOS] Privacy and Security on JOS
+
+Iain Shigeoka wrote:
+
+> Very interesting.  Can you elaborate or is there a wiki article on how
+> jos could be used to create such a private computing environment?  I
+> think I know what you're talking about but can't be sure.
+
+Unfortunately I have not created a Wiki page as I do not have the time
+to maintain it. I will, though, try to elaborate a little:
+
+1) The system part should be different from the administration part
+which should be different from the user part. This means that there are
+a few things that only the system can do, such as create security
+sandboxes, flag code as privileged, have direct access to memory, etc.
+The administration part can set security policies and run processes that
+stay alive after a user has logged off. The users can only play around
+with their own stuff, even if that is code being executed inside the
+same VM as the system code (which is an obvious case in JOS).
+
+2) All communication through any port must support various levels of
+security, such as having the JOS system start with a pre-defined local
+proxy server and firewall, so administrators and users can set their
+incoming *and* outgoing policies for all ports of communication.
+
+3) Encryption should not be facilitated by third party software, but
+should be an integral part of JOS, at, say, filesystem level. Each user
+follows an authentication method based on PKI, and disks are encrypted
+with conventional encryption based on each user's preferences.
+
+A basic idea is this:
+
+Each user has a user id (string) and a password (string-hashed). The
+system also stores a UID (string) and a system UID (string). It also
+generates a temporary ID called, say, temporary (string). Authentication
+is like this:
+
+LOGON
+
+Gather credentials:
+
+password + user-uid + user-name + system-uid + temporary
+
+Use credentials to create PBE cipher for DESede.
+
+Use cipher to decrypt user's private DH/DSS key.
+
+Create PKI cipher with private DH/DSS key.
+
+Use cipher to decrypt user's symmetric DESede key.
+
+Use symmetric DESede key to decrypt user's profile information.
+
+Begin session.
+
+
+LOGOFF
+
+Encrypt user's profile directory with symmetric key.
+
+Create new temporary UID and write to disk.
+
+Gather credentials from memory but with updated temporary UID.
+
+Create symmetric DESede cipher with above via PBE.
+
+Encrypt with above cipher the private DH/DSS key.
+
+Store encrypted private key to disk.
+
+Empty stored credentials, private and symmetric keys from memory.
+
+End session.
+
+
+As you can see, this way eliminates the danger of others brute forcing
+into the system (PKI can be DSS 4096 bits and symmetric can be DESede
+128 bit), nobody can recover with private key without knowledge of
+password.
+
+If user uses the same password in many accounts throughout the Internet,
+the system UID and the user UID will obfuscate the hash.
+
+Also, the temporary UID which is random will give an attacker as much
+time to brute force as the user needs to log in again. A new encryption
+key is generated upon the termination of each session, which would mean
+nobody would even think of starting a brute force attack.
+
+
+Even if the user's password was compromised, there is still a little
+safety, as the only way to obtain the system UID and the temporary UID
+is by having physical access to the JOS box (assuming a Java VM or VM
+with no pointers).
+
+Temporary UID's will be generated by very good sources of entropy, too,
+as nobody will know when the user terminates his session, nor the
+parameters of the entropy sources at that instant. Deleting old keys and
+the UID's by wiping them multiple times helps prevent their recovery and
+statistical attacks on the system. The private key is re-written to disk
+in enciphered state every time the user logs off, so recovery even by
+means of physical access should be impossible. Otherwise the private key
+remains *ONLY* in JOS memory space with absolutely no access to anything
+but the system security module. Let's say these private keys are only
+for decrypting the symmetric key used to protect the user's files, then
+it can be generated by the system, and the user won't even have access
+to it, which enhances its security. And since the user can't use it
+outside of the specific JOS box, no clear text attacks can be performed.
+There you go.
+
+
+Don't you think the above system is quite protective for most users?
+Please let me stress the word "users" as I cannot speak for truly strong
+security without having an implementation of JOS to play around with.
+Yet.
+
+
+-- 
+
+        "Though this be madness, yet there is method in't."
+                                          - William Shakespeare
+________________________________________________________________________
+[MAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al/]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT +2.00 H]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS E-MAIL
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 12 Sep 2000 09:39:34 -0500
+Date: Tue, 12 Sep 2000 09:39:34 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Privacy and Security on JOS
+
+At 12:32 AM 9/12/00 +0300, Al wrote:
+>Iain Shigeoka wrote:
+>
+> > Very interesting.  Can you elaborate or is there a wiki article on how
+> > jos could be used to create such a private computing environment?  I
+> > think I know what you're talking about but can't be sure.
+>
+>Unfortunately I have not created a Wiki page as I do not have the time
+>to maintain it. I will, though, try to elaborate a little:
+
+Well, that's the beauty of the Wiki.  You put up a page and let others 
+tweak and maintain it.
+
+>Don't you think the above system is quite protective for most users?
+>Please let me stress the word "users" as I cannot speak for truly strong
+>security without having an implementation of JOS to play around with.
+>Yet.
+
+Yes, this is very interesting.  It's always been my opinion that, 
+practically speaking, user security beyond a very simple scheme will always 
+fall prey to poor password choice and other user failings long before the 
+need to resort to attacks on the security system itself.  It's amazing how 
+many people will send you their password if you just send them an email 
+asking for it.  That being said, the OS should provide the best user 
+security possible so that users that are security savvy will be 
+protected.  The concept of a user in java though is also a new concept 
+(java-wise) that needs to be worked out in JOS.
+
+-iain
+
+
+
+
+
+From peter.schuller@infidyne.com Wed, 13 Sep 2000 21:25:39 +0200
+Date: Wed, 13 Sep 2000 21:25:39 +0200
+From: Peter Schuller peter.schuller@infidyne.com
+Subject: [JOS] Privacy and Security on JOS
+
+> A basic idea is this:
+> 
+> Each user has a user id (string) and a password (string-hashed). The
+> system also stores a UID (string) and a system UID (string). It also
+> generates a temporary ID called, say, temporary (string). Authentication
+> is like this:
+> 
+> LOGON
+
+[snip]
+
+> Use symmetric DESede key to decrypt user's profile information.
+
+While I agree with what you're saying, I'd just like to point out what I
+believe to be a  flaw in the kind of profile management you seem to be
+proposing (whether by intent or not - it doesn't matter, I think this issue
+should be brought up in any case).
+
+Am I correct in thinking that the idea is that upon login, the profile
+(applications settings, etc - something like the user specific registry info
+on Windows?) gets loaded, possible changed by running programs, and then
+stored again on disk when one logs out?
+
+The problem with this is that it interferes with multiple logins. This is a
+problem one sees in a Windows environment with roaming profiles. When a
+person logs onto a NT box, the client will get update it's local profile
+with that on the server. When you log out, the server profile is
+synchronized with the client-side one. This obviously creates huge problems
+with regards to being logged in multiple times from different locations (and
+then there's the problem of re-transfering a 500 mail file on the net
+everytime it changes... but that's besides the point).
+
+So while the idea of sessions is obviously a requirement (and a great thing
+if you make them persistent across logins), I believe any "profile" data
+should be accessed directly on disk (or wherever the "authorative" copy resides).
+
+-- 
+/ Peter Schuller, InfiDyne Technologies HB
+
+PGP userID: 0x5584BD98 or 'Peter Schuller <peter.schuller@infidyne.com>'
+Key retrival: Send an E-Mail to getpgpkey@scode.infidyne.com
+E-Mail: peter.schuller@infidyne.com Web: http://scode.infidyne.com
+
+
+
+
+
+From al@outworld.org Thu, 14 Sep 2000 13:53:37 +0300
+Date: Thu, 14 Sep 2000 13:53:37 +0300
+From: Al al@outworld.org
+Subject: [JOS] Privacy and Security on JOS
+
+Peter Schuller wrote:
+
+> Am I correct in thinking that the idea is that upon login, the profile
+> (applications settings, etc - something like the user specific
+> registry info on Windows?) gets loaded, possible changed by running
+> programs, and then stored again on disk when one logs out?
+
+You are quite correct in guessing what I had in mind. After developing
+the Registry API (inverted tree like structure) I thought of this
+scheme. The registry supports merging and synchronization, and it can
+run seamlessly in distributed applications, or many concurrent user
+sessions.
+
+> The problem with this is that it interferes with multiple logins.
+
+Not really... As long as there is at least one active session, no
+encryption and saving to the disk will be made (unless, of course, for
+matters of caching, buffering, etc., etc.). When all sessions of a
+specific user have been terminated or died (network time-out, for
+example), then the user's profile is considered "inactive" and will be
+securely stored to disk (or whatever other medium).
+
+> <snip> I believe any "profile" data should be accessed directly on
+> disk (or wherever the "authorative" copy resides).
+
+Indeed, and with my model it will be so, just that there will exist a
+transparent layer between user application and user profile data on
+disk: secure encryption. That is part of the system, and as I suggested
+in my original e-mail, I would be happy if this was done at file system
+level - system core at the most. Not even administrators should have
+access to this, on the VM and the JOS security monitor.
+
+-- 
+
+        "Though this be madness, yet there is method in't."
+                                          - William Shakespeare
+________________________________________________________________________
+[MAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al/]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT +2.00 H]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS E-MAIL
+
+
+
+
+From peter.schuller@infidyne.com Thu, 14 Sep 2000 22:38:43 +0200
+Date: Thu, 14 Sep 2000 22:38:43 +0200
+From: Peter Schuller peter.schuller@infidyne.com
+Subject: [JOS] Privacy and Security on JOS
+
+> Not really... As long as there is at least one active session, no
+> encryption and saving to the disk will be made (unless, of course, for
+> matters of caching, buffering, etc., etc.). When all sessions of a
+> specific user have been terminated or died (network time-out, for
+> example), then the user's profile is considered "inactive" and will be
+> securely stored to disk (or whatever other medium).
+
+Ah okay; with one single "shared" profile (shared as in shared between
+active sessions) my argument is indeed void. Thanks for clearing that up for
+me.
+
+-- 
+/ Peter Schuller, InfiDyne Technologies HB
+
+PGP userID: 0x5584BD98 or 'Peter Schuller <peter.schuller@infidyne.com>'
+Key retrival: Send an E-Mail to getpgpkey@scode.infidyne.com
+E-Mail: peter.schuller@infidyne.com Web: http://scode.infidyne.com
+
+
+
+
+
+From robfitz@273k.net Sat, 16 Sep 2000 00:05:42 +0000
+Date: Sat, 16 Sep 2000 00:05:42 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS] Fwd: Log for 2000-09-03 meeting
+
+--nFreZHaLTZJo0R7j
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi all
+
+This didn't go through the last few times I sent it.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+
+--nFreZHaLTZJo0R7j
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+Date: Sun, 3 Sep 2000 20:45:13 +0000
+From: Robert Fitzsimons <robfitz@273k.net>
+To: general@jos.org
+Subject: Log for 2000-09-03 meeting
+Message-ID: <20000903204513.A30225@tux.yi.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+User-Agent: Mutt/1.0.1i
+
+Hello
+
+The log for todays meeting is a available at
+<URL:http://www.metamech.com/wiki/view/Main/Logs>.
+
+There was a small technical discussion about JJOS/decaf, what class
+libraries it could use, and the use of native code.  Quinn gave and
+status update on sfWiki and decaf.  I also talked a little about my JVM
+and asked if it would be worth starting again on a combined effort to
+create a JVM.
+
+Iain investigated what was needed to setup a non-profit entity, and we
+talked about the issues involved.  We felt that in the short term there
+isn't that great a need for a non-profit entity, but we will keep doing
+some investigation.
+
+We are planing to have a meeting every two weeks for the next month or
+two to work on some organization issues.  The next meeting will be on
+Sunday the 17th of September, 2000 at 17:00 UTC, in the jos channel on
+the Undernet IRC Network.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+
+--nFreZHaLTZJo0R7j--
+
+
+
+
+From robfitz@geocities.com Sat, 16 Sep 2000 00:13:06 +0000
+Date: Sat, 16 Sep 2000 00:13:06 +0000
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS] Fwd: Notice for IRC Meeting on September 17, 2000
+
+--tThc/1wpZn/ma/RB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+FYI
+
+
+--tThc/1wpZn/ma/RB
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+Date: Fri, 15 Sep 2000 05:57:24 +0000
+From: Robert Fitzsimons <robfitz@273k.net>
+To: general@jos.org
+Subject: Notice for IRC Meeting on September 17, 2000
+Message-ID: <20000915055724.B1818@tux.yi.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.2.5i
+
+Hi everybody
+
+This is just a notice to say there will be an IRC meeting this coming
+Sunday everybody and everybody is welcome.  The agenda is the same as
+normal but i'd like to discuss some more JVM technical issues.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+
+--tThc/1wpZn/ma/RB--
+
+
+
+
+From robfitz@273k.net Mon, 18 Sep 2000 02:51:12 +0000
+Date: Mon, 18 Sep 2000 02:51:12 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS] Log for 2000-09-03 meeting
+
+Hi everybody
+
+This meeting was a little unusual in that we didn't really have a meeting
+it just a lot of discussion over about nine hours about Java GUI's, JVM's,
+and Java IDE's.  Anyway the log is available at
+<URL:http://www.metamech.com/wiki/view/Main/Logs>.
+
+The next meeting will be on Sunday the 1st of October, 2000 at 17:00
+UTC, in the jos channel on the Undernet IRC Network.  If you would like
+a topic discussed at the next meet please bring it up on the mailing or
+add it to the agenda
+<URL:http://www.metamech.com/wiki/view/Main/MeetingAgenda>.
+
+Everybody is welcome even if you just want to lurk.  During the two hour
+meeting we do like to keep to the agenda, but before and after that it's
+pretty much open discussion.
+ 
+Robert Fitzsimons
+robfitz@273k.net
+
+
+
+
+
+From robfitz@273k.net Mon, 18 Sep 2000 03:46:58 +0000
+Date: Mon, 18 Sep 2000 03:46:58 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS] The JOS Project?
+
+Hi everybody
+
+Around this time of the year three years ago on the old JavaLobby
+forums, the idea of creating an operating system based on the Java
+programming language was discussed, out of this discussion the JOS
+project started.
+
+Now over those years the JOS project has remained quite small with the
+number of active contributes staying about the same.  But interest is
+still quite high with new people joining all the time, but there has
+been just as many leaving as joining.  I believe this is because there
+has been very little progress as a group, although some individuals have
+made quite a bit of progress.
+
+Now I have always promoted the idea of there being multiple
+implementation of every component.  With the best being chosen by
+natural selection, but this hasn't worked each component is too strong
+and just won't die.  The problem with this is that the whole project
+will die off because new members don't know where to start and then
+leave.
+
+So far each developer has worked on there own project with little help
+from other developers, and nobody wants to give up there project and
+work on someone else's.
+
+Now for this to change we need to all stop working on our own projects
+and work together on a new unified project.  We should treat all the
+current project as prototypes and leave them behind, and just bring all
+the good ideas with us on the new unified project.
+
+For this to succeed we need to jump into the deep-end, new mailing
+lists, web site, cvs server.  We can keep the old stuff around but only
+for reference.
+
+So what do we all think, comments, flames, ideas, are all welcomed.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+
+
+
+
+From donaldp@mad.scientist.com Mon, 18 Sep 2000 19:00:00 +1000
+Date: Mon, 18 Sep 2000 19:00:00 +1000
+From: Peter Donald donaldp@mad.scientist.com
+Subject: [JOS] The JOS Project?
+
+Hi,
+
+I am someone who probably fits the picture you paint. I found the project a
+few years ago and have been half monitoring bits of it here and there. I
+was put off by a number of things and eventually gave up - so maybe my
+thoughts may be of interest
+
+At 03:00  18/9/00 -0400, you wrote:
+>Now I have always promoted the idea of there being multiple
+>implementation of every component.  With the best being chosen by
+>natural selection, but this hasn't worked each component is too strong
+>and just won't die.  The problem with this is that the whole project
+>will die off because new members don't know where to start and then
+>leave.
+
+I have always disliked this approach segregation of projects is rarely a
+good idea. So much more can be learnt by cooperating and building together.
+Sometimes it is impossible to fix the old version and you have to change
+from evolution to revolution. In many cases the new project will fall short
+or die out but sometimes it survives and is actually better.
+
+At apache we allow a seperate proposal to be active in the CVS tree and
+different people can talk over the second bit (or alternatively the
+branch). Sometimes parts of the proposal will be merged into main trunk and
+sometimes proposal branch will just be an ideas testing fround. Interesting
+approach and seems to work. It also creates a lot less friction if multiple
+developers want to work in same area.
+
+I am usually also deadly opposed to people including their own names into
+projects (ie rheise-os or whatever it was called) because it implies less a
+group. It is a better idea to come up with code-names.
+
+>So far each developer has worked on there own project with little help
+>from other developers, and nobody wants to give up there project and
+>work on someone else's.
+
+One thing I noticed here is that there is faaaaar to much re-invention of
+the wheel. I saw a lot of projects mentioned that were started but never
+finished but were almost 100% identical to external projects. 
+
+You should standardise as much across the projects using external tools if
+neccesary. Theres a build tool here when there is the far superior Ant
+(jakarta.apache.org) or you have rewritten scripting tools when there is
+already a large number of java scripting languages around (BSF includes
+javascript, python, lisp, tcl etc).
+
+Internally you should restructure to all work together and ideally work
+with external teams. I am not sure how much of code can be shared between
+the VMs here and other VMs but it is worth looking and trying to shared
+code at least.
+
+>Now for this to change we need to all stop working on our own projects
+>and work together on a new unified project.  We should treat all the
+>current project as prototypes and leave them behind, and just bring all
+>the good ideas with us on the new unified project.
+
++1
+
+thats always a good thing - it mean frictions at the start but in long run
+maybe better.
+
+Another thing to consider is making consistency across all the projects.
+Currently copyright is assigned to various people and licensing is
+different etc. It is much better to assign copyright to a non-profit
+organisation as that means if the owner of code leaves the rest of team are
+not screwed. You could look for a sponsor group if you don't want problems
+of setting up jos.org - there are a few around.
+
+Another thing to consider carefully is copyright. GPL and LGPL are
+extremely bad for java programmers - because of javas linking model
+LGPL==GPL and that is why many gnu java libraries have modified LGPL. 
+
+Another thing with the licensing is that it will determine who can and will
+work with you. For instance GPL means that many commercial bodies will
+simply not be able to touch it - unless it is a complete product because
+they have too much to loose. BSD-like licenses however see a lot of input
+from commercial people. At apache (which uses APL a BSD-like license) there
+are some projects where 3-4 or more of the people are payed to work on the
+projects part time. This does great things for code - and also some bad
+things. Sometimes the commercial guys try and do hacky things because have
+a deadline looming. Of course you have to have some strong willed people to
+keep you on trac aka Design Nazis :P.
+
+So unless you want to be product complete before you try and get people
+payed to work on it then some of the other licenses should be considered
+before L/GPL
+
+>For this to succeed we need to jump into the deep-end, new mailing
+>lists, web site, cvs server.  We can keep the old stuff around but only
+>for reference.
+
+It may also be worth drawing up a project guidelines on how projects are
+run like http://jakarta.apache.org/guidelines/index.html. 
+
+Also another thing that I would consider important is homogenizing
+web-pages. It is damn near impossible to find anything as it is currently
+setup - and if you stumble across the page - you are not sure if it is up
+to date or obsolete or even used anymore.
+
+Another good idea would be to standardize layout of directories in each
+project and seperate projects out into seperate well explained modules. 
+
+Personally I don't think a Wiki approach is the *right* approach - at least
+not for this. It is too damn hard to maintain, manage, navigate and
+standardize. 
+
+If you were to do this sort of thing I would gladly join up. FWIW I am
+currently working on Avalon Server framework at apache. Currently there is
+only a few applications built on top of it but soon many of other Avalon
+projects will switch to it. 
+
+In the future I plan to finish a MessageServer (NNTP/SMTP/IMAP4/POP3),
+start a FileServer (FTP/Free-net style/ Revision control in built) and
+write a simple DNS resolver + dns server.
+
+This I hope will be completed by March - at least that when I pencilled in
+deadline and I will be getting payed to dev this stuff. I als have a lot of
+stuff like echo/discard/other minor protocols during testing ideas on
+Avalon. If you were to offer support for multiple users I would also gladly
+do an ident server :P
+
+Of course this is all under APL so it would have to be compatable with
+whatever license you choose. I guess if I was in your position I would
+force all non-native-VM stuff to be something either Mozilla or BSD like
+but thats up to you :P
+
+Theres my thoughts - hope I didn't offend anyone too much :P
+
+BTW if you are standardising projects structure you may want to wait until
+end of november as I am trying to get a standard layout that all projects
+conform to defined at Apache. If that is the case then it will slowly
+trickle out - many of the other java projects rely on Apache tools and will
+gradually conform. 
+
+
+Cheers,
+
+Pete
+
+*------------------------------------------------------*
+| "Nearly all men can stand adversity, but if you want |
+| to test a man's character, give him power."          |
+|       -Abraham Lincoln                               |
+*------------------------------------------------------*
+
+
+
+
+From al@outworld.org Mon, 18 Sep 2000 14:22:19 +0300
+Date: Mon, 18 Sep 2000 14:22:19 +0300
+From: Al al@outworld.org
+Subject: [JOS] The JOS Project?
+
+Robert Fitzsimons wrote:
+
+> So far each developer has worked on there own project with little help
+> from other developers, and nobody wants to give up there project and
+> work on someone else's.
+
+Sun has a nice system for managing parts of the Java platform: expert
+groups. My suggestion is that we use something like the JSR's and form
+expert groups, and have their proposals voted upon by members of JOS,
+and thus accept or decline proposals. Once the proposals have been
+accepted, the expert group will interact closely with a general
+coordinating group who will see that all components can be integrated
+and follow common specification (from namespaces to coding style).
+
+We should form a group of people who are determined to make JOS succeed,
+and who have the *general* knowledge and skills to put together an OS.
+Then, other groups can form their own expert groups to create the
+components that will ultimately form JOS.
+
+> The problem with this is that the whole project will die off because
+> new members don't know where to start and then leave.
+
+This is quite very true. Personally, I have kept e-mails of over five
+people who had volunteered to help me with the system registry API. Two
+of them actually downloaded the API (version 1.0.0 beta) but none have
+ever responded since... I developed the initial API with the hopes that
+people would help me with their expertise in fields not so familiar to
+me (distribution, for instance) but one have come forth yet. On the
+mailing lists, so many people had suggestions and showed interest...
+This either means that a) we don't really have that many motivated
+developers on the mailing lists, or b) nobody dares to speak of JOS in
+the holistic view and try to see how components can be integrated.
+
+Even when we had a prototype process manager, and the registry and file
+system components could be very well integrated, that attempt also
+failed.
+
+> Now for this to change we need to all stop working on our own projects
+> and work together on a new unified project.  We should treat all the
+> current project as prototypes and leave them behind, and just bring
+> all the good ideas with us on the new unified project.
+
+Again, I hope everyone can see how a JSR mechanism can help here. If all
+ideas are formulated and posted within the boundaries of a common
+proposal template, then it will be easy to read, understand, vote and
+monitor ideas.
+
+> For this to succeed we need to jump into the deep-end, new mailing
+> lists, web site, cvs server.  We can keep the old stuff around but
+> only for reference.
+
+This is a good idea. The Wiki is useful, but there is no real
+organization strength behind it. The versioning must be made where and
+when it is useful. A hierarchy of information must be created. We need
+to separate news, discussion, reading material and implementation. The
+Wiki seems a bit too chaotic to serve such a huge project as an OS.
+
+Regarding leaving all behind, I would just like to point out that all
+user-level applications should not be left out, but continue being
+listed. User-level applications do not hinder the development of the
+underlying OS, nor do they complicate the API's (they are not API's -
+you see).
+
+
+
+
+I hope this message will help JOS, if not at least incite something that
+will eventually help the project.
+
+
+-- 
+
+        "Though this be madness, yet there is method in't."
+                                          - William Shakespeare
+________________________________________________________________________
+[MAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al/]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT +2.00 H]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS E-MAIL
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 18:38:16 -0500
+Date: Mon, 18 Sep 2000 18:38:16 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] The JOS Project?
+
+At 02:22 PM 9/18/00 +0300, you wrote:
+>Robert Fitzsimons wrote:
+>
+> > So far each developer has worked on there own project with little help
+> > from other developers, and nobody wants to give up there project and
+> > work on someone else's.
+>
+>Sun has a nice system for managing parts of the Java platform: expert
+>groups. My suggestion is that we use something like the JSR's and form
+>expert groups, and have their proposals voted upon by members of JOS,
+
+I think its a great approach but too much work for us.  We're having 
+trouble keeping people involved without any more over head.  If JOS 
+actually had a functional system, then I can see how this organization 
+would really help.  And I think we really should be actively thinking about 
+how to set this up.  But practically speaking I don't think we have the 
+number of developers needed to really need this.
+
+In all honesty, I think we really just need a few really bull-headed people 
+to take this thing by the horns and set a direction for the group.  The 
+number one problem seems to be lack of ownership.  The project started out 
+as a committee idea and so no one person is "THE DESIGNER".  And most of us 
+are a bit too polite and cautious to really just take the reigns.  I'd 
+really like to see someone just say, I'm officially JOS Desktop and I say 
+JOS is linux + Xwindows + kaffe + JOS Desktop (a java window manager) and 
+then design it, recruit helpers, and build it.  And someone else to say, 
+I'm officially JOS Kernel and I say JOS is decaf + jjos + classpath.  In 
+addition, I think we have people that could and would do that already, but 
+most of them are just too busy with other things to be able to be that person.
+
+> > For this to succeed we need to jump into the deep-end, new mailing
+> > lists, web site, cvs server.  We can keep the old stuff around but
+> > only for reference.
+>
+>This is a good idea. The Wiki is useful, but there is no real
+>organization strength behind it. The versioning must be made where and
+>when it is useful. A hierarchy of information must be created. We need
+>to separate news, discussion, reading material and implementation. The
+>Wiki seems a bit too chaotic to serve such a huge project as an OS.
+
+Yes.  This is part of the web update suggestion already in the queue.  I 
+think its already been "approved" in that we discussed in during the jos 
+meetings and everyone gave it a +1.  The task should naturally fall on me 
+but I've been very busy at work and spending all my limited spare time 
+trying to stay away from the computer!  :)
+
+I promise to address it soon though.
+
+>Regarding leaving all behind, I would just like to point out that all
+>user-level applications should not be left out, but continue being
+>listed. User-level applications do not hinder the development of the
+>underlying OS, nor do they complicate the API's (they are not API's -
+>you see).
+
+Agreed.  The current tactic I would propose is to tell every one to create 
+separate SourceForge projects, that link back to JOS.  JOS's website will 
+create a link directory going back to the individual sourceforge 
+projects.  Sound reasonable?
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 18:49:32 -0500
+Date: Mon, 18 Sep 2000 18:49:32 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] The JOS Project?
+
+At 07:00 PM 9/18/00 +1000, Peter Donald wrote:
+
+>I am usually also deadly opposed to people including their own names into
+>projects (ie rheise-os or whatever it was called) because it implies less a
+>group. It is a better idea to come up with code-names.
+
+Agreed.  This particular case came about because no-one could come up with 
+a name.  ;)  And now rheise.os has really split from jos so it further 
+complicates the issue.
+
+> >So far each developer has worked on there own project with little help
+> >from other developers, and nobody wants to give up there project and
+> >work on someone else's.
+>
+>One thing I noticed here is that there is faaaaar to much re-invention of
+>the wheel. I saw a lot of projects mentioned that were started but never
+>finished but were almost 100% identical to external projects.
+
+Agreed again.  Much of JOS was started in the hurly-burly days when java 
+was really going crazy.  Most of the time, there were a dozen alternatives 
+with the same functionality and jos seemed to absorb one from each for each 
+major function point.  The lack of focus at jos I think made the more 
+focused, stand-alone competitors more appealing for both developers and users.
+
+it's high time to do the rounds and try and collaborate again though.
+
+>Another thing to consider is making consistency across all the projects.
+>Currently copyright is assigned to various people and licensing is
+>different etc. It is much better to assign copyright to a non-profit
+>organisation as that means if the owner of code leaves the rest of team are
+>not screwed. You could look for a sponsor group if you don't want problems
+>of setting up jos.org - there are a few around.
+
+Yup.  Copyright has always been a problem with JOS.  I've always leaned 
+towards a BSD license but we could never agree on anything.  Once again, 
+this is probably mostly a matter of biting the bullet and doing 
+this.  There are core developers that will get pissed off and leave no 
+matter what decision is made though which is why the decision has never 
+been made.
+
+>It may also be worth drawing up a project guidelines on how projects are
+>run like http://jakarta.apache.org/guidelines/index.html.
+
++1
+
+>Also another thing that I would consider important is homogenizing
+>web-pages. It is damn near impossible to find anything as it is currently
+>setup - and if you stumble across the page - you are not sure if it is up
+>to date or obsolete or even used anymore.
+
++1
+
+>Another good idea would be to standardize layout of directories in each
+>project and seperate projects out into seperate well explained modules.
+
++1
+
+>Personally I don't think a Wiki approach is the *right* approach - at least
+>not for this. It is too damn hard to maintain, manage, navigate and
+>standardize.
+
++1  This is slated to change as soon as I can get the time.  See the mockup 
+at jos.sourceforge.net and send me a comment via email if you hate/like 
+it.  The content is really poor at the moment because I was just testing 
+out the look and feel.
+
+>BTW if you are standardising projects structure you may want to wait until
+>end of november as I am trying to get a standard layout that all projects
+>conform to defined at Apache. If that is the case then it will slowly
+>trickle out - many of the other java projects rely on Apache tools and will
+>gradually conform.
+
+That's great.  Can you ping the list when that's ready so we can eval it?
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 18:52:36 -0500
+Date: Mon, 18 Sep 2000 18:52:36 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] The JOS Project?
+
+At 03:46 AM 9/18/00 +0000, Robert Fitzsimons wrote:
+
+>Now for this to change we need to all stop working on our own projects
+>and work together on a new unified project.  We should treat all the
+>current project as prototypes and leave them behind, and just bring all
+>the good ideas with us on the new unified project.
+>
+>For this to succeed we need to jump into the deep-end, new mailing
+>lists, web site, cvs server.  We can keep the old stuff around but only
+>for reference.
+>
+>So what do we all think, comments, flames, ideas, are all welcomed.
+
++1
+
+The only problem/question being that its going to take a big effort to 
+really kick start a restart (or a throw away of the throw away 
+prototype).  Do we have the manpower for that right now?  I personally am 
+stretched a bit thin currently so don't know how much I can give to the effort.
+
+-iain
+
+
+
+
+
+From secret@io.com Tue, 19 Sep 2000 00:02:59 -0500
+Date: Tue, 19 Sep 2000 00:02:59 -0500
+From: Omega Bodhi secret@io.com
+Subject: [JOS] The JOS Project?
+
+This idea might necessitate a "junta" to pull off, but maybe that's
+something to think about. Let's just elect a president. Maybe a six-month
+stint? It doesn't have to be time consuming if the prez is willing to lose
+a few people for the sake of a strong backbone. So? People will always
+flock to a group with a backbone, people want and need direction, so the
+few losers who want to leave are probably part of the problem anyways. Adios!
+
+I think there should be a benevolent monarchy, supported by a benevolent
+senate. Call 'em a prez so it doesn't ruffle feathers. It doesn't take a
+LOT of work, or time, to make decisions. You just have to think what's best
+for the group and then say that's what it will be. Oh ... Joe's messaging
+queue architecture is better, faster, and small than Pete's. Hmmm. Joe
+wins, we implement it his way. Sorry Pete, let's talk about where else your
+design might make sense.
+
+What's that? It doesn't fit the current constitution? Benevolent
+Revolution. Put up a new set of rules.
+
+And you've got amazing coders walking away or languishing because of noisy
+talkers. Why people don't tell each other to be quiet amazes me. There is a
+strong arguement that says "politeness" is either a myth or a subtle form
+of arrogance. Take your pick.
+
+The lesson comes from ancient greece. When Sparta and Athens were at war,
+Athens had JUST kicked off the "experiment" they called "democracy". It was
+only 50 years old. So they all got out on the battle field and did what?
+Elect Generals for the Day. Every day they'd have a different general,
+seven per week, you had to be fair, and the big tent in the middle of the
+compound was where all the Generals went to to haggle about which Spartan
+that Johny should spear so they could make recommendations, and second
+them. But ... they were getting creamed bad.
+
+
+So what did Athens do to save democracy. (This really is history folks!)
+They remembered things were LESS FAIR, but MORE EFFICIENT under a monarchy.
+So they elected a General they liked whose duration of command would be the
+whole length of engagement, or until they decided to properly replace him
+with another. The guy they picked as mediocre, but had general support, and
+he won the defense of Athens quite dramatically.
+
+The point is that democracy is good for raising taxes and building roads,
+but in some places it HURTS. Liike big software projects. For all the talk
+of how the bazar is so super-duper, Linus and Larry Wall prove centralized
+command is what seperates the mobs from the organized development projects.
+Someone needs to be "point".
+
+Let's take licensing ...
+
+Many many moons ago I stopped working with JOS because I became exhausted
+over the licensing thing, which kept coming up, and up, and up. And still
+keeps coming up. Etc.
+
+JUST ADOPT THE LGPL, THE GLP, THE NLP, THE MPL, OR WHATEVER.
+
+Just say "its going to be this way." Period. If it makes the monarch's job
+any easier, they can feel better ask the three or four guys who's code they
+respect the best: hey, should we go GPL or LGPL or what? And then RESPECT
+their opinion. And then just put your foot down and say its going to be
+this way or that. Discussion? Okay. Two days of discussion and THEN I make
+the overruling binding decision. Everyone speak up. Personally, if I don't
+like the way licensing works I'll go somewhere I do. Fine. If you want tons
+of people choose LGPL. Just CHOOSE.
+
+But the way it is now, so much non-coding talk talk talk surrounds dump
+decisions that you could make in five minutes, you drive guys like me away.
+And you've got the loudest squeekers getting all the attention and getting
+their way, who produce no code. A president or monarch could just make any
+old random choice ... like "I choose A for JOS" ... and if it turns out it
+should have been B ... "Oops. We are now changing from A to B. Only do B
+from now on."  At least you end up knowing SOMETHING.,
+
+This is much better than "Maybe GPL", "no GPL sucks I can prove it", "how
+about LGPL", "My brother tried it and it failed", "How about JOS-PL?",
+"Nah, its proprietary." "That won't work" whine whine whine for year after
+year after year. Jeez.
+
+Anyone who doesn't like it will leave. Fine. Those who stay will have the
+comfort of strong decision.
+
+This is all old-fashioned leadership stuff. Some one person needs to stand
+up and take charge.
+
+I nominate Iain Shigeoka for President. Why not? Where's my bumper sticker?
+
+OB
+
+
+At 06:52 PM 9/18/00 -0500, Iain Shigeoka wrote:
+>At 03:46 AM 9/18/00 +0000, Robert Fitzsimons wrote:
+>
+>>Now for this to change we need to all stop working on our own projects
+>>and work together on a new unified project.  We should treat all the
+>>current project as prototypes and leave them behind, and just bring all
+>>the good ideas with us on the new unified project.
+>>
+>>For this to succeed we need to jump into the deep-end, new mailing
+>>lists, web site, cvs server.  We can keep the old stuff around but only
+>>for reference.
+>>
+>>So what do we all think, comments, flames, ideas, are all welcomed.
+>
+>+1
+>
+>The only problem/question being that its going to take a big effort to 
+>really kick start a restart (or a throw away of the throw away 
+>prototype).  Do we have the manpower for that right now?  I personally am 
+>stretched a bit thin currently so don't know how much I can give to the
+effort.
+>
+>-iain
+>
+>
+>_______________________________________________
+>General maillist  -  General@jos.org
+>http://jos.org/mailman/listinfo/general
+> 
+
+
+
+
+
+From helmut@webby.com Mon, 18 Sep 2000 23:53:15 -0600
+Date: Mon, 18 Sep 2000 23:53:15 -0600
+From: DearWebby helmut@webby.com
+Subject: [JOS] The JOS Project?
+
+Even though I am more observer than anything, I agree wholeheartedly !
+Next month JOS will be 3 years old and proof that sandbox politics don't
+produce the results that we envisioned.
+
+As we have seen, they don't evoke loyalty either. Most likely there
+would be fewer good people leaving even if the elected scapegoat was an
+arrogant tyrant, and with a decent president things would finally solidify.
+
+Ian has been around long enough, and I believe he has earned enough
+respect that he could carry it off as the first elected president of JOS.
+If Ian is willing to stand for it, I second the motion.
+
+Helmut
+
+
+At 11:02 PM 9/18/00, Omega Bodhi wrote:
+>This idea might necessitate a "junta" to pull off, but maybe that's
+>something to think about. Let's just elect a president. Maybe a six-month
+>stint? It doesn't have to be time consuming if the prez is willing to lose
+>a few people for the sake of a strong backbone. So? People will always
+>flock to a group with a backbone, people want and need direction, so the
+>few losers who want to leave are probably part of the problem anyways. Adios!
+>
+>I think there should be a benevolent monarchy, supported by a benevolent
+>senate. Call 'em a prez so it doesn't ruffle feathers. It doesn't take a
+>LOT of work, or time, to make decisions. You just have to think what's best
+>for the group and then say that's what it will be. Oh ... Joe's messaging
+>queue architecture is better, faster, and small than Pete's. Hmmm. Joe
+>wins, we implement it his way. Sorry Pete, let's talk about where else your
+>design might make sense.
+>
+>What's that? It doesn't fit the current constitution? Benevolent
+>Revolution. Put up a new set of rules.
+>
+>And you've got amazing coders walking away or languishing because of noisy
+>talkers. Why people don't tell each other to be quiet amazes me. There is a
+>strong arguement that says "politeness" is either a myth or a subtle form
+>of arrogance. Take your pick.
+>
+>The lesson comes from ancient greece. When Sparta and Athens were at war,
+>Athens had JUST kicked off the "experiment" they called "democracy". It was
+>only 50 years old. So they all got out on the battle field and did what?
+>Elect Generals for the Day. Every day they'd have a different general,
+>seven per week, you had to be fair, and the big tent in the middle of the
+>compound was where all the Generals went to to haggle about which Spartan
+>that Johny should spear so they could make recommendations, and second
+>them. But ... they were getting creamed bad.
+>
+>
+>So what did Athens do to save democracy. (This really is history folks!)
+>They remembered things were LESS FAIR, but MORE EFFICIENT under a monarchy.
+>So they elected a General they liked whose duration of command would be the
+>whole length of engagement, or until they decided to properly replace him
+>with another. The guy they picked as mediocre, but had general support, and
+>he won the defense of Athens quite dramatically.
+>
+>The point is that democracy is good for raising taxes and building roads,
+>but in some places it HURTS. Liike big software projects. For all the talk
+>of how the bazar is so super-duper, Linus and Larry Wall prove centralized
+>command is what seperates the mobs from the organized development projects.
+>Someone needs to be "point".
+>
+>Let's take licensing ...
+>
+>Many many moons ago I stopped working with JOS because I became exhausted
+>over the licensing thing, which kept coming up, and up, and up. And still
+>keeps coming up. Etc.
+>
+>JUST ADOPT THE LGPL, THE GLP, THE NLP, THE MPL, OR WHATEVER.
+>
+>Just say "its going to be this way." Period. If it makes the monarch's job
+>any easier, they can feel better ask the three or four guys who's code they
+>respect the best: hey, should we go GPL or LGPL or what? And then RESPECT
+>their opinion. And then just put your foot down and say its going to be
+>this way or that. Discussion? Okay. Two days of discussion and THEN I make
+>the overruling binding decision. Everyone speak up. Personally, if I don't
+>like the way licensing works I'll go somewhere I do. Fine. If you want tons
+>of people choose LGPL. Just CHOOSE.
+>
+>But the way it is now, so much non-coding talk talk talk surrounds dump
+>decisions that you could make in five minutes, you drive guys like me away.
+>And you've got the loudest squeekers getting all the attention and getting
+>their way, who produce no code. A president or monarch could just make any
+>old random choice ... like "I choose A for JOS" ... and if it turns out it
+>should have been B ... "Oops. We are now changing from A to B. Only do B
+>from now on."  At least you end up knowing SOMETHING.,
+>
+>This is much better than "Maybe GPL", "no GPL sucks I can prove it", "how
+>about LGPL", "My brother tried it and it failed", "How about JOS-PL?",
+>"Nah, its proprietary." "That won't work" whine whine whine for year after
+>year after year. Jeez.
+>
+>Anyone who doesn't like it will leave. Fine. Those who stay will have the
+>comfort of strong decision.
+>
+>This is all old-fashioned leadership stuff. Some one person needs to stand
+>up and take charge.
+>
+>I nominate Iain Shigeoka for President. Why not? Where's my bumper sticker?
+>
+>OB
+>
+>
+>At 06:52 PM 9/18/00 -0500, Iain Shigeoka wrote:
+> >At 03:46 AM 9/18/00 +0000, Robert Fitzsimons wrote:
+> >
+> >>Now for this to change we need to all stop working on our own projects
+> >>and work together on a new unified project.  We should treat all the
+> >>current project as prototypes and leave them behind, and just bring all
+> >>the good ideas with us on the new unified project.
+> >>
+> >>For this to succeed we need to jump into the deep-end, new mailing
+> >>lists, web site, cvs server.  We can keep the old stuff around but only
+> >>for reference.
+> >>
+> >>So what do we all think, comments, flames, ideas, are all welcomed.
+> >
+> >+1
+> >
+> >The only problem/question being that its going to take a big effort to
+> >really kick start a restart (or a throw away of the throw away
+> >prototype).  Do we have the manpower for that right now?  I personally am
+> >stretched a bit thin currently so don't know how much I can give to the
+>effort.
+> >
+> >-iain
+> >
+> >
+> >_______________________________________________
+> >General maillist  -  General@jos.org
+> >http://jos.org/mailman/listinfo/general
+> >
+>
+>
+>_______________________________________________
+>General maillist  -  General@jos.org
+>http://jos.org/mailman/listinfo/general
+
+Dear Webby
+Helmut Morscher, President of Webby, Inc
+High traffic marketing at it's best.
+Have Fun and the people will come !
+http://webby.com   http://mypostcards.com  http://posty.com
+
+
+
+
+
+From donaldp@mad.scientist.com Tue, 19 Sep 2000 20:23:58 +1000
+Date: Tue, 19 Sep 2000 20:23:58 +1000
+From: Peter Donald donaldp@mad.scientist.com
+Subject: [JOS] The JOS Project?
+
+At 06:49  18/9/00 -0500, you wrote:
+>At 07:00 PM 9/18/00 +1000, Peter Donald wrote:
+>
+>>I am usually also deadly opposed to people including their own names into
+>>projects (ie rheise-os or whatever it was called) because it implies less a
+>>group. It is a better idea to come up with code-names.
+>
+>Agreed.  This particular case came about because no-one could come up with 
+>a name.  ;)  And now rheise.os has really split from jos so it further 
+>complicates the issue.
+
+okays :P
+
+>> >So far each developer has worked on there own project with little help
+>> >from other developers, and nobody wants to give up there project and
+>> >work on someone else's.
+>>
+>>One thing I noticed here is that there is faaaaar to much re-invention of
+>>the wheel. I saw a lot of projects mentioned that were started but never
+>>finished but were almost 100% identical to external projects.
+>
+>Agreed again.  Much of JOS was started in the hurly-burly days when java 
+>was really going crazy.  Most of the time, there were a dozen alternatives 
+>with the same functionality and jos seemed to absorb one from each for each 
+>major function point.  The lack of focus at jos I think made the more 
+>focused, stand-alone competitors more appealing for both developers and
+users.
+>
+>it's high time to do the rounds and try and collaborate again though.
+
+Theres a certain amount of consolidating occuring at Jakarta apache
+project. They are slowly aquiring projects that should fulfill all your
+java orientated building needs.
+
+Currently it has a build tool (Ant), they are moving JUnit to it (Unit
+testing framework), as well as a logging framework (either log4j or one of
+a few other potentials), they have general regular expression libs (both
+ORO and regexp) etc. They are still missing a few tools (code
+formatter/beautifier, installshield) but mostly they will aquire them
+eventually. Combine that with the Bean Scripting Framework (OSS from IBM
+that acts as interface engine for some of javascript, python interpreters)
+and you have a complete build envionment. They also have all tools to build
+documentaion from XML sources.
+
+So they are good places to at least start looking also look at
+www.jpython.org and www.mozilla.org for nice scipt engines.
+
+>>Another thing to consider is making consistency across all the projects.
+>>Currently copyright is assigned to various people and licensing is
+>>different etc. It is much better to assign copyright to a non-profit
+>>organisation as that means if the owner of code leaves the rest of team are
+>>not screwed. You could look for a sponsor group if you don't want problems
+>>of setting up jos.org - there are a few around.
+>
+>Yup.  Copyright has always been a problem with JOS.  I've always leaned 
+>towards a BSD license but we could never agree on anything.  Once again, 
+>this is probably mostly a matter of biting the bullet and doing 
+>this.  There are core developers that will get pissed off and leave no 
+>matter what decision is made though which is why the decision has never 
+>been made.
+
+I guess you will always loose people but you will also gain people by
+consolidating. It may even be worth having a split license - GPL/LGPL for
+jvm/os/classlibraries. BSD for execution environment and the rest - this
+will allow you the most reuse as most JVMc/classlibraries are GPL and most
+other stuff on top of that isn't. 
+
+>>Personally I don't think a Wiki approach is the *right* approach - at least
+>>not for this. It is too damn hard to maintain, manage, navigate and
+>>standardize.
+>
+>+1  This is slated to change as soon as I can get the time.  See the mockup 
+>at jos.sourceforge.net and send me a comment via email if you hate/like 
+>it.  The content is really poor at the moment because I was just testing 
+>out the look and feel.
+
+I always like a navigation aid down the side that is large and hierarchial
+so you know exactly where you are other than that I like :P
+
+>>BTW if you are standardising projects structure you may want to wait until
+>>end of november as I am trying to get a standard layout that all projects
+>>conform to defined at Apache. If that is the case then it will slowly
+>>trickle out - many of the other java projects rely on Apache tools and will
+>>gradually conform.
+>
+>That's great.  Can you ping the list when that's ready so we can eval it?
+
+yep :P
+
+good luck with whatever you decide and if you decide something I am
+comtable with maybe I will join up :P
+Cheers,
+
+Pete
+
+*------------------------------------------------------*
+| "Nearly all men can stand adversity, but if you want |
+| to test a man's character, give him power."          |
+|       -Abraham Lincoln                               |
+*------------------------------------------------------*
+
+
+
+
+From al@outworld.org Tue, 19 Sep 2000 14:11:50 +0300
+Date: Tue, 19 Sep 2000 14:11:50 +0300
+From: Al al@outworld.org
+Subject: [JOS] The JOS Project?
+
+Iain Shigeoka wrote:
+
+> I think its a great approach but too much work for us.  We're having
+> trouble keeping people involved without any more over head.  If JOS
+> actually had a functional system, then I can see how this organization
+> would really help.  And I think we really should be actively thinking
+> about how to set this up.  But practically speaking I don't think we
+> have the number of developers needed to really need this.
+
+We don't, but if we use the JSR mechanism as a standard way of
+presentation, then more people can easily join later on. See, the expert
+group could be just one person, the submitter. When more people come,
+the group will be larger. Anyway, we have documents like JSR's on the
+Wiki, and a single name as the owner of the project (I remember making a
+page for the registry myself, but am not very sure). Let's make these
+formal, along with the process of standardizing the JOS website.
+
+> In all honesty, I think we really just need a few really bull-headed
+> people to take this thing by the horns and set a direction for the
+> group.  The number one problem seems to be lack of ownership.  The
+> project started out as a committee idea and so no one person is "THE
+> DESIGNER".  And most of us are a bit too polite and cautious to really
+> just take the reigns.
+
+Quite true... Maybe there is something we could do about this. Let's
+assume that JOS does not belong to anyone, and it belongs to everyone.
+Let's also assume that people who are already members (their name
+appears in the member list on the Wiki) have priority over future
+members or those who are not in the member list. Now, let's compile a
+list of people who believe they are capable of being bull-headed and
+grasping the thing by the horns, but are too polite to do that. Let this
+list be available on the Wiki, and let anyone who already has his name
+on the member list put his name (regular Wiki editing procedure).
+
+Let this list be on public display for a month or two, and then lock it.
+Then keep it in display, and request a veto from anyone who has his name
+on the member list. If, after two or three months this list is up nobody
+claims that he does not like the people who are on the list, then let
+these people be the "owners" or at least the people who can take the big
+decision in JOS.
+
+Although this is not the most democratic procedure, at least its
+initialization seems very fair. Everyone will have a chance to be one of
+those people, and everyone will have a chance to object. After that, the
+group will be responsible for admitting more people.
+
+The owner of jos.org (I guess we should consider you, as you do the
+HTML, right?) must be in this group. Apart from that, I hope Gilbert
+will be on it (he has made the CD distributions, after all). Also, I
+think it would be reasonable that the few people who contribute very
+regularly to general@jos.org should be on this list, as they have had
+more experience in working with each other (well, at least discussing
+with each other).
+
+
+What do you think people?
+
+
+
+
+Also:
+
+> <snip> The task should naturally fall on me but I've been very busy at
+> work and spending all my limited spare time trying to stay away from
+> the computer!  :)
+> 
+> I promise to address it soon though.
+
+I understand how time hinders everyone, on a personal level.
+Standardizing something three years after its creation and three years
+of web chaos can be hard. I will volunteer to help, if you wish, and I
+would also like to make a public call to anyone with good designing
+skills to also help. Maybe if each of us created a sample of the
+organization and design of a new JOS website, and then formed a small
+group that worked to implement it, things would be faster and easier for
+you.
+
+> Agreed.  The current tactic I would propose is to tell every one to
+> create separate SourceForge projects, that link back to JOS.  JOS's
+> website will create a link directory going back to the individual
+> sourceforge projects.  Sound reasonable?
+
+It sure does. And it does not have to be a SourceForge project, it can
+be anything. The JOS website should only contain things related to JOS,
+no separate projects (except for a few links, of course). Just because
+the JOS distribution may contain certain Java applications, it does not
+mean that these applications should be confused with JOS. Let's keep JOS
+pure and make sure that all we do is an operating system. If someone
+wishes to make a JOS distribution along with other applications, then
+let's think about that only *after* JOS starts existing.
+
+> The only problem/question being that its going to take a big effort to
+> really kick start a restart (or a throw away of the throw away
+> prototype).  Do we have the manpower for that right now?  I personally
+> am stretched a bit thin currently so don't know how much I can give to
+> the effort.
+
+We'll have to simply start, even if it means only one person working.
+Even if one HTML page is written per day, it is better than naught.
+Unfortunately I can see that there has been little pressure to finish
+work, on programming and website level, so the only way is to get
+"slowly but gradually". IMO, at least.
+
+
+-- 
+
+        "Though this be madness, yet there is method in't."
+                                          - William Shakespeare
+________________________________________________________________________
+[MAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al/]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT +2.00 H]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS E-MAIL
+
+
+
+
+From donaldp@mad.scientist.com Tue, 19 Sep 2000 23:53:22 +1000
+Date: Tue, 19 Sep 2000 23:53:22 +1000
+From: Peter Donald donaldp@mad.scientist.com
+Subject: [JOS] The JOS Project?
+
+At 01:54  19/9/00 -0400, you wrote:
+>This idea might necessitate a "junta" to pull off, but maybe that's
+>something to think about. Let's just elect a president. Maybe a six-month
+>stint? It doesn't have to be time consuming if the prez is willing to lose
+>a few people for the sake of a strong backbone. So? People will always
+>flock to a group with a backbone, people want and need direction, so the
+>few losers who want to leave are probably part of the problem anyways. Adios!
+
+ug - anything but a single head. I have seen sooo many projects die off
+because the head decides they are bored with project or has too little time
+to give to it. It is necessary for leadership but it should a group of some
+sort whether its a senate, a council, a cabal or whatever - just people
+whos main concern is the good of jos. People can step down from it or get
+nominated to ascend but only if they have good of project in mind.
+
+You should make sure that the council can always "close" a vote - ie don't
+have an even number of people - make sure in cases of equality that the
+absenting voters are forced to vote - or are allowed to propose another take.
+
+>Let's take licensing ...
+>
+>Many many moons ago I stopped working with JOS because I became exhausted
+>over the licensing thing, which kept coming up, and up, and up. And still
+>keeps coming up. Etc.
+>
+>JUST ADOPT THE LGPL, THE GLP, THE NLP, THE MPL, OR WHATEVER.
+>
+>Just say "its going to be this way." Period. If it makes the monarch's job
+>any easier, they can feel better ask the three or four guys who's code they
+>respect the best: hey, should we go GPL or LGPL or what? And then RESPECT
+>their opinion. And then just put your foot down and say its going to be
+>this way or that. Discussion? Okay. Two days of discussion and THEN I make
+>the overruling binding decision. Everyone speak up. Personally, if I don't
+>like the way licensing works I'll go somewhere I do. Fine. If you want tons
+>of people choose LGPL. Just CHOOSE.
+
+yep I reckon anything is better than nothing :P
+
+>Anyone who doesn't like it will leave. Fine. Those who stay will have the
+>comfort of strong decision.
+>
+>This is all old-fashioned leadership stuff. Some one person needs to stand
+>up and take charge.
+
+Not stand up and take charge - hopefully a group elected by those here that
+are committers. Say you have a council of 3 - make sure the votes are taken
+and these three are given power to enact any changes - ie make them able to
+make everyone GPL or MPL or BSD or X or Y. Make them able to decide where
+copyright should be assigned etc
+
+Cheers,
+
+Pete
+
+*------------------------------------------------------*
+| "Nearly all men can stand adversity, but if you want |
+| to test a man's character, give him power."          |
+|       -Abraham Lincoln                               |
+*------------------------------------------------------*
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 19 Sep 2000 19:15:53 -0500
+Date: Tue, 19 Sep 2000 19:15:53 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] JOS President
+
+Hello all,
+
+OK.  I think we have somewhat of a consensus that JOS the organization "as 
+it is" is broken.  At least, a bunch of yea's and no nay's.  I agree with 
+everyone that the best new tactic will probably be a benevolent dictator or 
+small cabal to provide much more focus and to get the ball rolling once again.
+
+For the long term, I agree that a cabal is the best solution to avoid a 
+variety of problems.  For the near term, just to "make things happen" and 
+to really break from committee mode, it may not be a bad idea to actually 
+target going with a transitional "president" who will act as the leader 
+(delegating of course) for a defined and limited time period.  6 months 
+seems reasonable.  As they say, there's nothing like having a dictator for 
+gettin things done.  The end of that period will see a formal election of a 
+cabal to replace the president (with a chairman so people can point fingers 
+when someone says, "who's in charge").
+
+I am flattered that I've gotten votes to be the president.  And I will be 
+willing to fill that role.  However, I think such a drastic change should 
+at least be discussed as widely as possible amongst the jos membership to 
+see if there is disagreement.  In addition, there should be a process for 
+people to nominate other people as president candidates (including 
+themselves).  Gee.  On the other hand, that sounds exactly like the process 
+that is currently bogging down JOS in inactivity and loss of 
+developers.  I'm a bit torn between "fair" and having things move 
+expeditiously.
+
+As far as the website and JSR's I think both are an excellent idea.  And 
+they're critical to the re-org of JOS.  I'm currently looking for a new 
+website home with an EJB server so we can do EJB/servlet development so the 
+website can exploit all these java programmers we have!  :)
+
+So the current big question is: should we be fair and go through a process, 
+or just elect someone amongst us on the mailing list, and start making 
+changes?  I'm currently leaning towards electing someone as a transitional 
+"president" for 6 months to just get a "shakedown" going and reshape JOS as 
+best as we can.  If this causes a problem (we get a large negative reaction 
+from the membership) we go back and do it with the normal JOS voting 
+procedure (a 2 month process as I recall).
+
+So, votes for electing a 6 month transitional president: (+1 yes, 0 
+abstain, -1 no)
+
+My vote: +1
+
+-iain
+
+
+
+
+
+From secret@io.com Tue, 19 Sep 2000 19:35:48 -0500
+Date: Tue, 19 Sep 2000 19:35:48 -0500
+From: Omega Bodhi secret@io.com
+Subject: [JOS] JOS President
+
+My vote: +1
+
+Yeah, prez! Do we at least get bumper-stickers or something?
+
+... something that might help: if you call for a "two-week general
+referendum", with the vote count two weeks from now (or something), then
+this would essentially constitute a general election, but would get it done
+faster, since those who snooze would lose.
+
+OB
+
+
+At 07:15 PM 9/19/00 -0500, Iain Shigeoka wrote:
+>Hello all,
+>
+>OK.  I think we have somewhat of a consensus that JOS the organization "as 
+>it is" is broken.  At least, a bunch of yea's and no nay's.  I agree with 
+>everyone that the best new tactic will probably be a benevolent dictator or 
+>small cabal to provide much more focus and to get the ball rolling once
+again.
+>
+>For the long term, I agree that a cabal is the best solution to avoid a 
+>variety of problems.  For the near term, just to "make things happen" and 
+>to really break from committee mode, it may not be a bad idea to actually 
+>target going with a transitional "president" who will act as the leader 
+>(delegating of course) for a defined and limited time period.  6 months 
+>seems reasonable.  As they say, there's nothing like having a dictator for 
+>gettin things done.  The end of that period will see a formal election of a 
+>cabal to replace the president (with a chairman so people can point fingers 
+>when someone says, "who's in charge").
+>
+>I am flattered that I've gotten votes to be the president.  And I will be 
+>willing to fill that role.  However, I think such a drastic change should 
+>at least be discussed as widely as possible amongst the jos membership to 
+>see if there is disagreement.  In addition, there should be a process for 
+>people to nominate other people as president candidates (including 
+>themselves).  Gee.  On the other hand, that sounds exactly like the process 
+>that is currently bogging down JOS in inactivity and loss of 
+>developers.  I'm a bit torn between "fair" and having things move 
+>expeditiously.
+>
+>As far as the website and JSR's I think both are an excellent idea.  And 
+>they're critical to the re-org of JOS.  I'm currently looking for a new 
+>website home with an EJB server so we can do EJB/servlet development so the 
+>website can exploit all these java programmers we have!  :)
+>
+>So the current big question is: should we be fair and go through a process, 
+>or just elect someone amongst us on the mailing list, and start making 
+>changes?  I'm currently leaning towards electing someone as a transitional 
+>"president" for 6 months to just get a "shakedown" going and reshape JOS as 
+>best as we can.  If this causes a problem (we get a large negative reaction 
+>from the membership) we go back and do it with the normal JOS voting 
+>procedure (a 2 month process as I recall).
+>
+>So, votes for electing a 6 month transitional president: (+1 yes, 0 
+>abstain, -1 no)
+>
+>My vote: +1
+>
+>-iain
+>
+>
+>_______________________________________________
+>General maillist  -  General@jos.org
+>http://jos.org/mailman/listinfo/general
+> 
+
+
+
+
+
+From helmut@webby.com Tue, 19 Sep 2000 18:54:00 -0600
+Date: Tue, 19 Sep 2000 18:54:00 -0600
+From: DearWebby helmut@webby.com
+Subject: [JOS] JOS President
+
++1 for electing a president
+Helmut
+
+At 06:15 PM 9/19/00, Iain Shigeoka wrote:
+>Hello all,
+>
+>OK.  I think we have somewhat of a consensus that JOS the organization "as 
+>it is" is broken.  At least, a bunch of yea's and no nay's.  I agree with 
+>everyone that the best new tactic will probably be a benevolent dictator 
+>or small cabal to provide much more focus and to get the ball rolling once 
+>again.
+>
+>For the long term, I agree that a cabal is the best solution to avoid a 
+>variety of problems.  For the near term, just to "make things happen" and 
+>to really break from committee mode, it may not be a bad idea to actually 
+>target going with a transitional "president" who will act as the leader 
+>(delegating of course) for a defined and limited time period.  6 months 
+>seems reasonable.  As they say, there's nothing like having a dictator for 
+>gettin things done.  The end of that period will see a formal election of 
+>a cabal to replace the president (with a chairman so people can point 
+>fingers when someone says, "who's in charge").
+>
+>I am flattered that I've gotten votes to be the president.  And I will be 
+>willing to fill that role.  However, I think such a drastic change should 
+>at least be discussed as widely as possible amongst the jos membership to 
+>see if there is disagreement.  In addition, there should be a process for 
+>people to nominate other people as president candidates (including 
+>themselves).  Gee.  On the other hand, that sounds exactly like the 
+>process that is currently bogging down JOS in inactivity and loss of 
+>developers.  I'm a bit torn between "fair" and having things move 
+>expeditiously.
+>
+>As far as the website and JSR's I think both are an excellent idea.  And 
+>they're critical to the re-org of JOS.  I'm currently looking for a new 
+>website home with an EJB server so we can do EJB/servlet development so 
+>the website can exploit all these java programmers we have!  :)
+>
+>So the current big question is: should we be fair and go through a 
+>process, or just elect someone amongst us on the mailing list, and start 
+>making changes?  I'm currently leaning towards electing someone as a 
+>transitional "president" for 6 months to just get a "shakedown" going and 
+>reshape JOS as best as we can.  If this causes a problem (we get a large 
+>negative reaction from the membership) we go back and do it with the 
+>normal JOS voting procedure (a 2 month process as I recall).
+>
+>So, votes for electing a 6 month transitional president: (+1 yes, 0 
+>abstain, -1 no)
+>
+>My vote: +1
+>
+>-iain
+>
+>
+>_______________________________________________
+>General maillist  -  General@jos.org
+>http://jos.org/mailman/listinfo/general
+
+Dear Webby
+Helmut Morscher, President of Webby, Inc
+High traffic marketing at it's best.
+Have Fun and the people will come !
+http://webby.com   http://mypostcards.com  http://posty.com
+
+
+
+
+
+From robfitz@273k.net Wed, 20 Sep 2000 01:25:45 +0000
+Date: Wed, 20 Sep 2000 01:25:45 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS] JOS President
+
+> So, votes for electing a 6 month transitional president: (+1 yes, 0 
+> abstain, -1 no)
+
+I do agree that we need a short term project leader (president), but I
+would make the term only three months.  I think three months is plenty
+of time to turn start turning the project around, and start the process
+of voting for a real board.
+
+Even still, one yes vote.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+
+
+
+
+From guigui@buyonet.com Wed, 20 Sep 2000 03:09:46 +0200 (MET DST)
+Date: Wed, 20 Sep 2000 03:09:46 +0200 (MET DST)
+From: Guillaume Vangelder guigui@buyonet.com
+Subject: [JOS] JOS President
+
++1 as well
+
+Not saying that we'd need a Linus Torvalds, but some kind of leader of
+some sort. A president sounds good.
+
+Now, I've been on this list for over two years, made a couple of shy
+attempts to engage myself in the projects, without much success. So please
+send me where most of the help is needed, I have 5 years of experience in
+Java, mostly doing server-side work like designing and writing application
+servers (where notions like processes are implemented). But if more help
+is needed in the low-level arena, my C isn't too rusty and I am familiar
+with the requirements of an operating system. So someone please put me to
+work! :)
+
+Regards,
+
+/Guillaume
+
+___________________________________________________
+Guillaume Vangelder, Technical Director.
+BUYONET INTERNATIONAL GROUP
+- The Global eAlliance Powerhouse & Electronic Software Store -
+
+guigui@buyonet.com
+
+www.buyonet.com
+____________________________________________________
+
+
+
+
+
+From peter.schuller@infidyne.com Tue, 19 Sep 2000 23:25:35 +0200
+Date: Tue, 19 Sep 2000 23:25:35 +0200
+From: Peter Schuller peter.schuller@infidyne.com
+Subject: [JOS] JOS President
+
+> So, votes for electing a 6 month transitional president: (+1 yes, 0 
+> abstain, -1 no)
+
++1
+
+Definitely.
+
+-- 
+/ Peter Schuller, InfiDyne Technologies HB
+
+PGP userID: 0x5584BD98 or 'Peter Schuller <peter.schuller@infidyne.com>'
+Key retrival: Send an E-Mail to getpgpkey@scode.infidyne.com
+E-Mail: peter.schuller@infidyne.com Web: http://scode.infidyne.com
+
+
+
+
+
+From digigod@earthling.net Tue, 19 Sep 2000 20:58:36 -0700
+Date: Tue, 19 Sep 2000 20:58:36 -0700
+From: none digigod@earthling.net
+Subject: [JOS] JOS President
+
+I agree with Robert.
+
+>> So, votes for electing a 6 month transitional president: (+1 yes, 0 
+>> abstain, -1 no)
+>
+>I do agree that we need a short term project leader (president), but I
+>would make the term only three months.  I think three months is plenty
+>of time to turn start turning the project around, and start the process
+>of voting for a real board.
+>
+>Even still, one yes vote.
+
+
+Cheers,
+DigiGod
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+_____NetZero Free Internet Access and Email______
+   http://www.netzero.net/download/index.html
+
+
+
+
+From al@outworld.org Wed, 20 Sep 2000 12:04:01 +0300
+Date: Wed, 20 Sep 2000 12:04:01 +0300
+From: Al al@outworld.org
+Subject: [JOS] JOS President
+
++1 as well
+
+
+I don't really mind who will be the president (as long as he is from
+this list and contributes, and we all know who are the people that
+contribute - and if not, we can run a statistical analysis on the
+archives of the list). Also, if there will be a group that has control
+over JOS, I would be interested in the responsibility myself (but not
+president or anything close to as high).
+
+
+May I point out a few things that I think we should do?
+
+
+1) Find a procedure that will enable us in the immediate future
+(something like, say, two weeks?) to select who will be the ultimate
+ruler of JOS right now.
+
+2) Find a procedure that will enable us in the near future (how about
+two months?) to select a team that will be the rulers of JOS.
+
+3) Use this team to establish JOS policy in all aspects.
+
+4) Create an all new web site for JOS.
+
+5) For groups, delegate works and start producing and integrating.
+
+
+
+-- 
+
+        "Though this be madness, yet there is method in't."
+                                          - William Shakespeare
+________________________________________________________________________
+[MAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al/]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT +2.00 H]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS E-MAIL
+
+
+
+
+From RegierAveryJ@JohnDeere.com Wed, 20 Sep 2000 07:58:26 -0500
+Date: Wed, 20 Sep 2000 07:58:26 -0500
+From: Regier Avery J RegierAveryJ@JohnDeere.com
+Subject: [JOS] (no subject)
+
+As I was instrumental in getting our Constitution set up, I have a certain
+feeling that we shouldn't try to contravent it so easily.  It was set up so
+that there is a clear procedure for settling disagreements and ratifying
+binding decisions.  Such a drastic change as this, should at least
+reasonably abide by the Constitution.
+
+According to the Constitution, the minimum that we could have an elected
+President would be 17 days.  7 days to advertise the vote and 10 days for
+the actual voting to take place.  That is if we define this as an 'ordinary'
+vote that doesn't change the Constitution.  This will settle point 1 below.
+We can then figure out how we want to change the Constitution to set up the
+'cabal'.  That vote will require 14+20 days.
+
+The biggest problem with such a vote are points 4.10-12 of the Constitution.
+They state that there can only be three possible votes:  yes, no, and
+neither.
+
+In order to reasonably keep this vote within the Constitution, I propose to
+word the vote as follows:
+	The JOS Project shall be led by a President.  The President shall
+have the power to: [whatever powers we wish to grant]
+	Please vote [yes/no/neither]:
+
+	Reason for Neither vote:
+
+
+	If this vote passes with a 'yes' vote, I elect the following person
+to the position of President: 
+	A> Iain
+	B> Someone else.
+	C> etc.
+
+The nominations for President can take place on the vote-info list during
+the 7 day advertisement period.
+
+In order for this to happen, we need a neutral administrator of the vote, a
+person to propose the vote, and a seconder.  All of the above people need to
+be members of the vote-info list.  If we figure out what powers the
+President should have, we can start the procedure immediately and have a
+President within 20 or so days.
+
+What is above is the qualification on my +1.
+
+Regards,
+Avery J. Regier
+
+
+
+	-----Original Message-----
+	From:	Al [SMTP:al@outworld.org]
+	Sent:	Wednesday, September 20, 2000 5:04 AM
+	To:	general@jos.org
+	Subject:	Re: [JOS] JOS President
+
+	+1 as well
+
+
+	I don't really mind who will be the president (as long as he is from
+	this list and contributes, and we all know who are the people that
+	contribute - and if not, we can run a statistical analysis on the
+	archives of the list). Also, if there will be a group that has
+control
+	over JOS, I would be interested in the responsibility myself (but
+not
+	president or anything close to as high).
+
+
+	May I point out a few things that I think we should do?
+
+
+	1) Find a procedure that will enable us in the immediate future
+	(something like, say, two weeks?) to select who will be the ultimate
+	ruler of JOS right now.
+
+	2) Find a procedure that will enable us in the near future (how
+about
+	two months?) to select a team that will be the rulers of JOS.
+
+	3) Use this team to establish JOS policy in all aspects.
+
+	4) Create an all new web site for JOS.
+
+	5) For groups, delegate works and start producing and integrating.
+
+
+
+	-- 
+
+	        "Though this be madness, yet there is method in't."
+	                                          - William Shakespeare
+	
+________________________________________________________________________
+	[MAIL: mailto:al@outworld.org] [URL:
+http://www.outworld.org/people/al/]
+	[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937
+110247]
+	[ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT
++2.00 H]
+	[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece
+GR]
+	DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS
+E-MAIL
+
+	_______________________________________________
+	General maillist  -  General@jos.org
+	http://jos.org/mailman/listinfo/general
+
+
+
+
+
+
+From iainshigeoka@yahoo.com Wed, 20 Sep 2000 09:34:33 -0500
+Date: Wed, 20 Sep 2000 09:34:33 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Voting
+
+OK!
+
+It sounds like this is a go then.  I know its a rush so people away from 
+their desks for a few days will probably dislike the haste but I feel its 
+important to keep the momentum going.  In this spirit, we should definitely 
+get this president issue concluded.  I agree that we can and should use the 
+constitution since 2 weeks is fast enough (I forgot about ordinary votes 
+which are so much shorter).
+
+For those of you who aren't, subscribe to vote-info.  I'm going to whip up 
+a vote proposal (on VoteInfo in the wiki) and post it to the wiki asap and 
+officially start the voting procedure.  7 days from today, we'll hold the 
+vote.  10 days after, we'll hopefully have a president and roadmap for the 
+future.  Note, as is usual, the initial vote proposal is just that, a 
+proposal and I hope very much that people will comment and help to tweak it 
+before voting on it goes forward.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Wed, 20 Sep 2000 09:56:12 -0500
+Date: Wed, 20 Sep 2000 09:56:12 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] JOS President
+
+At 03:09 AM 9/20/00 +0200, Guillaume Vangelder wrote:
+
+>Now, I've been on this list for over two years, made a couple of shy
+>attempts to engage myself in the projects, without much success. So please
+>send me where most of the help is needed, I have 5 years of experience in
+>Java, mostly doing server-side work like designing and writing application
+>servers (where notions like processes are implemented). But if more help
+>is needed in the low-level arena, my C isn't too rusty and I am familiar
+>with the requirements of an operating system. So someone please put me to
+>work! :)
+
+Would you be interested in helping re-org our website?  I'm currently 
+negotiating to get us web hosting with an ejb provider.  If that goes 
+through, I was thinking of possibly redoing the jos site using jetspeed 
+(java.apache.org - look at the jetspeed project).  That would get us back 
+to java programming even for the website.  And it may make it much easier 
+to expand the site since anyone can propose and submit new "portlets" to 
+extend the site without requiring major site changes or access to the 
+internals of the site.
+
+Obviously a wiki portlet, news portlet (slashdot-ish), and documentation 
+portlet (similar to php.net's annotated manual) would be the place to 
+start.  After that, official member list/directory portlet, package name 
+reservation system, JSR system, working group management portlets, etc, etc.
+
+If you're not interested because its too close to what you do at work 
+that's totally understandable!
+
+-iain
+
+
+
+
+
+From helmut@webby.com Wed, 20 Sep 2000 10:21:36 -0600
+Date: Wed, 20 Sep 2000 10:21:36 -0600
+From: DearWebby helmut@webby.com
+Subject: [JOS] JOS President
+
+Al, you totally miss the point.
+We are NOT looking for an ultimate ruler, but a president.
+The job of the president will be to be coach, referee, scapegoat, janitor,
+and scout for the next president.
+Since JOS is a volunteer effort, the "RULING" is more an arbitrating and 
+tie breaking and refereeing than dictating.
+Helmut
+
+At 03:04 AM 9/20/00, Al wrote:
+>+1 as well
+>
+>
+>I don't really mind who will be the president (as long as he is from
+>this list and contributes, and we all know who are the people that
+>contribute - and if not, we can run a statistical analysis on the
+>archives of the list). Also, if there will be a group that has control
+>over JOS, I would be interested in the responsibility myself (but not
+>president or anything close to as high).
+>
+>
+>May I point out a few things that I think we should do?
+>
+>
+>1) Find a procedure that will enable us in the immediate future
+>(something like, say, two weeks?) to select who will be the ultimate
+>ruler of JOS right now.
+>
+>2) Find a procedure that will enable us in the near future (how about
+>two months?) to select a team that will be the rulers of JOS.
+>
+>3) Use this team to establish JOS policy in all aspects.
+>
+>4) Create an all new web site for JOS.
+>
+>5) For groups, delegate works and start producing and integrating.
+>
+>
+>
+>--
+>
+>         "Though this be madness, yet there is method in't."
+>                                           - William Shakespeare
+>________________________________________________________________________
+>[MAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al/]
+>[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+>[ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT +2.00 H]
+>[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+>DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS E-MAIL
+>
+>_______________________________________________
+>General maillist  -  General@jos.org
+>http://jos.org/mailman/listinfo/general
+
+Dear Webby
+Helmut Morscher, President of Webby, Inc
+High traffic marketing at it's best.
+Have Fun and the people will come !
+http://webby.com   http://mypostcards.com  http://posty.com
+
+
+
+
+
+From helmut@webby.com Wed, 20 Sep 2000 11:08:59 -0600
+Date: Wed, 20 Sep 2000 11:08:59 -0600
+From: DearWebby helmut@webby.com
+Subject: [JOS] (no subject)
+
+Regier, we won't blame you for the constitution that did not work,
+if you stop mentioning it.
+
+Let's try not to to handicap the revolution with mistakes of the past.
+Once we get the truck unstuck and out of the mud, and get some
+momentum again, then some effort could be diverted towards stuff like
+researching which parts of the old constitution can be salvaged and
+upgraded, and which parts should be quietly flushed.
+
+For now though, please don't invalidate YOUR vote for the voting in progress
+by attaching conditions to YOUR vote. You can only vote +1, 0, -1, not
++11/16th. It's all metric now ;-)
+
+Helmut
+
+At 06:58 AM 9/20/00, Regier Avery J wrote:
+>As I was instrumental in getting our Constitution set up, I have a certain
+>feeling that we shouldn't try to contravent it so easily.  It was set up so
+>that there is a clear procedure for settling disagreements and ratifying
+>binding decisions.  Such a drastic change as this, should at least
+>reasonably abide by the Constitution.
+>
+>According to the Constitution, the minimum that we could have an elected
+>President would be 17 days.  7 days to advertise the vote and 10 days for
+>the actual voting to take place.  That is if we define this as an 'ordinary'
+>vote that doesn't change the Constitution.  This will settle point 1 below.
+>We can then figure out how we want to change the Constitution to set up the
+>'cabal'.  That vote will require 14+20 days.
+>
+>The biggest problem with such a vote are points 4.10-12 of the Constitution.
+>They state that there can only be three possible votes:  yes, no, and
+>neither.
+>
+>In order to reasonably keep this vote within the Constitution, I propose to
+>word the vote as follows:
+>         The JOS Project shall be led by a President.  The President shall
+>have the power to: [whatever powers we wish to grant]
+>         Please vote [yes/no/neither]:
+>
+>         Reason for Neither vote:
+>
+>
+>         If this vote passes with a 'yes' vote, I elect the following person
+>to the position of President:
+>         A> Iain
+>         B> Someone else.
+>         C> etc.
+>
+>The nominations for President can take place on the vote-info list during
+>the 7 day advertisement period.
+>
+>In order for this to happen, we need a neutral administrator of the vote, a
+>person to propose the vote, and a seconder.  All of the above people need to
+>be members of the vote-info list.  If we figure out what powers the
+>President should have, we can start the procedure immediately and have a
+>President within 20 or so days.
+>
+>What is above is the qualification on my +1.
+>
+>Regards,
+>Avery J. Regier
+>
+>
+>
+>         -----Original Message-----
+>         From:   Al [SMTP:al@outworld.org]
+>         Sent:   Wednesday, September 20, 2000 5:04 AM
+>         To:     general@jos.org
+>         Subject:        Re: [JOS] JOS President
+>
+>         +1 as well
+>
+>
+>         I don't really mind who will be the president (as long as he is from
+>         this list and contributes, and we all know who are the people that
+>         contribute - and if not, we can run a statistical analysis on the
+>         archives of the list). Also, if there will be a group that has
+>control
+>         over JOS, I would be interested in the responsibility myself (but
+>not
+>         president or anything close to as high).
+>
+>
+>         May I point out a few things that I think we should do?
+>
+>
+>         1) Find a procedure that will enable us in the immediate future
+>         (something like, say, two weeks?) to select who will be the ultimate
+>         ruler of JOS right now.
+>
+>         2) Find a procedure that will enable us in the near future (how
+>about
+>         two months?) to select a team that will be the rulers of JOS.
+>
+>         3) Use this team to establish JOS policy in all aspects.
+>
+>         4) Create an all new web site for JOS.
+>
+>         5) For groups, delegate works and start producing and integrating.
+>
+>
+>
+>         --
+>
+>                 "Though this be madness, yet there is method in't."
+>                                                   - William Shakespeare
+>
+>________________________________________________________________________
+>         [MAIL: mailto:al@outworld.org] [URL:
+>http://www.outworld.org/people/al/]
+>         [TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937
+>110247]
+>         [ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT
+>+2.00 H]
+>         [ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece
+>GR]
+>         DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS
+>E-MAIL
+>
+>         _______________________________________________
+>         General maillist  -  General@jos.org
+>         http://jos.org/mailman/listinfo/general
+>
+>
+>
+>_______________________________________________
+>General maillist  -  General@jos.org
+>http://jos.org/mailman/listinfo/general
+
+Dear Webby
+Helmut Morscher, President of Webby, Inc
+High traffic marketing at it's best.
+Have Fun and the people will come !
+http://webby.com   http://mypostcards.com  http://posty.com
+
+
+
+
+
+From RegierAveryJ@JohnDeere.com Wed, 20 Sep 2000 12:56:37 -0500
+Date: Wed, 20 Sep 2000 12:56:37 -0500
+From: Regier Avery J RegierAveryJ@JohnDeere.com
+Subject: [JOS] JOS President: Voting
+
+Helmut,
+
+sigh.
+
+Getting agreement on anything in this organization, even a voting procedure,
+is a major accomplishment.  In my mind, what the informal vote is on is
+simply whether it is worth taking a formal vote.  Why throw away an
+established and binding voting procedure (which is all the Contstitution
+really is) in favor of something else when the scope of this decision is
+this big?  
+
+Taking this vote as prescribed by the Constitution adds two important
+properties:
+*	It is binding.  Once the vote is taken and it is valid, it can't be
+undone except by another vote.
+*	People can't claim it is invalid, and therefore take away from the
+power we are trying to give our interim President.  I don't want to
+undermine the President's authority from the very start.
+
+My vote is +1.  I just want us to do it the right way.
+
+Regards,
+Avery J. Regier
+
+
+> -----Original Message-----
+> From:	DearWebby [SMTP:helmut@webby.com]
+> Sent:	Wednesday, September 20, 2000 1:09 PM
+> To:	Regier Avery J
+> Cc:	'general@jos.org'
+> Subject:	Re: [JOS] (no subject)
+> 
+> Regier, we won't blame you for the constitution that did not work,
+> if you stop mentioning it.
+> 
+> Let's try not to to handicap the revolution with mistakes of the past.
+> Once we get the truck unstuck and out of the mud, and get some
+> momentum again, then some effort could be diverted towards stuff like
+> researching which parts of the old constitution can be salvaged and
+> upgraded, and which parts should be quietly flushed.
+> 
+> For now though, please don't invalidate YOUR vote for the voting in
+> progress
+> by attaching conditions to YOUR vote. You can only vote +1, 0, -1, not
+> +11/16th. It's all metric now ;-)
+> 
+> Helmut
+> 
+> At 06:58 AM 9/20/00, Regier Avery J wrote:
+> >As I was instrumental in getting our Constitution set up, I have a
+> certain
+> >feeling that we shouldn't try to contravent it so easily.  It was set up
+> so
+> >that there is a clear procedure for settling disagreements and ratifying
+> >binding decisions.  Such a drastic change as this, should at least
+> >reasonably abide by the Constitution.
+> >
+> >According to the Constitution, the minimum that we could have an elected
+> >President would be 17 days.  7 days to advertise the vote and 10 days for
+> >the actual voting to take place.  That is if we define this as an
+> 'ordinary'
+> >vote that doesn't change the Constitution.  This will settle point 1
+> below.
+> >We can then figure out how we want to change the Constitution to set up
+> the
+> >'cabal'.  That vote will require 14+20 days.
+> >
+> >The biggest problem with such a vote are points 4.10-12 of the
+> Constitution.
+> >They state that there can only be three possible votes:  yes, no, and
+> >neither.
+> >
+> >In order to reasonably keep this vote within the Constitution, I propose
+> to
+> >word the vote as follows:
+> >         The JOS Project shall be led by a President.  The President
+> shall
+> >have the power to: [whatever powers we wish to grant]
+> >         Please vote [yes/no/neither]:
+> >
+> >         Reason for Neither vote:
+> >
+> >
+> >         If this vote passes with a 'yes' vote, I elect the following
+> person
+> >to the position of President:
+> >         A> Iain
+> >         B> Someone else.
+> >         C> etc.
+> >
+> >The nominations for President can take place on the vote-info list during
+> >the 7 day advertisement period.
+> >
+> >In order for this to happen, we need a neutral administrator of the vote,
+> a
+> >person to propose the vote, and a seconder.  All of the above people need
+> to
+> >be members of the vote-info list.  If we figure out what powers the
+> >President should have, we can start the procedure immediately and have a
+> >President within 20 or so days.
+> >
+> >What is above is the qualification on my +1.
+> >
+> >Regards,
+> >Avery J. Regier
+> >
+> >
+> >
+> >         -----Original Message-----
+> >         From:   Al [SMTP:al@outworld.org]
+> >         Sent:   Wednesday, September 20, 2000 5:04 AM
+> >         To:     general@jos.org
+> >         Subject:        Re: [JOS] JOS President
+> >
+> >         +1 as well
+> >
+> >
+> >         I don't really mind who will be the president (as long as he is
+> from
+> >         this list and contributes, and we all know who are the people
+> that
+> >         contribute - and if not, we can run a statistical analysis on
+> the
+> >         archives of the list). Also, if there will be a group that has
+> >control
+> >         over JOS, I would be interested in the responsibility myself
+> (but
+> >not
+> >         president or anything close to as high).
+> >
+> >
+> >         May I point out a few things that I think we should do?
+> >
+> >
+> >         1) Find a procedure that will enable us in the immediate future
+> >         (something like, say, two weeks?) to select who will be the
+> ultimate
+> >         ruler of JOS right now.
+> >
+> >         2) Find a procedure that will enable us in the near future (how
+> >about
+> >         two months?) to select a team that will be the rulers of JOS.
+> >
+> >         3) Use this team to establish JOS policy in all aspects.
+> >
+> >         4) Create an all new web site for JOS.
+> >
+> >         5) For groups, delegate works and start producing and
+> integrating.
+> >
+> >
+> >
+> >         --
+> >
+> >                 "Though this be madness, yet there is method in't."
+> >                                                   - William Shakespeare
+> >
+> >________________________________________________________________________
+> >         [MAIL: mailto:al@outworld.org] [URL:
+> >http://www.outworld.org/people/al/]
+> >         [TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937
+> >110247]
+> >         [ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT
+> >+2.00 H]
+> >         [ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki,
+> Greece
+> >GR]
+> >         DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR
+> RELIGIOUS
+> >E-MAIL
+> >
+> >         _______________________________________________
+> >         General maillist  -  General@jos.org
+> >         http://jos.org/mailman/listinfo/general
+> >
+> >
+> >
+> >_______________________________________________
+> >General maillist  -  General@jos.org
+> >http://jos.org/mailman/listinfo/general
+> 
+> Dear Webby
+> Helmut Morscher, President of Webby, Inc
+> High traffic marketing at it's best.
+> Have Fun and the people will come !
+> http://webby.com   http://mypostcards.com  http://posty.com
+> 
+
+
+
+
+
+From donaldp@mad.scientist.com Thu, 21 Sep 2000 20:12:07 +1000
+Date: Thu, 21 Sep 2000 20:12:07 +1000
+From: Peter Donald donaldp@mad.scientist.com
+Subject: [JOS] JOS President
+
+At 03:00  21/9/00 -0400, you wrote:
+>Would you be interested in helping re-org our website?  I'm currently 
+>negotiating to get us web hosting with an ejb provider.  If that goes 
+>through, I was thinking of possibly redoing the jos site using jetspeed 
+>(java.apache.org - look at the jetspeed project).  That would get us back 
+>to java programming even for the website.  And it may make it much easier 
+>to expand the site since anyone can propose and submit new "portlets" to 
+>extend the site without requiring major site changes or access to the 
+>internals of the site.
+
+Just a warning her - unless you have had a lot of experience with Jetspeed
+it can cost you a ***lot*** of time. It is not the most easiest thing to
+setup and maintain. It would take a huuuge amount of time to setup and you
+would have to assess if it is worth it - when the 60 hours spent instead on
+a simpler website and JOS would do more benefit.
+
+I am not saying don't use it - just think about it before you decide to. It
+takes a lot of effort and knowledge to maintain so consider yourself warned
+:P. 
+
+Thou as an Apache guy and friends with Kevin (the guy who wrote it) I say
+use it - if it is really what you want :P
+
+Cheers,
+
+Pete
+
+*------------------------------------------------------*
+| "Nearly all men can stand adversity, but if you want |
+| to test a man's character, give him power."          |
+|       -Abraham Lincoln                               |
+*------------------------------------------------------*
+
+
+
+
+From al@outworld.org Thu, 21 Sep 2000 14:15:36 +0300
+Date: Thu, 21 Sep 2000 14:15:36 +0300
+From: Al al@outworld.org
+Subject: [JOS] JOS President
+
+DearWebby wrote:
+
+> Al, you totally miss the point.
+> We are NOT looking for an ultimate ruler, but a president.
+> The job of the president will be to be coach, referee, scapegoat,
+> janitor, and scout for the next president.
+
+Em, that is what I meant, just a poor selection of words, sorry! :)
+
+-- 
+
+        "Though this be madness, yet there is method in't."
+                                          - William Shakespeare
+________________________________________________________________________
+[MAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al/]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT +2.00 H]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS E-MAIL
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 21 Sep 2000 10:51:54 -0500
+Date: Thu, 21 Sep 2000 10:51:54 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] JOS President
+
+At 08:12 PM 9/21/00 +1000, Peter Donald wrote:
+>At 03:00  21/9/00 -0400, you wrote:
+> >Would you be interested in helping re-org our website?  I'm currently
+> >negotiating to get us web hosting with an ejb provider.  If that goes
+> >through, I was thinking of possibly redoing the jos site using jetspeed
+> >(java.apache.org - look at the jetspeed project).  That would get us back
+> >to java programming even for the website.  And it may make it much easier
+> >to expand the site since anyone can propose and submit new "portlets" to
+> >extend the site without requiring major site changes or access to the
+> >internals of the site.
+>
+>Just a warning her - unless you have had a lot of experience with Jetspeed
+>it can cost you a ***lot*** of time. It is not the most easiest thing to
+>setup and maintain. It would take a huuuge amount of time to setup and you
+>would have to assess if it is worth it - when the 60 hours spent instead on
+>a simpler website and JOS would do more benefit.
+
+Eww.  OK.  I'd actually like to use it especially because its an apache 
+project and it looks like it has a lot of potential.  However, I'm short on 
+time and speed is of the essence.  So maybe jetspeed should be a website 
+2.0 thing and we should try something else... a custom portal based on 
+enhydra perhaps.  Any suggestions for the quickest servlet based portal 
+solution?
+
+I'm mostly interested in a system that allows us to quickly and easily put 
+up an ordered set of documentation with the concept of multiple "authors" 
+and "editors".  This is similar to midgard but in java.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 21 Sep 2000 10:54:39 -0500
+Date: Thu, 21 Sep 2000 10:54:39 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Voting
+
+Hello,
+
+For those of you who don't know, please see my vote proposal at VoteInfo in 
+the jos wiki.  I need someone to second it (edit the page and put yourself 
+in) and ping the list.  I'd also like to have someone volunteer to be the 
+vote administrator who is not interested in being interim President (it 
+would seem a little suspicious to have the vote admin be a candidate).  In 
+any case, if we could get the ball rolling on this....  :)
+
+-iain
+
+
+
+
+
+From guigui@buyonet.com Thu, 21 Sep 2000 14:19:42 -0500
+Date: Thu, 21 Sep 2000 14:19:42 -0500
+From: Guillaume Vangelder guigui@buyonet.com
+Subject: [JOS] JOS President
+
+Hi there,
+
+Well, I have installed jetspeed and it runs fine, I have never used it 
+before, so I guess I will look at the
+samples that are included in the distribution.. but I agree that it looks 
+powerful, and not too trivial to configure
+the right way.
+I'll just mess around with it, tie it to a MySQL database, and get back to 
+you as soon as I have something
+to show ;-) (If that's still what we want to do)
+
+Even though I am more interested in being involved in JOS 'itself' in the 
+long run, but one has to start
+somewhere!
+
+/Gui
+
+At 10:51 AM 9/21/00 -0500, Iain Shigeoka wrote:
+>At 08:12 PM 9/21/00 +1000, Peter Donald wrote:
+>>At 03:00  21/9/00 -0400, you wrote:
+>> >Would you be interested in helping re-org our website?  I'm currently
+>> >negotiating to get us web hosting with an ejb provider.  If that goes
+>> >through, I was thinking of possibly redoing the jos site using jetspeed
+>> >(java.apache.org - look at the jetspeed project).  That would get us back
+>> >to java programming even for the website.  And it may make it much easier
+>> >to expand the site since anyone can propose and submit new "portlets" to
+>> >extend the site without requiring major site changes or access to the
+>> >internals of the site.
+>>
+>>Just a warning her - unless you have had a lot of experience with Jetspeed
+>>it can cost you a ***lot*** of time. It is not the most easiest thing to
+>>setup and maintain. It would take a huuuge amount of time to setup and you
+>>would have to assess if it is worth it - when the 60 hours spent instead on
+>>a simpler website and JOS would do more benefit.
+>
+>Eww.  OK.  I'd actually like to use it especially because its an apache 
+>project and it looks like it has a lot of potential.  However, I'm short 
+>on time and speed is of the essence.  So maybe jetspeed should be a 
+>website 2.0 thing and we should try something else... a custom portal 
+>based on enhydra perhaps.  Any suggestions for the quickest servlet based 
+>portal solution?
+>
+>I'm mostly interested in a system that allows us to quickly and easily put 
+>up an ordered set of documentation with the concept of multiple "authors" 
+>and "editors".  This is similar to midgard but in java.
+>
+>-iain
+>
+>
+>_______________________________________________
+>General maillist  -  General@jos.org
+>http://jos.org/mailman/listinfo/general
+
+____________________________________________________
+Guillaume Vangelder, Technical Director.
+BUYONET INTERNATIONAL GROUP
+- The Global eAlliance Powerhouse & Electronic Software Store -
+
+Phone: +1 972 869 3319
+Cell: +1 214 683 5843
+guigui@buyonet.com
+
+www.buyonet.com
+____________________________________________________
+
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 21 Sep 2000 14:33:56 -0500
+Date: Thu, 21 Sep 2000 14:33:56 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Fwd: JOS President??? No way.
+
+Hi all.
+
+Gilbert sent this to me.  He's not subscribed to general so he's not up to 
+speed with the rest of the thread.  I assume he came across the vote 
+proposal and fired this off to me.  I'm reposting it here with his 
+permission.  I'll try and respond to it via the list.
+
+-iain
+
+
+>X-Apparently-To: iainshigeoka@yahoo.com via web1106.mail.yahoo.com
+>X-Track: 1-1: 40
+>X-Sender: gchii@pop.mindspring.com
+>X-Mailer: Windows Eudora Light Version 3.0.1 (32)
+>Date: Thu, 21 Sep 2000 13:14:25 -0400
+>To: Iain Shigeoka <iainshigeoka@yahoo.com>
+>From: Gilbert Carl Herschberger II <gchii@mindspring.com>
+>Subject: JOS President??? No way.
+>
+>Look at the constitution of the JOS Project which has been accepted by most
+>members of the JOS Project. There is no provision for the office of
+>president. There can be no president of the JOS Project unless the
+>constitution makes room for it. Only the constitution can define the role
+>of a president.
+>
+>Nominating a president and voting on it is outrageous. It may be a
+>misguided attempt to fix the public relations problems of an open source
+>and free license project. While you are working hard to make the JOS
+>Project succeed, I think you're going about it the wrong way.
+>
+>Start a legal organization of your own. Call it something else. If you want
+>to start your own organization with yourself as president, there is no
+>problem. If your organization is dedicated to promote the JOS Project,
+>there is no problem. If you want to link the JOS Project and your
+>organization together, there is no problem. But, your organization /is not/
+>the JOS Project.
+>
+>None of the members of the JOS Project are employees. None of them are
+>under contract. The JOS Project is not a non-profit organization. It is an
+>open source project. No member is required to follow a "president" anyway.
+>Anyone acting as "president" is acting on their own. Claiming to be
+>"president" when there can be no president destroys the credibility of the
+>JOS Project as an open source initiative.
+>
+>No contract signed by such a "president" is legally binding on any member
+>of the JOS Project. It might be binding on members of your own organization.
+>
+>No license expedited by such a "president" is legally binding on any source
+>code added to the JOS Project umbrella. In no way does a JOS License
+>supercede the license chosen by its original author. A vote for a
+>"president" is a hollow and misleading victory. It accomplishes nothing.
+>
+>To use your priviledges as webmaster to announce your candidacy for
+>president might be considered an abuse of power. You need to step back and
+>look at what you're doing. The JOS Project doesn't own anything. It is not
+>a legal entity. No one person can speak on behalf of its members. It
+>doesn't need a president.
+>
+>Using the JOS Project mailing list to conduct a vote for president is
+>contrary to the constitution. First of all, the constitution must be
+>ammended to create a presidential office. If that vote succeeds, rules for
+>the office of president must be adopted in the same way. The constitution
+>has provision for this already.
+>
+>Have you become so impatient? Why is that? Please don't get ahead of
+>yourself. You should work with individual authors as I have done. Only the
+>jJOS/decaf subproject has moved to SourceForge, not the JOS Project. People
+>sometimes forget themselves because they want something so much. Don't let
+>that happen to you.
+
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 21 Sep 2000 15:02:44 -0500
+Date: Thu, 21 Sep 2000 15:02:44 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] JOS President
+
+At 02:19 PM 9/21/00 -0500, Guillaume Vangelder wrote:
+
+>Well, I have installed jetspeed and it runs fine, I have never used it 
+>before, so I guess I will look at the
+>samples that are included in the distribution.. but I agree that it looks 
+>powerful, and not too trivial to configure
+>the right way.
+>I'll just mess around with it, tie it to a MySQL database, and get back to 
+>you as soon as I have something
+>to show ;-) (If that's still what we want to do)
+
+Sounds great.  Right now we haven't settled on anything so if you can get 
+jetspeed working and ready to accept our custom portlets (which still need 
+to be spec'd and built) then we'll probably pursue that.
+
+>Even though I am more interested in being involved in JOS 'itself' in the 
+>long run, but one has to start
+>somewhere!
+
+No kidding.  Between admin and the website I haven't done any real coding 
+for JOS myself!  ;)  I'm going to change that soon....
+
+-iain
+
+
+
+
+
+From robfitz@273k.net Fri, 22 Sep 2000 05:14:05 +0000
+Date: Fri, 22 Sep 2000 05:14:05 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS] Voting
+
+Hi all
+
+After thinking about it I think we need to stop this vote.  I think
+we're rushing it, we need to do this right.  We need to turn the project
+around, but lets not do it too fast, people need time to adjust.
+
+I don't think we need a president to change things, we just need someone
+to help guides us in the right direction.  Think of how Iain and myself
+have run the IRC meetings, we set an agenda, the discuss the topics, if
+the discussion goes off-topic we try and bring it back on topic.  Almost
+always the out come of the meeting has been good, with most of the
+issues getting solved.
+
+There is nothing in the responsibilities that needs the extraordinary
+powers we want to grant (thought I don't think Iain would abuse them),
+so lets not give them out.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+On Thu, Sep 21, 2000 at 10:54:39AM -0500, Iain Shigeoka wrote:
+> Hello,
+> 
+> For those of you who don't know, please see my vote proposal at VoteInfo in 
+> the jos wiki.  I need someone to second it (edit the page and put yourself 
+> in) and ping the list.  I'd also like to have someone volunteer to be the 
+> vote administrator who is not interested in being interim President (it 
+> would seem a little suspicious to have the vote admin be a candidate).  In 
+> any case, if we could get the ball rolling on this....  :)
+> 
+> -iain
+> 
+> 
+> _______________________________________________
+> General maillist  -  General@jos.org
+> http://jos.org/mailman/listinfo/general
+
+
+
+
+From helmut@webby.com Fri, 22 Sep 2000 02:08:31 -0600
+Date: Fri, 22 Sep 2000 02:08:31 -0600
+From: DearWebby helmut@webby.com
+Subject: [JOS] Voting
+
+Maybe JOS should be split in two,
+"jos" (just organizational stuff) for one group to debate organizational 
+and constitutional and political stuff for the next few hundred years,
+and
+"JOS"  (Java Operating System) to try to code a Java Operating System 
+before Java is put on the same shelf as Pascal.
+
+This is a smart-ass remark and NOT meant to take back my +1 vote for an 
+immediate election of an Emergency Dictator or President to get JOS unstuck 
+and moving.
+Helmut
+
+
+At 11:14 PM 9/21/00, Robert Fitzsimons wrote:
+>Hi all
+>
+>After thinking about it I think we need to stop this vote.  I think
+>we're rushing it, we need to do this right.  We need to turn the project
+>around, but lets not do it too fast, people need time to adjust.
+>
+>I don't think we need a president to change things, we just need someone
+>to help guides us in the right direction.  Think of how Iain and myself
+>have run the IRC meetings, we set an agenda, the discuss the topics, if
+>the discussion goes off-topic we try and bring it back on topic.  Almost
+>always the out come of the meeting has been good, with most of the
+>issues getting solved.
+>
+>There is nothing in the responsibilities that needs the extraordinary
+>powers we want to grant (thought I don't think Iain would abuse them),
+>so lets not give them out.
+>
+>Robert Fitzsimons
+>robfitz@273k.net
+>
+>On Thu, Sep 21, 2000 at 10:54:39AM -0500, Iain Shigeoka wrote:
+> > Hello,
+> >
+> > For those of you who don't know, please see my vote proposal at 
+> VoteInfo in
+> > the jos wiki.  I need someone to second it (edit the page and put yourself
+> > in) and ping the list.  I'd also like to have someone volunteer to be the
+> > vote administrator who is not interested in being interim President (it
+> > would seem a little suspicious to have the vote admin be a candidate).  In
+> > any case, if we could get the ball rolling on this....  :)
+> >
+> > -iain
+> >
+> >
+> > _______________________________________________
+> > General maillist  -  General@jos.org
+> > http://jos.org/mailman/listinfo/general
+>
+>_______________________________________________
+>General maillist  -  General@jos.org
+>http://jos.org/mailman/listinfo/general
+
+Dear Webby
+Helmut Morscher, President of Webby, Inc
+High traffic marketing at it's best.
+Have Fun and the people will come !
+http://webby.com   http://mypostcards.com  http://posty.com
+
+
+
+
+
+From al@outworld.org Fri, 22 Sep 2000 13:51:28 +0300
+Date: Fri, 22 Sep 2000 13:51:28 +0300
+From: Al al@outworld.org
+Subject: [JOS] Voting
+
+Robert Fitzsimons wrote:
+
+> After thinking about it I think we need to stop this vote.  I think
+> we're rushing it, we need to do this right.  We need to turn the
+> project around, but lets not do it too fast, people need time to
+> adjust.
+
+
+Many academic organizations in Europe have a scheme of control that
+could possibly assist us. Let me explain:
+
+
+Council - 3 members - the Council is the "top" in the hierarchy, but is
+only there to decide *general* policy, make public relations and (in the
+case of funding) manage funds. They can agree or vote for decisions.
+
+Senate - n members - the Senate is made up of JOS developers - they have
+to be people who know about code and right code. These are the people
+who, under the general guidelines of the council, take the technical and
+implementation decisions for the project. They always vote for
+decisions.
+
+Court - everyone - everyone involved in project JOS that has the right
+to access information regarding the development of JOS, propose ideas,
+challenge proposals, comment, etc., but does not have the authoritative
+power to change any decisions made by the Senate. People from the Court
+can become members of the Senate in a way defined by us.
+
+
+When we manage to define the aforementioned way, this scheme could work,
+because we would have a "head" that guides the project on general, but
+the actual decisions are made by the developers. The Council cannot
+overrule a decision made by the Senate, but the Senate must work in
+accordance to the general guidelines set by the Council.
+
+
+Thoughts?
+
+
+-- 
+
+        "Though this be madness, yet there is method in't."
+                                          - William Shakespeare
+________________________________________________________________________
+[MAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al/]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ICQ#: 11876955] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499] [TIME: GMT +2.00 H]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS E-MAIL
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 22 Sep 2000 09:57:15 -0500
+Date: Fri, 22 Sep 2000 09:57:15 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Re: JOS President??? No way.
+
+At 11:00 PM 9/21/00 -0400, you wrote:
+>Here is a quote from the constitution:
+>
+>2.2 "JOS*" shall use collaboration, as opposed to authoritarian methods, as
+>the basis for all operations except as needed for organizational details,
+>including, but not limited to, design and coding issues.
+>
+>What does this mean? When I read it one way, it says "authoritarian
+>methods" are not encouraged. When I read it again, it says "authoritarian
+>methods" are required (needed) for organizational details. Regardless,
+>there is no provision for the office of a president. I consider a president
+>to be part of those "authoritarian methods", especially when I read the
+>VoteInfo article on JOS Wiki. I cringe when I see the word "expedite"
+>because it has always been an excuse suitable for oppression.
+
+For org details, it says we do need authoritarian methods.  This is simply 
+because, for some things like writing checks or answering questions during 
+interviews, someone has to actually do it on behalf of jos without a vote 
+and every member participating.  ;)
+
+I agree that dictatorships leave a lot of room for oppression.  But the 
+question has come up if we can tolerate the inefficiencies of a true 
+democracy or do we risk a dictatorship (which is much more efficient).  The 
+hope is always that you get a "benevolent dictatorship" but its at the risk 
+that you get a bad one which, being more efficient, can do a lot more damage.
+
+The original discussion on the general mailing list essentially boiled down 
+to: "JOS, the organization, is broken and we should take some drastic 
+measures to try and fix it.  The fix is an interim President."  (my 
+interpretation)
+
+Now, I'm getting the vibe that the mood is swinging back to: "JOS, the 
+organization, is broken but we can fix it without taking drastic measures 
+like an interim President." (my interpretation)
+
+-iain
+
+
+
+
+
+From kim@bruning.demon.nl Fri, 22 Sep 2000 18:20:29 +0200 (CEST)
+Date: Fri, 22 Sep 2000 18:20:29 +0200 (CEST)
+From: Kim Bruning kim@bruning.demon.nl
+Subject: [JOS] Re: JOS President??? No way.
+
+
+
+On Fri, 22 Sep 2000, Iain Shigeoka wrote:
+
+> At 11:00 PM 9/21/00 -0400, you wrote:
+> >Here is a quote from the constitution:
+> >
+> >2.2 "JOS*" shall use collaboration, as opposed to authoritarian methods, as
+> >the basis for all operations except as needed for organizational details,
+> >including, but not limited to, design and coding issues.
+[snip] 
+> Now, I'm getting the vibe that the mood is swinging back to: "JOS, the 
+> organization, is broken but we can fix it without taking drastic measures 
+> like an interim President." (my interpretation)
+
+I'm just a quiet outside observer who once joined the JOS mailing list
+because I am interested in java, and like the idea of a java operating
+system. 
+
+For what my humble opinion is worth, the organisational problems JOS
+appears to be having do not appear to be unique. Perhaps it might be
+useful to (re-) read the standard text on running an open source projects
+by ESR called "The Cathedral and the Bazar" and perhaps also the follow-on
+texts.
+
+If you haven't read them already, they can be found at:
+http://www.tuxedo.org/~esr/writings/cathedral-bazaar/
+
+I hope this is useful,
+
+read you soon,
+	Kim Bruning
+
+
+
+
+
+
+From helmut@webby.com Fri, 22 Sep 2000 10:48:53 -0600
+Date: Fri, 22 Sep 2000 10:48:53 -0600
+From: DearWebby helmut@webby.com
+Subject: [JOS] Re: JOS President??? No way.
+
+Hi Ian
+
+At 08:57 AM 9/22/00, Iain Shigeoka wrote:
+
+>Now, I'm getting the vibe that the mood is swinging back to: "JOS, the 
+>organization, is broken but we can fix it without taking drastic measures 
+>like an interim President." (my interpretation)
+>-iain
+
+No, not the mood, just the expected few reactionaries who would prefer 
+endless sandbox politics to real action. That in itself is a further 
+indication why it takes a focused president who will keep the cart going 
+forward and not stop to chat or go off course every time somebody hears a 
+little squeak.
+Helmut
+
+
+
+Dear Webby
+Helmut Morscher, President of Webby, Inc
+High traffic marketing at it's best.
+Have Fun and the people will come !
+http://webby.com   http://mypostcards.com  http://posty.com
+
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 22 Sep 2000 18:50:58 -0500
+Date: Fri, 22 Sep 2000 18:50:58 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Re: JOS President??? No way.
+
+At 06:20 PM 9/22/00 +0200, Kim Bruning wrote:
+
+>For what my humble opinion is worth, the organisational problems JOS
+>appears to be having do not appear to be unique. Perhaps it might be
+>useful to (re-) read the standard text on running an open source projects
+>by ESR called "The Cathedral and the Bazar" and perhaps also the follow-on
+>texts.
+
+I agree with the views of CntB.  And of course, jos as it was founded and 
+as it stands violates most of its tenants for a successful open source 
+project which is probably why we're having so much trouble:
+
+<Quote 
+href="http://www.tuxedo.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/x285.html">
+
+9. Necessary Preconditions for the Bazaar Style
+
+It's fairly clear that one cannot code from the ground up in bazaar style 
+[IN]. One can test, debug and improve in bazaar style, but it would be very 
+hard to originate a project in bazaar mode. Linus didn't try it. I didn't 
+either. Your nascent developer community needs to have something runnable 
+and testable to
+play with.
+
+When you start community-building, what you need to be able to present is a 
+plausible promise. Your program doesn't have to work particularly well. It 
+can be crude, buggy, incomplete, and poorly documented. What it must not 
+fail to do is (a) run, and (b) convince potential co-developers that it can 
+be evolved into something really neat in the foreseeable future.
+
+</Quote>
+
+JOS began in bazaar mode and even worse in committee mode with the bazaar 
+development model.  And the project didn't have anything that ran, and 
+thus, doesn't show much potential for being something neat in the 
+foreseeable future.  Not that it couldn't be neat in the future.  Just not 
+in the _foreseeable_ future.  For reasons given in both CntB and 
+Homesteading in the Noosphere 
+(http://www.tuxedo.org/~esr/writings/homesteading/homesteading/) this 
+approach is almost doomed to failure.  The lure of JOS is that the project 
+itself meets with the CntB requirements for a great open source project, 
+especially #1: Every good work of software starts by scratching a 
+developer's personal itch.
+
+Everyone working on/in/under/around java wants a JOS!
+
+My current position is that jos, because of its start, is doomed to never 
+get going.  Homesteading the Noosphere really makes it clear (if you accept 
+his tenants) that JOS is going to have inherent problems the way we've 
+structured it.  Readers should carefully read: 
+http://www.tuxedo.org/~esr/writings/homesteading/homesteading/x349.html 
+Section 16. Project Structures and Ownership.
+
+Now I'm not saying that ESR is completely right and that I agree with 
+everything he has to say but I think he does offer interesting things to 
+think about.
+
+As far as JOS goes, I think the way the project is organized needs to be 
+rethought.  Sorta like a software "throw away" prototype.  Once you learn 
+all you're going to learn from it, you throw it away and start fresh.  We 
+tried it, we learned, now we need to do it all over from the ground up.
+
+ From the way the current discussions are going, I have the feeling that 
+many core members (as measured by activity both on the lists and in 
+development) are not interested in throwing away the current jos 
+organization structure.  This is an inherently dangerous situation as some 
+"active" members do want to go through a restructuring and so its hard to 
+make those that want to throw out the old rules follow the old rules.  ;)
+
+Just look at my effort to go through an interim President vote.  Something 
+that should obviously be an "extraordinary" vote but I'm only willing at 
+the slowest to put through a "normal" vote.
+
+So, at this point, its very important to establish how many people feel 
+that we need to keep jos as is (or at least work legitimately following our 
+constitution to make changes).
+
+VOTE:
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+So can I get an inpromptu vote:  How many people want to keep JOS as-is 
+and/or feel that any changes must be made through the processes outlined in 
+the constitution.  (+1 yes, +/-0 abstain, -1 no).
+
+-1
+Obviously
+I think we need to do a full shakeup including tossing the constitution.  I 
+voted in the constitution but now find it much too burdensome and the jos 
+org structure poor for getting an open source jos built.
+
+-iain
+
+ps - If enough people do want to keep to the status quo I think that is 
+perfectly understandable.  The rabble (including myself) that wants to 
+throw away the old JOS and restart can just do that under a new name as a 
+new project.  I'm sure we'll be able to collaborate (I don't see why it 
+needs to be an unfriendly parting).
+
+
+
+
+
+From secret@io.com Fri, 22 Sep 2000 19:43:56 -0500
+Date: Fri, 22 Sep 2000 19:43:56 -0500
+From: Omega Bodhi secret@io.com
+Subject: [JOS] Section 5: Extraordinary Change to Constitution
+
+Formation of the Ad Hoc Constitutional Committee 2000, nicknamed Section 5.
+
+Section 5 is an Ad Committee, and therefore no formal mechanism exists to
+promote, restrain, or encumber its formation. It is not a violation of the
+JOS Constitution or JOS 
+
+The mission of the AHCC 2000 consists of the following major objectives:
+
+1) To draft a recommendation for an extraordinary change to the JOS
+Constitution, Section 5, JOS Governance Procedures.
+2) To review the recommendations with the JOS Membership in order to take
+into account all issues brought forth.
+3) To edit the recommendations with regards to the input received.
+4) To advertise the recommendation under the extraordinary rules for a vote
+by JOS Membership.
+5) To further steward the recommendation through the JOS voting procedures.
+
+Once these five major objectives have been me the AHCC 2000 will dissolve
+with no further ado.
+
+No qualifications for Section 5 membership have been determined at this time.
+
+The contents of the recommendation that Section 5 is drafting would
+include, but not be delimited to:
+
+1) The institutionalization of a temporary Constitutional President (CP),
+who would hold office six months out of the year.
+2) The definition of the CP's roles, responsibilities, powers, constraints,
+etc.
+3) The institutionalization of a temporary Presidential Oversight Committee
+(POC), which would balance and check the power and control of the
+Constitutional President, but would operate year round.
+4) The definition of the POC's roles, responsibilities, powers,
+constraints, etc.
+5) The rules and procedures by which the POC oversees the executive power
+of the CP.
+
+I do not offer the actual text of the Section 5 recommendation ... I think
+this should be a group process, and recommend we continue further
+discussions on Section 5 on general@jos.org. I encourage all members to
+participate, and provide their valuable input in a timely manner. I
+recommend Section 5 discussion end in a timely manner, and the matter drawn
+up and advertised for a full vote.
+
+For your convenience, some relevant sections of the JOS Constitution
+concerning the extraordinary nature of this measure.
+
+Omega Bodhi
+
+================
+
+
+JOS Constitutional Sections
+
+4.2 Voting issues shall be classified as "ordinary" and "extraordinary".
+"Extraordinary" votes shall be reserved for
+changes to the Constitution. All other issues shall be decided by
+"ordinary" votes. 
+
+4.3 A vote may be called by any voting member. If a voting member wishes to
+call a vote then this shall be advertised
+for a minimum number of days prior to the start of the vote in the manner
+described in the policy book. The minimum
+number of days shall be 7 for "ordinary" votes and 14 for "extraordinary"
+votes. The advertisement shall specify one
+member who has agreed to second the vote and a member who has agreed to act
+as a neutral administrator of the
+vote. The advertisement shall also specify the proposed wording of the
+question to be asked in the vote. 
+
+
+
+
+
+
+
+From robfitz@273k.net Sun, 24 Sep 2000 05:07:05 +0000
+Date: Sun, 24 Sep 2000 05:07:05 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS] Re: [JOS-Kernel] No virtual machine mailing list
+
+Hello Johan
+
+There is more then one JVM that you can look at, thier are in fact
+three.
+
+The first is decaf it should be documented on the JOS website and
+mailing list, the source is available at
+<URL:http://sourceforge.net/cvs/?group_id=2376> under the module JJOS.
+The second one is kissme was developed outside of JOS and is available
+at <URL:http://kissme.sourceforge.net/>.  The third one was developed by
+me as a proof of concept and is available at
+<URL:http://www.273k.net/jos/jvm.20000911.tar.gz>. 
+
+Robert Fitzsimons
+robfitz@273k.net
+
+On Fri, Sep 22, 2000 at 02:58:07PM +0200, Johan Rydberg wrote:
+> Iain Shigeoka wrote:
+> > 
+> > At 09:29 AM 9/21/00 -0400, Gilbert Carl Herschberger II wrote:
+> > >There is no virtual machine mailing list for the JOS Project. I don't think
+> > >we should create one because there seems to be too many mailing lists
+> > >already. We have discussed virtual machines on this list before. We can
+> > >continue to do so, can't we?
+> > 
+> > Yes. In general, vm's should be discussed on the kernel list.  For us at
+> > least, it falls "under" the kernel itself.
+> 
+> Where can I find this JVM ?
+> 
+> 
+> 
+> -- 
+> Johan Rydberg			johan.rydberg@netinsight.net
+> Net Insight AB, Sweden		direct: +46-8-685 04 17
+> http://www.netinsight.net	phone:  +46-8-685 04 00
+> 				fax:    +46-8-685 04 20
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+
+From robfitz@273k.net Sun, 24 Sep 2000 06:01:45 +0000
+Date: Sun, 24 Sep 2000 06:01:45 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS] Re: JOS President??? No way.
+
+Hi Iain, all
+
+>  From the way the current discussions are going, I have the feeling that 
+> many core members (as measured by activity both on the lists and in 
+> development) are not interested in throwing away the current  
+> organization structure.  This is an inherently dangerous situation as some 
+> "active" members do want to go through a restructuring and so its hard to 
+> make those that want to throw out the old rules follow the old rules.  ;)
+
+The problem isn't with the current rules [1], it's with the lack of focus
+and direction.  Now we don't need a president to to give us this focus,
+this was the change of heart on my part.
+
+What we need to do is treat this mailing list like a IRC meeting, we
+need to set the agenda items, discuss them, and make decisions.  Any
+decisions that are too important will need to be voted on and
+constitution updated, etc.
+
+The hard part will be to keep the discussion going and on-topic, but
+thats not too hard when there are a number of people involved.
+
+So here are my agenda items:
+* Mailing list reorganization
+* Web site reorganization
+* Produce a status report
+* How we develop code
+* Chose a license for JOS
+* Which organizational structure
+* Setting up a non-profit entity
+* Anything else I've left out
+
+So add you agenda items.  I don't really mind the order we discuss
+these in, but doing the easiest first would probably be the best.
+
+> VOTE:
+> \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+> So can I get an inpromptu vote:  How many people want to keep JOS as-is 
+> and/or feel that any changes must be made through the processes outlined in 
+> the constitution.  (+1 yes, +/-0 abstain, -1 no).
+
++1
+Basically in the longterm we need to reorganize, but lets just do it a
+bit more slowly and *within the constitution*.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+1.  The current rules (Constitution and Policy Book) only set out the
+aims and how to vote on issues, and thats about it.
+
+
+
+
+
+From robfitz@273k.net Sun, 24 Sep 2000 06:23:05 +0000
+Date: Sun, 24 Sep 2000 06:23:05 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS] Mailing list reorganization
+
+Hi everybody
+
+It has been discussed on the UI mailing list a little and it's been
+something I want to discuss for a few week now.  We currently have
+eleven mailing list and only three of them have been used frequently in
+the last few months.
+
+So the proposal is too reduce the number so that the discussions can be
+more easily followed. 
+
+So these would be the mailing lists:
+announce -  Used to announce project status, releases, etc.
+            Same as current mailing list.
+vote-info - Used to organize votes as required by Policy Book.
+            Same as current mailing list.
+developer - Used to discuss all issuse related to developement.
+            A combination of all the previous mailing lists.
+
+I've left out the admin mailing list.  Do we need it?  Can we not just
+use the developer mailing list?
+ 
+Robert Fitzsimons
+robfitz@273k.net
+
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 26 Sep 2000 11:05:56 -0500
+Date: Tue, 26 Sep 2000 11:05:56 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Mailing list reorganization
+
+At 06:23 AM 9/24/00 +0000, Robert Fitzsimons wrote:
+
+>So the proposal is too reduce the number so that the discussions can be
+>more easily followed.
+>
+>So these would be the mailing lists:
+>announce -  Used to announce project status, releases, etc.
+>             Same as current mailing list.
+>vote-info - Used to organize votes as required by Policy Book.
+>             Same as current mailing list.
+>developer - Used to discuss all issuse related to developement.
+>             A combination of all the previous mailing lists.
+>
+>I've left out the admin mailing list.  Do we need it?  Can we not just
+>use the developer mailing list?
+
+I think we need a "general" or "user" list for anything that isn't 
+development related.  Typically, because the developers are the voters, 
+most projects seem to break it up as:
+
+announce
+dev
+general/user
+
+with votes occuring on the dev list.  I'd prefer to vote on a change to the 
+policy book to get voting onto the dev list and break it up this way (3 
+lists really is enough).
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 26 Sep 2000 11:37:14 -0500
+Date: Tue, 26 Sep 2000 11:37:14 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] JOS Agenda
+
+At 06:01 AM 9/24/00 +0000, Robert Fitzsimons wrote:
+>Hi Iain, all
+>
+> >  From the way the current discussions are going, I have the feeling that
+> > many core members (as measured by activity both on the lists and in
+> > development) are not interested in throwing away the current
+> > organization structure.  This is an inherently dangerous situation as some
+> > "active" members do want to go through a restructuring and so its hard to
+> > make those that want to throw out the old rules follow the old rules.  ;)
+>
+>The problem isn't with the current rules [1], it's with the lack of focus
+>and direction.  Now we don't need a president to to give us this focus,
+>this was the change of heart on my part.
+
+I disagree (that we don't need a much more focused group to provide new 
+focus) but I'll play it out this way and see what happens if this is what 
+poeple want.
+
+>So here are my agenda items:
+>* Mailing list reorganization
+
+As covered in another article, I think we should change to the following:
+
+jos-announce - low traffic (twice a month or once a week) Major 
+announcements only
+jos-dev - developers and voting occur here
+jos-user - general discussions, user issues, etc
+
+This requires changing the Policy book to point to the jos-dev list instead 
+of the vote-info list.  I don't think this requires a vote.  It's 
+administrative minutia.
+
+We should make an announcement of the fact that a change has occured though 
+on the announce list when that's in place.  I also recommend that we put 
+all lists together (right now announce is still at spin isn't it?)  In 
+addition, the archives from all old lists (and they're scattered all over 
+the place) should be consolidated and put into an archive on our website.
+
+Finally, since we're changing the list names, I also suggest hosting the 
+lists on sourceforge.  One less piece of net infrastructure to maintain, 
+fix, update, and backup.
+
+>* Web site reorganization
+
+I have just gotten the agreement from http://www.ejip.net/ to donate web 
+hosting for us!  Servlets and ejb's and a jdbc database are now usable to 
+build our website.  We just need to give them the word and we can have an 
+account activated for us.
+
+As soon as feasible, I'd really appreciate it if people could suggest 
+approaches to take here.  Now that its java, I'm hoping to get more help 
+with constructing the website... :)  Jetspeed and Enhydra is still my 
+leading options but I'm willing to hear alternative suggestions for 
+technology.  I'll be posting my outline of the new website (features, etc) 
+later this week or early next week.
+
+>* Produce a status report
+
+This should probably be done once the change is in progress?  I was writing 
+up one of the current state but there really wasn't much to put in it.
+
+>* How we develop code
+>* Chose a license for JOS
+>* Which organizational structure
+
+For these three, should we just put up a proposal and then let people tweak it?
+
+>* Setting up a non-profit entity
+
+I think this is a bit more overhead than we can handle right now.  Of 
+course if someone has the time and inclination, we'd love to get this 
+process started but I can't really start this now and I haven't heard 
+anyone else volunteer to do this.  I propose putting this on the backburner 
+until all the other major issues are taken care of.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 26 Sep 2000 11:40:43 -0500
+Date: Tue, 26 Sep 2000 11:40:43 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Section 5: Extraordinary Change to Constitution
+
+Let's put this in the wiki (if you're agreeable) (or if it is, can you 
+provide a link and edit the WebHome to also point there)?
+
+There are several issues we should be working on and this is one of them.
+
+-iain
+
+At 07:43 PM 9/22/00 -0500, Omega Bodhi wrote:
+>Formation of the Ad Hoc Constitutional Committee 2000, nicknamed Section 5.
+>
+>Section 5 is an Ad Committee, and therefore no formal mechanism exists to
+>promote, restrain, or encumber its formation. It is not a violation of the
+>JOS Constitution or JOS
+>
+>The mission of the AHCC 2000 consists of the following major objectives:
+>
+>1) To draft a recommendation for an extraordinary change to the JOS
+>Constitution, Section 5, JOS Governance Procedures.
+>2) To review the recommendations with the JOS Membership in order to take
+>into account all issues brought forth.
+>3) To edit the recommendations with regards to the input received.
+>4) To advertise the recommendation under the extraordinary rules for a vote
+>by JOS Membership.
+>5) To further steward the recommendation through the JOS voting procedures.
+>
+>Once these five major objectives have been me the AHCC 2000 will dissolve
+>with no further ado.
+>
+>No qualifications for Section 5 membership have been determined at this time.
+>
+>The contents of the recommendation that Section 5 is drafting would
+>include, but not be delimited to:
+>
+>1) The institutionalization of a temporary Constitutional President (CP),
+>who would hold office six months out of the year.
+>2) The definition of the CP's roles, responsibilities, powers, constraints,
+>etc.
+>3) The institutionalization of a temporary Presidential Oversight Committee
+>(POC), which would balance and check the power and control of the
+>Constitutional President, but would operate year round.
+>4) The definition of the POC's roles, responsibilities, powers,
+>constraints, etc.
+>5) The rules and procedures by which the POC oversees the executive power
+>of the CP.
+>
+>I do not offer the actual text of the Section 5 recommendation ... I think
+>this should be a group process, and recommend we continue further
+>discussions on Section 5 on general@jos.org. I encourage all members to
+>participate, and provide their valuable input in a timely manner. I
+>recommend Section 5 discussion end in a timely manner, and the matter drawn
+>up and advertised for a full vote.
+>
+>For your convenience, some relevant sections of the JOS Constitution
+>concerning the extraordinary nature of this measure.
+>
+>Omega Bodhi
+>
+>================
+>
+>
+>JOS Constitutional Sections
+>
+>4.2 Voting issues shall be classified as "ordinary" and "extraordinary".
+>"Extraordinary" votes shall be reserved for
+>changes to the Constitution. All other issues shall be decided by
+>"ordinary" votes.
+>
+>4.3 A vote may be called by any voting member. If a voting member wishes to
+>call a vote then this shall be advertised
+>for a minimum number of days prior to the start of the vote in the manner
+>described in the policy book. The minimum
+>number of days shall be 7 for "ordinary" votes and 14 for "extraordinary"
+>votes. The advertisement shall specify one
+>member who has agreed to second the vote and a member who has agreed to act
+>as a neutral administrator of the
+>vote. The advertisement shall also specify the proposed wording of the
+>question to be asked in the vote.
+>
+>
+>
+>
+>_______________________________________________
+>General maillist  -  General@jos.org
+>http://jos.org/mailman/listinfo/general
+
+
+
+
+
+From RegierAveryJ@JohnDeere.com Tue, 26 Sep 2000 13:53:10 -0500
+Date: Tue, 26 Sep 2000 13:53:10 -0500
+From: Regier Avery J RegierAveryJ@JohnDeere.com
+Subject: [JOS] Mailing list reorganization
+
+Iain,
+
+I have to disagree on this.  One of the properties of vote-info is that a
+single person is only to be signed up once to this list.  It is this list
+that enables us to have an accurate count of official 'membership'.  
+
+A 'dev' list on the other hand, many people will want and need to be signed
+up to more than once (like with both work and home email addresses) and this
+wreaks havoc with vote counting.
+
+Also, a change to the Policy Book for this would require an ordinary vote.
+I don't think it is worth it.
+
+Avery J. Regier
+
+
+
+> -----Original Message-----
+> From:	Iain Shigeoka [SMTP:iainshigeoka@yahoo.com]
+> Sent:	Tuesday, September 26, 2000 12:06 PM
+> To:	Robert Fitzsimons; general@jos.org
+> Subject:	Re: [JOS] Mailing list reorganization
+> 
+> At 06:23 AM 9/24/00 +0000, Robert Fitzsimons wrote:
+> 
+> >So the proposal is too reduce the number so that the discussions can be
+> >more easily followed.
+> >
+> >So these would be the mailing lists:
+> >announce -  Used to announce project status, releases, etc.
+> >             Same as current mailing list.
+> >vote-info - Used to organize votes as required by Policy Book.
+> >             Same as current mailing list.
+> >developer - Used to discuss all issuse related to developement.
+> >             A combination of all the previous mailing lists.
+> >
+> >I've left out the admin mailing list.  Do we need it?  Can we not just
+> >use the developer mailing list?
+> 
+> I think we need a "general" or "user" list for anything that isn't 
+> development related.  Typically, because the developers are the voters, 
+> most projects seem to break it up as:
+> 
+> announce
+> dev
+> general/user
+> 
+> with votes occuring on the dev list.  I'd prefer to vote on a change to
+> the 
+> policy book to get voting onto the dev list and break it up this way (3 
+> lists really is enough).
+> 
+> -iain
+> 
+> 
+> _______________________________________________
+> General maillist  -  General@jos.org
+> http://jos.org/mailman/listinfo/general
+
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 26 Sep 2000 17:00:43 -0500
+Date: Tue, 26 Sep 2000 17:00:43 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Mailing list reorganization
+
+At 01:53 PM 9/26/00 -0500, Regier Avery J wrote:
+>Iain,
+>
+>I have to disagree on this.  One of the properties of vote-info is that a
+>single person is only to be signed up once to this list.  It is this list
+>that enables us to have an accurate count of official 'membership'.
+>
+>A 'dev' list on the other hand, many people will want and need to be signed
+>up to more than once (like with both work and home email addresses) and this
+>wreaks havoc with vote counting.
+
+Hmm.  I was trying to model it after the apache org which only has 
+developers voting so everyone on dev (the developers) don't need an extra 
+vote.  I can see letting everyone (users and general interest) vote with 
+full vote privileges can be a big problem but it is how we're currently 
+setup.  As far vote counting, jos is setup to do voting by directly 
+emailing the vote admin.  The vote-info is only for vote announcements, and 
+vote discussion.  I'm a bit unclear why we can't do vote announcements on 
+announce, and vote discussion on general (if not dev).
+
+>Also, a change to the Policy Book for this would require an ordinary vote.
+>I don't think it is worth it.
+
+I think its worth it.  I want to clean up the mailing list org and am 
+willing to go through the pain.  IMHO, if voting is so difficult that doing 
+things correctly is sacrificed simply to avoid voting, then voting should 
+be made simpler/easier so we vote more often.  I personally think that 
+ordinary voting is much too difficult and should be switched over to normal 
+lazy voting ala apache's (+1, 0, -1 ping the list, get consensus).
+
+-iain
+
+
+>Avery J. Regier
+>
+>
+>
+> > -----Original Message-----
+> > From: Iain Shigeoka [SMTP:iainshigeoka@yahoo.com]
+> > Sent: Tuesday, September 26, 2000 12:06 PM
+> > To:   Robert Fitzsimons; general@jos.org
+> > Subject:      Re: [JOS] Mailing list reorganization
+> >
+> > At 06:23 AM 9/24/00 +0000, Robert Fitzsimons wrote:
+> >
+> > >So the proposal is too reduce the number so that the discussions can be
+> > >more easily followed.
+> > >
+> > >So these would be the mailing lists:
+> > >announce -  Used to announce project status, releases, etc.
+> > >             Same as current mailing list.
+> > >vote-info - Used to organize votes as required by Policy Book.
+> > >             Same as current mailing list.
+> > >developer - Used to discuss all issuse related to developement.
+> > >             A combination of all the previous mailing lists.
+> > >
+> > >I've left out the admin mailing list.  Do we need it?  Can we not just
+> > >use the developer mailing list?
+> >
+> > I think we need a "general" or "user" list for anything that isn't
+> > development related.  Typically, because the developers are the voters,
+> > most projects seem to break it up as:
+> >
+> > announce
+> > dev
+> > general/user
+> >
+> > with votes occuring on the dev list.  I'd prefer to vote on a change to
+> > the
+> > policy book to get voting onto the dev list and break it up this way (3
+> > lists really is enough).
+> >
+> > -iain
+> >
+> >
+> > _______________________________________________
+> > General maillist  -  General@jos.org
+> > http://jos.org/mailman/listinfo/general
+>
+>
+>_______________________________________________
+>General maillist  -  General@jos.org
+>http://jos.org/mailman/listinfo/general
+
+
+
+
+
+From robfitz@273k.net Wed, 27 Sep 2000 03:42:49 +0000
+Date: Wed, 27 Sep 2000 03:42:49 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS] Mailing list reorganization
+
+> I think we need a "general" or "user" list for anything that isn't 
+> development related.  Typically, because the developers are the voters, 
+> most projects seem to break it up as:
+> 
+> announce
+> dev
+> general/user
+
+Do we really need a user mailing list?  I don't think it is needed, at
+least until we have made a alpha or beta release.  Simplest question to
+ask yourself is, has there been any real discussions on a mailing list
+which hasn't been development related, and if we do reach a stage that
+there are to many user questions we can just start a new user mailing
+list.
+
+> with votes occuring on the dev list.  I'd prefer to vote on a change to the 
+> policy book to get voting onto the dev list and break it up this way (3 
+> lists really is enough).
+
+<meeting-mode>
+I think this is a little off-topic for this discussion lets add it as
+another agenda item.
+</meeting-mode>
+
+Robert Fitzsimons
+robfitz@273k.net
+
+
+
+
+
+From robfitz@273k.net Wed, 27 Sep 2000 03:58:37 +0000
+Date: Wed, 27 Sep 2000 03:58:37 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS] Notice for IRC meeting on October 1, 2000
+
+Hi everybody
+
+I hope to have a very important IRC meeting this coming Sunday the 1st
+of October 2000, at 17:00 UTC for about two hours.  This meeting will
+take place on the Undernet IRC Network, in the #jos channel.
+
+There is only item I would like to discuss:
+* How we are handling the current JOS reorganization
+
+I would hope that most of the people involved in the current
+discussions on the mailing list would try and attend.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+
+
+
+
+From donaldp@mad.scientist.com Wed, 27 Sep 2000 19:37:07 +1000
+Date: Wed, 27 Sep 2000 19:37:07 +1000
+From: Peter Donald donaldp@mad.scientist.com
+Subject: [JOS] Notice for IRC meeting on October 1, 2000
+
+At 03:00  27/9/00 -0400, you wrote:
+>From: Robert Fitzsimons <robfitz@273k.net>
+>Subject: [JOS] Notice for IRC meeting on October 1, 2000
+>
+>Hi everybody
+>
+>I hope to have a very important IRC meeting this coming Sunday the 1st
+>of October 2000, at 17:00 UTC for about two hours.  This meeting will
+>take place on the Undernet IRC Network, in the #jos channel.
+>
+>There is only item I would like to discuss:
+>* How we are handling the current JOS reorganization
+>
+>I would hope that most of the people involved in the current
+>discussions on the mailing list would try and attend.
+
+I think this is one of the problems with the way JOS is run. You choose to
+undertake an action that will isolate members who can't attend. Why not
+have discussions on the mailing lists instead ? This way it is archived
+better and allows more people to participate. 
+
+
+Cheers,
+
+Pete
+
+*------------------------------------------------------*
+| "Nearly all men can stand adversity, but if you want |
+| to test a man's character, give him power."          |
+|       -Abraham Lincoln                               |
+*------------------------------------------------------*
+
+
+
+
+From RegierAveryJ@JohnDeere.com Wed, 27 Sep 2000 07:40:35 -0500
+Date: Wed, 27 Sep 2000 07:40:35 -0500
+From: Regier Avery J RegierAveryJ@JohnDeere.com
+Subject: [JOS] Mailing list reorganization
+
+Ian wrote:
+	>Iain,
+	>
+	>I have to disagree on this.  One of the properties of vote-info is
+that a
+	>single person is only to be signed up once to this list.  It is
+this list
+	>that enables us to have an accurate count of official 'membership'.
+	>
+	>A 'dev' list on the other hand, many people will want and need to
+be signed
+	>up to more than once (like with both work and home email addresses)
+and this
+	>wreaks havoc with vote counting.
+
+	Hmm.  I was trying to model it after the apache org which only has 
+	developers voting so everyone on dev (the developers) don't need an
+extra 
+	vote.  I can see letting everyone (users and general interest) vote
+with 
+	full vote privileges can be a big problem but it is how we're
+currently 
+	setup.  As far vote counting, jos is setup to do voting by directly 
+	emailing the vote admin.  The vote-info is only for vote
+announcements, and 
+	vote discussion.  I'm a bit unclear why we can't do vote
+announcements on 
+	announce, and vote discussion on general (if not dev).
+
+Yes, the votes take place by directly emailing the vote admin.  However, the
+total number or 'registered' voters is taken from the roll of the vote-info
+list.  This number of registered voters is the basis for finding out if a
+vote passed.  This is why it is important that a single person be on the
+vote-info not more than once.
+
+	>Also, a change to the Policy Book for this would require an
+ordinary vote.
+	>I don't think it is worth it.
+
+	I think its worth it.  I want to clean up the mailing list org and
+am 
+	willing to go through the pain.  IMHO, if voting is so difficult
+that doing 
+	things correctly is sacrificed simply to avoid voting, then voting
+should 
+	be made simpler/easier so we vote more often.  I personally think
+that 
+	ordinary voting is much too difficult and should be switched over to
+normal 
+	lazy voting ala apache's (+1, 0, -1 ping the list, get consensus).
+
+I don't think it is worth going through the pain because:
+1) I don't believe such a reorganization of the voting procedure is in our
+best interest.  In your scenario, in order for us to count votes correctly
+(according to the constitution), I could only be subscribed to the 'dev'
+list once.  That is very inconvenient for me and I'm sure for many others.
+The voting designed in the Constitution is for making votes binding and
+official.  The 'dev' list doesn't accomplish that.
+2) If all you want to do is find a consensus of active developers, without
+making a vote binding or official, then you can use the +1 type vote on the
+'dev' list for that without going through an official Constitutional vote.
+The Constitution doesn't prevent that.  
+
+Regards,
+Avery J. Regier
+
+
+
+> -----Original Message-----
+> From:	Iain Shigeoka [SMTP:iainshigeoka@yahoo.com]
+> Sent:	Tuesday, September 26, 2000 6:01 PM
+> To:	Regier Avery J; general@jos.org
+> Subject:	RE: [JOS] Mailing list reorganization
+> 
+> At 01:53 PM 9/26/00 -0500, Regier Avery J wrote:
+> >Iain,
+> >
+> >I have to disagree on this.  One of the properties of vote-info is that a
+> >single person is only to be signed up once to this list.  It is this list
+> >that enables us to have an accurate count of official 'membership'.
+> >
+> >A 'dev' list on the other hand, many people will want and need to be
+> signed
+> >up to more than once (like with both work and home email addresses) and
+> this
+> >wreaks havoc with vote counting.
+> 
+> Hmm.  I was trying to model it after the apache org which only has 
+> developers voting so everyone on dev (the developers) don't need an extra 
+> vote.  I can see letting everyone (users and general interest) vote with 
+> full vote privileges can be a big problem but it is how we're currently 
+> setup.  As far vote counting, jos is setup to do voting by directly 
+> emailing the vote admin.  The vote-info is only for vote announcements,
+> and 
+> vote discussion.  I'm a bit unclear why we can't do vote announcements on 
+> announce, and vote discussion on general (if not dev).
+> 
+> >Also, a change to the Policy Book for this would require an ordinary
+> vote.
+> >I don't think it is worth it.
+> 
+> I think its worth it.  I want to clean up the mailing list org and am 
+> willing to go through the pain.  IMHO, if voting is so difficult that
+> doing 
+> things correctly is sacrificed simply to avoid voting, then voting should 
+> be made simpler/easier so we vote more often.  I personally think that 
+> ordinary voting is much too difficult and should be switched over to
+> normal 
+> lazy voting ala apache's (+1, 0, -1 ping the list, get consensus).
+> 
+> -iain
+> 
+> 
+> >Avery J. Regier
+> >
+> >
+> >
+> > > -----Original Message-----
+> > > From: Iain Shigeoka [SMTP:iainshigeoka@yahoo.com]
+> > > Sent: Tuesday, September 26, 2000 12:06 PM
+> > > To:   Robert Fitzsimons; general@jos.org
+> > > Subject:      Re: [JOS] Mailing list reorganization
+> > >
+> > > At 06:23 AM 9/24/00 +0000, Robert Fitzsimons wrote:
+> > >
+> > > >So the proposal is too reduce the number so that the discussions can
+> be
+> > > >more easily followed.
+> > > >
+> > > >So these would be the mailing lists:
+> > > >announce -  Used to announce project status, releases, etc.
+> > > >             Same as current mailing list.
+> > > >vote-info - Used to organize votes as required by Policy Book.
+> > > >             Same as current mailing list.
+> > > >developer - Used to discuss all issuse related to developement.
+> > > >             A combination of all the previous mailing lists.
+> > > >
+> > > >I've left out the admin mailing list.  Do we need it?  Can we not
+> just
+> > > >use the developer mailing list?
+> > >
+> > > I think we need a "general" or "user" list for anything that isn't
+> > > development related.  Typically, because the developers are the
+> voters,
+> > > most projects seem to break it up as:
+> > >
+> > > announce
+> > > dev
+> > > general/user
+> > >
+> > > with votes occuring on the dev list.  I'd prefer to vote on a change
+> to
+> > > the
+> > > policy book to get voting onto the dev list and break it up this way
+> (3
+> > > lists really is enough).
+> > >
+> > > -iain
+> > >
+> > >
+> > > _______________________________________________
+> > > General maillist  -  General@jos.org
+> > > http://jos.org/mailman/listinfo/general
+> >
+> >
+> >_______________________________________________
+> >General maillist  -  General@jos.org
+> >http://jos.org/mailman/listinfo/general
+> 
+
+
+
+
+
+From donaldp@mad.scientist.com Thu, 28 Sep 2000 00:11:29 +1000
+Date: Thu, 28 Sep 2000 00:11:29 +1000
+From: Peter Donald donaldp@mad.scientist.com
+Subject: [JOS] Janos java os
+
+hi,
+
+Just a link I hadn't heard around here in case you were interested
+
+http://www.cs.utah.edu/flux/janos/
+
+Cheers,
+
+Pete
+
+*------------------------------------------------------*
+| "Nearly all men can stand adversity, but if you want |
+| to test a man's character, give him power."          |
+|       -Abraham Lincoln                               |
+*------------------------------------------------------*
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 29 Sep 2000 15:36:03 -0500
+Date: Fri, 29 Sep 2000 15:36:03 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Mailing list reorganization
+
+At 07:40 AM 9/27/00 -0500, Regier Avery J wrote:
+
+>Yes, the votes take place by directly emailing the vote admin.  However, the
+>total number or 'registered' voters is taken from the roll of the vote-info
+>list.  This number of registered voters is the basis for finding out if a
+>vote passed.  This is why it is important that a single person be on the
+>vote-info not more than once.
+
+Correct.  But as far as making that a membership quality it seems pretty 
+lame.  I can see people wanting to be members that don't want to be on the 
+list and the other way around.  I think membership should be a web 
+database.  Part of the new site.  So you fill out a form, and you are 
+entered as member.  Another removes you from being a member.
+
+>I don't think it is worth going through the pain because:
+>1) I don't believe such a reorganization of the voting procedure is in our
+>best interest.  In your scenario, in order for us to count votes correctly
+>(according to the constitution), I could only be subscribed to the 'dev'
+>list once.  That is very inconvenient for me and I'm sure for many others.
+>The voting designed in the Constitution is for making votes binding and
+>official.  The 'dev' list doesn't accomplish that.
+
+As my above comment states.  I think mailing lists and membership need to 
+be separate things for exactly this reason amongst others.
+
+>2) If all you want to do is find a consensus of active developers, without
+>making a vote binding or official, then you can use the +1 type vote on the
+>'dev' list for that without going through an official Constitutional vote.
+>The Constitution doesn't prevent that.
+
+So that means developers will need to be politicians and that once JOS has 
+enough members (people interested in it by say using it) you'll never be 
+able to make a decision.  Say developers want to rewrite the kernel in 
+cobol.  They'd have to have everyone (or the majority in any case) that's a 
+JOS member approve.  This starts to look unwieldy if we had a membership 
+the size of say Java Lobby...
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 29 Sep 2000 15:38:22 -0500
+Date: Fri, 29 Sep 2000 15:38:22 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Mailing list reorganization
+
+At 03:42 AM 9/27/00 +0000, Robert Fitzsimons wrote:
+> > I think we need a "general" or "user" list for anything that isn't
+> > development related.  Typically, because the developers are the voters,
+> > most projects seem to break it up as:
+> >
+> > announce
+> > dev
+> > general/user
+>
+>Do we really need a user mailing list?  I don't think it is needed, at
+>least until we have made a alpha or beta release.  Simplest question to
+>ask yourself is, has there been any real discussions on a mailing list
+>which hasn't been development related, and if we do reach a stage that
+>there are to many user questions we can just start a new user mailing
+>list.
+>
+> > with votes occuring on the dev list.  I'd prefer to vote on a change to 
+> the
+> > policy book to get voting onto the dev list and break it up this way (3
+> > lists really is enough).
+>
+><meeting-mode>
+>I think this is a little off-topic for this discussion lets add it as
+>another agenda item.
+></meeting-mode>
+
+Agreed.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 29 Sep 2000 15:41:34 -0500
+Date: Fri, 29 Sep 2000 15:41:34 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS] Notice for IRC meeting on October 1, 2000
+
+At 07:37 PM 9/27/00 +1000, Peter Donald wrote:
+>At 03:00  27/9/00 -0400, you wrote:
+> >From: Robert Fitzsimons <robfitz@273k.net>
+> >Subject: [JOS] Notice for IRC meeting on October 1, 2000
+> >
+> >Hi everybody
+> >
+> >I hope to have a very important IRC meeting this coming Sunday the 1st
+> >of October 2000, at 17:00 UTC for about two hours.  This meeting will
+> >take place on the Undernet IRC Network, in the #jos channel.
+> >
+> >There is only item I would like to discuss:
+> >* How we are handling the current JOS reorganization
+> >
+> >I would hope that most of the people involved in the current
+> >discussions on the mailing list would try and attend.
+>
+>I think this is one of the problems with the way JOS is run. You choose to
+>undertake an action that will isolate members who can't attend. Why not
+>have discussions on the mailing lists instead ? This way it is archived
+>better and allows more people to participate.
+
+My personal opinion is that mailing list discussions tend to take too long 
+and go off on threads too easily.  The chat meetings usually are nice in 
+that they get decisions made much quicker.  I do sympathize with your 
+position though.  Perhaps it would be best to do these things over the 
+mailing list if we can figure out a way to make it move quicker.  Any 
+suggestions?
+
+-iain
+
+ps - I think it will go faster if we use the simple developer voting scheme 
+I've been pushing.  I've seen small and large decisions made quickly on 
+lists that use that technique.
+
+
+
+
+
+From robfitz@273k.net Sat, 30 Sep 2000 06:38:44 +0000
+Date: Sat, 30 Sep 2000 06:38:44 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS] Notice for IRC meeting on October 1, 2000
+
+Hi Peter
+
+Sorry for the delay in getting back to you on this.
+
+Sure, an IRC meeting is not the best way to involve most of the JOS
+membership, but it is a really good way to cover a number of topics in a
+short space of time.  I'm currently trying to have some more discussions
+on the mailing list.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+On Wed, Sep 27, 2000 at 07:37:07PM +1000, Peter Donald wrote:
+> At 03:00  27/9/00 -0400, you wrote:
+> >From: Robert Fitzsimons <robfitz@273k.net>
+> >Subject: [JOS] Notice for IRC meeting on October 1, 2000
+> >
+> >Hi everybody
+> >
+> >I hope to have a very important IRC meeting this coming Sunday the 1st
+> >of October 2000, at 17:00 UTC for about two hours.  This meeting will
+> >take place on the Undernet IRC Network, in the #jos channel.
+> >
+> >There is only item I would like to discuss:
+> >* How we are handling the current JOS reorganization
+> >
+> >I would hope that most of the people involved in the current
+> >discussions on the mailing list would try and attend.
+> 
+> I think this is one of the problems with the way JOS is run. You choose to
+> undertake an action that will isolate members who can't attend. Why not
+> have discussions on the mailing lists instead ? This way it is archived
+> better and allows more people to participate. 
+> 
+> 
+> Cheers,
+> 
+> Pete
+> 
+> *------------------------------------------------------*
+> | "Nearly all men can stand adversity, but if you want |
+> | to test a man's character, give him power."          |
+> |       -Abraham Lincoln                               |
+> *------------------------------------------------------*
+> 
+> _______________________________________________
+> General maillist  -  General@jos.org
+> http://jos.org/mailman/listinfo/general
+
+
+
+

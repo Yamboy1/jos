@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000441.html">
+   <LINK REL="Next" HREF="000449.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">tmiller@haverford.edu</A><BR>
+    <I>Mon, 10 Apr 2000 13:50:52 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000441.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000449.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#444">[ date ]</a>
+              <a href="thread.html#444">[ thread ]</a>
+              <a href="subject.html#444">[ subject ]</a>
+              <a href="author.html#444">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> We agree so far, except I'm not sure what you mean by the &quot;quite
+</I>&gt;<i> possibly by default&quot; bit. Do you mean it is quite possible to share all
+</I>&gt;<i> class definitions by default, or that it is quite possible to consider
+</I>&gt;<i> all objects for illegal casts by default?
+</I>
+	We /have/ to consider all objects for illegal casts by default for
+this to work transparently.  Whether or not all class definitions are
+shared by default is a design decision -- I was suggesting we should,
+because it's the most efficient, and applications which want to do tricks
+with classloaders won't be affected.
+
+&gt;<i> A note: byte-for-byte checking is not the only alternative. If we
+</I>&gt;<i> implement my proposal for memory saving, classes that were loaded from
+</I>&gt;<i> the same version of the same archive will reuse the same class
+</I>&gt;<i> definition even though they are different JavaClassInstances.
+</I>
+	See Gilbert's reply on why this won't work.
+
+&gt;<i> While this seems more consistent to me, assignClassLoader() seems like
+</I>&gt;<i> it will work too.
+</I>
+	We need assignClassLoader() for the reasons Gilbert outlined; the
+JVM spec explicitly allows for classloaders that generate bytecode
+on-the-fly.
+
+&gt;<i> What we /could/ do is allow casts between any two classes that share
+</I>&gt;<i> the same class definition (JavaClass). No restrictions. This is safe
+</I>&gt;<i> because the power to cast is useless unless you have a reference to an
+</I>&gt;<i> object that you want to cast. The restriction should be on gaining
+</I>&gt;<i> access to the shared object.
+</I>
+	If we /don't/ allow this by default, then the application must
+specifically request casting power in some fashion, which is something I
+think we want to avoid.  That is -- for Serializable IPC, the two
+processes MUST have different statics and MUST have the same class
+definition in order to communicate.  Take the parent spawning a child
+example; it seems evident to me that the expected behavior is that the
+child and the parent will be compatible, without any special coding.  That
+means (a) we by-default share class definitions and (b) by default allow
+'illegal' casts.
+
+&gt;<i> In my last email, I mentioned that an object that belongs to another
+</I>&gt;<i> process should be able to access it's own static fields, but the client
+</I>&gt;<i> code should not. It will instead access the static fields of its own
+</I>&gt;<i> process. This makes the no restrictions approach safe from the statics
+</I>&gt;<i> perspective as well.
+</I>
+	Exactly.  To be a separate process, the child must not have access
+to anything in the namespace of the parent.  The exact implementation of
+direct IPC we can leave for later.  (e.g. what happens you pass a class
+reference to a different process?  Since normal java doesn't allow this,
+we can also disallow it.  Etc.  This is near to mixing system policy and
+design decisions.)
+
+&gt;<i> Q2: What is the significance of sharing classes between a process and
+</I>&gt;<i> its parent? I think you should be able to share classes with any other
+</I>&gt;<i> process. And if all classes loaded from the same version of the same
+</I>&gt;<i> archive share the same class definition, then this becomes possible (if
+</I>&gt;<i> you allow casting between any two classes that share the same class
+</I>&gt;<i> definition, as described above).
+</I>
+	You can; the signifigance of process/parent is that I understood
+that to be the most common way for multi-process applications to be
+written, and is a case where a default of sharing makes semantic
+sense.  What we must avoid is separate processes NOT getting the chance to
+load classes and use them from their own classloaders, e.g. their own
+classpaths -- this is necessary for development, so I can, for instance, 
+work on a daemon's source and test it while the production version is
+running, or work on an editor in that editor, etc.  See below.
+
+&gt;<i> Q3: Can you please explain the bit about an application reloading its
+</I>&gt;<i> classes?
+</I>
+	Sure.  Class devEnviroment, immediately on its main() function
+being called, creates a new classloader, CL.  Reading from the command
+line, it decides to run main() of class developingClass.  It gets
+developingClass from CL, and spawns a thread to execute
+it in its own classloader.  When the thread terminates -- or the user
+interrupts -- devEnviroment garbage-collects CL so that the next run of
+developingClass is re-loaded from scratch, in case it's changed. 
+
+&gt;<i> - I don't see the logic in only inheriting class definitions from the
+</I>&gt;<i>   parent process.
+</I>
+	To be explicit: I did not propose that this would be the
+/exclusive/ method for sharing, only propose that it be the /a/ (perhaps
+/the/) default method of class sharing.  Independently-started processes
+/must/ be given the chance to use their own independent
+classes/classloaders; should they choose to use system-provided classes,
+they should share definitions and be allowed 'illegal' casts.  (And
+perhaps should be anyway.)
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000441.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000449.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#444">[ date ]</a>
+              <a href="thread.html#444">[ thread ]</a>
+              <a href="subject.html#444">[ subject ]</a>
+              <a href="author.html#444">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

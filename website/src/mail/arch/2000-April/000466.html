@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [multiple process] Is it that simple?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:peter.schuller%40infidyne.com">
+   <LINK REL="Previous"  HREF="000465.html">
+   <LINK REL="Next" HREF="000468.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [multiple process] Is it that simple?</H1>
+    <B>Peter Schuller</B> 
+    <A HREF="mailto:peter.schuller%40infidyne.com"
+       TITLE="[JOS-Arch] [multiple process] Is it that simple?">peter.schuller@infidyne.com</A><BR>
+    <I>Thu, 13 Apr 2000 17:33:32 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000465.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+        <LI> Next message: <A HREF="000468.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#466">[ date ]</a>
+              <a href="thread.html#466">[ thread ]</a>
+              <a href="subject.html#466">[ subject ]</a>
+              <a href="author.html#466">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> look at it slowly.  The objective of threading is to share memory between
+</I>&gt;<i> processes, basically.  So why would separate processes need or want to
+</I>&gt;<i> share memory?  You never /need/ to share objects, because anything you can
+</I>&gt;<i> program with shared memory, you can likewise program with message-passing.  
+</I>&gt;<i> (And vice-versa, actually.)  So you must want to share objects for
+</I>&gt;<i> efficiency -- but if the two process are pieces of the same program, why
+</I>&gt;<i> aren't they threads?  The only reasonable answer is efficiency between
+</I>&gt;<i> separate programs.
+</I>
+There may be another reason, depending on how one implements security. There
+is often a need for an appliction to switch identity before running a piece
+of code. The perfect example would be a web server. CGI scripts are usually
+executed &quot;as&quot; the user who owns the file (but the equivalent is not possible
+with servlets and JavaServer Pages using todays JVMs).
+
+A Java based operating system should probably provide an API through which
+applications can assume the identity of a user (provided that the &quot;current&quot;
+user has sufficient access to do so).
+
+When writing a Java application, one wants it to run on any JVM - not just
+on JOS. This means that the code the switches identity will (in many cases)
+have to be the only JOS-specific code. If sharing of objects across
+processes is possible, the rest of the code (in the web server, or whatever
+it is) could access data just as if it was just another thread - with the
+difference that it's actually a process. In a conventional JVM, it would
+indeed be a thread.
+
+Not many would implement an IPC-by-serialization technique just to make it
+run on JOS. This would, however, be required to achieve proper handling of
+security on JOS, while at the same time making the application run in a
+conventional JVM.
+
+This assumes that the security model doesn't allow for a thread to be owned
+by another user than other threads in the same process. If this would be
+possible to implement, it would probably be a better solution (IMHO).
+
+If I'm missing something blatantly obvious, please forgive me.
+
+-- 
+/ Peter Schuller, InfiDyne Technologies HB
+
+PGP userID: 0x5584BD98 or 'Peter Schuller &lt;<A HREF="mailto:peter.schuller@infidyne.com">peter.schuller@infidyne.com</A>&gt;'
+Key retrival: Send an E-Mail to <A HREF="mailto:getpgpkey@scode.infidyne.com">getpgpkey@scode.infidyne.com</A>
+E-Mail: <A HREF="mailto:peter.schuller@infidyne.com">peter.schuller@infidyne.com</A> Web: <A HREF="http://scode.infidyne.com">http://scode.infidyne.com</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000465.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+	<LI> Next message: <A HREF="000468.html">[JOS-Arch] [multiple process] Is it that simple?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#466">[ date ]</a>
+              <a href="thread.html#466">[ thread ]</a>
+              <a href="subject.html#466">[ subject ]</a>
+              <a href="author.html#466">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

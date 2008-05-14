@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Multi-process VM</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000063.html">
+   <LINK REL="Next" HREF="000065.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Multi-process VM</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] Multi-process VM">gchii@mindspring.com</A><BR>
+    <I>Tue, 27 Jul 1999 08:59:24 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000063.html">[JOS-Arch] Multi-process VM</A></li>
+        <LI> Next message: <A HREF="000065.html">[JOS-Arch] Multi-process VM</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#64">[ date ]</a>
+              <a href="thread.html#64">[ thread ]</a>
+              <a href="subject.html#64">[ subject ]</a>
+              <a href="author.html#64">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 05:52 PM 7/26/99 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>	The current plan is to continue work on decaf+JJOS as a
+</I>&gt;<i>single-process VM until it has a class library and is fully functional
+</I>&gt;<i>(i.e. jdk-1.0.2 or higher compliant).
+</I>
+Excellent plan!
+
+&gt;<i>At that point, or earlier, if other
+</I>&gt;<i>parts of the JOS project require a multi-process VM, I will modify
+</I>&gt;<i>decaf+JJOS so as to support multiple processes, which should involve two
+</I>&gt;<i>steps: first, rewriting the class-equality checks to look at the
+</I>&gt;<i>classloader involved, and second, writing the hooks necessary for java
+</I>&gt;<i>code to implement processes by manipulating classloaders, including (and
+</I>&gt;<i>especially) the primordial classloader.  The exact mechanics of the second
+</I>&gt;<i>step are subject to change; I expect the initial proof-of-concept
+</I>&gt;<i>implementation to set up classloaders whose class sets are completely
+</I>&gt;<i>disjoint and not sharing class definitions.  Refinements to this
+</I>&gt;<i>implementation are obvious.
+</I>
+I have been looking for this mechanism in the wrong place. IF we have a
+single process JVM that works, why can't we create multiple instances of
+it? We should plan to create a multiple process JVM in three steps: (1)
+single-process, (2) inefficient multi-process, (3) streamlined multi-process.
+
+I have been looking at the Java Native Interface. In a C/C++ program, you
+create an instance of the JVM, like this:
+
+JVM jvm = new JVM( env );
+
+The jvm variable must be used throughout your code.
+
+So why can't we create a java tool that creates more than one instance of a
+JVM?
+
+JVM[] jvm = new JVM[ 100 ];
+jvm[ 0 ] = new JVM( env );
+
+When a JVM is implemented as a shared library (or dynamic link library),
+there is only one instance of the JVM's code in RAM.
+
+In a multiple JVM environment, a C/C++ program can start each JVM in a
+separate native thread. Secondary JVMs would use standard inter-process
+communication to communicate with the primary JVM.
+
+When we change the start-up sequence of the java and javaw tools, we can
+almost use an existing off-the-shelf JVM and the Java Native Interface to
+create an inefficient multiple process environment. It is yet another way
+to experiment with the primordial class loader. And most of the code would
+be written with Java, the programming language.
+
+JVMs are added (and destroyed) as needed. To start secondary JVMs, the Java
+Native Interface must communicate with the java tool, not the kernel.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000063.html">[JOS-Arch] Multi-process VM</A></li>
+	<LI> Next message: <A HREF="000065.html">[JOS-Arch] Multi-process VM</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#64">[ date ]</a>
+              <a href="thread.html#64">[ thread ]</a>
+              <a href="subject.html#64">[ subject ]</a>
+              <a href="author.html#64">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

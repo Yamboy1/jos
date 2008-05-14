@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Registries</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000052.html">
+   <LINK REL="Next" HREF="000040.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Registries</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Arch] Registries">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Thu, 22 Jul 1999 10:20:15 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000052.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+        <LI> Next message: <A HREF="000040.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#37">[ date ]</a>
+              <a href="thread.html#37">[ thread ]</a>
+              <a href="subject.html#37">[ subject ]</a>
+              <a href="author.html#37">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Oops.  I've noticed that I consistently used SmartRegistry where I should
+have said Registry or possibly SmartAPI.  Both are needed to make JOS
+future-ready.  
+
+Gilbert:  Are you planning to change the Registry API after your experiences
+creating version 1?  I am a little confused whether the code in
+Registry1Lessons is the basis for the new API or the current one.
+Admitedly, I am only starting to read your pages on that, and I'm sure it'll
+become clear as I get time to read it fully, but a quick confirmation would
+be nice.
+
+Thanks,
+Avery J. Regier
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Regier Avery J 
+</I>&gt;<i> Sent:	Thursday, July 22, 1999 10:15 AM
+</I>&gt;<i> To:	<A HREF="mailto:arch@jos.org">arch@jos.org</A>
+</I>&gt;<i> Subject:	RE: [JOS-Arch] RE: [JOS-UI] peer-ui mappings
+</I>&gt;<i> 
+</I>&gt;<i> &gt; -----Original Message-----
+</I>&gt;<i> &gt; From:	Gilbert Carl Herschberger II [SMTP:<A HREF="mailto:gchii@mindspring.com">gchii@mindspring.com</A>]
+</I>&gt;<i> &gt; Sent:	Wednesday, July 21, 1999 8:28 PM
+</I>&gt;<i> &gt; To:	<A HREF="mailto:arch@jos.org">arch@jos.org</A>
+</I>&gt;<i> &gt; Subject:	[JOS-Arch] RE: [JOS-UI] peer-ui mappings
+</I>&gt;<i> &gt; 
+</I>&gt;<i> 	&lt;snip&gt; 
+</I>&gt;<i> 
+</I>&gt;<i> &gt; I believe I shall take this out of your e-mail and frame it. It will
+</I>&gt;<i> hang
+</I>&gt;<i> &gt; upon the wall in my office.
+</I>&gt;<i> &gt; 
+</I>&gt;<i> I will kindly ignore your flame.
+</I>&gt;<i> 
+</I>&gt;<i> &gt; &gt;If we do not implement the standard, and instead try to
+</I>&gt;<i> &gt; &gt;'correct' it, we are ourselves introducing incompatibilities into the
+</I>&gt;<i> &gt; &gt;platform.  Suddenly someone writing an application on JOS doesn't
+</I>&gt;<i> &gt; &gt;automatically get compatibility with Java on Win32.
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; Our responsibility is different for two different platforms. We cannot
+</I>&gt;<i> &gt; correct the standard of the 100% Pure Java platform. But in addition to
+</I>&gt;<i> &gt; the
+</I>&gt;<i> &gt; 100% Pure Java platform, we are creating this other thing. We are
+</I>&gt;<i> building
+</I>&gt;<i> &gt; this JOS platform. And application written directly to JOS does not have
+</I>&gt;<i> &gt; to
+</I>&gt;<i> &gt; suffer any of the design flaws created by Sun. It only has to suffer the
+</I>&gt;<i> &gt; flaws created by the JOS organization. When we build the JOS platform,
+</I>&gt;<i> we
+</I>&gt;<i> &gt; should make it right. We shouldn't build flaws into the JOS platform
+</I>&gt;<i> just
+</I>&gt;<i> &gt; because there are problems with the Java API.
+</I>&gt;<i> &gt; 
+</I>&gt;<i> I completely agree with this.  In the question that started this whole
+</I>&gt;<i> mess,
+</I>&gt;<i> Sean is working to create a new Toolkit that we can use to jumpstart the
+</I>&gt;<i> creation of our gui.  Unfortunately, Sean has to rely on Sun API's and
+</I>&gt;<i> work
+</I>&gt;<i> around shortsightedness in Sun's implementation.  Thus, Sean's code is
+</I>&gt;<i> necessarily tailored to one set of versions of packages of classes written
+</I>&gt;<i> by Sun, and must adhere to an API written by Sun.  There is nothing that
+</I>&gt;<i> he
+</I>&gt;<i> can do to correct this problem in the long term in the class he is writing
+</I>&gt;<i> now.  BUT, when we replace the JDK that Sean is using for testing with our
+</I>&gt;<i> own implementation (most likely based upon $Classpath) of the API's, we
+</I>&gt;<i> can
+</I>&gt;<i> create an org.jos.awt.ToolkitFactory which searches in our JOS
+</I>&gt;<i> SmartRegistry
+</I>&gt;<i> for the appropriate implementation of the Toolkit for this particular use
+</I>&gt;<i> of
+</I>&gt;<i> the Toolkit.  So if we have one application which relies on Swing 1.1.1
+</I>&gt;<i> (because it uses Swing 1.1.1 on top of the AWT and we need its peer
+</I>&gt;<i> implementation to be consistent) and another which relies on Swing 1.0.3,
+</I>&gt;<i> and another which wants to use something not even created yet as its peer
+</I>&gt;<i> implementation, all of these settings can be placed in our SmartRegistry
+</I>&gt;<i> and
+</I>&gt;<i> JOS will handle it all perfectly and it all just works.  We just need to
+</I>&gt;<i> pick the right level at which to make things future ready.
+</I>&gt;<i> 
+</I>&gt;<i> &gt; In theory, it is possible to build a JOS application that cannot not run
+</I>&gt;<i> &gt; on
+</I>&gt;<i> &gt; Sun's JVM. It only runs on JOS, with its kernel. While I don't know a
+</I>&gt;<i> way
+</I>&gt;<i> &gt; around using java.lang, my JOS application doesn't have to _use_ classes
+</I>&gt;<i> &gt; from any other java.* package.
+</I>&gt;<i> &gt; 
+</I>&gt;<i> Yes, it is possible.  Do we want to encourage this?  Absolutely not.  All
+</I>&gt;<i> applications that are tied to the JOS platform should be by nature OS
+</I>&gt;<i> utilities, shells, drivers, etc. and distributed with JOS and be a part of
+</I>&gt;<i> the JOS project.  Generic applications should never be JOS specific, but
+</I>&gt;<i> rather adhere to the Java spec and nothing more.  Additional libraries
+</I>&gt;<i> used
+</I>&gt;<i> by generic applications should also be built on top of the Java spec and
+</I>&gt;<i> not
+</I>&gt;<i> be reliant on JOS libraries.  The only exception to this rule is where
+</I>&gt;<i> some
+</I>&gt;<i> library (for instance java3d) which on other Java platforms uses native
+</I>&gt;<i> methods to get its work done, we may choose instead to call JOS specific
+</I>&gt;<i> libraries, but all of this is hidden from the application.
+</I>&gt;<i> 
+</I>&gt;<i> &gt; I'm thinking long term. That's what I do. I think the capability is just
+</I>&gt;<i> &gt; around the corner. I wish there was some way for JOS to take advantage
+</I>&gt;<i> of
+</I>&gt;<i> &gt; it.
+</I>&gt;<i> &gt; 
+</I>&gt;<i> It is just around the corner!  Here's what has to happen:
+</I>&gt;<i>    * JJOS+decaf gets to the point where we can begin to integrate
+</I>&gt;<i> $Classpath.
+</I>&gt;<i>    * We start modifying $Classpath for our specific needs:
+</I>&gt;<i>       ** We add muli-process support into both decaf &amp; $Classpath so that
+</I>&gt;<i> $Classpath's java.lang is calling org.jos.core.* which will handle things
+</I>&gt;<i> like interacting with the SmartRegistry to make sure that each process
+</I>&gt;<i> gets
+</I>&gt;<i> what it needs.
+</I>&gt;<i>       ** We modify the java.awt.Toolkit class to integrate with the
+</I>&gt;<i> SmartRegistry and return the proper Toolkit for the situation.
+</I>&gt;<i>       ** a whole bunch of other things.
+</I>&gt;<i> 
+</I>&gt;<i> In the meantime, there are some things that can be worked on:
+</I>&gt;<i>    * In order for JOS to be secure, we REALLY need an airtight secure
+</I>&gt;<i> SmartRegistry.  It must be encrypted and we need to figure out what kinds
+</I>&gt;<i> of
+</I>&gt;<i> protections it will need from the rest of the system to ensure that it is
+</I>&gt;<i> too expensive to hack to be worth it.
+</I>&gt;<i>    * I need to find time to continue to work on org.jos.core.* and
+</I>&gt;<i> defining
+</I>&gt;<i> the process model from the view of the JOS API.  This process model will
+</I>&gt;<i> need to be used by JADE so that shells can be implemented correctly.
+</I>&gt;<i> Integrating org.jos.core.* with your SmartRegistry I think is the critical
+</I>&gt;<i> step to ensuring that we can make JOS future-ready.  Care to work together
+</I>&gt;<i> on this?
+</I>&gt;<i> 
+</I>&gt;<i> Regards,
+</I>&gt;<i> Avery J. Regier  
+</I>&gt;<i> &gt;  
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Arch maillist  -  <A HREF="mailto:Arch@jos.org">Arch@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/arch">http://jos.org/mailman/listinfo/arch</A>
+</I>
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000052.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+	<LI> Next message: <A HREF="000040.html">[JOS-Arch] RE: [JOS-UI] peer-ui mappings</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#37">[ date ]</a>
+              <a href="thread.html#37">[ thread ]</a>
+              <a href="subject.html#37">[ subject ]</a>
+              <a href="author.html#37">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

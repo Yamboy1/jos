@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Console for Program</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000194.html">
+   <LINK REL="Next" HREF="000196.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Console for Program</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Console for Program">tmiller@haverford.edu</A><BR>
+    <I>Tue, 17 Aug 1999 19:09:20 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000194.html">[JOS-Arch] Console for Program</A></li>
+        <LI> Next message: <A HREF="000196.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#195">[ date ]</a>
+              <a href="thread.html#195">[ thread ]</a>
+              <a href="subject.html#195">[ subject ]</a>
+              <a href="author.html#195">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> What is our approach to solving the unsolvable?
+</I>
+	Unsolvable?  I believe the design for a multi-process JVM that
+I've been presenting on this and the kernel list is a solution.  The
+solution to seperate processes is quite simply separate namespaces, which
+are easy to establish if you control the primordial namespace.  Because
+Java has no pointers, disjoint namespaces are protected from each other in
+the exact same fashion in which multiple native processes are protected by
+the PMMU.  The exact mechanics of IPC and the various methods for
+obtaining space efficiency will be left almost entirely to Java code, and
+will evolve over time.
+
+	My goal in the design of this system is transperancy.  Any extant
+spec-compliant code must run unmodified on decaf, and behave in the
+expected manner.  This will entail modifications to certain library
+classes, which also must be transparent to the caller.
+
+	I understand your desire to start programming right away.  And it
+looks like your Program proposal will indeed allow you to fake multiple
+processes on a single process JVM.  If that's the case, it will certainly
+work on decaf, and you can re-write the back-end to actually make the
+Programs separate processes.  However, I question your diagnostic of
+processes as being symptomatic of distrust.  Processes, aside from being a
+wonderful programming convenience, are a way of moving the problem of
+fallibility from many places (all of your programs) to one (the process
+manager), which is a good thing for obvious reasons.
+
+-_Quinn
+
+
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000194.html">[JOS-Arch] Console for Program</A></li>
+	<LI> Next message: <A HREF="000196.html">[JOS-Arch] Console for Program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#195">[ date ]</a>
+              <a href="thread.html#195">[ thread ]</a>
+              <a href="subject.html#195">[ subject ]</a>
+              <a href="author.html#195">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

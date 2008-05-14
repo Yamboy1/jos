@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Java Processes: Final Summary?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000524.html">
+   <LINK REL="Next" HREF="000539.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Java Processes: Final Summary?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] Java Processes: Final Summary?">tmiller@haverford.edu</A><BR>
+    <I>Mon, 1 May 2000 15:58:57 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000524.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+        <LI> Next message: <A HREF="000539.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#532">[ date ]</a>
+              <a href="thread.html#532">[ thread ]</a>
+              <a href="subject.html#532">[ subject ]</a>
+              <a href="author.html#532">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Proxies are not required to do this (as I explained in response to
+</I>&gt;<i> Gilbert's email). JavaProcesses would still be owned by the system, but
+</I>&gt;<i> access does not need to be through proxy (in fact, this is the way I've
+</I>&gt;<i> currently implemented it in rheise.os).
+</I>
+	What the pid idea does is create an implicit proxy for us, so that
+we can have JavaProcesses without having to develop an object-sharing
+infrastructure, and the same with sockets.  What I intended here, and
+perhaps explained poorly, is that JoeApplication won't be able to tell the
+difference between a JavaProcess shared object and a JavaProcess wrapping
+a pid; the interface and results are identical.  It's an expedient so, if
+we choose to, we can implement Java Processes before we implement object
+sharing.  Likewise with Sockets, except, of course, we're re-writing
+(actually, I'm pretty sure it will be adjusting, because even Windows uses
+UNIX socket semantics, and hence magic numbers  -- the last time I
+checked) the SocketImpl code that the Socket uses.
+
+	At any rate, my guess is we'll be done hammering out the spec long
+before I get to programming it...
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000524.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+	<LI> Next message: <A HREF="000539.html">[JOS-Arch] Java Processes: Final Summary?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#532">[ date ]</a>
+              <a href="thread.html#532">[ thread ]</a>
+              <a href="subject.html#532">[ subject ]</a>
+              <a href="author.html#532">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

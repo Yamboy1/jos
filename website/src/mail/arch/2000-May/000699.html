@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] Object sharing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:sean-cribbs%40utulsa.edu">
+   <LINK REL="Previous"  HREF="000698.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] Object sharing</H1>
+    <B>Sean D Cribbs</B> 
+    <A HREF="mailto:sean-cribbs%40utulsa.edu"
+       TITLE="[JOS-Arch] Object sharing">sean-cribbs@utulsa.edu</A><BR>
+    <I>Tue, 30 May 2000 21:14:08 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000698.html">[JOS-Arch] Static fields/object sharing</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#699">[ date ]</a>
+              <a href="thread.html#699">[ thread ]</a>
+              <a href="subject.html#699">[ subject ]</a>
+              <a href="author.html#699">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I think the discussion on object sharing between processes is very
+interesting, but people aren't necessarily considering one aspect:
+What _actually_ needs to be shared?
+
+I believe there are a few obvious things that _need_ to be shared:
+* Protocol stack
+* Toolkit and other AWT junk
+* Other system services
+
+But seriously, these things can be handled with static calls.  I realize
+that we are trying to separate processes, but they are still essentially
+in the same VM.  The only problem with keeping it all open is the need to
+separate multiple users.
+
+If we assume we have a ten-foot thick brick wall like Gilbert suggests,
+and those things listed above are provided to each process (either
+directly or through proxy), I see no need to &quot;share&quot; objects other than
+through message passing.  If what you really want is a way to pass
+information, use pipes or FIFOs or messages or sockets.  They can be
+implemented so that you achieve nearly the speed of direct sharing,
+without worrying about obtaining a lock on an object. Or if you want the
+completely-separate approach, use RPC(RMI).
+
+If my argument here is completely off-base, would someone please explain
+to me the distinct advantages and uses of direct sharing?
+
+------------------------------------
+Sean Cribbs &lt;<A HREF="mailto:sean-cribbs@utulsa.edu">sean-cribbs@utulsa.edu</A>&gt;
+Computer Science and Mathematics
+University of Tulsa
+------------------------------------
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000698.html">[JOS-Arch] Static fields/object sharing</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#699">[ date ]</a>
+              <a href="thread.html#699">[ thread ]</a>
+              <a href="subject.html#699">[ subject ]</a>
+              <a href="author.html#699">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

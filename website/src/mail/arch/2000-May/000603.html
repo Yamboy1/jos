@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [test case] JDSK</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000604.html">
+   <LINK REL="Next" HREF="000607.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [test case] JDSK</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [test case] JDSK">gchii@mindspring.com</A><BR>
+    <I>Wed, 17 May 2000 16:32:56 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000604.html">[JOS-Arch] [ERIC Project] Goals</A></li>
+        <LI> Next message: <A HREF="000607.html">[JOS-Arch] [test case] JDSK</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#603">[ date ]</a>
+              <a href="thread.html#603">[ thread ]</a>
+              <a href="subject.html#603">[ subject ]</a>
+              <a href="author.html#603">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The Java Servlet Development Kit (JDSK) from Sun Microsystems contains a
+HTTP service, doesn't it? It contains a servletrunner tool to start this
+service. This might make a good test case for a bytecode process.
+
+When a process is terminated, everything that it owns must be garbage
+collected (or discarded) -- including its open server sockets.
+
+The main thread of a servletrunner is an endless loop. It listens for a TCP
+connection on a server socket. When it is launched as a separate process,
+the kill command should be able to kill it -- even when it is performing
+blocking I/O. The server socket must be automatically closed when the
+process dies. And all open sockets owned by the process must be closed,
+too. Immediately after that, the servletrunner can be started again on the
+same server socket.
+
+The following test code should run without error.
+
+  public void example() {
+    ProcessManager manager = ProcessManager.getManager();
+    String cmd = &quot;java servletrunner&quot;;
+    ProcessDescriptor pid;
+
+    for ( int i = 0; i &lt; 100; i++ ) {
+      pid = manager.createProcess( cmd );
+      sleep( 10000 );
+      manager.kill( pd );
+    }
+  }
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000604.html">[JOS-Arch] [ERIC Project] Goals</A></li>
+	<LI> Next message: <A HREF="000607.html">[JOS-Arch] [test case] JDSK</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#603">[ date ]</a>
+              <a href="thread.html#603">[ thread ]</a>
+              <a href="subject.html#603">[ subject ]</a>
+              <a href="author.html#603">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

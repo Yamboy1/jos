@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] processes &amp; properties vs behaviors</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000685.html">
+   <LINK REL="Next" HREF="000690.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] processes &amp; properties vs behaviors</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Arch] processes &amp; properties vs behaviors">tmiller@haverford.edu</A><BR>
+    <I>Fri, 26 May 2000 20:42:26 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000685.html">[JOS-Arch] [object sharing] Proof</A></li>
+        <LI> Next message: <A HREF="000690.html">[JOS-Arch] processes &amp; properties vs behaviors</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#687">[ date ]</a>
+              <a href="thread.html#687">[ thread ]</a>
+              <a href="subject.html#687">[ subject ]</a>
+              <a href="author.html#687">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>[This will take a while.]
+
+Processes/
+
+	Processes exist to protect concurrent sequences of operations
+('executing programs') from each other, the most significant process(es)
+of all being the operating system.  The primary model/method of
+concurrency in Java is threading.  When properly initiated, threads may
+not interfere with each other except via static methods or variables.
+
+	Threads &amp; Interference/
+	
+	Consider your generic Runnable Object as a node in a dataflow
+	graph.  We will examine only instance methods and
+	variables.  Looking at Runnable, we see the void method
+	run().  Nothing can escape there.  Looking at Object, the only
+	possible problem is getClass(), which returns an object generated
+	by the VM.  (The java.lang.Class instance of the class of the
+	Runnable Object we're examining.)  Since we're ignoring statics,
+	we can assume that whatever changes may be made to the Class
+	do not escape.  (That there are no other references to this
+	particular Class instance.)  Clearly, this Runnable Object and
+	it branch in the graph can not interfere with a Runnable Object
+	elsewhere in the graph.  If it generates a Runnable Object,
+	it could, but that's the programmer's problem, not ours.  (Unless
+	that Runnable Object is designated as a process, which we'll
+	address later.)
+
+	To continue: it is necessary and sufficient that for statics to be
+ignored to protect from threads from themselves.  Furthermore, it is
+necessary and sufficient for statics to be ignored to meet the definition
+of 'process.'  (This is the basis of of our discussion about processes so
+far.)  That is, aside from statics, example A is sufficient for the
+concurrency and protection required in an operating system.
+
+	Example A/
+	
+	public class RunMain implements Runnable extends Object {
+		Class c;
+	
+		public void run() {
+			/* execute main() method from class c,
+			   generating the arguments locally. */
+			} /* end run() */
+		} /* end class RunMain */
+
+	public class OS {
+		public static void main( String[] argv ) {
+			while( true ) {
+				RunMain rm = new RunMain();
+				rm.c = getNextRequest();
+				Thread.start( rm );
+				}
+			} /* end main() */
+		} /* end class OS */
+
+
+Statics/
+
+	Statics, of course, may not be ignored.  The simplest solution is
+to modify the OS class to spawn a new classloader for each request; that
+way, every thread not started by an application will have its own set of
+statics.  This, to my understanding, is the esssence of rheise.os; it can
+also be terribly inefficient.  With a variety of methods we've described,
+the non-static portions of classes (the class 'definition', in whatever
+form) -- that is, the ones which are redundant across processes, which is
+equivalent to saying read-only -- can be shared, reducing that redundancy
+to the bare minimum.
+
+Shared Objects/
+
+	Sharing objects between threads is a well-defined operation; a
+reference is simply copied from one variable to another.  The reference
+takes care of sharing the /properties/ of an object; the runtime system is
+responsible for sharing the object's /behaviors/ -- performing the lookup
+of its class and that class's symbolic reference.  On occasion, the class
+of an object will compared to the type of a variable.  (For instance,
+assignment to a field, or usage as a method parameter.)  It is in these
+cases that the runtime system (JVM) can look up the class of a shared
+object and discover that it doesn't match, having been loaded by another
+classloader.  An exception is thrown, and we move on.
+
+	However, threads in different processes will always have different
+classloaders, leading the JVM to conclude that the classes are different,
+even if their bytecode definitions are identical.  Here we come to our
+current controversy.
+
+Properties and Behaviors/
+
+	We have already established the ability to share object
+properties.  The equivalance of mechanisms for 'common-value' IPC are well
+understood, so I will take the position that we are using shared memory to
+communicate the properties of an object.  What we are attempting to
+establish is something very basic to Java -- the ability to share object
+behaviors.  There are three approaches.  The first is to hope that the
+other process* has the 'right' behavior, and just send the properties
+over.  The Serializable protocol takes this approach.  RMI, to my
+understanding, takes the opposite approach and ensures behavior
+compatability at compile-time.  Finally, you can ensure behavior by
+sending the behavior -- the classfile** -- along with the properties.
+
+	Footnotes/
+
+	*  Which could be separated in space or in time == orthogonal
+	   persistence/serialization.
+
+	** Incidentally, since the classfile doesn't store the 'current'
+	   value of its static variables, you could take the position
+	   that static variables are a (shared) /property/ of an object.  
+	   This supports Ryan's position, which I think I agree with now.
+
+	A shared object, then, always references its original static
+variables, as they are a (shared) part of its properties.  If we ensure
+that the class definitions are identical (as a precondition for sharing),
+it doesn't actually matter which set of behaviors (which have been reduced
+to be defined as to methods) we use; in fact, if the JVM utilises sharing,
+it will only have one (shared) set to use.
+
+	(That is, shared objects depart from the other two types of IPC in
+both implementation and in kind, which is what makes it worth discussion.)
+
+	Clearly, if the class definitions are identical, properties will
+be maintained, so long as statics (e.g. the classloader) are (is)  
+considered a property of the object.  Clearly, if the class definitions
+are identical, the behaviors (as we've reduced to and then defined as the
+methods) will be identical.  Clearly, the interpreter itself will be
+unable to distinguish between a shared object and one solely belonging to
+the current process (thread) under these conditions; so it is clearly safe
+to share them.  Our sole bending of the specification would be to consider
+identical classes to be the same despite classloader differences in the
+sole instance where they were loaded in different processes.
+
+However/
+
+	In the previous discussion, I have considered 'the methods' and
+'the fields' of a class as a lump unit.  This is not exactly the case,
+which has caused some discussion on this list.  In short, the logic above
+requires that 'the methods' and 'the fields' include super classes and
+interfaces to be recursively identical as well.  In general, this
+requirement should not be hard to satisfy; a parent is identical if and
+only if all of its parents are also identical, so we won't have to do very
+deep searches.  Furthermore, the normal flow of starting a new process
+will generate sharing data at all of the leaves of the inheritance graph
+as it goes.  (In fact, we should be able to install a further optimization
+-- in most cases the loader and the classpath will be the same, which
+means we won't even have to check before start sharing.)
+
+Further concerns/
+
+	Each archive-version pair has its own tree of shared / shareable
+class definitions, which can freely inline code from each other.  Even
+just this amount of inlining will allow us to optimize the vast majority
+of code; Java class libraries are or can be distributed as archives, and
+likewise for the JOS class libraries, and most applications.  Where you
+get hurt it is in separate classfiles (whose directory could be considered
+an archive?) doing development work, where you don't expect performance
+anyway.
+
+	In general, adaptive and JIT compiling systems can only optimize
+on a per-process basis.  Where there might be an opportunity to optimize
+in the application/OS interaction may not exist in another
+combination.  It may be well worth it to optimize these interactions even
+at the cost of maintaining multiple codebases in memory.  (Strictly, since
+JIT is compiling, it can operate on a per-program basis; we just happen to
+be running the compiler/optimizer much later than is conventional.  This
+is why sharing code between processes will work at all.  However, the
+dynamic linking can only be optimized as it happens, which means on a
+per-process basis.)
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000685.html">[JOS-Arch] [object sharing] Proof</A></li>
+	<LI> Next message: <A HREF="000690.html">[JOS-Arch] processes &amp; properties vs behaviors</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#687">[ date ]</a>
+              <a href="thread.html#687">[ thread ]</a>
+              <a href="subject.html#687">[ subject ]</a>
+              <a href="author.html#687">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

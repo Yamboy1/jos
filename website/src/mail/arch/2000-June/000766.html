@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Arch] [boot disk] byte array</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000764.html">
+   <LINK REL="Next" HREF="000767.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Arch] [boot disk] byte array</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Arch] [boot disk] byte array">gchii@mindspring.com</A><BR>
+    <I>Tue, 27 Jun 2000 19:55:52 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000764.html">[JOS-Arch] [boot disk] byte array</A></li>
+        <LI> Next message: <A HREF="000767.html">[JOS-Arch] [boot disk] byte array</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#766">[ date ]</a>
+              <a href="thread.html#766">[ thread ]</a>
+              <a href="subject.html#766">[ subject ]</a>
+              <a href="author.html#766">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 04:06 PM 6/27/00 -0700, Iain Shigeoka &lt;<A HREF="mailto:iainshigeoka@yahoo.com">iainshigeoka@yahoo.com</A>&gt; wrote:
+&gt;<i>Yup.  It's not meant for embedded resources.  Instead, keep your resources
+</I>&gt;<i>outside of the class and have the class read it in during startup.  There
+</I>&gt;<i>are ways to cobble your way around the problem (I think) but its really
+</I>&gt;<i>not worth it.  Is there a reason not to just put the raw resource in the
+</I>&gt;<i>jar?
+</I>
+BootDisk, while immediately useful, is an exercise. It was designed for me
+to test the limits of Java. It tries to answer the question of putting a
+binary resource into a class file. Until I tried it, I was surprised that
+my compiler failed to optimize my static final byte array. I assumed it
+would be smarter than it is.
+
+I do not intend to limit my application to Java 2. While I could put a
+binary resource into a jar file, I would be hard pressed to get it out with
+a virtual machine compatible with the Java 0 Platform.
+
+Sometimes, I wish Java were more of a system programming language, like
+C/C++. I would like it to support porting from one version of Java to another!
+
+How are we going to write system programs for an operating system without
+support for binary data? Isn't the byte array one of the fundamental
+constructs of programming?
+
+Rather than find a way to store binary resources in a class file, maybe I
+should be looking for a way to distribute binary resources with Java 0. Is
+CLASSPATH always available as a system property?
+
+&gt;<i>Nope.  You can jam the data into a constant String for the class or hack
+</I>&gt;<i>the raw class file.
+</I>
+I jammed the data into a constant String. I don't have access to a raw
+class file in an off-the-shelf virtual machine.
+
+&gt;<i>The tool should be separate from the data.  You can distribute them
+</I>&gt;<i>together in the same jar but it doesn't seem to make much sense to compile
+</I>&gt;<i>it into the tool itself.
+</I>
+While the tool should be separate from the data, a class loader is the only
+mechanism to load anything. When a class loader does not support external
+resources, separate data becomes a problem.
+
+&gt;<i>Won't you also need native methods to implement the actual disk writing
+</I>&gt;<i>(rawwrite)?
+</I>
+I don't think so. On Linux, I am working under the assumption that BootDisk
+writes directly to /dev/fd0. It's like rawwrite.
+
+On Windows, I am working under the assumption that BootDisk can invoke the
+external rawwrite program.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000764.html">[JOS-Arch] [boot disk] byte array</A></li>
+	<LI> Next message: <A HREF="000767.html">[JOS-Arch] [boot disk] byte array</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#766">[ date ]</a>
+              <a href="thread.html#766">[ thread ]</a>
+              <a href="subject.html#766">[ subject ]</a>
+              <a href="author.html#766">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>
