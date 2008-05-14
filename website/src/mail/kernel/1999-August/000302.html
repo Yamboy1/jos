@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000300.html">
+   <LINK REL="Next" HREF="000303.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Kernel] decaf updates">hilarycheng@usa.net</A><BR>
+    <I>Thu, 26 Aug 1999 09:07:13 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000300.html">[JOS-Kernel] About Current CVS Source of JJOS</A></li>
+        <LI> Next message: <A HREF="000303.html">[JOS-Kernel] Some Questions about JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#302">[ date ]</a>
+              <a href="thread.html#302">[ thread ]</a>
+              <a href="subject.html#302">[ subject ]</a>
+              <a href="author.html#302">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi All,
+
+&gt;&gt;<i> &gt;
+</I>&gt;&gt;<i> &gt;I updated the vga driver, made some bugfixes, added a stop routine that
+</I>&gt;&gt;<i> &gt;switches to the previous video mode and a bitblt to draw sprites (I
+</I>hate
+&gt;&gt;<i> &gt;bit shiftings *g*). Found 2 bugs in the jvm -&gt; idiv and irem.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> Would u mind send me the latest code ? :D
+</I>&gt;<i>
+</I>&gt;<i>yep, but first I have to clean up...
+</I>
+would u mind send me a copy after u have been finished ?
+
+&gt;&gt;<i> I wanna to test ur bitblt function and I would like to implement it to
+</I>&gt;&gt;<i> draw Font on the VGA Screen.
+</I>&gt;<i>
+</I>&gt;<i>cool, do you read the fonts from the vid-mem? the start routine
+</I>&gt;<i>clears unforunately the hole vid-mem, so no fonts after the stop routine
+</I>&gt;<i>are available (yet).
+</I>
+well, I just copy the font from Linux and store in byte array. and draw it
+pixel on the screen. I think that would be much more easy to do it.
+hm, What's vid-mem ?  :o, I remember that font are stored in VGA.
+But I forget how to retrieve it from VGA. is there any Doc?
+
+&gt;&gt;<i> Also, I have finished a drawLine and drawRect routine. These two methods
+</I>&gt;&gt;<i> are similar to java.awt.Graphcis. I will try to implements some more
+</I>&gt;&gt;<i> java.awt.Graphisc
+</I>&gt;&gt;<i> in device driver level.
+</I>&gt;<i>
+</I>&gt;<i>hmm, does drawLine and drawRect write direct to the vidmem or is there a
+</I>&gt;<i>kind of a virtual screen (jdkxx?).
+</I>
+yap, in Sun JDK. drawLine &amp; drawRect will draw it into Buffer first. and
+then
+draw those buffer on screen.
+
+&gt;<i>(drawRect/drawLine/drawString-&gt;buffer-&gt;bitblt?-&gt;vidmem) or
+</I>&gt;<i>(drawRect/drawLine/drawString-&gt;vidmem)
+</I>
+I am thinking about these two rountine. The best one should be
+(drawRect/drawLine/drawString-&gt;buffer-&gt;bitblt-&gt;vidmem). But I
+concern about speed. If I draw a simple Line on screen, it needs to
+draw to buffer, and then bilblt the buffer to screen. Will it be slow ?
+
+&gt;<i>If there is a kind of a buffer, then we can't use the drawLine and
+</I>&gt;<i>drawRect which is implemented in the driver. But I really don't know!
+</I>
+hm, the first one will be common implememtation of current OS/Graphics
+Rountine.
+(drawRect/drawLine/drawString-&gt;buffer-&gt;bitblt-&gt;vidmem)
+
+&gt;&gt;<i> &gt;I will update (send code to John-&gt; still no cvs access) the code when
+</I>&gt;&gt;<i> &gt;the general driver implementation is done (end of this week, I guess).
+</I>&gt;&gt;<i> &gt;
+</I>&gt;&gt;<i> &gt;The problem is the speed: I think we (Hilary?, you have done something
+</I>&gt;&gt;<i> &gt;similar) should implement a native memcopy to speed up the vga output.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> Well, I found two bugs in JVM.
+</I>&gt;&gt;<i> 1. Date Object -- When I create Date Object, JJOS Kernel will got some
+</I>&gt;&gt;<i> behaivour. (Show lots of Zero on the screen.)
+</I>&gt;<i>
+</I>&gt;<i>I had the same bug, but it was a div by zero. This is now fixed.
+</I>&gt;<i>-&gt;idiv,irem, already sent to John.
+</I>
+one more thing, Thomas, have u start to implemented VGA Driver from
+a generic Graphics Device ?
+
+[cut]
+
+Regards,
+
+Hilary
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000300.html">[JOS-Kernel] About Current CVS Source of JJOS</A></li>
+	<LI> Next message: <A HREF="000303.html">[JOS-Kernel] Some Questions about JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#302">[ date ]</a>
+              <a href="thread.html#302">[ thread ]</a>
+              <a href="subject.html#302">[ subject ]</a>
+              <a href="author.html#302">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

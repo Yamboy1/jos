@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000773.html">
+   <LINK REL="Next" HREF="000774.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS-Kernel] Device as a digital resource">al@outworld.org</A><BR>
+    <I>Tue, 21 Mar 2000 19:29:01 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000773.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000774.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#775">[ date ]</a>
+              <a href="thread.html#775">[ thread ]</a>
+              <a href="subject.html#775">[ subject ]</a>
+              <a href="author.html#775">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE><A HREF="mailto:Matt.Albrecht@trilogy.com">Matt.Albrecht@trilogy.com</A> wrote:
+
+&gt;<i> But wouldn't it be &quot;nicer&quot; if, instead of returning null, it returns
+</I>&gt;<i> an error message describing what's wrong with the request, such as
+</I>&gt;<i> &quot;out of bounds memory allocation&quot;, or &quot;XYZ has already allocated that
+</I>&gt;<i> resource&quot;, and so on.
+</I>
+A DeviceAllocationException can be thrown, and it can be subclassed like
+this:
+
+ParameterIncorrectException extends DeviceAllocationException {
+
+	public String getParameterName();
+	public Object getParamterValue();
+
+}
+
+ParameterOutOfRangeException extends ParameterIncorrectException {
+
+	public String getParameterValueRange();
+
+}
+
+etc..
+
+
+&gt;<i> Also, how would one deallocate the resource?
+</I>
+How about:
+
+Device.close();
+
+or
+
+Device.deallocate();
+
+?
+
+Or, maybe:
+
+URI uri =
+   new URI(&quot;device:modem:<A HREF="port://localhost/ports/serial/1/attached"">port://localhost/ports/serial/1/attached&quot;</A>);
+
+Modem modem = (Modem) DeviceManager.getDevice(uri);
+
+
+modem.doSomething(parameter...);
+
+DeviceManager.deallocate(modem);
+
+&gt;<i> What if the particular JVM that allocated this resource crashed, would
+</I>&gt;<i> the resource then be unavailable to everyone, requiring a reboot?
+</I>
+Will the hardware crash or the software crash?
+
+&gt;<i> Some other things to consider.  How would a program discover which
+</I>&gt;<i> devices are available?
+</I>
+DeviceManager.listBuses();
+DeviceManager.listPorts();
+DeviceManager.listPhysicalDevices();
+DeviceManager.listVirtualDevices();
+DeviceManager.listDevices();
+
+and most important of all:
+
+DeviceManager.listDevices(String type);
+
+&gt;<i>  How would the admin then configure these devices so that they are
+</I>&gt;<i> setup correctly?  I.e. how would you tell &quot;device:<A HREF="sound://localhost/1"">sound://localhost/1&quot;</A>
+</I>&gt;<i> to use DMA channel 1 instead of channel 3?
+</I>
+&quot;localhost/1&quot; does not point to a device. Maybe something like this:
+
+URI uri = new URI(&quot;<A HREF="device://localhost/bus/pci/4/attached"">device://localhost/bus/pci/4/attached&quot;</A>);
+String type = DeviceManager.resolveDeviceType(uri);
+
+The resolve will be a probe with information regarding known device
+types. If the device type is unknown, by definition, we don't have a
+driver for it.
+
+After you resolve it, you can use the Bean architecture to call methods
+such as:
+
+getDMAChannel();
+setDMAChannel(1);
+
+&gt;<i> Then again, how would you know that there aren't more than one sound card
+</I>&gt;<i> available on localhost?
+</I>
+JOS startup is responsible for probing the motherboard for everything
+connected to it. If JOS cannot find something, the application simply
+cannot use it.
+ 
+&gt;<i> Perhaps I'm looking at the problem in the wrong direction.  The URI
+</I>&gt;<i> here would be the way for the programs to allocate a resource.
+</I>
+No, I think the URI is a way of grabbing an interface to a device. Then,
+that interface can be used to allocate whatever can be allocated.
+Certain things cannot be allocated, right?
+
+&gt;<i> Here we come down to how much configuration of the device should be
+</I>&gt;<i> done by the programmer, as opposed through internal setup.  Does the
+</I>&gt;<i> programmer really need to know whether modem A is on a serial port or
+</I>&gt;<i> a USB port?
+</I>
+No, but he should be able to know if he wishes to. The JOS programmer
+*must* be able to know that, though ;-)
+
+&gt;<i> Would you want to have to type in
+</I>&gt;<i> &quot;in:data:buffer:file:fat16:<A HREF="hdd://1?cylinders=255&tracks=65535&file=external.txt"?">hdd://1?cylinders=255&amp;tracks=65535&amp;file=external.txt&quot;?</A>
+</I>
+No, this is long to type, but that's why JOS can map certain things
+during start up. Of course, I do want to be *able* to type the above
+thing. The &quot;file:&quot; protocol will be actually a shortcut to:
+
+in:file:device:hdisk:<A HREF="ide://localhost/bus/ide/1/a/1/filesystem?path=...">ide://localhost/bus/ide/1/a/1/filesystem?path=...</A>
+
+
+Nor will I have to type anything to allocate memory, I can just do it
+this way:
+
+String string = new String(&quot;Hello!&quot;);
+
+just as:
+
+File file = new File(&quot;filname.ext&quot;);
+
+&gt;<i> This may be a good place to add our diagnostic tools and configuration
+</I>&gt;<i> tools.  But how do we do this?  Do we add another scheme, such as
+</I>&gt;<i> &quot;config:device:port:/ports/serial/1&quot;, or do we add it to the path:
+</I>&gt;<i> &quot;device:port:/ports/serial/1/config&quot;?  I dunno.
+</I>
+The device finder and manager should return devices. We could do this:
+
+Modem modem = (Modem)DeviceManager.getDevice(...);
+
+DeviceConfiguration config = modem.getConfiguration();
+
+config.setParameter(..., ...);
+
+etc.
+
+What do you think?
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+________________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [URL: <A HREF="http://www.outworld.org/people/al]">http://www.outworld.org/people/al]</A>
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+PLEASE DO NOT SEND ME ANY UNSOLICITED COMMERCIAL EMAIL [DSS: 0xDBEF8ECC]
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000773.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000774.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#775">[ date ]</a>
+              <a href="thread.html#775">[ thread ]</a>
+              <a href="subject.html#775">[ subject ]</a>
+              <a href="author.html#775">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

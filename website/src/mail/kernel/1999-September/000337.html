@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000336.html">
+   <LINK REL="Next" HREF="000339.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] decaf updates">jm@mak.com</A><BR>
+    <I>Wed, 08 Sep 1999 08:37:11 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000336.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000339.html">[JOS-Kernel] decaf updates / FDC in progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#337">[ date ]</a>
+              <a href="thread.html#337">[ thread ]</a>
+              <a href="subject.html#337">[ subject ]</a>
+              <a href="author.html#337">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi All;
+
+&gt;<i>     I have think about it. I concern about Real Mode Interrupt. Since JJOS is running under Protected Mode.
+</I>&gt;<i> As I know, most of the real mode interrupt will not work under protected mode. If JJOS can provide a Real
+</I>&gt;<i> Mode Interface, we could save lots of times.
+</I>
+I thought about this when I was working on early versions of jjos.  There is an
+analogous software suite for DOS called &quot;Dos Protected Mode Interface&quot; (a.k.a.,
+DPMI).  It is a sort of DOS-extender which enables calls to real-mode DOS (and
+hence BIOS) calls from protected-mode code -- sort of what you're asking for
+here.  This was especially attractive when I thought it was unavoidable to write
+my own boot loader (just use BIOS calls to do it all).
+
+However, the more I looked into it, the messier it got.  The DPMI implementation
+I was looking at basically had to reimplement, for every &quot;interesting&quot; real-mode
+DOS/BIOS call, a protected-mode interface.  It seemed to include marshalling and
+unmarshalling args/params/return-values on a case-by-case basis, etc., and
+implementing the mechanics of the task switch.  Interrupt-handling also got
+weird.  It was not clear how it would work in a multi-threaded way (although I
+might've overlooked that capability entirely).  It was a *big* effort.  However,
+if you want to run under DOS (say, a game), but you also want a 32-bit flat
+address space, it's the only way to go.
+
+For us, that would be an awful lot of work (it would've taken me a year
+part-time), and we really want to do the device handling in Java anyways, so it
+didn't seem like a good idea at the time.  Plus, it wouldn't really even be
+close to being a portable approach...
+
+On the other hand, there *is* the virtual 8086 mode, which is supposed to help
+do stuff like this (even though it's utterly non-portable).
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/">http://www.mak.com/</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000336.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000339.html">[JOS-Kernel] decaf updates / FDC in progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#337">[ date ]</a>
+              <a href="thread.html#337">[ thread ]</a>
+              <a href="subject.html#337">[ subject ]</a>
+              <a href="author.html#337">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

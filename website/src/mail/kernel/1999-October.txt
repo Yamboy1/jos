@@ -1,0 +1,2732 @@
+From hilarycheng@usa.net Sun, 03 Oct 1999 12:53:54 +0800
+Date: Sun, 03 Oct 1999 12:53:54 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Bugs in JJOS
+
+Hi All,
+
+    I found a bug in JJOS of instruction "iinc". Accroding to JVM Spec.,
+
+the increment value is a value from -128 to 127. But, the increment
+value
+is not sign extended. If it can fix, we can print a Numeric Value
+from System.out.print.
+
+Current Bugs as far as I know:
+1. no Implmentation of getPrimitiveClass in java.lang.Class
+2. arraycopy is not implmentation.
+3. iinc sign extension problem.
+
+Now, I fix some problems temporay. I can print the integer value on
+Screen.
+I am trying fix it out in the coming weeks.
+
+Regards,
+
+Hilary
+
+
+
+
+From tmiller@haverford.edu Sun, 3 Oct 1999 20:25:46 -0400 (EDT)
+Date: Sun, 3 Oct 1999 20:25:46 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf bug report
+
+> I downloaded the latest CVS with the interp.cc fix, but I still have this
+> problem on the host build.  Here is the init.java file I use to show the
+> problem.  The testVoidReturn function is what I was playing with to try and
+> narrow down the cause.
+
+	Okay, I did a 'cvs update', and this test ran beautifully.  I
+checked at CVS commit and the only differences between my stuff and the
+server's were trivial; the only difference that could possibly be
+affecting you is that my host heap size is 12 MB instead of 8.  I really
+don't know what to tell you.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Sun, 3 Oct 1999 20:55:04 -0400 (EDT)
+Date: Sun, 3 Oct 1999 20:55:04 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Bugs in JJOS
+
+> 1. no Implmentation of getPrimitiveClass in java.lang.Class
+
+	Hm.  Can't seem to find this call in my docs, though it exists in
+Sun's library.  You pass it a string and it returns you a Class?  What's
+different than other functions that do the same thing?  (If you've gone
+over this before, my apologies; just tell me to look through my old mail.)
+
+> 2. arraycopy is not implmentation.
+
+	It's in CVS now, though it's known to be broken in two cases (see
+the source code) and untested.  Enjoy!
+
+> 3. iinc sign extension problem.
+
+	Feel free to correct this one yourself & u/l the change.
+
+-_Quinn
+
+
+
+
+
+
+From hilarycheng@usa.net Mon, 4 Oct 1999 22:00:01 +0800
+Date: Mon, 4 Oct 1999 22:00:01 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Bugs in JJOS
+
+Hi,
+
+>> 1. no Implmentation of getPrimitiveClass in java.lang.Class
+>
+> Hm.  Can't seem to find this call in my docs, though it exists in
+>Sun's library.  You pass it a string and it returns you a Class?  What's
+>different than other functions that do the same thing?  (If you've gone
+>over this before, my apologies; just tell me to look through my old mail.)
+
+getPrimitiveClass is used for generating a Class for Primitive Type. e.g.
+int, long, double.
+Since int is not a Object in Java. But it is needed.
+
+well, it is not implemented by Sun Class. It is implemented by JVM.
+
+right now, I created a a simple java_object and return this object to
+Integer/Long/etc.
+It can run w/o any problem. But if a program get a class from this method,
+it will cause
+problem. Since it got no informiation about Primitive Type.
+
+>> 2. arraycopy is not implmentation.
+>
+> It's in CVS now, though it's known to be broken in two cases (see
+>the source code) and untested.  Enjoy!
+
+well, let me test. :p
+
+>> 3. iinc sign extension problem.
+>
+> Feel free to correct this one yourself & u/l the change.
+
+I got no cvs access. hm........I think I would like to put change on the web
+page
+and let all developers have a look be4 made any change to cvs server.
+
+One More things, lushr is not implemented in JJOS. If we don't implemented
+this instruction, Long Object can't not be created.
+
+Regards,
+
+Hilary
+
+
+
+
+
+From querist@malsam.com Sat, 9 Oct 1999 22:51:20 -0400
+Date: Sat, 9 Oct 1999 22:51:20 -0400
+From: querist querist@malsam.com
+Subject: [JOS-Kernel] Makefile error on d/l-ed JOS
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_000A_01BF12A8.CE01E6A0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+=20
+I am getting an error "Makefile:17 missing separator" when trying to =
+make the JOS following
+the instructions (go to arch/i386/nativecode and type make).
+=20
+Here are the first 20something lines of the makefile, with line 17 =
+marked with an added comment
+(the comment is not in the makefile i'm running)  I have no idea why =
+it's spaced like that when I
+pasted it, either.
+.KEEP_STATE:
+
+NASM =3D nasm
+
+NASMOPTIONS =3D -f elf=20
+
+CC =3D g++
+
+IFLAGS =3D -I. -I../../../common/nativecode -I../../../common/decaf
+
+CFLAGS =3D -g -Wall -fno-builtin -fno-exceptions -DPARANOID =
+-DHANDLE_CLOCK -DTEST_A20 $(IFLAGS)
+
+ASMHEADERS =3D=20
+
+ASMSOURCES =3D \
+
+head.s86 \
+
+jjidt.s86
+
+GRUB_SOURCES =3D \
+
+grub.s86 \
+
+jjidt.s86
+
+ASMOBJECTS =3D \
+
+head.o \
+
+jjidt.o
+
+TARGET_HEADERS =3D \  # this is line 17
+
+jj386int.h \
+
+jjconsole.h \
+
+jjeflags.h \
+
+jjetherboot.h \
+
+jjidtent.h \
+
+jjramdisk.h \
+
+jjmachin.h \
+
+jjtimer.h
+
+TARGET_SOURCES =3D \
+
+entry.cc \
+
+jj386int.cc \
+
+jjconsol.cc \
+
+jjeflags.cc \
+
+jjetherboot.cc \
+
+jjidtent.cc \
+
+jjmachin.cc \
+
+jjramdisk.cc \
+
+jjfinfo.cc \
+
+jjvinfo.cc \
+
+jjtimer.cc
+
+TARGET_OBJECTS =3D \
+
+entry.o \
+
+jj386int.o \
+
+jjconsol.o \
+
+jjeflags.o \
+
+jjetherboot.o \
+
+jjidtent.o \
+
+jjmachin.o \
+
+jjramdisk.o \
+
+jjfinfo.o \
+
+jjvinfo.o \
+
+jjtimer.o
+
+=20
+
+# end cut of makefile
+
+Again, I have no idea what's wrong here... the makefile looks just fine =
+to me.
+
+=20
+
+Thanks!
+
+-glyn (WikiName: GlynGowing)
+
+=20
+
+
+
+
+------=_NextPart_000_000A_01BF12A8.CE01E6A0
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML//EN">
+<HTML>
+<HEAD>
+
+<META content=3Dtext/html;charset=3Diso-8859-1 =
+http-equiv=3DContent-Type><!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 =
+HTML//EN">
+<META content=3D'"MSHTML 4.72.3110.7"' name=3DGENERATOR>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT color=3D#000000 size=3D2>Hello,</FONT></DIV>
+<DIV><FONT color=3D#000000 size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT color=3D#000000 size=3D2>I am getting an error =
+&quot;Makefile:17 missing=20
+separator&quot; when trying to make the JOS following</FONT></DIV>
+<DIV><FONT color=3D#000000 size=3D2>the instructions (go to =
+arch/i386/nativecode and=20
+type make).</FONT></DIV>
+<DIV><FONT color=3D#000000 size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT color=3D#000000 size=3D2>Here are the first 20something lines =
+of the=20
+makefile, with line 17 marked with an added comment</FONT></DIV>
+<DIV><FONT size=3D2>(the comment is not in the makefile i'm =
+running)&nbsp; I have=20
+no idea why it's spaced like that when I</FONT></DIV>
+<DIV><FONT size=3D2>pasted it, either.</FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DTerminal size=3D1>
+<P><FONT face=3DArial><FONT size=3D2>.KEEP_STATE:</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2></FONT></FONT><FONT size=3D2><FONT=20
+face=3DArial>NASM =3D nasm</FONT></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>NASMOPTIONS =3D -f elf =
+</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>CC =3D g++</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>IFLAGS =3D -I. =
+-I../../../common/nativecode=20
+-I../../../common/decaf</FONT></FONT><FONT size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>CFLAGS =3D -g -Wall -fno-builtin =
+-fno-exceptions=20
+-DPARANOID -DHANDLE_CLOCK -DTEST_A20 $(IFLAGS)</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>ASMHEADERS =3D </FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>ASMSOURCES =3D \</FONT></FONT><FONT =
+
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>head.s86 \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidt.s86</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>GRUB_SOURCES =3D =
+\</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>grub.s86 \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidt.s86</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>ASMOBJECTS =3D \</FONT></FONT><FONT =
+
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>head.o \</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidt.o</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>TARGET_HEADERS =3D \&nbsp; # this =
+is line=20
+17</FONT></FONT><FONT size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jj386int.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjconsole.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjeflags.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjetherboot.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidtent.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjramdisk.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjmachin.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjtimer.h</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>TARGET_SOURCES =3D =
+\</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>entry.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jj386int.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjconsol.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjeflags.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjetherboot.cc \</FONT></FONT><FONT =
+
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidtent.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjmachin.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjramdisk.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjfinfo.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjvinfo.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjtimer.cc</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>TARGET_OBJECTS =3D =
+\</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>entry.o \</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jj386int.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjconsol.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjeflags.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjetherboot.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidtent.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjmachin.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjramdisk.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjfinfo.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjvinfo.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjtimer.o</FONT></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2></FONT></FONT><FONT =
+size=3D2></FONT>&nbsp;</P>
+<P><FONT face=3DArial size=3D2># end cut of makefile</FONT></P>
+<P><FONT face=3DArial size=3D2>Again, I have no idea what's wrong =
+here... the=20
+makefile looks just fine to me.</FONT></P>
+<P><FONT face=3DArial size=3D2></FONT>&nbsp;</P>
+<P><FONT face=3DArial size=3D2>Thanks!</FONT></P>
+<P><FONT face=3DArial size=3D2>-glyn (WikiName: GlynGowing)</FONT></P>
+<P><FONT face=3DArial><FONT size=3D2></FONT></FONT><FONT =
+size=3D2></FONT>&nbsp;</P>
+<P>&nbsp;</P></FONT></FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_000A_01BF12A8.CE01E6A0--
+
+
+
+
+From tmiller@haverford.edu Sun, 10 Oct 1999 04:47:52 -0400 (EDT)
+Date: Sun, 10 Oct 1999 04:47:52 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Makefile error on d/l-ed JOS
+
+> I am getting an error "Makefile:17 missing separator" when trying to make the JOS following
+> the instructions (go to arch/i386/nativecode and type make).
+
+	It's a stupid question, but I have to ask: did you do the CVS to a
+(V)FAT partition or an ext2 (linux) partition?  We've had reports of (more
+or less) random problems when d/ling to (V)FAT partitions.
+
+	In particular, "missing separator" usually means that make came
+across something it wasn't expecting, like a tab when there shouldn't have
+been one -- but you probably already know that.  Are you using GNU make?
+
+-_Quinn
+
+
+
+
+
+From werner.schuster@netway.at Sun, 10 Oct 1999 19:05:15 +0200
+Date: Sun, 10 Oct 1999 19:05:15 +0200
+From: Murphy werner.schuster@netway.at
+Subject: [JOS-Kernel] Makefile error on d/l-ed JOS
+
+At 22:51 09.10.99 -0400, you wrote:
+>Hello,
+>
+>I am getting an error "Makefile:17 missing separator" when trying to make 
+>the JOS following
+>the instructions (go to arch/i386/nativecode and type make).
+>
+sniped the makefile listing
+
+>Again, I have no idea what's wrong here... the makefile looks just fine to me.
+>
+>
+>
+>Thanks!
+>
+>-glyn (WikiName: GlynGowing)
+>
+
+yo GlynGowing,
+
+I had the same problem, cause I did the checkout to a VFAT Partition (I 
+used jcvs on NT4.0);
+
+if you use cvs on a linux system and save it onto an ext2fs partition,
+it should work fine (at least it has for me);
+
+just as a precaution:
+after I had succesfully built JJOS, I had some trouble running it,
+it worked after I added the file /JJOS/arch/host/bytecode/jos_common.zip (I 
+hope thats the correct name) to the $CLASSPATH;
+this worked for me;
+
+after that you can start programs with "jjos appname"
+(you can only run .classes that are inside that zip file (the init program, 
+that performs some test is inside that file), if you want to try some own 
+code, you have to add it to the zip file);
+
+hope that helps,
+murphee
+
+***************************************
+UNITE FOR JAVA -> www.javalobby.org
+Check this out -> www.jos.org
+My site -> www.angelfire.com/co/werners
+***************************************
+... and the fact, that i haven't put a gun to my mouth yet,
+proves that i'm a winner!
+Al Bundy
+
+
+
+From jm@mak.com Mon, 11 Oct 1999 19:27:17 -0400
+Date: Mon, 11 Oct 1999 19:27:17 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Seeking makefile dependency-generator for Java source files...
+
+Hi All;
+
+I should like to solve the build-order problem for our Java files.
+
+Does anybody know of a "better" dependency generator than:
+     http://www.CS.McGill.CA/~stever/software/JavaDeps/
+
+Thanks in advance,
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From querist@malsam.com Mon, 11 Oct 1999 20:40:17 -0400
+Date: Mon, 11 Oct 1999 20:40:17 -0400
+From: querist querist@malsam.com
+Subject: [JOS-Kernel] RE: Missing separator on pre-alpha JOS
+
+Thank you to the folks who have replied.
+I re-downloaded (via NetScape and Linux, this time) the
+pre-alpha files, but I am getting a similar error.
+This time, it's line 12 with the missing separator
+instead of line 17.  I cannot find the CVS instructions
+on how to pull the source directly via CVS.  Could
+someone please point me to that info on the web
+site and/or tell me where to go?
+
+Also, is this bootable?  I have an old 486SX laptop
+i would like to convert to running 100% JOS if possible.
+
+Thanks,
+-glyn
+
+
+
+From tmiller@haverford.edu Mon, 11 Oct 1999 21:11:17 -0400 (EDT)
+Date: Mon, 11 Oct 1999 21:11:17 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] RE: Missing separator on pre-alpha JOS
+
+> I cannot find the CVS instructions
+> on how to pull the source directly via CVS.  Could
+> someone please point me to that info on the web
+> site and/or tell me where to go?
+
+	They should be on my page (ToddMiller); if not, something like
+this should work:
+
+	cvs -d :pservers:anonymous@jos.org/sites/jos/cvs/cvsroot co JJOS
+	(or update Makefile, etc)
+
+where the password is also anonymous.
+
+> Also, is this bootable?  I have an old 486SX laptop
+> i would like to convert to running 100% JOS if possible.
+
+	It's bootable, though it doesn't do much quite yet; right now the
+only boot process is via bootp (ether/netboot).  There was a version
+hacked to boot with GRUB that I couldn't ever to get work floatin around
+also...
+
+-_Quinn
+
+
+
+
+From George.Marrows@Smallworld.co.uk Wed, 13 Oct 1999 15:39:27 +0100
+Date: Wed, 13 Oct 1999 15:39:27 +0100
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] GRUB
+
+Isn't there code kicking about somewhere that lets you boot jjos using GRUB?
+Etherboot's no good to me, as I've only got the one box, so I'd love to have
+whatever's out there - even if it's broken.
+
+Thanks
+
+-- George
+
+
+
+From robfitz@geocities.com Wed, 13 Oct 1999 19:49:52 +0000 (UTC)
+Date: Wed, 13 Oct 1999 19:49:52 +0000 (UTC)
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS-Kernel] GRUB
+
+Hi George
+
+Yes it's my code, checkout  
+<URL:http://www.eGroups.com/group/jos-kernel/746.html> for the
+instructions I posted to the kernel mailing list.
+
+As you will see this message was sent about six months ago, and I haven't
+really done much work on it since then.  The version of grub I worked with
+before was quite old, you can find out more information about the newer
+versions of grub at <URL:http://www.gnu.org/software/grub/grub.en.html>.
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+On Wed, 13 Oct 1999 George.Marrows@Smallworld.co.uk wrote:
+
+> Isn't there code kicking about somewhere that lets you boot jjos using GRUB?
+> Etherboot's no good to me, as I've only got the one box, so I'd love to have
+> whatever's out there - even if it's broken.
+> 
+> Thanks
+> 
+> -- George
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+> 
+
+
+
+
+From iainshigeoka@yahoo.com Wed, 13 Oct 1999 22:46:38 -0500
+Date: Wed, 13 Oct 1999 22:46:38 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] GRUB
+
+From:           	Robert Fitzsimons <robfitz@geocities.com>
+
+> As you will see this message was sent about six months ago, and I haven't
+> really done much work on it since then.  The version of grub I worked with
+> before was quite old, you can find out more information about the newer
+> versions of grub at <URL:http://www.gnu.org/software/grub/grub.en.html>.
+
+Would anyone be able to get a grub version up and running?  The 
+netboot requirement does seem pretty limiting for general 
+consumption.  Plus, I think it would be great if we could create a 
+bootable raw disk image of the current kernel so people can start 
+"kicking the tires" when we get to that point.  Are we at that point 
+yet?
+
+-iain
+
+> On Wed, 13 Oct 1999 George.Marrows@Smallworld.co.uk wrote:
+> 
+> > Isn't there code kicking about somewhere that lets you boot jjos using GRUB?
+> > Etherboot's no good to me, as I've only got the one box, so I'd love to have
+> > whatever's out there - even if it's broken.
+> > 
+> > Thanks
+> > 
+> > -- George
+> > 
+> > _______________________________________________
+> > Kernel maillist  -  Kernel@jos.org
+> > http://jos.org/mailman/listinfo/kernel
+> > 
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+> 
+
+
+
+
+
+From tmiller@haverford.edu Thu, 14 Oct 1999 13:36:23 -0400 (EDT)
+Date: Thu, 14 Oct 1999 13:36:23 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] GRUB
+
+> Would anyone be able to get a grub version up and running?  The 
+> netboot requirement does seem pretty limiting for general 
+> consumption.  Plus, I think it would be great if we could create a 
+> bootable raw disk image of the current kernel so people can start 
+> "kicking the tires" when we get to that point.  Are we at that point 
+> yet?
+
+	Not really.  While the (stalled) work I'm doing on the (keyboard)
+driver(s) is important, it's less important than the (unstarted) work that
+needs to be done to integrate with classpath.  With a (fully) functional
+class library, things become much better.  We also need to figure out
+what's going on with the garbage collection.
+
+-_Quinn
+
+
+
+
+From jm@mak.com Fri, 15 Oct 1999 15:26:00 -0400
+Date: Fri, 15 Oct 1999 15:26:00 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] trouble with CVS?
+
+Hi;
+
+Is anybody other than me having trouble with CVS?  I'm getting
+"Connection refused" replies.  The DNS is resolving to
+209.207.218.21.
+
+Thanks in advance,
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From hilarycheng@usa.net Mon, 18 Oct 1999 19:46:14 +0800
+Date: Mon, 18 Oct 1999 19:46:14 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] My Monthly Journal of JJOS
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0181_01BF19A1.6FF94760
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    I have written a homepage about the my current development of JJOS.
+I have attached Thomas Current Progress Also. If someone like
+to attach ur notes/words in my homepage, pls feel free to send me.
+
+http://jjos.uspace.net/Journal.htm
+
+Regards,
+
+Hilary
+
+
+------=_NextPart_000_0181_01BF19A1.6FF94760
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML//EN">
+<HTML><HEAD>
+<META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type>
+<STYLE></STYLE>
+
+<META content=3D'"MSHTML 5.00.0910.1309"' name=3DGENERATOR></HEAD>
+<BODY bgColor=3D#d8d0c8>
+<DIV><FONT size=3D2><FONT face=3DArial>Hi All,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>&nbsp;&nbsp;&nbsp; I have written =
+a homepage=20
+about the my current development of JJOS.</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>I have attached Thomas Current =
+Progress Also.=20
+If someone like</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>to attach ur notes/words in my =
+homepage, pls=20
+feel free to send me.</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><A=20
+href=3D"http://jjos.uspace.net/Journal.htm">http://jjos.uspace.net/Journa=
+l.htm</A></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>Regards,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Hilary</FONT></DIV>
+<DIV>&nbsp;</DIV></BODY></HTML>
+
+------=_NextPart_000_0181_01BF19A1.6FF94760--
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 19 Oct 1999 11:19:40 -0500
+Date: Tue, 19 Oct 1999 11:19:40 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] Re: [JOS-Arch] JOS Packages
+
+On 19 Oct 99, at 7:58, Gilbert Carl Herschberger II wrote:
+
+> The mission of the JOSystem is to put distance between the
+> platform-dependent implementation of a JOSBox and the platform-independent
+> JVM.
+
+Actually, as I understand it JOSystem is the "OS layer" of 
+abstraction which presents a common JOS interface to 
+applications.  So every implementation of the JOSystem will look 
+identical to applications using it.  So it includes a JVM and 
+supporting libraries (java standard and jos standard) so that any 
+JOS program will execute on top of that layer without modifications.
+
+So its not a layer between the JOSBox and the JVM.  It's actually 
+whatever combination of JOSBox, JVM, and libraries needed to 
+create a JOSystem environment.  Theoretically, if you had a native 
+java cpu, JOSystem would just be the libraries and boot code (and 
+any task switching and memory management not automatically 
+handled by the java chip).  The JOSBox becomes almost purely 
+hardware.  On more traditional cpu's, its a microkernel, the jvm, 
+and the libraries.
+
+Of course, I could be wrong so I'd like to hear others opinions.
+
+-iain
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Wed, 20 Oct 1999 20:51:15 +0200
+Date: Wed, 20 Oct 1999 20:51:15 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Fast key typing hangs the system!
+
+Hello all!
+I've downloaded the distribution1d of JOS and I was able to compile and run the
+system. (The init.class works on my station!).
+However, the station hangs if I do fast key typing. Maybe is there a bug in the
+interrupt handler ?
+
+Cheers,
+	Corrado.
+
+ --
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Wed, 20 Oct 1999 15:28:11 -0400 (EDT)
+Date: Wed, 20 Oct 1999 15:28:11 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Fast key typing hangs the system!
+
+> I've downloaded the distribution1d of JOS and I was able to compile and run the
+> system. (The init.class works on my station!).
+> However, the station hangs if I do fast key typing. Maybe is there a bug in the
+> interrupt handler ?
+
+	Among other places.  Fixing the interrupt handler & the keyboard
+driver are on my to-do list, though you're welcome to start hacking
+away...
+
+-_Quinn
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Thu, 21 Oct 1999 10:35:23 +0200
+Date: Thu, 21 Oct 1999 10:35:23 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Fast key typing hangs the system!
+
+On Wed, 20 Oct 1999, Todd L. Miller wrote:
+> 
+> 	Among other places.  Fixing the interrupt handler & the keyboard
+> driver are on my to-do list, though you're welcome to start hacking
+> away...
+> 
+...ok Todd (or Quinn??), I'll try..... maybe is there a re-entrance 
+problem in the interrupt service routine  ?
+
+Corrado.
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Wed, 20 Oct 1999 20:42:52 +0200
+Date: Wed, 20 Oct 1999 20:42:52 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Fast key typing hangs the system!
+
+Hello all!
+I've downloaded the distribution1d of JOS and I was able to compile and run the
+system. (The init.class works on my station!).
+However, the station hangs if I do fast key typing. Maybe is there a bug in the
+interrupt handler ?
+
+Cheers,
+	Corrado.
+
+ --
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+
+From siukeew@ctimail.com Thu, 14 Oct 1999 13:47:05 +0800
+Date: Thu, 14 Oct 1999 13:47:05 +0800
+From: S.K. Wong siukeew@ctimail.com
+Subject: [JOS-Kernel] GRUB
+
+Hi,
+
+    Personally, If we use Bochs as a testing/development  environment,
+It will be much better. Since It is a Intel X86 Emulator which can run
+Win9X already. ( Somethings like VMware ). It can increase the time
+of  testing.
+
+Regards,
+
+Hilary
+
+
+
+Iain Shigeoka wrote:
+
+> From:                   Robert Fitzsimons <robfitz@geocities.com>
+>
+> > As you will see this message was sent about six months ago, and I haven't
+> > really done much work on it since then.  The version of grub I worked with
+> > before was quite old, you can find out more information about the newer
+> > versions of grub at <URL:http://www.gnu.org/software/grub/grub.en.html>.
+>
+> Would anyone be able to get a grub version up and running?  The
+> netboot requirement does seem pretty limiting for general
+> consumption.  Plus, I think it would be great if we could create a
+> bootable raw disk image of the current kernel so people can start
+> "kicking the tires" when we get to that point.  Are we at that point
+> yet?
+>
+> -iain
+>
+> > On Wed, 13 Oct 1999 George.Marrows@Smallworld.co.uk wrote:
+> >
+> > > Isn't there code kicking about somewhere that lets you boot jjos using GRUB?
+> > > Etherboot's no good to me, as I've only got the one box, so I'd love to have
+> > > whatever's out there - even if it's broken.
+> > >
+> > > Thanks
+> > >
+> > > -- George
+> > >
+> > > _______________________________________________
+> > > Kernel maillist  -  Kernel@jos.org
+> > > http://jos.org/mailman/listinfo/kernel
+> > >
+> >
+> >
+> > _______________________________________________
+> > Kernel maillist  -  Kernel@jos.org
+> > http://jos.org/mailman/listinfo/kernel
+> >
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+
+
+From ion@larc.com Fri, 15 Oct 1999 16:07:27 -0500
+Date: Fri, 15 Oct 1999 16:07:27 -0500
+From: Iain Shigeoka ion@larc.com
+Subject: [JOS-Kernel] trouble with CVS?
+
+It would appear the whole shebang is down right now (4pm CST, 
+Oct 15).  It was working earlier this afternoon as I was hitting the 
+site and using webcvs.   I can't ping/telnet/http jos.org and 
+www.jos.org doesn't even respond with a dns entry.  Hopefully 
+Helmut is on the case and things will be back up shortly.  
+
+-iain
+
+On 15 Oct 99, at 15:26, John Morrison wrote:
+
+> Hi;
+> 
+> Is anybody other than me having trouble with CVS?  I'm getting
+> "Connection refused" replies.  The DNS is resolving to
+> 209.207.218.21.
+> 
+> Thanks in advance,
+> 
+> -jm
+> 
+> -- 
+> ==== John Morrison
+> ==== MaK Technologies Inc.
+> ==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+> ==== http://www.mak.com/
+> ==== vox:617-876-8085 x115
+> ==== fax:617-876-9208
+> ==== jm@mak.com
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+> 
+
+
+
+
+
+
+From George.Marrows@Smallworld.co.uk Thu, 21 Oct 1999 16:58:03 +0100
+Date: Thu, 21 Oct 1999 16:58:03 +0100
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] GRUB
+
+I've picked up Robert's code and am making decent progress with getting JOS
+to boot from GRUB. I think all the assembler is out of the way - I'm hoping
+I just need to parse the multiboot header that GRUB passes in and pass the
+info from that (memory size, whereabouts in memory of the zip file) into the
+rest of the kernel.
+
+Regarding bochs: I wouldn't have been able to get anywhere without it! Must
+send Kevin Lawton his 25 dollars....
+
+-- George
+
+> -----Original Message-----
+> From:	S.K. Wong [SMTP:siukeew@ctimail.com]
+> Sent:	Thursday, October 14, 1999 06:47
+> To:	kernel@jos.org
+> Subject:	Re: [JOS-Kernel] GRUB
+> 
+> Hi,
+> 
+>     Personally, If we use Bochs as a testing/development  environment,
+> It will be much better. Since It is a Intel X86 Emulator which can run
+> Win9X already. ( Somethings like VMware ). It can increase the time
+> of  testing.
+> 
+> Regards,
+> 
+> Hilary
+> 
+
+
+
+From iainshigeoka@yahoo.com Thu, 21 Oct 1999 15:43:59 -0500
+Date: Thu, 21 Oct 1999 15:43:59 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] GRUB
+
+For developers I think its a great idea to use a "standard" emulator. 
+Although, I have gotten the impression most JOS people are pretty 
+loathe to use commercial products in development.  
+
+For demos and public releases though, there's nothing more 
+impressive than a boot disk that will bring a computer up in a new 
+OS, displaying a beautiful logo.
+
+-iain
+
+On 14 Oct 99, at 13:47, S.K. Wong wrote:
+
+>     Personally, If we use Bochs as a testing/development  environment,
+> It will be much better. Since It is a Intel X86 Emulator which can run
+> Win9X already. ( Somethings like VMware ). It can increase the time
+> of  testing.
+> 
+
+> Iain Shigeoka wrote:
+> 
+> > From:                   Robert Fitzsimons <robfitz@geocities.com>
+> >
+> > > As you will see this message was sent about six months ago, and I haven't
+> > > really done much work on it since then.  The version of grub I worked with
+> > > before was quite old, you can find out more information about the newer
+> > > versions of grub at <URL:http://www.gnu.org/software/grub/grub.en.html>.
+> >
+> > Would anyone be able to get a grub version up and running?  The
+> > netboot requirement does seem pretty limiting for general
+> > consumption.  Plus, I think it would be great if we could create a
+> > bootable raw disk image of the current kernel so people can start
+> > "kicking the tires" when we get to that point.  Are we at that point
+> > yet?
+> >
+> > -iain
+> >
+> > > On Wed, 13 Oct 1999 George.Marrows@Smallworld.co.uk wrote:
+> > >
+> > > > Isn't there code kicking about somewhere that lets you boot jjos using GRUB?
+> > > > Etherboot's no good to me, as I've only got the one box, so I'd love to have
+> > > > whatever's out there - even if it's broken.
+> > > >
+> > > > Thanks
+> > > >
+> > > > -- George
+> > > >
+> > > > _______________________________________________
+> > > > Kernel maillist  -  Kernel@jos.org
+> > > > http://jos.org/mailman/listinfo/kernel
+> > > >
+> > >
+> > >
+> > > _______________________________________________
+> > > Kernel maillist  -  Kernel@jos.org
+> > > http://jos.org/mailman/listinfo/kernel
+> > >
+> >
+> > _______________________________________________
+> > Kernel maillist  -  Kernel@jos.org
+> > http://jos.org/mailman/listinfo/kernel
+> 
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+> 
+
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Fri, 22 Oct 1999 12:37:13 +0200
+Date: Fri, 22 Oct 1999 12:37:13 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] GRUB
+
+Hi Hilary,
+I think using Bochs is a good idea. But can you tell me how is it possible to
+boot JOS with Bochs ?
+Till now I have performed remote bootstrapps using en etherboot floppy.
+
+Cheers,
+Corrado
+
+On Thu, 14 Oct 1999, S.K. Wong wrote:
+> Hi,
+> 
+>     Personally, If we use Bochs as a testing/development  environment,
+> It will be much better. Since It is a Intel X86 Emulator which can run
+> Win9X already. ( Somethings like VMware ). It can increase the time
+> of  testing.
+> 
+> Regards,
+> 
+> Hilary
+> 
+> 
+> 
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From George.Marrows@Smallworld.co.uk Fri, 22 Oct 1999 11:50:28 +0100
+Date: Fri, 22 Oct 1999 11:50:28 +0100
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] GRUB
+
+Hi Corrado --
+
+When I've got the GRUB boot working, I'll do a write-up explaining how to
+use it with bochs. I'm hoping I'll be able to finish it over the coming
+weekend.
+
+-- George
+
+> -----Original Message-----
+> From:	Corrado Santoro [SMTP:Corrado.Santoro@IIT.UNICT.IT]
+> Sent:	Friday, October 22, 1999 11:37
+> To:	kernel@jos.org; S.K. Wong
+> Subject:	Re: [JOS-Kernel] GRUB
+> 
+> Hi Hilary,
+> I think using Bochs is a good idea. But can you tell me how is it possible
+> to
+> boot JOS with Bochs ?
+> Till now I have performed remote bootstrapps using en etherboot floppy.
+> 
+> Cheers,
+> Corrado
+> 
+> On Thu, 14 Oct 1999, S.K. Wong wrote:
+> > Hi,
+> > 
+> >     Personally, If we use Bochs as a testing/development  environment,
+> > It will be much better. Since It is a Intel X86 Emulator which can run
+> > Win9X already. ( Somethings like VMware ). It can increase the time
+> > of  testing.
+> > 
+> > Regards,
+> > 
+> > Hilary
+> > 
+> > 
+> > 
+> --
+> ======================================================
+> Eng. Corrado Santoro - PhD Student
+> 
+> Unversity of Catania - Engineering Faculty
+> Institute of Computer Science and Telecommunications
+> Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+> 
+> Tel: +39 095 7382365           Fax: +39 095 7382397
+> 
+> EMail: csanto@iit.unict.it
+> Personal Home Page:
+>             http://www.cdc.unict.it/~csanto
+> 
+> ARCA Mobile Agent Framework Home Page:
+>             http://netra.cdc.unict.it/ARCA
+> ======================================================
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From hilarycheng@usa.net Fri, 22 Oct 1999 18:54:04 +0800
+Date: Fri, 22 Oct 1999 18:54:04 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] GRUB
+
+hm........
+Since Boch Can Make a Floppy Disk Image., So it can boot JJOS also,
+but for right now, the diskimage tools of JJOS can't make the image of JJOS boot
+disk.
+
+
+Corrado Santoro wrote:
+
+> Hi Hilary,
+> I think using Bochs is a good idea. But can you tell me how is it possible to
+> boot JOS with Bochs ?
+> Till now I have performed remote bootstrapps using en etherboot floppy.
+>
+> Cheers,
+> Corrado
+>
+> On Thu, 14 Oct 1999, S.K. Wong wrote:
+> > Hi,
+> >
+> >     Personally, If we use Bochs as a testing/development  environment,
+> > It will be much better. Since It is a Intel X86 Emulator which can run
+> > Win9X already. ( Somethings like VMware ). It can increase the time
+> > of  testing.
+> >
+> > Regards,
+> >
+> > Hilary
+> >
+> >
+> >
+> --
+> ======================================================
+> Eng. Corrado Santoro - PhD Student
+>
+> Unversity of Catania - Engineering Faculty
+> Institute of Computer Science and Telecommunications
+> Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+>
+> Tel: +39 095 7382365           Fax: +39 095 7382397
+>
+> EMail: csanto@iit.unict.it
+> Personal Home Page:
+>             http://www.cdc.unict.it/~csanto
+>
+> ARCA Mobile Agent Framework Home Page:
+>             http://netra.cdc.unict.it/ARCA
+> ======================================================
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Fri, 22 Oct 1999 13:10:38 +0200
+Date: Fri, 22 Oct 1999 13:10:38 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] GRUB
+
+Thanks George!
+
+On Fri, 22 Oct 1999, George.Marrows@Smallworld.co.uk wrote:
+> Hi Corrado --
+> 
+> When I've got the GRUB boot working, I'll do a write-up explaining how to
+> use it with bochs. I'm hoping I'll be able to finish it over the coming
+> weekend.
+> 
+> -- George
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From hilarycheng@usa.net Fri, 22 Oct 1999 20:37:39 +0800
+Date: Fri, 22 Oct 1999 20:37:39 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] GRUB
+
+Hi,
+
+    Is there any source of GRUB ? If possible, I can write a simple
+guildline of it.
+
+Regards,
+
+Hilary
+
+
+----- Original Message -----
+From: <George.Marrows@smallworld.co.uk>
+To: <kernel@jos.org>
+Sent: Friday, October 22, 1999 6:50 PM
+Subject: RE: [JOS-Kernel] GRUB
+
+
+>Hi Corrado --
+>
+>When I've got the GRUB boot working, I'll do a write-up explaining how to
+>use it with bochs. I'm hoping I'll be able to finish it over the coming
+>weekend.
+>
+>-- George
+>
+>> -----Original Message-----
+>> From: Corrado Santoro [SMTP:Corrado.Santoro@IIT.UNICT.IT]
+>> Sent: Friday, October 22, 1999 11:37
+>> To: kernel@jos.org; S.K. Wong
+>> Subject: Re: [JOS-Kernel] GRUB
+>>
+>> Hi Hilary,
+>> I think using Bochs is a good idea. But can you tell me how is it
+possible
+>> to
+>> boot JOS with Bochs ?
+>> Till now I have performed remote bootstrapps using en etherboot floppy.
+>>
+>> Cheers,
+>> Corrado
+>>
+>> On Thu, 14 Oct 1999, S.K. Wong wrote:
+>> > Hi,
+>> >
+>> >     Personally, If we use Bochs as a testing/development  environment,
+>> > It will be much better. Since It is a Intel X86 Emulator which can run
+>> > Win9X already. ( Somethings like VMware ). It can increase the time
+>> > of  testing.
+>> >
+>> > Regards,
+>> >
+>> > Hilary
+>> >
+>> >
+>> >
+>> --
+>> ======================================================
+>> Eng. Corrado Santoro - PhD Student
+>>
+>> Unversity of Catania - Engineering Faculty
+>> Institute of Computer Science and Telecommunications
+>> Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+>>
+>> Tel: +39 095 7382365           Fax: +39 095 7382397
+>>
+>> EMail: csanto@iit.unict.it
+>> Personal Home Page:
+>>             http://www.cdc.unict.it/~csanto
+>>
+>> ARCA Mobile Agent Framework Home Page:
+>>             http://netra.cdc.unict.it/ARCA
+>> ======================================================
+>>
+>>
+>> _______________________________________________
+>> Kernel maillist  -  Kernel@jos.org
+>> http://jos.org/mailman/listinfo/kernel
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+
+
+
+
+From Corrado.Santoro@iit.unict.it Sun, 24 Oct 1999 12:35:14 +0100 (GMT+0100)
+Date: Sun, 24 Oct 1999 12:35:14 +0100 (GMT+0100)
+From: csanto Corrado.Santoro@iit.unict.it
+Subject: [JOS-Kernel] JOS and BOCHS.. they works!!
+
+Hi all,
+I've spent my weekend to write a boot loader able to load and run JOS from
+an hard disk. My program is composed of a pre-boot (installed on
+the master boot record of HD) and a loader which loads a JOS image written
+on HD starting from cyl=1,hd=0,sect=1. The loader is based on etherboot
+code and, till now, it ignores any disk partition. Soon, I'll patch my
+loader in order to make it able to boot from an HD partition rather than
+the master boot record. Using this loader I was able to start JOS with
+Bochs Pentium Emulator... it seems to work, however, it was necessary to
+make some patches:
+1. when JOS boots, it switches to VGA mode 7 (monocrome mode). It seems
+that Bochs does not like this.. I mean.. does not handle monocrome video.
+Thus I've patched "head.s86" and "jjconsol.cc" in order to startup with
+VGA mode 3 (80x25 color) and make character writings to 0xb8000 rather
+than 0xb0000. I've also added a software cursor to jjconsol.cc.
+2. in order to make JOS able to work with Bochs, the latter must have the
+FPU support, so download the FPU emulator and recompile Bochs (see Bochs
+home page).
+3. at JOS boot, the jbHeap class calls scrubMemory() which clear the
+ENTIRE extended memory. This process is too long for Bochs, thus I've
+removed this call.
+4. if JOS is compiled without the option -DNATIVE_CLOCK, when JOS boots
+(only under Bochs), it display continuosly "notifyOfInterrupt(3):VM
+corrupted. abort notify...". Anyone knows what's happen ? I think
+interrupt handling needs a lot of patches.
+5. The entire pre-boot/JOS load/JOS boot/start "init" process is VERY SLOW
+with Bochs. It takes several minutes on a Pentium 133. However, tomorrow
+I'll try a Pentium II/400.
+
+... ok, it seems to be enough...
+
+However, please let me know if you are interested in obtaining the JOS HD
+boot loader. If yes, I'll prepare a tar.gz version which I'll post on my
+web site so you can download it.
+
+Bye, bye,
+	Corrado
+
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+
+
+From tmiller@haverford.edu Sun, 24 Oct 1999 08:10:26 -0400 (EDT)
+Date: Sun, 24 Oct 1999 08:10:26 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JOS and BOCHS.. they works!!
+
+> 4. if JOS is compiled without the option -DNATIVE_CLOCK, when JOS boots
+> (only under Bochs), it display continuosly "notifyOfInterrupt(3):VM
+> corrupted. abort notify...". Anyone knows what's happen ? I think
+> interrupt handling needs a lot of patches.
+
+	Yup.  It means that something is Terribly Wrong, in this
+particular case, that the 8th index into the field table of the interrupt
+class (which is usually jos.system.interrupts) is null, i.e.
+uninitialized.  This is usually means that the static initializers haven't
+been run yet.  You should (eventually) get to where that static
+initializer is run; remember that the clock interrupt fires ALOT.  That's
+the reason for the NATIVE_CLOCK flag: to allow the native code to directly
+handle the clock, which is MUCH more efficient.
+	The reasoning is that the clock interrupt mostly concerns the
+scheduler; all the java-language device drivers could be written in terms
+of abstract timers implemented by the scheduler instead of clock
+interrupt handlers.  (But the timers and their interface don't exist yet,
+so some drivers use the clock -- like the fd driver currently under
+construction.)  Hopes this clears things up for you.
+
+> However, please let me know if you are interested in obtaining the JOS HD
+> boot loader. If yes, I'll prepare a tar.gz version which I'll post on my
+> web site so you can download it.
+
+	Is there a particular reason the boot loader needs to run JOS in
+the emulator?
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Sun, 24 Oct 1999 09:01:02 -0400 (EDT)
+Date: Sun, 24 Oct 1999 09:01:02 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] interrupt handling
+
+	Right now, the kernel code simply queues up interrupts until the
+interperter gets around to asking if any interrupts had happened while it
+busy doing java things.  (Reasoning: we don't have multitasking/threading
+yet, because it's rather difficult, so we can't context-switch to an
+interperter running the interrupt code; it would be too difficult to be
+worthwhile to make the interperter interruptable; and this way offers a
+fast turn-around to the hardware, so interrupts don't get lost in the
+kernel.)  
+
+	The interperter than looks at the queue before (after) every set
+(currently one) of java bytecodes executed (i.e. when the interperter is
+known to be in a safe state).  If there's an interrupt waiting to be
+handled, the scheduler (in a hideously inefficient manner) extracts the
+proper (static) interrupt object in the interrupts class it's been passed,
+and calls notifyAll() on it, which schedules the thread(s) wait()ing on
+that interrupt to run.
+
+	The problem is two-fold: first, notifyAll() appends threads to the
+scheduled list, rather than inserting them.  (i.e., the interrupt handling
+thread(s) is (are) not prioritized.)  Second, this method is prone to
+having the interrupt handlers lose interrupts.  If an interrupt handler
+doesn't wait() on the interrupt object before the next interrupt occurs,
+it's gone.  (Threading the response doesn't help, because the same logic
+applies.)  (This, in addition to the fact that a single thread can't
+listen for more than one interrupt this way.)
+
+	While there are any number of interesting ways to tackle this,
+they all have to do two things: 1, throw the interrupts 'over the wall*'
+to the Java code so the Right Things can happen; 2, arrange for the Java
+code not to lose interrupts.  Two solutions immediately present
+themselves.  First, using the MappedMemory extension**, construct an
+interrupt table (list/vector/etc) and have some java scheduler thread sit
+around and check it for changes.  When it dispatches an interrupt, it just
+notes that change and moves along.  Second, declare a function (say,
+jos.system.machine.handleInterrupt(int num)) to be "well known" and call
+it whenever an interrupt happens, and let the java code queue/stack/etc up
+the interrupts and schedule them however it sees fit.  (Which should be
+add/removeInterruptListener & event-based, IMHO.)
+
+	The third possibility is a hybrid of the two.  Have a well-known
+class, say jos.system.machine, which has [add|remove]InterruptListener
+methods adding listeners to a well-known (constant static***) array of
+vectors therein. The kernel can then extract this information and schedule
+the interested threads appropriately (i.e. at the top of the queue,
+aborting the current thread).  This solution is efficient, exposes the
+internals of the scheduler minimally to the Java, and imposes minimal
+restrictions on the Java code.  Combined with a timer mechanism
+(jos.system.machine.setTimer()?) (and native support for it!), this should
+make the driver writers' jobs much simpler.  It should also translate
+pretty closely into the JavaOS/B model whenever we might implement it.
+
+	Commentary?  I'm planning on doing a clean checkout of the CVS
+tree and making sure things work right 'out of the box' and discovering
+what all changes I've been making piece-meal should actual be committed.
+After that, I'd like to fix interrupts and the keyboard driver.  I do not,
+however, have any kind of time-line for these projects... 
+
+-_Quinn
+
+P.S.: JM, have you committed the new gc stuff to CVS yet?
+
+* More on 'the wall' later.  I've been doing some ruminations about
+garbage collection, involving allocating java and c memory differently,
+among other things.  (I'm thinking the right name for what I'm fiddling
+with for the java stack would be "fractional mark and sweep", but don't
+hold it to me -- I'm not a gc expert, yet :))
+
+** Returns a Java array at a certain h/w address.  Useful for things like
+VGA buffers and DMA transfers.  Not implemented yet.
+
+*** i.e., for efficiency, if we cache the pointer to the vector, it will
+always be right.
+
+
+
+
+From iainshigeoka@yahoo.com Sun, 24 Oct 1999 10:48:49 -0500
+Date: Sun, 24 Oct 1999 10:48:49 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] JOS and BOCHS.. they works!!
+
+> > However, please let me know if you are interested in obtaining the JOS HD
+> > boot loader. If yes, I'll prepare a tar.gz version which I'll post on my
+> > web site so you can download it.
+> 
+> 	Is there a particular reason the boot loader needs to run JOS in
+> the emulator?
+
+It will allow building and testing by people without 2 computers and 
+ethernet (aka etherboot).
+
+Corrado
+
+I think it would be excellent if you could put the package together.  
+It would seem to me that there are two ways to bundle it and, if you 
+have the time and inclination, both would be great.  
+
+The first as a developer "bundle" including the sources (if any) you 
+needed in order to get the "base" versions of either jos or bochs to 
+work.  Do we have a clear abstraction of a booter ala JavaOS or 
+would checking a second booter into CVS cause conflicts?
+
+The second as a pure binary for those that just want to get the 
+base running.  This second dist won't be super useful right now, but 
+as soon as we get a classloader ready (do we have a classloader 
+ready?) people can use the system to mess with adding class 
+library support without actually hacking the kernel.  It is also a 
+good first look at a possible system demo.
+
+-iain
+
+
+
+From tmiller@haverford.edu Sun, 24 Oct 1999 11:56:05 -0400 (EDT)
+Date: Sun, 24 Oct 1999 11:56:05 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JOS and BOCHS.. they works!!
+
+> It will allow building and testing by people without 2 computers and 
+> ethernet (aka etherboot).
+
+	I meant, as opposed to booting from the HD and handing control off
+to JJOS directly -- why slow JJOS down even more by using the emulator?
+Is there some technical difficulty with using the i386's ELF/stipped
+binary?  (I'm rather ignorant about booting, so it might be really
+obvious...)
+
+> The first as a developer "bundle" including the sources (if any) you 
+> needed in order to get the "base" versions of either jos or bochs to 
+> work.  Do we have a clear abstraction of a booter ala JavaOS or 
+> would checking a second booter into CVS cause conflicts?
+
+	We don't have a distinct abstraction for the booter, but the JJOS
+kernel does need to be handed the ramdisk information.  Checking a second
+booter into the CVS would work fine, but we'd probably cast it as a third
+architecture or an option in the i386 makefile.
+
+> The second as a pure binary for those that just want to get the 
+> base running.  This second dist won't be super useful right now, but 
+> as soon as we get a classloader ready (do we have a classloader 
+> ready?) people can use the system to mess with adding class 
+> library support without actually hacking the kernel.  It is also a 
+> good first look at a possible system demo.
+
+	Er, the classloader is ready and works fine, with the exception
+that native code doesn't work at all, which is OK because JJOS doesn't
+support that right now anyway.  The problem w.r.t. classloading is the
+lack of an fs/device driver.  Someone (can't remember who offhand) is
+writing a FD driver, so floppy-based classloading (i.e. not from the
+pre-compiled ramdisk) should be possible soon, although extrordinarily
+clunky.
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Sun, 24 Oct 1999 12:41:32 -0400 (EDT)
+Date: Sun, 24 Oct 1999 12:41:32 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] cvs changes
+
+	Made a few changes to the CVS which will hopefully improve the
+convience of things for newcomers wanting to make the i386 build.
+
+	Also included Hilary Cheng's iinc and lushr fixes, and the code to
+support them in interp's dispatch loop.
+
+-_Quinn
+
+
+
+
+
+From draft@fear.ch Sun, 24 Oct 1999 18:50:15 +0200 (CEST)
+Date: Sun, 24 Oct 1999 18:50:15 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] JOS and BOCHS.. they works!!
+
+Hi all
+
+
+On Sun, 24 Oct 1999, Todd L. Miller wrote:
+
+[cut]
+> 	Er, the classloader is ready and works fine, with the exception
+> that native code doesn't work at all, which is OK because JJOS doesn't
+> support that right now anyway.  The problem w.r.t. classloading is the
+> lack of an fs/device driver.  Someone (can't remember who offhand) is
+> writing a FD driver, so floppy-based classloading (i.e. not from the
+> pre-compiled ramdisk) should be possible soon, although extrordinarily
+> clunky.
+[cut]
+
+The FD driver still has the 16MB problem... (I need to reserve memory,
+and don't know how), but theoreticly the fd works. I was a long time idle
+(had a lot to do... work and now university)  but I hope that I'm soon
+working on JOS again.
+
+
+Thomas Bocek
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Mon, 25 Oct 1999 10:13:49 +0200
+Date: Mon, 25 Oct 1999 10:13:49 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] JOS and BOCHS.. they works!!
+
+On Sun, 24 Oct 1999, Todd L. Miller wrote:
+> 	I meant, as opposed to booting from the HD and handing control off
+> to JJOS directly -- why slow JJOS down even more by using the emulator?
+> Is there some technical difficulty with using the i386's ELF/stipped
+> binary?  (I'm rather ignorant about booting, so it might be really
+> obvious...)
+
+I think it is a good idea to have a way to test JJOS directly on a target
+platform (i.e. an emulator). However, I remind you that my boot loader should
+work also from an HD on a *real* Intel platfrom.
+
+Iain, I'll prepare a pre-beta distribution (for evaluation and test) of my boot
+loader, however, I think it is better to include the code in a bundle only when
+my boot loader will work with disk partitions.
+
+Corrado.
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Mon, 25 Oct 1999 11:27:27 +0200
+Date: Mon, 25 Oct 1999 11:27:27 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] JOS and BOCHS.. they works!!
+
+On Mon, 25 Oct 1999, Hilary Cheng wrote:
+> Hi Corrado ,
+> 
+>     I have developed a JJOS Web Site for the Kernel Progress.
+> Would u mind like to put ur boch boot loader in my Homepage ?
+> I think JJOS havn't got a centerized Web Site for developers.
+> If U got no problem, pls send me the files and some description of it.
+> 
+
+No problem Hilary! I have to make some patches to the boot loder. When I'll
+finish, I'll send to you everything!
+
+Bye,
+Corrado.
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From George.Marrows@Smallworld.co.uk Tue, 26 Oct 1999 12:32:24 +0100
+Date: Tue, 26 Oct 1999 12:32:24 +0100
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] JOS and BOCHS.. they works!!
+
+Hi Corrado and all --
+
+I spent my weekend getting jjos to boot using GRUB, which it now does (I
+think). Some problems:
+
+a) I haven't yet figured how to define the makefile targets (etherboot /
+GRUB) correctly so that they can both be built using the same makefile.
+Differences are that GRUB leaves you in protected mode (affects head.s86)
+and it loads the ramdisk low rather than high a la etherboot (affects
+entry.cc). Command line and available memory fetch are different too.
+
+b) (for those that are interested) Bochs booting doesn't work. This isn't
+jjos's fault - I just haven't managed yet to create a hard disk image file
+that looks sufficiently like a correctly partitioned disk to fool GRUB --
+this is needed to load jjos_common.zip. Apparently VSTa now boots under
+Bochs, and I know it uses GRUB so I'll see what they've done.
+
+c) What's the correct behaviour for the boot? I get the standard text
+messages (same as host build), then the screen blanks and the JOS logo
+appears. However, the screen blanks again a few seconds later and a series
+of error messages repeat up the screen. I'm afriad I haven't got round to
+putting in a delay loop so that I can actually read them! Is this the
+behaviour under etherboot?
+
+
+Corrado, cool though your boot loader undoubtedly is, is it worth your while
+to put in partition support et al, when GRUB already does this? GRUB is
+widely known and used by VSTa and the GNU Hurd (at least), so it's well
+supported and tested and isn't going to go away. Also, one of the goals of
+GRUB / multiboot was to avoid the proliferation of OS specific boot loaders.
+Perhaps JOS has a better use for your technical skills? Classpath
+integration, device drivers, more sophisticated gc, and investigations of
+virtual memory, native threading, support for processes etc etc all spring
+to mind.. 
+
+Of course, boot loaders might be your thing .. if so, please ignore my
+mumblings and carry right along!
+
+Regards
+
+-- George
+
+
+
+-----Original Message-----
+From: csanto [mailto:Corrado.Santoro@iit.unict.it]
+Sent: Sunday, October 24, 1999 12:35
+To: kernel@jos.org
+Subject: [JOS-Kernel] JOS and BOCHS.. they works!!
+
+
+Hi all,
+I've spent my weekend to write a boot loader able to load and run JOS from
+an hard disk. My program is composed of a pre-boot (installed on
+the master boot record of HD) and a loader which loads a JOS image written
+on HD starting from cyl=1,hd=0,sect=1. The loader is based on etherboot
+code and, till now, it ignores any disk partition. Soon, I'll patch my
+loader in order to make it able to boot from an HD partition rather than
+the master boot record. Using this loader I was able to start JOS with
+Bochs Pentium Emulator... it seems to work, however, it was necessary to
+make some patches:
+1. when JOS boots, it switches to VGA mode 7 (monocrome mode). It seems
+that Bochs does not like this.. I mean.. does not handle monocrome video.
+Thus I've patched "head.s86" and "jjconsol.cc" in order to startup with
+VGA mode 3 (80x25 color) and make character writings to 0xb8000 rather
+than 0xb0000. I've also added a software cursor to jjconsol.cc.
+2. in order to make JOS able to work with Bochs, the latter must have the
+FPU support, so download the FPU emulator and recompile Bochs (see Bochs
+home page).
+3. at JOS boot, the jbHeap class calls scrubMemory() which clear the
+ENTIRE extended memory. This process is too long for Bochs, thus I've
+removed this call.
+4. if JOS is compiled without the option -DNATIVE_CLOCK, when JOS boots
+(only under Bochs), it display continuosly "notifyOfInterrupt(3):VM
+corrupted. abort notify...". Anyone knows what's happen ? I think
+interrupt handling needs a lot of patches.
+5. The entire pre-boot/JOS load/JOS boot/start "init" process is VERY SLOW
+with Bochs. It takes several minutes on a Pentium 133. However, tomorrow
+I'll try a Pentium II/400.
+
+... ok, it seems to be enough...
+
+However, please let me know if you are interested in obtaining the JOS HD
+boot loader. If yes, I'll prepare a tar.gz version which I'll post on my
+web site so you can download it.
+
+Bye, bye,
+	Corrado
+
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+_______________________________________________
+Kernel maillist  -  Kernel@jos.org
+http://jos.org/mailman/listinfo/kernel
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Tue, 26 Oct 1999 16:31:46 +0200
+Date: Tue, 26 Oct 1999 16:31:46 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] JOS, BOCHS, GRUB, etc.....
+
+Ok George!
+Basically I agree with you!
+However, Iain Shigeoka is planning to prepare a "bundle" including a boot
+loader. If everyone agrees in using GRUB, I'll stop my work and I'll start to
+implement something else for JOS (what can I do ? Any suggestions ?).
+
+Concering Botch booting, I have successfully booted JOS only in text-mode. Check
+the suggestions on my previous e-mail. Probably, your boot process is OK. Some
+error messages are NOT real error messages (check the init.java source!).
+
+... I'm waiting for your answers men!
+
+Bye,
+	Corrado
+
+---
+On Tue, 26 Oct 1999, George.Marrows@Smallworld.co.uk wrote:
+> Hi Corrado and all --
+> 
+> I spent my weekend getting jjos to boot using GRUB, which it now does (I
+> think). Some problems:
+> 
+> a) I haven't yet figured how to define the makefile targets (etherboot /
+> GRUB) correctly so that they can both be built using the same makefile.
+> Differences are that GRUB leaves you in protected mode (affects head.s86)
+> and it loads the ramdisk low rather than high a la etherboot (affects
+> entry.cc). Command line and available memory fetch are different too.
+> 
+> b) (for those that are interested) Bochs booting doesn't work. This isn't
+> jjos's fault - I just haven't managed yet to create a hard disk image file
+> that looks sufficiently like a correctly partitioned disk to fool GRUB --
+> this is needed to load jjos_common.zip. Apparently VSTa now boots under
+> Bochs, and I know it uses GRUB so I'll see what they've done.
+> 
+> c) What's the correct behaviour for the boot? I get the standard text
+> messages (same as host build), then the screen blanks and the JOS logo
+> appears. However, the screen blanks again a few seconds later and a series
+> of error messages repeat up the screen. I'm afriad I haven't got round to
+> putting in a delay loop so that I can actually read them! Is this the
+> behaviour under etherboot?
+> 
+> 
+> Corrado, cool though your boot loader undoubtedly is, is it worth your while
+> to put in partition support et al, when GRUB already does this? GRUB is
+> widely known and used by VSTa and the GNU Hurd (at least), so it's well
+> supported and tested and isn't going to go away. Also, one of the goals of
+> GRUB / multiboot was to avoid the proliferation of OS specific boot loaders.
+> Perhaps JOS has a better use for your technical skills? Classpath
+> integration, device drivers, more sophisticated gc, and investigations of
+> virtual memory, native threading, support for processes etc etc all spring
+> to mind.. 
+> 
+> Of course, boot loaders might be your thing .. if so, please ignore my
+> mumblings and carry right along!
+> 
+> Regards
+> 
+> -- George
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Tue, 26 Oct 1999 16:53:13 +0200
+Date: Tue, 26 Oct 1999 16:53:13 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] interrupt handling
+
+Hummm.... Todd (or Quinn?)....
+I think your third possibility is very good... however...:
+a) what do you think about making (with a programmer option) an interrupt
+service thread NON-INTERRUPTABLE or, anyway, allowing a priority-based
+interrupt management ?
+b) I don't know if, in the future, it will be implemented a kind of memory
+management based on swapping. In this case, any interrupt service thread must
+not be swapped!
+
+Bye,
+	Corrado
+
+On Sun, 24 Oct 1999, Todd L. Miller wrote:
+> 
+> 	The third possibility is a hybrid of the two.  Have a well-known
+> class, say jos.system.machine, which has [add|remove]InterruptListener
+> methods adding listeners to a well-known (constant static***) array of
+> vectors therein. The kernel can then extract this information and schedule
+> the interested threads appropriately (i.e. at the top of the queue,
+> aborting the current thread).  This solution is efficient, exposes the
+> internals of the scheduler minimally to the Java, and imposes minimal
+> restrictions on the Java code.  Combined with a timer mechanism
+> (jos.system.machine.setTimer()?) (and native support for it!), this should
+> make the driver writers' jobs much simpler.  It should also translate
+> pretty closely into the JavaOS/B model whenever we might implement it.
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Tue, 26 Oct 1999 12:59:13 -0400 (EDT)
+Date: Tue, 26 Oct 1999 12:59:13 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JOS and BOCHS.. they works!!
+
+	It's great news that you've got it working!
+
+> a) I haven't yet figured how to define the makefile targets (etherboot /
+> GRUB) correctly so that they can both be built using the same makefile.
+> Differences are that GRUB leaves you in protected mode (affects head.s86)
+> and it loads the ramdisk low rather than high a la etherboot (affects
+> entry.cc). Command line and available memory fetch are different too.
+
+	#ifdef to the rescue?  (make grub passes the -DUSE_GRUB flag to a
+'normal' make?)  I'd be happy to look into this if you send me the
+changes.
+
+> c) What's the correct behaviour for the boot? I get the standard text
+> messages (same as host build), then the screen blanks and the JOS logo
+> appears. However, the screen blanks again a few seconds later and a series
+> of error messages repeat up the screen. I'm afriad I haven't got round to
+> putting in a delay loop so that I can actually read them! Is this the
+> behaviour under etherboot?
+
+	I haven't tested the etherboot build recently, but after the VGA
+driver test, it's supposed to return to text mode and test the garbage
+collector and/or the console drivers.  Look at init.java for more details,
+but in general, if it's not the SAME message over and over, init() is
+probably running just fine.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Tue, 26 Oct 1999 13:06:24 -0400 (EDT)
+Date: Tue, 26 Oct 1999 13:06:24 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] interrupt handling
+
+> a) what do you think about making (with a programmer option) an interrupt
+> service thread NON-INTERRUPTABLE or, anyway, allowing a priority-based
+> interrupt management?
+
+	This should happen, you're right, and I rather forgot about it.
+
+> b) I don't know if, in the future, it will be implemented a kind of memory
+> management based on swapping. In this case, any interrupt service thread must
+> not be swapped!
+
+	Yup.  Another good point.  I made some progress with this
+yesterday; I hope to finish it off by the end of the week.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Tue, 26 Oct 1999 21:25:13 -0400 (EDT)
+Date: Tue, 26 Oct 1999 21:25:13 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] new interrupt model
+
+	Went with the hybrid proposal, and it works perfectly (AFAIT*) on
+the host now.  I'll try to test the i386 boot out sometime tonight.  The
+native code support is activated with the -DNEW_INTERRUPT_HANDLING flag,
+but the bytecode support is radically different, to the extent that I had
+to make a new bytecode tree and compile against that.  Once I bring that
+tree up to snuff, I'll just move into where the old tree was and finally
+do a CVS commit and the thing.
+
+	Driver writers: the new interrupt paradigm is straight
+event-based, with jos.system.interrupts using addInterruptListener() in
+the usual way, with one exeption.  When the interpreter finishes the
+current timeslice, it checks the interrupt queue; while it's not empty,
+the C code will extract your driver objects from jos.system.interrupts and
+run its handleInterrupt ( int interrupt_number ) code from there.  This
+code will run, uninterrupted -- including by other interrupts -- until it
+completes, so be very careful with it.  Get your data from the h/w in that
+function and let another thread take care of the analysis, if at all
+possible.  (The keyboard driver, for instance, (will) slurps scancodes out
+of the controller and shoves them into a queue, where the keyboard daemon
+can play with them, distribute them, etc.)
+
+	My model, in general, is that jos.platform.* is limited to
+abstractions common across every computer JOS will run on, like keyboards
+(even if they aren't there).  jos.platform.keyboard generates Key and
+Scancode events, but jos.platform.driver.keyboard (& keyboardd) is what
+handles the hardware (lower-edge) part of the driver.  The
+platform.drivers are expected to use jos.system.* (probably should be
+renamed) to access the h/w, via the interrupts and machine classes, and
+more as we need them.
+
+	Thus jos.platform.screen would be driven by
+jos.platform.driver.screen, which would just be Thomas Bocek's VGA driver
+class (or a wrapper there-to).  jos.platform.driver.* will be copied over
+from arch/bytecode/jos/platform/driver/* according the current build, so
+that's how we get h/w-specificity.
+
+	jos.platform == JOSSystem and jos.system == JOSBox, I believe,
+though I haven't read their descriptions recently enough to be sure.
+
+	Comments?  (Suggestions?  Flames?)
+
+-_Quinn
+
+* As Far As I Tested
+
+
+
+
+From draft@fear.ch Wed, 27 Oct 1999 19:55:58 +0200 (CEST)
+Date: Wed, 27 Oct 1999 19:55:58 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] new interrupt model
+
+Hi Todd and all
+
+On Tue, 26 Oct 1999, Todd L. Miller wrote:
+
+> 	Went with the hybrid proposal, and it works perfectly (AFAIT*) on
+> the host now.  I'll try to test the i386 boot out sometime tonight.  The
+> native code support is activated with the -DNEW_INTERRUPT_HANDLING flag,
+> but the bytecode support is radically different, to the extent that I had
+> to make a new bytecode tree and compile against that.  Once I bring that
+> tree up to snuff, I'll just move into where the old tree was and finally
+> do a CVS commit and the thing.
+
+great I'll take a look at it.
+ 
+> 	Driver writers: the new interrupt paradigm is straight
+> event-based, with jos.system.interrupts using addInterruptListener() in
+> the usual way, with one exeption.  When the interpreter finishes the
+> current timeslice, it checks the interrupt queue; while it's not empty,
+> the C code will extract your driver objects from jos.system.interrupts and
+> run its handleInterrupt ( int interrupt_number ) code from there.  This
+> code will run, uninterrupted -- including by other interrupts -- until it
+> completes, so be very careful with it.  Get your data from the h/w in that
+> function and let another thread take care of the analysis, if at all
+> possible.  (The keyboard driver, for instance, (will) slurps scancodes out
+> of the controller and shoves them into a queue, where the keyboard daemon
+> can play with them, distribute them, etc.)
+
+Is it possible to dispatch/register more than one interrupt?
+
+The fdc-driver (not event based) has 2 lines in "handleInterrupt" I hope
+that is not time critical. Or does this driver has to be event based too?
+ 
+> 	My model, in general, is that jos.platform.* is limited to
+> abstractions common across every computer JOS will run on, like keyboards
+> (even if they aren't there).  jos.platform.keyboard generates Key and
+> Scancode events, but jos.platform.driver.keyboard (& keyboardd) is what
+> handles the hardware (lower-edge) part of the driver.  The
+> platform.drivers are expected to use jos.system.* (probably should be
+> renamed) to access the h/w, via the interrupts and machine classes, and
+> more as we need them.
+> 
+> 	Thus jos.platform.screen would be driven by
+> jos.platform.driver.screen, which would just be Thomas Bocek's VGA driver
+> class (or a wrapper there-to).  jos.platform.driver.* will be copied over
+> from arch/bytecode/jos/platform/driver/* according the current build, so
+> that's how we get h/w-specificity.
+[cut]
+
+some more questions:
+
+The "jos.platform.driver.screen" function is hooked into
+classpath ,probably with the reflection-class, and will decide which
+driver to load (Vga,Matrox or whatever) and there will also be  
+jos.platform.driver.networt, jos.platform.driver.hd,....
+ 
+
+Thomas Bocek
+
+
+
+
+From tmiller@haverford.edu Wed, 27 Oct 1999 14:38:26 -0400 (EDT)
+Date: Wed, 27 Oct 1999 14:38:26 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] new interrupt model
+
+> Is it possible to dispatch/register more than one interrupt?
+
+	Yes.  That's part of what make this model so much more flexible
+than the other one.  handleInterupt() is declared with an int parameter,
+which is the interrupt number, so you can check which one fired.
+
+> The fdc-driver (not event based) has 2 lines in "handleInterrupt" I hope
+> that is not time critical. Or does this driver has to be event based too?
+
+	The event basis is just to notify you about the interrupt.  Two
+lines is actually quite a bit less than what the keyboard driver has right
+now (it loops over the keyboard controller until it stops sending new
+scancodes), but that's because the the driver would miss data otherwise.
+To make it clear: I have removed the wait()-based model while implementing
+this one (they aren't really compatible).  If you choose to use some other
+model internally in your code, it shouldn't really matter that much; your
+handleInterrupt() method would just update the varibles your driver thread
+is looking at.  (For instance, the driver thread could .wait() on
+something in the driver object, to be notified() by handleInterrupt().)
+
+> The "jos.platform.driver.screen" function is hooked into
+> classpath ,probably with the reflection-class, and will decide which
+> driver to load (Vga,Matrox or whatever) and there will also be  
+> jos.platform.driver.networt, jos.platform.driver.hd,....
+
+	Right.  If we know that a particular platform object will need
+different drivers on a finer-grained level than platform (i386/host/etc),
+it can be constructed such that jos.platform.driver.screen is an object
+factory, returning driver objects as appropriate.  The drivers could, for
+instance, all be implemented against the JavaOS/B specs without changing
+the appearance of the JOSBox (or whatever).  Sub-packages of jos.platform
+are OK, too, if we need them.
+
+-_Quinn
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Thu, 28 Oct 1999 11:16:05 +0200
+Date: Thu, 28 Oct 1999 11:16:05 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Static members and process model.
+
+Hi all,
+I'm planning to work on a virtual console driver for JOS applicative programs
+enhancing the current "console/consoled". My aim is to allow an applicative
+program to use the System.in and System.out streams to perform console
+operation.
+
+First of all, is there anyone that is currently working on this issue ?
+Secondly, I've found a problem on the "scope" of static members: System.in and
+System.out are static members, i.e. single instances inside the SAME virtual
+machine. This approach is valid for the "standard" use of Java upon a operating
+system such as WinNT/9X or Unix/Linux: different Java processes are started
+inside different Java Virtual Machines, thus each process uses its own
+System.in and System.out streams. But in the JOS environment, there is a SINGLE
+virtual machine thus, by analogy, there might be only ONE instance of
+System.in and System.out, shared among ALL threads (and thus all appications) of
+the machine. This means that, basically, all threads are using the SAME console.
+Obviously this is not possible and the streams System.in and System.out of JOS
+must act as "wrappers", determining the current console of the current thread
+and calling then the appropriate console driver. In this case, the 'java.lang.System' 
+class provided by Sun can be no longer used, and it is necessary to suitably
+rewrite this class for JOS.
+
+I'm studying this problem and when I have a solution, I will prepare a
+descriptive document. Meanwhile, do you have any suggestion ?
+
+Bye,
+	Corrado.
+
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From hilarycheng@usa.net Thu, 28 Oct 1999 21:52:41 +0800
+Date: Thu, 28 Oct 1999 21:52:41 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Static members and process model.
+
+Hi Corrado,
+
+    I have an idea to makes a console system in Java.
+Since System.out and System.in can't capture KeyEvent.
+But in a Console System, it is very important. I would like to do it in this
+system.
+
+public class Console extends java.awt.Component;
+
+It can send Key Event to Console and allow us to customize the screen
+layout.
+most important, if someone has written a Java application depends on it,
+we can still write a implement on Linux, Win9X so that it can allows people
+to run it Linux.
+
+Regards,
+
+Hilary
+
+
+----- Original Message -----
+From: Corrado Santoro <Corrado.Santoro@IIT.UNICT.IT>
+To: <kernel@jos.org>
+Sent: Thursday, October 28, 1999 5:16 PM
+Subject: [JOS-Kernel] Static members and process model.
+
+
+>Hi all,
+>I'm planning to work on a virtual console driver for JOS applicative
+programs
+>enhancing the current "console/consoled". My aim is to allow an applicative
+>program to use the System.in and System.out streams to perform console
+>operation.
+>
+>First of all, is there anyone that is currently working on this issue ?
+>Secondly, I've found a problem on the "scope" of static members: System.in
+and
+>System.out are static members, i.e. single instances inside the SAME
+virtual
+>machine. This approach is valid for the "standard" use of Java upon a
+operating
+>system such as WinNT/9X or Unix/Linux: different Java processes are started
+>inside different Java Virtual Machines, thus each process uses its own
+>System.in and System.out streams. But in the JOS environment, there is a
+SINGLE
+>virtual machine thus, by analogy, there might be only ONE instance of
+>System.in and System.out, shared among ALL threads (and thus all
+appications) of
+>the machine. This means that, basically, all threads are using the SAME
+console.
+>Obviously this is not possible and the streams System.in and System.out of
+JOS
+>must act as "wrappers", determining the current console of the current
+thread
+>and calling then the appropriate console driver. In this case, the
+'java.lang.System'
+>class provided by Sun can be no longer used, and it is necessary to
+suitably
+>rewrite this class for JOS.
+>
+>I'm studying this problem and when I have a solution, I will prepare a
+>descriptive document. Meanwhile, do you have any suggestion ?
+>
+>Bye,
+> Corrado.
+>
+>
+>--
+>======================================================
+>Eng. Corrado Santoro - PhD Student
+>
+>Unversity of Catania - Engineering Faculty
+>Institute of Computer Science and Telecommunications
+>Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+>
+>Tel: +39 095 7382365           Fax: +39 095 7382397
+>
+>EMail: csanto@iit.unict.it
+>Personal Home Page:
+>            http://www.cdc.unict.it/~csanto
+>
+>ARCA Mobile Agent Framework Home Page:
+>            http://netra.cdc.unict.it/ARCA
+>======================================================
+>
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From tmiller@haverford.edu Thu, 28 Oct 1999 16:50:40 -0400 (EDT)
+Date: Thu, 28 Oct 1999 16:50:40 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Static members and process model.
+
+> First of all, is there anyone that is currently working on this issue ?
+
+	I had considered it while writing the console/consoled classes.
+If console is implemented in such a fashion that it can be passed around
+as a stream, everything just happens right.  The shell (or init, etc) sets
+up the necessary redirections to make System.in/out/err work.  If an
+application wants to use the console, they can use reflection to
+find out if System.in/out/err is actually a console.
+
+	You noted, quite correctly, that System isn't set up properly for
+JOS.  One solution is to re-write System, but that will involve a lot of
+behind-the-scenes dirty work.  And other globally static classes that
+shouldn't be will need to be re-written, and we've forked classpath.  And
+if an application makes use of a global static, we can't run multiple
+copies of it.  Considering this problem early on, I came to the
+conclusion that the Right Way to do this is to implement disjoint
+classloaders, and allow programs a unified way of accessing them.
+Originally, I came up with this approach as a way of ensuring
+multi-java-process isolation in a single-process JVM.  (If your statics
+are different, and you're not passed in any objects, since you can't
+manipulate pointers, you can't run over anything else in ram.)  However,
+it has the added benefit of allowing us to rampantly replace static
+classes, like System, that are normally considered globals, with local
+static copies, as suitably adjusted to make the process run.  (Although
+I'll admit we'll need to trap System.exit(), etc, at some level those
+calls must become native, and we can trap them and just nuke that process,
+instead.)
+
+	Disjoint classloaders are not present in JOS as it stands.  Adding
+the nativecode support for the least-efficient implementation (totally
+disjoint sets) should be relatively simple: allow a
+(native/primordial) classloader to be created without inheriting any
+classes.  Pass it the class (and arguments, for IPC) you want it to run,
+and off you go.  Some standard facility for this process --
+jos.system.system.fork()? -- should be provided to take care of the
+details; you'd also need some way of getting static classes out of the
+classloader so that they can be properly adjusted.  (eg:
+	jls = forkClassLoader.getClass( "java.lang.System" );
+        jls.setOut( shellRedirect );
+	jls.setIn( shellRedirect );
+	jls.setErr( shellRedirect );)
+
+	More complicated schemes (trees of classloaders, starting from the
+empty primordial) could be implemented behind the fork() (and/or whatever)
+interface I've so loosely sketched out above, and decrease memory usage
+and increase speed.  Security measures based on a denial of access to
+static classes like jos.system.machine could implemented at the native
+level or with a Java classloader.  (Also something, AFAIK, that doesn't
+work now, and we'll need classpath support to do.)
+
+	I'm hope that was clear; if not, let me know, and I'll try it
+again. :)
+
+-_Quinn
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Fri, 29 Oct 1999 09:19:17 +0200
+Date: Fri, 29 Oct 1999 09:19:17 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Static members and process model.
+
+On Thu, 28 Oct 1999, Todd L. Miller wrote:
+> 	I had considered it while writing the console/consoled classes.
+> If console is implemented in such a fashion that it can be passed around
+> as a stream, everything just happens right.  The shell (or init, etc) sets
+> up the necessary redirections to make System.in/out/err work.  If an
+> application wants to use the console, they can use reflection to
+> find out if System.in/out/err is actually a console.
+> 
+> [cut]
+>
+> details; you'd also need some way of getting static classes out of the
+> classloader so that they can be properly adjusted.  (eg:
+> 	jls = forkClassLoader.getClass( "java.lang.System" );
+>         jls.setOut( shellRedirect );
+> 	jls.setIn( shellRedirect );
+> 	jls.setErr( shellRedirect );)
+> 
+Right! But, I think that the problem persist (or probably I've not
+well understood your description). I mean, let us suppose that I write a "Java
+Shell" using my Linux/JDK. This shell will make use of System.in and System.out
+and, inside its code, there will be a lot of "invokestatic" on System.in and
+System.out. Now, let us suppose that I want to run this shell inside JOS,
+without making any patches to the code (suppose that I have only the bytecode).
+What's happen ? I mean, it is necessary that the "invokestatic" on System.in
+and System.out work in the current console! Using classloader forking,
+you are able to start another "System" class (which can be used from the
+running application, if it is patched), but you need to change the
+"invokestatic" into "invokevirtual" referring to the new "System" class. But my
+idea, is to allowing the direct execution on JOS of a bytecode compiled (and
+running) on a traditional JVM/JDK.
+
+Are you agree ?
+
+Bye,
+	Corrado.
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+From tmiller@haverford.edu Fri, 29 Oct 1999 09:35:38 -0400 (EDT)
+Date: Fri, 29 Oct 1999 09:35:38 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Static members and process model.
+
+	Running the bytecode, the interpreter will come across the
+invokestatic, which has a symbolic reference to 'java.lang.System'.  When
+it asks the classloader for 'java.lang.System', what comes back?  The key
+is this: whatever we want to come back.  The java.lang.System static
+class, in this case, /as modified by the calling process/ -- that is, as
+the calling process has set /the child's copy/ of java.lang.System.
+Information included in setting up the child's process would be the
+console/stream that java.lang.System.* should point at.
+
+	Basically, support for disjoint (sets with nothing in common)
+classloaders allows us to have any number of copies of java.lang.System
+around, one for each console/stream, as necessary.
+
+-_Quinn
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Fri, 29 Oct 1999 18:15:21 +0200
+Date: Fri, 29 Oct 1999 18:15:21 +0200
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Static members and process model.
+
+OK... OK....
+so each new process has its own classloader (which is part of the context of
+the process).
+Given this hints, I'll try to design a structure for console interface. Any
+other suggestion ?
+
+Corrado.
+
+On Fri, 29 Oct 1999, you wrote:
+> Running the bytecode, the interpreter will come across the
+> invokestatic, which has a symbolic reference to 'java.lang.System'.  When
+> it asks the classloader for 'java.lang.System', what comes back?  The key
+> is this: whatever we want to come back.  The java.lang.System static
+> class, in this case, /as modified by the calling process/ -- that is, as
+> the calling process has set /the child's copy/ of java.lang.System.
+> Information included in setting up the child's process would be the
+> console/stream that java.lang.System.* should point at.
+> 
+> 	Basically, support for disjoint (sets with nothing in common)
+> classloaders allows us to have any number of copies of java.lang.System
+> around, one for each console/stream, as necessary.
+> 
+> -_Quinn
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Fri, 29 Oct 1999 13:29:04 -0400 (EDT)
+Date: Fri, 29 Oct 1999 13:29:04 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Static members and process model.
+
+> Given this hints, I'll try to design a structure for console interface. Any
+> other suggestion ?
+
+	Aside from making it accept stream connections (in some form or
+another), you should stick the full-screen stuff in there also.
+(Separating the interface from the implementation as I've noted before.)
+I'd suggest taking a look at either ncurses + panels and how the AWT
+handles things.  It's probably overkill to develop a full textual
+windowing system, but you should provide the hooks so that if someone
+wanted to, they could.
+
+	But don't take anything I say as right or final -- I really
+haven't looked at this enough to say...
+
+-_Quinn
+
+
+
+

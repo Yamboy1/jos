@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Static members and process model.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000451.html">
+   <LINK REL="Next" HREF="000453.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Static members and process model.</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Static members and process model.">tmiller@haverford.edu</A><BR>
+    <I>Fri, 29 Oct 1999 09:35:38 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000451.html">[JOS-Kernel] Static members and process model.</A></li>
+        <LI> Next message: <A HREF="000453.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#452">[ date ]</a>
+              <a href="thread.html#452">[ thread ]</a>
+              <a href="subject.html#452">[ subject ]</a>
+              <a href="author.html#452">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Running the bytecode, the interpreter will come across the
+invokestatic, which has a symbolic reference to 'java.lang.System'.  When
+it asks the classloader for 'java.lang.System', what comes back?  The key
+is this: whatever we want to come back.  The java.lang.System static
+class, in this case, /as modified by the calling process/ -- that is, as
+the calling process has set /the child's copy/ of java.lang.System.
+Information included in setting up the child's process would be the
+console/stream that java.lang.System.* should point at.
+
+	Basically, support for disjoint (sets with nothing in common)
+classloaders allows us to have any number of copies of java.lang.System
+around, one for each console/stream, as necessary.
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000451.html">[JOS-Kernel] Static members and process model.</A></li>
+	<LI> Next message: <A HREF="000453.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#452">[ date ]</a>
+              <a href="thread.html#452">[ thread ]</a>
+              <a href="subject.html#452">[ subject ]</a>
+              <a href="author.html#452">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

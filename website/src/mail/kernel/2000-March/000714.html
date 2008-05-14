@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Installation instructions (8MB Ram)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000705.html">
+   <LINK REL="Next" HREF="000718.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Installation instructions (8MB Ram)</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Installation instructions (8MB Ram)">gchii@mindspring.com</A><BR>
+    <I>Wed, 08 Mar 2000 08:01:18 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000705.html">[JOS-Kernel] Installation instructions (8MB Ram)</A></li>
+        <LI> Next message: <A HREF="000718.html">[JOS-Kernel] Installation instructions (8MB Ram)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#714">[ date ]</a>
+              <a href="thread.html#714">[ thread ]</a>
+              <a href="subject.html#714">[ subject ]</a>
+              <a href="author.html#714">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:21 PM 3/7/00 -0500, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;&gt;<i> No, no.... I've tried to boot JOS on 8MB RAM machine. It does not work!!!
+</I>
+What about 16MB?
+
+If we had a virtual memory manager and swap file/partition, wouldn't JOS
+require less real RAM? We need to get that virtual memory manager working.
+
+&gt;<i>	If someone felt like cutting down Sun's library, it might.  The
+</I>&gt;<i>major barrier to an 8 MB machine is that Sun's class library alone weighs
+</I>&gt;<i>in at about 7.6 MB, IIRC.  The rest of JJOS should fit in that 8 MB w/o
+</I>&gt;<i>too much difficulty (e.g. turn off debug info) but that doesn't leave any
+</I>&gt;<i>room for a heap or a stack :)
+</I>
+This is one of the very good reasons for pursuing (1) Kore and (2) package
+files.
+
+We could use Kore on a machine that has only 8MB. Kore fits in a &quot;tiny&quot; zip
+file. While it only implements the Java 0 Platform from JDK 1.02, it has
+all of the Java essentials. In fact, I'm using Kore without the AWT. Why
+should I carry the AWT along on an embedded machine that doesn't have a
+monitor? That is a waste of RAM on a machine that has little RAM to spare.
+
+We could use package files on a machine that has only 8MB. Package files
+are a very good replacement for rt.jar or classes.zip. Each java.* package
+has its own package file. Package files are implemented in different ways.
+They can be implemented as .zip files, too. If put only one package in a
+zip file and call it by the name of the package, you have a package file.
+Here is my most recent design for bootstrapping JOS without a large
+monolythic classes.zip archive:
+
+core.zip:
+  java.io
+  java.lang
+  java.net
+  java.util
+
+java.applet.zip:
+  java.applet
+
+java.awt.zip:
+  java.awt
+
+java.awt.image.zip:
+  java.awt.image
+
+java.awt.peer.zip:
+  java.awt.peer
+
+java.sql.zip:
+  java.sql
+
+javax.servlet.zip:
+  javax.servlet
+
+javax.servlet.http.zip:
+  javax.servlet.http
+
+javax.comm.zip:
+  javax.comm
+
+javax.swing.zip:
+  javax.swing
+
+Because java.io is inside core.zip, extra packages can be loaded as needed
+from the I/O subsystem. Because java.net is inside core.zip, extra packages
+can be downloaded from across the network from a HTTP service.
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000705.html">[JOS-Kernel] Installation instructions (8MB Ram)</A></li>
+	<LI> Next message: <A HREF="000718.html">[JOS-Kernel] Installation instructions (8MB Ram)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#714">[ date ]</a>
+              <a href="thread.html#714">[ thread ]</a>
+              <a href="subject.html#714">[ subject ]</a>
+              <a href="author.html#714">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

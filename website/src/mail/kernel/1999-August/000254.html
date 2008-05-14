@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Adventures with the tool chain</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000253.html">
+   <LINK REL="Next" HREF="000256.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Adventures with the tool chain</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Adventures with the tool chain">tmiller@haverford.edu</A><BR>
+    <I>Wed, 18 Aug 1999 17:12:31 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000253.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+        <LI> Next message: <A HREF="000256.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#254">[ date ]</a>
+              <a href="thread.html#254">[ thread ]</a>
+              <a href="subject.html#254">[ subject ]</a>
+              <a href="author.html#254">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Last night, after a year of waiting for Linux to finally work with my
+</I>&gt;<i> hardware and other assorted challenges, I was finally able to get almost
+</I>&gt;<i> everything in the tool chain to compile!
+</I>
+	Hey, congratulations!
+
+&gt;<i> I had to make some changes in the
+</I>&gt;<i> mknbi-jos Makefile and mknbi.c to get mknbi to compile with Etherboot 4.2.?.
+</I>
+	Hm.  I'm currently using Etherboot-4.2 without any changes,
+though I'll admit it's been a while since I compiled mknbi-jos.
+
+&gt;<i> I also found that a few things in the tool chain are undocumented.  For
+</I>&gt;<i> instance, I had to get the blackdown JDK, but no where in the docs was that
+</I>&gt;<i> mentioned, and no mention of what version was required and/or known to work
+</I>&gt;<i> either.  I ended up getting the latest (1.1.7v3) and it compiles, though I
+</I>&gt;<i> don't know about running yet.
+</I>
+	The only part of the JDK that decaf/JJOS should require is the
+classfile, and that dependency will disappear when we start distributing
+classpath with the source, which will be whenever we (finally) integrate
+it.
+
+	bootp is for etherboot, newer versions of which should support
+DHCP using the -DDHCP_SUPPORT compile option.  (see
+etherboot-4.2/doc/text/README.txt).  
+
+&gt;<i> Here are my outstanding problems:
+</I>&gt;<i> * The i386 build compiles, but the host build does not.  It is complaining
+</I>&gt;<i> about missing a file: /etc/lib/gnu/types.h (or something like that, I dont'
+</I>&gt;<i> have it in front of me.)  And lo and behold, the directory is there, but not
+</I>&gt;<i> the file.  Am I missing an RPM?  If so, which one might that be?
+</I>
+	gnu/types.h is included by sys/types.h, and should be in
+/usr/include (at least, on my slackware system.)  It should not be
+directly included by any file in JJOS/decaf (which includes sys/types.h).
+
+&gt;<i> * I was able to build the floppy and I tried to boot JJOS over my home
+</I>&gt;<i> network, but for some reason it couldn't find my NIC.  Was there maybe a
+</I>&gt;<i> configuration step that I could have been missing?  What are the standard
+</I>&gt;<i> steps you need to go through to get that to work reliably  I am reasonably
+</I>&gt;<i> sure I have the right driver (Tulip) for my NIC.
+</I>
+	Be aware with the tulip driver that some of Netgear's cards need
+Netgear's tulip driver because the aren't the same chips as they used to
+be.  If that's not it, the same README referenced above notes that the
+tulip driver isn't well tested, and essentially needs to be written to
+include each particular specifically.  It might be worth the money in
+terms of time saved just to pick up a cheap PCI NE2000 clone...
+
+&gt;<i> I also learned yesterday that the maker of one of my video cards (NVIDIA)
+</I>&gt;<i> has released OS-independent source code for the driver with loads of
+</I>&gt;<i> documentation.  There is a good chance of my being able to massage that into
+</I>&gt;<i> a driver for JJOS.  I will need GRUB first, because that video card is on my
+</I>&gt;<i> host machine, not the slave.
+</I>
+	I believe that someone is working on GRUB right now.  If not, and
+anyone is interested, _please_ go ahead.
+
+&gt;<i> I'm looking forward to actually seeing this thing run and be able to
+</I>&gt;<i> contribute!
+</I>
+	I'm looking forward to seeing your stuff.  Hope I helped here.
+(Oh, BTW, if you've got specific suggestions for the docs, just right them
+into the docs and send them along -- I'll drop the changes into CVS.)
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000253.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+	<LI> Next message: <A HREF="000256.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#254">[ date ]</a>
+              <a href="thread.html#254">[ thread ]</a>
+              <a href="subject.html#254">[ subject ]</a>
+              <a href="author.html#254">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

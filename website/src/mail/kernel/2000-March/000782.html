@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000786.html">
+   <LINK REL="Next" HREF="000787.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Device as a digital resource">tmiller@haverford.edu</A><BR>
+    <I>Wed, 22 Mar 2000 13:37:16 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000786.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000787.html">[JOS-Kernel] About dd on Linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#782">[ date ]</a>
+              <a href="thread.html#782">[ thread ]</a>
+              <a href="subject.html#782">[ subject ]</a>
+              <a href="author.html#782">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> For BCNI and Smart API, no exception should be thrown by a controller or
+</I>&gt;<i> factory. This has been a difficult architectural decision. In a multiple
+</I>&gt;<i> stage factory, null can be returned much faster than an exception. Throwing
+</I>&gt;<i> an exception complicates every Smart API interface. It complicates
+</I>&gt;<i> interprocess communication.
+</I>
+	It should be possible, on the other hand, to generate an
+error: scheme that returns the error/exception/problem associated with a
+particular URI; it would be entirely optional for each Controller to
+recognize error: requests that correspond to URIs for which it has
+responsibility.  The idea is similar to UNIX's errno.  e.g. you start at
+the root of the tree with an &quot;error:device:<A HREF="ram://?start=0&end=0x100"">ram://?start=0&amp;end=0x100&quot;</A> and
+recursively look for a Controller willing to return an error about
+device:ram -- presumably, the one which returns objects about device:ram.
+
+&gt;<i> After a resource has been &quot;opened&quot; by the URI-based subsystem, we need a
+</I>&gt;<i> corresponding way to &quot;close&quot; it. I expected that objects would implement a
+</I>&gt;<i> close() method. The close() method cannot fail. This would be consistent
+</I>&gt;<i> with work that has already been done on asynchronous I/O. (And a finalize()
+</I>&gt;<i> method should invoke close().)
+</I>
+	OTOH, finalize() isn't, AFAIK, gauranteed to be called when an
+object is garbage-collected, but the more paranoid factories may well
+implement reference-counting in their returned objects.  (Device objects,
+AFAIK, will never form cycles, so reference-counting should work
+well.  This needs more thought, though.)
+
+&gt;<i> &gt;Don't get me wrong.  This feels to me to be one of the best solutions to
+</I>&gt;<i> &gt;device allocation I've seen.
+</I>
+	Right on, and for the reasons GCHII gave.
+
+-_Quinn
+
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000786.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000787.html">[JOS-Kernel] About dd on Linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#782">[ date ]</a>
+              <a href="thread.html#782">[ thread ]</a>
+              <a href="subject.html#782">[ subject ]</a>
+              <a href="author.html#782">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [no template] Can't make</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:clemens%40informatik.tu-muenchen.de">
+   <LINK REL="Previous"  HREF="000835.html">
+   <LINK REL="Next" HREF="000837.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [no template] Can't make</H1>
+    <B>Claudio Clemens</B> 
+    <A HREF="mailto:clemens%40informatik.tu-muenchen.de"
+       TITLE="[JOS-Kernel] [no template] Can't make">clemens@informatik.tu-muenchen.de</A><BR>
+    <I>Wed, 7 Jun 2000 23:34:49 +0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000835.html">[JOS-Kernel] [no template] Can't make</A></li>
+        <LI> Next message: <A HREF="000837.html">[JOS-Kernel] [no template] Can't make</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#836">[ date ]</a>
+              <a href="thread.html#836">[ thread ]</a>
+              <a href="subject.html#836">[ subject ]</a>
+              <a href="author.html#836">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Wed, 7 Jun 2000, Gilbert Carl Herschberger II wrote:
+
+&gt;<i>I have worked through a lot of other problems on my journey to this point.
+</I>&gt;<i>I have installed another version of Linux (SuSE 6.0) and reconfigured
+</I>&gt;<i>constantly to include all of the right tools.
+</I>&gt;<i>
+</I>&gt;<i>Now, my C++ compiler on Linux doesn't like the code for jJOS/decaf because
+</I>&gt;<i>it does not support templates. Is it possible to set up a compiler
+</I>&gt;<i>directive to exclude templates, like NO_TEMPLATES?
+</I>&gt;<i>
+</I>&gt;<i>Or, do I have to scratch all that I have done and get SuSE 6.3?
+</I>
+I don't know if it will work. I'm using SuSE 6.3 / 6.4 and can't compile
+it anyway.
+
+
+Building JJOS for host
+g++ -g -Wall -fno-builtin -DTARGET_UNIX -DPARANOID
+-DNEW_INTERRUPT_HANDLING -DUSE_CURSES -I. -I../../../common/nativecode
+-I../../../common/decaf -c ../../../common/decaf/java_object.cc
+../../../common/decaf/java_object.cc: In method `enum jbArray&lt;java_object
+*&gt;::primitiveArrayType java_object_array::array_type() const':
+../../../common/decaf/java_object.cc:219: use of class template `template
+&lt;class elem_t&gt; jbArray&lt;elem_t&gt;' as expression
+../../../common/decaf/java_object.cc:219: parse error before `::'
+../../../common/decaf/java_object.cc:220: warning: control reaches end of
+non-void function `java_object_array::array_type() const'
+../../../common/decaf/java_object.cc: In method `enum
+jbArray&lt;float&gt;::primitiveArrayType java_jfloat_array::array_type() const':
+../../../common/decaf/java_object.cc:254: use of class template `template
+&lt;class elem_t&gt; jbArray&lt;elem_t&gt;' as expression
+../../../common/decaf/java_object.cc:254: parse error before `::'
+../../../common/decaf/java_object.cc:255: warning: control reaches end of
+non-void function `java_jfloat_array::array_type() const'
+../../../common/decaf/java_object.cc: In method `enum
+jbArray&lt;double&gt;::primitiveArrayType java_jdouble_array::array_type() const':
+../../../common/decaf/java_object.cc:271: use of class template `template
+&lt;class elem_t&gt; jbArray&lt;elem_t&gt;' as expression
+../../../common/decaf/java_object.cc:271: parse error before `::'
+../../../common/decaf/java_object.cc:272: warning: control reaches end of
+non-void function `java_jdouble_array::array_type() const'
+../../../common/decaf/java_object.cc: In method `enum
+jbArray&lt;jju64&gt;::primitiveArrayType java_jlong_array::array_type() const':
+../../../common/decaf/java_object.cc:288: use of class template `template
+&lt;class elem_t&gt; jbArray&lt;elem_t&gt;' as expression
+../../../common/decaf/java_object.cc:288: parse error before `::'
+../../../common/decaf/java_object.cc:289: warning: control reaches end of
+non-void function `java_jlong_array::array_type() const'
+../../../common/decaf/java_object.cc: In method `enum jbArray&lt;unsigned
+char&gt;::primitiveArrayType java_mapped_array::array_type() const':
+../../../common/decaf/java_object.cc:298: use of class template `template
+&lt;class elem_t&gt; jbArray&lt;elem_t&gt;' as expression
+../../../common/decaf/java_object.cc:298: parse error before `::'
+../../../common/decaf/java_object.cc:299: warning: control reaches end of
+non-void function `java_mapped_array::array_type() const'
+make: *** [java_object.o] Error 1
+
+Building JJOS for i386 
+g++ -g -Wall -fno-builtin -fno-exceptions -DPARANOID -DHANDLE_CLOCK
+-DNATIVE_CLOCK -DNEW_INTERRUPT_HANDLING -DTEST_A20
+-I. -I../../../common/nativecode -I../../../common/decaf -o jbheap.o -c
+../../../common/nativecode/jbheap.cc
+../../../common/nativecode/jbheap.cc: In function `void getRoots()':
+../../../common/nativecode/jbheap.cc:514: invalid use of void expression
+../../../common/nativecode/jbheap.cc: At top level:
+../../../common/nativecode/jbheap.cc:481: warning: `void panic(char *)'
+defined but not used
+make: *** [jbheap.o] Error 1
+
+This is jos1f
+
+cu
+
+Claudio
+
+-- 
++-----| <A HREF="http://linux.brasileiro.net">http://linux.brasileiro.net</A> - Seu site de informações |-----+
+|<i>     Claudio Clemens at Home   -   Informatik   -   TU-München     |
+</I>|<i>         <A HREF="mailto:clemens@in.tum.de">clemens@in.tum.de</A>         <A HREF="http://www.in.tum.de/~clemens">http://www.in.tum.de/~clemens</A>   |
+</I>A poor excuse is better than no excuse!
+
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000835.html">[JOS-Kernel] [no template] Can't make</A></li>
+	<LI> Next message: <A HREF="000837.html">[JOS-Kernel] [no template] Can't make</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#836">[ date ]</a>
+              <a href="thread.html#836">[ thread ]</a>
+              <a href="subject.html#836">[ subject ]</a>
+              <a href="author.html#836">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

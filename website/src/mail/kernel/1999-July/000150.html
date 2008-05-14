@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Construction of a new Java Operating System</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000147.html">
+   <LINK REL="Next" HREF="000145.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Construction of a new Java Operating System</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Kernel] Construction of a new Java Operating System">ryan@whitewolf.com.au</A><BR>
+    <I>Wed, 21 Jul 1999 10:19:34 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000147.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+        <LI> Next message: <A HREF="000145.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#150">[ date ]</a>
+              <a href="thread.html#150">[ thread ]</a>
+              <a href="subject.html#150">[ subject ]</a>
+              <a href="author.html#150">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE><A HREF="mailto:golubovsky@altavista.net">golubovsky@altavista.net</A> wrote:
+&gt;<i> 
+</I>&gt;<i> From: <A HREF="mailto:golubovsky@altavista.net">golubovsky@altavista.net</A>
+</I>&gt;<i> 
+</I>&gt;<i> On Mon, 19 Jul 1999, Ryan Heise wrote:
+</I>&gt;<i> 
+</I>&gt;<i> &gt;Cliff Baeseman wrote:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;&gt; JOS is also based on a single instance JVM design. This is a very poor
+</I>&gt;<i> &gt;&gt; design in my opinion.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;It allows you to share 15 megs of system classes between applications.
+</I>&gt;<i> &gt;It allows you to have one thread scheduler across all applications. It
+</I>&gt;<i> &gt;allows you to have one garbage collecter and memory manager across all
+</I>&gt;<i> &gt;applications. There are a few other optimizations that are possible.
+</I>&gt;<i> 
+</I>&gt;<i> What about possibility of multiuser usage of such an OS (from the security
+</I>&gt;<i> point of view?) Or is this JOS project positioned only for client platform?
+</I>
+Although JJOS has a single JVM instance, each Java process runs in its
+own namespace. A process cannot obtain a reference to an object or class
+of another process unless that interaction is explicitly allowed. I
+believe _Quinn is making changes to the JVM to safely protect processes
+from one another.
+
+The main problem is that this protection only affects Java code. Native
+code can still access memory anywhere unless we implement memory
+protection. If we do, JOS may start to look more like a multi-instance
+JVM design or a single/multi hybrid. I would prefer that everything be
+written in Java except for trusted code that must be native.
+
+Another problem is that a flaw in JDK 1.1 allows validated code to
+confuse and crash the host JVM. In a single instance JVM design, that
+effectively means crashing the whole operating system. If we can
+implement the solution found in JDK 1.2 this is no longer a problem.
+
+So, the only real risk in a single instance JVM design is native code.
+And native code is something I'm happy to live without. After all, it is
+why I joined this project.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000147.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+	<LI> Next message: <A HREF="000145.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#150">[ date ]</a>
+              <a href="thread.html#150">[ thread ]</a>
+              <a href="subject.html#150">[ subject ]</a>
+              <a href="author.html#150">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

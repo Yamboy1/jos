@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: Changes/progress</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000044.html">
+   <LINK REL="Next" HREF="000049.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: Changes/progress</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Re: Changes/progress">tmiller@haverford.edu</A><BR>
+    <I>Thu, 27 May 1999 21:58:25 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000044.html">[JOS-Kernel] Changes/progress</A></li>
+        <LI> Next message: <A HREF="000049.html">[JOS-Kernel] Re: Changes/progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#47">[ date ]</a>
+              <a href="thread.html#47">[ thread ]</a>
+              <a href="subject.html#47">[ subject ]</a>
+              <a href="author.html#47">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> incremental step is to make it a method on the current frame (it keeps
+</I>&gt;<i> peeking to the current frame anyways for just about everything, and this
+</I>&gt;<i> will both make the code cleaner and faster by avoiding an unnecessary
+</I>&gt;<i> level of indirection).
+</I>
+	Yup.  Should have thought of that.
+
+&gt;<i> I made the global isParent fcn a method of java_class.
+</I>
+	It belongs there; I'm not sure why I didn't have it there the
+first time.
+
+&gt;<i> I separated out the various invoke opcodes into a function (for
+</I>&gt;<i> cleanliness' sake) -- this will be the focus of the &quot;environment&quot;
+</I>&gt;<i> effort.
+</I>
+	Once the &quot;enviroment&quot; for java methods is ready, it should be
+nearly trivial to extend to native methods, which will make things much
+more efficient.  (And provide an expansion point, if/when we implement
+native shared libraries...)
+
+&gt;<i> I think I'll have to make lots of changes to frame and java_thread --
+</I>&gt;<i> I'll want to cache the &quot;helper variables&quot; that currently get recomputed
+</I>&gt;<i> each bytecode, and I'll want to cache them (probably) on invocations,
+</I>&gt;<i> which will mean some code'll have to get divided up and reapportioned
+</I>&gt;<i> between the invocation code and the steady-state code.
+</I>
+	Makes sense.  Many of the things in run() are left over from
+before it was made properly re-entrant.
+
+	Out of simple curiosity, I went ahead and let init() finish
+executing; memory consumption is down to 1664K, which is a dramatic
+improvement over the last time I checked it (~30MB, IIRC).
+
+	I've been working on monitors, mostly.  Slow going; I've been busy
+and they aren't particularly simple beasts.  On the other hand, I won't
+have to implement anything totally new; all the various subfunctions for
+the monitors are already lying around.
+
+-_Quinn
+
+
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000044.html">[JOS-Kernel] Changes/progress</A></li>
+	<LI> Next message: <A HREF="000049.html">[JOS-Kernel] Re: Changes/progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#47">[ date ]</a>
+              <a href="thread.html#47">[ thread ]</a>
+              <a href="subject.html#47">[ subject ]</a>
+              <a href="author.html#47">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

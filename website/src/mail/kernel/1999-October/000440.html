@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOS and BOCHS.. they works!!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:George.Marrows%40Smallworld.co.uk">
+   <LINK REL="Previous"  HREF="000439.html">
+   <LINK REL="Next" HREF="000441.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOS and BOCHS.. they works!!</H1>
+    <B>George.Marrows@Smallworld.co.uk</B> 
+    <A HREF="mailto:George.Marrows%40Smallworld.co.uk"
+       TITLE="[JOS-Kernel] JOS and BOCHS.. they works!!">George.Marrows@Smallworld.co.uk</A><BR>
+    <I>Tue, 26 Oct 1999 12:32:24 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000439.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+        <LI> Next message: <A HREF="000441.html">[JOS-Kernel] JOS, BOCHS, GRUB, etc.....</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#440">[ date ]</a>
+              <a href="thread.html#440">[ thread ]</a>
+              <a href="subject.html#440">[ subject ]</a>
+              <a href="author.html#440">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Corrado and all --
+
+I spent my weekend getting jjos to boot using GRUB, which it now does (I
+think). Some problems:
+
+a) I haven't yet figured how to define the makefile targets (etherboot /
+GRUB) correctly so that they can both be built using the same makefile.
+Differences are that GRUB leaves you in protected mode (affects head.s86)
+and it loads the ramdisk low rather than high a la etherboot (affects
+entry.cc). Command line and available memory fetch are different too.
+
+b) (for those that are interested) Bochs booting doesn't work. This isn't
+jjos's fault - I just haven't managed yet to create a hard disk image file
+that looks sufficiently like a correctly partitioned disk to fool GRUB --
+this is needed to load jjos_common.zip. Apparently VSTa now boots under
+Bochs, and I know it uses GRUB so I'll see what they've done.
+
+c) What's the correct behaviour for the boot? I get the standard text
+messages (same as host build), then the screen blanks and the JOS logo
+appears. However, the screen blanks again a few seconds later and a series
+of error messages repeat up the screen. I'm afriad I haven't got round to
+putting in a delay loop so that I can actually read them! Is this the
+behaviour under etherboot?
+
+
+Corrado, cool though your boot loader undoubtedly is, is it worth your while
+to put in partition support et al, when GRUB already does this? GRUB is
+widely known and used by VSTa and the GNU Hurd (at least), so it's well
+supported and tested and isn't going to go away. Also, one of the goals of
+GRUB / multiboot was to avoid the proliferation of OS specific boot loaders.
+Perhaps JOS has a better use for your technical skills? Classpath
+integration, device drivers, more sophisticated gc, and investigations of
+virtual memory, native threading, support for processes etc etc all spring
+to mind.. 
+
+Of course, boot loaders might be your thing .. if so, please ignore my
+mumblings and carry right along!
+
+Regards
+
+-- George
+
+
+
+-----Original Message-----
+From: csanto [mailto:<A HREF="mailto:Corrado.Santoro@iit.unict.it">Corrado.Santoro@iit.unict.it</A>]
+Sent: Sunday, October 24, 1999 12:35
+To: <A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+Subject: [JOS-Kernel] JOS and BOCHS.. they works!!
+
+
+Hi all,
+I've spent my weekend to write a boot loader able to load and run JOS from
+an hard disk. My program is composed of a pre-boot (installed on
+the master boot record of HD) and a loader which loads a JOS image written
+on HD starting from cyl=1,hd=0,sect=1. The loader is based on etherboot
+code and, till now, it ignores any disk partition. Soon, I'll patch my
+loader in order to make it able to boot from an HD partition rather than
+the master boot record. Using this loader I was able to start JOS with
+Bochs Pentium Emulator... it seems to work, however, it was necessary to
+make some patches:
+1. when JOS boots, it switches to VGA mode 7 (monocrome mode). It seems
+that Bochs does not like this.. I mean.. does not handle monocrome video.
+Thus I've patched &quot;head.s86&quot; and &quot;jjconsol.cc&quot; in order to startup with
+VGA mode 3 (80x25 color) and make character writings to 0xb8000 rather
+than 0xb0000. I've also added a software cursor to jjconsol.cc.
+2. in order to make JOS able to work with Bochs, the latter must have the
+FPU support, so download the FPU emulator and recompile Bochs (see Bochs
+home page).
+3. at JOS boot, the jbHeap class calls scrubMemory() which clear the
+ENTIRE extended memory. This process is too long for Bochs, thus I've
+removed this call.
+4. if JOS is compiled without the option -DNATIVE_CLOCK, when JOS boots
+(only under Bochs), it display continuosly &quot;notifyOfInterrupt(3):VM
+corrupted. abort notify...&quot;. Anyone knows what's happen ? I think
+interrupt handling needs a lot of patches.
+5. The entire pre-boot/JOS load/JOS boot/start &quot;init&quot; process is VERY SLOW
+with Bochs. It takes several minutes on a Pentium 133. However, tomorrow
+I'll try a Pentium II/400.
+
+... ok, it seems to be enough...
+
+However, please let me know if you are interested in obtaining the JOS HD
+boot loader. If yes, I'll prepare a tar.gz version which I'll post on my
+web site so you can download it.
+
+Bye, bye,
+	Corrado
+
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+Personal Home Page:
+            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+
+ARCA Mobile Agent Framework Home Page:
+            <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+======================================================
+
+
+
+
+_______________________________________________
+Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+<A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000439.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+	<LI> Next message: <A HREF="000441.html">[JOS-Kernel] JOS, BOCHS, GRUB, etc.....</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#440">[ date ]</a>
+              <a href="thread.html#440">[ thread ]</a>
+              <a href="subject.html#440">[ subject ]</a>
+              <a href="author.html#440">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

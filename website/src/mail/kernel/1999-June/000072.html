@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000074.html">
+   <LINK REL="Next" HREF="000073.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]">jm@mak.com</A><BR>
+    <I>Wed, 09 Jun 1999 15:02:31 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000074.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000073.html">[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#72">[ date ]</a>
+              <a href="thread.html#72">[ thread ]</a>
+              <a href="subject.html#72">[ subject ]</a>
+              <a href="author.html#72">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+Is it considered Poor Form to follow-up your own message?
+
+Actually, I realized something else that needed to be said AFTER I sent the
+message (&quot;Doh!&quot; &lt;slap&gt;):
+
+John Morrison wrote:
+&gt;<i> Now, I'm a little out of my depth here, but here goes (somebody correct me if
+</I>&gt;<i> I'm wrong) -- it is my understanding that native methods are inherently
+</I>&gt;<i> non-portable, so we have some freedom to define how they should be
+</I>&gt;<i> compiled/written (if, in fact, we support them in the medium to long term -- we
+</I>&gt;<i> certainly won't support them in the short term).  Furthermore, given that we
+</I>&gt;<i> currently envision no memory protection (e.g., separate address spaces for
+</I>&gt;<i> native methods), allowing native methods is an huge invitation to Bad Things
+</I>&gt;<i> like BSODs, and viruses, etc.
+</I>
+It is fair to respond to that last assertion of mine &quot;How is this different from
+native methods in Kaffe?&quot; (Hi Patrick!)
+
+Well, typically Kaffe (or your favorite JVM) runs inside of a &quot;real OS&quot;
+heavyweight process (I understand this is not always the case -- didn't you guys
+retarget Kaffe to your FluxOS toolkit? -- and I'm REALLY sorry if I have
+incorrectly attributed this or misnamed/misspelled something).  So, the Bad
+Things a native method could do are pretty much limited to the bad things the
+user could do.  I know this could be bad if you're administrator/root, but, hey,
+at least it puts the brakes on the accidentally stupid (as opposed to outright
+malicious) mistakes like scribbling to memory that ain't there -- which is
+probably a fairly common thing.  And, running as a non-privileged user limits
+(somewhat) the bad things that a malicious thing could do.  (I'm not sure which
+would be more common -- e.g., viruses are pretty damned common.)
+
+However, running on bare iron, in a SASOS like jjos+decaf, there's NOTHING it
+couldn't do by accident.  Like, say, hammering your in-memory, Java, filesystem
+implementation, so as to render the box unbootable.  Boy, oh boy, would I be
+torqued if that happened to me.
+
+It is also my understanding (and I'm a little out of my depth here, too --
+somebody please speak up if I'm failing to tell the truth here) that some of the
+infamous instabilities of NT are due in part to drivers and other software that,
+for performance reasons, run inside privileged space (where there are fewer
+guardrails) so as to incur fewer protection-ring boundary-crossings.
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000074.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000073.html">[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#72">[ date ]</a>
+              <a href="thread.html#72">[ thread ]</a>
+              <a href="subject.html#72">[ subject ]</a>
+              <a href="author.html#72">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

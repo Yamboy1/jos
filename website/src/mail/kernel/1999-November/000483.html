@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Progress!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000482.html">
+   <LINK REL="Next" HREF="000485.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Progress!</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Kernel] Progress!">hilarycheng@usa.net</A><BR>
+    <I>Mon, 22 Nov 1999 21:58:48 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000482.html">[JOS-Kernel] FW: [JOS-Kernel] GRUB fixes</A></li>
+        <LI> Next message: <A HREF="000485.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#483">[ date ]</a>
+              <a href="thread.html#483">[ thread ]</a>
+              <a href="subject.html#483">[ subject ]</a>
+              <a href="author.html#483">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi All,
+
+    For the Networking Issue, is that EDLC Protocol need to implement ?
+Is that we send IP Data directly to Network Chip ?
+
+Regards,
+
+Hilary
+
+----- Original Message -----
+From: Ranieri Argentini &lt;<A HREF="mailto:R.Argentini@student.tudelft.nl">R.Argentini@student.tudelft.nl</A>&gt;
+To: &lt;<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>&gt;
+Sent: Monday, November 22, 1999 5:22 PM
+Subject: Re: [JOS-Kernel] Progress!
+
+
+&gt;&gt;<i>A TCP/IP stack is used by a network card driver. All incoming packets are
+</I>&gt;&gt;<i>stuffed into a Packet object and passed to the TCP/IP stack.
+</I>&gt;<i>
+</I>&gt;<i>How would you evision multithreading in such an environment?
+</I>&gt;<i>I'm currently toying with the idea of giving every interface it's own
+</I>&gt;<i>thread  and it's own objects (that would give me a neat Multiple
+</I>&gt;<i>Cache/Local Replacement ARP cache and some other link level enhancements
+</I>&gt;<i>when we'll support other hardware then ethernet.).
+</I>&gt;<i>
+</I>&gt;<i>The problem is that this model grinds to a halt when it comes to the IP
+</I>layer.
+&gt;<i>IP is responsible for distributing packets among interfaces, and can
+</I>&gt;<i>therefore not be bound to any of them.
+</I>&gt;<i>
+</I>&gt;<i>The only thing that comes to mind is to have a single IP object that queues
+</I>&gt;<i>incoming packets for all interfaces. This requires strict serialisation on
+</I>&gt;<i>the incoming_packet() functions. A thread that lives in IP could then
+</I>&gt;<i>handle the packets (route them through, drop them or reassemble them and
+</I>&gt;<i>queue them to TCP/UDP objects that eventually put them into user space
+</I>&gt;<i>buffers).
+</I>&gt;<i>
+</I>&gt;<i>Does anyone see a problem with this strategy? Speak up now if you do!
+</I>&gt;<i>
+</I>&gt;&gt;<i>From the other perspective of a sparsely populated array of PacketQueues,
+</I>a
+&gt;&gt;<i>PacketQueue is also a PacketListener. A packet queue is available
+</I>&gt;&gt;<i>(virtually) at every IP port (from 0 to 65,565).
+</I>&gt;<i>
+</I>&gt;<i>Hmm, IP does not have ports. UDP and TCP do. This structure belongs over
+</I>&gt;<i>there when i get there :)
+</I>&gt;<i>
+</I>&gt;<i>Btw, quick update.
+</I>&gt;<i>
+</I>&gt;<i>I finally got the linux kernel to let me bind a PF_PACKET socket to a
+</I>&gt;<i>specific interface, so multiple interfaces support is coming up, probably
+</I>&gt;<i>with the scheme outlined above.
+</I>&gt;<i>I implemented a quick ARP cache that violates every RFC  in the book, but
+</I>&gt;<i>sort of does something. I would like to let it respond to ARP queries to
+</I>&gt;<i>try and get it to bind an IP adress other than the linux card one. I hope
+</I>&gt;<i>linux does not go bananas with this, but since i get the packets before
+</I>&gt;<i>they go through the linux stack i give myself decent odds of doing this :)
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>_______________________________________________
+</I>&gt;<i>Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i><A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000482.html">[JOS-Kernel] FW: [JOS-Kernel] GRUB fixes</A></li>
+	<LI> Next message: <A HREF="000485.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#483">[ date ]</a>
+              <a href="thread.html#483">[ thread ]</a>
+              <a href="subject.html#483">[ subject ]</a>
+              <a href="author.html#483">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

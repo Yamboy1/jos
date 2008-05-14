@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] General questions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000550.html">
+   <LINK REL="Next" HREF="000552.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] General questions</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] General questions">gchii@mindspring.com</A><BR>
+    <I>Wed, 08 Dec 1999 08:41:05 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000550.html">[JOS-Kernel] changes to make grub work smoothly</A></li>
+        <LI> Next message: <A HREF="000552.html">[JOS-Kernel] General questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#551">[ date ]</a>
+              <a href="thread.html#551">[ thread ]</a>
+              <a href="subject.html#551">[ subject ]</a>
+              <a href="author.html#551">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I have a few more questions.
+
+What is the current plan to test decaf for full implementation of the
+java.* packages? Is there a check-list? In other words, when will we know
+when decaf is done?
+
+-----
+
+Where the subroutines from C standard library declared? defined?
+
+memcpy()
+newStr()
+alloc()
+free()
+strcpy()
+strcat()
+
+If subroutines from the standard library are not available in decaf, we
+should declare only the subroutines that are defined. We need new header
+files, like josstdio.h, josstdlib.h, etc.
+
+A #define might make it easier to write C code:
+
+#ifdef Uses_JOSStandardLibrary
+#define memcpy jos_memcpy
+#define strcpy jos_strcpy
+#endif
+
+-----
+
+What would happen if I compiled decaf into a standard shared library
+(libdecaf.so.#)? Could I use decaf in other Linux programs?
+
+-----
+
+I have been unable to compile bytecode on my Linux server.
+
+I downloaded JDK 1.1.6 v5 from blackdown, but all JDK tools abort with the
+following message:
+
+can't load library 'libXpm.so.4'
+
+Question 1. Where do I get libXpm.so.4?
+
+All the programs I want to run on my Linux server are TCP/IP daemons --
+completely free of a GUI such as AWT or Swing. So why do I even need
+libXpm.so.4?
+
+Question 2. Does anyone have an open-source example of dynamic shared
+libraries on Linux?
+
+Linux shared libraries seem to have two mechanisms. The first is the
+compile-time reference to a library, where a program depends on a shared
+library. This is also known as a overlay. It is automatic. The shared
+library is required for a program to run.
+
+The second is the runtime reference to a library, where a program is aware
+of, but not dependent on a shared library. This is also known as a dynamic
+link library. A dynamically linked shared library is similar to the
+loadLibrary() method from Java class libraries. How is this method
+implemented on Linux?
+
+loadLibrary( &quot;lib-name&quot; );
+
+For example, I would like to display a plain-English message when someone
+runs my program prior to installing libdecaf.so.#. I would like my program
+to keep on running, too.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000550.html">[JOS-Kernel] changes to make grub work smoothly</A></li>
+	<LI> Next message: <A HREF="000552.html">[JOS-Kernel] General questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#551">[ date ]</a>
+              <a href="thread.html#551">[ thread ]</a>
+              <a href="subject.html#551">[ subject ]</a>
+              <a href="author.html#551">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

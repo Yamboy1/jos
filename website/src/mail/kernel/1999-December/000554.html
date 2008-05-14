@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Next version of jjos / decaf garbage
+ collection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000552.html">
+   <LINK REL="Next" HREF="000556.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Next version of jjos / decaf garbage
+ collection</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Next version of jjos / decaf garbage
+ collection">gchii@mindspring.com</A><BR>
+    <I>Thu, 09 Dec 1999 08:06:06 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000552.html">[JOS-Kernel] General questions</A></li>
+        <LI> Next message: <A HREF="000556.html">[JOS-Kernel] Building Java operating systems</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#554">[ date ]</a>
+              <a href="thread.html#554">[ thread ]</a>
+              <a href="subject.html#554">[ subject ]</a>
+              <a href="author.html#554">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I am talking out of turn again; but, why not do garbage collection for
+very-large-objects just like technique used for shared libraries?
+
+From a requestor's viewpoint, the kernel provides a system-wide unique
+handle for the instance of a shared library. A shared library has many
+simultaneous handles. When a library is open'd, a new handle is created.
+When the handle is close'd, only the handle goes away -- unless it is the
+last handle.
+
+A virtual machine could use multiple object graphs, each gc'd
+independently. Object &quot;references&quot; in a virtual machine are handles (aren't
+they?). So, why doesn't a virtual machine provide many simultaneous handles
+to an object? When the last handle is closed, the object is gc'd.
+
+When the virtual machine returns a handle, it can be encoded in any form
+the virtual machine wants. This is similar to the machine interface of
+OS/400. It is also like a &quot;map&quot; of virtual storage, where a &quot;memory
+address&quot; is a reference to a page on disk.
+
+It is also similar to the way &quot;links&quot; work on the Linux file subsystem.
+Many links can be references to a physical file. A physical file is garbage
+collected when the last link is removed.
+
+Wouldn't this be great? A a virtual machine could closely track a class
+loader with an object graph, so that an entire object graph is
+garbage-collected when the class loader is destroyed. Thinking of the
+object graph in terms of &quot;local&quot; and &quot;global&quot; underestimates the scope of a
+virtual machine. Just like C/C++ provides for &quot;static&quot; references, private
+to a module, a virtual machine might have an object graph for a class
+loader (and thus a process).
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000552.html">[JOS-Kernel] General questions</A></li>
+	<LI> Next message: <A HREF="000556.html">[JOS-Kernel] Building Java operating systems</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#554">[ date ]</a>
+              <a href="thread.html#554">[ thread ]</a>
+              <a href="subject.html#554">[ subject ]</a>
+              <a href="author.html#554">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

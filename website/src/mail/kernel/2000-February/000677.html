@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf rewrite status update</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000676.html">
+   <LINK REL="Next" HREF="000671.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf rewrite status update</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] decaf rewrite status update">gchii@mindspring.com</A><BR>
+    <I>Sat, 26 Feb 2000 19:11:32 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000676.html">[JOS-Kernel] decaf rewrite status update</A></li>
+        <LI> Next message: <A HREF="000671.html">[JOS-Kernel] make</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#677">[ date ]</a>
+              <a href="thread.html#677">[ thread ]</a>
+              <a href="subject.html#677">[ subject ]</a>
+              <a href="author.html#677">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 05:10 PM 2/26/00 -0500, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>I've decided on
+</I>&gt;<i>taking a simple but (I hope) effective approach to handling resolution,
+</I>&gt;<i>where you always ask the potentially unresolved object for something (e.g.
+</I>&gt;<i>the method reference's class) expecting it to be unresolved (e.g. passing
+</I>&gt;<i>it a constant pool/class loader/etc) where the particular C++ class
+</I>&gt;<i>representing that object can cache that resolution or not, as it sees fit.  
+</I>&gt;<i>Basically, this moves the resolution logic from the interpreter to the
+</I>&gt;<i>objects, where it belongs.
+</I>
+Yes, I agree. I get tongue-tied trying to talk about it. Resolution goes
+into the C++ class representing java.lang.Class. There are at least three
+kinds of resolving.
+
+When speaking about a Java class, we could say java.lang.Class. What is
+java.lang.Class really? It is a byte array.
+
+There is a C++ class that provides the behavior for java.lang.Class. What
+is it called? It is nativeclass, right? There are many instances of
+nativeclass, one for each Java class for each process/class loader.
+
+The resolution of a class, field and method should be built into
+nativeclass. I thought nativeclass might become completely encapsulated, to
+resolve itself when used. The resolveClass() method must be called at the
+beginning of each method in nativeclass. Or, like you said, resolveClass()
+must be called each time before calling a method in nativeclass.
+
+Resolving a class might throw a java.lang.ClassNotFoundException.
+
+Internal to decaf, there must be a central collection of all bytecode.
+Bytecode can be intern'd to eliminate duplicate copies of identical
+bytecode. If a constructor to nativeclass accepts a byte array, the
+constructor can automatically intern the byte array.
+
+class nativeclass {
+  public:
+    nativeclass( const void *buffer, size_t size ) {
+      payload = internBytecode( buffer, size );
+    }
+  :
+  private:
+    const Bytecode *payload;
+};
+
+1. Class reference resolution.
+
+At first, a class is just a byte array. The byte array itself is read-only,
+immutable, and share-able by all class loaders everywhere. It sounds like
+the byte array should be intern'd.
+
+class Bytecode {
+  public:
+    Bytecode( const void *buffer, size_t size );
+    virtual ~Bytecode();
+
+    virtual Access getAccess() const;
+    virtual CharBuffer getThisClassSpec() const;
+    virtual CharBuffer getSuperClassSpec() const;
+    virtual int getInterfaceCount() const;
+    virtual CharBuffer getInterfaceSpec( int index ) const;
+    virtual int getFieldCount() const;
+    virtual Access getFieldAccess( int index ) const;
+    virtual CharBuffer getFieldName( int index ) const;
+    virtual int getMethodCount() const;
+    virtual Access getMethodAccess( int index ) const;
+    virtual CharBuffer getMethodName( int index ) const;
+    virtual CharBuffer getMethodDescriptor( int index ) const;
+    virtual CharBuffer getMethodAttribute( int index ) const;
+  :
+  private char *payload;
+  private size_t size;
+};
+
+The Bytecode class holds a byte array. Once an instance of Bytecode is
+constructed, it cannot be modified. It is immutable. The byte array comes
+from a class file (like java/lang/Object.class). Through its well-defined
+methods, the Bytecode class can tell your interpreter anything you want to
+know about a class.
+
+All of this has been prototyped in pure reflection
+(com.realignsoft.reflection2b) and is available from Smart API - Release 1b.
+
+Whenever a class is used, the class must first determine if it has been
+resolved. If a class has not been resolved, it must resolve itself before
+performing a request. At the class level, a class is resolved by looking
+through its codepool for other classes. Each class entry in codepool is
+converted to a pointer to an instance of a C++ object representing a class.
+
+All classes in codepool are resolved at the same time. They are resolved
+the first time the class is used. A class knows that it has not been used
+when the class lookup table is empty (null).
+
+2. Method reference resolution.
+
+Whenever a method is used, the class must determine if it has ever been
+resolved. Has it been used before? A method is resolved by looking up the
+native class and looking for its method index.
+
+Each method in codepool has a corresponding data structure:
+
+struct MethodReference {
+  NativeClass *nativeClass;
+  int methodID;
+};
+
+A class has a list of method references. When a method is invoked again,
+the method reference is non-null and points directly to the method (bytecode).
+
+3. Field reference resolution.
+
+Fields are like methods. Whenever a field is used, the class must determine
+if it has been resolved. Has it been used before? A field is resolved by
+looking up the native class and looking for its field index.
+
+Each field in codepool has a corresponding data structure:
+
+struct FieldReference {
+  NativeClass *nativeClass;
+  int fieldID;
+};
+
+A class has a list of field references. When a field is used again, the
+field reference is non-null and points directly to the right place (a
+native field).
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000676.html">[JOS-Kernel] decaf rewrite status update</A></li>
+	<LI> Next message: <A HREF="000671.html">[JOS-Kernel] make</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#677">[ date ]</a>
+              <a href="thread.html#677">[ thread ]</a>
+              <a href="subject.html#677">[ subject ]</a>
+              <a href="author.html#677">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

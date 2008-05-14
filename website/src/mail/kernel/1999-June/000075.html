@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000070.html">
+   <LINK REL="Next" HREF="000062.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf updates">tmiller@haverford.edu</A><BR>
+    <I>Wed, 9 Jun 1999 17:42:31 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000070.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000062.html">[JOS-Kernel] Progress report.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#75">[ date ]</a>
+              <a href="thread.html#75">[ thread ]</a>
+              <a href="subject.html#75">[ subject ]</a>
+              <a href="author.html#75">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Yes you do.  You do want every caller be able to tell if functions it
+</I>&gt;<i> called have aborted or are aborting.  Without fail, you will define
+</I>&gt;<i> functions that need to execute special code for handling failures.
+</I>
+	Every caller /should/ be able to catch exceptions that /might/ be
+thrown by the callee and otherwise let it be handled by the default C++ -&gt;
+Java exception converter, which it will probably call anyway.  But this
+p.o.v. might be too strongly influenced by Java.
+
+&gt;<i> Originally, Kaffe would throw exceptions from deep within native code
+</I>&gt;<i> and these exceptions would correctly unwind the native stack all the
+</I>&gt;<i> way back into Java code, and proceed from there looking for exception
+</I>&gt;<i> handlers.  This worked fine in most cases.  (As an aside, Kaffe uses
+</I>&gt;<i> the same stack for Java and native code.)
+</I>
+	To my understanding, this is precisely the approach that I /can't/
+take because of the limitations in JJOS.  (As an aside, decaf doesn't use
+the same stack because it caused problems with preemption of threads --
+which might not exist under an OS more advanced than JJOS.)
+
+&gt;<i> We opted for explicit returns codes.
+</I>
+	This seems to be somewhat wiser than rewriting C++ exceptions by
+hand in C, which is what the option sounded like.	
+
+&gt;<i> &gt; the native portion of the class library (classpath?) is where you
+</I>&gt;<i> &gt; can't get around exception-handling in native methods.
+</I>&gt;<i> 
+</I>&gt;<i> That is, calls into native functions like FileInputStream.read()
+</I>&gt;<i> should be able to just directly throw exceptions that will unroll the
+</I>&gt;<i> native stack like they unroll the java stack.
+</I>&gt;<i> 
+</I>&gt;<i> We decided (err, Godmar Back who designed/implemented this for Kaffe,
+</I>&gt;<i> decided) to make all VM internal functions return an integer status
+</I>&gt;<i> code and take an exception description struct.
+</I>
+	...sigh...  This is exactly the same massive rewrite that I had
+started this message-thread trying to avoid.  But it doesn't look that's
+going to happen, does it?
+
+&gt;<i> I hope this helps some,
+</I>
+	Thanks.  I should have guessed that other JVM efforts have tackled
+this problem, but it's good to get the justification as well as the
+result.
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000070.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000062.html">[JOS-Kernel] Progress report.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#75">[ date ]</a>
+              <a href="thread.html#75">[ thread ]</a>
+              <a href="subject.html#75">[ subject ]</a>
+              <a href="author.html#75">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

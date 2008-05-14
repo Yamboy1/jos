@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000762.html">
+   <LINK REL="Next" HREF="000769.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Device as a digital resource">tmiller@haverford.edu</A><BR>
+    <I>Mon, 20 Mar 2000 23:07:34 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000762.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000769.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#763">[ date ]</a>
+              <a href="thread.html#763">[ thread ]</a>
+              <a href="subject.html#763">[ subject ]</a>
+              <a href="author.html#763">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	As long as we're using URI's to request devices, why not use URI's
+to provide them?  There are two ways of doing this: a file read on startup
+which would be a list a URI's representing devices-by-classname known to
+exist on the machine, which a reader process would parse and post,
+line-by-line, to the device factory.  By post, I mean something along the
+lines of:
+
+...
+while ( enumerationOfDeviceList.hasMoreElements() ) {
+	/* need to trap errors */
+	String deviceURI = (String)enumerationOfDeviceList.nextElement();
+	systemWideSmartFactory.addControllerFor( deviceURI );
+	}
+...
+
+so that every driver listed in the startup device-list would be created
+(initialized) in order and registered with the system-wide SmartFactory.
+
+	Of course, one or more of the devices in the list could be, say,
+&quot;probeForSerialPortsByIRQ&quot; and would, in its constructor, either post the
+results of its probe (controller subclasses which return themselves on 
+getObject()) or itself be a factory which would return those driver
+instances which it created while probing.  That way, drivers could be
+controlled in a unified way by the admin.  Also, since drivers
+constructors can themselves call getObject() and addControllerFor(), if a
+device in the list requires some other device which isn't available, it
+can ask for it to be created; that is, the tree could be constructed
+bottom-up.  (I think.  There may be problems with this that I'm unaware
+of.)
+
+	Actually, a third method is necessary -- supplying driver names on
+the 'command line' to the kernel, so that you don't have to hard-code the
+driver(s) used to access the harddrive to read the file to parse to
+generate the device tree.  (You should also be able to replace drivers on
+the fly, though this would entail support in the driver being replaced in
+most cases -- because many drivers are persistent in the sense that
+replacing a driver in the Factory does not replace instances of that
+driver that may well be cached by an application or system process.)
+
+	If you've already covered this in a prior email, my apologies for
+not reading closely enough.
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000762.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000769.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#763">[ date ]</a>
+              <a href="thread.html#763">[ thread ]</a>
+              <a href="subject.html#763">[ subject ]</a>
+              <a href="author.html#763">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

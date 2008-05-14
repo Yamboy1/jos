@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Static members and process model.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT">
+   <LINK REL="Previous"  HREF="000447.html">
+   <LINK REL="Next" HREF="000450.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Static members and process model.</H1>
+    <B>Corrado Santoro</B> 
+    <A HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT"
+       TITLE="[JOS-Kernel] Static members and process model.">Corrado.Santoro@IIT.UNICT.IT</A><BR>
+    <I>Thu, 28 Oct 1999 11:16:05 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000447.html">[JOS-Kernel] new interrupt model</A></li>
+        <LI> Next message: <A HREF="000450.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#448">[ date ]</a>
+              <a href="thread.html#448">[ thread ]</a>
+              <a href="subject.html#448">[ subject ]</a>
+              <a href="author.html#448">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi all,
+I'm planning to work on a virtual console driver for JOS applicative programs
+enhancing the current &quot;console/consoled&quot;. My aim is to allow an applicative
+program to use the System.in and System.out streams to perform console
+operation.
+
+First of all, is there anyone that is currently working on this issue ?
+Secondly, I've found a problem on the &quot;scope&quot; of static members: System.in and
+System.out are static members, i.e. single instances inside the SAME virtual
+machine. This approach is valid for the &quot;standard&quot; use of Java upon a operating
+system such as WinNT/9X or Unix/Linux: different Java processes are started
+inside different Java Virtual Machines, thus each process uses its own
+System.in and System.out streams. But in the JOS environment, there is a SINGLE
+virtual machine thus, by analogy, there might be only ONE instance of
+System.in and System.out, shared among ALL threads (and thus all appications) of
+the machine. This means that, basically, all threads are using the SAME console.
+Obviously this is not possible and the streams System.in and System.out of JOS
+must act as &quot;wrappers&quot;, determining the current console of the current thread
+and calling then the appropriate console driver. In this case, the 'java.lang.System' 
+class provided by Sun can be no longer used, and it is necessary to suitably
+rewrite this class for JOS.
+
+I'm studying this problem and when I have a solution, I will prepare a
+descriptive document. Meanwhile, do you have any suggestion ?
+
+Bye,
+	Corrado.
+
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+Personal Home Page:
+            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+
+ARCA Mobile Agent Framework Home Page:
+            <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+======================================================
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000447.html">[JOS-Kernel] new interrupt model</A></li>
+	<LI> Next message: <A HREF="000450.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#448">[ date ]</a>
+              <a href="thread.html#448">[ thread ]</a>
+              <a href="subject.html#448">[ subject ]</a>
+              <a href="author.html#448">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

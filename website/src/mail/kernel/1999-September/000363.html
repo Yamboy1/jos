@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] troubles with making JJOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:werner.schuster%40netway.at">
+   <LINK REL="Previous"  HREF="000378.html">
+   <LINK REL="Next" HREF="000364.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] troubles with making JJOS</H1>
+    <B>Murphy</B> 
+    <A HREF="mailto:werner.schuster%40netway.at"
+       TITLE="[JOS-Kernel] troubles with making JJOS">werner.schuster@netway.at</A><BR>
+    <I>Thu, 16 Sep 1999 16:40:35 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000378.html">[JOS-Kernel] JOSSystem</A></li>
+        <LI> Next message: <A HREF="000364.html">[JOS-Kernel] Re: stupid code proposal for decaf</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#363">[ date ]</a>
+              <a href="thread.html#363">[ thread ]</a>
+              <a href="subject.html#363">[ subject ]</a>
+              <a href="author.html#363">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>yo group,
+
+I used jcvs (in windows nt 4.0 )to checkout the JJOS project; i looked at 
+the code and found it extremely interesting;
+so I booted linux (redhat 5.1) to build it;
+
+I went to the directory where jcvs put the files (c:\temp\jjos, in linux
+as /dos/temp/jjos);
+
+the dir contains readme &amp; install files, and also the a file called
+build ( a shell script that calls the makefiles for making
+the nativecode for host &amp; i386);
+the build file also has the rights to be executed (ie the file got xrw
+rights, it should be executable);
+but when I enter build (or ./build) it only tells me that it doesnt find
+the file;
+
+I then tried to do manually what the build file would do (go to the
+/arch/host/nativecode dir &amp; call make);
+but make didn't get far, it immediatly stopped complaining about
+missing separators;
+I looked at the make files, and found that some lines were lacking
+a &quot;\&quot; at the end, so I inserted this in (I think) all makefiles;
+after that, make didn't complain about the separators,
+
+but seemed to have troubles with the relative paths:
+
+:<i> No such file or directory../../common/bytecode/Makefile
+</I>'.  Stop. No rule to make target `../../common/bytecode/Makefile
+
+when calling make in /jjos/arch/host/nativecode/;
+well, thats obvious, cause if after doing &quot;..&quot; twice, you're only in
+/jjos/arch/ while the common dir, is in /jjos;
+
+so to solve this problem, I looked at some makefiles for this code and
+changed that relative path to an absolute path, but that didnt change
+anything;
+
+after all that trouble, I copied the jjos dir to my linux partition,
+I thought that my troubles might be caused, because I had the jjos
+dir on my fat partition;
+but that didnt change anything;
+
+so I kept fooling around, and found some other make output:
+
+[<A HREF="mailto:root@localhost">root@localhost</A> bytecode]# make
+:<i> No such file or directoryystem/Makefile:1: 
+</I>/jjos/common/bytecode/jos/system/event/Makefile
+/jjos/common/bytecode/jos/system/Makefile:4: *** missing separator.  Stop.
+
+the path is valid; it seems that I forgot to add the separator in this file;
+
+
+so, I think that's all; I hope my description is detailed enough;
+maybe my system in short again:
+cvs client: jcvs;
+linux:  redhat 5.1, german version, I didnt change anything
+	in the development tools;
+	also installed the nasm &amp; etherboot correctly;
+jdk:  blackdown jdk 1.1.7;
+
+
+hope someone can help me there;
+
+murphee
+***************************************
+UNITE FOR JAVA -&gt; www.javalobby.org
+Check this out -&gt; www.jos.org
+My site -&gt; www.angelfire.com/co/werners
+***************************************
+... and the fact, that i haven't put a gun to my mouth yet,
+proves that i'm a winner!
+Al Bundy
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000378.html">[JOS-Kernel] JOSSystem</A></li>
+	<LI> Next message: <A HREF="000364.html">[JOS-Kernel] Re: stupid code proposal for decaf</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#363">[ date ]</a>
+              <a href="thread.html#363">[ thread ]</a>
+              <a href="subject.html#363">[ subject ]</a>
+              <a href="author.html#363">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

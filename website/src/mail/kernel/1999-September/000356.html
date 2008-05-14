@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000343.html">
+   <LINK REL="Next" HREF="000348.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Kernel] decaf updates">onewith1@flash.net</A><BR>
+    <I>Sat, 11 Sep 1999 09:59:10 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000343.html">[JOS-Kernel] decaf updates / FDC in progress</A></li>
+        <LI> Next message: <A HREF="000348.html">[JOS-Kernel] JavaOS pdfs...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#356">[ date ]</a>
+              <a href="thread.html#356">[ thread ]</a>
+              <a href="subject.html#356">[ subject ]</a>
+              <a href="author.html#356">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ouch.  Adding V8086 mode is *not* pretty.  It adds plenty of overhead, is
+the cause of too many bugs (thunking between protected and v8086 isn't a
+ride in the country), and considering that we're not going to have DOS
+compatibility with JOS, isn't worth it.
+
+Unfortunately, this also means that if there's anything in real mode memory
+that you want, it needs to be protected before we switch over to protected
+mode.  Otherwise, we might overwrite that memory.
+
+I remember when I was doing boot-sector research, I found that OS/2's boot
+loader copies the fixed disk table into a high area of memory so that it
+will be saved when the protected mode kicks in.  I doubt that this is very
+feasable for us, considering that we're using COTS boot loaders.  So we'll
+probably have to load VGA fonts on our own.
+
+-Matt
+
+----- Original Message -----
+From: Hilary Cheng &lt;<A HREF="mailto:hilarycheng@usa.net">hilarycheng@usa.net</A>&gt;
+To: &lt;<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>&gt;
+Sent: Tuesday, September 07, 1999 7:39 PM
+Subject: Re: [JOS-Kernel] decaf updates
+
+
+Hi Ranieri,
+
+    I have think about it. I concern about Real Mode Interrupt. Since JJOS
+is running under Protected Mode.
+As I know, most of the real mode interrupt will not work under protected
+mode. If JJOS can provide a Real
+Mode Interface, we could save lots of times.
+
+Regards,
+
+Hilary
+
+
+  ----- Original Message -----
+  From: Ranieri Argentini
+  To: <A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+  Sent: 26 August 1999 PM 22:14
+  Subject: Re: [JOS-Kernel] decaf updates
+
+
+  &gt;&gt;cool, do you read the fonts from the vid-mem? the start routine
+  &gt;&gt;clears unforunately the hole vid-mem, so no fonts after the stop routine
+  &gt;&gt;are available (yet).
+  &gt;
+  &gt;well, I just copy the font from Linux and store in byte array. and draw
+it
+  &gt;pixel on the screen. I think that would be much more easy to do it.
+  &gt;hm, What's vid-mem ?  :o, I remember that font are stored in VGA.
+  &gt;But I forget how to retrieve it from VGA. is there any Doc?
+
+  This is the way to retrieve it using the BIOS. This might prove to be a
+bit problematic in OS design, but solving this problem is left as an
+excersize for the reader ;-D
+
+  This info has been extracted from Ralf Brown's interrupt list, file
+inter60a.zip available through ftpsearch.lycos.com ....
+
+  Hope it helps someone somewhere ...
+
+  Ranieri
+
+  --------V-101130-----------------------------
+  INT 10 - VIDEO - GET FONT INFORMATION (EGA, MCGA, VGA)
+          AX = 1130h
+          BH = pointer specifier
+              00h INT 1Fh pointer
+              01h INT 43h pointer
+              02h ROM 8x14 character font pointer
+              03h ROM 8x8 double dot font pointer
+              04h ROM 8x8 double dot font (high 128 characters)
+              05h ROM alpha alternate (9 by 14) pointer (EGA,VGA)
+              06h ROM 8x16 font (MCGA, VGA)
+              07h ROM alternate 9x16 font (VGA only) (see #00021)
+              11h (UltraVision v2+) 8x20 font (VGA) or 8x19 font (autosync
+EGA)
+              12h (UltraVision v2+) 8x10 font (VGA) or 8x11 font (autosync
+EGA)
+  Return: ES:BP = specified pointer
+          CX    = bytes/character of on-screen font (not the requested
+font!)
+          DL    = highest character row on screen
+  Note:   for UltraVision v2+, the 9xN alternate fonts follow the
+corresponding
+            8xN font at ES:BP+256N
+  BUG:    the IBM EGA and some other EGA cards return in DL the number of
+rows on
+            screen rather than the highest row number (which is one less).
+  SeeAlso: AX=1100h,AX=1103h,AX=1120h,INT 1F&quot;SYSTEM DATA&quot;,INT 43&quot;VIDEO DATA&quot;
+
+  Format of alternate font table [array]:
+  Offset  Size    Description     (Table 00021)
+   00h    BYTE    character to be replaced (00h = end of table)
+   01h  N BYTEs   graphics data for character, one byte per scan line
+  --------V-101130BX4D4F-----------------------
+
+
+  _______________________________________________ Kernel maillist -
+<A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000343.html">[JOS-Kernel] decaf updates / FDC in progress</A></li>
+	<LI> Next message: <A HREF="000348.html">[JOS-Kernel] JavaOS pdfs...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#356">[ date ]</a>
+              <a href="thread.html#356">[ thread ]</a>
+              <a href="subject.html#356">[ subject ]</a>
+              <a href="author.html#356">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

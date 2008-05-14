@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] host progress and jcurses</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Corrado.Santoro%40iit.unict.it">
+   <LINK REL="Previous"  HREF="000598.html">
+   <LINK REL="Next" HREF="000609.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] host progress and jcurses</H1>
+    <B>csanto</B> 
+    <A HREF="mailto:Corrado.Santoro%40iit.unict.it"
+       TITLE="[JOS-Kernel] host progress and jcurses">Corrado.Santoro@iit.unict.it</A><BR>
+    <I>Fri, 7 Jan 2000 18:17:01 +0100 (GMT+0100)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000598.html">[JOS-Kernel] host progress and jcurses</A></li>
+        <LI> Next message: <A HREF="000609.html">[JOS-Kernel] host progress and jcurses</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#608">[ date ]</a>
+              <a href="thread.html#608">[ thread ]</a>
+              <a href="subject.html#608">[ subject ]</a>
+              <a href="author.html#608">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd,
+I've updated my CVS and i'm happy to see a working console! i've also
+tryed to adapt jcurses to JOS removing several things like file-based
+properties or hash tables but i've found these problems:
+
+1. in the host build, the method console.setChar seems to not work. I've
+seen several consoleXX.java in host/bytecode/jos/platform/driver, but what
+is the file used in the host build ? (it seems console.java, but i think
+i'm wrong!). Adding setChar should be simple, I think, it would be
+required to add simple lines in jjconsol.c, but i have not understand in
+which way, starting from jos.system.console, we arrive to jjconsol.c.
+
+2. the java.lang.Integer class has some problems, i mean the method
+&quot;Integer.parseInt()&quot; seems to not work.
+
+3. what's happened in etherboot image ? after downloading jos-nbi.zip the
+booting station hangs up. I've forgot something or is there a (millennium)
+bug ?
+
+Cheers,
+	Corrado.
+
+On Wed, 5 Jan 2000, Todd L. Miller wrote:
+&gt;<i> &gt; 1. how can I put a char with a back and fore color onto the screen (using
+</I>&gt;<i> &gt; console or consoled class) ?
+</I>&gt;<i> 
+</I>&gt;<i> 	Er.  This is something that's not actually supported by the
+</I>&gt;<i> consoles right now.  (Gee, Avery, looks like I *did* forget something :))  
+</I>&gt;<i> It shouldn't be too difficult to add get/setAttribute() methods to the
+</I>&gt;<i> console classes.
+</I>&gt;<i> 
+</I>&gt;<i> &gt; 2. how can I read a *single* char ? (yes I have to use a KeyboardListener
+</I>&gt;<i> &gt; I think, but in the host build any typed char is returned only after a
+</I>&gt;<i> &gt; newline. I have designed a native class which, using a native method and
+</I>&gt;<i> &gt; some ncurses system call, is able to read a single keystroke, but I think
+</I>&gt;<i> &gt; it is better to integrate this inside JOS host core).
+</I>&gt;<i> 
+</I>&gt;<i> 	Scarily enough, I just finished doing this!  (See prior email,
+</I>&gt;<i> re: host progress.  That email also includes the to-do list.)  I guess
+</I>&gt;<i> your request means that I should go ahead and commit my changes to CVS.
+</I>&gt;<i> 
+</I>&gt;<i> &gt; My objective is to write the *first* interactive JOS application.
+</I>&gt;<i> 
+</I>&gt;<i> 	Might it, perchance, be a shell? :)
+</I>&gt;<i> 
+</I>&gt;<i> -_Quinn
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000598.html">[JOS-Kernel] host progress and jcurses</A></li>
+	<LI> Next message: <A HREF="000609.html">[JOS-Kernel] host progress and jcurses</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#608">[ date ]</a>
+              <a href="thread.html#608">[ thread ]</a>
+              <a href="subject.html#608">[ subject ]</a>
+              <a href="author.html#608">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

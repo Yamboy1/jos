@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Checkins to support 8/16/32-bit reads and writes from Java</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000141.html">
+   <LINK REL="Next" HREF="000143.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Checkins to support 8/16/32-bit reads and writes from Java</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Checkins to support 8/16/32-bit reads and writes from Java">jm@mak.com</A><BR>
+    <I>Mon, 19 Jul 1999 07:14:23 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000141.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+        <LI> Next message: <A HREF="000143.html">[JOS-Kernel] JJOS source</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#142">[ date ]</a>
+              <a href="thread.html#142">[ thread ]</a>
+              <a href="subject.html#142">[ subject ]</a>
+              <a href="author.html#142">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi All;
+
+Hopefully, one can now both read and write 8, 16, and 32-bit quantities from
+Java using read8, write8, and their sibling routines in class
+jos.system.machine.  Using these methods, I managed to write blinking-attribute
+text to the VGA framebuffer from init.java.
+
+Files touched include: interp.cc (where the built-ins get defined) and
+machine.java (which declares the routines from the Java side).  I also made a
+cosmetic change to class_loader.h/cc (making a member var &quot;protected&quot;) which
+necessitated a change to d_main.cc.
+
+As I said before on this list, we should probably start using the much more
+comprehensive IBM &quot;JavaOS for Business&quot; APIs, which solve this particular
+problem in a much prettier, more systematic, and much more labor-intensive way
+(for me, anyways).
+
+As usual, if there are any problems with the sources as I have just committed
+them to CVS, please be so kind as to let me know.
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000141.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+	<LI> Next message: <A HREF="000143.html">[JOS-Kernel] JJOS source</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#142">[ date ]</a>
+              <a href="thread.html#142">[ thread ]</a>
+              <a href="subject.html#142">[ subject ]</a>
+              <a href="author.html#142">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

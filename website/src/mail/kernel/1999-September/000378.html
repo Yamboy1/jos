@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOSSystem</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000376.html">
+   <LINK REL="Next" HREF="000363.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOSSystem</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Kernel] JOSSystem">onewith1@flash.net</A><BR>
+    <I>Sat, 18 Sep 1999 11:42:10 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000376.html">[JOS-Kernel] JOSSystem</A></li>
+        <LI> Next message: <A HREF="000363.html">[JOS-Kernel] troubles with making JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#378">[ date ]</a>
+              <a href="thread.html#378">[ thread ]</a>
+              <a href="subject.html#378">[ subject ]</a>
+              <a href="author.html#378">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I know it's bad form to reply to your own message, but I had a chance to
+think more about this design, and I feel that I can better describe my
+design philosophy now, with respect to JOS-Box, JOSystem, and Applications.
+I'm fully aware of how poor my first-cut (and twelfth-cut) explainations can
+be, so I'll try again.
+
+
+I wrote:
+&gt;<i> I'm trying to switch this design philosophy.  This design views all
+</I>services
+&gt;<i> and devices as remote.  There is a central local service which is used to
+</I>&gt;<i> access all other services - whether they are remote or local.
+</I>
+The JOS-Box layer contains only the bare-bones device drivers to get it
+going.  These are generally hard-coded into the kernel (such as simple text
+mode for displaying the Red-Screen-Of-Death, and a basic file system
+reader).
+
+The JOSystem layer creates the localized Jini lookup service for which
+local, non-Jini devices on the PC register themselves.  This should probably
+done as so:
+   1) A set of localized lookup services are created (in JavaOS for Business
+architecture, these would be the &quot;bus&quot; objects).  These would be things like
+&quot;ISA Bus&quot;, &quot;SCSI Bus&quot;, &quot;HotWire Bus&quot;, and so on.
+   2) Each localized lookup service then goes about detecting all devices
+that it has knowledge about.  This can include detecting a single device,
+running a set of plug-ins to detect a particular device, or starting up
+another localized lookup service.
+
+All of these lookup services are in a hierarchial view, where the top-level
+lookup is in charge of publication to the PC of all usable devices.
+Optionally, another lookup service can be loaded on top of that one to
+broadcast to the network all known devices (the lookup proxy).
+
+The Architecture layer uses the standard Jini mechanisms to discover devices
+on the network.  Commonly, the lookup service used is the top-level
+localized lookup service.  This top-level service should determine if the
+request for a device is from the local host or a remote host.  If from a
+local host, then the local Jini proxy (i.e. the actual device driver) is
+given to the application to increase the speed of access.
+
+Hopefully, this clears things up a bit about the design in my brain.
+Please, ask questions, and punch as many holes in it as you can.  If there's
+some critical error or wrong assumption I'm making, then let's iron it out
+or throw out the whole Jini idea.
+
+-Matt
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000376.html">[JOS-Kernel] JOSSystem</A></li>
+	<LI> Next message: <A HREF="000363.html">[JOS-Kernel] troubles with making JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#378">[ date ]</a>
+              <a href="thread.html#378">[ thread ]</a>
+              <a href="subject.html#378">[ subject ]</a>
+              <a href="author.html#378">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

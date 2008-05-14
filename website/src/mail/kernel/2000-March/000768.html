@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000772.html">
+   <LINK REL="Next" HREF="000780.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS-Kernel] Device as a digital resource">al@outworld.org</A><BR>
+    <I>Tue, 21 Mar 2000 16:26:25 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000772.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000780.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#768">[ date ]</a>
+              <a href="thread.html#768">[ thread ]</a>
+              <a href="subject.html#768">[ subject ]</a>
+              <a href="author.html#768">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> I put all devices under a device: scheme. Individual devices should be
+</I>&gt;<i> sub-schemes, right? Here is one subscheme I would like to try:
+</I>&gt;<i> 
+</I>&gt;<i> &quot;device:ram:?size=0xFF&quot;
+</I>&gt;<i> 
+</I>&gt;<i> and
+</I>&gt;<i> 
+</I>&gt;<i> &quot;device:ram:?start=0x0CC00&amp;end=0xCCFF&quot;
+</I>&gt;<i> 
+</I>&gt;<i> and
+</I>&gt;<i> 
+</I>&gt;<i> &quot;device:ram:?start=0xCC00&amp;size=0xFF&quot;
+</I>&gt;<i> 
+</I>&gt;<i> In Java, this URI might return a byte array.
+</I>
+Have in mind that the URI's agive don't return a byte array, they return
+a device object. I think you should alternate the protocols used.
+Instead of:
+
+	device:<A HREF="ram://localhost/rambus?offset=0x0&length=0xFF">ram://localhost/rambus?offset=0x0&amp;length=0xFF</A>
+
+you want:
+
+	ram:<A HREF="device://localhost/rambus?...">device://localhost/rambus?...</A>
+
+And if you want that to return a byte array, you should also do this:
+
+
+	byte[]:ram:<A HREF="device://localhost/rambus?...">device://localhost/rambus?...</A>
+
+
+But if you are going to convert a device into a device of type RAM, then
+you have to place the &quot;ram:&quot; protocol before the &quot;device:&quot; protocol,
+just like zip files:
+
+
+jar:zip:<A HREF="http://localhost/hda1/home/personal.jar">http://localhost/hda1/home/personal.jar</A>
+
+
+&gt;<i> Since memory is a limited digital resource, it can be used if no other
+</I>&gt;<i> process is using it. If any part of memory start to finish has already
+</I>&gt;<i> been allocated, the device factory must return null.
+</I>
+Of course, this goes for example's sake only, e? I don't think arbitrary
+memory access is exactly what we want in our security manifesto! :)
+
+&gt;<i> Likewise, I have become convinced that scheme chaining would work with
+</I>&gt;<i> devices. If one scheme expects a certain kind of interface from
+</I>&gt;<i> another scheme, we can use scheme chaining.
+</I>&gt;<i> 
+</I>&gt;<i> &quot;device:port:/ports/serial/1&quot; -&gt; Port (SerialPort)
+</I>&gt;<i> &quot;device:modem:port:/ports/serial/1&quot; -&gt; Modem (USRoboticsModem)
+</I>
+I still think that the port should not be able to be converted into a
+Modem. I think that the URI should end with /ports/serial/1/device? or
+something equivalent, to distringuish it from the port itself.
+
+&gt;<i> URI uri = new URI( &quot;modem:<A HREF="port://localhost/ports/serial/1"">port://localhost/ports/serial/1&quot;</A> );
+</I>&gt;<i> 56KVoiceFaxModem modem = (56KVoiceFaxModem) uri.getObject();
+</I>
+Yes, I really like this! This lets programmers tap into a device from
+wherever in their code, and it lets the System handle things centrally
+with stable and concentrated security. If there is not other way to
+access a physical device on JOS (and virtual devices) other than the
+Device interpreter, there is a lot of power behind. A lot of
+manageability. This sound very nice...
+
+&gt;<i> How do you find out the maximum speed of serial port 1?
+</I>
+There may be information in the chipset, the BIOS or the whatever. There
+may be manual information by the user. Alas, there is the default and
+safe assumption of 19200... There is no certain way really, not yet, and
+definitely not with all existing serial ports.
+
+&gt;<i> How do you find out what is really attached to serial port 1?
+</I>
+Same as above... You may guess that the PS/2 port connects to either a
+Keyboard or a pointing device. You can search serial ports for modems
+and null cables. You can search the parallel port for printers, cameras
+and scanners. But you can't *always* know for certain what you are
+dealing with. No possible way.
+
+&gt;<i> The ports themselves are detected by JOS at start-up.
+</I>
+The devices attached to the ports could also be detected, if we have the
+drivers for them. It depends. The more JOS, the more devices will be
+detected. Other devices will not function until drivers are installed.
+
+&gt;<i> I think device: should be a major scheme.
+</I>
+I see how you mean this. &quot;device:&quot; will not be treated like the rest of
+the protocols, it will just signify that the rest of the protocols will
+be &quot;transformation&quot; protocols of the returned object. The &quot;device:&quot; is
+there just to help the system know that this URI is intended for the
+device manager.
+
+&gt;<i> When these interfaces are already part of the org.jos.device package,
+</I>&gt;<i> adding the word &quot;Device&quot; is mostly redundent and, in general, should
+</I>&gt;<i> not be used. Exceptions are allowed, such as PointingDevice.
+</I>
+Yeah, I see your point, but what about things like:
+
+
+jos.system.security.JOSSecurityManager
+
+
+We could leave out the &quot;JOS&quot; part, since it's in package jos., but it
+would confuse programmers. Another example: JFrame could very well be
+Frame, since it's not in the java.awt. package, but things are clearer
+when that J is in front... The same could apply to JOS. I donno.
+
+&gt;<i> The general Java architecture makes everything a plug-in.
+</I>
+Very true. With the capabilities of reflecting on interface class files,
+I don't think there is actually a way to *stop* things from being
+plug-ins! :)
+
+&gt;<i> If JOS known that it's a modem, I should be able to tell it manually
+</I>&gt;<i> and use the modem without restarting my computer.
+</I>
+But this is JOS, not the modem... I don't think the Modem should know
+where it is (PCI or serial), I think only the device manager should.
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+________________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [URL: <A HREF="http://www.outworld.org/people/al]">http://www.outworld.org/people/al]</A>
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+PLEASE DO NOT SEND ME ANY UNSOLICITED COMMERCIAL EMAIL [DSS: 0xDBEF8ECC]
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000772.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000780.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#768">[ date ]</a>
+              <a href="thread.html#768">[ thread ]</a>
+              <a href="subject.html#768">[ subject ]</a>
+              <a href="author.html#768">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

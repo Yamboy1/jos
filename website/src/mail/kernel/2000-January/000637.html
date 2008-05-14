@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jos.vm.* packages?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000636.html">
+   <LINK REL="Next" HREF="000638.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jos.vm.* packages?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] jos.vm.* packages?">gchii@mindspring.com</A><BR>
+    <I>Sun, 23 Jan 2000 17:54:21 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000636.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+        <LI> Next message: <A HREF="000638.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#637">[ date ]</a>
+              <a href="thread.html#637">[ thread ]</a>
+              <a href="subject.html#637">[ subject ]</a>
+              <a href="author.html#637">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 02:58 PM 1/23/00 -0500, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;&gt;<i>Why would the jos.platform.driver package defined in both of these
+</I>&gt;&gt;<i>directories?
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> JJOS/arch/host/bytecode
+</I>&gt;&gt;<i> JJOS/arch/i386/bytecode
+</I>&gt;<i>
+</I>&gt;<i>Because the host and i386 builds use different drivers.
+</I>
+But two different classes should *never* have the same name. Since host and
+i386 use different drivers, there must be three packages:
+
+jos.platform.drivers
+jos.host.drivers
+jos.i386.drivers
+
+Interfaces common to both host and i386 should be defined once inside
+jos.platform.drivers (like console). Both host-specific and i386-specific
+drivers must implement a jos.platform.drivers interface.
+
+An instance of an interface is created through a factory (like Bytecode
+Native Interface).
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000636.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+	<LI> Next message: <A HREF="000638.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#637">[ date ]</a>
+              <a href="thread.html#637">[ thread ]</a>
+              <a href="subject.html#637">[ subject ]</a>
+              <a href="author.html#637">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

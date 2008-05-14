@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] GRUB booting</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:clemens%40informatik.tu-muenchen.de">
+   <LINK REL="Previous"  HREF="000850.html">
+   <LINK REL="Next" HREF="000852.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] GRUB booting</H1>
+    <B>Claudio Clemens</B> 
+    <A HREF="mailto:clemens%40informatik.tu-muenchen.de"
+       TITLE="[JOS-Kernel] GRUB booting">clemens@informatik.tu-muenchen.de</A><BR>
+    <I>Tue, 13 Jun 2000 23:02:45 +0200 (CEST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000850.html">[JOS-Kernel] GRUB booting</A></li>
+        <LI> Next message: <A HREF="000852.html">[JOS-Kernel] GRUB booting</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#851">[ date ]</a>
+              <a href="thread.html#851">[ thread ]</a>
+              <a href="subject.html#851">[ subject ]</a>
+              <a href="author.html#851">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Tue, 13 Jun 2000, Gilbert Carl Herschberger II wrote:
+
+&gt;<i>At 05:29 PM 6/10/00 -0400, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+</I>&gt;&gt;<i>	BTW -- if people are having problems booting JOS, I can post the
+</I>&gt;&gt;<i>(GRUB) (floppy) disk image I use somewhere.  (I was going to mention this
+</I>&gt;&gt;<i>earlier, but forgot about it.)
+</I>&gt;<i>
+</I>&gt;<i>If we're serious about creating a Java-based operating system, a Java
+</I>&gt;<i>application should be able to create a boot diskette. This is on my wish
+</I>&gt;<i>list. Any volunteers?
+</I>
+This is a great idea! It shouldn't be so dificult to do that. Can someone
+show a bootstring, that boots and say Hello? That should be a beginning,
+and maybe a could write something like this. The only problem is: who does
+GRUB works? I downloaded the GRUBd distribution, but have no idea how it
+works, and how I can make it works. What does it need? A bootloader, then
+it probably jumps to a kernel code segment, and this kernel loads some
+init-prosses (a command line or so). With JOS, the kernel should load the
+JVM, and then comes something from JOSBox (what the hell could be for a
+i386 in JOSBox? I know you don't have any example, I know...)
+
+&gt;<i>Here is how it might work. The boot image would be stored within the class
+</I>&gt;<i>file itself. This application should be self-contained. It should not use
+</I>&gt;<i>an external &quot;resource&quot; file. The raw boot image is converted to a byte
+</I>&gt;<i>array, like this:
+</I>&gt;<i>
+</I>&gt;<i>  private byte[] payload = {
+</I>&gt;<i>    0x??, 0x??, 0x?? .. 0x??
+</I>&gt;<i>    };
+</I>
+Doesn't seems dificult. The contents is the bigest problem.
+
+&gt;<i>The Java application opens /dev/fd0 for output and writes the payload byte
+</I>&gt;<i>array to the disk. See there! A GRUB boot diskette has been created.
+</I>
+No prob, I thing
+
+&gt;<i>One Java application could create a GRUB boot diskette and a Etherboot boot
+</I>&gt;<i>diskette. A command line version might enable me to select GRUB or
+</I>&gt;<i>Etherboot. A GUI version of this application might enable me to select
+</I>&gt;<i>/dev/fd0 or /def/fd1 and GRUB or Etherboot.
+</I>
+Etherboot is also a mistery for me. 8-(
+
+&gt;<i>Taking this one more step, there should be a suitable API so that any Java
+</I>&gt;<i>object can create a boot diskette.
+</I>
+That's rigth. But you need to rewrite this application for every host. So
+you should have a main application, and a bunch of classes, each with the
+bootstring for a specific host. With the application, you should be able
+to choose for wich host you are building the disk.
+
+&gt;<i>How do I create a boot diskette from MS-DOS or Microsoft Windows? I should
+</I>&gt;<i>be able to create a boot diskette on any foreign operating system with one
+</I>&gt;<i>platform-independent Java application.
+</I>
+See above.
+
+&gt;<i>Does anyone have enough talent (and time) to write this app? It would make
+</I>&gt;<i>my life a lot easier. I still don't have a GRUB boot diskette.
+</I>
+I thing this is trivial. Or is it more dificult than I think? 
+FileOutputStream fos=(/dev/fd0);
+
+Okay, this is not the right syntax, but you know what I mean, doesn't you?
+
+So long
+
+Claudio
+
+-- 
++-----| <A HREF="http://linux.brasileiro.net">http://linux.brasileiro.net</A> - Seu site de informações |-----+
+|<i>     Claudio Clemens at Home   -   Informatik   -   TU-München     |
+</I>|<i>         <A HREF="mailto:clemens@in.tum.de">clemens@in.tum.de</A>         <A HREF="http://www.in.tum.de/~clemens">http://www.in.tum.de/~clemens</A>   |
+</I>I wish I could remember where I parked my hard disk....
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000850.html">[JOS-Kernel] GRUB booting</A></li>
+	<LI> Next message: <A HREF="000852.html">[JOS-Kernel] GRUB booting</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#851">[ date ]</a>
+              <a href="thread.html#851">[ thread ]</a>
+              <a href="subject.html#851">[ subject ]</a>
+              <a href="author.html#851">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

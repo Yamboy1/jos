@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] How to crash JOS.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000121.html">
+   <LINK REL="Next" HREF="000123.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] How to crash JOS.</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Kernel] How to crash JOS.">ryan@whitewolf.com.au</A><BR>
+    <I>Thu, 08 Jul 1999 14:02:07 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000121.html">[JOS-Kernel] Some Ideas About JJOS</A></li>
+        <LI> Next message: <A HREF="000123.html">[JOS-Kernel] How to crash JOS.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#122">[ date ]</a>
+              <a href="thread.html#122">[ thread ]</a>
+              <a href="subject.html#122">[ subject ]</a>
+              <a href="author.html#122">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Important read for jos kernel developers:
+
+	<A HREF="http://www.research.att.com/~vj/bug.html">http://www.research.att.com/~vj/bug.html</A>
+
+It appears as though it is possible for _verified_ code to crash a JVM
+by spoofing one class with another.
+
+On a related topic, I don't think it has been discussed here that
+un-verified code can crash a JVM. The Java language stops you from doing
+stupid things but the JVM does not (when verification is turned off). It
+is possible to craft a Java class from hand-written bytecodes that will
+crash a JVM if it is not checked by the verifier.
+
+Interestingly, the verifier is only executed on applets. Applications
+will not be verified unless you explicitly ask for this to happen. This
+is because loading a class takes significantly longer if it needs to be
+verified.
+
+Since the kernel provides no memory protection (following the assumption
+that Java code can't corrupt memory) and since there is only one JVM
+instance for the whole operating system, we must verify all code that is
+to be executed, otherwise one program can bring down the whole system.
+It would be useful if the JVM could remember if it has already verified
+a particular class so each class is only ever verified once -- until
+that class file is changed.
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000121.html">[JOS-Kernel] Some Ideas About JJOS</A></li>
+	<LI> Next message: <A HREF="000123.html">[JOS-Kernel] How to crash JOS.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#122">[ date ]</a>
+              <a href="thread.html#122">[ thread ]</a>
+              <a href="subject.html#122">[ subject ]</a>
+              <a href="author.html#122">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

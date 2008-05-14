@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Building Java operating systems</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000554.html">
+   <LINK REL="Next" HREF="000555.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Building Java operating systems</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Kernel] Building Java operating systems">jewel@pixie.co.za</A><BR>
+    <I>Thu, 9 Dec 1999 15:53:25 +0200 (SAST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000554.html">[JOS-Kernel] Next version of jjos / decaf garbage
+ collection</A></li>
+        <LI> Next message: <A HREF="000555.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#556">[ date ]</a>
+              <a href="thread.html#556">[ thread ]</a>
+              <a href="subject.html#556">[ subject ]</a>
+              <a href="author.html#556">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>[Warning, this is pretty long]
+
+Most of you on this list probably recall some of my earlier postings on
+some stuff I've been doing with Utah's OSKit and a JVM that I'm working
+on. 
+
+For those who don't know about it, this is what I'm doing:
+
+I have a JVM written by a grad student at my university, it's written in C
+and is intended to be quite portable. I have spent some time recently
+integrating it with Classpath (the project making free java class
+libraries) and currently have things like file and network io working ok
+with it. Other features are a working tracing (sweep and compact) gc and
+an implementation of the JNI. 
+
+The move to classpath brings in support for most JDK 1.1 things, and
+allows a lot of work to be saved in doing things like internationalization
+etc.
+
+I have taken this JVM and converted it (slightly) to boot as a kernel with
+the OSKit. The OSKit is a large collection of modularized components
+useful for building operating systems. For example I use a C library,
+network device driver code, file system code, network tcp/ip stack, math
+library, memory manager etc from the standard OSKit build without any
+changes whatsoever. 
+
+The result is a 'kernel' that boots from a Multiboot compliant loader (eg
+GRUB) or the OSKit's netboot. Currently the OSKit does all the hardware
+related stuff, it handles interrupts, sets up the hardware, provides
+console support etc. 
+
+My experiments so far have allowed me to run simple java apps on this
+kernel (the kernel is about 700k). You need to provide the class libraries
+too, so one option is to include these in the boot image, but this posed a
+problem with size (the libraries are several megabytes). It takes too long
+to boot the kernel, so I wrote a very simple HTTP loader that just asks my
+linux machine running apache for the class files. Then what I do is make a
+barebones zip file containing the most commonly used class files (for
+running a helloworld program for example) which comes to 150k and put this
+in the boot image. 
+
+This system works pretty well, recently I have tried out once again Thomas
+Bocek's VGA driver, which works good, but seems to be slow for me
+to start writing a window manager / graphical framework (which I would
+like to do). 
+
+One of the biggest issues facing the JVM is IO. Currently it doesn't use
+native threads, it just emulates threading by using every instruction
+executed as a clock tick. This means that anything that does file IO,
+including a socket accept call, will block until the IO is finished. 
+
+Changes to the VM to do real IO will be tricky. One option is to keep IO
+state for each thread and do asynchronous calls while pretending to block.
+Another option is to implement the VM with native threads and let the OS
+underneath take care of this. 
+
+But the problem is that when you're building your OS on the VM, you don't
+know what's going to be underneath (a microkernel? Real context-switching
+like UNIX with multiple address spaces? A single address space single
+thread model?).
+
+So I'm curious to know what you guys plan for handling this sort of issue,
+what are the current plans for a memory and threading model?
+
+If anyone wants to look at what I have running you'll need a linux machine
+running NFS and Dhcp, and another machine connected via a network.
+Software needed is normal gcc and the OSKit distribution. I will probably
+make a tarball available some time. 
+
+I have spent quite a while looking at classpath and figuring out how to
+support it (although I still intend to get more thoroughly acquainted with
+it), so I'm willing to help out when you guys get to that stage. 
+
+John Leuner
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000554.html">[JOS-Kernel] Next version of jjos / decaf garbage
+ collection</A></li>
+	<LI> Next message: <A HREF="000555.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#556">[ date ]</a>
+              <a href="thread.html#556">[ thread ]</a>
+              <a href="subject.html#556">[ subject ]</a>
+              <a href="author.html#556">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Next version of jjos / decaf garbage collection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:George.Marrows%40Smallworld.co.uk">
+   <LINK REL="Previous"  HREF="000556.html">
+   <LINK REL="Next" HREF="000557.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Next version of jjos / decaf garbage collection</H1>
+    <B>George.Marrows@Smallworld.co.uk</B> 
+    <A HREF="mailto:George.Marrows%40Smallworld.co.uk"
+       TITLE="[JOS-Kernel] Next version of jjos / decaf garbage collection">George.Marrows@Smallworld.co.uk</A><BR>
+    <I>Thu, 9 Dec 1999 14:02:32 -0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000556.html">[JOS-Kernel] Building Java operating systems</A></li>
+        <LI> Next message: <A HREF="000557.html">[JOS-Kernel] Building Java operating systems</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#555">[ date ]</a>
+              <a href="thread.html#555">[ thread ]</a>
+              <a href="subject.html#555">[ subject ]</a>
+              <a href="author.html#555">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Gilbert --
+
+Unless I'm misunderstanding you, what you're suggesting sounds very like
+referencing counting. (With each new reference to an object, the ref count
+is increased by one; each removed reference decreases the count by one; when
+the count is zero the object is free.) It has two problems that I'm aware
+of:
+
+1. it can't cope with cycles of objects. If a refs b and b refs a, then
+their ref counts will always be at least 1, and the objects will never be
+freed.
+
+2. performance isn't great (apparently -- I've no personal experience of
+implementing this).
+
+The gc currently implemented in decaf will do the tidy up of object graphs
+when a class loader is destroyed -- if the cl is no longer referenced, then
+it, and any objects hanging off it, will be freed at the next gc (assuming
+that nothing else references the objects of course).
+
+Regarding object refs being handles, my understanding is that yes, that's
+effectively true in decaf at the moment. There's a java_object handle for
+each object, and this contains a pointer to a lump of memory holding the
+object's Java fields. It doesn't need to be this way though - see the tech
+docs on HotSpot, which doesn't use handles. An advantage of handles is that
+it simplifies implementing a moving garbage collector (such as we *don't*
+have currently); a disadvantage is that the indirection probably decreases
+performance slightly.
+
+-- George
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Gilbert Carl Herschberger II [SMTP:<A HREF="mailto:gchii@mindspring.com">gchii@mindspring.com</A>]
+</I>&gt;<i> Sent:	Thursday, December 09, 1999 13:06
+</I>&gt;<i> To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+</I>&gt;<i> Subject:	Re: [JOS-Kernel] Next version of jjos / decaf garbage
+</I>&gt;<i> collection
+</I>&gt;<i> 
+</I>&gt;<i> I am talking out of turn again; but, why not do garbage collection for
+</I>&gt;<i> very-large-objects just like technique used for shared libraries?
+</I>&gt;<i> 
+</I>&gt;<i> From a requestor's viewpoint, the kernel provides a system-wide unique
+</I>&gt;<i> handle for the instance of a shared library. A shared library has many
+</I>&gt;<i> simultaneous handles. When a library is open'd, a new handle is created.
+</I>&gt;<i> When the handle is close'd, only the handle goes away -- unless it is the
+</I>&gt;<i> last handle.
+</I>&gt;<i> 
+</I>&gt;<i> A virtual machine could use multiple object graphs, each gc'd
+</I>&gt;<i> independently. Object &quot;references&quot; in a virtual machine are handles
+</I>&gt;<i> (aren't
+</I>&gt;<i> they?). So, why doesn't a virtual machine provide many simultaneous
+</I>&gt;<i> handles
+</I>&gt;<i> to an object? When the last handle is closed, the object is gc'd.
+</I>&gt;<i> 
+</I>&gt;<i> When the virtual machine returns a handle, it can be encoded in any form
+</I>&gt;<i> the virtual machine wants. This is similar to the machine interface of
+</I>&gt;<i> OS/400. It is also like a &quot;map&quot; of virtual storage, where a &quot;memory
+</I>&gt;<i> address&quot; is a reference to a page on disk.
+</I>&gt;<i> 
+</I>&gt;<i> It is also similar to the way &quot;links&quot; work on the Linux file subsystem.
+</I>&gt;<i> Many links can be references to a physical file. A physical file is
+</I>&gt;<i> garbage
+</I>&gt;<i> collected when the last link is removed.
+</I>&gt;<i> 
+</I>&gt;<i> Wouldn't this be great? A a virtual machine could closely track a class
+</I>&gt;<i> loader with an object graph, so that an entire object graph is
+</I>&gt;<i> garbage-collected when the class loader is destroyed. Thinking of the
+</I>&gt;<i> object graph in terms of &quot;local&quot; and &quot;global&quot; underestimates the scope of
+</I>&gt;<i> a
+</I>&gt;<i> virtual machine. Just like C/C++ provides for &quot;static&quot; references, private
+</I>&gt;<i> to a module, a virtual machine might have an object graph for a class
+</I>&gt;<i> loader (and thus a process).
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000556.html">[JOS-Kernel] Building Java operating systems</A></li>
+	<LI> Next message: <A HREF="000557.html">[JOS-Kernel] Building Java operating systems</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#555">[ date ]</a>
+              <a href="thread.html#555">[ thread ]</a>
+              <a href="subject.html#555">[ subject ]</a>
+              <a href="author.html#555">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf rewrite status update</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000674.html">
+   <LINK REL="Next" HREF="000676.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf rewrite status update</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf rewrite status update">tmiller@haverford.edu</A><BR>
+    <I>Sat, 26 Feb 2000 17:10:29 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000674.html">[JOS-Kernel] decaf rewrite status update</A></li>
+        <LI> Next message: <A HREF="000676.html">[JOS-Kernel] decaf rewrite status update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#675">[ date ]</a>
+              <a href="thread.html#675">[ thread ]</a>
+              <a href="subject.html#675">[ subject ]</a>
+              <a href="author.html#675">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i>     I am sorry about that, I havn't started to write
+</I>&gt;<i> the jju64 class. But will u intergrate into it ?
+</I>
+	Would be the jji64 class ( we have the unsigned version ), but
+yes, it would be very easy to integrate -- jlong right now == jju64, so
+I'd only have to change the typedef to make it a jji64.  (If your jji64
+class provides the same operations, that's the only line of code that
+would be changed, aside from the #include &quot;jji64.h&quot; (or
+whatever).)  Thanks.
+
+BTW -- I'm in the middle of squashing bugs in the (sort-of) new scheduler
+right now, so I'm getting very close to done.  (I hope!)  I haven't done
+extensive testing on the classfile parsing, but since the actual parsing
+algorithm is virtually identical, I'm not too worried about it.  
+interp.cc remains to rewrite (closer to port, actually).  I've decided on
+taking a simple but (I hope) effective approach to handling resolution,
+where you always ask the potentially unresolved object for something (e.g.
+the method reference's class) expecting it to be unresolved (e.g. passing
+it a constant pool/class loader/etc) where the particular C++ class
+representing that object can cache that resolution or not, as it sees fit.  
+Basically, this moves the resolution logic from the interpreter to the
+objects, where it belongs.  Storage efficiency could be gained by unioning
+the resolved and unresolved data sets, but I'm not certain this would be
+wise, looking at potential problems in sharing class definitions across
+classloaders.  We'll see.
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000674.html">[JOS-Kernel] decaf rewrite status update</A></li>
+	<LI> Next message: <A HREF="000676.html">[JOS-Kernel] decaf rewrite status update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#675">[ date ]</a>
+              <a href="thread.html#675">[ thread ]</a>
+              <a href="subject.html#675">[ subject ]</a>
+              <a href="author.html#675">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

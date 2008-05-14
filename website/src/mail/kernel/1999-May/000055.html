@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] New and improved Kernel Interface</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:robfitz%40geocities.com">
+   <LINK REL="Previous"  HREF="000054.html">
+   <LINK REL="Next" HREF="000056.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] New and improved Kernel Interface</H1>
+    <B>Robert Fitzsimons</B> 
+    <A HREF="mailto:robfitz%40geocities.com"
+       TITLE="[JOS-Kernel] New and improved Kernel Interface">robfitz@geocities.com</A><BR>
+    <I>Sun, 30 May 1999 15:02:18 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000054.html">[JOS-Kernel] New and improved Kernel Interface</A></li>
+        <LI> Next message: <A HREF="000056.html">[JOS-Kernel] New and improved Kernel Interface</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#55">[ date ]</a>
+              <a href="thread.html#55">[ thread ]</a>
+              <a href="subject.html#55">[ subject ]</a>
+              <a href="author.html#55">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello Todd
+
+&gt;<i>  Seems to me like the kernel shouldn't be involved in monitors,
+</I>&gt;<i> unless you plan to have it support multiple native processes --
+</I>&gt;<i> and then the katomic operations would seem to suffice for
+</I>&gt;<i> implementing monitors inside the JVM -- where they belong. 
+</I>
+I can see what you mean.  But I don't think I will remove it.
+
+How I see the kernel interface being used by a jvm developer.  Is 
+that the developer will wrap the kernel interface function call into 
+a jvm function, with added validation, error checking, debugging, 
+etc.  The jvm developer is free to write there own version of a 
+function, as long as it is done in a way that won't cause problems 
+with other kernels, etc.
+
+&gt;<i>  How will your jos-linux host differ substantially from the 'host'
+</I>&gt;<i> build of JJOS?  (From the p.o.v. of decaf, the JVM.)  Or were you
+</I>&gt;<i> thinking more broadly, along the lines of kludging something
+</I>&gt;<i> together out of other open source projects
+</I>&gt;<i> (linux/kaffe/classpath/etc) and write wrappers to this proposed
+</I>&gt;<i> standard? 
+</I>
+I don't think there will be much difference, both would be used as a 
+development aid, for testing the jvm, class libraries, etc.
+
+I'm planing on using a linux system to provided the base kernel, 
+Japhar as the jvm and maybe using classpath for the class libraries 
+(but I don't know yet).
+
+&gt;<i>  I, at least (can't speak for JM), will probably not spend any time
+</I>&gt;<i> rewriting decaf/JJOS to match any standard we settle on any time
+</I>&gt;<i> soon, for the twin reasons of speed and efficiency.  Speed in
+</I>&gt;<i> development has been our goal -- with the end result that I expect
+</I>&gt;<i> the keyboard driver (more importantly, the scancode-to-unicode
+</I>&gt;<i> converter) to be fully functional before the end of june.
+</I>&gt;<i> Efficiency stems from my concerns about trying to set an interface
+</I>&gt;<i> for something that (I would guess) none of us have ever done --
+</I>&gt;<i> (build) a new kernel.  From my point of view (admittedly, I'm not
+</I>&gt;<i> writing the kernel half of things) it would make sense to wait
+</I>&gt;<i> until JJOS matured to the point where it wasn't going to be
+</I>&gt;<i> changing a whole lot anyway, and /then/ settle on a design,
+</I>&gt;<i> applying both our experience in what a kernel needs to do and our
+</I>&gt;<i> desires for improvements; refactoring by way of /educated/
+</I>&gt;<i> interface design decisions.  This as opposed to continually
+</I>&gt;<i> rewriting the interface as new factors came out. 
+</I>
+Although I haven't look into JJOS/decaf very much, how I would port 
+JJOS/decaf to use the kernel interface, is to write a version of JJOS 
+that uses the kernel interface internally.  I don't know how hard 
+that would be, but it should be possible.  
+
+Robert Fitzsimons
+<A HREF="mailto:robfitz@geocities.com">robfitz@geocities.com</A>
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000054.html">[JOS-Kernel] New and improved Kernel Interface</A></li>
+	<LI> Next message: <A HREF="000056.html">[JOS-Kernel] New and improved Kernel Interface</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#55">[ date ]</a>
+              <a href="thread.html#55">[ thread ]</a>
+              <a href="subject.html#55">[ subject ]</a>
+              <a href="author.html#55">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

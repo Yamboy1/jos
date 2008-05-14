@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [TCP/IP Stack] HWAddr suggestions</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000493.html">
+   <LINK REL="Next" HREF="000497.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [TCP/IP Stack] HWAddr suggestions</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [TCP/IP Stack] HWAddr suggestions">gchii@mindspring.com</A><BR>
+    <I>Thu, 25 Nov 1999 22:04:52 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000493.html">[JOS-Kernel] Booting JOS - RARP and BOOTP</A></li>
+        <LI> Next message: <A HREF="000497.html">[JOS-Kernel] [TCP/IP Stack] JNI on Linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#496">[ date ]</a>
+              <a href="thread.html#496">[ thread ]</a>
+              <a href="subject.html#496">[ subject ]</a>
+              <a href="author.html#496">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Here are my first suggestion for HWAddr.
+
+class HWAddr
+{
+  static final int SIZE = 6;
+
+  byte[] addr = new byte[ SIZE ];
+
+  HWAddr( byte[] raw, int offset )
+  {
+    System.arraycopy( raw, offset, addr, 0, SIZE );
+  }
+};
+
+Pass the entire raw array to HWAddr constructor. In C, it is just like
+
+    char *raw = &quot;a-very-long-string&quot;;
+    puts( raw );
+
+Inside EtherPacket.java,
+
+    dest = new HWAddr(raw[0],raw[1],raw[2],raw[3],raw[4],raw[5]);
+
+becomes
+
+    dest = new HWAddr( raw, 0 );
+
+and
+
+    src = new HWAddr(raw[6],raw[7],raw[8],raw[9],raw[10],raw[11]);
+
+becomes
+
+    src = new HWAddr( raw, 6 );
+
+-----
+
+Going to the next level...
+
+In the interest of high performance, bytes from an ethernet packet do not
+have to be duplicated in HWAddr. The HWAddr object is immutable. It points
+to the MAC Address. It might be written something like this:
+
+class HWAddr
+{
+  byte[] raw;
+  int offset;
+
+  HWAddr( byte[] r, int o )
+  {
+    raw = r;
+    offset = o;
+  }
+};
+
+-----
+
+Going to the next level: If you wanted to split HWAddr into SourceAddr and
+TargetAddress, you'd have this:
+
+    dest = new HWAddr( raw, 0 );
+
+becomes
+
+    dest = new SourceAddr( raw );
+
+and
+
+    src = new HWAddr( raw, 6 );
+
+becomes
+
+    src = new TargetAddr( raw );
+
+SourceAddr and TargetAddr share all of the same behavior, except for offset
+and class name.
+
+class SourceAddr
+{
+  static final int OFFSET = 0;
+
+  byte[] raw;
+
+  SourceAddr( byte[] r )
+  {
+    raw = r
+  }
+};
+
+and
+
+class TargetAddr
+{
+  static final int OFFSET = 6;
+
+  byte[] raw;
+
+  TargetAddr( byte[] r )
+  {
+    raw = r;
+  }
+};
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000493.html">[JOS-Kernel] Booting JOS - RARP and BOOTP</A></li>
+	<LI> Next message: <A HREF="000497.html">[JOS-Kernel] [TCP/IP Stack] JNI on Linux</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#496">[ date ]</a>
+              <a href="thread.html#496">[ thread ]</a>
+              <a href="subject.html#496">[ subject ]</a>
+              <a href="author.html#496">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

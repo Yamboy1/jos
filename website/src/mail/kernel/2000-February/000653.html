@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Multi-Process Spec</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000652.html">
+   <LINK REL="Next" HREF="000654.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Multi-Process Spec</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Multi-Process Spec">gchii@mindspring.com</A><BR>
+    <I>Fri, 04 Feb 2000 09:02:43 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000652.html">[JOS-Kernel] Multi-Process Spec</A></li>
+        <LI> Next message: <A HREF="000654.html">[JOS-Kernel] Multi-Process Spec</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#653">[ date ]</a>
+              <a href="thread.html#653">[ thread ]</a>
+              <a href="subject.html#653">[ subject ]</a>
+              <a href="author.html#653">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:40 PM 2/3/00 -0700, Patrick Tullmann &lt;<A HREF="mailto:tullmann@cs.utah.edu">tullmann@cs.utah.edu</A>&gt; wrote:
+&gt;<i>Another issue is the tension between sharing objects and total
+</I>&gt;<i>reclaimation of memory.  If a process is terminated, but some objects
+</I>&gt;<i>it allocated are sitting in a global table, what do you do?
+</I>
+The tension between sharing objects and total reclaimation of memory is
+another aspect of the persistence barrier. A persistence barrier is
+typically a barrier between a dormant object and an active one. A dormant
+object exists when all the the electrical power has been turned off. All
+domant objects have data and only data (fields). They have no behavior
+(methods) because they have no power, no CPU.
+
+We find a persistence barrier between the active CPU and a diskette, hard
+drive or CD-ROM. We also find it between two CPUs. The persistence barrier
+has been overcome through marshalling an object's data across a
+byte-by-byte stream.
+
+When it comes to processes, we want an strong persistence barrier to be
+maintained between all processes. Each process must maintain its own
+private object graph (sub-heap) and its own garbage collection thread. Two
+processes must never share objects. When a process is complete, all of its
+objects are destroyed. If the process should fail, it is an important
+function of the operating system to insist that all of its objects are
+destroyed. An operating system is defective when it enables a process to
+leak. An object that is not destroyed by the operating system when a
+process is destroyed leaks into a frightful place where total reclaimation
+of memory is not possible.
+
+We want a very strong persistence barrier between the kernel process and
+other processes. All objects created by a kernel should be destroyed when
+the kernel is complete.
+
+And yet, there must be coordination between processes. &quot;Shared memory&quot; is
+often managed by a third process. The third process owns the shared memory
+and works on behalf of the other two. The persistence barrier has been
+bridged successfully by a model of asynchronous I/O. Objects are copied
+across a persistence barrier. The third process is often the kernel.
+
+1. Process 1 creates an object. When process 1 is complete, the object dies.
+
+2. Process 1 asks the kernel to clone the object. The kernel (and only the
+kernel) creates a copy of the object's data. When the kernel is complete,
+space used by this data is reclaimed.
+
+3. Process 2 asks the kernel for a clone of an object. The kernel (and only
+the kernel) creates an object from the object's data. The second active
+object is just like the original, except it has crossed the persistence
+barrier. When process 2 is complete, this copy of the object dies.
+
+At the moment an object is cloned by the kernel, only the object's data is
+copied. The object's behavior is not copied. The object's data must not
+modified by the kernel while it is in its dormant state. As the copy is
+activated, it regains its behavior. It becomes just another object, as if
+it were constructed from scratch.
+
+This is something like the old clipboard metaphore. An object in a
+clipboard is domant. The object's data must not modified by the clipboard
+while it's dormant. In one application, you copy an object to the
+system-wide clipboard. From another application, you paste an object from
+the system-wide clipboard. Thus, an object can cross the persistence barrier.
+
+The mechanism of getting objects from the kernel has been demonstrated with
+the Bytecode Native Interface (BCNI). An object returned from BCNI belongs
+to the requesting process. The BCNI typically returns a proxy to objects
+owned by the kernel process. The ultimate BCNI plugs into a native method,
+leaving the confines of a custom class loader. The JVM implements this one
+native method to get JVM-specific objects and proxies from the kernel process.
+
+The persistence barrier is bridged exactly the same way for copying objects
+from one process to another as copying objects from one machine to another.
+The byte-by-byte asynchronous I/O subsystem works across a network
+interface. And the persistence barrier is bridged in the same way for
+copying objects from an active process to a diskette, hard drive or CD-ROM.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000652.html">[JOS-Kernel] Multi-Process Spec</A></li>
+	<LI> Next message: <A HREF="000654.html">[JOS-Kernel] Multi-Process Spec</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#653">[ date ]</a>
+              <a href="thread.html#653">[ thread ]</a>
+              <a href="subject.html#653">[ subject ]</a>
+              <a href="author.html#653">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

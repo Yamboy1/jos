@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Next version of jjos / decaf garbage collection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:George.Marrows%40Smallworld.co.uk">
+   <LINK REL="Previous"  HREF="000503.html">
+   <LINK REL="Next" HREF="000506.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Next version of jjos / decaf garbage collection</H1>
+    <B>George.Marrows@Smallworld.co.uk</B> 
+    <A HREF="mailto:George.Marrows%40Smallworld.co.uk"
+       TITLE="[JOS-Kernel] Next version of jjos / decaf garbage collection">George.Marrows@Smallworld.co.uk</A><BR>
+    <I>Wed, 24 Nov 1999 17:14:43 -0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000503.html">[JOS-Kernel] zlib implementation</A></li>
+        <LI> Next message: <A HREF="000506.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#491">[ date ]</a>
+              <a href="thread.html#491">[ thread ]</a>
+              <a href="subject.html#491">[ subject ]</a>
+              <a href="author.html#491">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I'm currently doing design work / back-of-envelope-scribbling for what I
+hope will be the next version of the garbage collector for jjos / decaf.
+Here's what I'm planning,  roughly in the order that I intend to do the
+work:
+
+1.  Rewrite in C++. Avoid assumptions about 32-bit pointers to simplify
+later ports.
+2.  Rework it to be a generational collector. This should decrease the
+average pause time by performing lots of little garbage collects, rather
+than the occasional big one (these would still be needed, but less
+frequently).
+3.  Tune and optimise.
+4.  Add support for finalisation.
+5.  Add support for weak references.
+
+As part of this work, I'll need to put in simple support for virtual memory.
+This is so that the generational collector can find dirty pages that might
+have had inter-generational pointers stored into them. Also, the extra
+breathing space offered by a 4Gb virtual address space might simplify some
+aspects of heap layout. I'll put out a brief 'spec' before carrying out this
+work so that people can comment. Of course, if someone wanted to beat me to
+it...
+
+One thing to ponder is whether all the above work is worthwhile - the
+Boehm-Demers garbage collector does all the above and more (eg concurrent gc
+apparently), is freely available and usable, and has been developed and
+widely used for over a decade, so is very stable. Integrating that might be
+a better way to get JOS to progress (though perhaps less fun for me :-).
+
+Some other musings:
+
+· There should be another mail of mine floating around on the arch list
+containing thoughts on how to deal with real-time aspects of device drivers.
+Does anyone have any idea if what I propose there will be sufficient, or
+does more thought need to be given to it?
+
+· The current GC and the one proposed above are conservative (see the FAQ
+below for what this means). An upshot of this is that objects can't be moved
+once allocated, and this restricts the type of gc algorithms that can be
+used. There are a number of possibilities for making the garbage collector
+more accurate and thus able to move objects:
+1. Separate C++ heap from which objects are explicitly freed.
+2. Separate C++ heap which is conservatively gc'd.
+3. Get hold of C++ object and stack layout from the compiler. I haven't
+fully investigated this, but it would seem that the stabs debug information
+produced by g++ should contain all the information needed. Whether this is
+true when the optimisation levels are cranked up is not clear.
+
+Todd - didn't you let slip in a mail recently that you'd had some thoughts
+about Java v C++ gc? Care to elaborate?
+
+Anything else I should be considering? Any other comments?
+
+And finally, a handy GC FAQ: <A HREF="http://www.iecc.com/gclist/GC-faq.html">http://www.iecc.com/gclist/GC-faq.html</A>
+
+-- George
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000503.html">[JOS-Kernel] zlib implementation</A></li>
+	<LI> Next message: <A HREF="000506.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#491">[ date ]</a>
+              <a href="thread.html#491">[ thread ]</a>
+              <a href="subject.html#491">[ subject ]</a>
+              <a href="author.html#491">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

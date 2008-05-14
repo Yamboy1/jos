@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [zerich] C header file for dl..()</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:alain%40qnx.com">
+   <LINK REL="Previous"  HREF="000693.html">
+   <LINK REL="Next" HREF="000695.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [zerich] C header file for dl..()</H1>
+    <B>Alain Magloire</B> 
+    <A HREF="mailto:alain%40qnx.com"
+       TITLE="[JOS-Kernel] [zerich] C header file for dl..()">alain@qnx.com</A><BR>
+    <I>Sun, 5 Mar 2000 21:40:13 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000693.html">[JOS-Kernel] [zerich] C header file for dl..()</A></li>
+        <LI> Next message: <A HREF="000695.html">[JOS-Kernel] [zerich] C header file for dl..()</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#694">[ date ]</a>
+              <a href="thread.html#694">[ thread ]</a>
+              <a href="subject.html#694">[ subject ]</a>
+              <a href="author.html#694">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Bonjour
+
+&gt;<i> Functions for loading shared libraries dynamically are implemented in
+</I>&gt;<i> libdl.so. There is a header file for this library. What is it?
+</I>&gt;<i> 
+</I>
+#include &lt;dlfcn.h&gt;
+
+&gt;<i> According to Linux Programmer's Reference from Osborne/McGraw-Hill, my C
+</I>&gt;<i> program should include &quot;dlfcnt.h&quot;, like this:
+</I>&gt;<i> 
+</I>&gt;<i> #include &lt;dlfcnt.h&gt;
+</I>
+It is probably a typo, This is not a Linux specific thing,
+it is how the stds for example Unix98, define things.
+
+&gt;<i> 
+</I>&gt;<i> But not on my Linux distribution! I search for all files on my computer
+</I>&gt;<i> that start with &quot;dl&quot; and end with &quot;.h&quot; and I can find none.
+</I>
+/usr/include/dlfcn.h
+
+&gt;<i> 
+</I>&gt;<i> I looked up these functions on the Linux documentation project. While it
+</I>&gt;<i> gives the signatures for dlopen(), dlclose(), dlerror() and dlsym(), it
+</I>&gt;<i> does not give the values of RTLD_.. enumeration (like RTLD_LAZY) that's
+</I>&gt;<i> passed to dlopen().
+</I>
+RTLD_* are not defines directly in dlfcn for GNU lib C, since glibc
+is use for many different operating systems and arch (i.e. GNU/Linux,
+GNU/Hurd, etc ..) the dependent parts are included, for example in
+bits/*.h are asm/*.h etc .. but in you case you should never include
+them directly but use
+#include &lt;dlfcnt.h&gt;
+
+Look at the man pages or info files for more, this should have been
+your first stop.  You may wine about info and all but how hard could
+it have been to do `man dlopen' ??
+
+-- 
+au revoir, alain
+----
+Aussi haut que l'on soit assis, on est toujours assis que sur son cul !!!
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000693.html">[JOS-Kernel] [zerich] C header file for dl..()</A></li>
+	<LI> Next message: <A HREF="000695.html">[JOS-Kernel] [zerich] C header file for dl..()</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#694">[ date ]</a>
+              <a href="thread.html#694">[ thread ]</a>
+              <a href="subject.html#694">[ subject ]</a>
+              <a href="author.html#694">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

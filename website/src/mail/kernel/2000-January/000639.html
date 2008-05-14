@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jos.vm.* packages?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000638.html">
+   <LINK REL="Next" HREF="000640.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jos.vm.* packages?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] jos.vm.* packages?">gchii@mindspring.com</A><BR>
+    <I>Mon, 24 Jan 2000 13:03:21 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000638.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+        <LI> Next message: <A HREF="000640.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#639">[ date ]</a>
+              <a href="thread.html#639">[ thread ]</a>
+              <a href="subject.html#639">[ subject ]</a>
+              <a href="author.html#639">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 11:22 PM 1/23/00 -0500, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;&gt;<i> But two different classes should *never* have the same name. Since host and
+</I>&gt;&gt;<i> i386 use different drivers, there must be three packages:
+</I>&gt;<i>
+</I>&gt;<i>	I disagree utterly.  Shared code which uses these drivers should
+</I>&gt;<i>be platform-agnostic, which for now means having the same class names.  At
+</I>&gt;<i>such a point where decaf and the class libraries can support factories --
+</I>&gt;<i>so that common code never sees a 'naked' driver to begin with -- I'll
+</I>&gt;<i>reconsider my position.
+</I>
+Why can't we switch to factories now? It would simplify the bytecode
+directories. I can easily provide you with a factory. I can rework two
+jos.platform.driver packages into jos.host.driver and jos.i386.driver.
+Would you like me to do that?
+
+Here is one example. The common code inside the keyboard class does not
+need to know where the implementation of jos.platform.keyboard is stored.
+Here is the first few lines of the original init() method from
+jos.platform.keyboard:
+
+----- jos/platform/keyboard.java
+  public void init () {
+    /* generate the default drivers */
+    // System.err.println( &quot;keyboard.init(): generating keyboard
+interpreter...&quot; );
+    ki = new jos.platform.driver.KeyboardInterpreter();
+
+    // System.err.println( &quot;keyboard.init(): generating keyboard driver...&quot;
+);
+    kd = new jos.platform.driver.keyboard();
+-----
+
+It could be reimplemented with a factory, like this:
+
+----- jos/platform/keyboard.java
+  public Object getFactoryObject( String v ) {
+    return Factory.getFactory().getObject( v );
+  }
+  public void init () {
+    /* generate the default drivers */
+    // System.err.println( &quot;keyboard.init(): generating keyboard
+interpreter...&quot; );
+    ki = new jos.platform.driver.KeyboardInterpreter();
+
+    // System.err.println( &quot;keyboard.init(): generating keyboard driver...&quot;
+);
+    // *D! kd = new jos.platform.driver.keyboard();
+    kd = (jos.platform.keyboard) getFactoryObject( &quot;jos.platform.keyboard&quot; );
+-----
+
+Each variation of a build can return a different implementation of
+jos.platform.keyboard, inside a different package.
+
+For a host build, getFactoryObject( &quot;jos.platform.keyboard&quot; ) would return
+jos.host.driver.keyboard.
+
+For a i386 build, getFactoryObject( &quot;jos.platform.keyboard&quot; ) would return
+jos.i386.driver.keyboard.
+
+Where is the Factory class? It has already been distributed as the Bytecode
+Native Interface. The factory class only needs to be &quot;configured&quot; for each
+variation of a build.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000638.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+	<LI> Next message: <A HREF="000640.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#639">[ date ]</a>
+              <a href="thread.html#639">[ thread ]</a>
+              <a href="subject.html#639">[ subject ]</a>
+              <a href="author.html#639">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

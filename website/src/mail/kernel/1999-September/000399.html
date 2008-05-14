@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] speed of ResourceManager</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:draft%40fear.ch">
+   <LINK REL="Previous"  HREF="000397.html">
+   <LINK REL="Next" HREF="000385.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] speed of ResourceManager</H1>
+    <B>Thomas Bocek</B> 
+    <A HREF="mailto:draft%40fear.ch"
+       TITLE="[JOS-Kernel] speed of ResourceManager">draft@fear.ch</A><BR>
+    <I>Tue, 28 Sep 1999 12:53:25 +0200 (CEST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000397.html">[JOS-Kernel] decaf bug report / Status of RessourceManager</A></li>
+        <LI> Next message: <A HREF="000385.html">[JOS-Kernel] Re: stupid code proposal for decaf</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#399">[ date ]</a>
+              <a href="thread.html#399">[ thread ]</a>
+              <a href="subject.html#399">[ subject ]</a>
+              <a href="author.html#399">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello world :-)
+
+
+On Mon, 27 Sep 1999, Matt Albrecht wrote:
+
+&gt;<i> Hey, all.
+</I>&gt;<i> 
+</I>&gt;<i> Thomas Bocek &lt;<A HREF="mailto:draft@fear.ch">draft@fear.ch</A>&gt; wrote:
+</I>&gt;<i> &gt; The RessourceManager is still unfinished, but today I added the
+</I>&gt;<i> &gt; DMA/PORT/IRQ reserve method. The RM is hooked into the dma class, so that
+</I>&gt;<i> &gt; the dma-driver works now with the RessourceManager.
+</I>&gt;<i> 
+</I>&gt;<i> Just a really minor point.  &quot;RessourceManager&quot; is a type-o. &quot;Resource&quot; is
+</I>&gt;<i> the correct spelling, unless you're wanting to differentiate it from
+</I>&gt;<i> something else...  I'm lucky that I know that spelling, kaws eye'm knot two
+</I>&gt;<i> gud at spelng, meyesalph.
+</I>
+whoops have to change RessourceManager.java into ResourceManager.java.
+thanks. (german: resources=ressourcen)
+ 
+
+&gt;<i> &gt; As a consequence of the new RM, the drivers need slightly to be updated.
+</I>&gt;<i> &gt; e.g. the fdc driver contains 2 more lines:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; RessourceManager rm=new RessourceManager();
+</I>&gt;<i> &gt; boolean reserved=rm.reserveDMA(2,this,false);
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; <A HREF="file://2">file://2</A>     -&gt; channel
+</I>&gt;<i> &gt; <A HREF="file://this">file://this</A>  -&gt; only this class can access dma 2
+</I>&gt;<i> &gt; <A HREF="file://false">file://false</A> -&gt; shareable -&gt; if 2 or more drivers are allowed to acces the
+</I>&gt;<i> &gt; //         same ressource
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; <A HREF="file://and">file://and</A> the line
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; dma_xfer(2,address,(int)nosectors*512,true,this);
+</I>&gt;<i> &gt; // has 1 more argument(this)
+</I>&gt;<i> 
+</I>&gt;<i> Just my 2 cents.  Should DMA for channel be an instance (created by
+</I>&gt;<i> rm.reserveDMA(...) ), where all DMA requests are filtered, or should it be
+</I>&gt;<i> accessed directly like you have above?  Since DMA is a highly time-sensitive
+</I>&gt;<i> hardware piece (well, all direct low-level hardware is timing sensitive), we
+</I>&gt;<i> need the fastest method to use it.  But, then, having a spiffy
+</I>&gt;<i> object-oriented interface is handy, too, especially for porting purposes.
+</I>
+You can only access dma_xfer(x,...) if you have reserved the dma. The only
+class which can access x is this (you have to reserve and access dma
+within one class).
+ 
+&gt;<i> On another point, what should we do with Plug-n-prey devices that have the
+</I>&gt;<i> option of using one of two DMA devices? Should we force the device driver
+</I>&gt;<i> developer to write out the long-hand of testing each DMA port, and reserving
+</I>&gt;<i> the most appropriate one (if both are available), or should this be a
+</I>&gt;<i> built-in function?  This all comes down to the speed and size of the kernel,
+</I>&gt;<i> of which I can't properly answer.
+</I>
+I made a method called getFreeDMA, which gives me the next free DMA. I
+think this should be enough for Plug'n'Pray. Pherhaps RM will need antoher
+method called getFreeDMA(int[]) -&gt; int[] the dma numbers that work with
+the pnp-card.
+I didn't find any good docu about pnp :-(
+
+
+&gt;<i> &gt; Now I thought about the speed of the RM: every call (DMA/PORT/IRQ) has to
+</I>&gt;<i> &gt; be verified. The dma method checks every call if the caller is the
+</I>&gt;<i> &gt; right owner. Isn't that slow? How do other OSes handle ressources?
+</I>&gt;<i> &gt;
+</I>&gt;<i> 
+</I>&gt;<i> This check could be eliminated by forcing all dedicated hardware resources
+</I>&gt;<i> to be passed through specific instances of a class, which can be
+</I>&gt;<i> constructed/divied up only by a special resource manager factory.
+</I>
+see below...
+
+[cut-n-paste] Hilarys mail:
+
+&gt;<i> For this issue, We can do it in this way.
+</I>&gt;<i> No one can construct a RM directly. Everyone need to get a instance of 
+</I>&gt;<i> RM so that they access DMA. So I put reserveDMA as a static method. If I
+</I>&gt;<i> need a DMA 2 unshareable, RM will create a instance of itself for me
+</I>&gt;<i> that can only access DMA 2. So only one got the instance of this RM can
+</I>&gt;<i> only access DMA 2.
+</I>&gt;<i>
+</I>&gt;<i> For this change, we don't need to check the classes each time and it
+</I>&gt;<i> will speed up a little bit.
+</I>&gt;<i>
+</I>&gt;<i> RessourceManager rm = RessourceManager.reserveDMA(2, false);
+</I>&gt;<i> rm.dma_xfer(address, (int) nosectors*512);
+</I>&gt;<i>
+</I>&gt;<i> ....................................
+</I>&gt;<i> ....................................
+</I>&gt;<i> public static RessouceManager reserveDMA(int dma, boolean shareable) {
+</I>&gt;<i>     RessouceManager rm = new RessouceManager(dma, shareable);
+</I>&gt;<i>     return rm;
+</I>&gt;<i> }
+</I>&gt;<i>
+</I>&gt;<i> public void dma_xfer(int address, int size) {
+</I>&gt;<i>   ....................................
+</I>&gt;<i>   ....................................
+</I>&gt;<i> }
+</I>&gt;<i> ....................................
+</I>&gt;<i> ....................................
+</I>
+Is it possible in Java to allow only one instance for one DMA? There could
+be x (if not shareable 8) instances, but only one for dma 2. So your
+public static RessouceManager reserveDMA needs to be extended. Does anyone
+know a good solution?
+
+[cut]
+&gt;<i> &gt; dma_xfer(2,address,(int)nosectors*512,true,this);
+</I>&gt;<i> &gt; // has 1 more argument(this)
+</I>
+&gt;<i> hm...........what's the meaning of the boolean argument in dma_xfer ?
+</I>
+whether dma_xfer should read or write : true=read, false=write.
+ 
+
+Thomas Bocek
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000397.html">[JOS-Kernel] decaf bug report / Status of RessourceManager</A></li>
+	<LI> Next message: <A HREF="000385.html">[JOS-Kernel] Re: stupid code proposal for decaf</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#399">[ date ]</a>
+              <a href="thread.html#399">[ thread ]</a>
+              <a href="subject.html#399">[ subject ]</a>
+              <a href="author.html#399">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

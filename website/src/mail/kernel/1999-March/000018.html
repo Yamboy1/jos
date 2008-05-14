@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000011.html">
+   <LINK REL="Next" HREF="000012.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf &amp; keyboard driver: follow-up idea">tmiller@haverford.edu</A><BR>
+    <I>Mon, 29 Mar 1999 14:29:32 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000011.html">[JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</A></li>
+        <LI> Next message: <A HREF="000012.html">[JOS-Kernel] I'm a newbie</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#18">[ date ]</a>
+              <a href="thread.html#18">[ thread ]</a>
+              <a href="subject.html#18">[ subject ]</a>
+              <a href="author.html#18">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> which is just fine for the AT system.
+</I>
+	*shrug*  Is one better than the other for the AT?  (As that the
+target architecture is i386.)
+
+&gt;<i> Right, in a sense (I just want to make sure that the air is clear here).  The PHM
+</I>&gt;<i> has several HardwareManagers registered with it, and any requests for a particular
+</I>&gt;<i> type of hardware get sent off to the HardwareManager that accepts that hardware type
+</I>&gt;<i> requested.
+</I>
+	So who's registering the various HardwareManagers?  Other Devices?
+(The system builds from the PHM by adding the PCI/ISA/AGP/USB bus devices,
+then devices on those busses?  (Although I suppose that PCI, ISA, and AGP
+unregister after scanning for devices.  One would expect the PCI bus
+to discover other busses like SCSI and FireWire, as well?)  That seems to
+be the direction you're heading in with the newbetter approach.)
+
+&gt;<i> As per my code, when an HRI is created, it knows the ranges it was allocated.  Then
+</I>&gt;<i> on each call, it just checks to see if the requested range was valid.  If not, it
+</I>&gt;<i> throws a HardwareResourceNotAllocatedException.  This could be too much of an
+</I>&gt;<i> overhead, though.
+</I>
+	Two questions: who decides if the range is valid?  Secondly, are
+we allowing only certain user's processes to request hardware resources?
+(Probably.  If so, how implement that?  But we can punt on that question
+because we don't have the concept of `users' in JOS yet.  Which will
+probably be another world of pain...)
+
+&gt;<i> Ok!  I never was too happy with my interrupt interface code anyway.
+</I>
+	I think I mentioned this elsewhere: the InterruptInterface becomes
+either a constructor or the primary reciever or &quot;interrupt events.&quot;  (i.e.
+either addInterruptListener to jos.system.interruptdispatcher -- which
+should probably be in Machine, but I digress -- or implement
+interruptdispatcher by itself.)
+
+&gt;<i> Yup.  BTW - I found the JavaOS book at Barnes &amp; Noble today, and the section on
+</I>&gt;<i> interrupts describes that JavaOS supports both native and Java interrupt handlers.
+</I>&gt;<i> Which makes sense, especially with time critical interrupts like USB or whatever.
+</I>
+	We can support support both also; whether a particular
+distribution does or not depends on the philosophical outlook of the
+distributor and/or the necessary effiencies.  (There is a single,
+well-known point where the scheduler considers interrupts.  What various
+coders do with it is up to them.  I would, however, suggest that they
+implement their native drivers as native java methods rather than do
+kernel hacking...)
+
+&gt;<i> Such as Winblows and OS/2's Ctrl-Esc sequence?  I've been thinking about this - the
+</I>&gt;<i> keyboard shouldn't be sending out events to every joe shmoe application that
+</I>&gt;<i> registers an event listener.  That would mean that when you type the letter &quot;a&quot;, 5
+</I>&gt;<i> applications display the letter &quot;a&quot; in their text box.  The keyboard device should
+</I>&gt;<i> really restrict who gets actual key events.  Under a GUI, the window manager would
+</I>&gt;<i> need to replace the jos.system.keyboard for an application such that it only
+</I>&gt;<i> recieves key events when it has the focus.  This is a tricky spot with big warning
+</I>&gt;<i> messages flashing in neon.
+</I>
+	Yeah.  See my rather lengthy response to your other post.
+
+-_Quinn
+
+
+
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000011.html">[JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</A></li>
+	<LI> Next message: <A HREF="000012.html">[JOS-Kernel] I'm a newbie</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#18">[ date ]</a>
+              <a href="thread.html#18">[ thread ]</a>
+              <a href="subject.html#18">[ subject ]</a>
+              <a href="author.html#18">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

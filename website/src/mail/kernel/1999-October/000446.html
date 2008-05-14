@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] new interrupt model</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:draft%40fear.ch">
+   <LINK REL="Previous"  HREF="000445.html">
+   <LINK REL="Next" HREF="000447.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] new interrupt model</H1>
+    <B>Thomas Bocek</B> 
+    <A HREF="mailto:draft%40fear.ch"
+       TITLE="[JOS-Kernel] new interrupt model">draft@fear.ch</A><BR>
+    <I>Wed, 27 Oct 1999 19:55:58 +0200 (CEST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000445.html">[JOS-Kernel] new interrupt model</A></li>
+        <LI> Next message: <A HREF="000447.html">[JOS-Kernel] new interrupt model</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#446">[ date ]</a>
+              <a href="thread.html#446">[ thread ]</a>
+              <a href="subject.html#446">[ subject ]</a>
+              <a href="author.html#446">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd and all
+
+On Tue, 26 Oct 1999, Todd L. Miller wrote:
+
+&gt;<i> 	Went with the hybrid proposal, and it works perfectly (AFAIT*) on
+</I>&gt;<i> the host now.  I'll try to test the i386 boot out sometime tonight.  The
+</I>&gt;<i> native code support is activated with the -DNEW_INTERRUPT_HANDLING flag,
+</I>&gt;<i> but the bytecode support is radically different, to the extent that I had
+</I>&gt;<i> to make a new bytecode tree and compile against that.  Once I bring that
+</I>&gt;<i> tree up to snuff, I'll just move into where the old tree was and finally
+</I>&gt;<i> do a CVS commit and the thing.
+</I>
+great I'll take a look at it.
+ 
+&gt;<i> 	Driver writers: the new interrupt paradigm is straight
+</I>&gt;<i> event-based, with jos.system.interrupts using addInterruptListener() in
+</I>&gt;<i> the usual way, with one exeption.  When the interpreter finishes the
+</I>&gt;<i> current timeslice, it checks the interrupt queue; while it's not empty,
+</I>&gt;<i> the C code will extract your driver objects from jos.system.interrupts and
+</I>&gt;<i> run its handleInterrupt ( int interrupt_number ) code from there.  This
+</I>&gt;<i> code will run, uninterrupted -- including by other interrupts -- until it
+</I>&gt;<i> completes, so be very careful with it.  Get your data from the h/w in that
+</I>&gt;<i> function and let another thread take care of the analysis, if at all
+</I>&gt;<i> possible.  (The keyboard driver, for instance, (will) slurps scancodes out
+</I>&gt;<i> of the controller and shoves them into a queue, where the keyboard daemon
+</I>&gt;<i> can play with them, distribute them, etc.)
+</I>
+Is it possible to dispatch/register more than one interrupt?
+
+The fdc-driver (not event based) has 2 lines in &quot;handleInterrupt&quot; I hope
+that is not time critical. Or does this driver has to be event based too?
+ 
+&gt;<i> 	My model, in general, is that jos.platform.* is limited to
+</I>&gt;<i> abstractions common across every computer JOS will run on, like keyboards
+</I>&gt;<i> (even if they aren't there).  jos.platform.keyboard generates Key and
+</I>&gt;<i> Scancode events, but jos.platform.driver.keyboard (&amp; keyboardd) is what
+</I>&gt;<i> handles the hardware (lower-edge) part of the driver.  The
+</I>&gt;<i> platform.drivers are expected to use jos.system.* (probably should be
+</I>&gt;<i> renamed) to access the h/w, via the interrupts and machine classes, and
+</I>&gt;<i> more as we need them.
+</I>&gt;<i> 
+</I>&gt;<i> 	Thus jos.platform.screen would be driven by
+</I>&gt;<i> jos.platform.driver.screen, which would just be Thomas Bocek's VGA driver
+</I>&gt;<i> class (or a wrapper there-to).  jos.platform.driver.* will be copied over
+</I>&gt;<i> from arch/bytecode/jos/platform/driver/* according the current build, so
+</I>&gt;<i> that's how we get h/w-specificity.
+</I>[cut]
+
+some more questions:
+
+The &quot;jos.platform.driver.screen&quot; function is hooked into
+classpath ,probably with the reflection-class, and will decide which
+driver to load (Vga,Matrox or whatever) and there will also be  
+jos.platform.driver.networt, jos.platform.driver.hd,....
+ 
+
+Thomas Bocek
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000445.html">[JOS-Kernel] new interrupt model</A></li>
+	<LI> Next message: <A HREF="000447.html">[JOS-Kernel] new interrupt model</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#446">[ date ]</a>
+              <a href="thread.html#446">[ thread ]</a>
+              <a href="subject.html#446">[ subject ]</a>
+              <a href="author.html#446">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

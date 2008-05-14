@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Big CVS commitments (mostly focused upon conservative GC)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000350.html">
+   <LINK REL="Next" HREF="000352.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Big CVS commitments (mostly focused upon conservative GC)</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Big CVS commitments (mostly focused upon conservative GC)">jm@mak.com</A><BR>
+    <I>Fri, 10 Sep 1999 11:16:12 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000350.html">[JOS-Kernel] Article on JavaLobby</A></li>
+        <LI> Next message: <A HREF="000352.html">[JOS-Kernel] Big CVS commitments (mostly focused upon conservative
+ GC)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#351">[ date ]</a>
+              <a href="thread.html#351">[ thread ]</a>
+              <a href="subject.html#351">[ subject ]</a>
+              <a href="author.html#351">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi All;
+
+I have just merged/updated the latest changes from CVS with the ones I
+emailed you all about earlier (fixes by Thomas, George, Todd, etc.).
+PLEASE let me know ASAP if there are problems introduced by the
+following file commitments:
+
+arch/host/main.cc: added top-of-stack-finding mechanism to support GC
+
+arch/i386/entry.cc: added top-of-stack-finding mechanism to support GC
+
+common/decaf/attr_info.cc: changed string-checking to no-garbage
+method
+
+common/decaf/attr_list.cc: no longer allocates zero-length blocks
+
+common/decaf/field_list.cc: ditto
+
+common/decaf/field_table.cc: ditto
+
+common/decaf/frame.cc: null-out local_vars prior to delete for GC
+
+commmon/decaf/interface_list.cc: no more zero-length blocks.
+
+common/decaf/interp.cc: fixed operand-order bugs Thomas identified.
+
+common/decaf/java_thread.cc: removed redundant delete calls
+
+common/decaf/method_list.cc: no more zero-length blocks.
+
+common/nativecode/jbheap.cc: selectable malloc/free/GC
+implementations.  Conservative GC now checks stack.
+
+common/nativecode/jbheap.h: definition for stack-top member var.
+
+common/nativecode/stdlib.cc: added %p format type for pointer
+
+common/nativecode/gc: whole directory added w/ new sources for
+conservative GC (George Marrows' contribution!)
+
+common/bytecode/init.java: added testGC method.  reorganized into
+smaller methods.
+
+
+-jm
+
+p.s., The JOS logo on the VGA screen is a nice touch!
+
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/">http://www.mak.com/</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000350.html">[JOS-Kernel] Article on JavaLobby</A></li>
+	<LI> Next message: <A HREF="000352.html">[JOS-Kernel] Big CVS commitments (mostly focused upon conservative
+ GC)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#351">[ date ]</a>
+              <a href="thread.html#351">[ thread ]</a>
+              <a href="subject.html#351">[ subject ]</a>
+              <a href="author.html#351">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

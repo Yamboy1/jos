@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [rheise.os 0.1.4] Warning</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:iainshigeoka%40yahoo.com">
+   <LINK REL="Previous"  HREF="000893.html">
+   <LINK REL="Next" HREF="000899.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [rheise.os 0.1.4] Warning</H1>
+    <B>Iain Shigeoka</B> 
+    <A HREF="mailto:iainshigeoka%40yahoo.com"
+       TITLE="[JOS-Kernel] [rheise.os 0.1.4] Warning">iainshigeoka@yahoo.com</A><BR>
+    <I>Mon, 18 Sep 2000 18:10:18 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000893.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+        <LI> Next message: <A HREF="000899.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#895">[ date ]</a>
+              <a href="thread.html#895">[ thread ]</a>
+              <a href="subject.html#895">[ subject ]</a>
+              <a href="author.html#895">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 07:50 AM 5/16/00 +1000, Ryan Heise wrote:
+
+&gt;<i>rheise.os-0.1.4-pre4 can be deconstructed as follows:
+</I>&gt;<i>
+</I>&gt;<i>The first number is the major version number. It is currently zero
+</I>
+[snip]
+
+&gt;<i>The second number is odd if this is a development release, or even if it
+</I>
+[snip]
+
+&gt;<i>The third number represents minor releases that includes changes
+</I>
+[snip]
+
+&gt;<i>The -pre4 suffix means that this is the 4th pre-release of what is to
+</I>
+[snip]
+
+This seems pretty standard.  Perhaps we should put this into the wiki as a 
+standard naming convention.  I assumed it was understood too but it appears 
+that its not tha standard.
+
+&gt;<i>the java package names, which is a different issue. The latter affects
+</I>&gt;<i>backward compatibility, and my believe is that such changes should be
+</I>&gt;<i>made as early as possible. This is because as more people start writing
+</I>&gt;<i>OS services on top of rheise.os, it will be more and more work for
+</I>&gt;<i>everyone to change their code when I rename my packages to jos.*. While
+</I>&gt;<i>my product is not _the_ java layer for JOS, I still see benefit in
+</I>&gt;<i>naming my classes jos.*. All I have done here is expressed my believe. I
+</I>&gt;<i>know you have different opinions on backward compatibility and I do not
+</I>&gt;<i>wish to argue about them here. Let's just acknowledge for the moment
+</I>&gt;<i>that we have different opinions and we are entitled to go with what we
+</I>&gt;<i>think is best. Later we can discuss our differences.
+</I>
+This seems to be more a matter of what should go into the jos.* package 
+space and what shouldn't.  What I think would be really nice is to leave 
+most of the jos.* core system packages as interfaces.  Then let 
+implementations exist outside of the jos.* package space and get sucked in 
+and instantiated at run-time via property files.  This is similar to the 
+CommAPI package.  The base package specifies low level interfaces, but the 
+actual functionality is provided by packages outside of the 
+space.  Depending on the property file you put into your directory, the 
+startup code instantiates the correct serial port driver that implements 
+the interfaces that the package functionality is built on.
+
+It is my impression that this is the direction that Ryan is 
+taking.  However, at this time, due to the EXTREMELY experimental nature of 
+most of the code related to JOS, shortcuts will be made, and package names 
+will be very unstable.
+
+Gilbert, I understand your desire to keep backward compatibility but it 
+simply does not seem feasible with the current codebase.  It's way too 
+mercurial at this point.  We don't know what should be in the common 
+interfaces and what should be implemented separately.  So i think for now, 
+that we'll all have to just live with the inconsistencies and have file 
+search and replace ready when changes do happen... ;)
+
+&gt;<i>It is the product name that makes it unique. My proposal for the JOS
+</I>&gt;<i>process API is that applications deal with a class called
+</I>&gt;<i>jos.process.JavaProcess.
+</I>
+And this seems reasonable.  In all reality, we should really only 
+standardize on interfaces and leave implementations to anyone.  That will 
+make JOS's implementation that ships the reference implementation but allow 
+anyone to replace any part with any other implementation.
+
+-iain
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000893.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+	<LI> Next message: <A HREF="000899.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#895">[ date ]</a>
+              <a href="thread.html#895">[ thread ]</a>
+              <a href="subject.html#895">[ subject ]</a>
+              <a href="author.html#895">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

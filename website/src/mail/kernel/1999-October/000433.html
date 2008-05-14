@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] interrupt handling</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000438.html">
+   <LINK REL="Next" HREF="000442.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] interrupt handling</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] interrupt handling">tmiller@haverford.edu</A><BR>
+    <I>Sun, 24 Oct 1999 09:01:02 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000438.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+        <LI> Next message: <A HREF="000442.html">[JOS-Kernel] interrupt handling</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#433">[ date ]</a>
+              <a href="thread.html#433">[ thread ]</a>
+              <a href="subject.html#433">[ subject ]</a>
+              <a href="author.html#433">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Right now, the kernel code simply queues up interrupts until the
+interperter gets around to asking if any interrupts had happened while it
+busy doing java things.  (Reasoning: we don't have multitasking/threading
+yet, because it's rather difficult, so we can't context-switch to an
+interperter running the interrupt code; it would be too difficult to be
+worthwhile to make the interperter interruptable; and this way offers a
+fast turn-around to the hardware, so interrupts don't get lost in the
+kernel.)  
+
+	The interperter than looks at the queue before (after) every set
+(currently one) of java bytecodes executed (i.e. when the interperter is
+known to be in a safe state).  If there's an interrupt waiting to be
+handled, the scheduler (in a hideously inefficient manner) extracts the
+proper (static) interrupt object in the interrupts class it's been passed,
+and calls notifyAll() on it, which schedules the thread(s) wait()ing on
+that interrupt to run.
+
+	The problem is two-fold: first, notifyAll() appends threads to the
+scheduled list, rather than inserting them.  (i.e., the interrupt handling
+thread(s) is (are) not prioritized.)  Second, this method is prone to
+having the interrupt handlers lose interrupts.  If an interrupt handler
+doesn't wait() on the interrupt object before the next interrupt occurs,
+it's gone.  (Threading the response doesn't help, because the same logic
+applies.)  (This, in addition to the fact that a single thread can't
+listen for more than one interrupt this way.)
+
+	While there are any number of interesting ways to tackle this,
+they all have to do two things: 1, throw the interrupts 'over the wall*'
+to the Java code so the Right Things can happen; 2, arrange for the Java
+code not to lose interrupts.  Two solutions immediately present
+themselves.  First, using the MappedMemory extension**, construct an
+interrupt table (list/vector/etc) and have some java scheduler thread sit
+around and check it for changes.  When it dispatches an interrupt, it just
+notes that change and moves along.  Second, declare a function (say,
+jos.system.machine.handleInterrupt(int num)) to be &quot;well known&quot; and call
+it whenever an interrupt happens, and let the java code queue/stack/etc up
+the interrupts and schedule them however it sees fit.  (Which should be
+add/removeInterruptListener &amp; event-based, IMHO.)
+
+	The third possibility is a hybrid of the two.  Have a well-known
+class, say jos.system.machine, which has [add|remove]InterruptListener
+methods adding listeners to a well-known (constant static***) array of
+vectors therein. The kernel can then extract this information and schedule
+the interested threads appropriately (i.e. at the top of the queue,
+aborting the current thread).  This solution is efficient, exposes the
+internals of the scheduler minimally to the Java, and imposes minimal
+restrictions on the Java code.  Combined with a timer mechanism
+(jos.system.machine.setTimer()?) (and native support for it!), this should
+make the driver writers' jobs much simpler.  It should also translate
+pretty closely into the JavaOS/B model whenever we might implement it.
+
+	Commentary?  I'm planning on doing a clean checkout of the CVS
+tree and making sure things work right 'out of the box' and discovering
+what all changes I've been making piece-meal should actual be committed.
+After that, I'd like to fix interrupts and the keyboard driver.  I do not,
+however, have any kind of time-line for these projects... 
+
+-_Quinn
+
+P.S.: JM, have you committed the new gc stuff to CVS yet?
+
+* More on 'the wall' later.  I've been doing some ruminations about
+garbage collection, involving allocating java and c memory differently,
+among other things.  (I'm thinking the right name for what I'm fiddling
+with for the java stack would be &quot;fractional mark and sweep&quot;, but don't
+hold it to me -- I'm not a gc expert, yet :))
+
+** Returns a Java array at a certain h/w address.  Useful for things like
+VGA buffers and DMA transfers.  Not implemented yet.
+
+*** i.e., for efficiency, if we cache the pointer to the vector, it will
+always be right.
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000438.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+	<LI> Next message: <A HREF="000442.html">[JOS-Kernel] interrupt handling</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#433">[ date ]</a>
+              <a href="thread.html#433">[ thread ]</a>
+              <a href="subject.html#433">[ subject ]</a>
+              <a href="author.html#433">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

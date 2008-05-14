@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Utah's OSKit + VGA works</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000332.html">
+   <LINK REL="Next" HREF="000335.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Utah's OSKit + VGA works</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Kernel] Utah's OSKit + VGA works">jewel@pixie.co.za</A><BR>
+    <I>Tue, 7 Sep 1999 02:14:02 +0200 (SAST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000332.html">[JOS-Kernel] Utah's OSKit</A></li>
+        <LI> Next message: <A HREF="000335.html">[JOS-Kernel] Utah's OSKit + VGA works</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#334">[ date ]</a>
+              <a href="thread.html#334">[ thread ]</a>
+              <a href="subject.html#334">[ subject ]</a>
+              <a href="author.html#334">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> &gt; But with regards to the OSKit, I have no idea what it's doing before it
+</I>&gt;<i> &gt; boots the VM, so it could be something there.
+</I>&gt;<i> 
+</I>&gt;<i> 	Oh, I just meant write the native method for your VGA stuff into
+</I>&gt;<i> the VM, and run it to make sure that OSKit wasn't doing something odd --
+</I>&gt;<i> i.e. make sure that the problem is the VM/Java, not OSKit.
+</I>
+That's what I was doing already, but in my stupidity I only implemented
+the methods from jjmachine.cc and didn't look at jvmbuiltins. I added the
+other 6 read8,write8,read16 ... methods and everything worked perfectly.
+
+I timed the VGA test (for comparison, not competition!), it took about 50
+seconds from textmode-to-textmode (including the delay). The PC is a
+486DX100 with a venerable Tseng ET4000.
+
+As far as I could see there were some red things at the top, with green
+vertical lines. This then got cleared followed by a JOS logo.
+
+Very impressive guys, the fact that I only had to cut and paste 12 methods
+(less that 50 lines) into my VM code shows how beautiful device drivers in
+Java can be!
+
+John Leuner
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000332.html">[JOS-Kernel] Utah's OSKit</A></li>
+	<LI> Next message: <A HREF="000335.html">[JOS-Kernel] Utah's OSKit + VGA works</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#334">[ date ]</a>
+              <a href="thread.html#334">[ thread ]</a>
+              <a href="subject.html#334">[ subject ]</a>
+              <a href="author.html#334">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

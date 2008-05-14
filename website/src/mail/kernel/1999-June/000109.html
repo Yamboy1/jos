@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Alternative approach to &quot;memory&quot; classes...</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000107.html">
+   <LINK REL="Next" HREF="000110.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Alternative approach to &quot;memory&quot; classes...</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Alternative approach to &quot;memory&quot; classes...">jm@mak.com</A><BR>
+    <I>Tue, 29 Jun 1999 08:25:28 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000107.html">[JOS-Kernel] Seeking scheme to handle unsigned data types
+ for drivers</A></li>
+        <LI> Next message: <A HREF="000110.html">[JOS-Kernel] Alternative approach to &quot;memory&quot; classes...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#109">[ date ]</a>
+              <a href="thread.html#109">[ thread ]</a>
+              <a href="subject.html#109">[ subject ]</a>
+              <a href="author.html#109">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi All;
+
+Sorry for the wide distribution, but I am interested in hearing your
+thoughts on the following, JOS-wide, and (unfortunately) related
+issues...
+
+Issue #1:
+
+Just bought the &quot;Inside JavaOS&quot; book.  Haven't had time to read the
+whole thing (you know how it is).  JavaOS has a quite different (and
+much more comprehensive) approach to memory classes than any of the ones
+I wrote about in my recent message to the kernel list (those of you who
+aren't on the kernel list can check the archives if you're really
+interested, but I really need your inputs on Issue #2...)
+
+Seems they have opaque (to Java, anyways) address32 and address64
+classes.  They also have &quot;address range&quot; classes, DMA address space
+classes, and even (seems to me) I/O space classes (as a 16-bit address
+space).  I haven't exactly figured out and/or read far enough to know
+if/how they handle the *contents* of addresses as unsigned quantities,
+although I'm sure they can handle it also via opaque classes.  Finally,
+they even seem to have an approach to handling physical&lt;-&gt;virtual
+mapping machinery.
+
+So, I guess this comes down to either of two options (please excuse the
+hyperbole):
+
+(1) inventing our own, unique, simplistic, must-be-upgraded-later
+approach, which will be expedient in the short term, but will never be
+able to use JavaOS drivers/software, and will be much harder for us to
+get consensus upon (e.g., agreeing upon driver, system, OS, and &quot;kernel&quot;
+APIs), or
+
+(2) implementing something as close as is humanly possible to the JavaOS
+API(s), which will be more work in the short term, but maybe less in the
+long term, and which will obviate the consensus-building group-grope
+problem we currently have, which makes it much harder to get anything
+done that involves more than one person...
+
+Basically, option (1) is the &quot;let's re-invent the wheel&quot; approach, and
+(2) is the time-honored, Open Source &quot;chase the tail-lights&quot; approach. 
+As much as I like designing my own APIs (of course, they would be far
+superior to and more aesthetically pleasing than the JavaOS ones --
+*N-O-T*), I'm kind of leaning towards option (2).  I mean, hell, we're
+not redesigning the Java language, the bytecodes, or the java.* classes,
+so...
+
+Issue #2:
+
+Are there any legal ramifications of cloning the JavaOS APIs?  Is
+anybody in a position to find out?  If there are issues, I'd sure like
+to know about them right now so that we can do option (1) instead...
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000107.html">[JOS-Kernel] Seeking scheme to handle unsigned data types
+ for drivers</A></li>
+	<LI> Next message: <A HREF="000110.html">[JOS-Kernel] Alternative approach to &quot;memory&quot; classes...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#109">[ date ]</a>
+              <a href="thread.html#109">[ thread ]</a>
+              <a href="subject.html#109">[ subject ]</a>
+              <a href="author.html#109">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [VM Kit] field list</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000880.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [VM Kit] field list</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [VM Kit] field list">gchii@mindspring.com</A><BR>
+    <I>Fri, 25 Aug 2000 13:01:21 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000880.html">[JOS-Kernel] Kernel Compatibility</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#879">[ date ]</a>
+              <a href="thread.html#879">[ thread ]</a>
+              <a href="subject.html#879">[ subject ]</a>
+              <a href="author.html#879">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>A field list component is a primative part of a virtual machine. It can
+exist outside a virtual machine for extreme testing. In other words, it can
+be completely tested /before/ it is integrated into your virtual machine.
+
+A field list is a component of each object. Just as it has a method list,
+an object has a field list. A field list can be used to store static fields
+for a class and instance fields for an object. And it looks as if the field
+list component could be reusable by the stack frame for local variables, too.
+
+A field list allocates room for fields when it is open'd. To initialize a
+field list, repeatedly call its addField() method for each field. The
+addField() method has a prototype like this:
+
+void FieldList::addField( const char *fieldSpec, const char *descriptor );
+
+where fieldSpec is a full field name (java/lang/System/out) and descriptor
+is the field type (Ljava/io/InputStream;).
+
+When open'd, the FieldList also creates a cross-reference index, so that
+fields can be addressed by their ID rather than by their name. FieldList
+provides a method to get a field ID:
+
+short FieldList::getFieldID( const char *fieldSpec );
+
+To get/set a four-octet field, use
+
+getIntField( short id );
+getIntField( const char *fieldSpec );
+setIntField( short id, jint v );
+setIntField( const char *fieldSpec, jint v );
+
+To get/set an eight-octet field, use
+
+getLongField( short id );
+getLongField( const char *fieldSpec );
+setLongField( short id, jlong v );
+setLongField( const char *fieldSpec, jlong v );
+
+Different field list components are possible. Some might organize fields
+into a linked list, an array, or allocate a single block of memory for all
+fields in the list.
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000880.html">[JOS-Kernel] Kernel Compatibility</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#879">[ date ]</a>
+              <a href="thread.html#879">[ thread ]</a>
+              <a href="subject.html#879">[ subject ]</a>
+              <a href="author.html#879">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

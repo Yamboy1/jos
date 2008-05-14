@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Opcode method</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000937.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Opcode method</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Opcode method">gchii@mindspring.com</A><BR>
+    <I>Fri, 29 Sep 2000 21:15:31 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000937.html">[JOS-Kernel] Is membership at SourceForge required?</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#935">[ date ]</a>
+              <a href="thread.html#935">[ thread ]</a>
+              <a href="subject.html#935">[ subject ]</a>
+              <a href="author.html#935">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>If a thread is passed as a parameter to each opcode method, it almost
+becomes possible to use p-code to invoke opcode methods. But I'm not sure
+how to handle exceptions.
+
+Every opcode method is capable of &quot;throwing&quot; an exception. The classic
+p-code uses a long jump to handle an exception. Here is basically how
+p-code works.
+
+The original code: (adds 0 and 1);
+  mc_iconst_0( thread );
+  mc_iconst_1( thread );
+  mc_iadd( thread );
+
+The p-code:
+  push thread
+  push &amp;mc_iadd
+  push thread
+  push &amp;mc_iconst_1
+  push thread;
+  push &amp;mc_iconst_0
+  ret
+
+When iconst_0 &quot;returns&quot;, it actually jumps to iconst_1. When iconst_1
+returns, it actually jumps to iadd. When an exception is thrown, all of the
+opcode methods and their parameters must be popped from the stack.
+
+When a segment is &quot;compiled&quot; into p-code, a buffer is filled with the
+values the method must push onto the machine code stack.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000937.html">[JOS-Kernel] Is membership at SourceForge required?</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#935">[ date ]</a>
+              <a href="thread.html#935">[ thread ]</a>
+              <a href="subject.html#935">[ subject ]</a>
+              <a href="author.html#935">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

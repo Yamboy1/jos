@@ -1,0 +1,574 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: native console &amp; bug report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ajregier%40earthlink.net">
+   <LINK REL="Previous"  HREF="000577.html">
+   <LINK REL="Next" HREF="000583.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: native console &amp; bug report</H1>
+    <B>Avery J. Regier</B> 
+    <A HREF="mailto:ajregier%40earthlink.net"
+       TITLE="[JOS-Kernel] Re: native console &amp; bug report">ajregier@earthlink.net</A><BR>
+    <I>Sat, 1 Jan 2000 15:36:42 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000577.html">[JOS-Kernel] Linux and JNI</A></li>
+        <LI> Next message: <A HREF="000583.html">[JOS-Kernel] Re: native console &amp; bug report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#578">[ date ]</a>
+              <a href="thread.html#578">[ thread ]</a>
+              <a href="subject.html#578">[ subject ]</a>
+              <a href="author.html#578">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Todd,
+
+I think that the object model for the consoles is fine for the consoles
+themselves, but as soon as we try to add real shells to them, it won't work. 
+There isn't enough flexibility there.  I'll see what I can come up with as I
+continue to work with it.
+
+You are right in how you understand the native bug.
+
+I'm also including the diff.  Thanks for getting cvs back up.
+
+- Avery
+
+----------------------------------------------
+?JJOS/arch/host/nativecode/messages.txt
+? JJOS/arch/host/nativecode/Makefile.mybak
+? JJOS/arch/i386/bytecode/jjos-new.zip
+? JJOS/arch/i386/bytecode/jos/platform/driver/consoleNative.java
+? JJOS/arch/i386/nativecode/jjidt.txt
+? JJOS/arch/i386/nativecode/head_ether.txt
+? JJOS/arch/i386/nativecode/head_grub.txt
+? JJOS/arch/i386/nativecode/jjos-grub-old
+? JJOS/arch/i386/nativecode/jjos-grub-new
+Index: JJOS/arch/i386/bytecode/jos/platform/driver/console.java
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/arch/i386/bytecode/jos/platform/driver/console.java,v
+retrieving revision 1.1
+diff -r1.1 console.java
+15a16,20
+&gt;<i> 	public final int id;
+</I>&gt;<i> 	
+</I>&gt;<i> 	public console(int id) {
+</I>&gt;<i> 		this.id = id;
+</I>&gt;<i> 	}
+</I>30c35
+&lt; 		update();
+---
+&gt;<i> 		update();		
+</I>31a37,43
+&gt;<i> 
+</I>&gt;<i> 	private void putString(String s) {
+</I>&gt;<i> 		for(int i=0; i&lt;s.length(); i++) {
+</I>&gt;<i> 			putChar(s.charAt(i));
+</I>&gt;<i> 		}
+</I>&gt;<i> 	}
+</I>&gt;<i> 
+</I>58,59c70,71
+&lt; protected void update () {
+&lt; 	System.arraycopy( buffer, 0, vga, 0, buffer.length );
+---
+&gt;<i> 	protected void update () {
+</I>&gt;<i> 		System.arraycopy( buffer, 0, vga, 0, buffer.length );
+</I>62,63c74,75
+&lt; protected void scrollUpOneLine() {
+&lt; 	System.arraycopy( buffer, JJSCREENWIDTH * 2, buffer, 0, buffer.length - JJSCREENWIDTH * 2 );
+---
+&gt;<i> 	protected void scrollUpOneLine() {
+</I>&gt;<i> 		System.arraycopy( buffer, JJSCREENWIDTH * 2, buffer, 0, buffer.length - JJSCREENWIDTH * 2 );
+</I>65,67c77,79
+&lt; 	/* fill in last row with blanks */
+&lt; 	for ( int rcol = 0; rcol &lt; JJSCREENWIDTH; rcol++ ) {
+&lt; 		setChar( JJSCREENHEIGHT - 1, rcol, ' ' );
+---
+&gt;<i> 		/* fill in last row with blanks */
+</I>&gt;<i> 		for ( int rcol = 0; rcol &lt; JJSCREENWIDTH; rcol++ ) {
+</I>&gt;<i> 			setChar( JJSCREENHEIGHT - 1, rcol, ' ' );
+</I>69,71c81,83
+&lt; 
+&lt; 	/* if we're 'live', update the display */
+&lt; 	if ( displayed ) { update(); }
+---
+&gt;<i> 	
+</I>&gt;<i> 		/* if we're 'live', update the display */
+</I>&gt;<i> 		if ( displayed ) { update(); }
+</I>74,91c86,107
+&lt; public void putChar( char c ) {
+&lt; 	if (c == '\n') {
+&lt;      		if (row &lt; (JJSCREENHEIGHT-1)) {
+&lt; 	          column = 0;
+&lt;         	  row++;
+&lt;        		  } else {
+&lt; 	          scrollUpOneLine();
+&lt;         	  column = 0;
+&lt;         	  }
+&lt;         	} else {
+&lt;      		if (column &lt; (JJSCREENWIDTH-1)) {
+&lt; 	          setChar(row, column, c );
+&lt;         	  column++;
+&lt;         	  } else {
+&lt; 	          putChar('\n');
+&lt;         	  putChar(c);
+&lt;         	  }
+&lt;         	} /* end else */
+---
+&gt;<i> 	public void putChar( char c ) {
+</I>&gt;<i> 		// This is debugging output to help track the native bug.
+</I>&gt;<i> 		// When consoleNative.putChar is native, this function is never called.
+</I>&gt;<i> 		// System.out.print(&quot;PC&quot;);
+</I>&gt;<i> 		// System.out.print(id);
+</I>&gt;<i> 		if (c == '\n') {
+</I>&gt;<i> 	     		if (row &lt; (JJSCREENHEIGHT-1)) {
+</I>&gt;<i> 		          column = 0;
+</I>&gt;<i> 	        	  row++;
+</I>&gt;<i> 	       	        } else {
+</I>&gt;<i> 		          scrollUpOneLine();
+</I>&gt;<i> 	        	  column = 0;
+</I>&gt;<i> 	        	}
+</I>&gt;<i> 	        } else {
+</I>&gt;<i> 	     		if (column &lt; (JJSCREENWIDTH-1)) {
+</I>&gt;<i> 		          setChar(row, column, c );
+</I>&gt;<i> 	        	  column++;
+</I>&gt;<i> 	        	} else {
+</I>&gt;<i> 		          putChar('\n');
+</I>&gt;<i> 	        	  putChar(c);
+</I>&gt;<i> 	        	}
+</I>&gt;<i> 	        } /* end else */
+</I>Index: JJOS/arch/i386/nativecode/entry.cc
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/arch/i386/nativecode/entry.cc,v
+retrieving revision 1.20
+diff -r1.20 entry.cc
+148a149,150
+&gt;<i> //  console.clear_screen();
+</I>&gt;<i> 
+</I>Index: JJOS/arch/i386/nativecode/jjconsol.cc
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/arch/i386/nativecode/jjconsol.cc,v
+retrieving revision 1.6
+diff -r1.6 jjconsol.cc
+19c19
+&lt;  *
+---
+&gt;<i>  * Avery Regier (ability to view native output with F1 console)
+</I>23,37c23
+&lt; 
+&lt; /*
+&lt;  * Programmer's Guide
+&lt;  * Table 6.3, pg 178
+&lt;  */
+&lt; 
+&lt; typedef enum 
+&lt; {
+&lt;   VGA_MODE_7_NORMAL		= 0x07,
+&lt;   VGA_MODE_7_INTENSE		= 0x0f,
+&lt;   VGA_MODE_7_UNDERLINE		= 0x01,
+&lt;   VGA_MODE_7_INTENSE_UNDERLINE	= 0x09,
+&lt;   VGA_MODE_7_REVERSED		= 0x70,
+&lt;   VGA_MODE_7_BLINKING_REVERSED	= 0xf0
+&lt; } VgaMode7CharacterAttributes;
+---
+&gt;<i> #include &quot;jbmachin.h&quot;
+</I>42a29,30
+&gt;<i>   buffer = NULL;
+</I>&gt;<i> // the destructor for this must still be written!
+</I>47a36
+&gt;<i>   visible = JJTRUE;
+</I>49a39,74
+&gt;<i> void jjConsole::setVisible(jjBoolean v)
+</I>&gt;<i> {
+</I>&gt;<i> // A little old debugging output...
+</I>&gt;<i> //  if(v == JJTRUE) printString(&quot;v == true\n&quot;);
+</I>&gt;<i> //  else if(v == JJFALSE) printString(&quot;v == false\n&quot;);
+</I>&gt;<i> //  else printString(&quot;v is corrupted!\n&quot;);
+</I>&gt;<i> 
+</I>&gt;<i>    // First, allocate the buffer.  This may be able to be done in the constructor,
+</I>&gt;<i>    // but it isn't absolutely necessary until here.
+</I>&gt;<i>    if(buffer == NULL) {
+</I>&gt;<i>       int allocationSize = sizeof(jju8) * JJSCREENWIDTH * JJSCREENHEIGHT * 2;
+</I>&gt;<i> 
+</I>&gt;<i>       // Allocates the buffer off of the Java heap.  Is there a better place to 
+</I>&gt;<i>       // allocate this from?  Could GC interfere with this?
+</I>&gt;<i>       buffer = (jju8 *) jbmp-&gt;myHeap-&gt;allocate(allocationSize);
+</I>&gt;<i>       // buffer = new unsigned char[JJSCREENWIDTH * JJSCREENHEIGHT * 2];
+</I>&gt;<i> 
+</I>&gt;<i>       for ( int x = 0; x &lt; JJSCREENWIDTH * JJSCREENHEIGHT * 2; x += 2 ) {
+</I>&gt;<i>          buffer[x] =  myVGAScreenBufferPointer[x];
+</I>&gt;<i>          buffer[x+1] = myVGAScreenBufferPointer[x+1];
+</I>&gt;<i>       }
+</I>&gt;<i> // } else if((visible == JJTRUE) &amp;&amp; (v == JJFALSE)) {
+</I>&gt;<i> 	// switching from visible to invisible
+</I>&gt;<i> 	// do nothing!
+</I>&gt;<i>    } else if ((visible == JJFALSE) &amp;&amp; (v == JJTRUE)) {
+</I>&gt;<i>       // switching from invisible to visible
+</I>&gt;<i>       // print the buffer to the screen;
+</I>&gt;<i>       for ( int x = 0; x &lt; JJSCREENWIDTH * JJSCREENHEIGHT * 2; x += 2 ) {
+</I>&gt;<i>          myVGAScreenBufferPointer[x] = buffer[x];
+</I>&gt;<i>          myVGAScreenBufferPointer[x+1] = buffer[x+1];
+</I>&gt;<i>       }
+</I>&gt;<i>    }
+</I>&gt;<i>    visible = v;
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>53c78,80
+&lt;   int attribute = myVGAScreenBufferPointer[subscript];
+---
+&gt;<i>   int attribute;
+</I>&gt;<i>   if(buffer != NULL) attribute = buffer[subscript];
+</I>&gt;<i>   else attribute = myVGAScreenBufferPointer[subscript];
+</I>60c87,89
+&lt;   int character = myVGAScreenBufferPointer[subscript];
+---
+&gt;<i>   int character;
+</I>&gt;<i>   if(buffer != NULL) character = buffer[subscript];
+</I>&gt;<i>   else  character= myVGAScreenBufferPointer[subscript];
+</I>67c96,97
+&lt;   myVGAScreenBufferPointer[charsubscript] = c;
+---
+&gt;<i>   if(visible == JJTRUE) myVGAScreenBufferPointer[charsubscript] = c;
+</I>&gt;<i>   if(buffer != NULL) buffer[charsubscript] = c;
+</I>69,70c99,102
+&lt;   int attribsubscript = (row*JJSCREENWIDTH*2) + (col*2) + 1;
+&lt;   myVGAScreenBufferPointer[attribsubscript] = a;
+---
+&gt;<i>   int attribsubscript = charsubscript + 1;
+</I>&gt;<i> 	//(row*JJSCREENWIDTH*2) + (col*2) + 1;
+</I>&gt;<i>   if(visible == JJTRUE) myVGAScreenBufferPointer[attribsubscript] = a;
+</I>&gt;<i>   if(buffer != NULL) buffer[attribsubscript] = a;
+</I>132,133c164,166
+&lt; 		myVGAScreenBufferPointer[x] = ' ';
+&lt; 		myVGAScreenBufferPointer[x+1] = VGA_MODE_7_NORMAL;
+---
+&gt;<i> 		if(buffer != NULL) {
+</I>&gt;<i> 			buffer[x] = ' ';
+</I>&gt;<i> 			buffer[x+1] = VGA_MODE_7_NORMAL;
+</I>135c168,175
+&lt; 	} /* end clear_screen() */
+---
+&gt;<i> 		if(visible == JJTRUE) {
+</I>&gt;<i> 			myVGAScreenBufferPointer[x] = ' ';
+</I>&gt;<i> 			myVGAScreenBufferPointer[x+1] = VGA_MODE_7_NORMAL;
+</I>&gt;<i> 		}
+</I>&gt;<i> 	}
+</I>&gt;<i> 	myRow = 0;
+</I>&gt;<i> 	myColumn = 0;
+</I>&gt;<i> } /* end clear_screen() */
+</I>Index: JJOS/arch/i386/nativecode/jjconsole.h
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/arch/i386/nativecode/jjconsole.h,v
+retrieving revision 1.5
+diff -r1.5 jjconsole.h
+38a39,41
+&gt;<i>   void setVisible(jjBoolean v);
+</I>&gt;<i>   jju8 getChar(int row, int col);
+</I>&gt;<i>   void setChar(int row, int col, jju8 c, jju8 a);
+</I>41a45
+&gt;<i>   jju8 *buffer;
+</I>45,46d48
+&lt;   jju8 getChar(int row, int col);
+&lt;   void setChar(int row, int col, jju8 c, jju8 a);
+49a52,53
+&gt;<i> 
+</I>&gt;<i>   jjBoolean visible;
+</I>51a56,70
+&gt;<i> /*
+</I>&gt;<i>  * Programmer's Guide
+</I>&gt;<i>  * Table 6.3, pg 178
+</I>&gt;<i>  */
+</I>&gt;<i> 
+</I>&gt;<i> typedef enum 
+</I>&gt;<i> {
+</I>&gt;<i>   VGA_MODE_7_NORMAL		= 0x07,
+</I>&gt;<i>   VGA_MODE_7_INTENSE		= 0x0f,
+</I>&gt;<i>   VGA_MODE_7_UNDERLINE		= 0x01,
+</I>&gt;<i>   VGA_MODE_7_INTENSE_UNDERLINE	= 0x09,
+</I>&gt;<i>   VGA_MODE_7_REVERSED		= 0x70,
+</I>&gt;<i>   VGA_MODE_7_BLINKING_REVERSED	= 0xf0
+</I>&gt;<i> } VgaMode7CharacterAttributes;
+</I>&gt;<i> 
+</I>Index: JJOS/JJOS/common/bytecode/TestSuite.java
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/bytecode/TestSuite.java,v
+retrieving revision 1.1
+diff -r1.1 TestSuite.java
+25,27c25,27
+&lt; import jos.system.keyboard;
+&lt; import jos.system.consoled;
+&lt; import jos.platform.driver.StandardVga;
+---
+&gt;<i> //import jos.system.keyboard;
+</I>&gt;<i> //import jos.system.consoled;
+</I>&gt;<i> import jos.platform.driver.standardVGA;
+</I>33c33
+&lt;     public static boolean testThreads = true;
+---
+&gt;<i>     public static boolean testThreads = false;
+</I>35c35
+&lt;     public static boolean testVGADriver = true;
+---
+&gt;<i>     public static boolean testVGADriver = false;
+</I>37c37
+&lt;     public static boolean testConsoleDaemons = true;
+---
+&gt;<i>     public static boolean testConsoleDaemons = false;
+</I>84,85c84,85
+&lt; 	if (testConsoleDaemons)
+&lt; 	    testConsoleDaemons();
+---
+&gt;<i> 	if (testConsoleDaemons){;}
+</I>&gt;<i> 	//    testConsoleDaemons();
+</I>283,284c283,284
+&lt; 	System.out.println( &quot;init(): testing threading.&quot; );
+&lt; 	System.out.println( &quot;init() starting counter...&quot; );
+---
+&gt;<i> //	System.out.println( &quot;init(): testing threading.&quot; );
+</I>&gt;<i> /*	System.out.println( &quot;init() starting counter...&quot; );
+</I>291,309c291,309
+&lt; 
+&lt; 	System.out.println( &quot;init() entering .wait() loop...&quot; );
+&lt; 	int interrupt_count = 0;
+&lt; 	while ( interrupt_count &lt; 10 ) {
+&lt; 				/* Bad Karma w/o this. */
+&lt; 	    synchronized( jos.system.interrupts.int000 ) {
+&lt; 		/* because wait() calls release
+&lt; 		   locks, this doesn't actually
+&lt; 		   cause any blockage. */
+&lt; 		try { jos.system.interrupts.int000.wait(); }
+&lt; 		catch ( InterruptedException ie ) {
+&lt; 		    System.out.println( &quot;init() interrupted waiting for notify&quot; );
+&lt; 		    continue;
+&lt; 		}
+&lt; 	    } /* end synchlock on interrupt. */
+&lt; 				// System.out.println( &quot;init() caught interrupt.&quot; );
+&lt; 	    interrupt_count++;
+&lt; 	} /* end .wait() loop */
+&lt; 	System.out.println( &quot;init() has caught 10 interrupts.&quot; );
+---
+&gt;<i> */
+</I>&gt;<i> //	System.out.println( &quot;init() entering .wait() loop...&quot; );
+</I>&gt;<i> //	int interrupt_count = 0;
+</I>&gt;<i> //	while ( interrupt_count &lt; 10 ) {
+</I>&gt;<i> //				/* Bad Karma w/o this. */
+</I>&gt;<i> //	    synchronized( jos.system.interrupts.int000 ) {
+</I>&gt;<i> //		/* because wait() calls release
+</I>&gt;<i> //		   locks, this doesn't actually
+</I>&gt;<i> //		   cause any blockage. */
+</I>&gt;<i> //		try { jos.system.interrupts.int000.wait(); }
+</I>&gt;<i> //		catch ( InterruptedException ie ) {
+</I>&gt;<i> //		    System.out.println( &quot;init() interrupted waiting for notify&quot; );
+</I>&gt;<i> //		    continue;
+</I>&gt;<i> //		}
+</I>&gt;<i> //	    } /* end synchlock on interrupt. */
+</I>&gt;<i> //				// System.out.println( &quot;init() caught interrupt.&quot; );
+</I>&gt;<i> //	    interrupt_count++;
+</I>&gt;<i> //	} /* end .wait() loop */
+</I>&gt;<i> //	System.out.println( &quot;init() has caught 10 interrupts.&quot; );
+</I>337,338c337,349
+&lt;     public static void testConsoleDaemons() {			
+&lt; 	System.out.println( &quot;init() starting console daemons...&quot; );
+---
+&gt;<i> //    public static void testConsoleDaemons() {			
+</I>&gt;<i> //	System.out.println( &quot;init() starting console daemons...&quot; );/
+</I>&gt;<i> //
+</I>&gt;<i> //	System.out.println( &quot;init() starting jos.system.keyboard...&quot; );
+</I>&gt;<i> //	/* sets up the hardware driver */
+</I>&gt;<i> //	keyboard k = new keyboard();
+</I>&gt;<i> //	/* starts the KeyEvent dispatch loop */
+</I>&gt;<i> //	k.start();
+</I>&gt;<i> //
+</I>&gt;<i> //	System.out.println( &quot;init() starting jos.system.consoled...&quot; );
+</I>&gt;<i> //	/* listens to the dispatching from j.s.k above */
+</I>&gt;<i> //	consoled cd = new consoled();
+</I>&gt;<i> //    }
+</I>340,350d350
+&lt; 	System.out.println( &quot;init() starting jos.system.keyboard...&quot; );
+&lt; 	/* sets up the hardware driver */
+&lt; 	keyboard k = new keyboard();
+&lt; 	/* starts the KeyEvent dispatch loop */
+&lt; 	k.start();
+&lt; 
+&lt; 	System.out.println( &quot;init() starting jos.system.consoled...&quot; );
+&lt; 	/* listens to the dispatching from j.s.k above */
+&lt; 	consoled cd = new consoled();
+&lt;     }
+&lt; 
+353c353
+&lt; 	StandardVga v = new StandardVga();
+---
+&gt;<i> 	standardVGA v = new standardVGA();
+</I>383a384
+&gt;<i> 		if(i % 100000 == 0) System.out.print('.');
+</I>Index: JJOS/JJOS/common/bytecode/init.java
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/bytecode/init.java,v
+retrieving revision 1.38
+diff -r1.38 init.java
+27,31c27,31
+&lt; 		standardVGA vga = new standardVGA();
+&lt; 		vga.startService();
+&lt; 		vga.bitblt(312, 232, logo, 16 );
+&lt; 		vga.delay( 0x100000 ); /* give us time to look at it */
+&lt; 		vga.stopService();
+---
+&gt;<i> 	//	standardVGA vga = new standardVGA();
+</I>&gt;<i> 	//	vga.startService();
+</I>&gt;<i> 	//	vga.bitblt(312, 232, logo, 16 );
+</I>&gt;<i> 	//	vga.delay( 0x100000 ); /* give us time to look at it */
+</I>&gt;<i> 	//	vga.stopService();
+</I>32a33,35
+&gt;<i> 		TestSuite suite = new TestSuite();
+</I>&gt;<i> 		suite.runTests();
+</I>&gt;<i> 
+</I>Index: JJOS/JJOS/common/bytecode/jos/system/console.java
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/bytecode/jos/system/console.java,v
+retrieving revision 1.7
+diff -r1.7 console.java
+14a15
+&gt;<i> 	private final int id;
+</I>16c17
+&lt; 	public console () {
+---
+&gt;<i> 	public console (int id) {
+</I>18c19,21
+&lt; 		dc = new jos.platform.driver.console();
+---
+&gt;<i> 		//  This is for debugging output to help track the native bug.
+</I>&gt;<i> 		this.id = id;
+</I>&gt;<i> 		dc = new jos.platform.driver.console(id);
+</I>22a26
+&gt;<i> 		id = 0;
+</I>26a31,33
+&gt;<i> 	//  This is debugging output to help track the native bug.
+</I>&gt;<i> 	//	System.out.print(&quot;KP&quot;);
+</I>&gt;<i> 	//	System.out.print(id);
+</I>30a38,40
+&gt;<i> 	//  This is debugging output to help track the native bug.
+</I>&gt;<i> 	//	System.out.print(&quot;KR&quot;);
+</I>&gt;<i> 	//	System.out.print(id);
+</I>39a50,52
+&gt;<i> 	//  This is debugging output to help track the native bug.
+</I>&gt;<i> 	//	System.out.print(&quot;KT&quot;);
+</I>&gt;<i> 	//	System.out.print(id);
+</I>55c68,73
+&lt; 	public void putChar(char c) { dc.putChar(c); }
+---
+&gt;<i> 	public void putChar(char c) { 
+</I>&gt;<i> 	//  This is debugging output to help track the native bug.
+</I>&gt;<i> 	//	System.out.print(&quot;jsc.pc&quot;);
+</I>&gt;<i> 	//	System.out.print(id);
+</I>&gt;<i> 		dc.putChar(c); 
+</I>&gt;<i> 	}
+</I>Index: JJOS/JJOS/common/bytecode/jos/system/consoled.java
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/bytecode/jos/system/consoled.java,v
+retrieving revision 1.7
+diff -r1.7 consoled.java
+25,26c25,29
+&lt; 		for (int x = 0; x &lt; 12; x++ ) {
+&lt; 			consoles[x] = new console();
+---
+&gt;<i> 		
+</I>&gt;<i> 		// Use F1 for the native console so as to view debugging output.
+</I>&gt;<i> 		consoles[0] = new console(new jos.platform.driver.consoleNative());
+</I>&gt;<i> 		for (int x = 1; x &lt; 12; x++ ) {
+</I>&gt;<i> 			consoles[x] = new console(x);
+</I>35c38
+&lt; //		System.err.println( &quot;consoled.init(): generating event tree...&quot; );
+---
+&gt;<i> 		System.err.println( &quot;consoled.init(): generating event tree...&quot; );
+</I>38c41
+&lt; //		System.err.println( &quot;consoled.init(): initialization complete...&quot; );
+---
+&gt;<i> 		System.err.println( &quot;consoled.init(): initialization complete...&quot; );
+</I>Index: JJOS/JJOS/common/decaf/d_main.cc
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/decaf/d_main.cc,v
+retrieving revision 1.34
+diff -r1.34 d_main.cc
+82a83,85
+&gt;<i>   internBuiltInMethod(jos_platform_driver_consoleNative_setVisible, &quot;jos/platform/driver/consoleNative&quot;, &quot;setVisible&quot;);
+</I>&gt;<i>   internBuiltInMethod(jos_platform_driver_consoleNative_putChar, &quot;jos/platform/driver/consoleNative&quot;, &quot;putNativeChar&quot;);
+</I>&gt;<i>   internBuiltInMethod(jos_platform_driver_consoleNative_setChar, &quot;jos/platform/driver/consoleNative&quot;, &quot;setNativeChar&quot;);
+</I>Index: JJOS/JJOS/common/decaf/jvmbuiltins.cc
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/decaf/jvmbuiltins.cc,v
+retrieving revision 1.9
+diff -r1.9 jvmbuiltins.cc
+25a26,27
+&gt;<i> #include &quot;jbmachin.h&quot;
+</I>&gt;<i> #include &quot;jjconsole.h&quot;
+</I>448a451,473
+&gt;<i> jjBoolean jos_platform_driver_consoleNative_setVisible(java_word argument[], frame *f, resolved_method *rm, int n_args){
+</I>&gt;<i>  // kprintf( &quot;v is %d\n&quot;, (jint)(argument[1]) );
+</I>&gt;<i>   jjBoolean v = (jjBoolean)(jint)argument[1]; //(((jint)(argument[1])) == 0 ? JJFALSE : JJTRUE);
+</I>&gt;<i>   jbmp-&gt;myConsole-&gt;setVisible(v);
+</I>&gt;<i>   return (JJTRUE);
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> jjBoolean jos_platform_driver_consoleNative_putChar(java_word argument[], frame *f, resolved_method *rm, int n_args) {
+</I>&gt;<i>   jju8 ch = (jju8)(argument[1]);
+</I>&gt;<i>   jbmp-&gt;myConsole-&gt;putChar(ch);
+</I>&gt;<i>   return (JJTRUE);	
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> jjBoolean jos_platform_driver_consoleNative_setChar(java_word argument[], frame *f, resolved_method *rm, int n_args) {
+</I>&gt;<i>   jint row = (jint) argument[1];
+</I>&gt;<i>   jint col = (jint) argument[2];
+</I>&gt;<i>   jju8 c = (jju8) argument[3];
+</I>&gt;<i>   jju8 a = (jju8) VGA_MODE_7_NORMAL;
+</I>&gt;<i>   
+</I>&gt;<i>   jbmp-&gt;myConsole-&gt;setChar(row, col, c, a);
+</I>&gt;<i>   return (JJTRUE);	
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>Index: JJOS/JJOS/common/decaf/jvmbuiltins.h
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/decaf/jvmbuiltins.h,v
+retrieving revision 1.6
+diff -r1.6 jvmbuiltins.h
+51a52,54
+&gt;<i> jjBoolean jos_platform_driver_consoleNative_setVisible(java_word argument[], frame *f, resolved_method *rm, int n_args);
+</I>&gt;<i> jjBoolean jos_platform_driver_consoleNative_putChar(java_word argument[], frame *f, resolved_method *rm, int n_args);
+</I>&gt;<i> jjBoolean jos_platform_driver_consoleNative_setChar(java_word argument[], frame *f, resolved_method *rm, int n_args);
+</I>Index: JJOS/JJOS/common/nativecode/jbconsol.h
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/nativecode/jbconsol.h,v
+retrieving revision 1.2
+diff -r1.2 jbconsol.h
+32c32
+&lt; 
+---
+&gt;<i>   virtual void setVisible(jjBoolean v) = 0;
+</I>34c34
+&lt; 
+---
+&gt;<i>   virtual void setChar(int row, int col, jju8 c, jju8 a) = 0;
+</I>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000577.html">[JOS-Kernel] Linux and JNI</A></li>
+	<LI> Next message: <A HREF="000583.html">[JOS-Kernel] Re: native console &amp; bug report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#578">[ date ]</a>
+              <a href="thread.html#578">[ thread ]</a>
+              <a href="subject.html#578">[ subject ]</a>
+              <a href="author.html#578">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

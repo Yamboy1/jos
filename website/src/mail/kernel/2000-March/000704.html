@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Kernel Tests</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000747.html">
+   <LINK REL="Next" HREF="000710.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Kernel Tests</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Kernel Tests">gchii@mindspring.com</A><BR>
+    <I>Tue, 07 Mar 2000 19:43:23 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000747.html">[JOS-Kernel] JOS Installation</A></li>
+        <LI> Next message: <A HREF="000710.html">[JOS-Kernel] Kernel Tests</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#704">[ date ]</a>
+              <a href="thread.html#704">[ thread ]</a>
+              <a href="subject.html#704">[ subject ]</a>
+              <a href="author.html#704">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>It is possible, isn't it? We can write C/C++ programs to test/demonstrate
+kernel functions. At the point where jJOS invokes decaf, jJOS could invoke
+a power-on self-test, a diagnostic program, or some other
+test/demonstration program written in C/C++.
+
+This has the following benefits. Kernel functions, like virtual memory
+management, interrupts and shared libraries, could be independently tested.
+When decaf uses a kernel function, we'd know it works.
+
+-----
+
+Where and when should we implement memory management? In the kernel? Or, in
+decaf? Should we do it now, when there is no swap file? Or later?
+
+We should implement memory management in the kernel. The host build of the
+kernel simply uses the memory management of a foreign operating system. The
+i386 build of the kernel must implement memory management independently
+from any other operating system.
+
+With the memory management inherent in the i386, there is only so much JOS
+can do differently than Linux. The interface between decaf and a kernel is
+something like this:
+
+void *alloc( size_t size );
+void free( void * );
+
+When decaf is the only kernel process, it is simple. When decaf must share
+memory with other libraries, memory should be allocated on a per-library basis.
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000747.html">[JOS-Kernel] JOS Installation</A></li>
+	<LI> Next message: <A HREF="000710.html">[JOS-Kernel] Kernel Tests</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#704">[ date ]</a>
+              <a href="thread.html#704">[ thread ]</a>
+              <a href="subject.html#704">[ subject ]</a>
+              <a href="author.html#704">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

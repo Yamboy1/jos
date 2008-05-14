@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOS and BOCHS.. they works!!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000434.html">
+   <LINK REL="Next" HREF="000437.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOS and BOCHS.. they works!!</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] JOS and BOCHS.. they works!!">tmiller@haverford.edu</A><BR>
+    <I>Sun, 24 Oct 1999 11:56:05 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000434.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+        <LI> Next message: <A HREF="000437.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#435">[ date ]</a>
+              <a href="thread.html#435">[ thread ]</a>
+              <a href="subject.html#435">[ subject ]</a>
+              <a href="author.html#435">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> It will allow building and testing by people without 2 computers and 
+</I>&gt;<i> ethernet (aka etherboot).
+</I>
+	I meant, as opposed to booting from the HD and handing control off
+to JJOS directly -- why slow JJOS down even more by using the emulator?
+Is there some technical difficulty with using the i386's ELF/stipped
+binary?  (I'm rather ignorant about booting, so it might be really
+obvious...)
+
+&gt;<i> The first as a developer &quot;bundle&quot; including the sources (if any) you 
+</I>&gt;<i> needed in order to get the &quot;base&quot; versions of either jos or bochs to 
+</I>&gt;<i> work.  Do we have a clear abstraction of a booter ala JavaOS or 
+</I>&gt;<i> would checking a second booter into CVS cause conflicts?
+</I>
+	We don't have a distinct abstraction for the booter, but the JJOS
+kernel does need to be handed the ramdisk information.  Checking a second
+booter into the CVS would work fine, but we'd probably cast it as a third
+architecture or an option in the i386 makefile.
+
+&gt;<i> The second as a pure binary for those that just want to get the 
+</I>&gt;<i> base running.  This second dist won't be super useful right now, but 
+</I>&gt;<i> as soon as we get a classloader ready (do we have a classloader 
+</I>&gt;<i> ready?) people can use the system to mess with adding class 
+</I>&gt;<i> library support without actually hacking the kernel.  It is also a 
+</I>&gt;<i> good first look at a possible system demo.
+</I>
+	Er, the classloader is ready and works fine, with the exception
+that native code doesn't work at all, which is OK because JJOS doesn't
+support that right now anyway.  The problem w.r.t. classloading is the
+lack of an fs/device driver.  Someone (can't remember who offhand) is
+writing a FD driver, so floppy-based classloading (i.e. not from the
+pre-compiled ramdisk) should be possible soon, although extrordinarily
+clunky.
+
+-_Quinn
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000434.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+	<LI> Next message: <A HREF="000437.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#435">[ date ]</a>
+              <a href="thread.html#435">[ thread ]</a>
+              <a href="subject.html#435">[ subject ]</a>
+              <a href="author.html#435">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Problem running VGA driver [Was: Re: [JOS-Kernel] Re: NATIVE_CLOCK?]</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000388.html">
+   <LINK REL="Next" HREF="000401.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Problem running VGA driver [Was: Re: [JOS-Kernel] Re: NATIVE_CLOCK?]</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Problem running VGA driver [Was: Re: [JOS-Kernel] Re: NATIVE_CLOCK?]">jm@mak.com</A><BR>
+    <I>Mon, 27 Sep 1999 08:22:52 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000388.html">[JOS-Kernel] Re: NATIVE_CLOCK?</A></li>
+        <LI> Next message: <A HREF="000401.html">[JOS-Kernel] Problem running VGA driver [Was: Re: [JOS-Kernel]
+ Re: NATIVE_CLOCK?]</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#392">[ date ]</a>
+              <a href="thread.html#392">[ thread ]</a>
+              <a href="subject.html#392">[ subject ]</a>
+              <a href="author.html#392">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi, Todd;
+
+&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; I think I made a mistake in failing to recognize a fairly nasty (and
+</I>&gt;<i> &gt; pretty obvious in hindsight) interrupt-related hazard in the interrupt
+</I>&gt;<i> &gt; notification schema.  In order to fix it, I'd like to muck about the
+</I>&gt;<i> &gt; scheduler::notifyOfInterrupts and other related routines.
+</I>&gt;<i> 
+</I>&gt;<i>         Would this be the 'why aren't using InterruptHandler' problem?
+</I>
+No.  Not only that, I spoke too soon.  I actually *did* put the critical
+sections in -- only I put them in the accessor/mutator methods.  Whoops.
+
+Having said that, you do bring up another problem.  Sorry, but I have
+not been able to devote much time recently, beyond a problem I'm chasing
+down.
+
+Please, anybody out there please feel free to let me know if you've seen
+this failure mode...  When I run the VGA driver, it hangs after writing
+the blue test pixels over about 3/4 of the screen.  After about another
+minute of no activity, the box resets itself.  I don't ever see it go
+back to the &quot;text mode.&quot;  However, if I change the increment so that it
+only draw every other line, then I *do* see this go to text mode.  I
+have done the obvious things to figure out why it's hanging, but have
+pretty much come up dry.  I've commented out the &quot;out8&quot; calls in the
+native code, and replaced them with &quot;kprintf&quot; calls -- when I do this,
+it runs all the way to the end, and does a GC successfully.  
+
+Thomas, if I were to want to go back to text mode from native code so
+that I could do a sort of &quot;Blue Screen of Death,&quot; what calls must I make
+to the VGA hardware to do that?  Do you know off the top of your head? 
+I know you have done this in the Java code...
+
+&gt;<i> Part of why I was asking about the JavaOS docs earlier was that I wanted
+</I>&gt;<i> to fix this problem (interrupt lossage, among other things) before fixing
+</I>&gt;<i> the keyboard driver, and as long as I was mucking about with it, I might
+</I>&gt;<i> as well muck about in a fashion at least vaguely resembling what it
+</I>&gt;<i> 'should be'.
+</I>
+Cool.  This is fine with me if you do this.
+
+&gt;<i>         Anyway, I haven't been doing almost nothing recently, but if I get
+</I>&gt;<i> any work done this weekend, I'll try to make work on JNI/classpath...
+</I>
+I'll have to wait on this until this weekend, which will unfortunately
+be shortened due to my having to go to recruiting at a local university
+on Friday.
+
+&gt;<i>         Oh, BTW, parts of the NATIVE_CLOCK bit had to do with the
+</I>&gt;<i> HANDLE_CLOCK bits because Bocek (I believe) requested use of the rtc for
+</I>&gt;<i> the floppy driver.
+</I>
+Hmm... is the &quot;real time clock&quot; the CMOS read-only one, as opposed to
+the system interrupt-generating clock (he asked, confusedly, and away
+from his PC documents)?
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000388.html">[JOS-Kernel] Re: NATIVE_CLOCK?</A></li>
+	<LI> Next message: <A HREF="000401.html">[JOS-Kernel] Problem running VGA driver [Was: Re: [JOS-Kernel]
+ Re: NATIVE_CLOCK?]</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#392">[ date ]</a>
+              <a href="thread.html#392">[ thread ]</a>
+              <a href="subject.html#392">[ subject ]</a>
+              <a href="author.html#392">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

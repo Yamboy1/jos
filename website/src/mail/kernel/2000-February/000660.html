@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Integration</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000659.html">
+   <LINK REL="Next" HREF="000661.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Integration</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Integration">gchii@mindspring.com</A><BR>
+    <I>Mon, 14 Feb 2000 19:54:44 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000659.html">[JOS-Kernel] First Boot!</A></li>
+        <LI> Next message: <A HREF="000661.html">[JOS-Kernel] Integration</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#660">[ date ]</a>
+              <a href="thread.html#660">[ thread ]</a>
+              <a href="subject.html#660">[ subject ]</a>
+              <a href="author.html#660">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>The JOS project should be closer to integration. What is integration? It is
+the point when the jJOS, decaf, jCurses, JEPS, BCNI, and standard class
+libraries come together to run a command line shell. These components must
+be integrated so that I can sit down at my JOS machine and run whatever
+character-based Java program I want.
+
+I think decafJVM::internBuiltInMethod() is a better mechanism than JNI.
+This method eliminates an awkward naming convention. The
+internBuiltInMethod() binds a bytecode method to its machine code.
+
+void decafJVM::internBuiltInMethod(
+    builtInMethod fcnp,
+    char *classname,
+    char *fcnname);
+
+It should be possible to create a corresponding
+decafJVM::internOpcodeMethod(), which binds an opcode to its machine code.
+
+-----
+
+Discussion: What kind of programs need to be written to demonstrate the JOS
+machine?
+
+Many character-based programs are already available in the Smart API. While
+an AWT-compatible component is often used to display the output from
+character-based programs on my computer, a character-based program works
+from a simpler non-bitmapped VGA mode.
+
+With the Alternative Packages sub-project, I have created three classes:
+
+TestException
+TestProgram, and
+TestSuite
+
+A TestException is thrown whenever a test has failed. An optional message
+contains the reason why the test failed.
+
+A TestProgram is an implementation of ConsoleProgram and uses a
+ProgramContext. Parameters can be passed to a TestProgram from a command line.
+
+A TestSuite is an extension of TestProgram. TestSuite is given a list of
+class names (TestPrograms) to run in batch.
+
+By writing test programs, we can run and re-run individual tests as needed
+from a command line. We can get a feel for how much of JOS is finished, how
+much needs more work.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000659.html">[JOS-Kernel] First Boot!</A></li>
+	<LI> Next message: <A HREF="000661.html">[JOS-Kernel] Integration</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#660">[ date ]</a>
+              <a href="thread.html#660">[ thread ]</a>
+              <a href="subject.html#660">[ subject ]</a>
+              <a href="author.html#660">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

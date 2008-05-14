@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000784.html">
+   <LINK REL="Next" HREF="000777.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Device as a digital resource">gchii@mindspring.com</A><BR>
+    <I>Wed, 22 Mar 2000 15:18:53 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000784.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000777.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#785">[ date ]</a>
+              <a href="thread.html#785">[ thread ]</a>
+              <a href="subject.html#785">[ subject ]</a>
+              <a href="author.html#785">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 09:26 PM 3/22/00 +0200, Al &lt;<A HREF="mailto:al@outworld.org">al@outworld.org</A>&gt; wrote:
+&gt;<i>Gilbert Carl Herschberger II wrote:
+</I>&gt;<i>
+</I>&gt;&gt;<i> Oh, I see where you might be going. You're looking for something like
+</I>&gt;&gt;<i> the /dev subdirectory on Linux/UNIX. Would you like every device to
+</I>&gt;&gt;<i> have a node in the file subsystem?
+</I>&gt;<i>
+</I>&gt;<i>No, not at all. Actually, I hate the way Linux handles filesystems.
+</I>&gt;<i>Files on a disk simply have nothing to do with devices. I can only think
+</I>&gt;<i>of the filesystem as an extension to the device called &quot;hard disk.&quot; I
+</I>&gt;<i>cannot understand why /dev is a subdirectory! It is only a subdirectory
+</I>&gt;<i>in a tree describing the computer hardware, *NOT* the filesystem!
+</I>
+I am glad to hear this. Like you, I dislike the way Linux handles devices.
+Why is /dev a subdirectory? Linux is working from a 30+ year old design.
+The design was invented before the world wide web and the invention of a
+scheme-based resource identifier. The Linux community is looking for a
+solution. They are working on more dynamic /dev directory, so that devices
+are assigned as needed. They won't be assigned only when the kernel is
+compiled.
+
+Just like all other operating systems, JOS has to break through this
+paradox. A few devices, like RAM, must exist before a file subsystem. And
+since a device, like VMM, might use the file subsystem, a file subsystem
+must exist before most devices.
+
+Resource-oriented thinking dominates the software industry today.
+Everything's a resource in resource-oriented thinking. I believe the device
+subsystem has greatest priority. A device subsystem is required. A file
+subsystem is not. With a URI scheme, devices can use other devices; but,
+they cannot use the file subsystem. After the device subsystem has been
+created, the file subsystem is created using previously existing devices.
+
+When blocks of data are read by the BIOS from a floppy, it is
+resource-oriented. When blocks of data are read by GRUB from a hard drive,
+it is resource-oriented. When blocks of data are read by Etherboot from a
+BOOTP/TFTP service, it is resource-oriented. When package files are read by
+a primordial class loader, it is resource-oriented. There is no OS file
+subsystem yet.
+
+File-oriented thinking dominated the software industry until 1996.
+Everything's a file in file-oriented thinking. In classic architecture
+prior to JOS, the operating system is in a rush to get to the file
+subsystem as fast as it possibly can. In Linux, the file subsystem exists
+first. It is compiled into the kernel. It exists before any devices. At
+first, only a placeholder is used for a devices in the /dev directory.
+Then, any device can use the file subsystem because it already exists.
+
+Because the file subsystem needs devices to read files, additional devices
+are plugged into the file subsystem as they become available. Nodes of the
+file subsystem are mounted.
+
+For Linux compatibility, a file subsystem might return a device as an I/O
+stream from the /dev directory.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000784.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000777.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#785">[ date ]</a>
+              <a href="thread.html#785">[ thread ]</a>
+              <a href="subject.html#785">[ subject ]</a>
+              <a href="author.html#785">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

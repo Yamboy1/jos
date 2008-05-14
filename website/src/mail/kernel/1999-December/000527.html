@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Next version of jjos / decaf garbage collection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000512.html">
+   <LINK REL="Next" HREF="000513.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Next version of jjos / decaf garbage collection</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Next version of jjos / decaf garbage collection">tmiller@haverford.edu</A><BR>
+    <I>Thu, 2 Dec 1999 20:05:42 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000512.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+        <LI> Next message: <A HREF="000513.html">[JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next release (fwd)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#527">[ date ]</a>
+              <a href="thread.html#527">[ thread ]</a>
+              <a href="subject.html#527">[ subject ]</a>
+              <a href="author.html#527">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE> 
+&gt;<i> ICBWB (I Could Be Wrong But) I do not believe the Boehm gc software, as
+</I>&gt;<i> distributed, is amenable to interfacing with the VM subsystem.  ICBWB I
+</I>&gt;<i> think that is essential here.  In particular, I should like to GC pages
+</I>&gt;<i> AS/BEFORE they get paged out so as to avoid physical I/O to the maximum
+</I>&gt;<i> extent possible.  It is my understanding (from reading the GC book you
+</I>&gt;<i> mentioned) that this feature alone constituted a lot of the performance
+</I>&gt;<i> advantages experienced by LispM users -- gc, no matter how slow, is
+</I>&gt;<i> always faster than hardware I/O.  
+</I>
+	This is a good idea; I'm wondering, though:  could we run
+GC only during I/O waits (except for out-of-memory conditions) and get
+very nice performance that way?  (At least on the Java side of things,
+where there's a well-defined subset of memory to check during the I/O
+wait, so the GC time won't overrun the I/O time by that much.)
+
+-_Quinn
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000512.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+	<LI> Next message: <A HREF="000513.html">[JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next release (fwd)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#527">[ date ]</a>
+              <a href="thread.html#527">[ thread ]</a>
+              <a href="subject.html#527">[ subject ]</a>
+              <a href="author.html#527">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

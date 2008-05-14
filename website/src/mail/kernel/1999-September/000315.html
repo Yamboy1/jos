@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Interrupts</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:draft%40fear.ch">
+   <LINK REL="Previous"  HREF="000312.html">
+   <LINK REL="Next" HREF="000316.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Interrupts</H1>
+    <B>Thomas Bocek</B> 
+    <A HREF="mailto:draft%40fear.ch"
+       TITLE="[JOS-Kernel] Interrupts">draft@fear.ch</A><BR>
+    <I>Wed, 1 Sep 1999 14:14:17 +0200 (CEST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000312.html">[JOS-Kernel] Interrupts</A></li>
+        <LI> Next message: <A HREF="000316.html">[JOS-Kernel] Interrupts</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#315">[ date ]</a>
+              <a href="thread.html#315">[ thread ]</a>
+              <a href="subject.html#315">[ subject ]</a>
+              <a href="author.html#315">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd
+
+On Tue, 31 Aug 1999, Todd L. Miller wrote:
+
+&gt;<i> &gt; &gt; Is the current JOS version able to handle Interrupts?
+</I>&gt;<i> &gt; &gt; I tried to catch the timer-interrupt (8), but it didn't work.
+</I>&gt;<i> &gt; &gt; ....int008.wait(); waits endless.
+</I>&gt;<i> 
+</I>&gt;<i> 	The timer interrupts aren't implemented; I believe I've mentioned
+</I>&gt;<i> this before and suggested we just scrap it and move on to JavaOS's APIs.
+</I>&gt;<i> As for int008 in particular, I've trapped it out in
+</I>&gt;<i> common/decaf/scheduler.cc because (being the clock) it generated enough
+</I>&gt;<i> interrupts to get in the way of debugging the keyboard.  The fix should be
+</I>&gt;<i> pretty evident.  (basically remove line 148)
+</I>
+I removed line 148, but was unable to catch int008, I found an endless
+loop it to the removeThread routine int thread_list.cc:
+
+while( this-&gt;current-&gt;next != stop ) 
+where stop is F000EF6F and next is never stop
+
+Thomas Bocek
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000312.html">[JOS-Kernel] Interrupts</A></li>
+	<LI> Next message: <A HREF="000316.html">[JOS-Kernel] Interrupts</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#315">[ date ]</a>
+              <a href="thread.html#315">[ thread ]</a>
+              <a href="subject.html#315">[ subject ]</a>
+              <a href="author.html#315">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

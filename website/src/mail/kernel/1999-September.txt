@@ -1,0 +1,5295 @@
+From tmiller@haverford.edu Tue, 31 Aug 1999 14:56:00 -0400 (EDT)
+Date: Tue, 31 Aug 1999 14:56:00 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Interrupts
+
+> > Is the current JOS version able to handle Interrupts?
+> > I tried to catch the timer-interrupt (8), but it didn't work.
+> > ....int008.wait(); waits endless.
+
+	The timer interrupts aren't implemented; I believe I've mentioned
+this before and suggested we just scrap it and move on to JavaOS's APIs.
+As for int008 in particular, I've trapped it out in
+common/decaf/scheduler.cc because (being the clock) it generated enough
+interrupts to get in the way of debugging the keyboard.  The fix should be
+pretty evident.  (basically remove line 148)
+
+-_Quinn
+
+
+
+
+
+From jm@mak.com Tue, 31 Aug 1999 19:13:02 -0400
+Date: Tue, 31 Aug 1999 19:13:02 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] CPUID instruction problem due to use of optimizer
+
+Hi;
+
+The latest i386 build Makefile has the optimizer turned on.  This
+breaks some of the hardware-stroking code in the i386 jjMachine (which
+contains some asm() code).
+
+In order for the optimizer to be used, I clearly have to eyeball the
+code, and probably put some "volatile" declarations in some places,
+etc.  Or else, I could just not use the optimizer for those places.
+
+I am curious as to the behavior of -O compiled code on other people's
+hardware and with other people's compilers.  Please let me know what
+happened when YOU tried this.  However, for now, I am disabling it,
+and I will turn it off when I next commit the Makefile and my code.
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From tmiller@haverford.edu Tue, 31 Aug 1999 20:32:49 -0400 (EDT)
+Date: Tue, 31 Aug 1999 20:32:49 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] CPUID instruction problem due to use of optimizer
+
+> The latest i386 build Makefile has the optimizer turned on.  This
+> breaks some of the hardware-stroking code in the i386 jjMachine (which
+> contains some asm() code).
+
+	Whoops.  This is my mistake, and I apologize; I wanted to see how
+well the VGA driver ran with an optimized build, and now I can't even
+recall how that was.
+
+-_Quinn
+
+
+
+
+From draft@fear.ch Wed, 1 Sep 1999 14:14:17 +0200 (CEST)
+Date: Wed, 1 Sep 1999 14:14:17 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] Interrupts
+
+Hi Todd
+
+On Tue, 31 Aug 1999, Todd L. Miller wrote:
+
+> > > Is the current JOS version able to handle Interrupts?
+> > > I tried to catch the timer-interrupt (8), but it didn't work.
+> > > ....int008.wait(); waits endless.
+> 
+> 	The timer interrupts aren't implemented; I believe I've mentioned
+> this before and suggested we just scrap it and move on to JavaOS's APIs.
+> As for int008 in particular, I've trapped it out in
+> common/decaf/scheduler.cc because (being the clock) it generated enough
+> interrupts to get in the way of debugging the keyboard.  The fix should be
+> pretty evident.  (basically remove line 148)
+
+I removed line 148, but was unable to catch int008, I found an endless
+loop it to the removeThread routine int thread_list.cc:
+
+while( this->current->next != stop ) 
+where stop is F000EF6F and next is never stop
+
+Thomas Bocek
+
+
+
+
+From tmiller@haverford.edu Wed, 1 Sep 1999 09:22:25 -0400 (EDT)
+Date: Wed, 1 Sep 1999 09:22:25 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Interrupts
+
+	I don't know what else you've been doing, but a (my) stock
+build runs just fine after removing the native-code check for interrupt
+number 8.  What that error looks like is an attempt to remove something
+that's not in the thread_list, which is Very Bad.
+
+-_Quinn
+
+
+
+
+From draft@fear.ch Wed, 1 Sep 1999 15:56:34 +0200 (CEST)
+Date: Wed, 1 Sep 1999 15:56:34 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] Interrupts
+
+hmm, perhaps I've got an old source of JOS. The best thing is to wait
+until the CPUID bug is removed, and get a newer source. If it won't work,
+I try to get more information (more DEBUG outputs).
+
+Thomas Bocek
+
+
+On Wed, 1 Sep 1999, Todd L. Miller wrote:
+
+> 	I don't know what else you've been doing, but a (my) stock
+> build runs just fine after removing the native-code check for interrupt
+> number 8.  What that error looks like is an attempt to remove something
+> that's not in the thread_list, which is Very Bad.
+
+
+
+
+
+From jm@mak.com Wed, 01 Sep 1999 10:13:14 -0400
+Date: Wed, 01 Sep 1999 10:13:14 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Interrupts
+
+Hi;
+
+Thomas Bocek wrote:
+> 
+> hmm, perhaps I've got an old source of JOS. The best thing is to wait
+> until the CPUID bug is removed, and get a newer source. If it won't work,
+> I try to get more information (more DEBUG outputs).
+
+Just disable the "-O2" in the arch/i386/nativecode/Makefile.  It's a makefile
+bug, not a code bug.
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== jm@mak.com               ==== http://www.mak.com/
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+
+
+From tmiller@haverford.edu Wed, 1 Sep 1999 14:17:27 -0400 (EDT)
+Date: Wed, 1 Sep 1999 14:17:27 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf & classpath
+
+	I've been playing with classpath for the past few days, so I'd
+figure I'd check in with my understanding so far.
+
+(A) We'll need to add JNI if we want to use classpath's native code.
+(B) Some amount of that native code will have libc stuff in it.  While
+	this shouldn't be a terrible problem for the host build (anyone
+	actually /know/?) it's a disaster for the i386 build.  It looks
+	like they put all the native code in classpath/native/*, which
+	means we should be able to point the Makefiles at something like
+	classpath/i386/* and everything will be happy.
+(C) It looks all the jvm-specific bits have been localized to
+	java classes in classpath/vm/*, which can just implement in
+	jjos/common/decaf[/vm].
+(D) The anonymous CVS server doesn't seem to have the 'configure' script
+	in it, so get the snapshot if you're interested in working on it.
+(E) Likewise, the configure script seems to want japhar to be installed
+	(looks for 'japhar-config'); someone should find out what the
+	configure script needs to know from this.  (Then implement a
+	--with-jjos option on the config?)
+(F) Because of (E), I haven't been able to build a classes.zip out of 
+	classpath, and see how well it works with jjos/decaf.
+
+	JM, you've been in contact with the classpath developers; if you
+could run my suspicions and questions by (one of) them, that would be
+great.
+
+-_Quinn
+
+
+
+
+
+
+From hilarycheng@usa.net Thu, 2 Sep 1999 08:56:31 +0800
+Date: Thu, 2 Sep 1999 08:56:31 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] CPUID instruction problem due to use of optimizer
+
+Hi all,
+
+    Last night, I have tested the VGA with lastest CVS Code. It has 
+optimizer which turned on. The Clear Screen is much faster. The old
+one takes about 3 sec. to clear the screen. The lastest one takes about
+1 sec. to finish. I found that the optimization got no problem for me
+to run JJOS. But I have modified the CPUID. So that I can run JJOS
+w/o problem.
+
+Regards,
+
+Hilary
+
+
+>> The latest i386 build Makefile has the optimizer turned on.  This
+>> breaks some of the hardware-stroking code in the i386 jjMachine (which
+>> contains some asm() code).
+>
+> Whoops.  This is my mistake, and I apologize; I wanted to see how
+>well the VGA driver ran with an optimized build, and now I can't even
+>recall how that was.
+>
+>-_Quinn
+
+
+
+
+
+From draft@fear.ch Thu, 2 Sep 1999 17:58:45 +0200 (CEST)
+Date: Thu, 2 Sep 1999 17:58:45 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] Interrupts again
+
+Hi all
+ 
+I've downloaded the latest source, removed the -O2, remarked the line
+148 (Interrupt 8) and tried to run it:
+
+JOS hangs after the 2A20 OK, loading..." and before "init for decaf..."
+
+Then I unmarked the line 148, and JOS runs fine.
+
+
+Thomas Bocek
+
+
+
+
+From tmiller@haverford.edu Thu, 2 Sep 1999 13:57:04 -0400 (EDT)
+Date: Thu, 2 Sep 1999 13:57:04 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Interrupts again
+
+> I've downloaded the latest source, removed the -O2, remarked the line
+> 148 (Interrupt 8) and tried to run it:
+> 
+> JOS hangs after the 2A20 OK, loading..." and before "init for decaf..."
+> 
+> Then I unmarked the line 148, and JOS runs fine.
+
+	And you haven't made any changes?  That's truly bizarre.  I'll try
+to look into it tonight.
+
+-_Quinn
+
+
+
+
+From jewel@pixie.co.za Fri, 3 Sep 1999 21:40:44 +0200 (SAST)
+Date: Fri, 3 Sep 1999 21:40:44 +0200 (SAST)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Kernel] Utah's OSKit
+
+Hey all
+
+This weekend (or more precisely today) I spent a while hacking with the
+OSKit, which is developed at the University of Utah.
+(http://www.cs.utah.edu/flux/oskit/). I managed to compile a simple JVM
+that I have been working with for the last few months and link it with the
+OSKit components to produce a bootable JVM.
+
+I boot the virtual machine with netboot and stick a whole lot of class
+files in the netboot image, so far I have managed to run a hello world app
+and verified that the garabage collection is working. 
+
+I know there has already been a huge amount of development work on JJOS
+and decaf by their authors, but I want to suggest that we examine the
+possibilities of the OSKit and perhaps parallel development of another
+kernel / VM combination.
+
+The OSKit comes with easy-to-use modules for kernels (threading), memory
+management, file io (console), filesystems (memory and disk), network code
+(and network drivers) and even some graphics libraries (I think SVGAlib
+and support for X). To reuse these components is really easy and could
+provide us with huge savings in time spent writing these parts.
+
+I know the OS 'model' implied by the OSKit is not what everyone wants (it
+is biased towards UNIX), but it really makes sense to me in terms of code
+reuse.
+
+Please tell me what you think, read the OSKit docs and see what it's got. 
+
+I don't see myself spending too much time on the JOS project due to other
+committments, but I'ld like to see the project progressing on more
+'fronts' than it currently is. We really need some kind of running system
+to start working on the higher-level OS services. 
+
+John Leuner
+
+
+
+
+From tmiller@haverford.edu Sun, 5 Sep 1999 00:51:04 -0400 (EDT)
+Date: Sun, 5 Sep 1999 00:51:04 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Utah's OSKit
+
+> I don't see myself spending too much time on the JOS project due to other
+> committments, but I'ld like to see the project progressing on more
+> 'fronts' than it currently is. We really need some kind of running system
+> to start working on the higher-level OS services. 
+
+	I'm biased, for obvious reasons, but I think that we'd be better
+served by continuing progress on JJOS/decaf.  The coding effort involved
+in connecting the OSKit native services with Java (especially in a way
+that's portable back to JJOS/decaf), I think, is substantial enough (i.e.
+take long enough) that would be more efficient to go ahead and do in java
+on JJOS/decaf.  In particular, integration with classpath or the the
+garbage collector are both enourmously important tasks that will make
+JJOS/decaf an order of magnitude more useful.
+
+	I'll take this opportunity to apologize for not getting any of the
+work I said I'd do done so far.  Various and sundry hardware difficulties
+caused by a set of upgrades have been plaguing me all weekend.
+
+-_Quinn
+
+
+
+
+From jm@mak.com Sun, 5 Sep 1999 09:17:29 -0400
+Date: Sun, 5 Sep 1999 09:17:29 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] status
+
+Hi All;
+
+
+(1) Thomas Bocek found and fixed a bug in idiv (operands transposed).
+    jm fixed isomorphic bugs in fdiv and ldiv (but curiously not
+    ddiv).
+
+(2) Thomas also found and fixed a similar operand transposition error
+    in irem.  jm fixed isomorphic bugs in drem, frem, and lrem.
+
+(3) George Marrows found a use of "interior pointers" to C++ objects,
+    wherein decaf retained a pointer to the "middle" of an object (as
+    opposed to a pointer to its reasonably easy-to-identify head).  He
+    updated his gc code to cope with most of these problems.  jm
+    incorporated George's fixes in the host build, which ran overnight
+    through 179 garbage collections before jm terminated it this
+    morning.
+
+(4) However (and this is a big "however"), the i386 build (as built by
+    jm from the same sources as the host build) does NOT seem to
+    survive (much after?) the first gc.  If the "vga.test()" method is
+    run, the program seems to hang for a bit, but then eventually
+    resets the box after drawing about 400 horizontal lines (anybody
+    else seen this?).  If repeated testVM() (and other methods) are
+    run, then the program runs a long time (hours), but it is not
+    clear, as of this writing, whether a successful GC has occurred
+    prior to crashing.  jm is continuing to work the issue this
+    weekend.
+
+(5) jm's sources are pretty much up to date with respect to the CVS
+    repository (only init.java and vga.java need updating, and jm has
+    extensively modified init.java).  jm has modified 8 files in
+    decaf, and 3 files in jjos.  
+
+My question, pursuant to (5) -- the conservative GC is a Big Win for
+those doing host development.  It's not necessarily a Big Win for
+those doing i386 development.  Would those people doing i386
+development PLEASE let me know whether I should commit the sources to
+CVS, which include the fixes in items (1) through (3)???  I don't want
+to commit sources which contain known bugs (e.g., (5) above), even if
+it fixes some problems, unless people tell me it's OK to do so.
+
+Thanks, and sorry for the slow progress.
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From jewel@pixie.co.za Mon, 6 Sep 1999 02:33:15 +0200 (SAST)
+Date: Mon, 6 Sep 1999 02:33:15 +0200 (SAST)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Kernel] Utah's OSKit
+
+> > I don't see myself spending too much time on the JOS project due to other
+> > committments, but I'ld like to see the project progressing on more
+> > 'fronts' than it currently is. We really need some kind of running system
+> > to start working on the higher-level OS services. 
+> 
+> 	I'm biased, for obvious reasons, 
+
+	Understood.
+
+>  but I think that we'd be better
+> served by continuing progress on JJOS/decaf.  The coding effort involved
+> in connecting the OSKit native services with Java (especially in a way
+> that's portable back to JJOS/decaf), I think, is substantial enough (i.e.
+> take long enough) that would be more efficient to go ahead and do in java
+> on JJOS/decaf.  
+
+Well I have to disagree here. While I fully believe that as much of
+operating services should be written in Java as possible, I do believe
+that we can piggyback on existing code until our own is written (and
+debugged). For example, the OSKit can provide us with network drivers,
+network stacks, ide/scsi drivers AND the code to mount and read/write
+filesystems. This is a substantial amount of work to implement.
+
+ > In particular, integration with classpath or the the
+> garbage collector are both enourmously important tasks that will make
+> JJOS/decaf an order of magnitude more useful.
+
+Agreed. But since I've been fiddling with this stuff anyway, I hope you
+don't mind if play with my OSKit/JavaVM and the JOS stuff. I've already
+played around with init(), running it in Linux as a process, and on the
+OSKit kernel. 
+
+The VM I'm using seems to work fine (except my floating point stuff is
+broken) and I think it could be useful as a comparative testbed to aid
+with debugging etc.
+
+With regards to the VGA driver, I managed to get into VGA mode, but at
+that point the screen stays blank and it never comes back. I copied the 6
+asm methods from jjmachine* (If I remember), in8 in16 in32 out8 etc.
+
+> 	I'll take this opportunity to apologize for not getting any of the
+> work I said I'd do done so far.  Various and sundry hardware difficulties
+> caused by a set of upgrades have been plaguing me all weekend.
+
+Isn't it amazing how computer experts waste so much time messing around
+with their hardware? I must have spent hundreds of hours taking my various
+machines apart and putting them back together for whatever purpose.
+Yesterday I spend about 5 hours trying to get a serial connection up to
+GDB for debugging (but I failed miserably). Are any of you doing this?
+
+John Leuner
+
+
+
+
+From tmiller@haverford.edu Sun, 5 Sep 1999 21:47:43 -0400 (EDT)
+Date: Sun, 5 Sep 1999 21:47:43 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Utah's OSKit
+
+> Well I have to disagree here.
+
+	I figured you'd disagree; again, I'm biased, so I'll hold it to be
+a waste of both of our times to argue.  If you get something worthwhile
+going, so much the better.  I will be the first to fall down at worship at
+your feet for satiating the device-driver writers :)
+
+> Agreed. But since I've been fiddling with this stuff anyway, I hope you
+> don't mind if play with my OSKit/JavaVM and the JOS stuff. I've already
+> played around with init(), running it in Linux as a process, and on the
+> OSKit kernel. 
+
+	No, not at all.  I wish you luck, and running on a second platform
+can only help expose problems.
+
+> With regards to the VGA driver, I managed to get into VGA mode, but at
+> that point the screen stays blank and it never comes back. I copied the 6
+> asm methods from jjmachine* (If I remember), in8 in16 in32 out8 etc.
+
+	Should have been more than 6, IIRC, but whatever.  Have you tried
+the native-code equivalent program just to make it's not a problem with
+OSKit?
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Sun, 5 Sep 1999 22:15:11 -0400 (EDT)
+Date: Sun, 5 Sep 1999 22:15:11 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] bocek's interrupt eight
+
+	First, a quick question: did I fluff my cvs update, or has none of
+the gc stuff made it in yet?
+
+	About interupt eight: the reason Bad Things happened to the i386
+build is that the clock interrupt fires before everything (i.e. the
+static variables interrupts.intXXX) is ready.  Testing with all the tests
+off (except the console drivers, which need work, btw) and w/o the
+function trace reveals that the java_word slurped up from
+interrupts.int008, the one that's supposed to be an interrupt object, is
+in fact a null object, so that when the threadable object is cast out of
+it, Bad Things happen.
+
+	At any rate, on my Celery 400, this happens three times before the
+initialization goes through, and everything seems to work fine.  The
+current check & abort correction I've got set up [ if ( jw.isNull() ) {
+kprintf(...); return; } ]* is rather kludgy.  I'd imagine that we could
+forcibly initialize the interrupts class before start()ing the scheduler,
+but I'm not sure what this would do to the system or the classes required
+by the clock driver.  What might work best is to offer a
+jos.system.machine method switching off/on native clock handling, so that
+init() could handle what was necessary to ensure the clock-handler was
+ready before it was allowed to run.
+
+	I haven't committed the changed scheduler.cc in light of my
+uncertainty about the correctness of my tree at this point; I've just
+moved into a new Slackware 4.0 system and I'm still being very careful
+about things.
+
+	I'll be trying the new vga driver later tonight and doing a bit of
+fiddling with the console driver(s).
+
+-_Quinn
+
+* right after "ft->getOffsetWord(...);" in scheduler.cc in the function
+  "notifyOfInterrupts()"
+
+
+
+
+From jm@mak.com Sun, 05 Sep 1999 23:15:02 -0400
+Date: Sun, 05 Sep 1999 23:15:02 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] bocek's interrupt eight
+
+Hi;
+
+Todd L. Miller wrote:
+>         First, a quick question: did I fluff my cvs update, or has none of
+> the gc stuff made it in yet?
+
+I sent a message to the list earlier today asking whether I should
+commit the new gc stuff given that it doesn't work too well on the i386
+build, and I haven't heard Word One (oh, we're computer types -- Word
+Zero) about whether I should.  (See more below...)
+
+>         About interupt eight: the reason Bad Things happened to the i386
+> build is that the clock interrupt fires before everything (i.e. the
+> static variables interrupts.intXXX) is ready.  Testing with all the tests
+> off (except the console drivers, which need work, btw) and w/o the
+> function trace reveals that the java_word slurped up from
+> interrupts.int008, the one that's supposed to be an interrupt object, is
+> in fact a null object, so that when the threadable object is cast out of
+> it, Bad Things happen.
+
+OK.  A couple of questions --
+
+(1) The "static variables" are exactly which ones?  We shouldn't have
+any static variables that require initialization code to be run -- given
+the limitations of the current initialization code, it *won't* be run
+for the i386 target.
+
+(2) I should've disabled interrupts (*all* interrupts) at head.s86 on
+line 124 (on my copy).  Theoretically (famous last words), there
+shouldn't be any interrupts happening until about line 161 in entry.cc
+(after the assignInterrupts() call).  If this isn't the case, something
+weird is going on, and it needs to be tracked down.  Maybe I need to
+disable them really early -- but I think that *not* having interrupts
+enabled breaks the BIOS calls.
+
+>         At any rate, on my Celery 400, this happens three times before the
+> initialization goes through, and everything seems to work fine.  The
+> current check & abort correction I've got set up [ if ( jw.isNull() ) {
+> kprintf(...); return; } ]* is rather kludgy.  I'd imagine that we could
+> forcibly initialize the interrupts class before start()ing the scheduler,
+> but I'm not sure what this would do to the system or the classes required
+> by the clock driver.  What might work best is to offer a
+> jos.system.machine method switching off/on native clock handling, so that
+> init() could handle what was necessary to ensure the clock-handler was
+> ready before it was allowed to run.
+> 
+>         I haven't committed the changed scheduler.cc in light of my
+> uncertainty about the correctness of my tree at this point; I've just
+> moved into a new Slackware 4.0 system and I'm still being very careful
+> about things.
+> 
+>         I'll be trying the new vga driver later tonight and doing a bit of
+> fiddling with the console driver(s).
+
+Let me know what the status of your i386 build is, so I can tell whether
+I'm either degrading things terribly, or the new changes are no-ops. 
+Like I said, I'm sitting on a whole bunch of changes...
+ 
+-jm
+
+-- 
+==== John Morrison ==== jm@mak.com == http://www.mak.com/welcome.html
+==== MaK Technologies Inc., 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+
+
+
+From tmiller@haverford.edu Mon, 6 Sep 1999 09:08:10 -0400 (EDT)
+Date: Mon, 6 Sep 1999 09:08:10 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] bocek's interrupt eight
+
+> I sent a message to the list earlier today asking whether I should
+
+	[...]  Of course, I read this AFTER asking...
+
+> (1) The "static variables" are exactly which ones?  We shouldn't have
+> any static variables that require initialization code to be run -- given
+> the limitations of the current initialization code, it *won't* be run
+> for the i386 target.
+
+	Er, the JAVA /class/-static variables in "jos.system.interrupts",
+name intXXX, from 001 to 015.  Sorry for any confusion.  You (next
+paragraph) disabled all the interrupts and then turned them back on for
+the java code to play with, which is the Right Thing to do; we just punted
+on what to do with the clock interrupt back when we were doing that part
+of the design.  (Say!  That means we've made it pretty far downfield.:))
+
+> Let me know what the status of your i386 build is, so I can tell whether
+> I'm either degrading things terribly, or the new changes are no-ops. 
+> Like I said, I'm sitting on a whole bunch of changes...
+
+	If I've got FN_TRACE turned on and all the VM tests running, it
+dies after the first keystroke in the consoled; haven't tested the new VGA
+driver at all; if I turn off FN_TRACE and all the VM tests, it runs long
+enough that I can confirm the various console driver changes I've been
+making; I've not crashed it yet there.  (Though now that I think about it,
+FN_TRACE shouldn't have any effect on how long things run and I've not
+bothered to see if it actually does...)
+
+	If you're sitting on a whole bunch of changes, it'll probably be
+easier for me to committ my stuff first.  (Not much, yet, unfortunately.)
+
+	Oh, given that some of the corrections JM & Bocek made were to
+math ops that /should/ have been checked before this, if anyone feels like
+writing up a more comprehensive suite of test for init.java, do, with my
+encouragement.
+
+-_Quinn
+
+
+
+
+
+
+From jewel@pixie.co.za Mon, 6 Sep 1999 19:42:59 +0200 (SAST)
+Date: Mon, 6 Sep 1999 19:42:59 +0200 (SAST)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Kernel] Utah's OSKit
+
+> > Well I have to disagree here.
+> 
+> 	I figured you'd disagree; again, I'm biased, so I'll hold it to be
+> a waste of both of our times to argue.  If you get something worthwhile
+> going, so much the better.  I will be the first to fall down at worship at
+> your feet for satiating the device-driver writers :)
+
+:-). It's just that an OS without drivers (and hence without a disk or a
+network connection), is pretty useless.
+ 
+> > With regards to the VGA driver, I managed to get into VGA mode, but at
+> > that point the screen stays blank and it never comes back. I copied the 6
+> > asm methods from jjmachine* (If I remember), in8 in16 in32 out8 etc.
+
+As far as I could tell the native code was only dependent on these 6, but
+maybe it only failed to find another native method *after* it switched to
+VGA mode (which makes me look stupid).
+
+> 	Should have been more than 6, IIRC, but whatever. Have you tried
+> the native-code equivalent program just to make it's not a problem with
+> OSKit?
+
+Urm, I don't quite understand. AFAIK you can't address the video memory
+directly in Linux (even as root), am I wrong?
+
+But with regards to the OSKit, I have no idea what it's doing before it
+boots the VM, so it could be something there.
+
+John Leuner
+
+
+
+
+
+From tmiller@haverford.edu Mon, 6 Sep 1999 16:04:55 -0400 (EDT)
+Date: Mon, 6 Sep 1999 16:04:55 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Utah's OSKit
+
+> But with regards to the OSKit, I have no idea what it's doing before it
+> boots the VM, so it could be something there.
+
+	Oh, I just meant write the native method for your VGA stuff into
+the VM, and run it to make sure that OSKit wasn't doing something odd --
+i.e. make sure that the problem is the VM/Java, not OSKit.
+
+-_Quinn
+
+
+
+
+From warp@spin.de Tue, 31 Aug 1999 20:21:35 +0200
+Date: Tue, 31 Aug 1999 20:21:35 +0200
+From: Markus Peter warp@spin.de
+Subject: [JOS-Kernel] FYI -- rumours of an MS-Office killer available via Java applet
+
+John Morrison <jm@mak.com> wrote:
+
+> http://www.theregister.co.uk/990831-000003.html
+
+As far as I know, this refers to StarDivisions "Java version" of
+StarOffice. They have the code for it lying around for about 2
+years already and demo'ed the stuff several times but never really
+sold it. Unfortunately it is _not_ a full Office application,
+instead it's just a Java display applet which will connect
+to a StarOffice server which does the real work... think of
+something similar to X/Windows with a little more intelligence
+on the terminal side.
+
+--
+Markus Peter (SPiN GmbH - Java, Webdesign, Perl, Databases)
+
+
+
+
+
+From jewel@pixie.co.za Tue, 7 Sep 1999 02:14:02 +0200 (SAST)
+Date: Tue, 7 Sep 1999 02:14:02 +0200 (SAST)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Kernel] Utah's OSKit + VGA works
+
+> > But with regards to the OSKit, I have no idea what it's doing before it
+> > boots the VM, so it could be something there.
+> 
+> 	Oh, I just meant write the native method for your VGA stuff into
+> the VM, and run it to make sure that OSKit wasn't doing something odd --
+> i.e. make sure that the problem is the VM/Java, not OSKit.
+
+That's what I was doing already, but in my stupidity I only implemented
+the methods from jjmachine.cc and didn't look at jvmbuiltins. I added the
+other 6 read8,write8,read16 ... methods and everything worked perfectly.
+
+I timed the VGA test (for comparison, not competition!), it took about 50
+seconds from textmode-to-textmode (including the delay). The PC is a
+486DX100 with a venerable Tseng ET4000.
+
+As far as I could see there were some red things at the top, with green
+vertical lines. This then got cleared followed by a JOS logo.
+
+Very impressive guys, the fact that I only had to cut and paste 12 methods
+(less that 50 lines) into my VM code shows how beautiful device drivers in
+Java can be!
+
+John Leuner
+
+
+
+
+From tmiller@haverford.edu Tue, 7 Sep 1999 16:48:58 -0400 (EDT)
+Date: Tue, 7 Sep 1999 16:48:58 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Utah's OSKit + VGA works
+
+> I timed the VGA test (for comparison, not competition!), it took about 50
+> seconds from textmode-to-textmode (including the delay). The PC is a
+> 486DX100 with a venerable Tseng ET4000.
+
+	And hey, it stayed up for the whole test!  Lucky dog!
+
+> Very impressive guys, the fact that I only had to cut and paste 12 methods
+> (less that 50 lines) into my VM code shows how beautiful device drivers in
+> Java can be!
+
+	Hopefully the JavaOS/B model is equally elegant; I'm investigating
+it as I'm rewriting the keyboard driver.  Since it JavaOS/B is now
+defunct, I'm more inclined to roll our own driver/device model.  We'll
+see.  (I don't want to start doing major hackery to support classpath
+until the gc stuff is firmly in place...)
+
+-_Quinn
+
+
+
+
+From hilarycheng@usa.net Wed, 8 Sep 1999 08:39:22 +0800
+Date: Wed, 8 Sep 1999 08:39:22 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] decaf updates
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_000D_01BEF9D5.A66D8C20
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Ranieri,
+
+    I have think about it. I concern about Real Mode Interrupt. Since =
+JJOS is running under Protected Mode.
+As I know, most of the real mode interrupt will not work under protected =
+mode. If JJOS can provide a Real
+Mode Interface, we could save lots of times.
+
+Regards,
+
+Hilary
+
+
+  ----- Original Message -----=20
+  From: Ranieri Argentini=20
+  To: kernel@jos.org=20
+  Sent: 26 August 1999 PM 22:14
+  Subject: Re: [JOS-Kernel] decaf updates
+
+
+  >>cool, do you read the fonts from the vid-mem? the start routine
+  >>clears unforunately the hole vid-mem, so no fonts after the stop =
+routine
+  >>are available (yet).
+  >
+  >well, I just copy the font from Linux and store in byte array. and =
+draw it
+  >pixel on the screen. I think that would be much more easy to do it.
+  >hm, What's vid-mem ?  :o, I remember that font are stored in VGA.
+  >But I forget how to retrieve it from VGA. is there any Doc?
+
+  This is the way to retrieve it using the BIOS. This might prove to be =
+a bit problematic in OS design, but solving this problem is left as an =
+excersize for the reader ;-D
+
+  This info has been extracted from Ralf Brown's interrupt list, file =
+inter60a.zip available through ftpsearch.lycos.com ....
+
+  Hope it helps someone somewhere ...
+
+  Ranieri
+
+  --------V-101130-----------------------------
+  INT 10 - VIDEO - GET FONT INFORMATION (EGA, MCGA, VGA)
+          AX =3D 1130h
+          BH =3D pointer specifier
+              00h INT 1Fh pointer
+              01h INT 43h pointer
+              02h ROM 8x14 character font pointer
+              03h ROM 8x8 double dot font pointer
+              04h ROM 8x8 double dot font (high 128 characters)
+              05h ROM alpha alternate (9 by 14) pointer (EGA,VGA)
+              06h ROM 8x16 font (MCGA, VGA)
+              07h ROM alternate 9x16 font (VGA only) (see #00021)
+              11h (UltraVision v2+) 8x20 font (VGA) or 8x19 font =
+(autosync EGA)
+              12h (UltraVision v2+) 8x10 font (VGA) or 8x11 font =
+(autosync EGA)
+  Return: ES:BP =3D specified pointer
+          CX    =3D bytes/character of on-screen font (not the requested =
+font!)
+          DL    =3D highest character row on screen
+  Note:   for UltraVision v2+, the 9xN alternate fonts follow the =
+corresponding
+            8xN font at ES:BP+256N
+  BUG:    the IBM EGA and some other EGA cards return in DL the number =
+of rows on
+            screen rather than the highest row number (which is one =
+less).
+  SeeAlso: AX=3D1100h,AX=3D1103h,AX=3D1120h,INT 1F"SYSTEM DATA",INT =
+43"VIDEO DATA"
+
+  Format of alternate font table [array]:
+  Offset  Size    Description     (Table 00021)
+   00h    BYTE    character to be replaced (00h =3D end of table)
+   01h  N BYTEs   graphics data for character, one byte per scan line
+  --------V-101130BX4D4F-----------------------
+
+
+  _______________________________________________ Kernel maillist - =
+Kernel@jos.org http://jos.org/mailman/listinfo/kernel=20
+
+------=_NextPart_000_000D_01BEF9D5.A66D8C20
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META content=3D"text/html; charset=3Dbig5" http-equiv=3DContent-Type>
+<META content=3D"MSHTML 5.00.2014.210" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hi Ranieri,</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>&nbsp;&nbsp;&nbsp; I have think about =
+it. I concern=20
+about Real Mode Interrupt. Since JJOS is running under Protected=20
+Mode.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>As I know, most of the real mode =
+interrupt will not=20
+work under protected mode. If JJOS can provide a Real</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>Mode Interface, we could save lots of=20
+times.</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Hilary</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&nbsp;</DIV>
+<BLOCKQUOTE=20
+style=3D"BORDER-LEFT: #000000 2px solid; MARGIN-LEFT: 5px; MARGIN-RIGHT: =
+0px; PADDING-LEFT: 5px; PADDING-RIGHT: 0px">
+  <DIV style=3D"FONT: 10pt arial">----- Original Message ----- </DIV>
+  <DIV=20
+  style=3D"BACKGROUND: #e4e4e4; FONT: 10pt arial; font-color: =
+black"><B>From:</B>=20
+  <A href=3D"mailto:R.Argentini@student.tudelft.nl"=20
+  title=3DR.Argentini@student.tudelft.nl>Ranieri Argentini</A> </DIV>
+  <DIV style=3D"FONT: 10pt arial"><B>To:</B> <A =
+href=3D"mailto:kernel@jos.org"=20
+  title=3Dkernel@jos.org>kernel@jos.org</A> </DIV>
+  <DIV style=3D"FONT: 10pt arial"><B>Sent:</B> 26 August 1999 PM =
+22:14</DIV>
+  <DIV style=3D"FONT: 10pt arial"><B>Subject:</B> Re: [JOS-Kernel] decaf =
+
+  updates</DIV>
+  <DIV><BR></DIV>&gt;&gt;cool, do you read the fonts from the vid-mem? =
+the start=20
+  routine<BR>&gt;&gt;clears unforunately the hole vid-mem, so no fonts =
+after the=20
+  stop routine<BR>&gt;&gt;are available (yet).<BR>&gt;<BR>&gt;well, I =
+just copy=20
+  the font from Linux and store in byte array. and draw it<BR>&gt;pixel =
+on the=20
+  screen. I think that would be much more easy to do it.<BR>&gt;hm, =
+What's=20
+  vid-mem ?&nbsp; :o, I remember that font are stored in VGA.<BR>&gt;But =
+I=20
+  forget how to retrieve it from VGA. is there any Doc?<BR><BR>This is =
+the way=20
+  to retrieve it using the BIOS. This might prove to be a bit =
+problematic in OS=20
+  design, but solving this problem is left as an excersize for the =
+reader=20
+  ;-D<BR><BR>This info has been extracted from Ralf Brown's interrupt =
+list, file=20
+  inter60a.zip available through ftpsearch.lycos.com ....<BR><BR>Hope it =
+helps=20
+  someone somewhere ...<BR><BR>Ranieri<BR><BR><TT><FONT=20
+  face=3D"Courier New, Courier"=20
+  size=3D2>--------V-101130-----------------------------<BR>INT 10 - =
+VIDEO - GET=20
+  FONT INFORMATION (EGA, MCGA,=20
+  =
+VGA)<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB>AX=
+ =3D=20
+  =
+1130h<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB>B=
+H =3D=20
+  pointer=20
+  =
+specifier<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-T=
+AB>&nbsp;&nbsp;&nbsp;=20
+  00h INT 1Fh=20
+  =
+pointer<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB=
+>&nbsp;&nbsp;&nbsp;=20
+  01h INT 43h=20
+  =
+pointer<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB=
+>&nbsp;&nbsp;&nbsp;=20
+  02h ROM 8x14 character font=20
+  =
+pointer<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB=
+>&nbsp;&nbsp;&nbsp;=20
+  03h ROM 8x8 double dot font=20
+  =
+pointer<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB=
+>&nbsp;&nbsp;&nbsp;=20
+  04h ROM 8x8 double dot font (high 128=20
+  =
+characters)<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X=
+-TAB>&nbsp;&nbsp;&nbsp;=20
+  05h ROM alpha alternate (9 by 14) pointer=20
+  =
+(EGA,VGA)<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-T=
+AB>&nbsp;&nbsp;&nbsp;=20
+  06h ROM 8x16 font (MCGA,=20
+  =
+VGA)<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB>&n=
+bsp;&nbsp;&nbsp;=20
+  07h ROM alternate 9x16 font (VGA only) (see=20
+  =
+#00021)<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB=
+>&nbsp;&nbsp;&nbsp;=20
+  11h (UltraVision v2+) 8x20 font (VGA) or 8x19 font (autosync=20
+  =
+EGA)<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB>&n=
+bsp;&nbsp;&nbsp;=20
+  12h (UltraVision v2+) 8x10 font (VGA) or 8x11 font (autosync =
+EGA)<BR>Return:=20
+  ES:BP =3D specified=20
+  =
+pointer<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB=
+>CX&nbsp;&nbsp;&nbsp;=20
+  =3D bytes/character of on-screen font (not the requested=20
+  =
+font!)<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB>=
+DL&nbsp;&nbsp;&nbsp;=20
+  =3D highest character row on =
+screen<BR>Note:<X-TAB>&nbsp;&nbsp;&nbsp;</X-TAB>for=20
+  UltraVision v2+, the 9xN alternate fonts follow the=20
+  =
+corresponding<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<=
+/X-TAB>&nbsp;=20
+  8xN font at =
+ES:BP+256N<BR>BUG:<X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB>the IBM=20
+  EGA and some other EGA cards return in DL the number of rows=20
+  =
+on<BR><X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB>&nbs=
+p;=20
+  screen rather than the highest row number (which is one =
+less).<BR>SeeAlso:=20
+  AX=3D1100h,AX=3D1103h,AX=3D1120h,INT 1F"SYSTEM DATA",INT 43"VIDEO=20
+  DATA"<BR><BR>Format of alternate font table=20
+  =
+[array]:<BR>Offset<X-TAB>&nbsp;&nbsp;</X-TAB>Size<X-TAB>&nbsp;&nbsp;&nbsp=
+;&nbsp;</X-TAB>Description<X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB>(T=
+able=20
+  =
+00021)<BR>&nbsp;00h<X-TAB>&nbsp;&nbsp;&nbsp;&nbsp;</X-TAB>BYTE<X-TAB>&nbs=
+p;&nbsp;&nbsp;&nbsp;</X-TAB>character=20
+  to be replaced (00h =3D end of table)<BR>&nbsp;01h&nbsp; N=20
+  BYTEs<X-TAB>&nbsp;&nbsp;&nbsp;</X-TAB>graphics data for character, one =
+byte=20
+  per scan=20
+  =
+line<BR>--------V-101130BX4D4F-----------------------<BR><BR><BR></FONT>_=
+______________________________________________=20
+  Kernel maillist - Kernel@jos.org =
+http://jos.org/mailman/listinfo/kernel=20
+</TT></BLOCKQUOTE></BODY></HTML>
+
+------=_NextPart_000_000D_01BEF9D5.A66D8C20--
+
+
+
+
+From jm@mak.com Wed, 08 Sep 1999 08:37:11 -0400
+Date: Wed, 08 Sep 1999 08:37:11 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] decaf updates
+
+Hi All;
+
+>     I have think about it. I concern about Real Mode Interrupt. Since JJOS is running under Protected Mode.
+> As I know, most of the real mode interrupt will not work under protected mode. If JJOS can provide a Real
+> Mode Interface, we could save lots of times.
+
+I thought about this when I was working on early versions of jjos.  There is an
+analogous software suite for DOS called "Dos Protected Mode Interface" (a.k.a.,
+DPMI).  It is a sort of DOS-extender which enables calls to real-mode DOS (and
+hence BIOS) calls from protected-mode code -- sort of what you're asking for
+here.  This was especially attractive when I thought it was unavoidable to write
+my own boot loader (just use BIOS calls to do it all).
+
+However, the more I looked into it, the messier it got.  The DPMI implementation
+I was looking at basically had to reimplement, for every "interesting" real-mode
+DOS/BIOS call, a protected-mode interface.  It seemed to include marshalling and
+unmarshalling args/params/return-values on a case-by-case basis, etc., and
+implementing the mechanics of the task switch.  Interrupt-handling also got
+weird.  It was not clear how it would work in a multi-threaded way (although I
+might've overlooked that capability entirely).  It was a *big* effort.  However,
+if you want to run under DOS (say, a game), but you also want a 32-bit flat
+address space, it's the only way to go.
+
+For us, that would be an awful lot of work (it would've taken me a year
+part-time), and we really want to do the device handling in Java anyways, so it
+didn't seem like a good idea at the time.  Plus, it wouldn't really even be
+close to being a portable approach...
+
+On the other hand, there *is* the virtual 8086 mode, which is supposed to help
+do stuff like this (even though it's utterly non-portable).
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== jm@mak.com               ==== http://www.mak.com/
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+
+
+From jm@mak.com Wed, 08 Sep 1999 08:47:46 -0400
+Date: Wed, 08 Sep 1999 08:47:46 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] bocek's interrupt eight
+
+Hi;
+
+"Todd L. Miller" wrote:
+> 
+> > I sent a message to the list earlier today asking whether I should
+> 
+>         [...]  Of course, I read this AFTER asking...
+> 
+> > (1) The "static variables" are exactly which ones?  We shouldn't have
+> > any static variables that require initialization code to be run -- given
+> > the limitations of the current initialization code, it *won't* be run
+> > for the i386 target.
+> 
+>         Er, the JAVA /class/-static variables in "jos.system.interrupts",
+> name intXXX, from 001 to 015.  Sorry for any confusion.  You (next
+> paragraph) disabled all the interrupts and then turned them back on for
+> the java code to play with, which is the Right Thing to do; we just punted
+> on what to do with the clock interrupt back when we were doing that part
+> of the design.  (Say!  That means we've made it pretty far downfield.:))
+
+OK.  Do you think it's better to leave interrupts entirely *disabled* until the
+Java code decides it's the time to enable them?  This is an entirely reasonable
+approach, and (hmm....) I don't think it will break anything at all (hmm...,
+right?).  Actually, I don't understand why I didn't do it that way in the first
+place (maybe I'm forgetting something ... wouldn't be the first time).
+
+> > Let me know what the status of your i386 build is, so I can tell whether
+> > I'm either degrading things terribly, or the new changes are no-ops.
+> > Like I said, I'm sitting on a whole bunch of changes...
+> 
+>         If I've got FN_TRACE turned on and all the VM tests running, it
+> dies after the first keystroke in the consoled; haven't tested the new VGA
+> driver at all; if I turn off FN_TRACE and all the VM tests, it runs long
+> enough that I can confirm the various console driver changes I've been
+> making; I've not crashed it yet there.  (Though now that I think about it,
+> FN_TRACE shouldn't have any effect on how long things run and I've not
+> bothered to see if it actually does...)
+
+So, in other words, I would not be breaking an entirely "working" build for
+you...
+
+>         If you're sitting on a whole bunch of changes, it'll probably be
+> easier for me to committ my stuff first.  (Not much, yet, unfortunately.)
+
+OK.  Let me know when you do this ... I won't really be able to do much more
+until Thursday at the earliest.  Do you think you'll be able to commit your
+stuff by then?  I'd REALLY like to commit the changes both because I'd like to
+attack some of the other remaining problems, and because I'd like the sources on
+more than one disk for safety's sake.
+
+>         Oh, given that some of the corrections JM & Bocek made were to
+> math ops that /should/ have been checked before this, if anyone feels like
+> writing up a more comprehensive suite of test for init.java, do, with my
+> encouragement.
+
+Isn't there a JVM compatibility/test suite around?  I can't remember the name,
+but I seem to recall reading about it (but I seem also to recall some
+licensing/NDA issues).  Anybody else heard about something like this?
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== jm@mak.com               ==== http://www.mak.com/
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+
+
+From draft@fear.ch Wed, 8 Sep 1999 15:25:31 +0200 (CEST)
+Date: Wed, 8 Sep 1999 15:25:31 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] decaf updates / FDC in progress
+
+Hi all
+
+
+>   This is the way to retrieve it using the BIOS. This might prove to be a bit problematic in OS design, but solving this problem is left as an excersize for the reader ;-D
+> 
+>   This info has been extracted from Ralf Brown's interrupt list, file inter60a.zip available through ftpsearch.lycos.com ....
+> 
+>   Hope it helps someone somewhere ...
+> 
+>   Ranieri
+
+Thanks, this could get me the location of the font-buffer and should be
+implemented in the next version. Now I save the whole screen, and print it
+back after the vga is finished (not very efficient, but it works).
+
+Today I made a succuessful run with my fdc/dma driver -> and it WORKED
+*yeah* the fdc-driver reads from the floppy drive, and prints the content
+on the screen. I think it will be finished this weekend.
+
+The dma driver is a bit tricky, it can only address 16MB. I thought I
+could make a (reserved) buffer below 16MB and copy the buffer to the
+appropriate java_byte_array -> jm, is it possible to reserve memory?
+
+For the dma/fdc I had to make several builtins. I think JNI would be a
+better method. Is it dicfficult to implement the Java Native Interface?
+
+Thomas Bocek
+
+
+
+
+From linus@bomben.nu Wed, 8 Sep 1999 15:33:17 +0200 (MEST)
+Date: Wed, 8 Sep 1999 15:33:17 +0200 (MEST)
+From: Linus G Larsson linus@bomben.nu
+Subject: [JOS-Kernel] decaf updates / FDC in progress
+
+
+On Wed, 8 Sep 1999, Thomas Bocek wrote:
+
+>Hi all
+
+[snip]
+
+>For the dma/fdc I had to make several builtins. I think JNI would be a
+>better method. Is it dicfficult to implement the Java Native Interface?
+
+Actually, I'm looking into JNI right now at work. It seems pretty hands on...
+
+//Linus
+
+
+
+
+From tullmann@cs.utah.edu Wed, 8 Sep 1999 08:44:24 -0600
+Date: Wed, 8 Sep 1999 08:44:24 -0600
+From: Patrick Tullmann tullmann@cs.utah.edu
+Subject: [JOS-Kernel] bocek's interrupt eight
+
+John Morrison wrote:
+> Isn't there a JVM compatibility/test suite around?  I can't remember
+> the name, but I seem to recall reading about it (but I seem also to
+> recall some licensing/NDA issues).  Anybody else heard about
+> something like this?
+
+There's mauve: http://sourceware.cygnus.com/mauve/.  Its a cygnus
+product, so it should be sufficiently unencumbered for you.
+
+Kaffe also contains a fair number of regression tests that you could
+snarf.
+
+-Pat
+
+----- ----- ---- ---  ---  --   -    -      -         -               -
+Pat Tullmann                                       tullmann@cs.utah.edu
+			  Mean people suck.
+
+
+
+From tmiller@haverford.edu Wed, 8 Sep 1999 13:04:21 -0400 (EDT)
+Date: Wed, 8 Sep 1999 13:04:21 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf updates / FDC in progress
+
+> Is it dicfficult to implement the Java Native Interface?
+
+	(First, it's great that we've got a FDC driver going, it shows
+great progress.  Second, it's that the VGA driver now does text/graphics
+switching, so it should be really easy to make it to text/text switching
+and finish off the virtual consoles.  (Once, that is, I finish rewriting
+the keyboard driver to more closely resemble Albrecht's code...))  To my
+(limited) understanding of JNI, implementing the calls TO JNI won't be
+difficult at all, but implementing all the JNI callbacks will be at least
+tedious and possibly very difficult.  I haven't looked closely enough at
+the spec yet to say more than that.  Linus, if you feel a particular
+desire to code JNI up, please, please, do, because it'll make things go
+MUCH faster w.r.t. to integrating classpath.
+
+	BTW, I've also committed my (slight) changes, JM, so go ahead and
+get the gc into cvs.
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Wed, 8 Sep 1999 13:06:05 -0400 (EDT)
+Date: Wed, 8 Sep 1999 13:06:05 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf updates / FDC in progress
+
+> For the dma/fdc I had to make several builtins. I think JNI would be a
+> better method. Is it dicfficult to implement the Java Native Interface?
+
+	It just occured to me that you might be thinking about
+dynamically-linked libraries, in which case the answer is, yes, ld would
+be very difficult to do.  What, btw, didn't the kernel already include
+that it needed to handle the FDC?
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Wed, 8 Sep 1999 09:31:41 -0400 (EDT)
+Date: Wed, 8 Sep 1999 09:31:41 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] bocek's interrupt eight
+
+> OK.  Do you think it's better to leave interrupts entirely *disabled* until the
+> Java code decides it's the time to enable them?  This is an entirely reasonable
+> approach, and (hmm....) I don't think it will break anything at all (hmm...,
+> right?).  Actually, I don't understand why I didn't do it that way in the first
+> place (maybe I'm forgetting something ... wouldn't be the first time).
+
+	I thought there was some good reason for it (leaving them enable
+but ignoring the clock) also, but I couldn't tell you what it might have
+been.
+
+> So, in other words, I would not be breaking an entirely "working" build for
+> you...
+
+	Right.  Hopefully my commit wouldn't be breaking anything for
+anyone else...
+
+> OK.  Let me know when you do this ... I won't really be able to do much more
+> until Thursday at the earliest.  Do you think you'll be able to commit your
+> stuff by then?  I'd REALLY like to commit the changes both because I'd like to
+> attack some of the other remaining problems, and because I'd like the sources on
+> more than one disk for safety's sake.
+
+	I'll try to commit my changes sometime today.  A note about the
+Makefiles: -DFAST_NATIVE_CODE activates the check-native-before-lookup
+code, which breaks things; -DNATIVE_CLOCK activates the code that traps
+interrupt eight in the scheduler.  (-DHANDLE_CLOCK still needs to be
+defined in the native build if you want the clock interrupt to reach the 
+scheduler at all.)
+
+> Isn't there a JVM compatibility/test suite around?  I can't remember the name,
+> but I seem to recall reading about it (but I seem also to recall some
+> licensing/NDA issues).  Anybody else heard about something like this?
+
+	I believe you're thinking about /mauve/, which, the last time I
+looked at it, was more of a class-library compatibility checker than
+anything else.
+
+
+	Finally, have you been able to find the JavaOS API specs anywhere?
+The website the .pdf files point to seems to have vanished, and I can't
+find anything on the Sun or IBM websites anymore.
+
+-_Quinn
+
+
+
+
+From jm@mak.com Thu, 09 Sep 1999 06:56:08 -0400
+Date: Thu, 09 Sep 1999 06:56:08 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] bocek's interrupt eight
+
+Hi Todd;
+
+"Todd L. Miller" wrote:
+> 
+> > OK.  Do you think it's better to leave interrupts entirely *disabled* until the
+> > Java code decides it's the time to enable them?  This is an entirely reasonable
+> > approach, and (hmm....) I don't think it will break anything at all (hmm...,
+> > right?).  Actually, I don't understand why I didn't do it that way in the first
+> > place (maybe I'm forgetting something ... wouldn't be the first time).
+> 
+>         I thought there was some good reason for it (leaving them enable
+> but ignoring the clock) also, but I couldn't tell you what it might have
+> been.
+
+So, I'll leave them disabled and see what (if anything) breaks.
+
+> > So, in other words, I would not be breaking an entirely "working" build for
+> > you...
+> 
+>         Right.  Hopefully my commit wouldn't be breaking anything for
+> anyone else...
+
+Well, everybody's had a chance to respond, and I haven't heard anything, so I'm
+going to do it later (after I "merge" or "update" with your changes).  Probably
+not until tomorrow mid-afternoon at the earliest.
+
+>         I'll try to commit my changes sometime today.  A note about the
+> Makefiles: -DFAST_NATIVE_CODE activates the check-native-before-lookup
+> code, which breaks things; -DNATIVE_CLOCK activates the code that traps
+> interrupt eight in the scheduler.  (-DHANDLE_CLOCK still needs to be
+> defined in the native build if you want the clock interrupt to reach the
+> scheduler at all.)
+
+Disabling interrupts will probably solve this problem.
+
+> > Isn't there a JVM compatibility/test suite around?  I can't remember the name,
+> > but I seem to recall reading about it (but I seem also to recall some
+> > licensing/NDA issues).  Anybody else heard about something like this?
+> 
+>         I believe you're thinking about /mauve/, which, the last time I
+> looked at it, was more of a class-library compatibility checker than
+> anything else.
+
+Yes, I think Patrick also mentioned this, too (thanks!), and was kind enough to
+provide a URL.  It would be great if somebody would step up to trying to check
+compatibility here (although maybe it's premature given the state of the
+integration with classpath).
+
+>         Finally, have you been able to find the JavaOS API specs anywhere?
+> The website the .pdf files point to seems to have vanished, and I can't
+> find anything on the Sun or IBM websites anymore.
+
+There's a broken link to the "JavaOS for Business" documents on:
+	http://wwwwswest2.sun.com/software/quick_index.html
+I sent a "you've got a broken link" message back to them.  I don't expect any
+action on this point.  If you need them, I'm sure we can figure out a way to get
+them.
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== jm@mak.com               ==== http://www.mak.com/
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+
+
+From draft@fear.ch Thu, 9 Sep 1999 13:46:30 +0200 (CEST)
+Date: Thu, 9 Sep 1999 13:46:30 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] general interrupts
+
+Hi all
+
+I just wanted to implement int8 and int14 for my fdc driver, and realised
+that I have have to make for each interrupt a thread. Which means
+Interrupt-driver=16 classes=16 threads.
+
+Now JOS has
+int000.wait()
+int001.wait()
+.....
+
+I thought this would be a better soulution
+
+int.wait()
+int.getcaughtint()
+
+I don't know if this would be difficult/possible to write.
+
+Thomas Bocek
+
+
+
+
+From tmiller@haverford.edu Thu, 9 Sep 1999 09:07:36 -0400 (EDT)
+Date: Thu, 9 Sep 1999 09:07:36 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] general interrupts
+
+> int.wait()
+> int.getcaughtint()
+> 
+> I don't know if this would be difficult/possible to write.
+
+	Part of what I want to do while rewriting the keyboard driver was
+to correct this (it's broken in two or three different ways, actually),
+with a system where interrupts/InterruptDispatcher queues up interrupt
+notifications and then fires off events to the interested listeners, viz:
+
+interrupts.addInterruptListener( 8, this );
+interrupts.addInterruptListener( 14, this )
+
+void handleInterrupt( int i ) {
+	if ( i == 8 ) {
+		/* do something */
+	else if ( i == 14 ) {
+		/* do something else */
+	else {
+		/* somehow interrupts got confused */
+	}
+
+
+	The reason I was asking JM about the API docs for JavaOS/B was to
+clone their interrupt-handling design (which I don't recall right now).
+If I can't find anything soon, I'll just roll my own.
+
+-_Quinn
+
+
+
+
+From corevisions@gmx.de Fri, 10 Sep 1999 04:23:49 +0200
+Date: Fri, 10 Sep 1999 04:23:49 +0200
+From: Corevisions corevisions@gmx.de
+Subject: [JOS-Kernel] JavaOS pdfs...
+
+i dowloaded some JavaOS pdf a time ago ...
+i have the ApplicationDeveloperGuide.pdf, DeviceDriverGuide.pdf,
+PortingGuide.pdf and ReferenceGuide.pdf ... probably i have more but i
+must search ... if you want them just mail me and i'll send them .. ok?
+
+Greets Sebastian
+
+
+
+
+From satish@pluris.com Fri, 10 Sep 1999 00:23:53 -0700
+Date: Fri, 10 Sep 1999 00:23:53 -0700
+From: Satish Dattatri satish@pluris.com
+Subject: [JOS-Kernel] JavaOS pdfs...
+
+can u please send them to me..
+thanks a lot
+satish
+
+
+Corevisions wrote:
+
+> i dowloaded some JavaOS pdf a time ago ...
+> i have the ApplicationDeveloperGuide.pdf, DeviceDriverGuide.pdf,
+> PortingGuide.pdf and ReferenceGuide.pdf ... probably i have more but i
+> must search ... if you want them just mail me and i'll send them .. ok?
+>
+> Greets Sebastian
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+
+From draft@fear.ch Fri, 10 Sep 1999 11:11:47 +0200 (CEST)
+Date: Fri, 10 Sep 1999 11:11:47 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] Article on JavaLobby
+
+Has anyone read the Article about the JVM Synthesizer on JavaLobby ?
+
+I haven't understood how the synthesizer works. Is it a tool like Tower/J?
+
+BTW I tried to download the package, but the files are missing...
+
+Thomas Bocek
+
+
+
+
+
+
+From jm@mak.com Fri, 10 Sep 1999 11:16:12 -0400
+Date: Fri, 10 Sep 1999 11:16:12 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Big CVS commitments (mostly focused upon conservative GC)
+
+Hi All;
+
+I have just merged/updated the latest changes from CVS with the ones I
+emailed you all about earlier (fixes by Thomas, George, Todd, etc.).
+PLEASE let me know ASAP if there are problems introduced by the
+following file commitments:
+
+arch/host/main.cc: added top-of-stack-finding mechanism to support GC
+
+arch/i386/entry.cc: added top-of-stack-finding mechanism to support GC
+
+common/decaf/attr_info.cc: changed string-checking to no-garbage
+method
+
+common/decaf/attr_list.cc: no longer allocates zero-length blocks
+
+common/decaf/field_list.cc: ditto
+
+common/decaf/field_table.cc: ditto
+
+common/decaf/frame.cc: null-out local_vars prior to delete for GC
+
+commmon/decaf/interface_list.cc: no more zero-length blocks.
+
+common/decaf/interp.cc: fixed operand-order bugs Thomas identified.
+
+common/decaf/java_thread.cc: removed redundant delete calls
+
+common/decaf/method_list.cc: no more zero-length blocks.
+
+common/nativecode/jbheap.cc: selectable malloc/free/GC
+implementations.  Conservative GC now checks stack.
+
+common/nativecode/jbheap.h: definition for stack-top member var.
+
+common/nativecode/stdlib.cc: added %p format type for pointer
+
+common/nativecode/gc: whole directory added w/ new sources for
+conservative GC (George Marrows' contribution!)
+
+common/bytecode/init.java: added testGC method.  reorganized into
+smaller methods.
+
+
+-jm
+
+p.s., The JOS logo on the VGA screen is a nice touch!
+
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From tmiller@haverford.edu Fri, 10 Sep 1999 17:09:38 -0400 (EDT)
+Date: Fri, 10 Sep 1999 17:09:38 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Big CVS commitments (mostly focused upon conservative
+ GC)
+
+> common/decaf/frame.cc: null-out local_vars prior to delete for GC
+
+	Just to make sure, this means you're zeroing out the pointers to
+local objects after pushing the result object onto the caller frame's
+stack?  (A good idea that will help the GC immensely.)
+
+> common/decaf/java_thread.cc: removed redundant delete calls
+
+	Just out of curiousity, where were they?
+
+> common/nativecode/gc: whole directory added w/ new sources for
+> conservative GC (George Marrows' contribution!)
+
+	Just a note, that you'll need "cvs update -d" in order to get the
+new directory, the normal cvs update doesn't do that.
+
+> p.s., The JOS logo on the VGA screen is a nice touch!
+
+	I'll try to get around to seeing it sometime this weekend :)  And
+of course, thanks to Marrows and Bocek for their work!
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Fri, 10 Sep 1999 17:39:04 -0400 (EDT)
+Date: Fri, 10 Sep 1999 17:39:04 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Big CVS commitments (mostly focused upon conservative
+ GC)
+
+	I had to make one change for jbheap.cc to compile, and made two
+others to get rid of a pair of warnings; I've committed that and the
+changed arch/*/nativecode/Makefiles that include the gc stuff.  If this
+breaks anything, I'd be very suprised.
+
+-_Quinn
+
+
+
+
+From hilarycheng@usa.net Sat, 11 Sep 1999 11:15:01 +0800
+Date: Sat, 11 Sep 1999 11:15:01 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] About Memory Map
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_000C_01BEFC46.E3DEEAE0
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    Is there any Memory Map Function in JJOS ? I am writing PCI Driver. =
+But when I call the
+BIOS32 Service. It will throw 000D Exception ( Is that a Divide by Zero =
+Exception ) ? I have
+several source code from other OSes. They do the same as me. If there is =
+no MMap, probably
+it got some problem of my source.
+
+Regards,
+
+Hilary
+
+------=_NextPart_000_000C_01BEFC46.E3DEEAE0
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type>
+<META content=3D"MSHTML 5.00.2014.210" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hi All,</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>&nbsp;&nbsp;&nbsp; Is there any Memory =
+Map Function=20
+in JJOS ? I am writing PCI Driver. But when I call the</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>BIOS32 Service. It will throw 000D =
+Exception ( Is=20
+that a Divide by Zero Exception ) ? I have</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>several source code from other OSes. =
+They do the=20
+same as me. If there is no MMap, probably</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>it got some problem of my =
+source.</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Hilary</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_000C_01BEFC46.E3DEEAE0--
+
+
+
+
+From jm@mak.com Sat, 11 Sep 1999 09:00:42 -0400
+Date: Sat, 11 Sep 1999 09:00:42 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] About Memory Map
+
+Hi;
+
+Hilary Cheng wrote:
+>     Is there any Memory Map Function in JJOS ? I am writing PCI
+> Driver. But when I call the
+> BIOS32 Service. It will throw 000D Exception ( Is that a Divide by
+> Zero Exception ) ? I have
+> several source code from other OSes. They do the same as me. If there
+> is no MMap, probably
+> it got some problem of my source.
+
+With respect to using BIOS32 from flat, 32-bit protected mode, after
+we've already appropriated all the interrupt handlers -- I'm not sure
+that is possible right now.  I'd have to look into it further.
+
+What exactly are you trying to do?  Map a region of PCI address space
+into the CPU's address space?  We don't have virtual memory (yet).  The
+next step would be to identity-map the existing physical memory anyways
+so that nothing we'd done up until the virtual memory enablement would
+break (that's a crappy sentence, but you probably know what I mean).
+
+-jm
+
+-- 
+==== John Morrison ==== jm@mak.com == http://www.mak.com/welcome.html
+==== MaK Technologies Inc., 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+
+
+
+From onewith1@flash.net Sat, 11 Sep 1999 09:59:10 -0500
+Date: Sat, 11 Sep 1999 09:59:10 -0500
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] decaf updates
+
+Ouch.  Adding V8086 mode is *not* pretty.  It adds plenty of overhead, is
+the cause of too many bugs (thunking between protected and v8086 isn't a
+ride in the country), and considering that we're not going to have DOS
+compatibility with JOS, isn't worth it.
+
+Unfortunately, this also means that if there's anything in real mode memory
+that you want, it needs to be protected before we switch over to protected
+mode.  Otherwise, we might overwrite that memory.
+
+I remember when I was doing boot-sector research, I found that OS/2's boot
+loader copies the fixed disk table into a high area of memory so that it
+will be saved when the protected mode kicks in.  I doubt that this is very
+feasable for us, considering that we're using COTS boot loaders.  So we'll
+probably have to load VGA fonts on our own.
+
+-Matt
+
+----- Original Message -----
+From: Hilary Cheng <hilarycheng@usa.net>
+To: <kernel@jos.org>
+Sent: Tuesday, September 07, 1999 7:39 PM
+Subject: Re: [JOS-Kernel] decaf updates
+
+
+Hi Ranieri,
+
+    I have think about it. I concern about Real Mode Interrupt. Since JJOS
+is running under Protected Mode.
+As I know, most of the real mode interrupt will not work under protected
+mode. If JJOS can provide a Real
+Mode Interface, we could save lots of times.
+
+Regards,
+
+Hilary
+
+
+  ----- Original Message -----
+  From: Ranieri Argentini
+  To: kernel@jos.org
+  Sent: 26 August 1999 PM 22:14
+  Subject: Re: [JOS-Kernel] decaf updates
+
+
+  >>cool, do you read the fonts from the vid-mem? the start routine
+  >>clears unforunately the hole vid-mem, so no fonts after the stop routine
+  >>are available (yet).
+  >
+  >well, I just copy the font from Linux and store in byte array. and draw
+it
+  >pixel on the screen. I think that would be much more easy to do it.
+  >hm, What's vid-mem ?  :o, I remember that font are stored in VGA.
+  >But I forget how to retrieve it from VGA. is there any Doc?
+
+  This is the way to retrieve it using the BIOS. This might prove to be a
+bit problematic in OS design, but solving this problem is left as an
+excersize for the reader ;-D
+
+  This info has been extracted from Ralf Brown's interrupt list, file
+inter60a.zip available through ftpsearch.lycos.com ....
+
+  Hope it helps someone somewhere ...
+
+  Ranieri
+
+  --------V-101130-----------------------------
+  INT 10 - VIDEO - GET FONT INFORMATION (EGA, MCGA, VGA)
+          AX = 1130h
+          BH = pointer specifier
+              00h INT 1Fh pointer
+              01h INT 43h pointer
+              02h ROM 8x14 character font pointer
+              03h ROM 8x8 double dot font pointer
+              04h ROM 8x8 double dot font (high 128 characters)
+              05h ROM alpha alternate (9 by 14) pointer (EGA,VGA)
+              06h ROM 8x16 font (MCGA, VGA)
+              07h ROM alternate 9x16 font (VGA only) (see #00021)
+              11h (UltraVision v2+) 8x20 font (VGA) or 8x19 font (autosync
+EGA)
+              12h (UltraVision v2+) 8x10 font (VGA) or 8x11 font (autosync
+EGA)
+  Return: ES:BP = specified pointer
+          CX    = bytes/character of on-screen font (not the requested
+font!)
+          DL    = highest character row on screen
+  Note:   for UltraVision v2+, the 9xN alternate fonts follow the
+corresponding
+            8xN font at ES:BP+256N
+  BUG:    the IBM EGA and some other EGA cards return in DL the number of
+rows on
+            screen rather than the highest row number (which is one less).
+  SeeAlso: AX=1100h,AX=1103h,AX=1120h,INT 1F"SYSTEM DATA",INT 43"VIDEO DATA"
+
+  Format of alternate font table [array]:
+  Offset  Size    Description     (Table 00021)
+   00h    BYTE    character to be replaced (00h = end of table)
+   01h  N BYTEs   graphics data for character, one byte per scan line
+  --------V-101130BX4D4F-----------------------
+
+
+  _______________________________________________ Kernel maillist -
+Kernel@jos.org http://jos.org/mailman/listinfo/kernel
+
+
+
+
+
+From hilarycheng@usa.net Sun, 12 Sep 1999 00:19:52 +0800
+Date: Sun, 12 Sep 1999 00:19:52 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] About Memory Map
+
+Hi,
+
+Well, I have read several source about PCI. They Do Memory Map from
+Address to C Pointer. I think they do performing Some Kinds of Memory
+Protected Mode ( Maybe I am wrong ).
+
+For The Problem of BIOS32, finally , I can call it sucessfully, I hope that
+I can finish scanning PCI Device in this week.
+
+Regards.
+
+Hilary
+
+>
+>With respect to using BIOS32 from flat, 32-bit protected mode, after
+>we've already appropriated all the interrupt handlers -- I'm not sure
+>that is possible right now.  I'd have to look into it further.
+>
+>What exactly are you trying to do?  Map a region of PCI address space
+>into the CPU's address space?  We don't have virtual memory (yet).  The
+>next step would be to identity-map the existing physical memory anyways
+>so that nothing we'd done up until the virtual memory enablement would
+>break (that's a crappy sentence, but you probably know what I mean).
+>
+
+
+
+
+From tmiller@haverford.edu Tue, 14 Sep 1999 10:24:58 -0400 (EDT)
+Date: Tue, 14 Sep 1999 10:24:58 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] interp.cc bugfix
+
+	Finally figured out why a particular set of keystrokes would nark
+the keyboard driver; it turns out that the code for determining the
+byte-alignment of a lookupswitch was wildly inaccurate.  Fixed version is
+in CVS; if you've been getting 'unknown bytecode XXX' or segfaults, this
+might be why.
+
+-_Quinn
+
+
+
+
+From hilarycheng@usa.net Wed, 15 Sep 1999 22:49:24 +0800
+Date: Wed, 15 Sep 1999 22:49:24 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] About jobject in JJOS
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_000A_01BEFFCC.8EBFD360
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    I am implments arraycopy in JJOS. I would like to get class name ( a =
+byte array ) from
+java_object. It gives me a serious of strange characters. If I print the =
+byte array from System.out.print, it gives VM Errors. How can I type =
+cast java_object to byte array ?
+
+    Also, I found that jbArray has implements jInt, jFloat. Is that we =
+need to implement jShort or jByte ?
+
+Regards,
+
+Hilary
+
+------=_NextPart_000_000A_01BEFFCC.8EBFD360
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML//EN">
+<HTML><HEAD>
+<META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type>
+<STYLE></STYLE>
+
+<META content=3D'"MSHTML 5.00.0910.1309"' name=3DGENERATOR></HEAD>
+<BODY bgColor=3D#d8d0c8>
+<DIV><FONT size=3D2><FONT face=3DArial>Hi All,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>&nbsp;&nbsp;&nbsp; I am implments =
+arraycopy=20
+in JJOS. I would like to get class name ( a byte array )=20
+from</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>java_object. It gives me a =
+serious of strange=20
+characters. If I print the byte array from System.out.print, it gives VM =
+Errors.=20
+How can I type cast java_object to byte array ?</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>&nbsp;&nbsp;&nbsp; Also, I found =
+that jbArray=20
+has implements jInt, jFloat. Is that we need to implement jShort or =
+jByte=20
+?</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>Regards,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Hilary</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_000A_01BEFFCC.8EBFD360--
+
+
+
+
+From tmiller@haverford.edu Wed, 15 Sep 1999 12:54:25 -0400 (EDT)
+Date: Wed, 15 Sep 1999 12:54:25 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] About jobject in JJOS
+
+>     I am implments arraycopy in JJOS. I would like to get class name (
+> a byte array ) from java_object. It gives me a serious of strange
+> characters. If I print the byte array from System.out.print, it gives
+> VM Errors. How can I type cast java_object to byte array ?
+
+	java_object_variable->my_class->class_name is the name of a given
+java_object's class.  I'm not sure why you want the class name, though.
+(What are you trying to do?)
+
+>     Also, I found that jbArray has implements jInt, jFloat. Is that we
+> need to implement jShort or jByte ?
+
+	jShort and jByte are stored in (unpacked) jInt arrays, IIRC.
+
+-_Quinn
+
+
+
+
+From onewith1@flash.net Wed, 15 Sep 1999 19:32:43 -0500
+Date: Wed, 15 Sep 1999 19:32:43 -0500
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] JOSSystem
+
+[Warning: super long.  Required for reading: 4 shots espresso = 32 cups of
+coffee]
+
+I'm currently unsure about where discussions about JOSSystem are placed, so
+I'll post this to both kernel and arch in the hopes that someone knows.
+
+I've recently been rekindling my interest in Jini, and in doing so I've been
+rolling around a Jini-based OS in my head.  Don't know if we want to go that
+way (full dedication to a single technology), so here it is for your
+edification.  At least if I'm going in the wrong direction, someone can stop
+me before I go insane.
+
+First off, if we are to implement a multi-process JVM for JOS, there is a
+dire need for shared objectspace between processes (there may not be much of
+an argument against this, but here it is anyway). This could be as simple as
+a single static hashtable which is shared, or all the way up to a
+full-featured registry or Jini name server, and possibly into a whole shared
+memory API.  But whatever we do, we need to have shared memory between
+processes.  Here's why:
+
+If we want to have Java device drivers, we need a way to share access to
+them.  If we cannot share access between device drivers, then we have no way
+of restricting threads from interfering with driver access.  I don't know
+about you, but I wouldn't want two independent file systems trying to write
+files to my harddrive at the same time - can you say "reformat your
+harddrive"?
+
+An early wiki message suggested that JOS use the TCP/IP protocol stack for
+communication to drivers via RMI.  Note: implied in the statement is a
+/shared/ protocol stack.
+
+I suggest, at least at first, that we have a single, static, shared object
+which every process can see.  Perhaps something like a registry (see below).
+Note that any object registered to this shared object should becomes shared
+across the processes.
+
+Ok, onto my JOSSystem idea:
+=======================
+
+Jini offers Java applications a unified method of discovering all known
+devices  (technically, "services") on a network (or a stand-alone PC).  Not
+only that, but it includes a unified method to interact with all discovered
+devices.
+
+I say, let's code all our device drivers to that standard.  But wait -
+doesn't Jini require a network?  But at boot time, JOS doesn't have a
+network yet, Matt!
+
+The current Jini specification talks about a network (and thus RMI) as the
+underlying "bare iron" for a djinn (Jini network).  However, if I read the
+small print right, using datagram broadcast for discovery, and RMI for
+across-the-wire communication, is only the /default/ implementation.  I
+believe that we can still be Jini compliant by making a non-network Jini
+network (or is that doublethink?).
+
+If we place the localized Jini lookup service in a well-defined location
+(say, the base shared object in JOS, or an parameter in the localized
+discovery method), then localized discovery is done by calling the local
+lookup service directly, without the need for a network.  Likewise for
+finding a localized Jini service.  Calling a Jini service would then be a
+direct Java call, without the need for RMI.
+
+We could create a specific localized Jini service which connects the local
+Jini lookuped devices to a real djinn.
+
+This way, all our PC (non-Jini ready) devices register themselves to the
+local Jini lookup service at boot time (really, post boot, pre shell
+startup, so we're left with device discovery in the middle, or rather
+JOSSystem boot!).  Then any application or service that requires a service,
+finds one in the localized djinn.
+
+To help with security, we should create access levels in our local djinn.
+Only services that we declaire public can be seen outside the djinn
+protection.  After all, we don't want anyone on the internet to have access
+to our PC_CLOCK device, and what could be done with a PCI_BRIDGE device?
+
+We can chain local djinns together in the common fashion of a device tree.
+This way, we can have specialized local djinns that only detect a certain
+type of device.
+
+Yeah, Matt, that all sounds good and hunky-doory.  But how do we load the
+definitions for what localized djinns to load?  We want JOS to be
+configurable, which implies a configuration file, but at the time JOSSystem
+loads, we don't have a storage access driver!  Sounds like the
+chicken-and-the-egg problem.  How do you plan to overcome that one, Mr.
+Smartypants?
+
+I'm somewhat stumped on that one.  I've been thinking about several ideas.
+One is a "basic local djinn" which is passed to JOSSystem from the JOS-box.
+This is about what JavaOS for Business did.  That way, though, we might have
+to recompile the JOS-box for different configurations, so that the JOSSystem
+has the basic I/O capabilities for loading the robust Java services over the
+default ones.  This is also good for JOS for Embedded Devices (tm), which
+wouldn't need this kind of configuration time, and would just pass up the
+djinn from flash memory (or whatever).
+
+Any comments? Flames?  Abuses?  All are welcome!
+
+-Matt
+
+
+
+
+From hilarycheng@usa.net Thu, 16 Sep 1999 13:34:47 +0800
+Date: Thu, 16 Sep 1999 13:34:47 +0800
+From: hilarycheng@usa.net hilarycheng@usa.net
+Subject: [JOS-Kernel] About jobject in JJOS
+
+HI,
+
+>	java_object_variable->my_class->class_name is the name of a given
+>java_object's class.  I'm not sure why you want the class name, though.
+>(What are you trying to do?)
+
+Since I would like to implement System.arraycopy. I need to determine the
+object type of Given Object in C++. But I donno how to determine. The Simplest
+way is that I get the class name from java_object.
+
+
+>>     Also, I found that jbArray has implements jInt, jFloat. Is that we
+>> need to implement jShort or jByte ?
+>
+>	jShort and jByte are stored in (unpacked) jInt arrays, IIRC.
+>
+
+Thanks :D
+
+Regards,
+
+Hilary
+
+
+
+
+
+From werner.schuster@netway.at Thu, 16 Sep 1999 16:40:35 +0200
+Date: Thu, 16 Sep 1999 16:40:35 +0200
+From: Murphy werner.schuster@netway.at
+Subject: [JOS-Kernel] troubles with making JJOS
+
+yo group,
+
+I used jcvs (in windows nt 4.0 )to checkout the JJOS project; i looked at 
+the code and found it extremely interesting;
+so I booted linux (redhat 5.1) to build it;
+
+I went to the directory where jcvs put the files (c:\temp\jjos, in linux
+as /dos/temp/jjos);
+
+the dir contains readme & install files, and also the a file called
+build ( a shell script that calls the makefiles for making
+the nativecode for host & i386);
+the build file also has the rights to be executed (ie the file got xrw
+rights, it should be executable);
+but when I enter build (or ./build) it only tells me that it doesnt find
+the file;
+
+I then tried to do manually what the build file would do (go to the
+/arch/host/nativecode dir & call make);
+but make didn't get far, it immediatly stopped complaining about
+missing separators;
+I looked at the make files, and found that some lines were lacking
+a "\" at the end, so I inserted this in (I think) all makefiles;
+after that, make didn't complain about the separators,
+
+but seemed to have troubles with the relative paths:
+
+: No such file or directory../../common/bytecode/Makefile
+'.  Stop. No rule to make target `../../common/bytecode/Makefile
+
+when calling make in /jjos/arch/host/nativecode/;
+well, thats obvious, cause if after doing ".." twice, you're only in
+/jjos/arch/ while the common dir, is in /jjos;
+
+so to solve this problem, I looked at some makefiles for this code and
+changed that relative path to an absolute path, but that didnt change
+anything;
+
+after all that trouble, I copied the jjos dir to my linux partition,
+I thought that my troubles might be caused, because I had the jjos
+dir on my fat partition;
+but that didnt change anything;
+
+so I kept fooling around, and found some other make output:
+
+[root@localhost bytecode]# make
+: No such file or directoryystem/Makefile:1: 
+/jjos/common/bytecode/jos/system/event/Makefile
+/jjos/common/bytecode/jos/system/Makefile:4: *** missing separator.  Stop.
+
+the path is valid; it seems that I forgot to add the separator in this file;
+
+
+so, I think that's all; I hope my description is detailed enough;
+maybe my system in short again:
+cvs client: jcvs;
+linux:  redhat 5.1, german version, I didnt change anything
+	in the development tools;
+	also installed the nasm & etherboot correctly;
+jdk:  blackdown jdk 1.1.7;
+
+
+hope someone can help me there;
+
+murphee
+***************************************
+UNITE FOR JAVA -> www.javalobby.org
+Check this out -> www.jos.org
+My site -> www.angelfire.com/co/werners
+***************************************
+... and the fact, that i haven't put a gun to my mouth yet,
+proves that i'm a winner!
+Al Bundy
+
+
+
+From werner.schuster@netway.at Thu, 16 Sep 1999 17:29:45 +0200
+Date: Thu, 16 Sep 1999 17:29:45 +0200
+From: Murphy werner.schuster@netway.at
+Subject: [JOS-Kernel] Re: stupid code proposal for decaf
+
+At 22:24 14.09.99 -0400, you wrote:
+>Hi!
+>
+>Todd L. Miller wrote:
+> >
+> > > a week ago I checked out the JJOS from jos.org, and had a look
+> > > at it, tried to build it, but it seems that either me or my
+> > > linux(redhat 5.1)/make is to stupid to do that (you decide);
+> > > after hours, i quit trying frustrated;
+> >
+> >         Let us know what problems you had!  We'd like to know; it'll
+> > probably clue us in on something that should be in the docs or an error we
+> > made.  And if you'd got any time for coding, we'd love your help.
+>
+>Ditto.  Let me know, too.  Hell, send it to the list.  I think I'm going
+>to shortly run into problems when I try and do some machine-dependent
+>bytecode.
+>
+
+done;
+
+
+> >         Thanks for your suggestion about interp.cc.  I've always been
+> > worried about the main interperter switch in interp.cc.  I'm under the
+> > impression, however, that you're essentially hardcoding what the compiler
+> > will do for us when it generates the switch's jump-table.  I've forwarded
+> > your last mail to John Morrison, who knows more about this than I do;
+> > we'll see what he says.
+>
+>You know, it's funny you mention this.  I just ran some profiling on
+>both "normal" and optimized code, and noted that frame::runOpcode took
+>9% of the time on unoptimized code, and 12% of the time for optimized
+>code.
+
+
+by unoptimized code, do you mean that you compiled it with
+optimization turned of,
+or do you mean the code with the switch statement as unoptimized ('normal') 
+code, and my ~code as 'optimized' code?
+
+
+>  I then checked what the compiler was doing for the switch, and
+>found it was generating a jump table as you suggested (you can verify
+>this by adding a "-S" switch to the compilation switches for interp.cc
+>and check out what the compiler spits out -- the array of .L### things
+>is the set of goto-labels for the jump-table).  It's possible we might
+>be able to do better if we paid attention to some other things like
+>cache locality (I think the jump table might be put distantly in the
+>.data section), but I'm not sure we could do a helluva lot better than
+>the compiler.  However, if we can, we should...  Benchmarking should
+>definitely be done to verify and quantify the progress if we undertake
+>the task...
+
+
+
+before I sent you my Idea, i also thought that there might be some way for 
+the compiler to optimize the switch statement; but I only found a way
+for subsequent case options
+(dont know if thats the right word; I mean code that looks like this
+swich(var) {
+case 1: some code for 1
+case 2: some code for 2
+case 3: some code for 3
+default: some default code
+}// end of switch  ),
+
+cause for this case, the compiler (I thought) could just make code 
+something like this:
+the "swich statement" code,
+  it takes its own adress and adds the the content of var;
+cause then, for var == 1 it would jump to this, it would add
+1 to its address; the resulting adress would contain a goto statement
+pointing to the code that handles 1;
+if var == 2, it would add 2, and the resulting adress would contain
+a goto to a handler for this case,...;
+
+this should look like this:
+0xbase  address for switch code
+0xbase+1        contains goto for case 1
+0xbase+2        contains goto for case 2
+...
+
+of course, one if is necessary to check if var contains something bigger
+than 3 (in this example), and handle that;
+
+
+as I said, I thought, that the compiler might make an optimization like this,
+but this is not possible with:
+
+swich(var) {
+case 10: some code for 10
+case 29: some code for 29
+case 222: some code for 222
+default: some default code
+}// end of switch
+---
+
+I'm not sure if you understand all my babbling above, if you don't forget it
+its not important :-)
+it only shows that I dont know how the compiler handles switch optimization;
+but I kinda feel that my approach gotta be faster than any switch 
+optimization that the compiler can do;
+cause we need no if or gotos in the code, we only have to get
+get the function pointer from the array using the bytecode as parameter;
+
+also, we don't have to do this with an array:
+- locate memory (to hold 256 function pointers),
+- then fill this with the function pointers
+
+now, in frame:runOpcode, to resolve the function, only do this:
+
+functionPointer = *base + (bytecode * sizeOf(bool) )
+
+et voila;
+I mean that gotta be [much?] faster than some switch thing;
+
+---
+
+another advantage of my approach is, that you could easily change the
+bytecode handler functions at runtime (although I don't know if that feature
+could be used; I mean, could that be used for any optimizations at runtime, 
+something hotspot like;
+or maybe to change the behaviour of the vm at runtime (are there any
+bytecode differences in the different vm versions?));
+
+
+
+>Having said that, there is still tons of optimizations that could be
+>done.  Todd and I have written an awful lot of small methods (especially
+>accessor methods) and oft-used methods (e.g., setting/getting local
+>variables in a stack frame) that could stand to be rewritten as
+>"inlines."  There are probably even more algorithmically interesting
+>optimizations that could be made -- we currently do no opcode
+>rewriting...
+well, I gotta ask stupidly:
+what's opcode rewriting?
+something like hotspot?
+
+murphee
+
+
+
+>-
+
+***************************************
+UNITE FOR JAVA -> www.javalobby.org
+Check this out -> www.jos.org
+My site -> www.angelfire.com/co/werners
+***************************************
+... and the fact, that i haven't put a gun to my mouth yet,
+proves that i'm a winner!
+Al Bundy
+
+
+
+From werner.schuster@netway.at Thu, 16 Sep 1999 18:27:07 +0200
+Date: Thu, 16 Sep 1999 18:27:07 +0200
+From: Murphy werner.schuster@netway.at
+Subject: [JOS-Kernel] Re: stupid code proposal for decaf
+
+At 22:24 14.09.99 -0400, you wrote:
+>Hi!
+>
+>Todd L. Miller wrote:
+> >
+> > > a week ago I checked out the JJOS from jos.org, and had a look
+> > > at it, tried to build it, but it seems that either me or my
+> > > linux(redhat 5.1)/make is to stupid to do that (you decide);
+> > > after hours, i quit trying frustrated;
+> >
+> >         Let us know what problems you had!  We'd like to know; it'll
+> > probably clue us in on something that should be in the docs or an error we
+> > made.  And if you'd got any time for coding, we'd love your help.
+>
+>Ditto.  Let me know, too.  Hell, send it to the list.  I think I'm going
+>to shortly run into problems when I try and do some machine-dependent
+>bytecode.
+>
+
+done;
+
+
+> >         Thanks for your suggestion about interp.cc.  I've always been
+> > worried about the main interperter switch in interp.cc.  I'm under the
+> > impression, however, that you're essentially hardcoding what the compiler
+> > will do for us when it generates the switch's jump-table.  I've forwarded
+> > your last mail to John Morrison, who knows more about this than I do;
+> > we'll see what he says.
+>
+>You know, it's funny you mention this.  I just ran some profiling on
+>both "normal" and optimized code, and noted that frame::runOpcode took
+>9% of the time on unoptimized code, and 12% of the time for optimized
+>code.
+
+
+by unoptimized code, do you mean that you compiled it with
+optimization turned of,
+or do you mean the code with the switch statement as unoptimized ('normal') 
+code, and my ~code as 'optimized' code?
+
+
+>  I then checked what the compiler was doing for the switch, and
+>found it was generating a jump table as you suggested (you can verify
+>this by adding a "-S" switch to the compilation switches for interp.cc
+>and check out what the compiler spits out -- the array of .L### things
+>is the set of goto-labels for the jump-table).  It's possible we might
+>be able to do better if we paid attention to some other things like
+>cache locality (I think the jump table might be put distantly in the
+>.data section), but I'm not sure we could do a helluva lot better than
+>the compiler.  However, if we can, we should...  Benchmarking should
+>definitely be done to verify and quantify the progress if we undertake
+>the task...
+
+
+
+before I sent you my Idea, i also thought that there might be some way for 
+the compiler to optimize the switch statement; but I only found a way
+for subsequent case options
+(dont know if thats the right word; I mean code that looks like this
+swich(var) {
+case 1: some code for 1
+case 2: some code for 2
+case 3: some code for 3
+default: some default code
+}// end of switch  ),
+
+cause for this case, the compiler (I thought) could just make code 
+something like this:
+the "swich statement" code,
+  it takes its own adress and adds the the content of var;
+cause then, for var == 1 it would jump to this, it would add
+1 to its address; the resulting adress would contain a goto statement
+pointing to the code that handles 1;
+if var == 2, it would add 2, and the resulting adress would contain
+a goto to a handler for this case,...;
+
+this should look like this:
+0xbase  address for switch code
+0xbase+1        contains goto for case 1
+0xbase+2        contains goto for case 2
+...
+
+of course, one if is necessary to check if var contains something bigger
+than 3 (in this example), and handle that;
+
+
+as I said, I thought, that the compiler might make an optimization like this,
+but this is not possible with:
+
+swich(var) {
+case 10: some code for 10
+case 29: some code for 29
+case 222: some code for 222
+default: some default code
+}// end of switch
+---
+
+I'm not sure if you understand all my babbling above, if you don't forget it
+its not important :-)
+it only shows that I dont know how the compiler handles switch optimization;
+but I kinda feel that my approach gotta be faster than any switch 
+optimization that the compiler can do;
+cause we need no if or gotos in the code, we only have to get
+get the function pointer from the array using the bytecode as parameter;
+
+also, we don't have to do this with an array:
+- locate memory (to hold 256 function pointers),
+- then fill this with the function pointers
+
+now, in frame:runOpcode, to resolve the function, only do this:
+
+functionPointer = *base + (bytecode * sizeOf(bool) )
+
+et voila;
+I mean that gotta be [much?] faster than some switch thing;
+
+---
+
+another advantage of my approach is, that you could easily change the
+bytecode handler functions at runtime (although I don't know if that feature
+could be used; I mean, could that be used for any optimizations at runtime, 
+something hotspot like;
+or maybe to change the behaviour of the vm at runtime (are there any
+bytecode differences in the different vm versions?));
+
+
+
+>Having said that, there is still tons of optimizations that could be
+>done.  Todd and I have written an awful lot of small methods (especially
+>accessor methods) and oft-used methods (e.g., setting/getting local
+>variables in a stack frame) that could stand to be rewritten as
+>"inlines."  There are probably even more algorithmically interesting
+>optimizations that could be made -- we currently do no opcode
+>rewriting...
+well, I gotta ask stupidly:
+what's opcode rewriting?
+something like hotspot?
+
+murphee
+
+
+
+>-
+
+***************************************
+UNITE FOR JAVA -> www.javalobby.org
+Check this out -> www.jos.org
+My site -> www.angelfire.com/co/werners
+***************************************
+... and the fact, that i haven't put a gun to my mouth yet,
+proves that i'm a winner!
+Al Bundy
+
+
+
+From hilarycheng@usa.net Fri, 17 Sep 1999 09:03:22 +0800
+Date: Fri, 17 Sep 1999 09:03:22 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] troubles with making JJOS
+
+Hi,
+
+    For me, I just go to arch/i386/nativecode or arch/host/nativecode. Then
+Run Make w/o any problem.
+bytecode directory just contains the implementation of Java Code.
+
+Regards,
+
+Hilary
+
+
+>yo group,
+>
+>I used jcvs (in windows nt 4.0 )to checkout the JJOS project; i looked at
+>the code and found it extremely interesting;
+>so I booted linux (redhat 5.1) to build it;
+>
+>I went to the directory where jcvs put the files (c:\temp\jjos, in linux
+>as /dos/temp/jjos);
+>
+>the dir contains readme & install files, and also the a file called
+>build ( a shell script that calls the makefiles for making
+>the nativecode for host & i386);
+>the build file also has the rights to be executed (ie the file got xrw
+>rights, it should be executable);
+>but when I enter build (or ./build) it only tells me that it doesnt find
+>the file;
+>
+>I then tried to do manually what the build file would do (go to the
+>/arch/host/nativecode dir & call make);
+>but make didn't get far, it immediatly stopped complaining about
+>missing separators;
+>I looked at the make files, and found that some lines were lacking
+>a "\" at the end, so I inserted this in (I think) all makefiles;
+>after that, make didn't complain about the separators,
+>
+>but seemed to have troubles with the relative paths:
+>
+>: No such file or directory../../common/bytecode/Makefile
+>'.  Stop. No rule to make target `../../common/bytecode/Makefile
+>
+>when calling make in /jjos/arch/host/nativecode/;
+>well, thats obvious, cause if after doing ".." twice, you're only in
+>/jjos/arch/ while the common dir, is in /jjos;
+>
+>so to solve this problem, I looked at some makefiles for this code and
+>changed that relative path to an absolute path, but that didnt change
+>anything;
+>
+>after all that trouble, I copied the jjos dir to my linux partition,
+>I thought that my troubles might be caused, because I had the jjos
+>dir on my fat partition;
+>but that didnt change anything;
+>
+>so I kept fooling around, and found some other make output:
+>
+>[root@localhost bytecode]# make
+>: No such file or directoryystem/Makefile:1:
+>/jjos/common/bytecode/jos/system/event/Makefile
+>/jjos/common/bytecode/jos/system/Makefile:4: *** missing separator.  Stop.
+>
+>the path is valid; it seems that I forgot to add the separator in this
+file;
+>
+>
+>so, I think that's all; I hope my description is detailed enough;
+>maybe my system in short again:
+>cvs client: jcvs;
+>linux:  redhat 5.1, german version, I didnt change anything
+> in the development tools;
+> also installed the nasm & etherboot correctly;
+>jdk:  blackdown jdk 1.1.7;
+>
+>
+>hope someone can help me there;
+>
+>murphee
+>***************************************
+>UNITE FOR JAVA -> www.javalobby.org
+>Check this out -> www.jos.org
+>My site -> www.angelfire.com/co/werners
+>***************************************
+>.... and the fact, that i haven't put a gun to my mouth yet,
+>proves that i'm a winner!
+>Al Bundy
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+
+
+
+
+From hilarycheng@usa.net Fri, 17 Sep 1999 09:09:59 +0800
+Date: Fri, 17 Sep 1999 09:09:59 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Re: stupid code proposal for decaf
+
+Hi,
+
+>
+>now, in frame:runOpcode, to resolve the function, only do this:
+>
+>functionPointer = *base + (bytecode * sizeOf(bool) )
+>
+>et voila;
+>I mean that gotta be [much?] faster than some switch thing;
+>
+
+Well, I think it can speed up a little bit. But it is not part that is time
+consuming.
+Since each bytecode needs i386 CALL instruction. as compare to switch
+statment,
+time of "Call" is much much larger than "Compare and then Jump On
+Condition".
+IMO, JIT is the best way to INCREASE the speed of JJOS. hm, but I prefer to
+implement
+a COMPLETE JVM in JJOS rather speed up it. Since current JJOS just
+implements about
+80%-90% of Java.
+
+Regards,
+
+Hilary
+
+
+
+
+From a_rueckert@gmx.net Fri, 17 Sep 1999 10:00:08 +0200
+Date: Fri, 17 Sep 1999 10:00:08 +0200
+From: Andreas Rückert a_rueckert@gmx.net
+Subject: [JOS-Kernel] Problems with JJOS i386 build
+
+Hi!
+
+I'm trying to build the JJOS kernel, but it seems that it needs the 
+jos.platform.driver.vga package, which I don't have. Are there any snapshots
+via FTP available? I tried to download the entire CVS, but that didn't work for
+some reason.
+
+Ciao,
+Andreas
+
+
+
+From hilarycheng@usa.net Fri, 17 Sep 1999 17:34:09 +0800
+Date: Fri, 17 Sep 1999 17:34:09 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Problems with JJOS i386 build
+
+Hi,
+
+    can u find out the source vga.java from directory that u download CVS ?
+Since I have downloaded CVS last weeks, It works for me. :p
+
+Regards,
+
+Hilary
+
+
+>Hi!
+>
+>I'm trying to build the JJOS kernel, but it seems that it needs the
+>jos.platform.driver.vga package, which I don't have. Are there any
+snapshots
+>via FTP available? I tried to download the entire CVS, but that didn't work
+for
+>some reason.
+>
+>Ciao,
+>Andreas
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Fri, 17 Sep 1999 08:04:42 -0500
+Date: Fri, 17 Sep 1999 08:04:42 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] troubles with making JJOS
+
+Murphy,
+
+I had similar problems when I tried to compile JJOS on a FAT partition  (I
+also originally used jCVS).  I even tried copying it over and that failed
+too.  What I discovered is in my situation was that putting it on the FAT
+partition caused all of the security settings to get screwed up, which is
+why it didn't work when I moved it over to the ext2fs partition. 
+
+Do this:  Boot into linux and use the command line cvs to download JJOS
+afresh.  After that, you may need to update your dependencies.  Do a 'make
+depend' in the JJOS/arch/host/nativecode/ directory (or in whatever
+directories you are having that problem).  That should take care of it
+complaining about the missing seperators.
+
+Hope this helps,
+Avery J. Regier
+
+
+
+> -----Original Message-----
+> From:	Murphy [SMTP:werner.schuster@netway.at]
+> Sent:	Thursday, September 16, 1999 10:41 AM
+> To:	kernel@jos.org
+> Subject:	[JOS-Kernel] troubles with making JJOS
+> 
+> yo group,
+> 
+> I used jcvs (in windows nt 4.0 )to checkout the JJOS project; i looked at 
+> the code and found it extremely interesting;
+> so I booted linux (redhat 5.1) to build it;
+> 
+> I went to the directory where jcvs put the files (c:\temp\jjos, in linux
+> as /dos/temp/jjos);
+> 
+> the dir contains readme & install files, and also the a file called
+> build ( a shell script that calls the makefiles for making
+> the nativecode for host & i386);
+> the build file also has the rights to be executed (ie the file got xrw
+> rights, it should be executable);
+> but when I enter build (or ./build) it only tells me that it doesnt find
+> the file;
+> 
+> I then tried to do manually what the build file would do (go to the
+> /arch/host/nativecode dir & call make);
+> but make didn't get far, it immediatly stopped complaining about
+> missing separators;
+> I looked at the make files, and found that some lines were lacking
+> a "\" at the end, so I inserted this in (I think) all makefiles;
+> after that, make didn't complain about the separators,
+> 
+> but seemed to have troubles with the relative paths:
+> 
+> : No such file or directory../../common/bytecode/Makefile
+> '.  Stop. No rule to make target `../../common/bytecode/Makefile
+> 
+> when calling make in /jjos/arch/host/nativecode/;
+> well, thats obvious, cause if after doing ".." twice, you're only in
+> /jjos/arch/ while the common dir, is in /jjos;
+> 
+> so to solve this problem, I looked at some makefiles for this code and
+> changed that relative path to an absolute path, but that didnt change
+> anything;
+> 
+> after all that trouble, I copied the jjos dir to my linux partition,
+> I thought that my troubles might be caused, because I had the jjos
+> dir on my fat partition;
+> but that didnt change anything;
+> 
+> so I kept fooling around, and found some other make output:
+> 
+> [root@localhost bytecode]# make
+> : No such file or directoryystem/Makefile:1: 
+> /jjos/common/bytecode/jos/system/event/Makefile
+> /jjos/common/bytecode/jos/system/Makefile:4: *** missing separator.  Stop.
+> 
+> the path is valid; it seems that I forgot to add the separator in this
+> file;
+> 
+> 
+> so, I think that's all; I hope my description is detailed enough;
+> maybe my system in short again:
+> cvs client: jcvs;
+> linux:  redhat 5.1, german version, I didnt change anything
+> 	in the development tools;
+> 	also installed the nasm & etherboot correctly;
+> jdk:  blackdown jdk 1.1.7;
+> 
+> 
+> hope someone can help me there;
+> 
+> murphee
+> ***************************************
+> UNITE FOR JAVA -> www.javalobby.org
+> Check this out -> www.jos.org
+> My site -> www.angelfire.com/co/werners
+> ***************************************
+> ... and the fact, that i haven't put a gun to my mouth yet,
+> proves that i'm a winner!
+> Al Bundy
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From a_rueckert@gmx.net Fri, 17 Sep 1999 15:17:43 +0200
+Date: Fri, 17 Sep 1999 15:17:43 +0200
+From: Andreas Rückert a_rueckert@gmx.net
+Subject: [JOS-Kernel] Problems with JJOS i386 build
+
+Hi!
+
+On Fri, 17 Sep 1999 Hilary Cheng wrote:
+>Hi,
+>
+>    can u find out the source vga.java from directory that u download CVS ?
+>Since I have downloaded CVS last weeks, It works for me. :p
+
+You mean
+cvs -d :pserver:anonymous@jos.org:/sites/jos/cvs/cvsroot -z9 checkout
+jos/platform/driver/vga/vga.java 
+?
+
+Nope, doesn't work. Could it be, that it's a permissions problem? Does the
+download work as 'anonymous' ?
+  
+Ciao,
+Andreas
+
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Fri, 17 Sep 1999 09:31:25 -0500
+Date: Fri, 17 Sep 1999 09:31:25 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] Problems with JJOS i386 build
+
+jos/platform/driver/vga/vga.java doesn't exist in CVS, however
+jos/platform/driver/Vga.java does.  Do we have a Makefile or include bug
+somewhere?
+
+Avery J. Regier
+
+
+> -----Original Message-----
+> From:	Andreas Rückert [SMTP:a_rueckert@gmx.net]
+> Sent:	Friday, September 17, 1999 9:18 AM
+> To:	kernel@jos.org
+> Subject:	Re: [JOS-Kernel] Problems with JJOS i386 build
+> 
+> Hi!
+> 
+> On Fri, 17 Sep 1999 Hilary Cheng wrote:
+> >Hi,
+> >
+> >    can u find out the source vga.java from directory that u download CVS
+> ?
+> >Since I have downloaded CVS last weeks, It works for me. :p
+> 
+> You mean
+> cvs -d :pserver:anonymous@jos.org:/sites/jos/cvs/cvsroot -z9 checkout
+> jos/platform/driver/vga/vga.java 
+> ?
+> 
+> Nope, doesn't work. Could it be, that it's a permissions problem? Does the
+> download work as 'anonymous' ?
+>   
+> Ciao,
+> Andreas
+> 
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From ajregier@earthlink.net Mon, 13 Sep 1999 20:46:06 -0500
+Date: Mon, 13 Sep 1999 20:46:06 -0500
+From: Avery J. Regier ajregier@earthlink.net
+Subject: [JOS-Kernel] decaf bug report
+
+decaf doesn't seem to want to return from methods in the host build after you
+have run any variation on System.out.print();  
+
+Actually printing the text runs fine, as well as returning from the print()
+method.  You can even run further bytcodes and invoke other methods, but as
+soon as you return out of the function which called the print() function, you
+get a Segmentation Fault.  It is quite consistent and repeatable.  It doesn't
+matter what function you choose, or how you return from the function.
+
+I haven't tried this with the i386 build because I still don't have that up and
+running.  This is a checkout of the latest CVS source. (~7:30 EDT, 13 Sept).
+
+Any ideas?
+- Avery J. Regier
+
+
+
+
+
+From weolopez@yahoo.com Thu, 16 Sep 1999 07:07:58 -0700 (PDT)
+Date: Thu, 16 Sep 1999 07:07:58 -0700 (PDT)
+From: Mauricio Lopez weolopez@yahoo.com
+Subject: [JOS-Kernel] JOSSystem
+
+--- Matt Albrecht <onewith1@flash.net> wrote:
+--cut---
+> Ok, onto my JOSSystem idea:
+> =======================
+> 
+> Jini offers Java applications a unified method of
+> discovering all known
+> devices  (technically, "services") on a network (or
+> a stand-alone PC).  Not
+> only that, but it includes a unified method to
+> interact with all discovered
+> devices.
+> 
+Note:  this is with JINI devices or proxies...
+
+Here (I think) is the problem with your ideas. 
+Discovery and Join only occures with JINI(TM) enabled
+devices and proxies for those devices.  I agree we
+should make a proxie for all of hardware in JOS but
+this is independent of our java written drivers.  It
+would be interesting; however, to create general
+interfaces that can be used in a JINI network that
+allows direct access to JOS System drivers from
+accross the network(but I digress).
+
+> I say, let's code all our device drivers to that
+> standard.  But wait -
+> doesn't Jini require a network?  But at boot time,
+> JOS doesn't have a
+> network yet, Matt!
+> 
+> The current Jini specification talks about a network
+> (and thus RMI) as the
+> underlying "bare iron" for a djinn (Jini network). 
+> However, if I read the
+> small print right, using datagram broadcast for
+> discovery, and RMI for
+> across-the-wire communication, is only the /default/
+> implementation.  I
+> believe that we can still be Jini compliant by
+> making a non-network Jini
+> network (or is that doublethink?).
+> 
+> If we place the localized Jini lookup service in a
+> well-defined location
+> (say, the base shared object in JOS, or an parameter
+> in the localized
+> discovery method), then localized discovery is done
+> by calling the local
+> lookup service directly, without the need for a
+> network.  Likewise for
+> finding a localized Jini service.  Calling a Jini
+> service would then be a
+> direct Java call, without the need for RMI.
+
+A jini lookup service for the JOS System devices is a
+must for JOS Server but if we are going to make a
+minimized JOS Client it is more than what is needed. 
+The JOS Client should export all of its devices to a
+jini network. 
+
+--cut--
+
+This is great but the problem with jini right now it
+that Free Software only has a partial implementation
+of RMI let alone jini.  It would be great if
+development would increase on that.  Classpath is
+currently the most active in implementation of java
+api standards.  Next to JOS of course :) (recreating
+JAVA OS API).
+
+weo
+===
+"It's a damn poor mind that can only think of one way to spell
+something!"
+        President Andrew Jackson
+
+
+
+__________________________________________________
+Do You Yahoo!?
+Bid and sell for free at http://auctions.yahoo.com
+
+
+
+
+From draft@fear.ch Fri, 17 Sep 1999 20:32:21 +0200 (CEST)
+Date: Fri, 17 Sep 1999 20:32:21 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] Problems with JJOS i386 build
+
+Hi Andreas,
+
+This is my fault, JJOS does not need the package jos.platform.driver.vga
+anymore. You can delete the import line.
+
+I will fix this ASAP.
+
+Thomas Bocek
+
+
+
+On Fri, 17 Sep 1999, Andreas Rückert wrote:
+
+> Hi!
+> 
+> I'm trying to build the JJOS kernel, but it seems that it needs the 
+> jos.platform.driver.vga package, which I don't have. Are there any snapshots
+> via FTP available? I tried to download the entire CVS, but that didn't work for
+> some reason.
+> 
+> Ciao,
+> Andreas
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+> 
+
+
+
+
+From draft@fear.ch Fri, 17 Sep 1999 23:48:12 +0200 (CEST)
+Date: Fri, 17 Sep 1999 23:48:12 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] Problems with JJOS i386 build
+
+Hi all
+
+init.java is updated and should be fixed now. Please report if any other
+problem occures. This will help us very much.
+
+
+Thomas Bocek 
+
+
+On Fri, 17 Sep 1999, Andreas Rückert wrote:
+
+> Hi!
+> 
+> On Fri, 17 Sep 1999 Hilary Cheng wrote:
+> >Hi,
+> >
+> >    can u find out the source vga.java from directory that u download CVS ?
+> >Since I have downloaded CVS last weeks, It works for me. :p
+> 
+> You mean
+> cvs -d :pserver:anonymous@jos.org:/sites/jos/cvs/cvsroot -z9 checkout
+> jos/platform/driver/vga/vga.java 
+> ?
+> 
+> Nope, doesn't work. Could it be, that it's a permissions problem? Does the
+> download work as 'anonymous' ?
+>   
+> Ciao,
+> Andreas
+> 
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+> 
+
+
+
+
+From onewith1@flash.net Fri, 17 Sep 1999 19:21:29 -0500
+Date: Fri, 17 Sep 1999 19:21:29 -0500
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] JOSSystem
+
+I'll try to answer two messages at once.
+
+But before that, I'll try and specify my philosophy behind using Jini as the
+device driver setup.
+
+The current implementation with drivers and networks in OSs is that local PC
+resources/services are seen as local devices.  Then when remote services are
+tried to use, a large API framework is created to try to emulate the
+local-ness of the local drivers, so that the remote drivers act like they
+are local.  This is because most current OSs were originally for stand alone
+computers, with a limited set of remote capabilities.  Once the technologies
+such as CORBA, COM, and RMI became available, the OSs were retrofit to make
+it all work.
+
+I'm trying to switch this design philosophy.  This design views all services
+and devices as remote.  There is a central local service which is used to
+access all other services - whether they are remote or local.
+
+First, a response to the sceptic:
+
+Mauricio Lopez <weolopez@yahoo.com> wrote:
+> Note:  this is with JINI devices or proxies...
+Note: JINI stands for "Jini Is Not Initials" (i.e. it doesn't stand for
+anything)
+
+>
+> Here (I think) is the problem with your ideas.
+> Discovery and Join only occures with JINI(TM) enabled
+> devices and proxies for those devices.  I agree we
+> should make a proxie for all of hardware in JOS but
+> this is independent of our java written drivers.  It
+> would be interesting; however, to create general
+> interfaces that can be used in a JINI network that
+> allows direct access to JOS System drivers from
+> accross the network(but I digress).
+
+Well, I started looking at the Jini specification again, and I'll re-do my
+terminology to make it match the specs.  Maybe this will clear things up.
+
+We're in agreement with the local proxy of the PC hardware to the djinn
+(Jini network), so that when the local proxy is registered to the network,
+it registers its known services via remote stubs (if the service does not
+have a rmi stub, it is not registered).  Also, I believe, we are in
+agreement (from below) that a slimmed-down PC setup may not need a local
+proxy to the djinn.
+
+Since the PC devices are (obviously) not Jini enabled, the drivers operating
+these devices need to pick up the slack and become Jini proxies.  Since they
+are known to be on a local system, their discovery/join mechanisms only work
+locally.  It would be up to the local proxy to perform the discovery/join
+to the network in the proper Jini method.
+
+So if we specify that all drivers need both RMI stubs and a local version
+(which isn't a stretch), any device can be placed onto the network djinn for
+anyone to use.  Thus, we could possibly emulate a parallel computer without
+too much work on the device level (that was based on a whole 2 seconds of
+thought).
+
+> This is great but the problem with jini right now it
+> that Free Software only has a partial implementation
+> of RMI let alone jini.  It would be great if
+> development would increase on that.  Classpath is
+> currently the most active in implementation of java
+> api standards.  Next to JOS of course :) (recreating
+> JAVA OS API).
+
+Ok, you got me there.  However, I don't believe there is anything like the
+local Jini lookup service I described in my message.  So this would be our
+own development, anyway.  Then we would need to develop the local Jini proxy
+like I described above so the JOS computer can interact with the djinn.  So
+this is all our development anyway, all based on the Jini specs, not the
+actual code.
+
+For the actual Jini code, that could be downloaded by the individual user,
+but the system-wide Jini implementation we can provide, along with the Jini
+device proxies.
+
+For the boot-level questions:
+
+Thomas Bocek wrote:
+>1. what about the boot drivers, that has to be loaded to handle the other
+>drivers (fdc/hdc).
+
+I don't know.  That's where I'm in a gray area.  For the moment, I'll do the
+cop-out and say the JOSBox layer needs their own simple versions of these
+drivers.  These would only need to be the bare-minimum drivers to get the
+system to a state where the next level can start.
+
+>2. There has to be a standard -> all vga driver must have e.g. the method
+>setpixel. I don't know if that is allready handled by JINI.
+
+I doubt it.  Jini is in the begining stages where most of this hasn't been
+specified.  This is where JOS can come in and blaze a trail for the rest of
+the world.  Still, for Video I believe that something along the lines of the
+java.awt.GraphicsContext and java.awt.GraphicsConfiguration should do the
+trick.  That's only for graphics, though.  We'd need to make an extention to
+support text mode.
+
+Didn't we already have a discussion about this?  Have I forgotten so
+quickly?
+
+-Matt
+
+
+
+
+From hilarycheng@usa.net Sat, 18 Sep 1999 08:39:14 +0800
+Date: Sat, 18 Sep 1999 08:39:14 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] decaf bug report
+
+Hi,
+
+    As I know, there are some problems of current System.out.print.
+It is not the problem of print method. Since right now, String, primitive
+Class
+are not completed fully implmented.
+
+    a. System.arraycopy : I have implemented this.
+    b. Class.getPrimitiveClass(String primitive_name) : u can found out
+there is a private static method in Class.
+        So, we need to implement this. But I got No IDEA how to create a
+"class" in C++ of JJOS.
+        getPrimitiveClass is used for those Integer, Float, Short, Byte, etc
+to check existing Primitive with Objects.
+
+If So, I think we implements these two methods. We can got a prefect
+System.out.print.
+
+Regards,
+
+Hilary
+
+
+>decaf doesn't seem to want to return from methods in the host build after
+you
+>have run any variation on System.out.print();
+>
+>Actually printing the text runs fine, as well as returning from the print()
+>method.  You can even run further bytcodes and invoke other methods, but as
+>soon as you return out of the function which called the print() function,
+you
+>get a Segmentation Fault.  It is quite consistent and repeatable.  It
+doesn't
+>matter what function you choose, or how you return from the function.
+>
+>I haven't tried this with the i386 build because I still don't have that up
+and
+>running.  This is a checkout of the latest CVS source. (~7:30 EDT, 13
+Sept).
+>
+>Any ideas?
+>- Avery J. Regier
+>
+>
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+
+
+
+
+From onewith1@flash.net Sat, 18 Sep 1999 11:42:10 -0500
+Date: Sat, 18 Sep 1999 11:42:10 -0500
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] JOSSystem
+
+I know it's bad form to reply to your own message, but I had a chance to
+think more about this design, and I feel that I can better describe my
+design philosophy now, with respect to JOS-Box, JOSystem, and Applications.
+I'm fully aware of how poor my first-cut (and twelfth-cut) explainations can
+be, so I'll try again.
+
+
+I wrote:
+> I'm trying to switch this design philosophy.  This design views all
+services
+> and devices as remote.  There is a central local service which is used to
+> access all other services - whether they are remote or local.
+
+The JOS-Box layer contains only the bare-bones device drivers to get it
+going.  These are generally hard-coded into the kernel (such as simple text
+mode for displaying the Red-Screen-Of-Death, and a basic file system
+reader).
+
+The JOSystem layer creates the localized Jini lookup service for which
+local, non-Jini devices on the PC register themselves.  This should probably
+done as so:
+   1) A set of localized lookup services are created (in JavaOS for Business
+architecture, these would be the "bus" objects).  These would be things like
+"ISA Bus", "SCSI Bus", "HotWire Bus", and so on.
+   2) Each localized lookup service then goes about detecting all devices
+that it has knowledge about.  This can include detecting a single device,
+running a set of plug-ins to detect a particular device, or starting up
+another localized lookup service.
+
+All of these lookup services are in a hierarchial view, where the top-level
+lookup is in charge of publication to the PC of all usable devices.
+Optionally, another lookup service can be loaded on top of that one to
+broadcast to the network all known devices (the lookup proxy).
+
+The Architecture layer uses the standard Jini mechanisms to discover devices
+on the network.  Commonly, the lookup service used is the top-level
+localized lookup service.  This top-level service should determine if the
+request for a device is from the local host or a remote host.  If from a
+local host, then the local Jini proxy (i.e. the actual device driver) is
+given to the application to increase the speed of access.
+
+Hopefully, this clears things up a bit about the design in my brain.
+Please, ask questions, and punch as many holes in it as you can.  If there's
+some critical error or wrong assumption I'm making, then let's iron it out
+or throw out the whole Jini idea.
+
+-Matt
+
+
+
+
+From tmiller@haverford.edu Sun, 19 Sep 1999 19:31:09 -0400 (EDT)
+Date: Sun, 19 Sep 1999 19:31:09 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf bug report
+
+> decaf doesn't seem to want to return from methods in the host build after you
+> have run any variation on System.out.print();  
+
+	(First, apologies for taking so long to get around to this.)
+
+	Okay, I can't replicate this bug, even though it sounds like it
+should be pretty easy to.  Some particular attempts at print()ing will
+cause immediate errors (Bocek's remarks about arraycopy() and
+getPrimitiveClass()).  I can't, however, seem to get an error to occur
+after returning.  I'm suspecting something to do with the GC?  If you send
+me your problematic code, I'll take a closer look.
+
+-_Quinn
+
+
+
+
+
+From hilarycheng@usa.net Mon, 20 Sep 1999 08:55:34 +0800
+Date: Mon, 20 Sep 1999 08:55:34 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] decaf bug report
+
+Hi,
+
+
+It is not a easy way to create/maniplate a Java Object in C++ of JJOS.
+Right now, I have implemented the arraycopy, if I can find the way
+to create a Java Primitive Class, I think System.out.println will works.
+
+Regards,
+
+Hilary
+
+
+>> decaf doesn't seem to want to return from methods in the host build after
+you
+>> have run any variation on System.out.print();
+>
+> (First, apologies for taking so long to get around to this.)
+>
+> Okay, I can't replicate this bug, even though it sounds like it
+>should be pretty easy to.  Some particular attempts at print()ing will
+>cause immediate errors (Bocek's remarks about arraycopy() and
+>getPrimitiveClass()).  I can't, however, seem to get an error to occur
+>after returning.  I'm suspecting something to do with the GC?  If you send
+>me your problematic code, I'll take a closer look.
+>
+>-_Quinn
+>
+>
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+
+
+
+
+From hilarycheng@usa.net Mon, 20 Sep 1999 09:59:51 +0800
+Date: Mon, 20 Sep 1999 09:59:51 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Some Idea About Speed Up JJOS
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_01B5_01BF034E.E186BF20
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    I got a idea to speed up JJOS a little bit.=20
+
+    For the right now, we are using switch statement to interrupt the =
+Java Bytecodes.
+i.e.=20
+
+swtich (bytecodes) {
+case 0: do_opcode_0();
+break;
+case 1: do_opcode_1();
+break;
+............
+............
+............
+............
+}
+
+It is slow. every opcodes needs one to hundred comparsion so that they =
+can perform the operation.
+
+well, yup, we can store all the bytecode operation function into a =
+array. It can run a little faster.
+i.e.
+
+function_list =3D { do_opcode_0, do_opcode_1, ...........};
+
+(*function_list[bytecodes * sizeof(function_list[]])();
+
+But It needs several mulitplation(*) and addition(+). and then we make a =
+call. It is not fast enough.
+
+maybe we can do it in another way.
+
+For the right now, Java bytecode in JJOS are a serial of i386 "Call" =
+instruction (in general). i.e.
+
+push variable_a
+Call Do_OpCode_0
+mov ax, [bp+12]
+mov variable_a , ax
+push variable_b
+Call Do_OpCode_1
+mov ax, [bp+10]
+mov variable_b , ax
+push variable_c
+Call Do_OpCode_1
+.............
+
+sths like that. When we load the class from Disk/Memory into JVM, we =
+convert each bytecodes into
+a i386 "Call" Instruction and store into Memory. When a Java method =
+call, we simple jump to
+the start of code. Will It be faster ? I think it will. Since We Remove =
+All the Comparsion / Multiplation(*) / Addition (+) for
+each bytecodes. For Each Java Method Call , we just simply jump to =
+instruction set that we are already compiled. it will
+be faster. But we need to precompile each Class when Class is uploaded =
+into memory. It is the time we need to pay.
+
+Any Opinion ?
+
+Regards,
+
+Hilary
+
+
+
+------=_NextPart_000_01B5_01BF034E.E186BF20
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type>
+<META content=3D"MSHTML 5.00.2014.210" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hi All,</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>&nbsp;&nbsp;&nbsp; I got a idea to =
+speed up JJOS a=20
+little bit. </FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>&nbsp;&nbsp;&nbsp; For the right now, =
+we are using=20
+switch statement to interrupt the Java Bytecodes.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>i.e. </FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>swtich (bytecodes) {</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>case 0: do_opcode_0();</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>break;</FONT></DIV><FONT face=3DArial =
+size=3D2>
+<DIV><FONT face=3DArial size=3D2>case 1: do_opcode_1();</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>break;</FONT></DIV>
+<DIV>............</DIV>
+<DIV>
+<DIV>............</DIV>
+<DIV>
+<DIV>............</DIV></DIV></DIV>
+<DIV>............</DIV>
+<DIV>}</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>It is slow. every opcodes needs one to hundred comparsion so that =
+they can=20
+perform the operation.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>well, yup, we can store all the bytecode operation function into a =
+array.=20
+It can run a little faster.</DIV>
+<DIV>i.e.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>function_list =3D { do_opcode_0, do_opcode_1, ...........};</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>(*function_list[bytecodes * sizeof(function_list[]])();</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>But It needs several mulitplation(*) and addition(+). and then we =
+make a=20
+call. It is not fast enough.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>maybe we can do it in another way.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>For the right now, Java bytecode in JJOS are a serial of i386 =
+"Call"=20
+instruction (in general). i.e.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>push variable_a</DIV>
+<DIV>Call Do_OpCode_0</DIV>
+<DIV>mov ax, [bp+12]</DIV>
+<DIV>mov variable_a , ax</DIV>
+<DIV>
+<DIV>
+<DIV>push variable_b</DIV>Call Do_OpCode_1</DIV>
+<DIV>
+<DIV>mov ax, [bp+10]</DIV>
+<DIV>mov variable_b , ax</DIV>
+<DIV>
+<DIV>
+<DIV>push variable_c</DIV>Call Do_OpCode_1</DIV>
+<DIV>.............</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>sths like that. When we load the class from Disk/Memory into JVM, =
+we=20
+convert each bytecodes into</DIV>
+<DIV>a i386 "Call" Instruction and store into Memory. When a Java method =
+call,=20
+we simple jump to</DIV>
+<DIV>the start of&nbsp;code. Will It be faster ? I think it will. Since =
+We=20
+Remove All the Comparsion / Multiplation(*) / Addition (+) for</DIV>
+<DIV>each bytecodes. For Each Java Method Call , we just simply jump to=20
+instruction set that we are already compiled. it will</DIV>
+<DIV>be faster. But we need to precompile each Class when Class is =
+uploaded into=20
+memory. It is the time we need to pay.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Any Opinion ?</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Regards,</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Hilary</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&nbsp;</DIV></DIV></DIV></FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_01B5_01BF034E.E186BF20--
+
+
+
+
+From jm@mak.com Mon, 20 Sep 1999 07:06:52 -0400
+Date: Mon, 20 Sep 1999 07:06:52 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Some Idea About Speed Up JJOS
+
+Hi;
+
+> Hilary Cheng wrote:
+> swtich (bytecodes) {
+> case 0: do_opcode_0();
+> break;
+> case 1: do_opcode_1();
+> break;
+> ............
+> ............
+> ............
+> ............
+> }
+> 
+> It is slow. every opcodes needs one to hundred comparsion so that they can
+> perform the operation.
+
+Well, jjos+decaf *is* slow, but it isn't due to this.
+
+The compiler is actually emitting a jump table for the switch statement.  For
+your convenience, I have attached excerpts from my not-too-out-of-date version
+of interp.cc (compiled with the optimizer OFF) -- The jump table proper begins
+at label L1562.  The first entry (for value zero) jumps to label L1535, which,
+as included below, you can see is the call to the NOP instruction.  Having said
+this, there is still a lot of things we could do to speed the system up in its
+entirety.  I have run the host version with profiling enabled, and have learned
+lots of interesting stuff (well, to me, anyways).   I would be happy to discuss
+this with anybody who was willing to concentrate upon performance.
+ 
+runOpcode__5frameR11java_object:
+.LFB208:
+        pushl %ebp
+.LCFI1871:
+        movl %esp,%ebp
+.LCFI1872:
+        subl $4,%esp
+.LCFI1873:
+        pushl %ebx
+.LCFI1874:
+        movl 8(%ebp),%ebx
+        movb $1,-1(%ebp)
+        cmpl $0,debug
+        je .L1359
+        movl 4(%ebx),%eax
+        pushl %eax
+        pushl %ebx
+        movl 32(%ebx),%eax
+        pushl %eax
+        pushl $.LC263
+.LCFI1875:
+        call kprintf__FPCce
+        addl $16,%esp
+.L1359:
+        movl 24(%ebx),%eax
+        movl 16(%eax),%edx
+        movl 4(%ebx),%eax
+        addl %eax,%edx
+        movzbl (%edx),%eax
+        cmpl $201,%eax
+        ja .L1561
+        movl .L1562(,%eax,4),%eax
+        jmp *%eax
+        .p2align 4,,7
+.section        .rodata
+        .align 4
+        .align 4
+.L1562:
+        .long .L1535
+        .long .L1363
+        .long .L1456
+        .long .L1450
+        .long .L1451
+        .long .L1452
+        .long .L1453
+        .long .L1454
+        .long .L1455
+        .long .L1507
+        .long .L1508
+        .long .L1418
+        .long .L1419
+        .long .L1420
+        .long .L1392
+        .long .L1393
+        .long .L1380
+
+[ The rest of the jump table deleted for brevity's sake. -jm ]
+
+.L1535:
+        movl 12(%ebp),%eax
+        pushl %eax
+        pushl %ebx
+        call nop__5frameR11java_object
+        addl $8,%esp
+        movb %al,%al
+        movb %al,-1(%ebp)
+        jmp .L1360
+        .p2align 4,,7
+
+[ Lots more stuff deleted -jm ]
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== jm@mak.com               ==== http://www.mak.com/
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+
+
+From hilarycheng@usa.net Mon, 20 Sep 1999 21:30:26 +0800
+Date: Mon, 20 Sep 1999 21:30:26 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Some Idea About Speed Up JJOS
+
+Hi,
+
+    What do u think the critical part that makes JJOS slow ? :O
+
+Regards,
+
+Hilary
+
+
+
+
+From jm@mak.com Mon, 20 Sep 1999 14:21:45 -0400
+Date: Mon, 20 Sep 1999 14:21:45 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Some Idea About Speed Up JJOS
+
+Hi;
+
+Hilary Cheng wrote:
+>     What do u think the critical part that makes JJOS slow ? :O
+
+How much time do you have? ;=)
+
+Seriously, since you asked, in no particular order (based upon a cursory
+examination of profiling output)...
+
+(1) Obligation to "intercept" method calls to Sun's JDK for methods that will
+break decaf+jjos.  Entails examining each and every method call to see if it is
+one such.  This should go away when we use classpath.
+
+(2) Failure to do "invoke" opcode rewriting so that we can avoid overhead of
+method lookup.
+
+(3) Failure to inline "obvious" candidates (e.g., all the local_variable
+accessor and mutators methods, some constructors).
+
+(4) Scheduler/interrupt polling overhead is way too high...
+
+(5) Given that the heap implementation zeroes memory, some common constructors
+(e.g., java_object) could skip re-initializing member variables...
+
+(6) Failure to do JIT compilation...
+
+BTW, here are the top couple of offenders for the host build WITHOUT
+optimization:
+
+>   %   cumulative   self              self     total           
+>  time   seconds   seconds    calls  ms/call  ms/call  name    
+>   9.92      5.95     5.95  2336461     0.00     0.01  frame::runOpcode(java_object &)
+>   9.20     11.47     5.52  2334752     0.00     0.00  jjMachine::interruptFIFOEmpty(void)
+>   3.67     13.67     2.20        1  2200.00 58806.54  scheduler::start(jjMachine *, java_class *)
+>   3.60     15.83     2.16  2334752     0.00     0.00  scheduler::notifyOfInterrupts(jjMachine *, java_class *)
+>   3.32     17.82     1.99  2350034     0.00     0.00  java_object::java_object(java_class *)
+>   3.25     19.77     1.95  2334752     0.00     0.00  scheduler::currentTimeSliceExpired(void)
+>   2.98     21.56     1.79  2336461     0.00     0.01  java_thread::runOpcode(void)
+>   2.85     23.27     1.71   910386     0.00     0.00  local_variables::load_jint(unsigned int)
+>   2.80     24.95     1.68  4678122     0.00     0.00  scheduler::currentThread(void)
+>   2.80     26.63     1.68  2354659     0.00     0.00  typed_data::~typed_data(void)
+>   2.57     28.17     1.54   456252     0.00     0.00  jbSLL<java_thread *>::_lookup(jbSLLItem<java_thread *> *, java_thread *const &)
+>   2.55     29.70     1.53  2337693     0.00     0.00  d_stack<frame>::peek(void)
+>   2.48     31.19     1.49  2350238     0.00     0.00  threadable::threadable(void)
+>   2.35     32.60     1.41  2336461     0.00     0.00  java_object::~java_object(void)
+>   2.25     33.95     1.35   388818     0.00     0.00  wcscmp(unsigned short const *, unsigned short const *)
+>   2.02     35.16     1.21  1113591     0.00     0.00  operand_stack::pop_jint(void)
+>   1.98     36.35     1.19  2336461     0.00     0.00  java_thread::currentFrame(void) const
+>   1.95     37.52     1.17        1  1170.00  1170.00  jbHeap::scrubMemory(void)
+>   1.73     38.56     1.04  2393897     0.00     0.00  typed_data::typed_data(void)
+>   1.72     39.59     1.03  1189224     0.00     0.00  s_stack<java_word>::push(java_word)
+>   1.70     40.61     1.02  2024179     0.00     0.00  java_word::operator int(void) const
+>   1.53     41.53     0.92   984558     0.00     0.00  operand_stack::push_java_word(java_word)
+>   1.32     42.32     0.79   361580     0.00     0.01  frame::if_icmplt(java_object &)
+>   1.25     43.07     0.75  2334752     0.00     0.00  java_thread::priority(void)
+>   1.17     43.77     0.70  1189224     0.00     0.00  s_stack<java_word>::pop(void)
+>   1.15     44.46     0.69   364244     0.00     0.00  frame::bipush(java_object &)
+>   1.15     45.15     0.69    78375     0.01     0.01  jbZipFileLocalFileHeader::getMyFileName(char *)
+>   1.07     45.79     0.64  4700476     0.00     0.00  thread_list::thread_list(void)
+>   1.05     46.42     0.63  2854961     0.00     0.00  heapMark(void *)
+>   1.05     47.05     0.63  2334753     0.00     0.00  scheduler::noThreadsLeftToRun(void)
+>   1.00     47.65     0.60    50290     0.01     0.04  heapMarkBlock(void *, void *)
+>   0.98     48.24     0.59    78375     0.01     0.01  jbZipFileLocalFileHeader::isValidZipFile(void)
+>   0.97     48.82     0.58   362498     0.00     0.01  frame::iinc(java_object &)
+
+Here are the top couple of offenders for the -O3 (max optimization) host build:
+
+>   %   cumulative   self              self     total           
+>  time   seconds   seconds    calls  ms/call  ms/call  name    
+>  12.49      5.68     5.68  2336461     0.00     0.01  frame::runOpcode(java_object &)
+>  11.26     10.80     5.12  2334752     0.00     0.00  jjMachine::interruptFIFOEmpty(void)
+>   7.48     14.20     3.40  2338911     0.00     0.00  java_object::java_object(java_class *)
+>   7.06     17.41     3.21        1  3210.00 44877.76  scheduler::start(jjMachine *, java_class *)
+>   5.02     19.69     2.28  2334752     0.00     0.00  java_thread::priority(void)
+>   4.95     21.94     2.25  2337693     0.00     0.00  d_stack<frame>::peek(void)
+>   4.95     24.19     2.25  2334753     0.00     0.00  jbSLL<java_thread *>::isEmpty(void)
+>   4.60     26.28     2.09  2336461     0.00     0.00  java_thread::runOpcode(void)
+>   3.50     27.87     1.59  2350238     0.00     0.00  threadable::threadable(void)
+>   2.75     29.12     1.25   910386     0.00     0.00  local_variables::load_jint(unsigned int)
+>   2.33     30.18     1.06  1113591     0.00     0.00  operand_stack::pop_jint(void)
+>   2.11     31.14     0.96  2354659     0.00     0.00  typed_data::~typed_data(void)
+>   1.67     31.90     0.76  2024179     0.00     0.00  java_word::operator int(void) const
+>   1.65     32.65     0.75  1189224     0.00     0.00  s_stack<java_word>::pop(void)
+>   1.61     33.38     0.73   456252     0.00     0.00  jbSLL<java_thread *>::lookup(java_thread *const &)
+>   1.58     34.10     0.72   388818     0.00     0.00  wcscmp(unsigned short const *, unsigned short const *)
+>   1.56     34.81     0.71  4700476     0.00     0.00  thread_list::thread_list(void)
+>   1.50     35.49     0.68    78375     0.01     0.01  jbZipFileLocalFileHeader::isValidZipFile(void)
+>   1.36     36.11     0.62  1189224     0.00     0.00  s_stack<java_word>::push(java_word)
+>   1.34     36.72     0.61   968658     0.00     0.00  operand_stack::push_java_word(java_word)
+>   1.25     37.29     0.57        1   570.00   570.00  jbHeap::scrubMemory(void)
+>   1.23     37.85     0.56   456252     0.00     0.00  scheduler::switchToNextThread(void)
+>   1.08     38.34     0.49    51002     0.01     0.02  my_calloc(unsigned int, unsigned int)
+>   0.97     38.78     0.44  3152254     0.00     0.00  pagerDescriptorForPage(pager *, void *)
+>   0.95     39.21     0.43  1658416     0.00     0.00  java_word::operator=(java_word const &)
+
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== jm@mak.com               ==== http://www.mak.com/
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+
+
+From werner.schuster@netway.at Tue, 21 Sep 1999 18:12:44 +0200
+Date: Tue, 21 Sep 1999 18:12:44 +0200
+From: Murphy werner.schuster@netway.at
+Subject: [JOS-Kernel] Re: stupid code proposal for decaf
+
+At 20:28 19.09.99 -0400, you wrote:
+>         BTW, and I meant to ask earlier, how hard/easy was to read the
+>code/docs/etc?  (Comment & clarity-wise.)  If we want to add more
+>developers, these things need to be taken care of, and I don't have
+>enought to perspective to say...
+yo,
+
+well I guess I can't help you much here, cause I think the source code
+is very well organized & well commented;
+I had no trouble reading the code, (although I didnt understand some
+things, done in the code; but thats only due to my little knowledge of JVM 
+internals);
+
+the docs are well enough;
+
+one thought though:
+you could provide "hooks" for [future] coders; by hooks I mean something
+like a little ToDo  inside the code, at the place where it should be done,
+this could be something like little job descriptions for people that look
+at the code but don't know where to start;
+eg: some code (function,...) that could be implemented more better,
+(although thats somehow done already, it could be more direct, so
+that people like me could start fooling around with the code);
+
+another thing:
+is there something like javadoc for C[++]?
+this could help up understanding the code, also the purpose of the
+code could be added to this doc;
+
+murphee
+***************************************
+UNITE FOR JAVA -> www.javalobby.org
+Check this out -> www.jos.org
+My site -> www.angelfire.com/co/werners
+***************************************
+... and the fact, that i haven't put a gun to my mouth yet,
+proves that i'm a winner!
+Al Bundy
+
+
+
+From scode@scode.webprovider.com Wed, 22 Sep 1999 18:39:05 +0200
+Date: Wed, 22 Sep 1999 18:39:05 +0200
+From: scode@scode.webprovider.com scode@scode.webprovider.com
+Subject: [JOS-Kernel] Re: stupid code proposal for decaf
+
+> is there something like javadoc for C[++]?
+
+There's something called Doxygen (inspired by the syntax of the Qt docs).
+It's been awhile since I've touched Qt/Doxygen though, so I don't have the
+URL. But it should be easy to find.
+
+-- 
+/ Peter Schuller
+
+PGP userID: 0x5584BD98 or 'Peter Schuller <scode@scode.webprovider.com>'
+Key retrival: Send an E-Mail to scode-getpgpkey@scode.webprovider.com
+E-Mail: scode@scode.webprovider.com Web: http://hem.passagen.se/petersch
+
+
+
+From jm@mak.com Fri, 24 Sep 1999 17:03:13 -0400
+Date: Fri, 24 Sep 1999 17:03:13 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] NATIVE_CLOCK?
+
+Hi Guys;
+
+I think I made a mistake in failing to recognize a fairly nasty (and
+pretty obvious in hindsight) interrupt-related hazard in the interrupt
+notification schema.  In order to fix it, I'd like to muck about the
+scheduler::notifyOfInterrupts and other related routines.
+
+I notice that scheduler.cc contains some ifdefs related to NATIVE_CLOCK,
+which looks like it blows off notifying Java threads if the interrupt is
+number 8 (which is, BTW, unfortunately, a machine-dependent thing,
+located in a machine-independent file).  Doing this would preclude Java
+drivers from waiting on the clock interrupt.  In fact, I would like to
+use the clock interrupt to help debug the problem.  Unless I hear some
+objections from you all out there in kernel-land, I'm going to elide
+this logic prior to rewriting the notification handler(s).
+
+Also, has anybody else seen similar problems?  I know Todd must've been
+bitten, because of the PARANOID printouts in the notifyOfInterrupts
+method.
+
+-jm
+
+-- 
+==== John Morrison ==== jm@mak.com == http://www.mak.com/welcome.html
+==== MaK Technologies Inc., 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+
+
+
+From tmiller@haverford.edu Fri, 24 Sep 1999 17:21:18 -0400 (EDT)
+Date: Fri, 24 Sep 1999 17:21:18 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: NATIVE_CLOCK?
+
+> I think I made a mistake in failing to recognize a fairly nasty (and
+> pretty obvious in hindsight) interrupt-related hazard in the interrupt
+> notification schema.  In order to fix it, I'd like to muck about the
+> scheduler::notifyOfInterrupts and other related routines.
+
+	Would this be the 'why aren't using InterruptHandler' problem?
+Part of why I was asking about the JavaOS docs earlier was that I wanted
+to fix this problem (interrupt lossage, among other things) before fixing
+the keyboard driver, and as long as I was mucking about with it, I might
+as well muck about in a fashion at least vaguely resembling what it
+'should be'.
+
+	Anyway, I haven't been doing almost nothing recently, but if I get
+any work done this weekend, I'll try to make work on JNI/classpath...
+
+	Oh, BTW, parts of the NATIVE_CLOCK bit had to do with the
+HANDLE_CLOCK bits because Bocek (I believe) requested use of the rtc for
+the floppy driver.
+
+-_Quinn
+
+
+
+
+
+From werner.schuster@netway.at Sun, 26 Sep 1999 20:27:44 +0200
+Date: Sun, 26 Sep 1999 20:27:44 +0200
+From: Murphy werner.schuster@netway.at
+Subject: [JOS-Kernel] Problem starting JJOS
+
+yo Group,
+
+I wrote to the group last week because I had trouble building JJOS;
+Avery J. Regier gave me the tip to do the checkout under Linux onto
+a ext2fs partition instead of using jcvs/windows NT4.0 onto FAT;
+the build worked fine (THANX Avery/J./Regier (choose your first name:-))
+maybe this problem could be added to a JJOS FAQ on the website (is there 
+something like that?);
+
+but jjos didnt start; the Readme says that running build (or running
+make in /JJOS/arch/host/nativecode ) would start jjos;
+so I thought, lets do yourself; I went to the /JJOS/arch/host/nativecode 
+dir and copied the file HelloWorld.class (guess what that does 8-) )to this 
+dir, and then did this:
+
+[root@localhost nativecode]# jjos HelloWorld
+jm's JOS Kernel Host!
+start pds:      0x40113008      end pds:        0x40139E88      (1992 page 
+descriptors)
+start heap:     0x4013B000      end heap:       0x40903000      (1992 pages)
+Page freelist:
+0x4014B000: 1976 pages
+heap freelists:
+freelist Size: 8; SPD: 0x40113008; SPDI: 0
+sizes mapping to this freelist: 0-8
+freelist Size: 12; SPD: 0x40113058; SPDI: 0
+sizes mapping to this freelist: 9-12
+freelist Size: 16; SPD: 0x401130A8; SPDI: 0
+sizes mapping to this freelist: 13-16
+freelist Size: 20; SPD: 0x401130F8; SPDI: 0
+sizes mapping to this freelist: 17-20
+freelist Size: 24; SPD: 0x40113148; SPDI: 0
+sizes mapping to this freelist: 21-24
+freelist Size: 28; SPD: 0x40113198; SPDI: 0
+sizes mapping to this freelist: 25-28
+freelist Size: 32; SPD: 0x401131E8; SPDI: 0
+sizes mapping to this freelist: 29-32
+freelist Size: 36; SPD: 0x40113238; SPDI: 0
+sizes mapping to this freelist: 33-36
+freelist Size: 40; SPD: 0x40113288; SPDI: 0
+sizes mapping to this freelist: 37-40
+freelist Size: 100; SPD: 0x401132D8; SPDI: 0
+sizes mapping to this freelist: 41-100
+freelist Size: 2048; SPD: 0x40113328; SPDI: 0
+sizes mapping to this freelist: 101-2048
+class_loader: can't load HelloWorld.class
+Segmentation fault (core dumped)
+[root@localhost nativecode]#
+
+I tried a couple of other things (like going to the /JJOS/common/bytecode 
+dir and starting "jjos init" (the path to jjos
+was in the $PATH) but it only did the same thing as with the
+HelloWorld.class;
+
+also: the HelloWorld.class works with java, the Classpath is correct
+to;
+
+I checked JJOS out on September 23. 1999 (Thursday);
+
+What could be the trouble with that?
+hope someone might help me here,
+THANX in advance
+
+murphee
+***************************************
+UNITE FOR JAVA -> www.javalobby.org
+Check this out -> www.jos.org
+My site -> www.angelfire.com/co/werners
+***************************************
+... and the fact, that i haven't put a gun to my mouth yet,
+proves that i'm a winner!
+Al Bundy
+
+
+
+From hilarycheng@usa.net Mon, 27 Sep 1999 08:47:50 +0800
+Date: Mon, 27 Sep 1999 08:47:50 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Problem starting JJOS
+
+Hi,
+
+    I recommand to use i386 build rather than using Host Build. Since i386
+build got
+more feature than host build like VGA Driver, etc.
+
+    well, if u use Host build, u need to find out a zip file call
+"jos_common.zip" in
+arch/host/bytecode. pls include ur testing class file into this zip file so
+that u can
+run HelloWorld.
+
+Regards,
+
+Hilary
+
+>yo Group,
+>
+>I wrote to the group last week because I had trouble building JJOS;
+>Avery J. Regier gave me the tip to do the checkout under Linux onto
+>a ext2fs partition instead of using jcvs/windows NT4.0 onto FAT;
+>the build worked fine (THANX Avery/J./Regier (choose your first name:-))
+>maybe this problem could be added to a JJOS FAQ on the website (is there
+>something like that?);
+>
+>but jjos didnt start; the Readme says that running build (or running
+>make in /JJOS/arch/host/nativecode ) would start jjos;
+>so I thought, lets do yourself; I went to the /JJOS/arch/host/nativecode
+>dir and copied the file HelloWorld.class (guess what that does 8-) )to this
+>dir, and then did this:
+>
+>[root@localhost nativecode]# jjos HelloWorld
+>jm's JOS Kernel Host!
+>start pds:      0x40113008      end pds:        0x40139E88      (1992 page
+>descriptors)
+>start heap:     0x4013B000      end heap:       0x40903000      (1992
+pages)
+>Page freelist:
+>0x4014B000: 1976 pages
+>heap freelists:
+>freelist Size: 8; SPD: 0x40113008; SPDI: 0
+>sizes mapping to this freelist: 0-8
+>freelist Size: 12; SPD: 0x40113058; SPDI: 0
+>sizes mapping to this freelist: 9-12
+>freelist Size: 16; SPD: 0x401130A8; SPDI: 0
+>sizes mapping to this freelist: 13-16
+>freelist Size: 20; SPD: 0x401130F8; SPDI: 0
+>sizes mapping to this freelist: 17-20
+>freelist Size: 24; SPD: 0x40113148; SPDI: 0
+>sizes mapping to this freelist: 21-24
+>freelist Size: 28; SPD: 0x40113198; SPDI: 0
+>sizes mapping to this freelist: 25-28
+>freelist Size: 32; SPD: 0x401131E8; SPDI: 0
+>sizes mapping to this freelist: 29-32
+>freelist Size: 36; SPD: 0x40113238; SPDI: 0
+>sizes mapping to this freelist: 33-36
+>freelist Size: 40; SPD: 0x40113288; SPDI: 0
+>sizes mapping to this freelist: 37-40
+>freelist Size: 100; SPD: 0x401132D8; SPDI: 0
+>sizes mapping to this freelist: 41-100
+>freelist Size: 2048; SPD: 0x40113328; SPDI: 0
+>sizes mapping to this freelist: 101-2048
+>class_loader: can't load HelloWorld.class
+>Segmentation fault (core dumped)
+>[root@localhost nativecode]#
+>
+>I tried a couple of other things (like going to the /JJOS/common/bytecode
+>dir and starting "jjos init" (the path to jjos
+>was in the $PATH) but it only did the same thing as with the
+>HelloWorld.class;
+>
+>also: the HelloWorld.class works with java, the Classpath is correct
+>to;
+>
+>I checked JJOS out on September 23. 1999 (Thursday);
+>
+>What could be the trouble with that?
+>hope someone might help me here,
+>THANX in advance
+>
+>murphee
+>***************************************
+>UNITE FOR JAVA -> www.javalobby.org
+>Check this out -> www.jos.org
+>My site -> www.angelfire.com/co/werners
+>***************************************
+>.... and the fact, that i haven't put a gun to my mouth yet,
+>proves that i'm a winner!
+>Al Bundy
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+
+
+
+
+From tmiller@haverford.edu Sun, 26 Sep 1999 21:55:08 -0400 (EDT)
+Date: Sun, 26 Sep 1999 21:55:08 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Problem starting JJOS
+
+> I tried a couple of other things (like going to the
+> /JJOS/common/bytecode dir and starting "jjos init" (the path to jjos
+> was in the $PATH) but it only did the same thing as with the
+> HelloWorld.class; also: the HelloWorld.class works with java, the
+> Classpath is correct to;
+
+	JJOS only reads files out of the class library zipfile it creates
+the 'maja' part of the build.  'init' /should/ be in that .zip file; check
+with the unzip tool (there're a list only option in there somewere).
+
+-_Quinn
+
+
+
+
+From jm@mak.com Mon, 27 Sep 1999 08:22:52 -0400
+Date: Mon, 27 Sep 1999 08:22:52 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Problem running VGA driver [Was: Re: [JOS-Kernel] Re: NATIVE_CLOCK?]
+
+Hi, Todd;
+
+"Todd L. Miller" wrote:
+> 
+> > I think I made a mistake in failing to recognize a fairly nasty (and
+> > pretty obvious in hindsight) interrupt-related hazard in the interrupt
+> > notification schema.  In order to fix it, I'd like to muck about the
+> > scheduler::notifyOfInterrupts and other related routines.
+> 
+>         Would this be the 'why aren't using InterruptHandler' problem?
+
+No.  Not only that, I spoke too soon.  I actually *did* put the critical
+sections in -- only I put them in the accessor/mutator methods.  Whoops.
+
+Having said that, you do bring up another problem.  Sorry, but I have
+not been able to devote much time recently, beyond a problem I'm chasing
+down.
+
+Please, anybody out there please feel free to let me know if you've seen
+this failure mode...  When I run the VGA driver, it hangs after writing
+the blue test pixels over about 3/4 of the screen.  After about another
+minute of no activity, the box resets itself.  I don't ever see it go
+back to the "text mode."  However, if I change the increment so that it
+only draw every other line, then I *do* see this go to text mode.  I
+have done the obvious things to figure out why it's hanging, but have
+pretty much come up dry.  I've commented out the "out8" calls in the
+native code, and replaced them with "kprintf" calls -- when I do this,
+it runs all the way to the end, and does a GC successfully.  
+
+Thomas, if I were to want to go back to text mode from native code so
+that I could do a sort of "Blue Screen of Death," what calls must I make
+to the VGA hardware to do that?  Do you know off the top of your head? 
+I know you have done this in the Java code...
+
+> Part of why I was asking about the JavaOS docs earlier was that I wanted
+> to fix this problem (interrupt lossage, among other things) before fixing
+> the keyboard driver, and as long as I was mucking about with it, I might
+> as well muck about in a fashion at least vaguely resembling what it
+> 'should be'.
+
+Cool.  This is fine with me if you do this.
+
+>         Anyway, I haven't been doing almost nothing recently, but if I get
+> any work done this weekend, I'll try to make work on JNI/classpath...
+
+I'll have to wait on this until this weekend, which will unfortunately
+be shortened due to my having to go to recruiting at a local university
+on Friday.
+
+>         Oh, BTW, parts of the NATIVE_CLOCK bit had to do with the
+> HANDLE_CLOCK bits because Bocek (I believe) requested use of the rtc for
+> the floppy driver.
+
+Hmm... is the "real time clock" the CMOS read-only one, as opposed to
+the system interrupt-generating clock (he asked, confusedly, and away
+from his PC documents)?
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From Holger.Veit@gmd.de Mon, 20 Sep 1999 09:29:55 +0200
+Date: Mon, 20 Sep 1999 09:29:55 +0200
+From: Holger Veit Holger.Veit@gmd.de
+Subject: [JOS-Kernel] (no subject)
+
+On Mon, Sep 20, 1999 at 03:00:08AM -0400, kernel-admin@jos.org wrote:
+> Message: 3
+> From: "Hilary Cheng" <hilarycheng@usa.net>
+>     I got a idea to speed up JJOS a little bit.=20
+> 
+>     For the right now, we are using switch statement to interrupt the =
+> Java Bytecodes.
+> i.e.=20
+> 
+> swtich (bytecodes) {
+> case 0: do_opcode_0();
+> break;
+> case 1: do_opcode_1();
+> break;
+> ............
+> ............
+> ............
+> ............
+> }
+> 
+> It is slow. every opcodes needs one to hundred comparsion so that they =
+> can perform the operation.
+
+You are wrong. It does not need 100 comparisons to find "do_opcode_100()".
+Compilers, including also gcc, produce jump tables for decades. The assembler
+code typically looks like this:
+	mov eax, [bytecodes]
+	cmp eax, maxvalue
+	jg defaultcase
+	jmp [table+eax*4]
+table:	dd	case0
+	dd	case1
+	...
+	dd	case100
+defaultcase:
+	...
+case0:
+	...
+...
+
+So you have a single comparison only.
+
+> well, yup, we can store all the bytecode operation function into a =
+> array. It can run a little faster.
+> i.e.
+> 
+> function_list =3D { do_opcode_0, do_opcode_1, ...........};
+> 
+> (*function_list[bytecodes * sizeof(function_list[]])();
+> 
+> But It needs several mulitplation(*) and addition(+). and then we make a =
+> call. It is not fast enough.
+
+The multiplication you assume is actually a shift, when the table is laid out
+properly. See "strength reduction" in any good introductory book on compiler
+construction.
+
+> maybe we can do it in another way.
+> 
+> For the right now, Java bytecode in JJOS are a serial of i386 "Call" =
+> instruction (in general). i.e.
+> 
+> push variable_a
+> Call Do_OpCode_0
+> mov ax, [bp+12]
+> mov variable_a , ax
+> push variable_b
+> Call Do_OpCode_1
+> mov ax, [bp+10]
+> mov variable_b , ax
+> push variable_c
+> Call Do_OpCode_1
+> .............
+> 
+> sths like that. When we load the class from Disk/Memory into JVM, we =
+> convert each bytecodes into
+> a i386 "Call" Instruction and store into Memory. When a Java method =
+> call, we simple jump to
+> the start of code. Will It be faster ? I think it will. Since We Remove =
+
+Congratulation, in principle, you have just detected what a JIT is.
+However, the code won't be so simple, as you'll need certain parameter
+checking and exception handling; thus you'll have to pass more parameters
+to the routine unless you want to do everything with global variables
+which is a Bad Thing(tm).
+
+> All the Comparsion / Multiplation(*) / Addition (+) for
+> each bytecodes. For Each Java Method Call , we just simply jump to =
+> instruction set that we are already compiled. it will
+> be faster. But we need to precompile each Class when Class is uploaded =
+> into memory. It is the time we need to pay.
+> 
+> Any Opinion ?
+
+The bottleneck is not where you expect it to be.
+
+Holger
+
+-- 
+Signature fault - code dumbed
+
+
+
+
+From digigod@earthling.net Fri, 17 Sep 1999 19:02:11 -0700
+Date: Fri, 17 Sep 1999 19:02:11 -0700
+From: DigiGod Q =?iso-8859-1?Q?Frasch=E9?= digigod@earthling.net
+Subject: [JOS-Kernel] Re: [JOS-Arch] JOSSystem (-S)
+
+> I'm currently unsure about where discussions about JOSSystem are placed, so
+> I'll post this to both kernel and arch in the hopes that someone knows.
+
+its actually JOSystem (we're just accentuating the System to
+differentiate it from the other layers...), I've been saying it "Joe
+System".
+
+I don't know how applicable this is, but I was at the MIT "Parallel and
+Distributed OS" (or PDOS) page and they were talking about a new design,
+called exokernel. its a good idea and its flexible like we need, but I
+don't know how well it would translate to a VM based OS, unless we used
+it on JOSystem which is, basically, "the kernel on the kernel", or the
+virtual kernel. I think we could get flexibility and speed by using a
+nanokernel for the JOSBox and an exokernel for JOSystem. of course I
+don't much of such things, so I encourage you to see the site
+http://www.pdos.lcs.mit.edu/exo/ and goto
+http://www.pdos.lcs.mit.edu/PDOS-papers.html for more (to much, in fact)
+information. at the very least we can use their neat file system...
+
+Cheers,
+DigiGod
+_________________________
+DigiGod@earthling.net
+AIM:DigiGod 86
+_________________________
+Quote of the Moment:
+        No, I'm Canadian. It's like an American, but without a 
+        gun.
+              -Dave Foley
+_________________________
+Prank of the Moment:
+	Using the conferencing feature of your office phone, dial
+	one Induhvidual, then while it's ringing dial another and
+	conference them together. Put your own phone on mute
+	and listen to see how long they'll make small talk before
+	figuring out that neither one placed the call.
+O-
+
+
+
+
+From ajregier@earthlink.net Mon, 20 Sep 1999 20:42:49 -0500
+Date: Mon, 20 Sep 1999 20:42:49 -0500
+From: Avery J. Regier ajregier@earthlink.net
+Subject: [JOS-Kernel] decaf bug report
+
+I downloaded the latest CVS with the interp.cc fix, but I still have this
+problem on the host build.  Here is the init.java file I use to show the
+problem.  The testVoidReturn function is what I was playing with to try and
+narrow down the cause.
+
+- Avery J. Regier
+
+/*
+ *    The contents of this file are subject to the JJOS Public License
+ *    Version 0.0 (the "License"); you may not use this file except in
+ *    compliance with the License. You may obtain a copy of the License at
+ *    http://www.jos.org/
+ *
+ *    Software distributed under the License is distributed on an "AS IS"
+ *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *    License for the specific language governing rights and limitations
+ *    under the License.
+ *
+ *    The Original Code is decaf's code, released October, 1998.
+ *
+ *    The Initial Developer of the Original Code is Todd L. Miller.
+ *    Portions created by Todd L. Miller  are Copyright (C) 1998 & 1999.
+ *    All Rights Reserved.
+ *
+ */
+
+/**
+ * init
+ *
+ * The first thread run and the last to die.
+ */
+
+import jos.system.interrupts;
+import jos.system.keyboard;
+import jos.system.consoled;
+import java.util.Vector;
+import java.util.Enumeration;
+
+import java.io.*;
+import jos.platform.driver.StandardVga;
+
+
+public class init {
+	public static boolean testVM = true;
+	public static boolean testThreads = true;
+	public static boolean testExceptions = true;
+	public static boolean testConsoleDaemons = true;
+	public static boolean testVGADriver = false;
+        public static boolean exitWhenDone = true;
+        public static boolean testGC = true;
+
+	/* the jos logo -> just for testing */
+	final static int[] logo =
+       {0,0,0,0,0,14,15,15,15,15,14,0,0,0,0,0,
+	0,0,0,14,15,7,3,7,3,7,3,15,14,0,0,0,
+	0,0,14,15,7,3,7,3,7,3,7,3,15,14,0,0,
+	0,14,15,6,6,6,3,7,3,7,3,7,3,15,14,0,
+	0,15,6,1,1,1,6,3,7,3,7,3,7,3,15,0,
+	14,6,1,1,1,1,1,6,3,7,3,7,3,7,3,14,
+	15,1,1,1,1,1,1,6,7,3,7,3,7,3,7,15,
+	15,1,1,3,7,1,1,6,3,7,3,1,1,7,3,15,
+	15,1,1,7,3,1,1,1,6,3,7,1,1,3,7,15,
+	15,1,1,1,1,1,1,1,6,7,3,7,3,7,3,15,
+	14,1,1,1,1,1,1,1,6,3,7,3,7,3,6,14,
+	0,15,1,1,1,1,1,1,1,6,3,7,3,6,15,0,
+	0,14,1,1,1,1,1,1,1,1,6,6,6,1,14,0,
+	0,0,14,1,1,1,1,1,1,1,1,1,1,14,0,0,
+	0,0,0,14,15,1,1,1,1,1,1,15,14,0,0,0,
+	0,0,0,0,0,14,15,15,15,15,14,0,0,0,0,0};
+
+    public static void main( String[] argv ) {
+	System.out.println( "init for decaf, version 0.0.1" );
+
+	if (init.testVM)
+	    testVM();
+	else
+	    System.out.println( "skipping VM tests..." );
+
+	if (init.testThreads)
+	    testThreads();
+	else
+	    System.out.println( "skipping threading tests..." );
+
+	if (init.testExceptions)
+	    testExceptions();
+	else
+	    System.out.println( "skipping exception tests..." );
+
+	if (init.testConsoleDaemons)
+	    testConsoleDaemons();
+	else
+	    System.out.println( "init() skipping console daemon tests..." );
+
+	if (testVGADriver)
+	    testVGADriver();
+	else
+	    System.out.println( "init() skipping VGA tests..." );
+		
+	if (testGC)
+	    testGC();
+	else
+	    System.out.println( "init() skipping GC tests..." );
+
+	if (exitWhenDone)
+	    {
+		System.out.println( "init() for decaf v0.0.1, exiting..." );
+	    }
+	else
+	    {
+		System.out.println( "init() entering idle time..." );
+		while ( true ); /* or, j.s.system.isNotShuttingDown(), etc. */
+	    }
+    }
+
+    public static void testCasting() {
+	System.out.println( "init() testing casting..." );
+
+	Object o = new Object();
+	Vector v = new Vector();
+	int[] array_i = new int[10];
+	String[] array_s = new String[10];
+	
+	System.out.println( "o = (Object)Vector; (OK)" );
+	o = (Object)v;
+
+	System.out.println( "Vector = (Vector)o; (OK)" );
+	v = (Vector)o;
+
+	System.out.println( "o = Object; Vector = (Vector)o (NOT OK)" );
+	o = new Object();
+	v = (Vector)o;
+
+	System.out.println( "ser = new String(); (OK)" );
+	System.out.println( "o = (Object)int[]; (OK)" );
+	o = (Object)array_i;
+
+	System.out.println( "o = (Object)String[]; (OK)" );
+	o = (Object)array_s;
+
+	System.out.println( "o = (Object)int[]; int[] = (int[])o; (OK)" );
+	o = (Object)array_i;
+	array_i = (int[])o;
+
+	// Failed by compiler.
+	// System.out.println( "s = (String[])int[]; (NOT OK)" );
+	// array_s = (String[])array_i;
+
+	// Failed by compiler.
+	// System.out.println( "i = (int[])Vector; (NOT OK)" );
+	// array_i = (int[])v;
+
+	o = new Object();
+	v = new Vector();
+	Enumeration e = v.elements();
+	System.out.println( "e = (Enumeration)v; (NOT OK)" );
+	e = (Enumeration)v;
+
+	e = v.elements();
+	System.out.println( "v = (Vector)e; (NOT OK)" );
+	v = (Vector)e;
+
+	System.out.println( "ser = new String(); (OK)" );
+	Serializable ser = new String();
+    } /* end testCasting() */
+		
+
+public static boolean testFunctionCalls() {
+	// return true on error.
+	testVoidReturn();
+	System.out.println("Void return successful");
+	if ( testStaticDoubleReturn() != (double)5.77 ) {
+		System.out.println( "Static double return failed." );
+		return true;
+		}	
+	if ( testDynamicDoubleReturn((double)5.77) != (double)5.77 ) {
+		System.out.println( "Dynamic double return failed." );
+		return true;
+		}
+
+	// float, int, reference(array), void(null) remain to test.
+
+	return false;	
+} // end testFunctionCalls()
+
+public static double testStaticDoubleReturn() { return (double)5.77; }
+public static double testDynamicDoubleReturn( double d ) { return d; }
+public static int testVoidReturn() {
+	System.out.println("Having fun with testing");
+	int i=0;
+	for(; i<10; i++);
+	return i;
+}
+
+public static void testMathOps() {
+	System.out.print( "testing integer comparisons... " );
+       
+	int k = 1;
+	int l = 10;
+	System.out.print( "ops failed: " );
+	if ( k == l ) { System.out.print( "== " ); }
+        if ( k != l ) { ; } else { System.out.print( "!= " ); }
+        if ( k > l ) { System.out.print( "> " ); }
+        if ( l < k ) { System.out.print( "< " ); }
+        if ( k >= l ) { System.out.print( ">= " ); }
+        if ( l <= k ) { System.out.print( "<=" ); }
+	System.out.print( "\n" );
+
+	System.out.print( "testing double comparisons... " );
+
+        double o = (double)55.3;
+        double p = (double)11.1;
+	System.out.print( "ops failed: " );
+        if ( o == p ) { System.out.print( "== " ); }
+        if ( o != p ) { ; } else { System.out.print( "!= "); }
+        if ( o < p ) { System.out.print( "< " ); }
+        if ( p > o ) { System.out.print( "> " ); }
+        if ( o <= p ) { System.out.print( "<= " ); }
+        if ( p >= o ) { System.out.print( ">=" ); }
+	System.out.print( "\n" );
+
+        System.out.print( "Testing float comparisons... " );
+
+        float q = (float)4.5;
+        float r = (float)4.5;
+	System.out.print( "ops failed: " );
+        if ( q == r ) { ; } else { System.out.print( "== "); }
+        if ( q != r ) { System.out.print( "!= " ); }
+        if ( q < r ) { System.out.print( "< " ); }
+        if ( r > q ) { System.out.print( "> " ); }
+        if ( r <= q ) { ; } else { System.out.print( "<= " ); }
+        if ( q >= r ) { ; } else { System.out.print( ">=" ); }
+	System.out.print( "\n" );
+
+        System.out.print( "Testing float ops... " );
+
+	System.out.print( "ops failed: " );
+        if ( q + r != (float)9.0 ) { System.out.print( "add " ); }
+        if ( q - r != (float)0.0 ) { System.out.print( "sub " ); }
+        if ( q / r != (float)1.0 ) { System.out.print( "div " ); }
+        if ( q % r != (float)0.0 ) { System.out.print( "mod " ); }
+        if (    -q != (float)-4.5 ) { System.out.print( "neg " ); }
+        if ( q * r != (float)20.25 ) { System.out.print( "mul" ); }
+        System.out.print( "\n" );
+
+        System.out.print( "Testing double ops... " );
+
+	double result;
+	System.out.print( "ops failed: " );
+	result = o + p;
+        if ( result < 66.0 || result > 67.0 ) { System.out.print("add "); }
+	result = o - p;
+        if ( result < 44.0 || result > 45.0 ) { System.out.print("sub "); }
+	result = -o;
+        if ( result > -55 || result < -56 ) { System.out.print("neg "); }
+	result = o * p;
+        if ( result < 613 || result > 614 ) { System.out.print( "mul" ); }
+        System.out.print( "\n" );
+
+	// need long ops & comparisons, integer ops;
+  	// byte & char ops * comparisons.
+	System.out.print( "Math ops finished\n");
+testArrayOps();
+	} // end testMathOps()
+
+public static void testArrayOps() {
+	System.out.print( "testing array operations... " );	
+
+	int[][][] array_three = new int [5][5][5];
+	array_three[4][4][4] = 3;
+
+	int[][] array_two = new int [4][4];
+	array_two[3][3] = 2;
+
+	int[] array_one = new int [3];
+	array_one[2] = 1;
+
+	int two = array_two[3][3];
+	int three = array_three[4][4][4];
+	int one = array_one[2];
+
+	if( one != 1 ) { System.out.print( "1-dim int array failed. " ); }
+	if( two != 2 ) { System.out.print( "2-dim int array failed. " ); }
+	if( three != 3 ) { System.out.print( "3-dim int array failed." ); }
+	System.out.print( "\n" );
+
+	String[] strings = new String[3];
+	strings[1] = "one";
+	System.out.print( "\"one\" should be printed: " );
+	System.out.println( strings[1] );
+	} // end testArrayOps()
+
+    public static void testVM() {
+	System.out.println( "testing the VM..." );
+			
+	if ( testFunctionCalls() ) {
+	    System.out.println( "testFunctionCalls() failed!" );
+	    System.out.println( "the remaining tests are probably invalid." );
+	}	
+	testMathOps();
+	System.out.print( "Now testing Arrays\n");
+	testArrayOps();
+	testCasting();
+
+	/* test print/println */
+	System.out.print( "does 56 = " );
+	System.out.print( 56 );
+	System.out.println( "?" );
+
+	System.out.print( "is true = " );
+	System.out.print( true );
+	System.out.println( "?" ) ;
+
+	System.out.print( "This sentence should end with a period" );
+	System.out.println( (char)'.' );	
+    }
+
+    public static void testThreads() {
+	System.out.println( "init(): testing threading." );
+	System.out.println( "init() starting counter..." );
+	counter c = new counter();
+	c.start();
+
+	System.out.println( "init() starting decounter..." );
+	counter d = new counter( false );
+	d.start();
+
+	System.out.println( "init() entering .wait() loop..." );
+	int interrupt_count = 0;
+	while ( interrupt_count < 10 ) {
+				/* Bad Karma w/o this. */
+	    synchronized( jos.system.interrupts.int000 ) {
+		/* because wait() calls release
+		   locks, this doesn't actually
+		   cause any blockage. */
+		try { jos.system.interrupts.int000.wait(); }
+		catch ( InterruptedException ie ) {
+		    System.out.println( "init() interrupted waiting for notify" );
+		    continue;
+		}
+	    } /* end synchlock on interrupt. */
+				// System.out.println( "init() caught interrupt." );
+	    interrupt_count++;
+	} /* end .wait() loop */
+	System.out.println( "init() has caught 10 interrupts." );
+    }
+
+    public static void testExceptions() {
+	/* run exception tests */
+	System.out.println( "init() testing exceptions()" );
+
+	/* throw/catch pair #1 -- basic mechanism */
+	try {
+	    throw new Exception();
+	} /* end throw #1 */
+	catch ( Exception e ) {
+	    System.out.println( "init(): caught exception #1!" );
+	} /* end catch #1 */
+
+	/* throw/catch pair #2 -- casting exceptions up */
+	try { throw new java.io.IOException(); }
+	catch ( Exception e ) {
+	    System.out.println( "init(): caught exception #2!" );
+	} /* end catch #2 */
+
+	/* throw/catch pair #3 -- data preservation */
+	try { throw new Exception( "init(): caught exception #3!" ); }
+	catch ( Exception e ) {
+	    System.out.println( e.getMessage() );
+	}
+    }
+
+    public static void testConsoleDaemons() {			
+	System.out.println( "init() starting console daemons..." );
+
+	System.out.println( "init() starting jos.system.keyboard..." );
+	/* sets up the hardware driver */
+	keyboard k = new keyboard();
+	/* starts the KeyEvent dispatch loop */
+	k.start();
+
+	System.out.println( "init() starting consoled..." );
+	/* listens to the dispatching from j.s.k above */
+	consoled cd = new consoled();
+    }
+
+    public static void testVGADriver() {
+	System.out.println( "init() testing VGA driver..." );
+	StandardVga v = new StandardVga();
+	if(v.setVideoMode(640,480,4)==0)
+	    {
+		v.startService();
+		v.bitblt(312,232,logo,16);
+		v.delay(0x100000);
+		v.stopService();
+		System.out.println("back to textmode");
+	    }
+	/* end VGA test routine */
+    }
+
+    public static void testGC() {
+	int i=0;
+
+	while (i<1000000)
+	    {
+		int size = i%1000;
+		int[] garbage = new int[size];
+		i = i+1;
+
+		testVM();
+		testThreads();
+		testExceptions();
+		testCasting();
+	    }
+    }
+
+} // end init.
+
+
+
+
+From tmiller@haverford.edu Mon, 27 Sep 1999 17:04:58 -0400 (EDT)
+Date: Mon, 27 Sep 1999 17:04:58 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] (no subject)
+
+> The bottleneck is not where you expect it to be.
+
+	A lot of the bottleneck is in the scheduler, suprisingly enough,
+especially the parts where it checks for interrupts and/or if the current
+time slice has expired.  (Does everyone remember why polled I/O is bad?)
+The easiest fix for now, I think, is to adjust the number of java
+ops executed between interrupt polls, and to inline some of the scheduling
+functions.  (i.e. in scheduler::start(), loop over runOpcode() a few times
+before re-starting the main scheduling loop; make this settable somewhere
+else in the code for tuning.  A small optimization might be to make the
+myTimeSlice multiplier a #define instead of variable, just to really get
+the point across to the compiler that it's a constant...)
+
+-_Quinn
+
+
+
+
+
+From draft@fear.ch Mon, 27 Sep 1999 23:45:37 +0200 (CEST)
+Date: Mon, 27 Sep 1999 23:45:37 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] decaf bug report / Status of RessourceManager
+
+Hi Avery, and all...
+
+
+On Mon, 20 Sep 1999, Avery J. Regier wrote:
+
+> I downloaded the latest CVS with the interp.cc fix, but I still have this
+> problem on the host build.  Here is the init.java file I use to show the
+> problem.  The testVoidReturn function is what I was playing with to try and
+> narrow down the cause.
+
+I guess you tried this with the i386 build. The host build works fine with
+your testVoidReturn class. Since I haven't worked a lot (well...nothing 
+at all..) with the i386 build, I can't help very much...
+
+
+The RessourceManager is still unfinished, but today I added the
+DMA/PORT/IRQ reserve method. The RM is hooked into the dma class, so that
+the dma-driver works now with the RessourceManager.
+
+As a consequence of the new RM, the drivers need slightly to be updated.
+e.g. the fdc driver contains 2 more lines:
+
+RessourceManager rm=new RessourceManager();
+boolean reserved=rm.reserveDMA(2,this,false);
+
+//2     -> channel
+//this  -> only this class can access dma 2
+//false -> shareable -> if 2 or more drivers are allowed to acces the
+//         same ressource
+
+//and the line
+
+dma_xfer(2,address,(int)nosectors*512,true,this); 
+// has 1 more argument(this)
+
+Now I thought about the speed of the RM: every call (DMA/PORT/IRQ) has to
+be verified. The dma method checks every call if the caller is the
+right owner. Isn't that slow? How do other OSes handle ressources?
+
+
+Thomas Bocek
+
+
+
+
+From hilarycheng@usa.net Tue, 28 Sep 1999 09:06:51 +0800
+Date: Tue, 28 Sep 1999 09:06:51 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Performance Issue
+
+Hi
+
+>
+>The multiplication you assume is actually a shift, when the table is laid
+out
+>properly. See "strength reduction" in any good introductory book on
+compiler
+>construction.
+
+I know that. But it depends on the Optimization of C Compiler.
+
+>
+>Congratulation, in principle, you have just detected what a JIT is.
+>However, the code won't be so simple, as you'll need certain parameter
+>checking and exception handling; thus you'll have to pass more parameters
+>to the routine unless you want to do everything with global variables
+>which is a Bad Thing(tm).
+
+Yes, I puporse a generic idea of performing a simple JIT. If we need to
+write JIT,
+LOTS OF WORK need to do.
+
+>The bottleneck is not where you expect it to be.
+
+Well, Yes, Not only Bytescode Comparsion is the bottleneck. Lots of Area
+need to
+work on so that It can increase the performance.
+
+Regards,
+
+Hilary
+
+
+
+
+From onewith1@flash.net Mon, 27 Sep 1999 20:29:34 -0500
+Date: Mon, 27 Sep 1999 20:29:34 -0500
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] decaf bug report / Status of RessourceManager
+
+Hey, all.
+
+Thomas Bocek <draft@fear.ch> wrote:
+> The RessourceManager is still unfinished, but today I added the
+> DMA/PORT/IRQ reserve method. The RM is hooked into the dma class, so that
+> the dma-driver works now with the RessourceManager.
+
+Just a really minor point.  "RessourceManager" is a type-o. "Resource" is
+the correct spelling, unless you're wanting to differentiate it from
+something else...  I'm lucky that I know that spelling, kaws eye'm knot two
+gud at spelng, meyesalph.
+
+>
+> As a consequence of the new RM, the drivers need slightly to be updated.
+> e.g. the fdc driver contains 2 more lines:
+>
+> RessourceManager rm=new RessourceManager();
+> boolean reserved=rm.reserveDMA(2,this,false);
+>
+> file://2     -> channel
+> file://this  -> only this class can access dma 2
+> file://false -> shareable -> if 2 or more drivers are allowed to acces the
+> //         same ressource
+>
+> file://and the line
+>
+> dma_xfer(2,address,(int)nosectors*512,true,this);
+> // has 1 more argument(this)
+
+Just my 2 cents.  Should DMA for channel be an instance (created by
+rm.reserveDMA(...) ), where all DMA requests are filtered, or should it be
+accessed directly like you have above?  Since DMA is a highly time-sensitive
+hardware piece (well, all direct low-level hardware is timing sensitive), we
+need the fastest method to use it.  But, then, having a spiffy
+object-oriented interface is handy, too, especially for porting purposes.
+
+On another point, what should we do with Plug-n-prey devices that have the
+option of using one of two DMA devices? Should we force the device driver
+developer to write out the long-hand of testing each DMA port, and reserving
+the most appropriate one (if both are available), or should this be a
+built-in function?  This all comes down to the speed and size of the kernel,
+of which I can't properly answer.
+
+>
+> Now I thought about the speed of the RM: every call (DMA/PORT/IRQ) has to
+> be verified. The dma method checks every call if the caller is the
+> right owner. Isn't that slow? How do other OSes handle ressources?
+>
+
+This check could be eliminated by forcing all dedicated hardware resources
+to be passed through specific instances of a class, which can be
+constructed/divied up only by a special resource manager factory.
+
+>
+> Thomas Bocek
+>
+
+
+-Matt
+
+
+
+
+From hilarycheng@usa.net Tue, 28 Sep 1999 09:28:15 +0800
+Date: Tue, 28 Sep 1999 09:28:15 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] decaf bug report / Status of RessourceManager
+
+Hi Thomas,
+
+The RM is Cool........:D
+
+I would like to suggest a idea about the issue of "speed of RM".
+
+For this issue, We can do it in this way.
+No one can construct a RM directly. Everyone need to get a instance of RM
+so that they access DMA. So I put reserveDMA as a static method. If I need
+a DMA 2 unshareable, RM will create a instance of itself for me that can
+only access DMA 2. So only one got the instance of this RM can only access
+DMA 2.
+
+For this change, we don't need to check the classes each time and it will
+speed up
+a little bit.
+
+RessourceManager rm = RessourceManager.reserveDMA(2, false);
+rm.dma_xfer(address, (int) nosectors*512);
+
+....................................
+....................................
+public static RessouceManager reserveDMA(int dma, boolean shareable) {
+    RessouceManager rm = new RessouceManager(dma, shareable);
+    return rm;
+}
+
+public void dma_xfer(int address, int size) {
+  ....................................
+  ....................................
+}
+....................................
+....................................
+
+
+>
+>The RessourceManager is still unfinished, but today I added the
+>DMA/PORT/IRQ reserve method. The RM is hooked into the dma class, so that
+>the dma-driver works now with the RessourceManager.
+>
+>As a consequence of the new RM, the drivers need slightly to be updated.
+>e.g. the fdc driver contains 2 more lines:
+>
+>RessourceManager rm=new RessourceManager();
+>boolean reserved=rm.reserveDMA(2,this,false);
+>
+>//2     -> channel
+>//this  -> only this class can access dma 2
+>//false -> shareable -> if 2 or more drivers are allowed to acces the
+>//         same ressource
+>
+>//and the line
+>
+>dma_xfer(2,address,(int)nosectors*512,true,this);
+>// has 1 more argument(this)
+
+hm...........what's the meaning of the boolean argument in dma_xfer ?
+
+>Now I thought about the speed of the RM: every call (DMA/PORT/IRQ) has to
+>be verified. The dma method checks every call if the caller is the
+>right owner. Isn't that slow? How do other OSes handle ressources?
+>
+
+Regards,
+
+Hilary
+
+
+
+
+From draft@fear.ch Tue, 28 Sep 1999 12:53:25 +0200 (CEST)
+Date: Tue, 28 Sep 1999 12:53:25 +0200 (CEST)
+From: Thomas Bocek draft@fear.ch
+Subject: [JOS-Kernel] speed of ResourceManager
+
+Hello world :-)
+
+
+On Mon, 27 Sep 1999, Matt Albrecht wrote:
+
+> Hey, all.
+> 
+> Thomas Bocek <draft@fear.ch> wrote:
+> > The RessourceManager is still unfinished, but today I added the
+> > DMA/PORT/IRQ reserve method. The RM is hooked into the dma class, so that
+> > the dma-driver works now with the RessourceManager.
+> 
+> Just a really minor point.  "RessourceManager" is a type-o. "Resource" is
+> the correct spelling, unless you're wanting to differentiate it from
+> something else...  I'm lucky that I know that spelling, kaws eye'm knot two
+> gud at spelng, meyesalph.
+
+whoops have to change RessourceManager.java into ResourceManager.java.
+thanks. (german: resources=ressourcen)
+ 
+
+> > As a consequence of the new RM, the drivers need slightly to be updated.
+> > e.g. the fdc driver contains 2 more lines:
+> >
+> > RessourceManager rm=new RessourceManager();
+> > boolean reserved=rm.reserveDMA(2,this,false);
+> >
+> > file://2     -> channel
+> > file://this  -> only this class can access dma 2
+> > file://false -> shareable -> if 2 or more drivers are allowed to acces the
+> > //         same ressource
+> >
+> > file://and the line
+> >
+> > dma_xfer(2,address,(int)nosectors*512,true,this);
+> > // has 1 more argument(this)
+> 
+> Just my 2 cents.  Should DMA for channel be an instance (created by
+> rm.reserveDMA(...) ), where all DMA requests are filtered, or should it be
+> accessed directly like you have above?  Since DMA is a highly time-sensitive
+> hardware piece (well, all direct low-level hardware is timing sensitive), we
+> need the fastest method to use it.  But, then, having a spiffy
+> object-oriented interface is handy, too, especially for porting purposes.
+
+You can only access dma_xfer(x,...) if you have reserved the dma. The only
+class which can access x is this (you have to reserve and access dma
+within one class).
+ 
+> On another point, what should we do with Plug-n-prey devices that have the
+> option of using one of two DMA devices? Should we force the device driver
+> developer to write out the long-hand of testing each DMA port, and reserving
+> the most appropriate one (if both are available), or should this be a
+> built-in function?  This all comes down to the speed and size of the kernel,
+> of which I can't properly answer.
+
+I made a method called getFreeDMA, which gives me the next free DMA. I
+think this should be enough for Plug'n'Pray. Pherhaps RM will need antoher
+method called getFreeDMA(int[]) -> int[] the dma numbers that work with
+the pnp-card.
+I didn't find any good docu about pnp :-(
+
+
+> > Now I thought about the speed of the RM: every call (DMA/PORT/IRQ) has to
+> > be verified. The dma method checks every call if the caller is the
+> > right owner. Isn't that slow? How do other OSes handle ressources?
+> >
+> 
+> This check could be eliminated by forcing all dedicated hardware resources
+> to be passed through specific instances of a class, which can be
+> constructed/divied up only by a special resource manager factory.
+
+see below...
+
+[cut-n-paste] Hilarys mail:
+
+> For this issue, We can do it in this way.
+> No one can construct a RM directly. Everyone need to get a instance of 
+> RM so that they access DMA. So I put reserveDMA as a static method. If I
+> need a DMA 2 unshareable, RM will create a instance of itself for me
+> that can only access DMA 2. So only one got the instance of this RM can
+> only access DMA 2.
+>
+> For this change, we don't need to check the classes each time and it
+> will speed up a little bit.
+>
+> RessourceManager rm = RessourceManager.reserveDMA(2, false);
+> rm.dma_xfer(address, (int) nosectors*512);
+>
+> ....................................
+> ....................................
+> public static RessouceManager reserveDMA(int dma, boolean shareable) {
+>     RessouceManager rm = new RessouceManager(dma, shareable);
+>     return rm;
+> }
+>
+> public void dma_xfer(int address, int size) {
+>   ....................................
+>   ....................................
+> }
+> ....................................
+> ....................................
+
+Is it possible in Java to allow only one instance for one DMA? There could
+be x (if not shareable 8) instances, but only one for dma 2. So your
+public static RessouceManager reserveDMA needs to be extended. Does anyone
+know a good solution?
+
+[cut]
+> > dma_xfer(2,address,(int)nosectors*512,true,this);
+> > // has 1 more argument(this)
+
+> hm...........what's the meaning of the boolean argument in dma_xfer ?
+
+whether dma_xfer should read or write : true=read, false=write.
+ 
+
+Thomas Bocek
+
+
+
+
+From werner.schuster@netway.at Tue, 28 Sep 1999 18:32:22 +0200
+Date: Tue, 28 Sep 1999 18:32:22 +0200
+From: Murphy werner.schuster@netway.at
+Subject: [JOS-Kernel] Problem starting JJOS
+
+At 21:55 26.09.99 -0400, you wrote:
+>         JJOS only reads files out of the class library zipfile it creates
+>the 'maja' part of the build.  'init' /should/ be in that .zip file; check
+>with the unzip tool (there're a list only option in there somewere).
+>
+>-_Quinn
+thanx, I added the zip file to the classpath & now it works perfectly
+(machine does some allocating & stuff, then quits properly);
+
+btw: the documentation doesn't say that (does it?);
+maybe you could add this;
+I guess there might be more people that stumble over this;
+
+murphee
+***************************************
+UNITE FOR JAVA -> www.javalobby.org
+Check this out -> www.jos.org
+My site -> www.angelfire.com/co/werners
+***************************************
+... and the fact, that i haven't put a gun to my mouth yet,
+proves that i'm a winner!
+Al Bundy
+
+
+
+From tmiller@haverford.edu Tue, 28 Sep 1999 23:03:24 -0400 (EDT)
+Date: Tue, 28 Sep 1999 23:03:24 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Problem running VGA driver [Was: Re: [JOS-Kernel]
+ Re: NATIVE_CLOCK?]
+
+	Sorry, JM, haven't been seeing that failure -- or many others;
+again, I've been insanely busy.
+
+> Hmm... is the "real time clock" the CMOS read-only one, as opposed to
+> the system interrupt-generating clock (he asked, confusedly, and away
+> from his PC documents)?
+
+	Whichever one generates those obnoxious interrupts we trapped in
+native code because they weren't interesting.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Tue, 28 Sep 1999 23:04:20 -0400 (EDT)
+Date: Tue, 28 Sep 1999 23:04:20 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Problem starting JJOS
+
+> thanx, I added the zip file to the classpath & now it works perfectly
+> (machine does some allocating & stuff, then quits properly);
+
+	Hm.  I didn't think that the classpath was necessary for anything,
+but whatever works.
+
+-_Quinn
+
+
+
+

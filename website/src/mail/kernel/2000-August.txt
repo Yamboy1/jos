@@ -1,0 +1,118 @@
+From robfitz@273k.net Thu, 10 Aug 2000 03:31:55 +0000
+Date: Thu, 10 Aug 2000 03:31:55 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS-Kernel] What i've been working on.
+
+Hi All
+
+Well i've been in Chicago for almost six months now, and for four month
+I was living in a hotel.  Also for the first month I had no access to
+the internet (I don't know how I didn't kill myself ;), and no access to
+a computer outside of work.
+
+Since I got my laptop I haven't had access to a second computer to test
+with i've been unable to get much work done on RJK, so over the last few
+months i've been working on a JVM.
+
+My goals for this JVM are to allow the running of multipule Java
+Processes inside the one JVM, share as much class information as possible
+between Processes, and be small and fast.
+
+I followed the discussions on the arch mailing list about sharing data
+between Processes.  But i'm not sure if I realy like the out come of that
+discussion, although I did like some of the ideas.  But i've drawn from
+ideas used by lots of JVM, i.e. Japhar, Chives, etc.
+
+My current code base is written in ANSI C and runs on Linux, though this
+may change soon.  The code is currently able to parse a classfile into
+the internal format used by my JVM, and i'm currently working on having
+the Java bytecode converted to native code (ake JIT compiler).
+
+I've been taking my time with this and i've completely rewritten in about
+three times so far.  I don't plan to release it yet as I want it to be
+able to excute some code first, although previous code bases were able
+to interpret some code until they reached a native method.
+
+I also think i'm going to releasing my code under GPL, so if anybody has
+a problem with this now would be a good time to discuss it.
+
+Once the JVM is able to excute most code i'll proably go back and work
+on RJK.
+
+That about it for the moment.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+
+
+
+
+From gchii@mindspring.com Fri, 25 Aug 2000 13:01:21 -0400
+Date: Fri, 25 Aug 2000 13:01:21 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [VM Kit] field list
+
+A field list component is a primative part of a virtual machine. It can
+exist outside a virtual machine for extreme testing. In other words, it can
+be completely tested /before/ it is integrated into your virtual machine.
+
+A field list is a component of each object. Just as it has a method list,
+an object has a field list. A field list can be used to store static fields
+for a class and instance fields for an object. And it looks as if the field
+list component could be reusable by the stack frame for local variables, too.
+
+A field list allocates room for fields when it is open'd. To initialize a
+field list, repeatedly call its addField() method for each field. The
+addField() method has a prototype like this:
+
+void FieldList::addField( const char *fieldSpec, const char *descriptor );
+
+where fieldSpec is a full field name (java/lang/System/out) and descriptor
+is the field type (Ljava/io/InputStream;).
+
+When open'd, the FieldList also creates a cross-reference index, so that
+fields can be addressed by their ID rather than by their name. FieldList
+provides a method to get a field ID:
+
+short FieldList::getFieldID( const char *fieldSpec );
+
+To get/set a four-octet field, use
+
+getIntField( short id );
+getIntField( const char *fieldSpec );
+setIntField( short id, jint v );
+setIntField( const char *fieldSpec, jint v );
+
+To get/set an eight-octet field, use
+
+getLongField( short id );
+getLongField( const char *fieldSpec );
+setLongField( short id, jlong v );
+setLongField( const char *fieldSpec, jlong v );
+
+Different field list components are possible. Some might organize fields
+into a linked list, an array, or allocate a single block of memory for all
+fields in the list.
+
+
+
+
+
+
+From silverbyte@postmark.net Wed, 23 Aug 2000 12:45:10 +0000
+Date: Wed, 23 Aug 2000 12:45:10 +0000
+From: Silverbyte silverbyte@postmark.net
+Subject: [JOS-Kernel] Kernel Compatibility
+
+Hi,
+   I have Linux installed on my machines . Can I use the JOS kernel
+straight away using my Linux Kernel loader or do I need to explicitly
+install JOS.
+
+Thanks
+
+
+
+
+

@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Matt.Albrecht%40trilogy.com">
+   <LINK REL="Previous"  HREF="000766.html">
+   <LINK REL="Next" HREF="000775.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Matt.Albrecht@trilogy.com</B> 
+    <A HREF="mailto:Matt.Albrecht%40trilogy.com"
+       TITLE="[JOS-Kernel] Device as a digital resource">Matt.Albrecht@trilogy.com</A><BR>
+    <I>Tue, 21 Mar 2000 11:01:30 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000766.html">[JOS-Kernel] JOS Installation</A></li>
+        <LI> Next message: <A HREF="000775.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#773">[ date ]</a>
+              <a href="thread.html#773">[ thread ]</a>
+              <a href="subject.html#773">[ subject ]</a>
+              <a href="author.html#773">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ah, the lurker returns...  Please pardon my ramblings.
+
+
+
+
+&gt;<i>I put all devices under a device: scheme. Individual devices should be
+</I>&gt;<i>sub-schemes, right? Here is one subscheme I would like to try:
+</I>&gt;<i>
+</I>&gt;<i>&quot;device:ram:?size=0xFF&quot;
+</I>&gt;<i>
+</I>&gt;<i>and
+</I>&gt;<i>
+</I>&gt;<i>&quot;device:ram:?start=0x0CC00&amp;end=0xCCFF&quot;
+</I>&gt;<i>
+</I>&gt;<i>and
+</I>&gt;<i>
+</I>&gt;<i>&quot;device:ram:?start=0xCC00&amp;size=0xFF&quot;
+</I>&gt;<i>
+</I>&gt;<i>In Java, this URI might return a byte array. Since memory is a limited
+</I>&gt;<i>digital resource, it can be used if no other process is using it. If any
+</I>&gt;<i>part of memory start to finish has already been allocated, the device
+</I>&gt;<i>factory must return null.
+</I>
+This means that now the device factory must handle the registration and
+allocation of *every* device.  Wouldn't it be easier, in that respect, to
+have the device schemes register themselves with &quot;device:&quot;, then the
+individual schemes themselves handle the allocation?
+
+In this respect, the individual scheme specifies several things:
+
+1. The class which is returned (which must be a subclass/interface of
+Device)
+2. If it's a limited resource, then a null may be returned if the resource
+has already been allocated.
+
+But wouldn't it be &quot;nicer&quot; if, instead of returning null, it returns an
+error message describing what's wrong with the request, such as &quot;out of
+bounds memory allocation&quot;, or &quot;XYZ has already allocated that resource&quot;,
+and so on.
+
+Also, how would one deallocate the resource?  Would this need to be
+specified in the finalize method of the resource's returned object?  What
+if the particular JVM that allocated this resource crashed, would the
+resource then be unavailable to everyone, requiring a reboot?  These
+questions aren't just limited to your particular implementation; they are
+serious things to consider for any system.
+
+Don't get me wrong.  This feels to me to be one of the best solutions to
+device allocation I've seen.
+
+Some other things to consider.  How would a program discover which devices
+are available?  How would the admin then configure these devices so that
+they are setup correctly?  I.e. how would you tell
+&quot;device:<A HREF="sound://localhost/1"">sound://localhost/1&quot;</A> to use DMA channel 1 instead of channel 3?
+Then again, how would you know that there aren't more than one sound card
+available on localhost?
+
+Perhaps I'm looking at the problem in the wrong direction.  The URI here
+would be the way for the programs to allocate a resource.  Some other
+technique would be needed to discover the devices available, and possibly
+another to configure them (a bean resource would be very handy here).
+
+&gt;&gt;<i>What happens if the Modem is on a PCI slot? Maybe the modem should not
+</I>&gt;&gt;<i>be responsible for knowing what port it's attached to, rather, the port
+</I>&gt;&gt;<i>knowing what modem is attached to it?
+</I>&gt;<i>
+</I>&gt;<i>We have to throw system-wide configuration into this somewhere. JOS
+</I>doesn't
+&gt;<i>know for sure it has a PCI slot until start-up. If it depends on a
+</I>&gt;<i>persistent system-wide configuration, that might expect to find a modem on
+</I>&gt;<i>a PCI slot. If it probes for a modem, that might find a modem on a PCI
+</I>&gt;<i>slot. If JOS known that it's a modem, I should be able to tell it manually
+</I>&gt;<i>and use the modem without restarting my computer.
+</I>
+Here we come down to how much configuration of the device should be done by
+the programmer, as opposed through internal setup.  Does the programmer
+really need to know whether modem A is on a serial port or a USB port?  The
+programmer should be able to find all the modems, and discover what are
+their properties (such as maximum speed, and various possible bit settings
+- I've known some bad modems in my day that could only be set to
+odd-parity), and then select the best fit.  Another possibility would be to
+send a template to the device:modem scheme for it to return the best fit.
+
+We must not go overboard on this URI schema.  We need to keep it simple.
+Would you want to have to type in
+&quot;in:data:buffer:file:fat16:<A HREF="hdd://1?cylinders=255&tracks=65535&file=external.txt"?">hdd://1?cylinders=255&amp;tracks=65535&amp;file=external.txt&quot;?</A>
+
+ The &quot;file:&quot; scheme automatically maps the given file to the internal
+device registry, whether the file be on a remote machine, a RAM disk, or on
+a hard-drive.
+
+&gt;<i>
+</I>&gt;<i>As a diagnostic tool, I look forward to using the Universal Browser with
+</I>&gt;<i>the device: scheme. It looks like we can create a Device Browser. I should
+</I>&gt;<i>be able to type in &quot;device:port:/ports/serial/1&quot; and my browser should
+</I>show
+&gt;<i>me (1) if it exists, and (2) its current status. For example, I should be
+</I>&gt;<i>able to use a browser to quickly determine which process (if any) is
+</I>&gt;<i>currently using my modem.
+</I>
+This may be a good place to add our diagnostic tools and configuration
+tools.  But how do we do this?  Do we add another scheme, such as
+&quot;config:device:port:/ports/serial/1&quot;, or do we add it to the path:
+&quot;device:port:/ports/serial/1/config&quot;?  I dunno.
+
+-Matt
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000766.html">[JOS-Kernel] JOS Installation</A></li>
+	<LI> Next message: <A HREF="000775.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#773">[ date ]</a>
+              <a href="thread.html#773">[ thread ]</a>
+              <a href="subject.html#773">[ subject ]</a>
+              <a href="author.html#773">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

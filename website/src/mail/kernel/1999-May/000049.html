@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: Changes/progress</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000047.html">
+   <LINK REL="Next" HREF="000053.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: Changes/progress</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Re: Changes/progress">jm@mak.com</A><BR>
+    <I>Thu, 27 May 1999 23:15:24 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000047.html">[JOS-Kernel] Re: Changes/progress</A></li>
+        <LI> Next message: <A HREF="000053.html">[JOS-Kernel] Re: Changes/progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#49">[ date ]</a>
+              <a href="thread.html#49">[ thread ]</a>
+              <a href="subject.html#49">[ subject ]</a>
+              <a href="author.html#49">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd;
+
+&gt;<i> &gt; I separated out the various invoke opcodes into a function (for
+</I>&gt;<i> &gt; cleanliness' sake) -- this will be the focus of the &quot;environment&quot;
+</I>&gt;<i> &gt; effort.
+</I>&gt;<i> 
+</I>&gt;<i>         Once the &quot;enviroment&quot; for java methods is ready, it should be
+</I>&gt;<i> nearly trivial to extend to native methods, which will make things much
+</I>&gt;<i> more efficient.  (And provide an expansion point, if/when we implement
+</I>&gt;<i> native shared libraries...)
+</I>
+Not only that, but (I think) both JIT and Hot-Spot type things will
+benefit.  Although, to be perfectly honest, I haven't really thought too
+deeply about it yet (my attention budget is a trifle, er, overspent at
+the moment).
+
+&gt;<i>         Out of simple curiosity, I went ahead and let init() finish
+</I>&gt;<i> executing; memory consumption is down to 1664K, which is a dramatic
+</I>&gt;<i> improvement over the last time I checked it (~30MB, IIRC).
+</I>
+Well, that's certainly a step in the right direction, although I must
+admit to some surprise -- that's an awfully big improvement -- what, a
+factor of almost 20?  Don't know whether to be happy at the improvement
+or embarrassed about there being so much room for it!
+
+On the other hand, if we get our act totally together with respect to
+GC, the Perfect Performance would be closer to zero, right?  Except for
+classes that have static member variables, right?  I remember some big
+debate on the Java lists about what to do about classes that had those
+static vars (e.g., a counter that got incremented every time an instance
+got made) -- it wasn't really good form to simply gc the class after the
+last instance got reaped/gc-ed/finalized, because the count would get
+reset/hammered.  Does anybody out there know what the Party Line is on
+this issue?
+
+&gt;<i>         I've been working on monitors, mostly.  Slow going; I've been busy
+</I>&gt;<i> and they aren't particularly simple beasts.  On the other hand, I won't
+</I>&gt;<i> have to implement anything totally new; all the various subfunctions for
+</I>&gt;<i> the monitors are already lying around.
+</I>
+OK.  Best of luck.  Unfortunately, I will not get as much done as usual
+this weekend due to schedule conflicts...
+
+Later!
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000047.html">[JOS-Kernel] Re: Changes/progress</A></li>
+	<LI> Next message: <A HREF="000053.html">[JOS-Kernel] Re: Changes/progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#49">[ date ]</a>
+              <a href="thread.html#49">[ thread ]</a>
+              <a href="subject.html#49">[ subject ]</a>
+              <a href="author.html#49">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

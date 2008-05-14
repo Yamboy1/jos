@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] zlib implementation</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:golubovsky%40altavista.net">
+   <LINK REL="Previous"  HREF="000495.html">
+   <LINK REL="Next" HREF="000491.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] zlib implementation</H1>
+    <B>golubovsky@altavista.net</B> 
+    <A HREF="mailto:golubovsky%40altavista.net"
+       TITLE="[JOS-Kernel] zlib implementation">golubovsky@altavista.net</A><BR>
+    <I>Wed, 24 Nov 1999 10:50:51 +0300 (MSK)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000495.html">[JOS-Kernel] Bulk Make for Java</A></li>
+        <LI> Next message: <A HREF="000491.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#503">[ date ]</a>
+              <a href="thread.html#503">[ thread ]</a>
+              <a href="subject.html#503">[ subject ]</a>
+              <a href="author.html#503">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ranieri Argentini wrote:
+
+&gt;<i> The problem is that this model grinds to a halt when it comes to the IP layer.
+</I>&gt;<i> IP is responsible for distributing packets among interfaces, and can
+</I>&gt;<i> therefore not be bound to any of them.
+</I>&gt;<i> 
+</I>&gt;<i> The only thing that comes to mind is to have a single IP object that queues
+</I>&gt;<i> incoming packets for all interfaces. This requires strict serialisation on
+</I>&gt;<i> the incoming_packet() functions. A thread that lives in IP could then
+</I>&gt;<i> handle the packets (route them through, drop them or reassemble them and
+</I>&gt;<i> queue them to TCP/UDP objects that eventually put them into user space
+</I>&gt;<i> buffers).
+</I>
+BSD* operating systems solves this problem with a number of routines:
+
+	o ether_input
+	o ip_input
+	o tcp_input
+	o ...
+
+When a device driver (i.e., a netword card driver) receives a packet it
+calls
+&quot;ether_input,&quot; passing information about which interface the packet was
+received
+on (and ofcouse the packet data).
+
+The &quot;ether_input&quot; then passes the packet to the right protocol stack. 
+
+Why not implement this in a similar manner?
+
+-- 
+Johan Rydberg			<A HREF="mailto:johan.rydberg@netinsight.net">johan.rydberg@netinsight.net</A>
+Net Insight AB, Sweden		direct: +46-8-685 04 17
+<A HREF="http://www.netinsight.net">http://www.netinsight.net</A>	phone:  +46-8-685 04 00
+				fax:    +46-8-685 04 20
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000495.html">[JOS-Kernel] Bulk Make for Java</A></li>
+	<LI> Next message: <A HREF="000491.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#503">[ date ]</a>
+              <a href="thread.html#503">[ thread ]</a>
+              <a href="subject.html#503">[ subject ]</a>
+              <a href="author.html#503">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

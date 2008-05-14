@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf bug report / Status of RessourceManager</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000395.html">
+   <LINK REL="Next" HREF="000399.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf bug report / Status of RessourceManager</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Kernel] decaf bug report / Status of RessourceManager">onewith1@flash.net</A><BR>
+    <I>Mon, 27 Sep 1999 20:29:34 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000395.html">[JOS-Kernel] decaf bug report / Status of RessourceManager</A></li>
+        <LI> Next message: <A HREF="000399.html">[JOS-Kernel] speed of ResourceManager</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#397">[ date ]</a>
+              <a href="thread.html#397">[ thread ]</a>
+              <a href="subject.html#397">[ subject ]</a>
+              <a href="author.html#397">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hey, all.
+
+Thomas Bocek &lt;<A HREF="mailto:draft@fear.ch">draft@fear.ch</A>&gt; wrote:
+&gt;<i> The RessourceManager is still unfinished, but today I added the
+</I>&gt;<i> DMA/PORT/IRQ reserve method. The RM is hooked into the dma class, so that
+</I>&gt;<i> the dma-driver works now with the RessourceManager.
+</I>
+Just a really minor point.  &quot;RessourceManager&quot; is a type-o. &quot;Resource&quot; is
+the correct spelling, unless you're wanting to differentiate it from
+something else...  I'm lucky that I know that spelling, kaws eye'm knot two
+gud at spelng, meyesalph.
+
+&gt;<i>
+</I>&gt;<i> As a consequence of the new RM, the drivers need slightly to be updated.
+</I>&gt;<i> e.g. the fdc driver contains 2 more lines:
+</I>&gt;<i>
+</I>&gt;<i> RessourceManager rm=new RessourceManager();
+</I>&gt;<i> boolean reserved=rm.reserveDMA(2,this,false);
+</I>&gt;<i>
+</I>&gt;<i> <A HREF="file://2">file://2</A>     -&gt; channel
+</I>&gt;<i> <A HREF="file://this">file://this</A>  -&gt; only this class can access dma 2
+</I>&gt;<i> <A HREF="file://false">file://false</A> -&gt; shareable -&gt; if 2 or more drivers are allowed to acces the
+</I>&gt;<i> //         same ressource
+</I>&gt;<i>
+</I>&gt;<i> <A HREF="file://and">file://and</A> the line
+</I>&gt;<i>
+</I>&gt;<i> dma_xfer(2,address,(int)nosectors*512,true,this);
+</I>&gt;<i> // has 1 more argument(this)
+</I>
+Just my 2 cents.  Should DMA for channel be an instance (created by
+rm.reserveDMA(...) ), where all DMA requests are filtered, or should it be
+accessed directly like you have above?  Since DMA is a highly time-sensitive
+hardware piece (well, all direct low-level hardware is timing sensitive), we
+need the fastest method to use it.  But, then, having a spiffy
+object-oriented interface is handy, too, especially for porting purposes.
+
+On another point, what should we do with Plug-n-prey devices that have the
+option of using one of two DMA devices? Should we force the device driver
+developer to write out the long-hand of testing each DMA port, and reserving
+the most appropriate one (if both are available), or should this be a
+built-in function?  This all comes down to the speed and size of the kernel,
+of which I can't properly answer.
+
+&gt;<i>
+</I>&gt;<i> Now I thought about the speed of the RM: every call (DMA/PORT/IRQ) has to
+</I>&gt;<i> be verified. The dma method checks every call if the caller is the
+</I>&gt;<i> right owner. Isn't that slow? How do other OSes handle ressources?
+</I>&gt;<i>
+</I>
+This check could be eliminated by forcing all dedicated hardware resources
+to be passed through specific instances of a class, which can be
+constructed/divied up only by a special resource manager factory.
+
+&gt;<i>
+</I>&gt;<i> Thomas Bocek
+</I>&gt;<i>
+</I>
+
+-Matt
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000395.html">[JOS-Kernel] decaf bug report / Status of RessourceManager</A></li>
+	<LI> Next message: <A HREF="000399.html">[JOS-Kernel] speed of ResourceManager</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#397">[ date ]</a>
+              <a href="thread.html#397">[ thread ]</a>
+              <a href="subject.html#397">[ subject ]</a>
+              <a href="author.html#397">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

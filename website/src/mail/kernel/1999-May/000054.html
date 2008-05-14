@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] New and improved Kernel Interface</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000045.html">
+   <LINK REL="Next" HREF="000055.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] New and improved Kernel Interface</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] New and improved Kernel Interface">tmiller@haverford.edu</A><BR>
+    <I>Sun, 30 May 1999 00:23:30 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000045.html">[JOS-Kernel] New and improved Kernel Interface</A></li>
+        <LI> Next message: <A HREF="000055.html">[JOS-Kernel] New and improved Kernel Interface</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#54">[ date ]</a>
+              <a href="thread.html#54">[ thread ]</a>
+              <a href="subject.html#54">[ subject ]</a>
+              <a href="author.html#54">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I've added support for atomic operations, debugging, interrupts, 
+</I>&gt;<i> inter thread communication, time, timer, virtual memory.  And updated 
+</I>&gt;<i> io ports, linear memory, monitors, threads, and data types.
+</I>
+	Seems to me like the kernel shouldn't be involved in monitors,
+unless you plan to have it support multiple native processes -- and then
+the katomic operations would seem to suffice for implementing monitors
+inside the JVM -- where they belong.
+
+&gt;<i> I made this update so I can get more input on what changes need to be 
+</I>&gt;<i> made, and so the interface is mostly defined before I start working 
+</I>&gt;<i> on a jos-linux host.
+</I>
+	How will your jos-linux host differ substantially from the 'host'
+build of JJOS?  (From the p.o.v. of decaf, the JVM.)  Or were you thinking
+more broadly, along the lines of kludging something together out of other
+open source projects (linux/kaffe/classpath/etc) and write wrappers to
+this proposed standard?
+
+	I, at least (can't speak for JM), will probably not spend any time
+rewriting decaf/JJOS to match any standard we settle on any time soon, for
+the twin reasons of speed and efficiency.  Speed in development has been
+our goal -- with the end result that I expect the keyboard driver (more
+importantly, the scancode-to-unicode converter) to be fully functional
+before the end of june.  Efficiency stems from my concerns about trying to
+set an interface for something that (I would guess) none of us have ever
+done -- (build) a new kernel.  From my point of view (admittedly, I'm not
+writing the kernel half of things) it would make sense to wait until JJOS
+matured to the point where it wasn't going to be changing a whole lot
+anyway, and /then/ settle on a design, applying both our experience in
+what a kernel needs to do and our desires for improvements; refactoring by
+way of /educated/ interface design decisions.  This as opposed to
+continually rewriting the interface as new factors came out.
+
+-_Quinn
+
+
+
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000045.html">[JOS-Kernel] New and improved Kernel Interface</A></li>
+	<LI> Next message: <A HREF="000055.html">[JOS-Kernel] New and improved Kernel Interface</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#54">[ date ]</a>
+              <a href="thread.html#54">[ thread ]</a>
+              <a href="subject.html#54">[ subject ]</a>
+              <a href="author.html#54">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

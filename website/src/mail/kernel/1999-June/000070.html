@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tullmann%40cs.utah.edu">
+   <LINK REL="Previous"  HREF="000076.html">
+   <LINK REL="Next" HREF="000075.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>Patrick Tullmann</B> 
+    <A HREF="mailto:tullmann%40cs.utah.edu"
+       TITLE="[JOS-Kernel] decaf updates">tullmann@cs.utah.edu</A><BR>
+    <I>Wed, 9 Jun 1999 13:27:58 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000076.html">[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</A></li>
+        <LI> Next message: <A HREF="000075.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi JOSers,
+
+Just wanted to interject some of my experience with threading,
+exceptions and JVMs in this discussion.  I'm very familiar with how
+all of this stuff works in Kaffe, so I think I've got good
+credentials.  On the other hand, I've never looked at any of the JOS
+code, so I only understand what you're working on from emails that fly 
+back and forth.
+
+Anyway...
+
+Todd wrote:
+&gt;<i> I do NOT want to rewrite every single function call in the JVM to
+</I>&gt;<i> (a) check all of /its/ calls for exceptions and abort back to
+</I>&gt;<i> runOpcode() (which will in turn, have to abort) and (b) return true
+</I>&gt;<i> or false depending on if an exception was thrown or not.
+</I>
+Yes you do.  You do want every caller be able to tell if functions it
+called have aborted or are aborting.  Without fail, you will define
+functions that need to execute special code for handling failures.
+I see two ways of doing that.
+
+Originally, Kaffe would throw exceptions from deep within native code
+and these exceptions would correctly unwind the native stack all the
+way back into Java code, and proceed from there looking for exception
+handlers.  This worked fine in most cases.  (As an aside, Kaffe uses
+the same stack for Java and native code.)
+
+What we discovered later is that frequently native code needs to do
+things like release locks, or free data structures if an error
+occurs.  Example
+
+	lock_ClassPool();
+	...	
+	jc = get_Class(...);
+	...
+	unlock_ClassPool();
+	
+If get_Class() throws an error and unwinds the stack, the ClassPool
+doesn't get unlocked.  Thus, this caller of get_Class() really needs
+to handle the error.  Either a full-blown exception handler (ugly in
+C, but see the book _C Interfaces and Implementations_ by David Hanson
+for a setjmp-based implementation), or explicit return codes from the
+methods.  We opted for explicit returns codes.  At the least, you'll
+need to do this in your code that implements exceptions and exception
+handling.  (Can't have them throwing errors, now can we?)
+
+On the other hand, as Todd points out:
+
+&gt;<i> the native portion of the class library (classpath?) is where you
+</I>&gt;<i> can't get around exception-handling in native methods.
+</I>
+That is, calls into native functions like FileInputStream.read()
+should be able to just directly throw exceptions that will unroll the
+native stack like they unroll the java stack.  
+
+We decided (err, Godmar Back who designed/implemented this for Kaffe,
+decided) to make all VM internal functions return an integer status
+code and take an exception description struct.
+
+So, the above code effectively looks like this in Kaffe:
+
+	lock_ClassPool();
+	...	
+	success = get_Class(..., &amp;errorInfo);
+	...
+	unlock_ClassPool();
+
+At some point, a caller in an appropriate context will do:
+
+	if (!success)
+		throwError(&amp;errorInfo);
+
+Error info contains things like the name of the exception (or an
+exception object) and the string message, etc.
+
+throwError() can still be called by any code (e.g., native methods for 
+class library functions like read()), but you just have to agree on
+what functions/libraries use return codes and which ones are allowed
+to throw exceptions willy-nilly.  
+
+I hope this helps some,
+
+Pat
+
+----- ----- ---- ---  ---  --   -    -      -         -               -
+Pat Tullmann                                       <A HREF="mailto:tullmann@cs.utah.edu">tullmann@cs.utah.edu</A>
+		   ${HOME} is where the .emacs is.
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000076.html">[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</A></li>
+	<LI> Next message: <A HREF="000075.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

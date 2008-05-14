@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] GRUB booting</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000851.html">
+   <LINK REL="Next" HREF="000853.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] GRUB booting</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] GRUB booting">gchii@mindspring.com</A><BR>
+    <I>Wed, 14 Jun 2000 10:10:45 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000851.html">[JOS-Kernel] GRUB booting</A></li>
+        <LI> Next message: <A HREF="000853.html">[JOS-Kernel] GRUB booting</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#852">[ date ]</a>
+              <a href="thread.html#852">[ thread ]</a>
+              <a href="subject.html#852">[ subject ]</a>
+              <a href="author.html#852">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 11:02 PM 6/13/00 +0200, Claudio Clemens
+&lt;<A HREF="mailto:clemens@informatik.tu-muenchen.de">clemens@informatik.tu-muenchen.de</A>&gt; wrote:
+&gt;<i>I thing this is trivial. Or is it more dificult than I think? 
+</I>&gt;<i>FileOutputStream fos=(/dev/fd0);
+</I>&gt;<i>
+</I>&gt;<i>Okay, this is not the right syntax, but you know what I mean, doesn't you?
+</I>
+Is that right? If we assume we have one payload for GRUB and another for
+Etherboot (etc.), then creating an actual boot diskette with Java on Linux
+becomes something like this (?):
+
+  public void createBootDisk( byte[] payload ) {
+    OutputStream output;
+    try {
+      output = new FileOutputStream( &quot;/dev/fd0&quot; );
+    }
+    catch( IOException e ) {
+      // uh oh.
+      return;
+    }
+
+    try {
+      output.write( payload );
+    }
+    catch( IOException e ) {
+      // uh oh.
+    }
+
+    try {
+      output.close();
+    }
+    catch( IOException e ) {
+      // uh oh.
+    }
+  }
+
+I have downloaded a GRUB boot image; but, I've been unable to boot with
+GRUB. I understand how Etherboot works. GRUB is still a mystery.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000851.html">[JOS-Kernel] GRUB booting</A></li>
+	<LI> Next message: <A HREF="000853.html">[JOS-Kernel] GRUB booting</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#852">[ date ]</a>
+              <a href="thread.html#852">[ thread ]</a>
+              <a href="subject.html#852">[ subject ]</a>
+              <a href="author.html#852">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

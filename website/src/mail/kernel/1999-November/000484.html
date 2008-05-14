@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Progress!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000503.html">
+   <LINK REL="Next" HREF="000480.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Progress!</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Progress!">gchii@mindspring.com</A><BR>
+    <I>Mon, 22 Nov 1999 10:49:39 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000503.html">[JOS-Kernel] Progress!</A></li>
+        <LI> Next message: <A HREF="000480.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#484">[ date ]</a>
+              <a href="thread.html#484">[ thread ]</a>
+              <a href="subject.html#484">[ subject ]</a>
+              <a href="author.html#484">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:22 AM 11/22/99 +0100, Ranieri Argentini
+&lt;<A HREF="mailto:R.Argentini@student.tudelft.nl">R.Argentini@student.tudelft.nl</A>&gt; wrote:
+&gt;<i>How would you evision multithreading in such an environment?
+</I>
+A packet queue is a packet queue. The outgoing packet queue and packet
+queue for each port are identical, just wired in different directions. It
+does not run in its own thread.
+
+When incoming packets are double-queued, network driver and IP layer are
+running in two separate threads. The network driver pushes packets onto the
+IP packet queue. The IP layer pushes packets into the UDP or TCP packet
+queue, where there is a packet queue for each port used. This allows the
+network driver to run ahead of the incoming packet queue without losing
+packets. It allows the IP layer to run ahead of applications programs
+without losing packets.
+
+TCP usually has duplicate packet elimination. TCP is responsible for
+resequencing/eliminating packets so they arrive in a packet queue for a TCP
+port in the order they were sent. This doesn't need to run in a separate
+thread.
+
+A network driver and IP layer can be integrated in a single thread. When
+incoming packets are single-queued, a network driver does both. It recieves
+packets and pushes them to the right packet queue for each port.
+
+Outgoing packets are much easier to implement than incoming packets. Any
+thread, including high-level application threads, can write a packet into
+the outgoing queue. It does not run in a separate thread; it uses the
+timeslice of calling threads. While running in its own thread, the network
+driver reads from this queue whenever there's an opportunity to send an
+outgoing packet.
+
+When an application writes a packet for its own machine, an outgoing packet
+is immediately -- without delay -- written into the TCP/IP stack, with its
+packet queue for each port. Again, this mechanism uses the timeslice of a
+calling thread. The IP layer needs no thread of its own.
+
+&gt;<i>I'm currently toying with the idea of giving every interface it's own
+</I>&gt;<i>thread  and it's own objects (that would give me a neat Multiple
+</I>&gt;<i>Cache/Local Replacement ARP cache and some other link level enhancements
+</I>&gt;<i>when we'll support other hardware then ethernet.).
+</I>
+Threads should be used when they are required. It might be a clean design
+to given each layer of the network model its own thread. Threads are
+refined after you build a class library and work with the model. It isn't a
+decision you must make on day one.
+
+&gt;<i>The problem is that this model grinds to a halt when it comes to the IP
+</I>layer.
+&gt;<i>IP is responsible for distributing packets among interfaces, and can
+</I>&gt;<i>therefore not be bound to any of them.
+</I>
+The IP layer can be integrated or separate from a network driver. It is a
+question of whether the IP layer has its own thread, or not.
+
+&gt;<i>The only thing that comes to mind is to have a single IP object that queues
+</I>&gt;<i>incoming packets for all interfaces. This requires strict serialisation on
+</I>&gt;<i>the incoming_packet() functions. A thread that lives in IP could then
+</I>&gt;<i>handle the packets (route them through, drop them or reassemble them and
+</I>&gt;<i>queue them to TCP/UDP objects that eventually put them into user space
+</I>&gt;<i>buffers).
+</I>
+A single IP object queues incoming packets and recieves outgoing packets.
+When the IP object is asked to send an outgoing packet to itself, there is
+no delay. Such a packet is *never* sent to hardware.
+
+&gt;<i>Hmm, IP does not have ports. UDP and TCP do. This structure belongs over
+</I>&gt;<i>there when i get there :)
+</I>
+You're right. IP does not have ports. UDP and TCP have ports.
+
+An IP address is four octets. It is generally written in decimal dot
+notation, like 4.65.6.119. An IP datagram starts with an IP header. This
+header has a source IP address and a target IP address. The UDP and TCP
+port is considered raw data to the IP layer.
+
+Personally, I recommend Pete Loshin's simple description of TCP/IP in his
+boot &quot;TCP/IP Clearly Explained,&quot; published by Academic Press.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000503.html">[JOS-Kernel] Progress!</A></li>
+	<LI> Next message: <A HREF="000480.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#484">[ date ]</a>
+              <a href="thread.html#484">[ thread ]</a>
+              <a href="subject.html#484">[ subject ]</a>
+              <a href="author.html#484">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

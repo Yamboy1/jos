@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [Fwd: [JOS-Admin] An idea for increasing the number of code-writers]</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000171.html">
+   <LINK REL="Next" HREF="000174.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [Fwd: [JOS-Admin] An idea for increasing the number of code-writers]</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] [Fwd: [JOS-Admin] An idea for increasing the number of code-writers]">jm@mak.com</A><BR>
+    <I>Thu, 29 Jul 1999 06:32:51 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000171.html">[JOS-Kernel] AD:Family Reunion T Shirts &amp; More</A></li>
+        <LI> Next message: <A HREF="000174.html">[JOS-Kernel] Re: [JOS-Admin] An idea for increasing the number of code-writers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#172">[ date ]</a>
+              <a href="thread.html#172">[ thread ]</a>
+              <a href="subject.html#172">[ subject ]</a>
+              <a href="author.html#172">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is a multi-part message in MIME format.
+--------------6067F15F4C9F7C9F08B75DC3
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hi All;
+
+You may be aware that the heap/GC issue/task has been lying on the floor for
+quite some time now, although at least two individuals have, in the medium-term
+past, expressed interest.  Looks like now it'll get done!
+
+Welcome, George!
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+--------------6067F15F4C9F7C9F08B75DC3
+Content-Type: message/rfc822
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Return-Path: &lt;<A HREF="mailto:jm@mak.com">jm@mak.com</A>&gt;
+Received: from mak.com (alexander [207.86.232.32])
+	by mak.mak.com (8.9.3/8.8.7) with ESMTP id JAA22483;
+	Wed, 28 Jul 1999 09:09:32 -0400
+Message-ID: &lt;<A HREF="mailto:379F0206.E27FD714@mak.com">379F0206.E27FD714@mak.com</A>&gt;
+Date: Wed, 28 Jul 1999 09:13:42 -0400
+From: John Morrison &lt;<A HREF="mailto:jm@mak.com">jm@mak.com</A>&gt;
+Reply-To: <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+Organization: MaK Technologies, Inc.
+X-Mailer: Mozilla 4.06 [en] (WinNT; U)
+MIME-Version: 1.0
+To: <A HREF="mailto:George.Marrows@Smallworld.co.uk">George.Marrows@Smallworld.co.uk</A>
+CC: <A HREF="mailto:jm@mak.com">jm@mak.com</A>, _Quinn &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt;
+Subject: Re: [JOS-Admin] An idea for increasing the number of code-writers
+References: &lt;<A HREF="mailto:6FDAD424E81FD211BFAB00A0C9DB2DDA7D8146@tropic.smallworld.co.uk">6FDAD424E81FD211BFAB00A0C9DB2DDA7D8146@tropic.smallworld.co.uk</A>&gt;
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hello George;
+
+<A HREF="mailto:George.Marrows@Smallworld.co.uk">George.Marrows@Smallworld.co.uk</A> wrote:
+&gt;<i> Has anyone taken up the garbage collector challenge? If not, and if you're
+</I>
+Mr. Iain Lowe expressed interest over two months ago, but I haven't heard from
+him lately.
+
+&gt;<i> still looking for help in this area, I'd be willing to do my best to step
+</I>&gt;<i> in. What I've got so far is an implementation of a heap suitable for a
+</I>&gt;<i> conservative mark / sweep garbage collector. (By the way, why did you want
+</I>&gt;<i> the gc to be conservative? As I understand it, conservative gc is only
+</I>&gt;<i> necessary when you don't know what is a pointer and what is an integer
+</I>&gt;<i> (say). decaf must know this for objects on the heap, and presumably does for
+</I>
+Yes, that property of conservative GC schemes is the driving requirement, for a
+few reasons.
+
+(1) The decaf JVM we're using uses pointers, not handles, to represent Java
+objects (although all Java objects are subclassed from a single C++ base class
+in the JVM so we could probably change this if it became necessary).  This rules
+out a whole bunch of &quot;moving&quot; or &quot;copying&quot; GC approaches.
+
+(2) The decaf JVM and the jjos nano/pico/femto/whatever kernel uses C++ and
+dynamic memory allocation as well. Currently, both the jjos C++ objects and the
+Java objects (which are, after all, C++ objects as far as the JVM is concerned)
+are allocated out of the same heap.  (This is just laziness and expediency. 
+Originally, I thought we would use handles and reference counting, and
+compacting GC for &quot;back up.&quot;  The best laid plans...  However, maybe simpler is
+better.)
+
+(3) The JVM uses &quot;green threads&quot; right now (i.e., simulated, not &quot;real&quot;
+threads).  However, when the underlying kernel implements native threads, we're
+really going to have both a Java and a native code stack for each Java thread. 
+Wouldn't it be nice if we just used a conservative GC to scan both data
+structures the same way?
+
+&gt;<i> its stacks too?)  It is based on pages (standard 4K size), with a page only
+</I>&gt;<i> holding objects of a specific size. Each page has a descriptor, and objects
+</I>&gt;<i> are marked using a bitmap in the descriptor for their page. Scanning of the
+</I>&gt;<i> heap is incremental, so that the scan cost is spread over allocations rather
+</I>&gt;<i> than as a hit at the end of marking.
+</I>
+This is, to the best of my knowledge, similar to the time-honored Kaffe-adopted
+solution as described at:
+	<A HREF="http://sourceware.cygnus.com/java/papers/nosb.html">http://sourceware.cygnus.com/java/papers/nosb.html</A>
+
+&gt;<i> To be done before useful:
+</I>&gt;<i> - Allocation of large objects (&gt; 1/2 page). These will get whole pages to
+</I>&gt;<i> themselves.
+</I>&gt;<i>         Issues: need a freelist or similar to manage pages
+</I>&gt;<i> - Implement mark phase.
+</I>&gt;<i>         Issues: how best to handle mark stack overflow?
+</I>&gt;<i> - Integrate with decaf.
+</I>&gt;<i>         Issues: got to find my way round it first!
+</I>
+Todd, whom I have cc-ed on this reply (Hi, Todd!), is The Man for decaf.  If
+it's an easy question, then I can help you, too.  decaf uses the C++ heap (such
+as it is) provided by jjos, for which I am the main point of contact (although
+Todd can help you there, too).  Perhaps it is sufficient to modify the following
+jjos files, which implement whatever heap functionality we have (currently
+memory chunks can be allocated, but the routine to deallocate them simply throws
+them away):
+
+common/nativecode/builtins.cc (implements the &quot;built in&quot; memory allocators
+called by the compiler)
+common/nativecode/jbheap.cc (implements the C++ heap object called by the
+builtins)
+
+With respect to design considerations, a couple of not-quite-typical
+requirements:
+
+(1) Currently, decaf does not call destructors (and thence heap deallocators)
+everywhere it is possible to know that the memory object has instantaneously
+become garbage.  Either Todd or I can track those down so you don't have to.  We
+have, of late, become more conscientious about calling destructors.  Please
+advise us if there is a suitable entry point in your conservative heap
+implementation for us to mark a memory block as unused...
+
+(2) Currently, jjos does NOT provide virtual memory services (obviously, this
+only applies to the &quot;bare iron&quot; i386 build).  We operate in physical memory
+space.  This must change eventually (although it is not a short-term concern, it
+*is* a design concern).
+
+(3) We currently plan to implement Java-thread paging, so the virtual memory
+subsystem is currently envisioned to throw the memory page to be paged out &quot;over
+the wall&quot; for the Java paging thread to page out.  And, vice versa, we plan to
+have the Java pager page back in pages and throw them back over the wall to the
+native-code to map into virtual memory space.  (This would be nice, because we
+plan to have the other Java threads which are ready to run to continue -- this
+is unlike Linux-based Java implementations, which are typically in one UNIX
+process and must stop all threads entirely while pages are fetched.  This should
+compensate in large part for the pokiness of Java because, no matter how pokey
+Java is, it's faster than the bloody mechanical disk.)
+
+(4) As part of the mechanics of getting this cooperation between Java and the
+native code to work correctly, the vmem/GC subsystem must be able to &quot;lock down&quot;
+regions of memory (e.g., device driver code and data, the JVM itself, etc.). 
+Such memory must neither be GC-ed nor paged.  Please note our heap object is not
+necessarily a global, so we can set up separate heaps if such is required...
+
+(5) Java requires that we call any &quot;finalize&quot; Java methods upon Java objects
+prior to their being GC-ed/reclaimed.  Todd can perhaps shed more light upon
+which context the methods must be executed in ... 
+
+&gt;<i> Future directions:
+</I>&gt;<i> - Debug and optimise
+</I>&gt;<i> - Incremental marking, perhaps making use of the virtual memory system
+</I>
+It's OK with me (and probably Todd) if there is a stop-and-GC-entirely pause for
+now.  Later, with the paging scheme as described above, obviously the vmem/pmem
+subsystems, the Java pager, and the GC must all play nicely together.
+
+&gt;<i> - Look at other types of gc: is generational gc useful for Java?
+</I>
+Without having either a copying/compacting collector, I don't know right now...
+
+&gt;<i> My guiding light in all this has been &quot;Garbage Collection : Algorithms for
+</I>&gt;<i> Automatic Dynamic Memory Management&quot; by Richard Jones and Rafael Lins.
+</I>&gt;<i> <A HREF="http://www.amazon.com/exec/obidos/ASIN/0471941484/o/qid=932632539/sr=8-1/002">http://www.amazon.com/exec/obidos/ASIN/0471941484/o/qid=932632539/sr=8-1/002</A>
+</I>
+An absolutely fabulous book -- read it cover-to-cover.  Please pay particular
+attention to the brief bits about how Lisp Machines availed themselves of the
+special virtual memory hardware to increase performance (I do not have the book
+with me at work, but I recall finding some of these bits via the index).  In
+particular, I hope that we can scan pages BEFORE they have to get paged out, as
+part of the &quot;regular&quot; paging process, and reclaim instantly those pages which
+only contain garbage, and thus avoid the overhead of &quot;throwing the page over the
+wall&quot; and sleeping any threads at all.  This is supposed to be a Really Big Win.
+
+&gt;<i> -0933432-9403644 Incidentally, do you know of anywhere that discusses gc
+</I>&gt;<i> specifically for Java - eg a statement of what the most efficient method
+</I>&gt;<i> seems to be for the &quot;average&quot; Java app?
+</I>
+The URL I sent you above is one...
+	<A HREF="http://adept.cs.twsu.edu/~thomas/jos_web.html">http://adept.cs.twsu.edu/~thomas/jos_web.html</A>
+	<A HREF="http://www.ddj.com/articles/1998/9810/9810a/9810a.htm">http://www.ddj.com/articles/1998/9810/9810a/9810a.htm</A>
+
+I have other GC-related URLs, too, if you are interested...
+
+&gt;<i> Sadly, I don't get too much time to do programming in my spare time - for
+</I>&gt;<i> example, I only managed to get started on this a month ago. What I propose
+</I>&gt;<i> is that I plough on for another month or so, but if I find I'm really not
+</I>&gt;<i> getting anywhere fast, I'll hand it all over to you or _Quinn to do with as
+</I>&gt;<i> you see fit. Of course, if you're interested in seeing what's there
+</I>&gt;<i> currently (not a huge lot), I can make that available now.
+</I>
+Both Todd and I can empathize with the problem of having limited hacking time. 
+However, whatever you can contribute is that much more than we can do by
+ourselves.  And, now is a really good time for us to be addressing these
+problems.  Todd has (pretty much) finished the functionality of the JVM, and we
+can boot and run Java programs (that don't require device access).  Now, we need
+to keep JOS up and running longer (not leaking memory like a sieve), and enable
+others to work on device drivers, etc...
+
+Thanks for any help you can give us!  If it's OK with you, I'd like to forward
+this reply on to the kernel list, so they can know what's going on ... please
+advise...
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+--------------6067F15F4C9F7C9F08B75DC3--
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000171.html">[JOS-Kernel] AD:Family Reunion T Shirts &amp; More</A></li>
+	<LI> Next message: <A HREF="000174.html">[JOS-Kernel] Re: [JOS-Admin] An idea for increasing the number of code-writers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#172">[ date ]</a>
+              <a href="thread.html#172">[ thread ]</a>
+              <a href="subject.html#172">[ subject ]</a>
+              <a href="author.html#172">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

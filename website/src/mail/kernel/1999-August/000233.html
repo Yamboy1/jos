@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jJOS speed</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000232.html">
+   <LINK REL="Next" HREF="000238.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jJOS speed</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] jJOS speed">jm@mak.com</A><BR>
+    <I>Sun, 15 Aug 1999 12:54:11 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000232.html">[JOS-Kernel] jJOS speed</A></li>
+        <LI> Next message: <A HREF="000238.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#233">[ date ]</a>
+              <a href="thread.html#233">[ thread ]</a>
+              <a href="subject.html#233">[ subject ]</a>
+              <a href="author.html#233">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Thomas;
+
+Thomas Bocek wrote:
+&gt;<i> I made a little benchmark with the old source and with the new one:
+</I>&gt;<i> 
+</I>&gt;<i> old: vga fillroutine ~7 sec
+</I>&gt;<i> new: vga fillroutine ~5 sec
+</I>&gt;<i> 
+</I>&gt;<i> The results aren't exact, because
+</I>&gt;<i> 
+</I>&gt;<i> 1. made the test with a stop-watch
+</I>&gt;<i> 
+</I>&gt;<i> 2. the old source crashed after 7 sec, and the screen was only 1/5 filled,
+</I>&gt;<i> the new source crashes after the screen is 4/5 filled.
+</I>
+OK, so if I were to extrapolate, the old one would finish in 35 seconds
+(barring a crash - HA), and the new one would finish in about 7 seconds
+(barring a crash), right?  So, this means we've speeded up the
+calls-to-native code about 5 times, eh?  If so, is performance creeping
+into the &quot;acceptable for now&quot; range (At least, until we do the
+JavaOS-style memory classes -- I'm also curious as to why the write32
+stuff is SLOWER -- can you try that one, too?)?  If so, is the
+memory-management stuff now the hottest fire?  
+
+With respect to the crash:
+
+(1) When my version hangs after displaying the checkmark, is that the
+crash's failure mode?  I mean, is this the same &quot;crash&quot; you're getting? 
+If so, I can try and debug it.
+
+(2) Do you think it would help if I wrote something that, in the case of
+a detectable crash, reset the VGA display to text mode and spat out some
+debugging info?  (Our own little BSOD!  What color should I make the
+screen?)  I could print out:
+(a) a diagnostic string
+(b) the native-code stacktrace (with &quot;nm&quot; you could see where in the JVM
+we were)
+(c) and maybe some other Java stuff (I'd have to think about how to do
+this, and fit it on one screen -- there could be quite a few Java
+threads -- too many to fit on one screen)
+We don't have enough of a console/GUI/Window Mgr for me to do anything
+else, right?
+
+Again, thanks for the help -- I appreciate how, er, hostile the
+debugging environment is at this point in time!  I shall endeavor to
+make it less so.
+
+-jm
+
+-- 
+==== John Morrison ==== <A HREF="mailto:jm@mak.com">jm@mak.com</A> == <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== MaK Technologies Inc., 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000232.html">[JOS-Kernel] jJOS speed</A></li>
+	<LI> Next message: <A HREF="000238.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#233">[ date ]</a>
+              <a href="thread.html#233">[ thread ]</a>
+              <a href="subject.html#233">[ subject ]</a>
+              <a href="author.html#233">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

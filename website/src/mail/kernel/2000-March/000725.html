@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [zerich] Release 1 is available</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000724.html">
+   <LINK REL="Next" HREF="000726.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [zerich] Release 1 is available</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [zerich] Release 1 is available">gchii@mindspring.com</A><BR>
+    <I>Wed, 08 Mar 2000 21:30:50 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000724.html">[JOS-Kernel] LangBridge example</A></li>
+        <LI> Next message: <A HREF="000726.html">[JOS-Kernel] AltBridge 1a - Release 1</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#725">[ date ]</a>
+              <a href="thread.html#725">[ thread ]</a>
+              <a href="subject.html#725">[ subject ]</a>
+              <a href="author.html#725">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Release 1 of both Zerich 1a and 1b is available for immediate download at
+&lt;URL:<A HREF="http://www.jos.org/redist/mirror">http://www.jos.org/redist/mirror</A>&gt;
+
+Zerich is an ERIC sub-project. These classes were compiled first on
+Windows. Now that I found /usr/include/dlfcn.h, I have been able to compile
+these classes on Linux, too. The point of this project is to use the
+SharedLibrary class throughout platform-independent C/C++ code, even though
+shared libraries are implemented differently on Linux and Windows.
+
+SharedLibrary is integrated into the C++ environment, so you can write code
+like this:
+
+  void example() {
+    SharedLibrary a = &quot;jvm&quot;;
+    SharedLibrary b = a;
+
+    void (*decaf_main)( int argc, char *argv[], kernel *k );
+    decaf_main = a.getMethod( &quot;decaf_main&quot; );
+  }
+
+NativeLibrary is a pure virtual class, like an interface, for a native
+library. SharedLibrary is an integrated wrapper for NativeLibrary.
+
+The purpose is clear. I want a NativeLibrary that only a native library
+factory can instantiate. At the same time, I want a SharedLibrary that is
+fully integrated into the C/C++ environment.
+
+The critical part for a virtual machine, like decaf, is to implement the
+native library factory. Note: Linux returns a symbol, not a method.
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000724.html">[JOS-Kernel] LangBridge example</A></li>
+	<LI> Next message: <A HREF="000726.html">[JOS-Kernel] AltBridge 1a - Release 1</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#725">[ date ]</a>
+              <a href="thread.html#725">[ thread ]</a>
+              <a href="subject.html#725">[ subject ]</a>
+              <a href="author.html#725">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

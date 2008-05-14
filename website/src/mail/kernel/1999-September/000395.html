@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf bug report / Status of RessourceManager</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:draft%40fear.ch">
+   <LINK REL="Previous"  HREF="000393.html">
+   <LINK REL="Next" HREF="000397.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf bug report / Status of RessourceManager</H1>
+    <B>Thomas Bocek</B> 
+    <A HREF="mailto:draft%40fear.ch"
+       TITLE="[JOS-Kernel] decaf bug report / Status of RessourceManager">draft@fear.ch</A><BR>
+    <I>Mon, 27 Sep 1999 23:45:37 +0200 (CEST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000393.html">[JOS-Kernel] decaf bug report</A></li>
+        <LI> Next message: <A HREF="000397.html">[JOS-Kernel] decaf bug report / Status of RessourceManager</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#395">[ date ]</a>
+              <a href="thread.html#395">[ thread ]</a>
+              <a href="subject.html#395">[ subject ]</a>
+              <a href="author.html#395">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Avery, and all...
+
+
+On Mon, 20 Sep 1999, Avery J. Regier wrote:
+
+&gt;<i> I downloaded the latest CVS with the interp.cc fix, but I still have this
+</I>&gt;<i> problem on the host build.  Here is the init.java file I use to show the
+</I>&gt;<i> problem.  The testVoidReturn function is what I was playing with to try and
+</I>&gt;<i> narrow down the cause.
+</I>
+I guess you tried this with the i386 build. The host build works fine with
+your testVoidReturn class. Since I haven't worked a lot (well...nothing 
+at all..) with the i386 build, I can't help very much...
+
+
+The RessourceManager is still unfinished, but today I added the
+DMA/PORT/IRQ reserve method. The RM is hooked into the dma class, so that
+the dma-driver works now with the RessourceManager.
+
+As a consequence of the new RM, the drivers need slightly to be updated.
+e.g. the fdc driver contains 2 more lines:
+
+RessourceManager rm=new RessourceManager();
+boolean reserved=rm.reserveDMA(2,this,false);
+
+//2     -&gt; channel
+//this  -&gt; only this class can access dma 2
+//false -&gt; shareable -&gt; if 2 or more drivers are allowed to acces the
+//         same ressource
+
+//and the line
+
+dma_xfer(2,address,(int)nosectors*512,true,this); 
+// has 1 more argument(this)
+
+Now I thought about the speed of the RM: every call (DMA/PORT/IRQ) has to
+be verified. The dma method checks every call if the caller is the
+right owner. Isn't that slow? How do other OSes handle ressources?
+
+
+Thomas Bocek
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000393.html">[JOS-Kernel] decaf bug report</A></li>
+	<LI> Next message: <A HREF="000397.html">[JOS-Kernel] decaf bug report / Status of RessourceManager</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#395">[ date ]</a>
+              <a href="thread.html#395">[ thread ]</a>
+              <a href="subject.html#395">[ subject ]</a>
+              <a href="author.html#395">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000781.html">
+   <LINK REL="Next" HREF="000782.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Device as a digital resource">tmiller@haverford.edu</A><BR>
+    <I>Wed, 22 Mar 2000 16:10:16 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000781.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000782.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#786">[ date ]</a>
+              <a href="thread.html#786">[ thread ]</a>
+              <a href="subject.html#786">[ subject ]</a>
+              <a href="author.html#786">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Perhaps this is for a larger scope.  If a system shared object creates
+</I>&gt;<i> another object, what memory space is that created object in?  From what
+</I>&gt;<i> I've gleaned from learning about JVM GCing, every shared object needs to
+</I>&gt;<i> have all its created objects in the same memory space.  But then, if the
+</I>&gt;<i> controller creates objects specific for its current JVM process... What
+</I>&gt;<i> kind of mess is this?
+</I>
+	To a GC, memory is a directed graph with (in our case) a single
+source node.  There is no reason to distinguish between memory spaces with
+addressing changes if the programmer can't arbitrarily access memory --
+that is, they can only chase pointers created by the system.  The insight
+that Java memory spaces are disjoint unless the parent process
+deliberately maintains a pointer into its child is what underlies the
+decaf process model.  The question of which memory space an object is in
+isn't the question to ask -- it's which subset of the graph that object is
+accessible from.  If a JVM crashes (suppose we can tell this), we re-trace
+the tree from the root, excluding the pointer to that JVM -- anything that
+doesn't match up is garbage, and all references into it (another graph
+traversal) are illegal and need to marked/handled as such.  (e.g. IPC
+references must be weak, because it's in the spec that they can throw
+exceptions on access, whereas strong references can not.  (Actually, we
+need a fourth class, IPC pointers, where they're treated in Java as weak
+but by the GC as strong, so that we don't accidentally reap things people
+are expecting to be persistent.)  I think that this model generates better
+error handling in multi-process code.)
+
+	What this means is that a shared object is pointed to from more
+than one (potentially disjoing) subgraphs.  'Where' in memory the returned
+object it produces is located depends entirely on whether or not the
+producer maintains a reference to it; if it does, the return object is
+located in the 'higher'/'larger' subgraph of the shared object.  That is,
+if the consumer blows up and dies, the produced object is still 'live;' if
+the producer doesn't maintain a reference, the object dies.  For the
+former, the object or the parent ought to get an exception (on the next
+access) noting that one of its parents has died; for the latter, the
+produced object really needs to be finalize()d...  jJOS/decaf, can if,
+necessary, (I think!) make /stronger/ conditions on finalize() than the
+spec w/o contradicting it.
+
+-_Quinn
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000781.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000782.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#786">[ date ]</a>
+              <a href="thread.html#786">[ thread ]</a>
+              <a href="subject.html#786">[ subject ]</a>
+              <a href="author.html#786">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

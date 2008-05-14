@@ -1,0 +1,730 @@
+From tmiller@haverford.edu Wed, 31 Mar 1999 23:48:43 -0500 (EST)
+Date: Wed, 31 Mar 1999 23:48:43 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] event handling & decaf/JJOS
+
+	I was just thinking about how one might go about distributing
+jos.system.event.* to where they might need to go, in the context of
+how java.lang.System.* variables will be redirected *by the shell.*  Uh...
+why not let the 'shell' handle event dispatching?  The shell pretty
+clearly will know which program is 'active' and needs to have keyEvents
+distributed to; make the shell both a keyListener and a keySpeaker, in
+other words, where it speaks keys to the applications that are running
+under it as necessary, as part of its java.lang.System.* redirects,
+basically.  If an application from the c/l implements interface
+jos.system.event.keyListener (xxxListener, in the general case, for
+whatever redirects the shell supports), the events are direct to the
+application; otherwise the shell employs whatever its default handling
+might be -- which is probably just converting the keyEvents into a
+character stream for the 'active' (fg) application's java.lang.System.*
+variables.
+
+	Obviously, the console could do some keyEvent filtering and
+redirects as well, and then the Virtual Console Manager (or whatever we
+call it -- the consoled that should be the sole jos.system.keyboard
+listener in text mode (the listener switching to the WM upon invocation),
+started by init, would direct keyEvents to the current console.  Likewise,
+the WM could handle redirects to the xterm console objects.  Clearly,
+consoled would install a keyboard interperter that would handle the
+trapping of ALT-F1 (or whatever) that's used to handle console swapping.
+
+viz, with three virtual consoles, one in use: ( -> speaks to )
+
+jos.system.keyboard -> jos.system.consoled ->
+	-> jos.core.console -> login 
+	-> jos.core.console -> login
+	-> jos.core.console -> jsh ->
+		-> j_pine
+		-> j_ftp
+
+Clearly, then, access to jos.system.keyboard needs to be limited in some
+fashion, because it would screw things up royally to have multiple
+identical keyEvent sources in the same dispatch tree.
+
+	There are two ways to implement this.  The first is to implement a
+'static' variable somewhere that in turns points to the next object up on
+the tree; this would Aviery's (?) idea, with the added understanding that
+the static variable is used as the instance for an addKeyListener()
+method; and have the access methods, etc. to handle those 'redirects.'
+The major problem with this is that it voluntarily adds another static
+class to keep track of across different processes, which strikes me as
+asking for trouble.
+
+	The second way (there might be more -- any ideas?) would be to
+provide a method for the parent process to tell the child process to
+listen to it, i.e. setKeySpeaker().  ('discovery' methods, i.e.
+findKeySpeaker() simply move the static variable setting stuff a level
+away.)  The jos.core.application superclass we provide to simplify the
+making of jos-aware applications would provide an addKeyListener()
+function in much the same way that Component does for the AWT.
+
+	Comments?
+
+-_Quinn
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Thu, 1 Apr 1999 14:25:56 -0600
+Date: Thu, 1 Apr 1999 14:25:56 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] event handling & decaf/JJOS
+
+Todd,
+
+I think you both misunderstood what I was saying and reinvented it all at
+the same time. :)
+
+MY concern with this is how to distribute events & streams from a parent
+Process (ProcessEnvironment) to its child processes.  That is essentially
+what I was describing before that will need to be implemented into the
+org.jos.core.* library which will be used to implement java.lang.*, and (now
+that I think about it) the event handling system (java.awt.event.*,
+java.util.EventObject, java.awt.AWTEventMulticaster, etc.).  What I
+described before was how we can let the shell (of which its
+ProcessEnvironment is a parent to the ProcessEnvironments of applications
+started from that shell) translate KeyEvents into the System.in for each
+process (and each process will need its own seperate System.in - which means
+that statics will have to be unique to a Process, not accross all Processes
+in the VM!).  This is essentially the type of system you descibe in the
+first paragraph below.  Also, not all KeyEvents sent to a shell necessarily
+get turned into System.in, but some will have to be sent as KeyEvents to
+various GUI components.  I think that it is enough for now to say that the
+shell's ProcessEnvironment will have to have its own smart event distributor
+which will know where to send such events next.  This is a topic completely
+seperate from the VM & device driver implementation and is best hashed out
+in the arch@jos.org list.
+
+The real question before us is how to get KeyEvents (and other events
+generated by device drivers) to the shell(s?) so that the shell can take
+care of sending them where they ultimately need to go.  What we may need is
+a simple Proxy that is not necessarily a static class but perhaps daemon
+process which is a parent to all of the shells.  This Proxy would then be
+'designated' for sending events wherever they need to go, and how it handles
+them is of no concern to the vm and device drivers.  This EventProxy could
+be replaced by the user with another implementation that has characteristics
+more suitable to the user (For instance, one that is more real-time in
+nature, or one that has a complicated threading scheme to make sure that an
+errant process's event handling doesn't tie up the system, etc.)
+
+I don't particularly like the second way that you mention because I can see
+a lot of overhead when components change focus and another component
+suddenly needs to be recieving the key events.  But on the other hand, all
+of the options have overhead somewhere, it is just a matter of where do we
+want the overhead to be, and which one makes for the most flexible and
+robust system.
+
+Avery J. Regier
+
+
+> -----Original Message-----
+> From:	Todd L. Miller [SMTP:tmiller@haverford.edu]
+> Sent:	Wednesday, March 31, 1999 11:49 PM
+> To:	kernel@jos.org
+> Subject:	[JOS-Kernel] event handling & decaf/JJOS
+> 
+> 	I was just thinking about how one might go about distributing
+> jos.system.event.* to where they might need to go, in the context of
+> how java.lang.System.* variables will be redirected *by the shell.*  Uh...
+> why not let the 'shell' handle event dispatching?  The shell pretty
+> clearly will know which program is 'active' and needs to have keyEvents
+> distributed to; make the shell both a keyListener and a keySpeaker, in
+> other words, where it speaks keys to the applications that are running
+> under it as necessary, as part of its java.lang.System.* redirects,
+> basically.  If an application from the c/l implements interface
+> jos.system.event.keyListener (xxxListener, in the general case, for
+> whatever redirects the shell supports), the events are direct to the
+> application; otherwise the shell employs whatever its default handling
+> might be -- which is probably just converting the keyEvents into a
+> character stream for the 'active' (fg) application's java.lang.System.*
+> variables.
+> 
+> 	Obviously, the console could do some keyEvent filtering and
+> redirects as well, and then the Virtual Console Manager (or whatever we
+> call it -- the consoled that should be the sole jos.system.keyboard
+> listener in text mode (the listener switching to the WM upon invocation),
+> started by init, would direct keyEvents to the current console.  Likewise,
+> the WM could handle redirects to the xterm console objects.  Clearly,
+> consoled would install a keyboard interperter that would handle the
+> trapping of ALT-F1 (or whatever) that's used to handle console swapping.
+> 
+> viz, with three virtual consoles, one in use: ( -> speaks to )
+> 
+> jos.system.keyboard -> jos.system.consoled ->
+> 	-> jos.core.console -> login 
+> 	-> jos.core.console -> login
+> 	-> jos.core.console -> jsh ->
+> 		-> j_pine
+> 		-> j_ftp
+> 
+> Clearly, then, access to jos.system.keyboard needs to be limited in some
+> fashion, because it would screw things up royally to have multiple
+> identical keyEvent sources in the same dispatch tree.
+> 
+> 	There are two ways to implement this.  The first is to implement a
+> 'static' variable somewhere that in turns points to the next object up on
+> the tree; this would Aviery's (?) idea, with the added understanding that
+> the static variable is used as the instance for an addKeyListener()
+> method; and have the access methods, etc. to handle those 'redirects.'
+> The major problem with this is that it voluntarily adds another static
+> class to keep track of across different processes, which strikes me as
+> asking for trouble.
+> 
+> 	The second way (there might be more -- any ideas?) would be to
+> provide a method for the parent process to tell the child process to
+> listen to it, i.e. setKeySpeaker().  ('discovery' methods, i.e.
+> findKeySpeaker() simply move the static variable setting stuff a level
+> away.)  The jos.core.application superclass we provide to simplify the
+> making of jos-aware applications would provide an addKeyListener()
+> function in much the same way that Component does for the AWT.
+> 
+> 	Comments?
+> 
+> -_Quinn
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From tmiller@haverford.edu Thu, 1 Apr 1999 20:11:25 -0500 (EST)
+Date: Thu, 1 Apr 1999 20:11:25 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] event handling & decaf/JJOS
+
+> I think that it is enough for now to say that the
+> shell's ProcessEnvironment will have to have its own smart event distributor
+> which will know where to send such events next.  This is a topic completely
+> seperate from the VM & device driver implementation and is best hashed out
+> in the arch@jos.org list.
+
+	Right.  I believe I mentioned this -- once we get the events to
+the shell, it's no longer our problem.
+
+> The real question before us is how to get KeyEvents (and other events
+> generated by device drivers) to the shell(s?) so that the shell can take
+> care of sending them where they ultimately need to go.  What we may need is
+> a simple Proxy that is not necessarily a static class but perhaps daemon
+> process which is a parent to all of the shells.
+
+	AKA "consoled," the daemon I suggested to handle multiple
+virtual consoles would be the Proxy you're talking about.  consoled would
+send each (of an arbitrary, RAM-limited number) virtual console instance
+Events that they were Listeners for and had the focus to recieve.  Whether
+the WM then displaces consoled as the "prime reciever" of Events or not is
+entirely immaterial and depends on if you think a virtual console should
+virtualize the graphics subsytem as well -- something we don't have to
+worry about for a while, if at all.  (i.e. it might be more arch@jos.org
+stuff.)  Each shell, then, that would be a child of a virtual console
+instance, would be responsible (or not, depending on the shell) listening
+to its parent ( ProcessContext, etc: the interface between shell and
+console (or shell and jterm, etc) needs to be standardized) for Events
+which might concern it.
+ 
+> I don't particularly like the second way that you mention because I can see
+> a lot of overhead when components change focus and another component
+> suddenly needs to be recieving the key events.  But on the other hand, all
+> of the options have overhead somewhere, it is just a matter of where do we
+> want the overhead to be, and which one makes for the most flexible and
+> robust system.
+
+	It is, isn't it?  And you're probably right that this particular
+discussion should be moved to arch@jos.org; the concern of the kernel
+group is mostly "How many listeners should we allow per Device?  Should
+each Device decide that on its own?"  And so on.
+
+	At any rate, I'll try to hack Albrecht's (?) scancode translation
+stuff into the current setup, assuming for now that jos.system.keyboard
+is the system-wide static abstraction of the physical keyboard generating
+raw scancode KeyEvents, punting on the issue of single/multiple listeners
+for now; and that the echo console (which is the short-term point of
+writing in the scancode translator) subscribes a KeyboardInterperter to
+jos.system.keyboard and listens to that interperter in turn, writing the
+VK out to the screen as a character.  This echo console would probably
+then become the consoled...
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Fri, 2 Apr 1999 16:22:30 -0500 (EST)
+Date: Fri, 2 Apr 1999 16:22:30 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] (more or less) weekly update
+
+	Didn't get much coding done recently, I've been trying to hash
+out some necessary aspects of the driver architecture before I start
+coding something more complicated (i.e. an echo console w/ scancode
+translations).  The rest of my time was spent fiddling with designs for
+implementing monitors, which (I think) are the last big part misssing from
+the JVM proper for 1.0.2-compliance.  (The native end of the class library
+is, of course, missing.)  Nothing definite yet.
+	JM has been putting some major effort into JJOS & decaf; I expect
+his work to yield substantial fruits shortly, including speed & size
+improvements, as well as double/long primitive types support.  Things will
+probably slow down over here as I get busier IRL, but you should expect
+some major milestones to be reached in decaf/JJOS by month's end.
+
+	BTW: is anyone familiar with the Electrical Fire project?
+
+-_Quinn
+
+
+
+
+From onewith1@flash.net Sun, 04 Apr 1999 15:17:44 -0500
+Date: Sun, 04 Apr 1999 15:17:44 -0500
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] Joe Shmoe Device Driver Architecture beta released!
+
+Ok - I've finished my beta draft of my current Device Architecture
+without really mentioning the driver classes, I've noticed.  So, that
+needs to be added.  Here's the link:
+
+http://www.flash.net/~onewith1/java/jos/NewDeviceSystem.html
+
+Have fun.
+
+-Matt
+
+
+
+
+From clark.evans@manhattanproject.com Wed, 07 Apr 1999 20:30:33 +0000
+Date: Wed, 07 Apr 1999 20:30:33 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Kernel] CYGNUS Java Compiler, Public Release
+
+FYI	
+
+-------- Original Message --------
+Subject: First public libgcj release
+Date: 07 Apr 1999 10:05:57 -0600
+From: Tom Tromey <tromey@cygnus.com>
+Reply-To: tromey@cygnus.com
+To: java-discuss@sourceware.cygnus.com
+
+We are very pleased to announce the public release of libgcj, the
+run-time component of GCJ, the GNU Compiler for Java.  This allows you
+to build executable programs from Java source, without needing any JDK
+components.
+
+Libgcj includes the core run-time environment, such as object
+management, garbage collection, thread support.  It also includes the
+core Java classes from java.lang, java.util, and parts of java.io,
+java.net, and java.text.  Many things (such as object serialization,
+java.awt, java.util.zip, and most of java.lang.reflect) are not yet
+implemented.
+
+Libgcj is licensed under the terms of the LGPL; see the file
+COPYING.LIB for details.
+
+gdb 4.18, to be released very soon, is Java-aware and can debug
+Gcj-compiled programs.  This release means that there is a complete
+suite of free software tools for compiled Java.
+
+For instructions on downloading and installation, and for more
+information on gcj and libgcj in general, see the Gcj and Libgcj
+homepage at http://sourceware.cygnus.com/java/.
+
+	--The Cygnus Java Team
+
+
+
+From msneto@fee.unicamp.br Thu, 8 Apr 1999 11:53:56 -0300 (EST)
+Date: Thu, 8 Apr 1999 11:53:56 -0300 (EST)
+From: MARIO DE SOUZA NETO msneto@fee.unicamp.br
+Subject: [JOS-Kernel] Learn the kernel structure
+
+Hello!
+
+I am interested in learn about the kernel. I would like to know what to
+read, to study, etc to understand the kernel of the Jos System. If
+possible, i would like to know too where to find the source files...
+
+Thanks in advance,
+
+Mario
+
+PS: I am interested in the development, but i need to know if my knoledge
+is sufficient to do this :).
+
+
+
+
+From robfitz@geocities.com Thu, 8 Apr 1999 10:53:00 -0500
+Date: Thu, 8 Apr 1999 10:53:00 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS-Kernel] Learn the kernel structure
+
+Hello Mario
+
+> I am interested in learn about the kernel. I would like to know
+> what to read, to study, etc to understand the kernel of the Jos
+> System. If possible, i would like to know too where to find the
+> source files... 
+
+I believe that the kernel will be a form of micro kernel.  It will 
+provided the minimum functions needed to run the jvm and drivers the 
+rest will be done in java.  I don't really think there is anything 
+documented about the jos kernel, but you should be able to find 
+information about mirco kernels on the internet.
+
+You can get the source from our cvs server.  There are instructions 
+on accessing the cvs server at http://jos.org/wiki/view/main/CVS.
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+
+
+From corevisions@gmx.de Thu, 08 Apr 1999 19:05:31 +0200
+Date: Thu, 08 Apr 1999 19:05:31 +0200
+From: corevisions corevisions@gmx.de
+Subject: [JOS-Kernel] Intersting work
+
+Hi to the JOSCommunity :)
+
+my name is Sebastian Hesselbarth and i am very interested in the jos
+project.
+i was following some discussions for about 3 month and now decided to
+introduce
+myself...
+
+OK... i am a 19 year old student from germany. i will have my final
+exams in may
+and then i want to go to university and study electrical enginieering or
+computer
+science.
+i started java about a year ago and i really like it but i do not like
+how to code
+on a pc. actually i have w9x and linux running and it is annoying coding
+on w9x but
+blackdown.org did not finished the port yet :(((
+ok so far , sorry if i annoyed you ;)
+
+i just read the "Joe Shmoe"-architecture and i don't know if i quite
+understood it
+but i want to present my "dreams" of a good os ... (if you aggree or
+disaggree please
+let me know and please tell me if it is even possible to code ...
+because i do not know
+so much about lowlevel coding...)
+
+- device drivers should easyly be plugged into the system and a kind of
+supervisor class
+  should give away needed resources (i think MattAlbrecht mentioned
+this!!)
+- i think nearly the whole system should be extendible by plugins. i
+came to i386 from
+  the amiga (which is still alive :)) and i liked the way of pluging
+datatypes into the
+  system : you want to view "jpg" pics so you just need a app that used
+datatypes and
+  the jpg-datatype and you were able to watch the pic ... the same thing
+could be done
+  with jos (i hope) ... you want to have vfat devices or affs disks so
+you just plug
+  the right modules into a kind of FileSystemPluginHolder class or so
+...
+- easy gui based handling of the devices (like in w9x but more stable)
+and lowlevel
+  configuring like in linux should be possible ...
+
+ok that enough for now ... hope i get request from you ...
+
+i am very interested in coding drivers and that stuff but i dont know
+really how yet
+it would be nice if you could give me some inet resources to read
+through ...
+
+ bye Sebatian
+
+
+
+From matthew.c.albrecht@lmco.com Thu, 08 Apr 1999 10:03:34 -0600
+Date: Thu, 08 Apr 1999 10:03:34 -0600
+From: Albrecht, Matthew C matthew.c.albrecht@lmco.com
+Subject: [JOS-Kernel] Calling for Directory Designs!
+
+In my search for the driver/configuration/etc. directory, I have come across
+several designs, but none of which are really satisfactory.
+
+Here's my current wish-list for such a directory:
+   1. Able to store Java objects with a name-object binding
+   2. Names are referenced in a tree-like structure (ala Unix path
+       names, or something similar)
+   3. Each Entry (a bounded Java object) can have a set of attributes,
+       which are themselves objects.
+   4. Able to search the directory by several keys:
+          a. Exact Name
+          b. wild-card name (ala Unix again)
+          c. object class (ala Jini)
+          d. attributes
+   5. Each entry has the option to be persistent, remote, both, or neither.
+       This would specify which objects can be remotely downloaded,
+       and saved for reloading on future reboots and directory restores..
+   6. The base directory class is an interface, so any number of
+       implementations can be made compatible.
+   7. Probably an event system to announce new or removed entries, or
+changes
+       in entries' object or attributes.
+
+I envision the directory to replace the classic idea of a Kernel API with a
+configurable framework.  Sure, the other "kernel" parts will have their API
+being static (such as the direct hardware access and process features),
+since these are the built-in basic operations.  I also see the directory
+having several "static" entries which act as gateways between the Java
+"static" APIs (core, Java Media, whatever), and these entries are then tied
+to the directory's other entries.
+
+To support this framework idea, the middle-tier in the architecture would
+need methods to change its directory entry references, and possibly listen
+to the directory events for changes in its referenced entries.
+
+For the "static" gateways, we would need to define interfaces for each part,
+and implement, at a minimum, an adapter object which accepts all calls but
+does nothing.
+
+In this way a system architecture can be user-defined.  We would only supply
+(as the kernel) several foundation utilities to make it possible.  And even
+these kernel utilities are configurable with the right interfaces.
+
+Just to show that this isn't all wish with no thought, here are some example
+architectures a system architect could create:
+
+1. A Plain-Jane architecture with nothing fancy. Drivers would be registered
+in the directory, then the basic layers are added on these (file system to
+link the disk drivers together, protocol stacks built on the network
+drivers, and so on).  Then the "static" entries are assigned to the entry
+points for these layers (java.io.File is linked to "/static/java/io/File"
+for File I/O, java.net.Socket is linked to "/static/java/io/TCPIPSocket",
+and so on).  After this initial setup, each application only knows about the
+Java API and acts as if it is in a standard jvm.
+
+2. A research group works with per-process architecture. They design the
+directory interface so that each process inherits a copy of the directory,
+which can be configured such that each process can make its directory
+optimized for its own task, without affecting the parent directories.  Each
+process spawns off a configuration task which restructures the directory,
+adding its own entries to optimize the to-driver layers.
+
+3. A network computer sets up the directory so that it directly references a
+Jini lookup server on the network.  All directory calls would be translated
+into Jini remote requests and calls, and all located drivers would be RMI
+stubs.
+
+
+-MattAlbrecht
+
+
+
+
+From guanix@softhome.net Fri, 9 Apr 1999 13:06:42 +0200
+Date: Fri, 9 Apr 1999 13:06:42 +0200
+From: Guan Yang guanix@softhome.net
+Subject: [JOS-Kernel] Calling for Directory Designs!
+
+I have some comments, more related to user directory design (like the Linux
+FileSystem Hierachy Standard). This is actually rather unrelated to the
+kernel. Sorry if it is irrelevant.
+
+Here I use slashes to represent directory boundaries.
+
+Definitions:
+Dynamic Classpath A classpath that is searched only after the "static
+   classpath" is exhausted
+
+=== Directory Structure/User Experience ===
+The Directory Structure (DS) should look like this:
+/user   /* Linked to the user's home directory, or (if it is a
+   single-user machine) a directory by itself */
+
+/user/classes  // [Write-only?] these are accesible through the
+/user/classes/jar // /classes-hierachy.
+/user/classes/exec // (Some form of RAID.)
+
+/user/system  /* All the stuff in /system that the user has access
+   to. Perhaps /system should be executable-only?
+   This should be represented in a simplefied manner.
+   (In Linux, executable on directories mean that you
+   can see what's in them.) */
+
+/classes  /* Plain-vanilla Java application classes, part of the
+   CLASSPATH (like /classes/org/jos/Hello.class) */
+
+/classes/jar  /* All JAR files in this are path of the dynamic
+   classpath. */
+
+/classes/exec  /* Only contains executable JAR files that can be
+   executed as if they were normal class files in the
+   user environment. */
+
+/jos   /* Everything in jos.*, and stuff like JVM and
+   kernel images. */
+
+/system   /* Everything system-related, including devices.
+   So we could have stuff like:
+   user.system.Audio =>
+   system.local.devices.Audio =>
+   jos.device.audio.SoundBlaster16 =>
+   system.local.isa.slot2 */
+=== END. ===
+
+=== User Experience ===
+This is just a little fictional shell session (inspired by how I
+wanted Linux/bash to be) (comments are with '#' like bash):
+
+<fictional>
+[ Load stuff like JJOS, decaf, VGA logo, etc. ]
+This is guan.superman.com.
+
+Login: guan
+Password: *******
+
+jsh 1.0 (c) 1999 JOS.org
+Welcome to JOS, Guan Yang. The date is 1 January 2000.
+
+/user$ dir  # jos.command.dir; /user => /users/guan
+[classes] [system] [Work]  [Home Computer] [Fun]
+[source]
+/user$ cd system # jos.command.cd
+/user/system$ dir
+[devices] [network] [computer] [jini]  [environment]
+/user/system$ cd devices
+/user/system$ dir # abridged
+Audio  Video  ...
+/user/system$ copy /user/fun/jossong.au Audio
+JOSplayer: Playing /user/fun/jossong.au on /user/system/devices/Audio...
+End.
+# JOSplayer is "assigned" to /user/system/devices/Audio
+/user/system$ adduser guan2 # Interactive call of jos.command.adduser
+You do not have access to add users. Do you wish to enter password? (Y/N) y
+Supervisor password: *********
+User guan2 added.
+/user/system$ exec adduser guan3 # Non-interactive call of
+jos.command.adduser
+/user/system$ checkmesg # Check messages
+Messages: 1
+jos.command.exec Password required for task add users
+   (jos.command.adduser guan3)
+   Supervisor password was not in key library.
+/user/system$ keylib addkey supervisor password # add a new key to the key \
+library; the key is generated from password "password"
+/user/system$ exec adduser guan4 # Non-interactive call
+/user/system$ checkmesg
+Messages: 1
+jos.command.exec Password required for task addusers
+   (jos.command.adduser 4)
+   Supervisor password was in key library. A-OK!
+
+=== END. ===
+
+A couple of points: When invoking "adduser guan2" interactively, "adduser"
+asks for a password. But when invoking non-interactively, "adduser" checks
+the "key library" of the current user. "Keys" are generated from passwords
+and the system key library, because passwords can't be used
+non-interactively. Just a security thought.
+
+
+
+
+From al@outworld.org Fri, 09 Apr 1999 17:27:31 +0300
+Date: Fri, 09 Apr 1999 17:27:31 +0300
+From: Al al@outworld.org
+Subject: [JOS-Kernel] Calling for Directory Designs!
+
+Guan Yang wrote:
+
+> /user/system  /* All the stuff in /system that the user has access
+>    to. Perhaps /system should be executable-only?
+>    This should be represented in a simplefied manner.
+>    (In Linux, executable on directories mean that you
+>    can see what's in them.) */
+
+This, though, implies that the system can change from user to user.
+Since system classes have system access, would not this impose a
+security hole? If you make system classes that don't have system access,
+why name them system?
+
+How about something more security oriented, like:
+
+/jos/                         // JOS home
+/jos/system/                  // JOS System
+/jos/system/vm/               // Virtual Machine
+/jos/system/vm/bin/           // native executable code, if any
+/jos/system/vm/lib/           // run time Java (latest version)
+/jos/system/vm/lib/ext/       // standard Java extensions
+/jos/system/lib/              // jos.* and org.jos.*
+/jos/system/lib/ext/          // system add-ons by root
+/jos/system/lib/services/     // services added by root
+/jos/system/registry/         // preferences and central registry
+
+I am not quite sure what else is needed, but this looks good (it is also
+similar to the JDK hierarchy).
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+___________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: http://www.outworld.org/people/al/ ]  [spambait@outworld.net]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Fri, 16 Apr 1999 14:57:14 -0500
+Date: Fri, 16 Apr 1999 14:57:14 -0500
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] 2nd Edition of Java VM spec finally available
+
+The 2nd Edition of the Java VM spec finally available at
+http://java.sun.com/docs/books/vmspec/
+
+It contains clarifications to the text such that you should not have to rely
+as heavily on the Java Developer's Connection Bug Parade as someone writing
+a JVM had to before.
+
+For three or four more days you can get a copy on paper from FatBrain (
+http://www1.fatbrain.com/asp/bookinfo/bookinfo.asp?theisbn=0201432943 ) for
+$32.90 (includes shipping and handling) if you order through April 19th and
+include the information here: http://www.fatbrain.com/offers/fb399/home.html
+when you make your order, saving $15!
+
+Regards,
+Avery J. Regier
+
+
+
+From mage@phobos.fachschaften.tu-muenchen.de Tue, 20 Apr 1999 13:48:08 +0000 (GMT)
+Date: Tue, 20 Apr 1999 13:48:08 +0000 (GMT)
+From: Max Berger mage@phobos.fachschaften.tu-muenchen.de
+Subject: [JOS-Kernel] ACPI4JOS
+
+High,
+
+my Name is Max Berger, i am the founder of the ACPI4Linux project. I am,
+however also involved in JOS, and I would like to share my knowledge about
+ACPI with the JOS group. 
+
+So whenever it comes to Power-Management questions in JOS, especially
+about ACPI, feel free to ask me. Please to this directly to
+max.berger@phobos.fachschaften.tu-muenchen.de , since I am not subscribed
+to jos-kernel
+
+I know this might not be an issue during the current development state,
+but when time comes, I'll be there.
+
+Max Berger
+ACPI4Linux: http://www.phobos.fachschaften.tu-muenchen.de/acpi/
+
+
+
+
+

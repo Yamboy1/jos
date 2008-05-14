@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Static members and process model.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000448.html">
+   <LINK REL="Next" HREF="000451.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Static members and process model.</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Static members and process model.">tmiller@haverford.edu</A><BR>
+    <I>Thu, 28 Oct 1999 16:50:40 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000448.html">[JOS-Kernel] Static members and process model.</A></li>
+        <LI> Next message: <A HREF="000451.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#450">[ date ]</a>
+              <a href="thread.html#450">[ thread ]</a>
+              <a href="subject.html#450">[ subject ]</a>
+              <a href="author.html#450">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> First of all, is there anyone that is currently working on this issue ?
+</I>
+	I had considered it while writing the console/consoled classes.
+If console is implemented in such a fashion that it can be passed around
+as a stream, everything just happens right.  The shell (or init, etc) sets
+up the necessary redirections to make System.in/out/err work.  If an
+application wants to use the console, they can use reflection to
+find out if System.in/out/err is actually a console.
+
+	You noted, quite correctly, that System isn't set up properly for
+JOS.  One solution is to re-write System, but that will involve a lot of
+behind-the-scenes dirty work.  And other globally static classes that
+shouldn't be will need to be re-written, and we've forked classpath.  And
+if an application makes use of a global static, we can't run multiple
+copies of it.  Considering this problem early on, I came to the
+conclusion that the Right Way to do this is to implement disjoint
+classloaders, and allow programs a unified way of accessing them.
+Originally, I came up with this approach as a way of ensuring
+multi-java-process isolation in a single-process JVM.  (If your statics
+are different, and you're not passed in any objects, since you can't
+manipulate pointers, you can't run over anything else in ram.)  However,
+it has the added benefit of allowing us to rampantly replace static
+classes, like System, that are normally considered globals, with local
+static copies, as suitably adjusted to make the process run.  (Although
+I'll admit we'll need to trap System.exit(), etc, at some level those
+calls must become native, and we can trap them and just nuke that process,
+instead.)
+
+	Disjoint classloaders are not present in JOS as it stands.  Adding
+the nativecode support for the least-efficient implementation (totally
+disjoint sets) should be relatively simple: allow a
+(native/primordial) classloader to be created without inheriting any
+classes.  Pass it the class (and arguments, for IPC) you want it to run,
+and off you go.  Some standard facility for this process --
+jos.system.system.fork()? -- should be provided to take care of the
+details; you'd also need some way of getting static classes out of the
+classloader so that they can be properly adjusted.  (eg:
+	jls = forkClassLoader.getClass( &quot;java.lang.System&quot; );
+        jls.setOut( shellRedirect );
+	jls.setIn( shellRedirect );
+	jls.setErr( shellRedirect );)
+
+	More complicated schemes (trees of classloaders, starting from the
+empty primordial) could be implemented behind the fork() (and/or whatever)
+interface I've so loosely sketched out above, and decrease memory usage
+and increase speed.  Security measures based on a denial of access to
+static classes like jos.system.machine could implemented at the native
+level or with a Java classloader.  (Also something, AFAIK, that doesn't
+work now, and we'll need classpath support to do.)
+
+	I'm hope that was clear; if not, let me know, and I'll try it
+again. :)
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000448.html">[JOS-Kernel] Static members and process model.</A></li>
+	<LI> Next message: <A HREF="000451.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#450">[ date ]</a>
+              <a href="thread.html#450">[ thread ]</a>
+              <a href="subject.html#450">[ subject ]</a>
+              <a href="author.html#450">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

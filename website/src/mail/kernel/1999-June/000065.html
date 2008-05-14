@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: Progress report.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000064.html">
+   <LINK REL="Next" HREF="000067.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: Progress report.</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Re: Progress report.">jm@mak.com</A><BR>
+    <I>Wed, 09 Jun 1999 10:54:17 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000064.html">[JOS-Kernel] Re: Progress report.</A></li>
+        <LI> Next message: <A HREF="000067.html">[JOS-Kernel] Re: Progress report.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#65">[ date ]</a>
+              <a href="thread.html#65">[ thread ]</a>
+              <a href="subject.html#65">[ subject ]</a>
+              <a href="author.html#65">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd;
+
+Todd L. Miller wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; (2) I have made moved duplicative code from the global functions
+</I>&gt;<i> &gt; into methods of the various classes (java_thread, java_class, frame).
+</I>&gt;<i> 
+</I>&gt;<i>         Increasing their efficiency as well, I'd imagine.
+</I>
+Well, I don't know that it's any more efficient (there is now subroutine
+overhead), but it shrinks the size of the executable (a good thing), and, since
+we'll probably be revisiting the initialization phase (when we get native
+threads), it'll mean we've only got to muck about in one place.  (Also,
+hopefully, it's easier to understand for new code-readers/contributors.)
+
+&gt;<i> &gt; (3) I propagated the active thread throughout the class loading, linking,
+</I>&gt;<i> &gt; preparing, and resolving steps because I thought I could, at this stage, and
+</I>&gt;<i> &gt; prior to having native threads, handle this entirely WITHOUT keeping context in
+</I>&gt;<i> &gt; native stacks.  This would enable the scheduler to know which thread was
+</I>&gt;<i> &gt; running, and it would enable a debugger to know, and it would enable pre-emption
+</I>&gt;<i> &gt; of static initializers.  I was wrong, wrong, wrong.  I do not know whether I
+</I>&gt;<i> &gt; should back these changes out, or leave them in (they don't seem to break
+</I>&gt;<i> &gt; anything).
+</I>&gt;<i> 
+</I>&gt;<i>         They might be useful later on (viz: exceptions).  But why doesn't
+</I>&gt;<i> propogating the thread throughout allow for pre-emptive static
+</I>&gt;<i> initializers?
+</I>
+It's a necessary (but not sufficient) condition for pre-emptive initializers. 
+There were some complications.  You know how the PC value is
+incremented/decremented at several places in the runOpcode/runInvoke methods? 
+Well, in order to pre-empt, I'd have to absolutely back out of the instruction
+completely so as to enable a clean restart, and the PC is mucked about with in
+literally dozens of places (and I would have had to chase them all down and
+verify that I hadn't broken anything).  So, I wimped out.
+
+The threads are also created pretty far down in the bowels of the resolution
+machinery, and I would've had to &quot;throw&quot; (conceptually, anyways) all the way
+back up the native stack, and catch it in an utterly clean way (e.g., don't
+create garbage, although a Boehm-whatever GC would help), and back out of the
+offending opcode, and then make sure all the state machinery of the various
+classes (java_class, java_thread, class_loader, etc.) were all restartable. 
+Maybe also &quot;wait&quot; the current thread on the initializer thread.  Seemed like too
+big a job at this point.  So, more reasons to wimp out.  Alternatively, we can
+punt on this until we get native threads, and then just keep the context on the
+native stack.
+
+&gt;<i> &gt; (4) In perusing this machinery, I think there are some further changes I might
+</I>&gt;<i> &gt; like to make with respect to how classes are known to be
+</I>&gt;<i> &gt; resolved/linked/whatever, and, in specific, when the initializer threads get
+</I>&gt;<i> &gt; spawned (right now they get spawned really early, but don't get executed, so
+</I>&gt;<i> &gt; there are a LOT of dormant threads lying about).  I shall discuss these with
+</I>&gt;<i> &gt; Todd after I commit the merged changes.
+</I>&gt;<i> 
+</I>&gt;<i>         Right now, threads don't cost a whole lot more than frames do, and
+</I>&gt;<i> they're a little more convenient.  We could get away with nothing more
+</I>&gt;<i> than a pointer to the opcodes, but that's probably inflicting unnecessary
+</I>&gt;<i> pain on ourselves.
+</I>
+Fine -- the changes I was talking about are (more or less) to address those
+resolution concerns (especially when we get user-provided class loaders).
+
+&gt;<i> &gt; (6) I have not (cannot?) build the latest Java source successfully.  Todd, would
+</I>&gt;<i> &gt; you please be so kind as to put your latest successful zipfile (compressed, of
+</I>&gt;<i> &gt; course) somewhere I can FTP it from?  Then I can test my merged changes before I
+</I>&gt;<i> &gt; commit them so as not to break anything.  It would also help if you put a
+</I>&gt;<i> &gt; logfile (obviously, host build only) showing me what output to expect.
+</I>&gt;<i> 
+</I>&gt;<i>         Sure thing.  Has anyone else had problems building the latest java
+</I>&gt;<i> sources?
+</I>
+I confess I haven't tried to rebuild them yet since you all have reduced
+dependencies upon AWT (I just got as far as I described in my email this
+morning, and haven't gotten any further).
+
+Later!
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000064.html">[JOS-Kernel] Re: Progress report.</A></li>
+	<LI> Next message: <A HREF="000067.html">[JOS-Kernel] Re: Progress report.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#65">[ date ]</a>
+              <a href="thread.html#65">[ thread ]</a>
+              <a href="subject.html#65">[ subject ]</a>
+              <a href="author.html#65">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

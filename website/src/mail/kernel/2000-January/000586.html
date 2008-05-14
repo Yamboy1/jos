@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: native console</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000623.html">
+   <LINK REL="Next" HREF="000587.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: native console</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Re: native console">gchii@mindspring.com</A><BR>
+    <I>Tue, 04 Jan 2000 19:34:33 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000623.html">[JOS-Kernel] File System</A></li>
+        <LI> Next message: <A HREF="000587.html">[JOS-Kernel] Jeps 0.001e doesn't compile!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#586">[ date ]</a>
+              <a href="thread.html#586">[ thread ]</a>
+              <a href="subject.html#586">[ subject ]</a>
+              <a href="author.html#586">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 04:08 PM 1/4/00 -0600, Regier Avery J &lt;<A HREF="mailto:RegierAveryJ@JDCORP.deere.com">RegierAveryJ@JDCORP.deere.com</A>&gt;
+wrote:
+&gt;<i>...It is almost like there needs to be a single meta shell to intercept
+</I>&gt;<i>the Fx keys and control the switching between shells. Hmmm.....
+</I>
+A &quot;single meta shell&quot; is also known as a window manager, or virtual console
+manager. A virtual console manager must intercept keystroke or mouse events
+to switch between virtual consoles. A physical console is a limited
+resource. There might be only one keyboard, one mouse, one monitor and many
+concurrent consoles. Immediately there are two kinds of &quot;consoles&quot;.
+
+ - A real console. This console has direct access to the keyboard, mouse
+and video adapter (and monitor).
+
+ - A virtual console. This console has only indirect access to the
+keyboard, mouse and video adapter.
+
+The virtual console manager is a third kind of object that fits between a
+virtual console and a real console. Many different implementations of a
+virtual console manager are possible.
+
+The virtual console manager outputs a copy of a virtual console to the real
+console, when a virtual console comes into focus. The virtual console
+manager dispatches keystroke and mouse events to one virtual console at a
+time. Only one virtual console has &quot;focus&quot;. Since the virtual console
+manager is a keystroke event listener, it is the first object to read a
+keystroke event. Well-defined keystrokes and/or mouse events are used by
+the virtual console manager to change focus.
+
+When a virtual console is constructed, it is isolated and independent from
+the virtual console manager. In its lifetime, a virtual console can be
+attached and detatched many times to the virtual console manager. A virtual
+console is an object that must manage its own character-mapped or
+bit-mapped data. (A real console is not required to maintain data beyond
+the physical limits of a video adapter.)
+
+The virtual console manager reads the data from a virtual console and
+writes it to the real console. Each virtual console has a horizontal and/or
+vertical offset, modified by line-up, line-down, page-up, page-down, top
+and bottom keys. A virtual console manager might use a horizontal and/or
+vertical scroll bar to modify the horizontal/vertical offsets for the
+current virtual console.
+
+A virtual console must implement both a console and virtual console
+interface. For an example of a mouse-driven, object-oriented,
+character-based window manager, see also Turbo Vision for C++/Pascal from
+Borland.
+
+-----
+
+All functions of the JCurses library are available indirectly through
+setChar() when an escape sequence is defined and implemented. A
+&quot;stream&quot;-based console requires a program to use escape sequence to control
+the cursor. An escape sequence is a special interpretation of plain text.
+This is like HTML and XML, where an escape sequence starts with less-than
+(&lt;) and ends with greater-than (&gt;). This is like the old ANSI-terminal
+escape sequence, where ESC, [ clears a window. This is like the TELNET
+protocol, where 0xFF, 0xF0 clears a window. Through an escape sequence,
+colors can be selected and the text cursor moved.
+
+A &quot;stream&quot;-based console is important when implementing a console that's
+useful across the network. A socket provides a stream. The setChar() method
+would write a character to a stream. A virtual console and its video
+adapter do not have to be on the same machine.
+
+A high-level stream console would have additional methods to push standard
+escape sequences through the setChar() method.
+
+-----
+
+A shell is not a console, is it? One program might have two or more
+simultaneous virtual consoles. While one virtual console shows you the
+&quot;normal&quot; program, another might show a trace of program execution. Inside
+the clUtilities, there's a demo shell. Inside the Smart API, there are a
+few dozen shells.
+
+A &quot;shell&quot; accepts one line of text from standard input stream and
+interprets the line of text as a command line. While a shell is a program,
+not all programs are shells.
+
+-----
+
+I've been working a long time toward a CommandLineBrowser, a
+character-based version of UniversalBrowser. The bulk of these browsers are
+identical. The mechanism to get a location from the keyboard is a critical
+difference between CommandLineBrowser and UniversalBrowser. While the
+AWT-based UniversalBrowser listens for an action event, the
+CommandLineBrowser will read one line at a time from standard input,
+something like this:
+
+  public void run() {
+    DataInputStream input = new DataInputStream( System.in );
+    String line;
+    for (;;) {
+      try {
+        line = input.readLine();
+      }
+      catch( IOException e ) {
+        break;
+      }
+      if ( line == null ) {
+        break; // only if redirection (pipe)
+      }
+      onLocationSelection( line );
+    }
+  }
+
+Just like the UniversalBrowser, this browser will be URI-based and will
+display the content of any file, any web page, any registry-compatible
+file, any JDBC connection, and will run any mostly-bytecode program.
+
+A virtual console is a perfect companion to the CommandLineBrowser. The
+virtual console would enable me to scroll up and down when a URI produces
+more output than fits on a real console. The CommandLineBrowser will call
+System.exit() when the given URI is exactly equal to &quot;quit&quot;.
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000623.html">[JOS-Kernel] File System</A></li>
+	<LI> Next message: <A HREF="000587.html">[JOS-Kernel] Jeps 0.001e doesn't compile!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#586">[ date ]</a>
+              <a href="thread.html#586">[ thread ]</a>
+              <a href="subject.html#586">[ subject ]</a>
+              <a href="author.html#586">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jJOS speed</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:bpederson%40geocities.com">
+   <LINK REL="Previous"  HREF="000240.html">
+   <LINK REL="Next" HREF="000241.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jJOS speed</H1>
+    <B>Barry Pederson</B> 
+    <A HREF="mailto:bpederson%40geocities.com"
+       TITLE="[JOS-Kernel] jJOS speed">bpederson@geocities.com</A><BR>
+    <I>Mon, 16 Aug 1999 15:33:38 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000240.html">[JOS-Kernel] jJOS speed</A></li>
+        <LI> Next message: <A HREF="000241.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#243">[ date ]</a>
+              <a href="thread.html#243">[ thread ]</a>
+              <a href="subject.html#243">[ subject ]</a>
+              <a href="author.html#243">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>
+Joakim Dahlstedt wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; Speaking of bounds checking, I understand that in at least some JVMs,
+</I>&gt;<i> &gt; it'd be even faster to write code like:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;   try
+</I>&gt;<i> &gt;     {
+</I>&gt;<i> &gt;     byte[] vgaBuffer = jos.system.machine.getBytes(0xa0000, 0x10000);
+</I>&gt;<i> &gt;     int i = 0;
+</I>&gt;<i> &gt;     while (true)
+</I>&gt;<i> &gt;       vgaBuffer[i++] = 0;
+</I>&gt;<i> &gt;     }
+</I>&gt;<i> &gt;   catch (ArrayIndexOutOfBoundsException aioobe)
+</I>&gt;<i> &gt;     {
+</I>&gt;<i> &gt;     }
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; basically, don't bother explicitly checking the value of i (like the
+</I>&gt;<i> &gt; &quot;for&quot; loop does) since the JVM will be checking it itself anyhow.
+</I>&gt;<i> 
+</I>&gt;<i> I have to comment on this one.
+</I>&gt;<i> Please, please, please... don't do that..
+</I>&gt;<i> Don't!
+</I>&gt;<i> You will make life much harder for an optimizing compiler.
+</I>&gt;<i> Constant ranged loops can easily be optimized
+</I>&gt;<i> (bounds checking removed, loopunrolling, etc.).
+</I>
+&gt;<i> Please, don't rely on Exception-handling mechanism to handle cases that
+</I>&gt;<i> are quite common. Exception handlers should handle exceptions from the
+</I>&gt;<i> ordinary,
+</I>&gt;<i> things that may take long time.
+</I>
+I guess what &quot;ordinary&quot; is depends on your point of view.  The idea
+behind that particular trick is that the assignment to the array will be
+made without any problem 65536 times and will fail on the 65537th.  So
+you -could- say that something failing 1/65537th of the time is pretty
+uncommon :)
+
+But yeah, a person could always imagine some smart JIT that that trick
+would confound - but lacking such a JIT, it's the kind of thing a person
+might try in order to get unbearably slow code running a bit faster.
+
+And to be honest, that example was probably unrealistic - it'd be much
+better to have some sort of memset() equivalent to fill a range of
+bytes.
+
+	Barry
+
+(I'm kind of itching now to figure out a way to get jJOS running somehow
+so I can play with this stuff)
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000240.html">[JOS-Kernel] jJOS speed</A></li>
+	<LI> Next message: <A HREF="000241.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#243">[ date ]</a>
+              <a href="thread.html#243">[ thread ]</a>
+              <a href="subject.html#243">[ subject ]</a>
+              <a href="author.html#243">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

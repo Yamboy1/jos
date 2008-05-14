@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOS Machine</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000688.html">
+   <LINK REL="Next" HREF="000690.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOS Machine</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] JOS Machine">tmiller@haverford.edu</A><BR>
+    <I>Wed, 1 Mar 2000 13:27:18 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000688.html">[JOS-Kernel] JOS Machine</A></li>
+        <LI> Next message: <A HREF="000690.html">[JOS-Kernel] JOS Machine</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#689">[ date ]</a>
+              <a href="thread.html#689">[ thread ]</a>
+              <a href="subject.html#689">[ subject ]</a>
+              <a href="author.html#689">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Oh, wow. I hadn't thought of that. If we have a SharedLibrary interface in
+</I>&gt;<i> C++, we can have a corresponding shared library factory for JVM-specific
+</I>&gt;<i> &quot;classes&quot;. I was thinking of decaf as one big shared library; but no! it
+</I>&gt;<i> can be more modular.
+</I>
+	Specifically, there could be the interpreter and bytecode
+internalization* in one module, and the VM-specific code in another module
+or set of modules; ditto the native code for the class library to be
+used.  My specific concern for JNI is that class library native code that
+the maintainers of the class library write in JNI (to maintain VM
+independence).  It would be /very/ nice not to add another Java class
+library to the mix...
+
+&gt;<i> Of course, getNativeClass() is JVM-specific. For decaf, it can return an
+</I>&gt;<i> instance of SharedLibrary appropriate to the requested class. Using the
+</I>&gt;<i> existing decaf mechanism to bind methods to machine code, each decaf
+</I>&gt;<i> sublibrary might return pointers to methods of a single class.
+</I>
+	And that's the key -- for JVM-specific classes, it's fine to use
+JVM-specific methods (duh.)  But this mechanism doesn't extend to extant
+native libraries which use JNI.
+
+&gt;<i> Thanks for the clarification. I'd like to continue working on Kore/BCNI.
+</I>
+	And I will be more than happy to slurp the BCNI code at the
+appropriate point -- and the Kore code if you can get it and its libraries
+working before I get classpath working.  Happy hacking!
+
+&gt;<i> The SharedLibrary mechanism shown above might be simpler than JNI. I prefer
+</I>&gt;<i> BCNI over JNI. decaf works without JNI. To start decaf after its a shared
+</I>&gt;<i> library, any program can call decaf_main() to start the virtual machine.
+</I>&gt;<i> decaf returns from decaf_main() after all of non-daemon threads are
+</I>&gt;<i> complete (doesn't it?).
+</I>
+	Yes.  That's why the current implementation of 'init' sits in an
+infinite loop.  This may be changed so that some VMs will continue to
+exist for daemon threads like the TCP/IP stack -- things at the system
+level.  (On the other hand, decaf doesn't make an explicit distinction
+between daemon and regular threads, so I'll have to look at the specs and
+see what to do.  The technical behavoir of decaf is to terminate when
+(a) there are no unserviced interrupts pending, (b) there are no
+unserviced notifications pending, and (c) there are no threads in the
+active queue.  This will probably create problems for event-based apps
+(most of them!) unless they also leave a busy-waiting thread lying
+around, so I'll look at that before I CVS the new code.  Thanks for
+bringing it to my attention.)
+
+&gt;<i> The interface between jJOS and decaf (and any other virtual machine for
+</I>&gt;<i> that matter) might be reduced to an interface like that of a command line,
+</I>&gt;<i> similar to the java tool. A caller must assemble argv and pass it to
+</I>&gt;<i> decaf_main().
+</I>&gt;<i> 
+</I>&gt;<i> void decaf_main( int argc, char *argv[], Kernel *k );
+</I>&gt;<i> 
+</I>&gt;<i> This is what jJOS does, isn't it?
+</I>
+	Yes.  If the initialization code for getting the 'Kernel'
+(jjmachine *) weren't platform-specific, decaf_main() could be the C++ 
+entry point for jJOS/decaf.
+
+	In general, I don't see any particular technical difficulty to
+maintaining a decaf distribution as a system-wide 'libjvm' type of thing,
+and with a bit of work, it should be able to work much like TCL.  I've
+(obviously!) got other things to work on right now, but this could be an
+interesting project.
+
+-_Quinn
+
+* Note that the bytecode /fetching/, as per the classloader spec, can be
+done by just about anything -- and there's no reason to suppose that the
+primordial classloader couldn't also be provided by the application,
+though I'm not going to go out of my way to allow that right now.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000688.html">[JOS-Kernel] JOS Machine</A></li>
+	<LI> Next message: <A HREF="000690.html">[JOS-Kernel] JOS Machine</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#689">[ date ]</a>
+              <a href="thread.html#689">[ thread ]</a>
+              <a href="subject.html#689">[ subject ]</a>
+              <a href="author.html#689">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

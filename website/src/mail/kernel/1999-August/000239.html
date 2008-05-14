@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jJOS speed</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:bpederson%40geocities.com">
+   <LINK REL="Previous"  HREF="000238.html">
+   <LINK REL="Next" HREF="000240.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jJOS speed</H1>
+    <B>Barry Pederson</B> 
+    <A HREF="mailto:bpederson%40geocities.com"
+       TITLE="[JOS-Kernel] jJOS speed">bpederson@geocities.com</A><BR>
+    <I>Mon, 16 Aug 1999 12:43:18 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000238.html">[JOS-Kernel] jJOS speed</A></li>
+        <LI> Next message: <A HREF="000240.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#239">[ date ]</a>
+              <a href="thread.html#239">[ thread ]</a>
+              <a href="subject.html#239">[ subject ]</a>
+              <a href="author.html#239">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> hmm a write32 is still about 10 times slower than a write8, but a write16
+</I>&gt;<i> is about twice as fast as write8.
+</I>
+Hey guys, I've been lurking here a while (don't have a setup to run jJOS
+- sure would be nice when you no longer need the Etherboot stuff), but
+was wondering...
+
+How about if you added a feature to allow arrays to be created that had
+their values in particular regions of memory..something like:
+
+    byte[] getBytes(long address, long length);
+
+so you could write code like (just off the top of my head..don't really
+know the details of VGA):
+
+  byte[] vgaBuffer = jos.system.machine.getBytes(0xa0000, 0x10000);
+  for (int i = 0; i &lt; 0x10000; i++)
+      vgaBuffer[i] = 0;
+
+The only trick would be to make sure that when such an array was GC'd,
+the underlying bytes were left alone and not reallocated. 
+
+I'd think you'd save a fair amount of function call overhead, you'd be
+able to use standard methods like java.lang.System.arraycopy(), and
+you'd get the builtin Java array bounds checking for free.
+
+Speaking of bounds checking, I understand that in at least some JVMs,
+it'd be even faster to write code like:
+
+  try
+    {
+    byte[] vgaBuffer = jos.system.machine.getBytes(0xa0000, 0x10000);
+    int i = 0;
+    while (true)
+      vgaBuffer[i++] = 0;
+    }
+  catch (ArrayIndexOutOfBoundsException aioobe)
+    {
+    }
+    
+basically, don't bother explicitly checking the value of i (like the
+&quot;for&quot; loop does) since the JVM will be checking it itself anyhow.
+
+    Barry
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000238.html">[JOS-Kernel] jJOS speed</A></li>
+	<LI> Next message: <A HREF="000240.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#239">[ date ]</a>
+              <a href="thread.html#239">[ thread ]</a>
+              <a href="subject.html#239">[ subject ]</a>
+              <a href="author.html#239">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

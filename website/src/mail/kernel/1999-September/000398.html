@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf bug report / Status of RessourceManager</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000396.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf bug report / Status of RessourceManager</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Kernel] decaf bug report / Status of RessourceManager">hilarycheng@usa.net</A><BR>
+    <I>Tue, 28 Sep 1999 09:28:15 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000396.html">[JOS-Kernel] Performance Issue</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#398">[ date ]</a>
+              <a href="thread.html#398">[ thread ]</a>
+              <a href="subject.html#398">[ subject ]</a>
+              <a href="author.html#398">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Thomas,
+
+The RM is Cool........:D
+
+I would like to suggest a idea about the issue of &quot;speed of RM&quot;.
+
+For this issue, We can do it in this way.
+No one can construct a RM directly. Everyone need to get a instance of RM
+so that they access DMA. So I put reserveDMA as a static method. If I need
+a DMA 2 unshareable, RM will create a instance of itself for me that can
+only access DMA 2. So only one got the instance of this RM can only access
+DMA 2.
+
+For this change, we don't need to check the classes each time and it will
+speed up
+a little bit.
+
+RessourceManager rm = RessourceManager.reserveDMA(2, false);
+rm.dma_xfer(address, (int) nosectors*512);
+
+....................................
+....................................
+public static RessouceManager reserveDMA(int dma, boolean shareable) {
+    RessouceManager rm = new RessouceManager(dma, shareable);
+    return rm;
+}
+
+public void dma_xfer(int address, int size) {
+  ....................................
+  ....................................
+}
+....................................
+....................................
+
+
+&gt;<i>
+</I>&gt;<i>The RessourceManager is still unfinished, but today I added the
+</I>&gt;<i>DMA/PORT/IRQ reserve method. The RM is hooked into the dma class, so that
+</I>&gt;<i>the dma-driver works now with the RessourceManager.
+</I>&gt;<i>
+</I>&gt;<i>As a consequence of the new RM, the drivers need slightly to be updated.
+</I>&gt;<i>e.g. the fdc driver contains 2 more lines:
+</I>&gt;<i>
+</I>&gt;<i>RessourceManager rm=new RessourceManager();
+</I>&gt;<i>boolean reserved=rm.reserveDMA(2,this,false);
+</I>&gt;<i>
+</I>&gt;<i>//2     -&gt; channel
+</I>&gt;<i>//this  -&gt; only this class can access dma 2
+</I>&gt;<i>//false -&gt; shareable -&gt; if 2 or more drivers are allowed to acces the
+</I>&gt;<i>//         same ressource
+</I>&gt;<i>
+</I>&gt;<i>//and the line
+</I>&gt;<i>
+</I>&gt;<i>dma_xfer(2,address,(int)nosectors*512,true,this);
+</I>&gt;<i>// has 1 more argument(this)
+</I>
+hm...........what's the meaning of the boolean argument in dma_xfer ?
+
+&gt;<i>Now I thought about the speed of the RM: every call (DMA/PORT/IRQ) has to
+</I>&gt;<i>be verified. The dma method checks every call if the caller is the
+</I>&gt;<i>right owner. Isn't that slow? How do other OSes handle ressources?
+</I>&gt;<i>
+</I>
+Regards,
+
+Hilary
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000396.html">[JOS-Kernel] Performance Issue</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#398">[ date ]</a>
+              <a href="thread.html#398">[ thread ]</a>
+              <a href="subject.html#398">[ subject ]</a>
+              <a href="author.html#398">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

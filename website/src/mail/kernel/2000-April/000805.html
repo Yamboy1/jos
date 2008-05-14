@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] new_decaf CVS branch</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:George.Marrows%40Smallworld.co.uk">
+   <LINK REL="Previous"  HREF="000804.html">
+   <LINK REL="Next" HREF="000809.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] new_decaf CVS branch</H1>
+    <B>George.Marrows@Smallworld.co.uk</B> 
+    <A HREF="mailto:George.Marrows%40Smallworld.co.uk"
+       TITLE="[JOS-Kernel] new_decaf CVS branch">George.Marrows@Smallworld.co.uk</A><BR>
+    <I>Tue, 11 Apr 2000 13:54:37 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000804.html">[JOS-Kernel] (testing mailman upgrade... please ignore)</A></li>
+        <LI> Next message: <A HREF="000809.html">[JOS-Kernel] new_decaf CVS branch</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#805">[ date ]</a>
+              <a href="thread.html#805">[ thread ]</a>
+              <a href="subject.html#805">[ subject ]</a>
+              <a href="author.html#805">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi again Todd --
+
+1/. As you may have noticed, I didn't get chance to update stdlib with some
+ASSERT macros last weekend. I *might* get chance this evening (but don't
+hold your breath).
+
+2/. I meant the Java exception OutOfMemoryError and
+InvalidMonitorStateException .. as far as I could see, these and similar JVM
+exceptions aren't thrown and nor were they in the old code. But correct me
+if I'm wrong. As I said in my first mail, I'd be interested in trying to
+help sort this out if they are not yet functional.
+
+Another comment on code structure (which might have come out of the various
+discussions that have been going on, but I haven't had chance to read them
+yet): I think it would be useful to have a Process class in the C++. It
+would hold information about it class loader, threads/thread group, process
+id and, when we get some security infrastructure, the identity of the
+process owner etc.
+
+-- George
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Todd L. Miller [SMTP:<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>]
+</I>&gt;<i> Sent:	08 April 2000 07:37
+</I>&gt;<i> To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+</I>&gt;<i> Subject:	RE: [JOS-Kernel] new_decaf CVS branch
+</I>&gt;<i> 
+</I>&gt;<i> &gt; 1. The code would be cleaner, shorter and more flexible if you used an
+</I>&gt;<i> &gt; ASSERT macro. For example, I saw a couple of places with this kind of
+</I>&gt;<i> thing:
+</I>&gt;<i> 
+</I>&gt;<i> 	You're right, and I'm amazed I didn't realize this on my
+</I>&gt;<i> own.  Thanks.
+</I>&gt;<i> 
+</I>&gt;<i> &gt; 2. There seem to be quite a few places where exceptions should be thrown
+</I>&gt;<i> &gt; (illegal monitor state, out of memory etc) but aren't. I'd be interested
+</I>&gt;<i> in
+</I>&gt;<i> &gt; trying to help out in this area when the interpreter's up and running.
+</I>&gt;<i> 
+</I>&gt;<i> 	Unfortunately, C++ exceptions aren't supported on the i386 build
+</I>&gt;<i> yet, so I never gave much thought to them.  They are, clearly, the Right
+</I>&gt;<i> Way to do things*.  I'll be looking into some static-link fu for
+</I>&gt;<i> dynamic_cast&lt;&gt;(), so maybe I'll look into exceptions at the same time.**
+</I>&gt;<i> I don't think, basically, that I should spend time kludging something up
+</I>&gt;<i> that wouldn't work as well anyway.
+</I>&gt;<i> 
+</I>&gt;<i> 	Anyway, I hope you get more time to look at the code; your
+</I>&gt;<i> comments will be valuable.
+</I>&gt;<i> 
+</I>&gt;<i> -_Quinn
+</I>&gt;<i> 
+</I>&gt;<i> *  outline:
+</I>&gt;<i> 
+</I>&gt;<i> decaf_main () {
+</I>&gt;<i> 	try { /* everything before the call that starts the intreperter */ }
+</I>&gt;<i> 	catch ( Exception e ) {
+</I>&gt;<i> 		/* Try to do something intelligent, e.g. a garbage
+</I>&gt;<i> collection
+</I>&gt;<i> 		   and try again; if still no good, abort. */
+</I>&gt;<i> 		}
+</I>&gt;<i> 	scheduler-&gt;start();
+</I>&gt;<i> 	}
+</I>&gt;<i> 
+</I>&gt;<i> Frame::interpret() {
+</I>&gt;<i> 	try { /* switching on the bytecode */ }
+</I>&gt;<i> 	catch ( Exception e ) {
+</I>&gt;<i> 		/* throw e into Java.  (Unless we want try and
+</I>&gt;<i> 		   do something intelligent first.  Exceptions are
+</I>&gt;<i> JavaObject
+</I>&gt;<i> 		   subclasses, so this shouldn't be too hard;
+</I>&gt;<i> 		   return to scheduler after exception-handling frame
+</I>&gt;<i> 		   is on the thread's stack, to be run on the next
+</I>&gt;<i> 		   iteration. */
+</I>&gt;<i> 		}
+</I>&gt;<i> 	}
+</I>&gt;<i> 
+</I>&gt;<i> **: dynamic_cast&lt;&gt;() should be entirely user-space.  Messing about with
+</I>&gt;<i> the frame stack, etc, may not be, which means it wouldn't work.
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000804.html">[JOS-Kernel] (testing mailman upgrade... please ignore)</A></li>
+	<LI> Next message: <A HREF="000809.html">[JOS-Kernel] new_decaf CVS branch</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#805">[ date ]</a>
+              <a href="thread.html#805">[ thread ]</a>
+              <a href="subject.html#805">[ subject ]</a>
+              <a href="author.html#805">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

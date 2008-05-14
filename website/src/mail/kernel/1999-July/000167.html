@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] speed</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000165.html">
+   <LINK REL="Next" HREF="000164.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] speed</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] speed">jm@mak.com</A><BR>
+    <I>Sun, 25 Jul 1999 15:37:07 +0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000165.html">[JOS-Kernel] speed</A></li>
+        <LI> Next message: <A HREF="000164.html">[JOS-Kernel] speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#167">[ date ]</a>
+              <a href="thread.html#167">[ thread ]</a>
+              <a href="subject.html#167">[ subject ]</a>
+              <a href="author.html#167">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi All;
+
+Sorry to take so long to get back to you, but I'm just re-surfacing
+after a Day Job crisis period.  (And, your question deserves a long
+reply.)
+
+Thomas Bocek wrote:
+&gt;<i> I've made some tests with JJOS and java -D.compiler.NONE. JJOS seems to be
+</I>&gt;<i> 10 times slower than java. Why?
+</I>
+Geez, how much time do you have to read my response?  
+
+*Only* 10 times slower?  Actually, at this point in time, that's
+actually pretty good.  We're still at the &quot;let's get the damned thing to
+work&quot; stage, and we haven't (hadn't until now?) reached the &quot;we'd better
+speed this thing up or nobody'll use it&quot; stage.
+
+Starting from the most straightforward &quot;why it's slow&quot; reason...
+
+(0) We've still got this &quot;if (debug)&quot; stuff bloody *everywhere* (note
+it's a runtime check within a compile-time macro).
+
+(2) We're not compiling with C++ compiler optimization on.
+
+(3) We've not inlined any of the obvious member functions (e.g., local
+variable set/get, operand stack manipulation).
+
+(4) Every Java invocation runs through an expensive kludge to check for
+built-in functionality (e.g., reading/writing memory by address).  (This
+one has GOT to hurt.)
+
+(5) (This one I haven't had a lot of time to check, but if I'm right,
+it's GOT to hurt.)  I *think* that when we check UTF8 Java-space strings
+against ASCII, compiled-in strings, we actually allocate a UTF8 copy of
+the ASCII string (which entails memory allocation and constructor calls)
+to compare the strings.  We'd probably be better off with a special test
+which walks byte-at-a-time through the ASCII string and compares it to
+the word-at-a-time chars of the UTF8, and also checks for zero values in
+the high byte(s).
+
+(6) We've not hand-optimized *anything*.
+
+(7) We've not implemented either JIT or &quot;Hot Spot&quot; type algorithms.
+
+That's all I can think of right now, although I'm sure it's far from an
+exhaustive list.
+
+On a more positive note, I have some suggestions for how I would try to
+speed things up if I had any time to devote to optimization (it's all I
+can do right now to create functionality).  Any volunteers to do the
+following?  Thomas?
+
+(1) First, I'd rebuild the host target, enabling profiling (-p switches
+to both compiler and linker for the &quot;prof&quot; profiler -- hmm.. can we use
+&quot;-gp&quot; for the more-capable &quot;gprof&quot;?).  
+
+(2) Then, I'd add an &quot;on_exit&quot; handler for the host build, which would
+do whatever it had to do for the profiler to spit out the &quot;mon.out&quot;
+record of execution (this might just be calling the normal exit()
+routine).  The goal is that, when the user typed ^C (or whatever), the
+&quot;mon.out&quot; file gets written.
+
+(3) I'd try to get some sufficiently &quot;interesting&quot; Java code written, or
+find some sufficiently &quot;interesting&quot; benchmark (CaffeineMark -- does it
+run under decaf?).
+
+(4) I'd try it under kaffe/whatever and record the execution times.
+
+(5) I'd try it under the host build.
+
+(6) I'd run the profile on the mon.out file, and forward the results to
+the list.
+
+Optionally, I'd try this profiling thing again after:
+
+(a) Undefining TRACE and DEBUG macros via the Makefiles.
+
+(b) Turning on the optimizer (I don't know which options to use right
+now).
+
+(c) Turning off the &quot;-g&quot; symbolic debugger option (which limits the
+optimizations which the compiler can use).
+
+Let me know what you think, and thanks for the attention to the
+performance issue!
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000165.html">[JOS-Kernel] speed</A></li>
+	<LI> Next message: <A HREF="000164.html">[JOS-Kernel] speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#167">[ date ]</a>
+              <a href="thread.html#167">[ thread ]</a>
+              <a href="subject.html#167">[ subject ]</a>
+              <a href="author.html#167">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

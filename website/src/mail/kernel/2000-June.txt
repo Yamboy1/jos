@@ -1,0 +1,813 @@
+From lepreau@cs.utah.edu Fri, 02 Jun 2000 04:31:20 MDT
+Date: Fri, 02 Jun 2000 04:31:20 MDT
+From: Jay Lepreau lepreau@cs.utah.edu
+Subject: [JOS-Kernel] New paper available on KaffeOS (a Java OS)
+
+Hi JOS'ers,
+You should be able to get some design ideas from this paper.
+We'll also be releasing the code soon, as soon as we upgrade
+to the current Kaffe base.  Also note the second paper.
+Do mail us if you have comments or want clarifications.
+
+Processes in KaffeOS: Isolation, Resource Management, and Sharing in Java
+				   
+	      Godmar Back, Wilson C. Hsieh, Jay Lepreau
+	    University of Utah, Dept. of Computer Science
+		     Technical Report UUCS-00-010
+				   
+     http://www.cs.utah.edu/flux/papers/kaffeos-tr00010-base.html
+				   
+			       Abstract
+
+Single-language runtime systems, in the form of Java virtual machines,
+are widely deployed platforms for executing untrusted mobile code.
+These runtimes provide some of the features that operating systems
+provide: inter-application memory protection and basic system
+services.  They do not, however, provide the ability to isolate
+applications from each other, or limit their resource consumption.  
+This paper describes KaffeOS, a system that provides these features
+for a Java runtime.  The KaffeOS architecture takes many lessons
+from operating system design, such as the use of a user/kernel boundary.
+
+The KaffeOS architecture supports the OS abstraction of a 
+process in a Java virtual machine.  Each process executes as if it
+were run in its own virtual machine, including separate garbage
+collection of its own heap.  The difficulty in designing KaffeOS lay
+in balancing the goals of isolation and resource management against
+the goal of allowing direct sharing.  Overall, KaffeOS is up to 11%
+slower than the JVM on which it is based, which is an acceptable
+penalty for the safety that it provides.  KaffeOS is substantially
+slower than commercial JVMs, but exhibits much better performance
+scaling in the presence of uncooperative code.
+
+-------------------------------------------------------------------
+This prior, short paper contains a key insight into Java OS design.
+
+
+		     Drawing the Red Line in Java
+				   
+		     Godmar Back, Wilson C. Hsieh
+     In Seventh IEEE Workshop on Hot Topics in Operating Systems
+			      March 1999
+				   
+      http://www.cs.utah.edu/flux/papers/redline-hotos7-base.html
+				   
+			       Abstract
+				   
+Software-based protection has become a viable alternative to 
+hardware-based protection in systems based on languages such as 
+Java, but the absence of hardware mechanisms for protection has 
+been coupled with an absence of a user/kernel boundary.  We show 
+why such a "red line" must be present in order for a Java virtual 
+machine to be as effective and as reliable as an operating system. 
+We discuss how the red line can be implemented using software 
+mechanisms, and explain the ones we use in the Java system that 
+we are building.
+
+
+
+
+From gchii@mindspring.com Fri, 02 Jun 2000 10:00:36 -0400
+Date: Fri, 02 Jun 2000 10:00:36 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] New paper available on KaffeOS (a Java OS)
+
+At 04:31 AM 6/2/00 MDT, Jay Lepreau <lepreau@cs.utah.edu> wrote:
+>Hi JOS'ers,
+
+Thanks for the update. This is welcome news.
+
+>You should be able to get some design ideas from this paper.
+
+Yes, we should. I am pleased to here that Kaffe has been extended to build
+KaffeOS. It seems to me that Kore is compatible with Sun's JDK 1.02. What
+is Kaffe compatible with? I'd like to think KaffeOS can benefit from our
+research, too.
+
+>The KaffeOS architecture supports the OS abstraction of a 
+>process in a Java virtual machine. Each process executes as if it
+>were run in its own virtual machine, including separate garbage
+>collection of its own heap.
+
+It sounds like KaffeOS is similar to JNI design, where each bytecode
+process has four threads: main, gui, gc and finalization. In MPCL design,
+each bytecode process has three threads: main, gui and finalization. The gc
+thread is vm-wide.
+
+>Overall, KaffeOS is up to 11% slower than the JVM on which it is based,
+>which is an acceptable penalty for the safety that it provides. KaffeOS is
+>substantially slower than commercial JVMs, but exhibits much better
+>performance scaling in the presence of uncooperative code.
+
+Here is a comment worthy of more discussion. We expect our MPCL-compatible
+virtual machine to be as fast (or faster) than decaf in host mode. We do
+not plan on reworking every opcode method to deal with multiple bytecode
+processes. As far as the interpreter (thread) is concerned, it is still a
+virtual machine with a single primordial class loader.
+
+>Drawing the Red Line in Java
+
+This article sounds familiar. For more information, see also the
+AboveAndBelow article on JOS Wiki.
+
+
+
+
+
+From gchii@mindspring.com Tue, 06 Jun 2000 20:22:22 -0400
+Date: Tue, 06 Jun 2000 20:22:22 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [no template] Can't make
+
+I have worked through a lot of other problems on my journey to this point.
+I have installed another version of Linux (SuSE 6.0) and reconfigured
+constantly to include all of the right tools.
+
+Now, my C++ compiler on Linux doesn't like the code for jJOS/decaf because
+it does not support templates. Is it possible to set up a compiler
+directive to exclude templates, like NO_TEMPLATES?
+
+Or, do I have to scratch all that I have done and get SuSE 6.3?
+
+To be frank, I would rather compile jJOS/decaf on Windows 95 with Borland
+C++ 5.0. Is that going to be a problem?
+
+
+
+
+
+From clemens@informatik.tu-muenchen.de Wed, 7 Jun 2000 23:34:49 +0000
+Date: Wed, 7 Jun 2000 23:34:49 +0000
+From: Claudio Clemens clemens@informatik.tu-muenchen.de
+Subject: [JOS-Kernel] [no template] Can't make
+
+On Wed, 7 Jun 2000, Gilbert Carl Herschberger II wrote:
+
+>I have worked through a lot of other problems on my journey to this point.
+>I have installed another version of Linux (SuSE 6.0) and reconfigured
+>constantly to include all of the right tools.
+>
+>Now, my C++ compiler on Linux doesn't like the code for jJOS/decaf because
+>it does not support templates. Is it possible to set up a compiler
+>directive to exclude templates, like NO_TEMPLATES?
+>
+>Or, do I have to scratch all that I have done and get SuSE 6.3?
+
+I don't know if it will work. I'm using SuSE 6.3 / 6.4 and can't compile
+it anyway.
+
+
+Building JJOS for host
+g++ -g -Wall -fno-builtin -DTARGET_UNIX -DPARANOID
+-DNEW_INTERRUPT_HANDLING -DUSE_CURSES -I. -I../../../common/nativecode
+-I../../../common/decaf -c ../../../common/decaf/java_object.cc
+../../../common/decaf/java_object.cc: In method `enum jbArray<java_object
+*>::primitiveArrayType java_object_array::array_type() const':
+../../../common/decaf/java_object.cc:219: use of class template `template
+<class elem_t> jbArray<elem_t>' as expression
+../../../common/decaf/java_object.cc:219: parse error before `::'
+../../../common/decaf/java_object.cc:220: warning: control reaches end of
+non-void function `java_object_array::array_type() const'
+../../../common/decaf/java_object.cc: In method `enum
+jbArray<float>::primitiveArrayType java_jfloat_array::array_type() const':
+../../../common/decaf/java_object.cc:254: use of class template `template
+<class elem_t> jbArray<elem_t>' as expression
+../../../common/decaf/java_object.cc:254: parse error before `::'
+../../../common/decaf/java_object.cc:255: warning: control reaches end of
+non-void function `java_jfloat_array::array_type() const'
+../../../common/decaf/java_object.cc: In method `enum
+jbArray<double>::primitiveArrayType java_jdouble_array::array_type() const':
+../../../common/decaf/java_object.cc:271: use of class template `template
+<class elem_t> jbArray<elem_t>' as expression
+../../../common/decaf/java_object.cc:271: parse error before `::'
+../../../common/decaf/java_object.cc:272: warning: control reaches end of
+non-void function `java_jdouble_array::array_type() const'
+../../../common/decaf/java_object.cc: In method `enum
+jbArray<jju64>::primitiveArrayType java_jlong_array::array_type() const':
+../../../common/decaf/java_object.cc:288: use of class template `template
+<class elem_t> jbArray<elem_t>' as expression
+../../../common/decaf/java_object.cc:288: parse error before `::'
+../../../common/decaf/java_object.cc:289: warning: control reaches end of
+non-void function `java_jlong_array::array_type() const'
+../../../common/decaf/java_object.cc: In method `enum jbArray<unsigned
+char>::primitiveArrayType java_mapped_array::array_type() const':
+../../../common/decaf/java_object.cc:298: use of class template `template
+<class elem_t> jbArray<elem_t>' as expression
+../../../common/decaf/java_object.cc:298: parse error before `::'
+../../../common/decaf/java_object.cc:299: warning: control reaches end of
+non-void function `java_mapped_array::array_type() const'
+make: *** [java_object.o] Error 1
+
+Building JJOS for i386 
+g++ -g -Wall -fno-builtin -fno-exceptions -DPARANOID -DHANDLE_CLOCK
+-DNATIVE_CLOCK -DNEW_INTERRUPT_HANDLING -DTEST_A20
+-I. -I../../../common/nativecode -I../../../common/decaf -o jbheap.o -c
+../../../common/nativecode/jbheap.cc
+../../../common/nativecode/jbheap.cc: In function `void getRoots()':
+../../../common/nativecode/jbheap.cc:514: invalid use of void expression
+../../../common/nativecode/jbheap.cc: At top level:
+../../../common/nativecode/jbheap.cc:481: warning: `void panic(char *)'
+defined but not used
+make: *** [jbheap.o] Error 1
+
+This is jos1f
+
+cu
+
+Claudio
+
+-- 
++-----| http://linux.brasileiro.net - Seu site de informações |-----+
+|     Claudio Clemens at Home   -   Informatik   -   TU-München     |
+|         clemens@in.tum.de         http://www.in.tum.de/~clemens   |
+A poor excuse is better than no excuse!
+
+
+
+
+
+From gchii@mindspring.com Thu, 08 Jun 2000 09:22:04 -0400
+Date: Thu, 08 Jun 2000 09:22:04 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [no template] Can't make
+
+At 11:34 PM 6/7/00 +0000, Claudio Clemens
+<clemens@informatik.tu-muenchen.de> wrote:
+>I don't know if it will work. I'm using SuSE 6.3 / 6.4 and can't compile
+>it anyway.
+
+Thank for the heads-up warning. I'll put off loading another version of
+Linux. Who has a compiler that works? What compiler are we supposed to use?
+
+>This is jos1f
+
+Yes. Same here. Couldn't each of these classes could be written out "long
+hand" and use inheritence rather than templates? Or, should I wait for a
+new compiler?
+
+
+
+
+
+From tmiller@haverford.edu Thu, 8 Jun 2000 23:19:32 -0400 (EDT)
+Date: Thu, 8 Jun 2000 23:19:32 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] [no template] Can't make
+
+> Thank for the heads-up warning. I'll put off loading another version of
+> Linux. Who has a compiler that works? What compiler are we supposed to use?
+
+	I wrote the code and hadn't had problems with it.  (Obviously.)  
+My g++ version is egcs-2.91.66.  I'd strongly recommend fetching a new
+compiler.  I went ahead and checked the jos1f distribution; it compiled
+and ran JJOS just fine.  The seventh console (alt+f7) is a VGA console,
+though I didn't check which mode it runs in, and the mode switching is
+very, very, slow.  I'll look into why tonight.
+
+	Specifically about the compiler errors:
+
+../../../common/nativecode/jbheap.cc: In function `void getRoots()':
+../../../common/nativecode/jbheap.cc:514: invalid use of void expression
+
+	egcs warns about non-ANSI void pointers arithmetic here; if you
+can't find a compiler switch to turn this back to an error for your
+compiler, feel free to cast the pointers to char * before doing math on
+them.
+
+	The errors reported in java_object.cc are all scoping bugs or
+problems.  (Either in egcs 2.91.66 or in your compiler, whatever it may
+happen to be.)  A brute-force solution is to replace every instance of
+'jbArray::T_' with jbArray< x >::T_, where x is the type as declared in
+the function header.  Or, if you feel like doing a bit more
+code-rewriting, you can pull the enumeration out of jbArray.  Since I
+included the type in the header, it's possible that not requiring it in
+the body is an egcs 2.91.66-specific misfeature.
+
+	I did not take concious advantage of whatever non-ANSI C++
+features are available in egcs, so other compilers should work just fine.
+There are a few places where we might run into trouble where we ignore
+warnings generated by -Wall, but those shouldn't be hard to fix.  Just for
+kicks, I ran g++ with -pedantic (ANSI-strict).  I got the following
+warnings about "commas at the end of enumerator list" in various places,
+and the following:
+
+../../../common/decaf/scheduler.cc:377: warning: text following `#endif' violates ANSI standard
+../../../common/decaf/interp.cc:443: warning: ANSI C++ forbids variable-size array `argument'
+../../../common/decaf/interp.cc:546: warning: ANSI C++ forbids variable-size array `argument'
+../../../common/decaf/interp.cc:666: warning: ANSI C++ forbids variable-size array `argument'
+../../../common/decaf/interp.cc:778: warning: ANSI C++ forbids variable-size array `argument'
+../../../common/decaf/java_object.cc:205: warning: default argument given for parameter 3 of `java_object_array::java_object_array(class java_class *, jju32, jju32 = 1)'
+../../../common/decaf/java_object.h:63: warning: after previous specification in `java_object_array::java_object_array(class java_class *, jju32, jju32 = 1)'
+../../../common/nativecode/jbheap.cc:514: warning: ANSI C++ forbids using pointer of type `void *' in subtraction
+../../../common/nativecode/jbmachin.cc:130: warning: ANSI C++ forbids zero-size array `link'
+../../../common/nativecode/jbzipfile.h:68: warning: ANSI C++ forbids zero-size array `myFilename'
+../../../common/nativecode/jbzipfile.h:69: warning: ANSI C++ forbids zero-size array `myExtraField'
+../../../common/nativecode/jbtypes.cc:329: warning: ANSI C++ does not support `long long'
+../../../common/nativecode/jbzipfile.h:68: warning: ANSI C++ forbids zero-size array `myFilename'
+../../../common/nativecode/jbzipfile.h:69: warning: ANSI C++ forbids zero-size array `myExtraField'
+jjmachin.cc:54: warning: ANSI C++ forbids using pointer of type `void *' in arithmetic
+jjmachin.cc:54: warning: ANSI C++ forbids using pointer of type `void *' in arithmetic
+jjramdisk.cc:63: warning: ANSI C++ forbids implicit conversion from `void *' in initialization
+
+	None of which look like they'd be a problem* if your compiler
+doesn't support these 'extensions'.
+
+-_Quinn
+
+* to get around long-long, just activate jdouble-as-class support
+
+
+
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 8 Jun 2000 23:45:36 -0500
+Date: Thu, 8 Jun 2000 23:45:36 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] [no template] Can't make
+
+On 8 Jun 00, at 9:22, Gilbert Carl Herschberger II wrote:
+
+> Yes. Same here. Couldn't each of these classes could be written out "long
+> hand" and use inheritence rather than templates? Or, should I wait for a
+> new compiler?
+
+Not having much to say about the code itself since I haven't written 
+any of it (and so don't know what design decisions went into 
+certain choices) I would shy away from templates in native code for 
+JOS just for portability sake.  In fact, I wouldn't go much past 
+EC++ (embedded C++) standard stuff (which I believe nixes 
+templates).  I'd also avoid using C++ exceptions because of its 
+mixed implementation platform to platform.
+
+I hold these opinions because of two factors that have been 
+gnawing at the back of my mind for a while.  First, we want to 
+maximize portability.  The simpler the language you use, the better 
+the chance you'll find a compliant compiler on a platform.  Second, 
+although its not mentioned much at all, it would be best if at some 
+point JOS were self hosting.  I see no reason to port the entire gcc 
+to java.  It would seem more logical to use C or even a subset of C 
+since the native code should be very limited in scope (at least as 
+far as our ideal JOS design is concerned).  That way, we could 
+build a small C compiler (probably based on the old classic 
+SmallC) and a small assembler.  Not something we'll be doing 
+soon, but something I'd like us to keep in the back of our minds...
+
+-iain
+
+
+
+
+From clemens@informatik.tu-muenchen.de Fri, 9 Jun 2000 21:28:13 +0000
+Date: Fri, 9 Jun 2000 21:28:13 +0000
+From: Claudio Clemens clemens@informatik.tu-muenchen.de
+Subject: [JOS-Kernel] [no template] Can't make
+
+On Fri, 9 Jun 2000, Todd L. Miller wrote:
+
+>> Thank for the heads-up warning. I'll put off loading another version of
+>> Linux. Who has a compiler that works? What compiler are we supposed to use?
+>
+>	I wrote the code and hadn't had problems with it.  (Obviously.)  
+>My g++ version is egcs-2.91.66.  I'd strongly recommend fetching a new
+>compiler.  I went ahead and checked the jos1f distribution; it compiled
+>and ran JJOS just fine.  The seventh console (alt+f7) is a VGA console,
+>though I didn't check which mode it runs in, and the mode switching is
+>very, very, slow.  I'll look into why tonight.
+
+The problem is, I'M USING a newer compiler (gcc 2.95.2). It seems, that
+gcc is geting stricter.
+
+CU
+
+Claudio
+
+-- 
++-----| http://linux.brasileiro.net - Seu site de informações |-----+
+|     Claudio Clemens at Home   -   Informatik   -   TU-München     |
+|         clemens@in.tum.de         http://www.in.tum.de/~clemens   |
+Se sua TV está no ar, segura que vai cair.
+
+
+
+
+
+From tmiller@haverford.edu Fri, 9 Jun 2000 17:25:17 -0400 (EDT)
+Date: Fri, 9 Jun 2000 17:25:17 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] [no template] Can't make
+
+> The problem is, I'M USING a newer compiler (gcc 2.95.2). It seems, that
+> gcc is geting stricter.
+
+	OK.  I'll try to be aware of that while I'm working on the new
+tree.  I'll try to get a new(er) compiler shortly.  Until the new tree is
+ready, the suggestions in my other mail ought to work.
+
+-_Quinn
+
+
+
+
+
+From tullmann@cs.utah.edu Sat, 10 Jun 2000 14:29:35 -0600
+Date: Sat, 10 Jun 2000 14:29:35 -0600
+From: Patrick Tullmann tullmann@cs.utah.edu
+Subject: [JOS-Kernel] New paper available on KaffeOS (a Java OS)
+
+Gilbert Carl Herschberger II wrote:
+> Yes, we should. I am pleased to here that Kaffe has been extended to build
+> KaffeOS. It seems to me that Kore is compatible with Sun's JDK 1.02. What
+> is Kaffe compatible with? I'd like to think KaffeOS can benefit from our
+> research, too.
+
+Kaffe has its own set of standard Java libraries.  They are much more
+complete than Kore's (approx. version 1.1, though parts are missing,
+and there is a good bit of 1.2 in them).  KaffeOS uses modified Kaffe
+core libraries.
+
+-Pat
+
+----- ----- ---- ---  ---  --   -    -      -         -               -
+Pat Tullmann                                       tullmann@cs.utah.edu
+ Indifference may cause the downfall of mankind, but who really cares?
+
+
+
+
+From tmiller@haverford.edu Sat, 10 Jun 2000 16:53:33 -0400 (EDT)
+Date: Sat, 10 Jun 2000 16:53:33 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] New paper available on KaffeOS (a Java OS)
+
+> Kaffe has its own set of standard Java libraries.  They are much more
+> complete than Kore's (approx. version 1.1, though parts are missing,
+> and there is a good bit of 1.2 in them).
+
+	Could you give me a rough guess on the size of the native code in
+the Kaffe library?  When I do the first library integration with decaf, I
+want the smallest possible amount of native code.  (Partly because it
+means we'll have to rewrite less into BCNI, and partly because if the
+amount is small enough, I'll be able to put off implementing
+JNI.)  Thanks.
+
+-_Quinn
+
+
+
+
+
+From tullmann@cs.utah.edu Sat, 10 Jun 2000 14:59:23 -0600
+Date: Sat, 10 Jun 2000 14:59:23 -0600
+From: Patrick Tullmann tullmann@cs.utah.edu
+Subject: [JOS-Kernel] New paper available on KaffeOS (a Java OS)
+
+> 	Could you give me a rough guess on the size of the native code in
+> the Kaffe library?  
+
+You could probably get away with only the native code in
+kaffe/libraries/clib/native/, which is about 6,000 lines.  There are
+on the order of 140 native methods defined in that code.
+
+For Kore there are on the order of 70 native methods, you'll need to
+implement.  Kore's native methods are much cleaner in terms of their
+arguments, and are quite focused.
+
+Note: these numbers are for mostly just java.lang (e.g., not java.io)
+and are approximations obtained via 'grep' and 'wc'.
+
+> When I do the first library integration with decaf, I want the
+> smallest possible amount of native code.  (Partly because it means
+> we'll have to rewrite less into BCNI, and partly because if the
+> amount is small enough, I'll be able to put off implementing JNI.)
+
+You'll probably want to go with Kore then.  There's no real reason you 
+can't have both Kore and Kaffe library support (eventually).  Just
+keep the native library support code separate from the core VM.
+
+-Pat
+
+----- ----- ---- ---  ---  --   -    -      -         -               -
+Pat Tullmann                                       tullmann@cs.utah.edu
+     To understand recursion one must first understand recursion.
+
+
+
+
+From tmiller@haverford.edu Sat, 10 Jun 2000 17:27:56 -0400 (EDT)
+Date: Sat, 10 Jun 2000 17:27:56 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] New paper available on KaffeOS (a Java OS)
+
+> Note: these numbers are for mostly just java.lang (e.g., not java.io)
+> and are approximations obtained via 'grep' and 'wc'.
+
+	Most of the library outside of java.lang will be rewritten to use
+Java "native" methods (BCNI), anyway, I expect.  Thanks for the info.  I
+do intend to allow multiple-library support.  How well it will work is
+open to question, especially 1.0.x vs 1.1.x vs 1.2.x, because of changes
+in the VM spec.
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Sat, 10 Jun 2000 17:29:37 -0400 (EDT)
+Date: Sat, 10 Jun 2000 17:29:37 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] GRUB booting
+
+	BTW -- if people are having problems booting JOS, I can post the
+(GRUB) (floppy) disk image I use somewhere.  (I was going to mention this
+earlier, but forgot about it.)
+
+-_Quinn
+
+
+
+
+
+
+
+From al@outworld.org Sun, 11 Jun 2000 13:21:27 +0300
+Date: Sun, 11 Jun 2000 13:21:27 +0300
+From: Al al@outworld.org
+Subject: [JOS-Kernel] GRUB booting
+
+"Todd L. Miller" wrote:
+
+> BTW -- if people are having problems booting JOS, I can post the
+> (GRUB) (floppy) disk image I use somewhere.
+
+That would be very nice! :)
+
+
+-- 
+
+        "Though this be madness, yet there is method in't."
+                                          - William Shakespeare
+________________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ICQ#: 11876955] [AIM: "petrounias"] [DSS: 0xDBEF8ECC] [RSA: 0xBC469499]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+DO NOT SEND ME ANY UNSOLICITED COMMERCIAL, POLITICAL OR RELIGIOUS E-MAIL
+
+
+
+
+From tmiller@haverford.edu Sun, 11 Jun 2000 13:51:11 -0400 (EDT)
+Date: Sun, 11 Jun 2000 13:51:11 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] GRUB booting
+
+> That would be very nice! :)
+
+	ftp://jos.sourceforge.net/pub/jos/grub.img
+
+	Hopefully it uploaded correctly.
+
+-_Quinn
+
+
+
+
+
+From clemens@informatik.tu-muenchen.de Sun, 11 Jun 2000 19:28:09 +0200 (CEST)
+Date: Sun, 11 Jun 2000 19:28:09 +0200 (CEST)
+From: Claudio Clemens clemens@informatik.tu-muenchen.de
+Subject: [JOS-Kernel] GRUB booting
+
+On Sat, 10 Jun 2000, Todd L. Miller wrote:
+
+>	BTW -- if people are having problems booting JOS, I can post the
+>(GRUB) (floppy) disk image I use somewhere.  (I was going to mention this
+>earlier, but forgot about it.)
+>
+>-_Quinn
+
+I would aprecieate that. Can you put somewhere to download? If not you can
+send me.
+
+:-).... soon running JOS... I can't believe.
+
+Claudio
+
+-- 
++-----| http://linux.brasileiro.net - Seu site de informações |-----+
+|     Claudio Clemens at Home   -   Informatik   -   TU-München     |
+|         clemens@in.tum.de         http://www.in.tum.de/~clemens   |
+My Mother loves ME!  It's the computer she hates.
+
+
+
+
+
+From gchii@mindspring.com Tue, 13 Jun 2000 11:02:11 -0400
+Date: Tue, 13 Jun 2000 11:02:11 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] GRUB booting
+
+At 05:29 PM 6/10/00 -0400, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>	BTW -- if people are having problems booting JOS, I can post the
+>(GRUB) (floppy) disk image I use somewhere.  (I was going to mention this
+>earlier, but forgot about it.)
+
+If we're serious about creating a Java-based operating system, a Java
+application should be able to create a boot diskette. This is on my wish
+list. Any volunteers?
+
+I would like to see a Java application that is capable of creating a GRUB
+boot diskette. This application should be distributed in a jar as well as
+in source code.
+
+Here is how it might work. The boot image would be stored within the class
+file itself. This application should be self-contained. It should not use
+an external "resource" file. The raw boot image is converted to a byte
+array, like this:
+
+  private byte[] payload = {
+    0x??, 0x??, 0x?? .. 0x??
+    };
+
+Where does the byte array come from? A Java program should be written to
+create the .java file from a GRUB boot image.
+
+The Java application opens /dev/fd0 for output and writes the payload byte
+array to the disk. See there! A GRUB boot diskette has been created.
+
+One Java application could create a GRUB boot diskette and a Etherboot boot
+diskette. A command line version might enable me to select GRUB or
+Etherboot. A GUI version of this application might enable me to select
+/dev/fd0 or /def/fd1 and GRUB or Etherboot.
+
+Taking this one more step, there should be a suitable API so that any Java
+object can create a boot diskette.
+
+How do I create a boot diskette from MS-DOS or Microsoft Windows? I should
+be able to create a boot diskette on any foreign operating system with one
+platform-independent Java application.
+
+Does anyone have enough talent (and time) to write this app? It would make
+my life a lot easier. I still don't have a GRUB boot diskette.
+
+
+
+
+
+From clemens@informatik.tu-muenchen.de Tue, 13 Jun 2000 23:02:45 +0200 (CEST)
+Date: Tue, 13 Jun 2000 23:02:45 +0200 (CEST)
+From: Claudio Clemens clemens@informatik.tu-muenchen.de
+Subject: [JOS-Kernel] GRUB booting
+
+On Tue, 13 Jun 2000, Gilbert Carl Herschberger II wrote:
+
+>At 05:29 PM 6/10/00 -0400, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>>	BTW -- if people are having problems booting JOS, I can post the
+>>(GRUB) (floppy) disk image I use somewhere.  (I was going to mention this
+>>earlier, but forgot about it.)
+>
+>If we're serious about creating a Java-based operating system, a Java
+>application should be able to create a boot diskette. This is on my wish
+>list. Any volunteers?
+
+This is a great idea! It shouldn't be so dificult to do that. Can someone
+show a bootstring, that boots and say Hello? That should be a beginning,
+and maybe a could write something like this. The only problem is: who does
+GRUB works? I downloaded the GRUBd distribution, but have no idea how it
+works, and how I can make it works. What does it need? A bootloader, then
+it probably jumps to a kernel code segment, and this kernel loads some
+init-prosses (a command line or so). With JOS, the kernel should load the
+JVM, and then comes something from JOSBox (what the hell could be for a
+i386 in JOSBox? I know you don't have any example, I know...)
+
+>Here is how it might work. The boot image would be stored within the class
+>file itself. This application should be self-contained. It should not use
+>an external "resource" file. The raw boot image is converted to a byte
+>array, like this:
+>
+>  private byte[] payload = {
+>    0x??, 0x??, 0x?? .. 0x??
+>    };
+
+Doesn't seems dificult. The contents is the bigest problem.
+
+>The Java application opens /dev/fd0 for output and writes the payload byte
+>array to the disk. See there! A GRUB boot diskette has been created.
+
+No prob, I thing
+
+>One Java application could create a GRUB boot diskette and a Etherboot boot
+>diskette. A command line version might enable me to select GRUB or
+>Etherboot. A GUI version of this application might enable me to select
+>/dev/fd0 or /def/fd1 and GRUB or Etherboot.
+
+Etherboot is also a mistery for me. 8-(
+
+>Taking this one more step, there should be a suitable API so that any Java
+>object can create a boot diskette.
+
+That's rigth. But you need to rewrite this application for every host. So
+you should have a main application, and a bunch of classes, each with the
+bootstring for a specific host. With the application, you should be able
+to choose for wich host you are building the disk.
+
+>How do I create a boot diskette from MS-DOS or Microsoft Windows? I should
+>be able to create a boot diskette on any foreign operating system with one
+>platform-independent Java application.
+
+See above.
+
+>Does anyone have enough talent (and time) to write this app? It would make
+>my life a lot easier. I still don't have a GRUB boot diskette.
+
+I thing this is trivial. Or is it more dificult than I think? 
+FileOutputStream fos=(/dev/fd0);
+
+Okay, this is not the right syntax, but you know what I mean, doesn't you?
+
+So long
+
+Claudio
+
+-- 
++-----| http://linux.brasileiro.net - Seu site de informações |-----+
+|     Claudio Clemens at Home   -   Informatik   -   TU-München     |
+|         clemens@in.tum.de         http://www.in.tum.de/~clemens   |
+I wish I could remember where I parked my hard disk....
+
+
+
+
+
+From gchii@mindspring.com Wed, 14 Jun 2000 10:10:45 -0400
+Date: Wed, 14 Jun 2000 10:10:45 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] GRUB booting
+
+At 11:02 PM 6/13/00 +0200, Claudio Clemens
+<clemens@informatik.tu-muenchen.de> wrote:
+>I thing this is trivial. Or is it more dificult than I think? 
+>FileOutputStream fos=(/dev/fd0);
+>
+>Okay, this is not the right syntax, but you know what I mean, doesn't you?
+
+Is that right? If we assume we have one payload for GRUB and another for
+Etherboot (etc.), then creating an actual boot diskette with Java on Linux
+becomes something like this (?):
+
+  public void createBootDisk( byte[] payload ) {
+    OutputStream output;
+    try {
+      output = new FileOutputStream( "/dev/fd0" );
+    }
+    catch( IOException e ) {
+      // uh oh.
+      return;
+    }
+
+    try {
+      output.write( payload );
+    }
+    catch( IOException e ) {
+      // uh oh.
+    }
+
+    try {
+      output.close();
+    }
+    catch( IOException e ) {
+      // uh oh.
+    }
+  }
+
+I have downloaded a GRUB boot image; but, I've been unable to boot with
+GRUB. I understand how Etherboot works. GRUB is still a mystery.
+
+
+
+
+
+From tmiller@haverford.edu Wed, 14 Jun 2000 17:54:12 -0400 (EDT)
+Date: Wed, 14 Jun 2000 17:54:12 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] GRUB booting
+
+> I have downloaded a GRUB boot image; but, I've been unable to boot with
+> GRUB. I understand how Etherboot works. GRUB is still a mystery.
+
+	dd if=grub.img of=/dev/fd0 blocksize=1k count=1440
+
+with a blank-but-formatted floppy in the drive.  If you're using winblows,
+find rawrite.exe from one of the linux distros and use that.  Reboot with
+the floppy.
+
+-_Quinn
+
+
+
+
+

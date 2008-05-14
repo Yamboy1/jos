@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000776.html">
+   <LINK REL="Next" HREF="000784.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Device as a digital resource">gchii@mindspring.com</A><BR>
+    <I>Wed, 22 Mar 2000 11:46:40 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000776.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000784.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#779">[ date ]</a>
+              <a href="thread.html#779">[ thread ]</a>
+              <a href="subject.html#779">[ subject ]</a>
+              <a href="author.html#779">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 07:32 PM 3/21/00 +0200, Al &lt;<A HREF="mailto:al@outworld.org">al@outworld.org</A>&gt; wrote:
+&gt;<i>device:zipdrive:<A HREF="scsi://localhost/bus/scsi/6/attached">scsi://localhost/bus/scsi/6/attached</A>
+</I>&gt;<i>
+</I>&gt;<i>and
+</I>&gt;<i>
+</I>&gt;<i>device:zipdrive:scsi//localhost/bus/scsi/6/attached/disk
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>The first URI points to the Zip drive itself, the second to the disk
+</I>&gt;<i>*inside* the Zip drive.
+</I>
+Oh, I see where you might be going. You're looking for something like the
+/dev subdirectory on Linux/UNIX. Would you like every device to have a node
+in the file subsystem?
+
+If so, the file: and in: schemes returns an instance of InputStream. The
+out: scheme returns an instance of OutputStream. Today, all these URIs work
+on virtual machines for Linux.
+
+To open a floppy disk device:
+
+<A HREF="file://localhost/dev/fd0">file://localhost/dev/fd0</A>
+in:file:/dev/fd0
+out:file:/dev/fd0
+
+To open a hard drive device:
+
+<A HREF="file://localhost/dev/hd0">file://localhost/dev/hd0</A>
+in:file:/dev/hd0
+out:file:/dev/hd0
+
+To open a tty: device:
+
+<A HREF="file://localhost/dev/tty0">file://localhost/dev/tty0</A>
+in:file:/dev/tty0
+out:file:/dev/tty0
+
+The file: scheme is a major scheme. Experience has shown that host and port
+should have been an optional part of the file: scheme. Both host and port
+are optional for the in: and out: schemes. For example, use these URI to
+open a file in the current directory:
+
+in:file:example.txt -&gt; java.lang.InputStream
+out:file:example.txt -&gt; java.lang.OutputStream
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000776.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000784.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#779">[ date ]</a>
+              <a href="thread.html#779">[ thread ]</a>
+              <a href="subject.html#779">[ subject ]</a>
+              <a href="author.html#779">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

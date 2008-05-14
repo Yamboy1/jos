@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] changes to make grub work smoothly</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ajregier%40earthlink.net">
+   <LINK REL="Previous"  HREF="000548.html">
+   <LINK REL="Next" HREF="000550.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] changes to make grub work smoothly</H1>
+    <B>Avery J. Regier</B> 
+    <A HREF="mailto:ajregier%40earthlink.net"
+       TITLE="[JOS-Kernel] changes to make grub work smoothly">ajregier@earthlink.net</A><BR>
+    <I>Tue, 7 Dec 1999 21:34:09 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000548.html">[JOS-Kernel] TELNET</A></li>
+        <LI> Next message: <A HREF="000550.html">[JOS-Kernel] changes to make grub work smoothly</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#549">[ date ]</a>
+              <a href="thread.html#549">[ thread ]</a>
+              <a href="subject.html#549">[ subject ]</a>
+              <a href="author.html#549">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+
+All,
+
+If you are frustrated trying to figure out what to modify in order to make JJOS
+with GRUB work smoothly, I've got a fix for you.
+
+Just apply this diff after doing a clean checkout from the CVS and remake it.  
+
+Included are:
+* the return(false); instead of abort(); which will allow JJOS to run to
+completion.
+* a little bit of loop unrolling in the function to test the VGA driver to see
+if it would speed it up any.  (But only speeds it up a little.)
+* a piece of code that prints out a '.' on every 1000th memory allocation in
+the function to test garbage collection so that I could know that something was
+actually happenning during that big long wait.
+* the Makefile change to define -DMULTIBOOT
+
+Happy JOSing,
+Avery J. Regier
+
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD
+Content-Type: text/plain;
+  name=&quot;easy_grub.diff&quot;
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=&quot;easy_grub.diff&quot;
+
+PyBKSk9TL3N0YWdlMQo/IEpKT1Mvc3RhZ2UyCj8gSkpPUy9hcmNoL2hvc3QvYnl0ZWNvZGUvampv
+cy56aXAKPyBKSk9TL2FyY2gvaG9zdC9uYXRpdmVjb2RlL21lc3NhZ2VzLnR4dAo/IEpKT1MvYXJj
+aC9ob3N0L25hdGl2ZWNvZGUvampvcwo/IEpKT1MvYXJjaC9ob3N0L25hdGl2ZWNvZGUvTWFrZWZp
+bGUubXliYWsKPyBKSk9TL2FyY2gvaTM4Ni9ieXRlY29kZS9qam9zLnppcAo/IEpKT1MvYXJjaC9p
+Mzg2L2J5dGVjb2RlL2pqb3MtbmV3LnppcAo/IEpKT1MvYXJjaC9pMzg2L25hdGl2ZWNvZGUvaGVh
+ZF9ldGhlci50eHQKPyBKSk9TL2FyY2gvaTM4Ni9uYXRpdmVjb2RlL2hlYWRfZ3J1Yi50eHQKPyBK
+Sk9TL2FyY2gvaTM4Ni9uYXRpdmVjb2RlL2pqb3MtZ3J1Yi1vbGQKPyBKSk9TL2FyY2gvaTM4Ni9u
+YXRpdmVjb2RlL2pqb3MtZ3J1Yi1uZXcKPyBKSk9TL2FyY2gvaTM4Ni9uYXRpdmVjb2RlL2pqb3Mt
+Z3J1Ygo/IEpKT1MvY29tbW9uL2J5dGVjb2RlL2pqb3NfY29tbW9uLnppcAo/IEpKT1MvdG9vbHMv
+bmFzbS0wLjk4Cj8gSkpPUy90b29scy9ldGhlcmJvb3QtNC4yCj8gSkpPUy90b29scy9uYXNtLTAu
+OTgudGFyCj8gSkpPUy90b29scy9ldGhlcmJvb3QtNC4yLjQudGFyCkluZGV4OiBKSk9TL2FyY2gv
+aTM4Ni9uYXRpdmVjb2RlL01ha2VmaWxlCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9zaXRlcy9qb3Mv
+Y3ZzL2N2c3Jvb3QvSkpPUy9hcmNoL2kzODYvbmF0aXZlY29kZS9NYWtlZmlsZSx2CnJldHJpZXZp
+bmcgcmV2aXNpb24gMS4yNgpkaWZmIC1yMS4yNiBNYWtlZmlsZQoxOGMxOAo8ICAtREVUSEVSQk9P
+VCBcCi0tLQo+ICAtRE1VTFRJQk9PVCBcCjIwYTIxLDIyCj4gIyAtREVUSEVSQk9PVCBcCj4gCklu
+ZGV4OiBKSk9TL2FyY2gvaTM4Ni9uYXRpdmVjb2RlL2VudHJ5LmNjCj09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZp
+bGU6IC9zaXRlcy9qb3MvY3ZzL2N2c3Jvb3QvSkpPUy9hcmNoL2kzODYvbmF0aXZlY29kZS9lbnRy
+eS5jYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4xOQpkaWZmIC1yMS4xOSBlbnRyeS5jYwoxNDVh
+MTQ2LDE0Nwo+ICAgY29uc29sZS5jbGVhcl9zY3JlZW4oKTsKPiAKMTUyZDE1Mwo8ICAgLy8gIGNv
+bnNvbGUuY2xlYXJTY3JlZW4oKTsKMTU0ZDE1NAo8IApJbmRleDogSkpPUy9jb21tb24vYnl0ZWNv
+ZGUvVGVzdFN1aXRlLmphdmEKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL3NpdGVzL2pvcy9jdnMvY3Zz
+cm9vdC9KSk9TL2NvbW1vbi9ieXRlY29kZS9UZXN0U3VpdGUuamF2YSx2CnJldHJpZXZpbmcgcmV2
+aXNpb24gMS4xCmRpZmYgLXIxLjEgVGVzdFN1aXRlLmphdmEKMzYwYzM2MCwzNjkKPCAJCSAgICBm
+b3IgKGludCB4PTA7IHg8NjQwOyB4KyspCi0tLQo+IAkJICAgIGZvciAoaW50IHg9MDsgeDw2NDA7
+IHgrKykgewo+IAkJCXYuZHJhd1BpeGVsKHgrKywgeSwgMSk7Cj4gCQkJdi5kcmF3UGl4ZWwoeCsr
+LCB5LCAxKTsKPiAJCQl2LmRyYXdQaXhlbCh4KyssIHksIDEpOwo+IAkJCXYuZHJhd1BpeGVsKHgr
+KywgeSwgMSk7Cj4gCQkJdi5kcmF3UGl4ZWwoeCsrLCB5LCAxKTsKPiAJCQl2LmRyYXdQaXhlbCh4
+KyssIHksIDEpOwo+IAkJCXYuZHJhd1BpeGVsKHgrKywgeSwgMSk7Cj4gCQkJdi5kcmF3UGl4ZWwo
+eCsrLCB5LCAxKTsKPiAJCQl2LmRyYXdQaXhlbCh4KyssIHksIDEpOwozNjFhMzcxCj4gCQkgICAg
+fQozODNhMzk0Cj4gCQlpZigoaSUxMDAwMCkgPT0gMCkgU3lzdGVtLm91dC5wcmludCgiLiIpOwoz
+ODZjMzk3CjwgCVN5c3RlbS5vdXQucHJpbnRsbiggInRlc3RpbmcgR0MgLi4uIiApOwotLS0KPiAJ
+U3lzdGVtLm91dC5wcmludGxuKCAiXG5GaW5pc2hlZCB0ZXN0aW5nIEdDIC4uLiIgKTsKSW5kZXg6
+IEpKT1MvY29tbW9uL2RlY2FmL3NjaGVkdWxlci5jYwo9PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvc2l0
+ZXMvam9zL2N2cy9jdnNyb290L0pKT1MvY29tbW9uL2RlY2FmL3NjaGVkdWxlci5jYyx2CnJldHJp
+ZXZpbmcgcmV2aXNpb24gMS4xMgpkaWZmIC1yMS4xMiBzY2hlZHVsZXIuY2MKMjg2YTI4NywyOTAK
+PiAjaWZkZWYgTVVMVElCT09UCj4gCQlrcHJpbnRmKCAibm90aWZ5T2ZJbnRlcnJ1cHRzKDMpOiBB
+cnJheSBub3Qgc2V0IHlldC4gIENvbnRpbnVpbmcuXG4iICk7Cj4gCQlyZXR1cm4oZmFsc2UpOwo+
+ICNlbHNlCjI4OGEyOTMKPiAjZW5kaWYK
+
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD--
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000548.html">[JOS-Kernel] TELNET</A></li>
+	<LI> Next message: <A HREF="000550.html">[JOS-Kernel] changes to make grub work smoothly</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#549">[ date ]</a>
+              <a href="thread.html#549">[ thread ]</a>
+              <a href="subject.html#549">[ subject ]</a>
+              <a href="author.html#549">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

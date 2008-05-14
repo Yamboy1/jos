@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Seeking scheme to handle unsigned data types for drivers</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000106.html">
+   <LINK REL="Next" HREF="000104.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Seeking scheme to handle unsigned data types for drivers</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Seeking scheme to handle unsigned data types for drivers">jm@mak.com</A><BR>
+    <I>Thu, 24 Jun 1999 16:52:47 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000106.html">[JOS-Kernel] About JOS Kernel Developement</A></li>
+        <LI> Next message: <A HREF="000104.html">[JOS-Kernel] Seeking scheme to handle unsigned data types for
+ drivers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#103">[ date ]</a>
+              <a href="thread.html#103">[ thread ]</a>
+              <a href="subject.html#103">[ subject ]</a>
+              <a href="author.html#103">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+It seems that the Java language designers have attempted to achieve
+their goal of a &quot;language without sharp edges,&quot; in part, by preventing
+Children From Playing With Unsigned Types.
+
+(Q. Can anybody out there name another language that did the same
+thing?  One answer is below my signature .. no fair peeking!)
+
+Somewhat obviously, in writing drivers (e.g., VGA), one wishes to
+employ unsigned types -- 8-bit and 16-bit for &quot;data,&quot; and (at least)
+32-bit for addresses.  (So there -- thhhhbpt!)
+
+Thus, the issue becomes, how to do this in JOS in the most, well,
+*palatable* way.  I figure there's one semi-obvious way, and probably
+lots of others.  (E.g., how do Java-language network protocol
+implementations handle this?  Network protocols are chock *full* of
+unsigned quantities.)  Please feel free to reply with candidates
+schemes to either me and/or the list.  I am especially interested to
+know how JavaOS handles this problem (without, of course, compromising
+my &quot;clean room&quot; status).  Obviously, we cannot possibly be the first
+people to run across this problem.
+
+Here's one semi-obvious candidate:
+
+(0) Have separate native methods for each and every Java type.
+(1) Use Java shorts for reading/writing unsigned 8-bit quantities.
+(2) Use Java ints for reading/writing unsigned 16-bit quantities.
+(3) Use Java longs for reading/writing unsigned 32-bit
+quantities/addresses.
+(4) Use atomic operations for all reads/writes.
+(5) Build &quot;array&quot; types out of these primitives.
+
+An advantage is that it's pretty straightforward.  Also, the Java
+programmer will have control of what kind of memory cycle is generated
+(in my limited experience, this is often important to the device being
+prodded).  Finally, because we don't synthesize 16-bit operations out
+of consecutive 8-bit operations (and likewise 32-bits operations out
+16-bit operations), we can get atomic reads and writes (and thus avoid
+race conditions).
+
+However, one big drawback (as I see it based on a whole 10 seconds'
+thought) is that the address stuff might run like dog-meat --
+8bit/16bit stuff should be OK because it fits in one register or
+machine-word.
+
+Another big drawback is that we'd basically be throwing bits away when
+we cross the boundary into C++/asm from Java (hmm... can we throw an
+exception saying &quot;too many bits?&quot; if they're set?), and inventing
+(zero-padding) bits on the way back in.
+
+Finally -- don't we have this problem currently with the current
+in/out primitives?  (Oh, yeah, and what's the right thing to do with
+respect to read-modify-writes?)
+
+Thanks,
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+(A. It's Ada!)
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000106.html">[JOS-Kernel] About JOS Kernel Developement</A></li>
+	<LI> Next message: <A HREF="000104.html">[JOS-Kernel] Seeking scheme to handle unsigned data types for
+ drivers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#103">[ date ]</a>
+              <a href="thread.html#103">[ thread ]</a>
+              <a href="subject.html#103">[ subject ]</a>
+              <a href="author.html#103">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

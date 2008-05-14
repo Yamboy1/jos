@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] kissme JVM + linux kernel (fwd)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000906.html">
+   <LINK REL="Next" HREF="000911.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] kissme JVM + linux kernel (fwd)</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Kernel] kissme JVM + linux kernel (fwd)">jewel@pixie.co.za</A><BR>
+    <I>Wed, 20 Sep 2000 04:18:56 +0000 (UTC)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000906.html">[JOS-Kernel] [JOS Technical Edition] Release 1h</A></li>
+        <LI> Next message: <A HREF="000911.html">[JOS-Kernel] Re: kissme JVM + linux kernel</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#907">[ date ]</a>
+              <a href="thread.html#907">[ thread ]</a>
+              <a href="subject.html#907">[ subject ]</a>
+              <a href="author.html#907">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I didn't see this message come through, so I'm resending it.
+
+
+---------- Forwarded message ----------
+Date: Sun, 17 Sep 2000 22:17:23 +0000 (UTC)
+From: John Leuner &lt;<A HREF="mailto:jewel@mweb.co.za">jewel@mweb.co.za</A>&gt;
+To: <A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+Subject: kissme JVM + linux kernel
+
+I've uploaded the source for my hacked JVM to the sourceforge CVS
+repository. 
+
+The codename for this version of the JVM is &quot;teaseme&quot;. To get the source:
+
+cvs -d:pserver:<A HREF="mailto:anonymous@cvs.teaseme.sourceforge.net">anonymous@cvs.teaseme.sourceforge.net</A>:/cvsroot/teaseme login 
+                         
+cvs -z3 -d:pserver:<A HREF="mailto:anonymous@cvs.teaseme.sourceforge.net">anonymous@cvs.teaseme.sourceforge.net</A>:/cvsroot/teaseme
+co current
+
+I duplicated the 'current' directory by mistake, so if you browse the CVS
+tree you'll see current/current/{vm files}
+
+This is just the source for the JVM. To get it to run anything you'll need
+the class library files too. I'll upload these soon. (They are the same as
+for the kissme (<A HREF="http://kissme.sourceforge.net">http://kissme.sourceforge.net</A>) project).
+
+Building
+-----------------------
+
+To compile the JVM you need a java interpreter installed, and a copy of my
+makeme build tool, <A HREF="http://makeme.sourceforge.net/.">http://makeme.sourceforge.net/.</A> Unfortunately this
+depends on the ANTLR compiler-compiler, see <A HREF="http://antlr.org.">http://antlr.org.</A>
+
+You can try executing the contents of the build_commands file in the
+top-level directory, this just compiles all the files. 
+
+
+Running:
+-----------------------
+
+The makefiles generate an object file called teaseme.o. 
+
+This contains the JVM. Currently it is hard-coded to look for its classes
+in /home/jewel/kissme_classpath. It is also hard-coded to run
+kissme_test.hello. 
+
+This will change. 
+
+To run the JVM, go insmod teaseme.o. It spews a whole lot of output in the
+kernel buffer (type dmesg to see it). This will change too.
+
+If the jvm didn't cause a segfault, you can remove it with 'rmmod
+teaseme'. 
+
+Currently I've only run a hello world app, getting more stuff to run is a
+matter of fixing up the class library functions to use the linux kernel
+directly (eg file access, time/date). Also threads need to implemented
+(threads mapped to linux kernel threads instead of pthreads). 
+
+That's it for now. Later I'll make it more tester friendly and provide a
+binary that people can try out. 
+
+I'm building and using this on Debian Potato, with a 2.2.17 kernel. I
+assume it will work on all 2.2 kernels.
+
+(I apologise for the delay in putting the source up, I should have done it
+before I posted to the list).
+
+John Leuner
+
+
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000906.html">[JOS-Kernel] [JOS Technical Edition] Release 1h</A></li>
+	<LI> Next message: <A HREF="000911.html">[JOS-Kernel] Re: kissme JVM + linux kernel</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#907">[ date ]</a>
+              <a href="thread.html#907">[ thread ]</a>
+              <a href="subject.html#907">[ subject ]</a>
+              <a href="author.html#907">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

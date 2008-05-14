@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000754.html">
+   <LINK REL="Next" HREF="000762.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS-Kernel] Device as a digital resource">al@outworld.org</A><BR>
+    <I>Mon, 20 Mar 2000 00:29:05 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000754.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000762.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#757">[ date ]</a>
+              <a href="thread.html#757">[ thread ]</a>
+              <a href="subject.html#757">[ subject ]</a>
+              <a href="author.html#757">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> IF a modem is connected to serial port 1, I could write this:
+</I>&gt;<i> 
+</I>&gt;<i> device:<A HREF="modem://localhost/ports/serial/1?maxspeed=...">modem://localhost/ports/serial/1?maxspeed=...</A>
+</I>
+Actually, this could be even better... The above URI point to the serial
+port, not the device *attached* to the serial port. Why not use this,
+instead:
+
+modem:<A HREF="device://localhost/ports/serial/1/attached?maxspeed=...">device://localhost/ports/serial/1/attached?maxspeed=...</A>
+
+Take note of the alternating modem:device beginning of this URI...
+
+&gt;<i> The device manager returns the raw device, and bnci converts it into
+</I>&gt;<i> the specified &quot;jod.device.Modem&quot; class.
+</I>
+If the JOS specific interpreter of these URI's is told that the &quot;modem:&quot;
+protocol means &quot;turn the object returned from device: into an object of
+type jos.devices.Modem&quot; then this would work.
+
+Thus, for a VERY custom device, you could use this:
+
+com.mycompany.devices.CardioPulseMeter:<A HREF="device://localhost/...">device://localhost/...</A>
+
+of you can set up and use custom drivers:
+
+com.3com.modems.56KVoiceFaxModem:modem:<A HREF="device://localhost/...">device://localhost/...</A>
+
+What do you think?
+
+&gt;<i> Since more types of devices than modems can be attached to the serial
+</I>&gt;<i> port, the device manager can only return the raw version of the
+</I>&gt;<i> device: the port itself.
+</I>
+That is only if you wish the URI to return a fully expressed device. You
+may have defined protocols such as &quot;modem:&quot; that knows to convert the
+device attached to the port into a modem object, and you may just have a
+simple, raw device, which you can query, and then determine what it is.
+But you should also have access to the port itself, independently. For
+example, if I wish to set the maximum speed for the serial port, I have
+to tell this to the serial port, *not* the attached device...
+
+&gt;<i> To get at the raw serial port, you might use a URI like this:
+</I>&gt;<i> 
+</I>&gt;<i> device:<A HREF="serial://localhost/ports/serial/1/?maxspeed=...">serial://localhost/ports/serial/1/?maxspeed=...</A>
+</I>
+Once again, I think &quot;serial:&quot; should be *before* &quot;device:&quot; But anyway:
+
+In this case, every &quot;sub directory&quot; of the URI will in reality also
+signify a protocol. Such as:
+
+com.custom.CustomModem:modem:serial:<A HREF="device://localhost/ports/serial/1/attached?maxspeed=...">device://localhost/ports/serial/1/attached?maxspeed=...</A>
+
+&gt;<i> Starting with interfaces we have already named:
+</I>&gt;<i> 
+</I>&gt;<i> ParallelPort
+</I>&gt;<i> SerialPort
+</I>&gt;<i> Modem
+</I>
+We can post a list of proposed device names, and have people comment on
+device names which they don't like, while also adding their own proposed
+device names. These device names should be as general as possible, and
+should follow the typical class naming schemes we have accepted in JOS a
+(or two?) year ago. Something like starting with a capital, using full
+words, etc..
+
+Things like:
+
+Keyboard?keycount=104&amp;functionkeys=true&amp;layout=us-ascii
+PointingDevice?commandcount=4
+Mouse?buttoncount=3&amp;wheel=true
+ISDNAdapter?lines=2&amp;dataline=true
+EthernetAdapter?baud=100&amp;encrypted=true
+Monitor?toomanyparameters=very_true  :)
+etc..
+
+An apparent issue is: do we add the word &quot;Device&quot; after these things?
+
+&gt;<i> Like any smart factory, it must use a separate plug-in controller for
+</I>&gt;<i> each sub-scheme.
+</I>
+Apparently... Any piece of software must come in changeable modules. If
+that cannot happen, it has the fate and performance of things like
+Solaris, Windows, OS/2, etc... Look at Linux: everybody can put his
+little piece inside, and thus everybody (almost, other story) is happy.
+
+&gt;<i> For example, it seems to me that Modem has-a SerialPort. Or rather, a
+</I>&gt;<i> Modem has-a port. A port might be implemented as a real object.
+</I>
+The port is also on an I/O controller (which could very well be custom,
+as most modern motherboards provide EPROM), which is on a PCI bus (or on
+whatever bus Macs use), which is on the motherboard.
+
+&gt;<i> public interface Modem {
+</I>&gt;<i>   public Port getPort();
+</I>&gt;<i>   public void setPort( Port v );
+</I>&gt;<i> }
+</I>
+What happens if the Modem is on a PCI slot? Maybe the modem should not
+be responsible for knowing what port it's attached to, rather, the port
+knowing what modem is attached to it?
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+________________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [URL: <A HREF="http://www.outworld.org/people/al]">http://www.outworld.org/people/al]</A>
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+PLEASE DO NOT SEND ME ANY UNSOLICITED COMMERCIAL EMAIL [DSS: 0xDBEF8ECC]
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000754.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000762.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#757">[ date ]</a>
+              <a href="thread.html#757">[ thread ]</a>
+              <a href="subject.html#757">[ subject ]</a>
+              <a href="author.html#757">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

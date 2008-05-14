@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Pure virtual classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000679.html">
+   <LINK REL="Next" HREF="000681.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Pure virtual classes</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Pure virtual classes">tmiller@haverford.edu</A><BR>
+    <I>Mon, 28 Feb 2000 23:31:26 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000679.html">[JOS-Kernel] Pure virtual classes</A></li>
+        <LI> Next message: <A HREF="000681.html">[JOS-Kernel] dos-mode makefiles</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#680">[ date ]</a>
+              <a href="thread.html#680">[ thread ]</a>
+              <a href="subject.html#680">[ subject ]</a>
+              <a href="author.html#680">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	I use pure virtual classes as if they were Java interfaces.  This
+is one technique for maintaining platform independence -- where
+platform-specific code is abstracted out the same way a particular
+implementation of and algorithm (as represented by a class) is abstracted
+out by its public methods.  For this reason -- that the calling code
+doesn't know and doesn't care how the work is done -- I tend to code such
+that platform-specific code can be #ifdef'd or subclasses as is
+appropriate.  For instance -- the code for converting java-byte-order
+integers to host order is enscapulated away into JavaWord.  In this case I
+believe it is more appropriate for the code to be #ifdef'd than
+virtualized, as (a) the host byte order is not going to change while the
+program is running and (b) with a class used as often as JavaWord,
+overhead is an important consideration.  Furthermore, host order
+conversion does not require any significant alteration (none at all, in
+fact, in the code, because 'int' is as apropos to the machine, etc) to the
+data structures in JavaWord, so virtualizing JavaWord would not deliver
+any implementation elegance.
+
+	On the other hand, it may make more sense to virtualize something
+like Scheduler, where algorithmic changes OR architecture changes could
+cause a modification of the data.  I'm not doing now because none of
+Scheduler's data is public.  If I'd provided accessor functions, I might
+be a bit more worried (e.g. is the data to which I'm providing access
+universal accross every possible implementation?), but I didn't -- add and
+removeThread() are effectively a part of the definition of a scheduler, so
+I feel no qualms assuming the scheduler will keep track of its threads
+somehow :)  However -- if at any time any of my code ought to be
+virtualized, and you can convince me so*, I'll be more than happy to take
+a replacement, which ought to be able to drop in with only the most
+minimal of changes.  (Virtualize the class, move its current
+implementation to a default child, add whatever prompted the
+virtualization somewhere else; handle picking between the two in the
+virtual class. (e.g. Frame::generateFrame(), or any of the points where I
+use generate*()** functions, I expect that there may be more than one way
+to do things.  If I incorrectly did not expect this for some other class,
+the extent of the external changes should be converting a 'new Class()' to
+a 'Class::generateClass()' on the right-hand sides.)  Abstraction is my
+friend.***
+
+-_Quinn
+
+*: I can't think of an example off-hand where hardware requirements force
+wildly divergent algorithms/data structures AND that hardware isn't used
+often enough that it's worth the overhead to virtualize.  (Or, for that
+matter, that it'll be changing during run-time, unless our target
+architecture(s) suddenly move into the HA range.)
+
+**: Which, I don't believe, are in the CVS tree quite yet -- I've adopted
+them in my rewrite of decaf.
+
+***: Anecdotal proof of this: Having implemented everything but (I
+thought) the interpreter and the interrupt-notification part of the
+scheduler, I discovered that I had so succesfully abstracted certain parts
+of the problem out of the way that I had inadvertently neglected to
+implement JavaObject!  I think most of time estimates will come in
+correctly because writing the new code the way I am makes it really fast
+to get that code done, but spawns two or three new functions to implement,
+and so on -- the net amount of work remains the same, but chunks of it are
+in different places than I'd thought they'd be.****
+
+****: That led me to following observation: Following the maxim to write
+it once to get it done and again to get it done well (or etc) works (for
+me, anyway) because the first part builds up and the second builds down --
+I start working on the particulars of a given algorithm or data structure
+without really being able to see how it fits in, generally, which leads to
+grotty code.  The second time you can write things so that they make sense
+overall and drop in the algorithms you developed the first time in the
+'leaves' of the design -- frequently replacing commented blocks of code
+with a function call whose name derives from the comment, as so:
+
+/* This gets the java object which will be running the interrupt handler */
+.
+.
+.
+/* now, interruptHandler is set correctly. */
+
+becomes:
+
+JavaObject * interruptHandler = some_abstraction-&gt;getInterruptHandler( interruptNumber)
+
+that is, moving that particular algorithm which had initially thought
+belonged where it was used to where it 'belongs.' Then, of course, you get
+to write the abstraction and the getInterruptHandler() code, but that
+shouldn't be too hard because you can almost cargo-cult program it from
+your first try. :)  But what it does, and what it's supposed to do, is
+make the algorithms and data structures more elegant.
+
+Hope that wasn't too --pendantic for you. :)
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000679.html">[JOS-Kernel] Pure virtual classes</A></li>
+	<LI> Next message: <A HREF="000681.html">[JOS-Kernel] dos-mode makefiles</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#680">[ date ]</a>
+              <a href="thread.html#680">[ thread ]</a>
+              <a href="subject.html#680">[ subject ]</a>
+              <a href="author.html#680">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

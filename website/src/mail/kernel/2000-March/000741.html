@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000740.html">
+   <LINK REL="Next" HREF="000749.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Device as a digital resource">gchii@mindspring.com</A><BR>
+    <I>Fri, 17 Mar 2000 16:20:01 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000740.html">[JOS-Kernel] Making progress!</A></li>
+        <LI> Next message: <A HREF="000749.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#741">[ date ]</a>
+              <a href="thread.html#741">[ thread ]</a>
+              <a href="subject.html#741">[ subject ]</a>
+              <a href="author.html#741">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I've been thinking about devices and mapping them with a URI. I think
+hardware is a digital resource, too. If we use a device: scheme, we can ask
+for all kinds of devices through the BCNI (and Smart API).
+
+If I have a Modem interface called jos.device.Modem, I can &quot;open&quot; a
+connection to my modem with a URI like this:
+
+bcni:jos.device.Modem?port=0
+
+or
+
+device:Modem?port=0
+
+The device: scheme maps a request through BCNI to create a JVM-specific class.
+
+If I have a Keyboard interface called jos.device.Keyboard, I can &quot;open&quot; a
+connection to my keyboard with a URI like this:
+
+device:Keyboard?language=en
+
+If I have a ParallelPort interface called jos.device.ParallelPort, I can
+&quot;open&quot; a connection to my parallel port with a URI like this:
+
+device:ParallelPort?port=0
+
+If I have a CommPort interface called jos.device.CommPort, I can &quot;open&quot; a
+connection to my comm port with a URI like this:
+
+device:CommPort?port=0
+
+Of course, these are limited resources. Following in the tradition of BCNI
+(and Smart API), null is returned when a device is already in use.
+
+  public void example() {
+    URI uri = new URI( &quot;device:Modem?port=0&quot; );
+    Modem m = (Modem) uri.getObject();
+    if ( m == null ) {
+      println( &quot;Modem is busy.&quot; );
+      return;
+    }
+    :
+  }
+
+While &quot;devices&quot; are not exactly JVM-specific classes, they are below the
+line in a user process environment.
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000740.html">[JOS-Kernel] Making progress!</A></li>
+	<LI> Next message: <A HREF="000749.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#741">[ date ]</a>
+              <a href="thread.html#741">[ thread ]</a>
+              <a href="subject.html#741">[ subject ]</a>
+              <a href="author.html#741">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

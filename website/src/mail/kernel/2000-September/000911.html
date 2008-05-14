@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: kissme JVM + linux kernel</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000907.html">
+   <LINK REL="Next" HREF="000908.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: kissme JVM + linux kernel</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Kernel] Re: kissme JVM + linux kernel">jewel@pixie.co.za</A><BR>
+    <I>Wed, 20 Sep 2000 21:17:09 +0000 (UTC)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000907.html">[JOS-Kernel] kissme JVM + linux kernel (fwd)</A></li>
+        <LI> Next message: <A HREF="000908.html">[JOS-Kernel] [kernel bytecode cache] Definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#911">[ date ]</a>
+              <a href="thread.html#911">[ thread ]</a>
+              <a href="subject.html#911">[ subject ]</a>
+              <a href="author.html#911">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I've managed to get basic file IO working (reading file streams from the
+local filesystem) and have prepared the way for native kernel threads and
+garbage collection. (last 2 not working yet though). 
+
+Following on my previous message, I've uploaded the source and class files
+for the classpath files that the kissme/teaseme JVM depends on. 
+
+Check out the module &quot;classpath&quot; in CVS. (See instructions in previous
+email). 
+
+You can build the kernel module yourself (see the
+&quot;current&quot; module). You'll need the makeme utility
+(<A HREF="http://makeme.sourceforge.net">http://makeme.sourceforge.net</A>), and you might find
+<A HREF="http://teaseme.sourceforget.net/antlr.jar">http://teaseme.sourceforget.net/antlr.jar</A> useful for running that. 
+
+I've also built a binary object file, it's at:
+
+<A HREF="http://teaseme.sourceforge.net/teaseme.o">http://teaseme.sourceforge.net/teaseme.o</A> 
+
+I run it with:
+
+insmod -v -x teaseme.o 
+
+You may have a version conflict, or a need to force it.
+
+Before you run it, make sure you unpack the classpath files in:
+
+/usr/share/teaseme/classpath
+
+ie, java/lang/String.class would be at:
+
+/usr/share/teaseme/classpath/java/lang/String.class
+
+It will print messages to the console. (It is hardwired to run
+kissme_test.hello)
+
+Type rmmod teaseme to unload it. 
+
+The VM does clean up the GC heap when you unload it, but it will still eat
+up kernel memory if you do this too many times. 
+
+As you should know, installing a kernel module is dangerous and could
+destroy all your data. You have been warned. 
+
+I'm going away on holiday for a week and am limited to 1 pc (I need two to
+work on this), so I'll only be able to resume work then. 
+
+
+Have fun, all questions / comments welcome.
+
+John Leuner
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000907.html">[JOS-Kernel] kissme JVM + linux kernel (fwd)</A></li>
+	<LI> Next message: <A HREF="000908.html">[JOS-Kernel] [kernel bytecode cache] Definition</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#911">[ date ]</a>
+              <a href="thread.html#911">[ thread ]</a>
+              <a href="subject.html#911">[ subject ]</a>
+              <a href="author.html#911">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

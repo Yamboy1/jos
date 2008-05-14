@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] new interrupt model</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000443.html">
+   <LINK REL="Next" HREF="000446.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] new interrupt model</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] new interrupt model">tmiller@haverford.edu</A><BR>
+    <I>Tue, 26 Oct 1999 21:25:13 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000443.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+        <LI> Next message: <A HREF="000446.html">[JOS-Kernel] new interrupt model</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#445">[ date ]</a>
+              <a href="thread.html#445">[ thread ]</a>
+              <a href="subject.html#445">[ subject ]</a>
+              <a href="author.html#445">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Went with the hybrid proposal, and it works perfectly (AFAIT*) on
+the host now.  I'll try to test the i386 boot out sometime tonight.  The
+native code support is activated with the -DNEW_INTERRUPT_HANDLING flag,
+but the bytecode support is radically different, to the extent that I had
+to make a new bytecode tree and compile against that.  Once I bring that
+tree up to snuff, I'll just move into where the old tree was and finally
+do a CVS commit and the thing.
+
+	Driver writers: the new interrupt paradigm is straight
+event-based, with jos.system.interrupts using addInterruptListener() in
+the usual way, with one exeption.  When the interpreter finishes the
+current timeslice, it checks the interrupt queue; while it's not empty,
+the C code will extract your driver objects from jos.system.interrupts and
+run its handleInterrupt ( int interrupt_number ) code from there.  This
+code will run, uninterrupted -- including by other interrupts -- until it
+completes, so be very careful with it.  Get your data from the h/w in that
+function and let another thread take care of the analysis, if at all
+possible.  (The keyboard driver, for instance, (will) slurps scancodes out
+of the controller and shoves them into a queue, where the keyboard daemon
+can play with them, distribute them, etc.)
+
+	My model, in general, is that jos.platform.* is limited to
+abstractions common across every computer JOS will run on, like keyboards
+(even if they aren't there).  jos.platform.keyboard generates Key and
+Scancode events, but jos.platform.driver.keyboard (&amp; keyboardd) is what
+handles the hardware (lower-edge) part of the driver.  The
+platform.drivers are expected to use jos.system.* (probably should be
+renamed) to access the h/w, via the interrupts and machine classes, and
+more as we need them.
+
+	Thus jos.platform.screen would be driven by
+jos.platform.driver.screen, which would just be Thomas Bocek's VGA driver
+class (or a wrapper there-to).  jos.platform.driver.* will be copied over
+from arch/bytecode/jos/platform/driver/* according the current build, so
+that's how we get h/w-specificity.
+
+	jos.platform == JOSSystem and jos.system == JOSBox, I believe,
+though I haven't read their descriptions recently enough to be sure.
+
+	Comments?  (Suggestions?  Flames?)
+
+-_Quinn
+
+* As Far As I Tested
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000443.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+	<LI> Next message: <A HREF="000446.html">[JOS-Kernel] new interrupt model</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#445">[ date ]</a>
+              <a href="thread.html#445">[ thread ]</a>
+              <a href="subject.html#445">[ subject ]</a>
+              <a href="author.html#445">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

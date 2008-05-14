@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Building Java operating systems</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000555.html">
+   <LINK REL="Next" HREF="000558.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Building Java operating systems</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Building Java operating systems">gchii@mindspring.com</A><BR>
+    <I>Fri, 10 Dec 1999 09:13:16 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000555.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+        <LI> Next message: <A HREF="000558.html">[JOS-Kernel] Free CVS Web Site</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#557">[ date ]</a>
+              <a href="thread.html#557">[ thread ]</a>
+              <a href="subject.html#557">[ subject ]</a>
+              <a href="author.html#557">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Thank you, John Leuner! &lt;<A HREF="mailto:jewel@pixie.co.za">jewel@pixie.co.za</A>&gt;
+
+&gt;<i>My experiments so far have allowed me to run simple java apps on this
+</I>&gt;<i>kernel (the kernel is about 700k). You need to provide the class libraries
+</I>&gt;<i>too, so one option is to include these in the boot image, but this posed a
+</I>&gt;<i>problem with size (the libraries are several megabytes). It takes too long
+</I>&gt;<i>to boot the kernel, so I wrote a very simple HTTP loader that just asks my
+</I>&gt;<i>linux machine running apache for the class files.
+</I>
+Using the classic model of very large archives, it takes far too long to
+start a virtual machine. If you had to statically link the 20+MB rt.jar to
+the kernel/virtual machine, you would never boot.
+
+Just like you, I wrote a simple HTTP-based class loader. It downloads
+classes from my Linux machine running Apache, too.
+
+This has been bothering me for a year and a half. I have been puzzling over
+this part of the architecture far more than any other issue. Right now, I
+might be using part of the solution.  For my intranet applications,
+customers use my Cooperating Runtime Environment (CRE). cre is a tiny 60KB
+program that uses the Invocation API from JNI to start a JRE and launch any
+Java application off the network through an HTTP service. The path to an
+HTTP service is optional and configurable. The shell, or first class
+invoked, is optional and configurable. When you don't specify a shell, cre
+launches the Universal Browser.
+
+Here is the break through that makes the CRE possible.
+
+I do not store bytecode in .class files. While downloading from HTTP, that
+would consume far too many network resources. Each file requires its own
+connect-download-disconnect cycle.
+
+Neither do I store bytecode in .cab, .jar, or .zip files. Downloading a
+20+MB rt.jar from HTTP is just about as bad as having a 20+MB boot image.
+
+What do I do?
+
+I store bytecode in package files. My HTTP-based class loader downloads one
+package at a time, which matches the semantics of Java bytecode exactly.
+All package files have a .jpkg extension. For each of the HTTP servers
+where package files are stored, all package files are found in the /jpkg
+directory.
+
+Package files are given a rigorous naming convension so that you can build
+packages files with the greatest of ease and the package-based class loader
+can find package files directly. The name of a package is the name of the
+package file, plus the .jpkg extension. Here are some examples, off the top
+of my head:
+
+java.applet     java.applet.jpkg
+java.awt     java.awt.jpkg
+java.sql     java.sql.jpkg
+java.util.jar     java.util.jar
+java.util.zip     java.util.zip.jpkg
+
+org.jos.console3a     org.jos.console3a.jpkg
+org.jos.smartapi2a     org.jos.smartapi2a.jpkg
+
+&gt;<i>Then what I do is make a barebones zip file containing the most commonly used
+</I>&gt;<i>class files (for running a helloworld program for example) which comes to
+</I>&gt;<i>150k and put this in the boot image.
+</I>
+Packages must be download *as needed*, rather than all at once. JDBC,
+JFC/Swing, JSDK, and many parts of the 20+MB rt.jar are not part of the
+core, or linked to the kernel/virtual machine, because there are many
+applications that will never use them. Only these packages are truely core:
+
+java.io
+java.lang
+java.net
+java.util
+org.jos.gchii.packageloader1a
+
+Your &quot;barebones&quot; zip is just like my true core zip. It contains only those
+classes that are absolutely necessary to get to a point where additional
+packages can be downloaded. It is part of a bootstrap startup sequence.
+
+Your experience with the OSKit and Classpath project would surely help the
+JOS Project finish its Java-based operating system.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000555.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+	<LI> Next message: <A HREF="000558.html">[JOS-Kernel] Free CVS Web Site</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#557">[ date ]</a>
+              <a href="thread.html#557">[ thread ]</a>
+              <a href="subject.html#557">[ subject ]</a>
+              <a href="author.html#557">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

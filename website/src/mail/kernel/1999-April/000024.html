@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] event handling &amp; decaf/JJOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   
+   <LINK REL="Next" HREF="000025.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] event handling &amp; decaf/JJOS</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] event handling &amp; decaf/JJOS">tmiller@haverford.edu</A><BR>
+    <I>Wed, 31 Mar 1999 23:48:43 -0500 (EST)</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000025.html">[JOS-Kernel] event handling &amp; decaf/JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#24">[ date ]</a>
+              <a href="thread.html#24">[ thread ]</a>
+              <a href="subject.html#24">[ subject ]</a>
+              <a href="author.html#24">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	I was just thinking about how one might go about distributing
+jos.system.event.* to where they might need to go, in the context of
+how java.lang.System.* variables will be redirected *by the shell.*  Uh...
+why not let the 'shell' handle event dispatching?  The shell pretty
+clearly will know which program is 'active' and needs to have keyEvents
+distributed to; make the shell both a keyListener and a keySpeaker, in
+other words, where it speaks keys to the applications that are running
+under it as necessary, as part of its java.lang.System.* redirects,
+basically.  If an application from the c/l implements interface
+jos.system.event.keyListener (xxxListener, in the general case, for
+whatever redirects the shell supports), the events are direct to the
+application; otherwise the shell employs whatever its default handling
+might be -- which is probably just converting the keyEvents into a
+character stream for the 'active' (fg) application's java.lang.System.*
+variables.
+
+	Obviously, the console could do some keyEvent filtering and
+redirects as well, and then the Virtual Console Manager (or whatever we
+call it -- the consoled that should be the sole jos.system.keyboard
+listener in text mode (the listener switching to the WM upon invocation),
+started by init, would direct keyEvents to the current console.  Likewise,
+the WM could handle redirects to the xterm console objects.  Clearly,
+consoled would install a keyboard interperter that would handle the
+trapping of ALT-F1 (or whatever) that's used to handle console swapping.
+
+viz, with three virtual consoles, one in use: ( -&gt; speaks to )
+
+jos.system.keyboard -&gt; jos.system.consoled -&gt;
+	-&gt; jos.core.console -&gt; login 
+	-&gt; jos.core.console -&gt; login
+	-&gt; jos.core.console -&gt; jsh -&gt;
+		-&gt; j_pine
+		-&gt; j_ftp
+
+Clearly, then, access to jos.system.keyboard needs to be limited in some
+fashion, because it would screw things up royally to have multiple
+identical keyEvent sources in the same dispatch tree.
+
+	There are two ways to implement this.  The first is to implement a
+'static' variable somewhere that in turns points to the next object up on
+the tree; this would Aviery's (?) idea, with the added understanding that
+the static variable is used as the instance for an addKeyListener()
+method; and have the access methods, etc. to handle those 'redirects.'
+The major problem with this is that it voluntarily adds another static
+class to keep track of across different processes, which strikes me as
+asking for trouble.
+
+	The second way (there might be more -- any ideas?) would be to
+provide a method for the parent process to tell the child process to
+listen to it, i.e. setKeySpeaker().  ('discovery' methods, i.e.
+findKeySpeaker() simply move the static variable setting stuff a level
+away.)  The jos.core.application superclass we provide to simplify the
+making of jos-aware applications would provide an addKeyListener()
+function in much the same way that Component does for the AWT.
+
+	Comments?
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000025.html">[JOS-Kernel] event handling &amp; decaf/JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#24">[ date ]</a>
+              <a href="thread.html#24">[ thread ]</a>
+              <a href="subject.html#24">[ subject ]</a>
+              <a href="author.html#24">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

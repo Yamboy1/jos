@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] status report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000661.html">
+   <LINK REL="Next" HREF="000663.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] status report</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] status report">tmiller@haverford.edu</A><BR>
+    <I>Tue, 15 Feb 2000 02:41:53 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000661.html">[JOS-Kernel] Integration</A></li>
+        <LI> Next message: <A HREF="000663.html">[JOS-Kernel] Bytecode Interpretation</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#662">[ date ]</a>
+              <a href="thread.html#662">[ thread ]</a>
+              <a href="subject.html#662">[ subject ]</a>
+              <a href="author.html#662">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	The following is what's on my to-do list for the re-write of
+decaf.  Some of the elements on it entail much more work than others, but
+I hope to get things done before Feb 28.
+
+(1) implement Frame::generateFrame()
+(2) implement JavaThread::generateJavaThread()
+(3) implement Threadable (*1)
+(4) implement the scheduler (*2)
+(5) implement 'Operand' == java_word
+(6) Figure out how to handle JavaClass resolution and
+	static initialization as transparently as possible.
+	Then implement it. (*3)
+(7) Finally, the rewrite of interp.cc itself, which I've already
+	begun and will in large part be rather rote.
+
+	I've done about 6000 lines of code so far, with about half of
+that being partially converted lines from interp.cc; this is the count
+without the license text.  This as compares to 15000 in the current decaf
+source, with 4000 lines in interp and 1200 lines in c_pool.cc (with the
+license text).  
+
+-_Quinn
+
+(*1) -- should be an almost exact copy of the current threadable.
+(*2) -- likewise, an almost exact copy of the current scheduler.
+(*3) -- could take a long time; may have to end up with handles.  Possibly
+something nontransparent (e.g., you have to ask for resolution &amp; static
+init) but with the 'raw' (classfile) representation and the resolved,
+initialized representation sharing a single (virtual) interface.  For
+example:
+
+invoke_virtual(... JavaClass * jc ) {
+	jc = jc-&gt;resolve();
+	jc = jc-&gt;staticInitialize();
+
+	.
+	.
+	.
+	}
+
+	Where RawJavaClass's resolve() implementation does something
+useful, and ResolvedJavaClass's resolve() method just returns 'this'.
+Similarly for staticInitialize().
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000661.html">[JOS-Kernel] Integration</A></li>
+	<LI> Next message: <A HREF="000663.html">[JOS-Kernel] Bytecode Interpretation</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#662">[ date ]</a>
+              <a href="thread.html#662">[ thread ]</a>
+              <a href="subject.html#662">[ subject ]</a>
+              <a href="author.html#662">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,4322 @@
+From tmiller@haverford.edu Fri, 31 Dec 1999 18:42:37 -0500 (EST)
+Date: Fri, 31 Dec 1999 18:42:37 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] native console & bug report
+
+> I have made a set of changes to the consoles such that F1 is now the 'native'
+> console.
+
+	Hey, good stuff!  I'd been thinking about this but coudn't come up
+with an elegant way to do it before I had to move on.  I'll be interested
+in seeing your code.  (thanks!)
+
+> My next step is to increase the size of the buffer and somehow figure
+> out a way to be able to page up and down on the native console so that
+> we can view output that has scrolled out of view.
+
+	As long as you're adding scrolling/buffering to the native
+console, feel free to add it to the virtual consoles, as well :)
+
+> In doing this I also discovered a bug with the decaf native methods.  I had
+> made a new class, consoleNative, which implements ConsoleDriver just like
+> jos.platform.drivers.console does.
+
+	BTW -- having worked with this way of doing the drivers/consoles,
+do you have any structural-style suggestions?
+
+> In consoleNative, putChar and setChar became native methods.  
+> Suddenly, all keyboard input was outputted to the native console
+> instead of the java consoles.  What was happenning is that the native
+> consoleNative.putChar() was being called where console.putChar() was
+> supposed to be called.  I changed consoleNative.putChar() to instead
+> call the native consoleNative.putNativeChar() and suddenly everything
+> worked.  In short, there is a problem with how decaf resolves if a
+> native method is supposed to be used.  I haven't tracked down what
+> exactly is happenning yet, but I did leave the debugging messages I
+> used to track this down in the code but commented out along with what
+> to do in order to show the bug again so that someone can track this
+> down later.
+
+	That is a truly twisted bug, if I understand what you're saying
+correctly.  You've got N consoles, where the first one is
+driver.consoleNative.  For consoles 1 to N, which are driver.console
+instances.  When 1 to N .putChar() is called, decaf calls the
+driver.consoleNative.putChar()?  -- That is, decaf called not only the
+wrong type of method, but also a method in the wrong class?
+
+> P.S.  I was going to include a patch file with this, but the cvs server is down
+> again.  Could someone with access please restart it?  I'll send the patch as
+> soon as I see that cvs is up again.  - Thanks.
+
+	I turned it back on.
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Sat, 01 Jan 2000 10:39:35 -0500
+Date: Sat, 01 Jan 2000 10:39:35 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Linux and JNI
+
+Does the Invocation API work on Linux? I would like to use the Invocation
+API on Linux to load and run a JNI-compatible virtual machine.
+
+Your help is appreciated,
+
+
+
+
+From ajregier@earthlink.net Sat, 1 Jan 2000 15:36:42 -0600
+Date: Sat, 1 Jan 2000 15:36:42 -0600
+From: Avery J. Regier ajregier@earthlink.net
+Subject: [JOS-Kernel] Re: native console & bug report
+
+Todd,
+
+I think that the object model for the consoles is fine for the consoles
+themselves, but as soon as we try to add real shells to them, it won't work. 
+There isn't enough flexibility there.  I'll see what I can come up with as I
+continue to work with it.
+
+You are right in how you understand the native bug.
+
+I'm also including the diff.  Thanks for getting cvs back up.
+
+- Avery
+
+----------------------------------------------
+?JJOS/arch/host/nativecode/messages.txt
+? JJOS/arch/host/nativecode/Makefile.mybak
+? JJOS/arch/i386/bytecode/jjos-new.zip
+? JJOS/arch/i386/bytecode/jos/platform/driver/consoleNative.java
+? JJOS/arch/i386/nativecode/jjidt.txt
+? JJOS/arch/i386/nativecode/head_ether.txt
+? JJOS/arch/i386/nativecode/head_grub.txt
+? JJOS/arch/i386/nativecode/jjos-grub-old
+? JJOS/arch/i386/nativecode/jjos-grub-new
+Index: JJOS/arch/i386/bytecode/jos/platform/driver/console.java
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/arch/i386/bytecode/jos/platform/driver/console.java,v
+retrieving revision 1.1
+diff -r1.1 console.java
+15a16,20
+> 	public final int id;
+> 	
+> 	public console(int id) {
+> 		this.id = id;
+> 	}
+30c35
+< 		update();
+---
+> 		update();		
+31a37,43
+> 
+> 	private void putString(String s) {
+> 		for(int i=0; i<s.length(); i++) {
+> 			putChar(s.charAt(i));
+> 		}
+> 	}
+> 
+58,59c70,71
+< protected void update () {
+< 	System.arraycopy( buffer, 0, vga, 0, buffer.length );
+---
+> 	protected void update () {
+> 		System.arraycopy( buffer, 0, vga, 0, buffer.length );
+62,63c74,75
+< protected void scrollUpOneLine() {
+< 	System.arraycopy( buffer, JJSCREENWIDTH * 2, buffer, 0, buffer.length - JJSCREENWIDTH * 2 );
+---
+> 	protected void scrollUpOneLine() {
+> 		System.arraycopy( buffer, JJSCREENWIDTH * 2, buffer, 0, buffer.length - JJSCREENWIDTH * 2 );
+65,67c77,79
+< 	/* fill in last row with blanks */
+< 	for ( int rcol = 0; rcol < JJSCREENWIDTH; rcol++ ) {
+< 		setChar( JJSCREENHEIGHT - 1, rcol, ' ' );
+---
+> 		/* fill in last row with blanks */
+> 		for ( int rcol = 0; rcol < JJSCREENWIDTH; rcol++ ) {
+> 			setChar( JJSCREENHEIGHT - 1, rcol, ' ' );
+69,71c81,83
+< 
+< 	/* if we're 'live', update the display */
+< 	if ( displayed ) { update(); }
+---
+> 	
+> 		/* if we're 'live', update the display */
+> 		if ( displayed ) { update(); }
+74,91c86,107
+< public void putChar( char c ) {
+< 	if (c == '\n') {
+<      		if (row < (JJSCREENHEIGHT-1)) {
+< 	          column = 0;
+<         	  row++;
+<        		  } else {
+< 	          scrollUpOneLine();
+<         	  column = 0;
+<         	  }
+<         	} else {
+<      		if (column < (JJSCREENWIDTH-1)) {
+< 	          setChar(row, column, c );
+<         	  column++;
+<         	  } else {
+< 	          putChar('\n');
+<         	  putChar(c);
+<         	  }
+<         	} /* end else */
+---
+> 	public void putChar( char c ) {
+> 		// This is debugging output to help track the native bug.
+> 		// When consoleNative.putChar is native, this function is never called.
+> 		// System.out.print("PC");
+> 		// System.out.print(id);
+> 		if (c == '\n') {
+> 	     		if (row < (JJSCREENHEIGHT-1)) {
+> 		          column = 0;
+> 	        	  row++;
+> 	       	        } else {
+> 		          scrollUpOneLine();
+> 	        	  column = 0;
+> 	        	}
+> 	        } else {
+> 	     		if (column < (JJSCREENWIDTH-1)) {
+> 		          setChar(row, column, c );
+> 	        	  column++;
+> 	        	} else {
+> 		          putChar('\n');
+> 	        	  putChar(c);
+> 	        	}
+> 	        } /* end else */
+Index: JJOS/arch/i386/nativecode/entry.cc
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/arch/i386/nativecode/entry.cc,v
+retrieving revision 1.20
+diff -r1.20 entry.cc
+148a149,150
+> //  console.clear_screen();
+> 
+Index: JJOS/arch/i386/nativecode/jjconsol.cc
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/arch/i386/nativecode/jjconsol.cc,v
+retrieving revision 1.6
+diff -r1.6 jjconsol.cc
+19c19
+<  *
+---
+>  * Avery Regier (ability to view native output with F1 console)
+23,37c23
+< 
+< /*
+<  * Programmer's Guide
+<  * Table 6.3, pg 178
+<  */
+< 
+< typedef enum 
+< {
+<   VGA_MODE_7_NORMAL		= 0x07,
+<   VGA_MODE_7_INTENSE		= 0x0f,
+<   VGA_MODE_7_UNDERLINE		= 0x01,
+<   VGA_MODE_7_INTENSE_UNDERLINE	= 0x09,
+<   VGA_MODE_7_REVERSED		= 0x70,
+<   VGA_MODE_7_BLINKING_REVERSED	= 0xf0
+< } VgaMode7CharacterAttributes;
+---
+> #include "jbmachin.h"
+42a29,30
+>   buffer = NULL;
+> // the destructor for this must still be written!
+47a36
+>   visible = JJTRUE;
+49a39,74
+> void jjConsole::setVisible(jjBoolean v)
+> {
+> // A little old debugging output...
+> //  if(v == JJTRUE) printString("v == true\n");
+> //  else if(v == JJFALSE) printString("v == false\n");
+> //  else printString("v is corrupted!\n");
+> 
+>    // First, allocate the buffer.  This may be able to be done in the constructor,
+>    // but it isn't absolutely necessary until here.
+>    if(buffer == NULL) {
+>       int allocationSize = sizeof(jju8) * JJSCREENWIDTH * JJSCREENHEIGHT * 2;
+> 
+>       // Allocates the buffer off of the Java heap.  Is there a better place to 
+>       // allocate this from?  Could GC interfere with this?
+>       buffer = (jju8 *) jbmp->myHeap->allocate(allocationSize);
+>       // buffer = new unsigned char[JJSCREENWIDTH * JJSCREENHEIGHT * 2];
+> 
+>       for ( int x = 0; x < JJSCREENWIDTH * JJSCREENHEIGHT * 2; x += 2 ) {
+>          buffer[x] =  myVGAScreenBufferPointer[x];
+>          buffer[x+1] = myVGAScreenBufferPointer[x+1];
+>       }
+> // } else if((visible == JJTRUE) && (v == JJFALSE)) {
+> 	// switching from visible to invisible
+> 	// do nothing!
+>    } else if ((visible == JJFALSE) && (v == JJTRUE)) {
+>       // switching from invisible to visible
+>       // print the buffer to the screen;
+>       for ( int x = 0; x < JJSCREENWIDTH * JJSCREENHEIGHT * 2; x += 2 ) {
+>          myVGAScreenBufferPointer[x] = buffer[x];
+>          myVGAScreenBufferPointer[x+1] = buffer[x+1];
+>       }
+>    }
+>    visible = v;
+> }
+> 
+> 
+53c78,80
+<   int attribute = myVGAScreenBufferPointer[subscript];
+---
+>   int attribute;
+>   if(buffer != NULL) attribute = buffer[subscript];
+>   else attribute = myVGAScreenBufferPointer[subscript];
+60c87,89
+<   int character = myVGAScreenBufferPointer[subscript];
+---
+>   int character;
+>   if(buffer != NULL) character = buffer[subscript];
+>   else  character= myVGAScreenBufferPointer[subscript];
+67c96,97
+<   myVGAScreenBufferPointer[charsubscript] = c;
+---
+>   if(visible == JJTRUE) myVGAScreenBufferPointer[charsubscript] = c;
+>   if(buffer != NULL) buffer[charsubscript] = c;
+69,70c99,102
+<   int attribsubscript = (row*JJSCREENWIDTH*2) + (col*2) + 1;
+<   myVGAScreenBufferPointer[attribsubscript] = a;
+---
+>   int attribsubscript = charsubscript + 1;
+> 	//(row*JJSCREENWIDTH*2) + (col*2) + 1;
+>   if(visible == JJTRUE) myVGAScreenBufferPointer[attribsubscript] = a;
+>   if(buffer != NULL) buffer[attribsubscript] = a;
+132,133c164,166
+< 		myVGAScreenBufferPointer[x] = ' ';
+< 		myVGAScreenBufferPointer[x+1] = VGA_MODE_7_NORMAL;
+---
+> 		if(buffer != NULL) {
+> 			buffer[x] = ' ';
+> 			buffer[x+1] = VGA_MODE_7_NORMAL;
+135c168,175
+< 	} /* end clear_screen() */
+---
+> 		if(visible == JJTRUE) {
+> 			myVGAScreenBufferPointer[x] = ' ';
+> 			myVGAScreenBufferPointer[x+1] = VGA_MODE_7_NORMAL;
+> 		}
+> 	}
+> 	myRow = 0;
+> 	myColumn = 0;
+> } /* end clear_screen() */
+Index: JJOS/arch/i386/nativecode/jjconsole.h
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/arch/i386/nativecode/jjconsole.h,v
+retrieving revision 1.5
+diff -r1.5 jjconsole.h
+38a39,41
+>   void setVisible(jjBoolean v);
+>   jju8 getChar(int row, int col);
+>   void setChar(int row, int col, jju8 c, jju8 a);
+41a45
+>   jju8 *buffer;
+45,46d48
+<   jju8 getChar(int row, int col);
+<   void setChar(int row, int col, jju8 c, jju8 a);
+49a52,53
+> 
+>   jjBoolean visible;
+51a56,70
+> /*
+>  * Programmer's Guide
+>  * Table 6.3, pg 178
+>  */
+> 
+> typedef enum 
+> {
+>   VGA_MODE_7_NORMAL		= 0x07,
+>   VGA_MODE_7_INTENSE		= 0x0f,
+>   VGA_MODE_7_UNDERLINE		= 0x01,
+>   VGA_MODE_7_INTENSE_UNDERLINE	= 0x09,
+>   VGA_MODE_7_REVERSED		= 0x70,
+>   VGA_MODE_7_BLINKING_REVERSED	= 0xf0
+> } VgaMode7CharacterAttributes;
+> 
+Index: JJOS/JJOS/common/bytecode/TestSuite.java
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/bytecode/TestSuite.java,v
+retrieving revision 1.1
+diff -r1.1 TestSuite.java
+25,27c25,27
+< import jos.system.keyboard;
+< import jos.system.consoled;
+< import jos.platform.driver.StandardVga;
+---
+> //import jos.system.keyboard;
+> //import jos.system.consoled;
+> import jos.platform.driver.standardVGA;
+33c33
+<     public static boolean testThreads = true;
+---
+>     public static boolean testThreads = false;
+35c35
+<     public static boolean testVGADriver = true;
+---
+>     public static boolean testVGADriver = false;
+37c37
+<     public static boolean testConsoleDaemons = true;
+---
+>     public static boolean testConsoleDaemons = false;
+84,85c84,85
+< 	if (testConsoleDaemons)
+< 	    testConsoleDaemons();
+---
+> 	if (testConsoleDaemons){;}
+> 	//    testConsoleDaemons();
+283,284c283,284
+< 	System.out.println( "init(): testing threading." );
+< 	System.out.println( "init() starting counter..." );
+---
+> //	System.out.println( "init(): testing threading." );
+> /*	System.out.println( "init() starting counter..." );
+291,309c291,309
+< 
+< 	System.out.println( "init() entering .wait() loop..." );
+< 	int interrupt_count = 0;
+< 	while ( interrupt_count < 10 ) {
+< 				/* Bad Karma w/o this. */
+< 	    synchronized( jos.system.interrupts.int000 ) {
+< 		/* because wait() calls release
+< 		   locks, this doesn't actually
+< 		   cause any blockage. */
+< 		try { jos.system.interrupts.int000.wait(); }
+< 		catch ( InterruptedException ie ) {
+< 		    System.out.println( "init() interrupted waiting for notify" );
+< 		    continue;
+< 		}
+< 	    } /* end synchlock on interrupt. */
+< 				// System.out.println( "init() caught interrupt." );
+< 	    interrupt_count++;
+< 	} /* end .wait() loop */
+< 	System.out.println( "init() has caught 10 interrupts." );
+---
+> */
+> //	System.out.println( "init() entering .wait() loop..." );
+> //	int interrupt_count = 0;
+> //	while ( interrupt_count < 10 ) {
+> //				/* Bad Karma w/o this. */
+> //	    synchronized( jos.system.interrupts.int000 ) {
+> //		/* because wait() calls release
+> //		   locks, this doesn't actually
+> //		   cause any blockage. */
+> //		try { jos.system.interrupts.int000.wait(); }
+> //		catch ( InterruptedException ie ) {
+> //		    System.out.println( "init() interrupted waiting for notify" );
+> //		    continue;
+> //		}
+> //	    } /* end synchlock on interrupt. */
+> //				// System.out.println( "init() caught interrupt." );
+> //	    interrupt_count++;
+> //	} /* end .wait() loop */
+> //	System.out.println( "init() has caught 10 interrupts." );
+337,338c337,349
+<     public static void testConsoleDaemons() {			
+< 	System.out.println( "init() starting console daemons..." );
+---
+> //    public static void testConsoleDaemons() {			
+> //	System.out.println( "init() starting console daemons..." );/
+> //
+> //	System.out.println( "init() starting jos.system.keyboard..." );
+> //	/* sets up the hardware driver */
+> //	keyboard k = new keyboard();
+> //	/* starts the KeyEvent dispatch loop */
+> //	k.start();
+> //
+> //	System.out.println( "init() starting jos.system.consoled..." );
+> //	/* listens to the dispatching from j.s.k above */
+> //	consoled cd = new consoled();
+> //    }
+340,350d350
+< 	System.out.println( "init() starting jos.system.keyboard..." );
+< 	/* sets up the hardware driver */
+< 	keyboard k = new keyboard();
+< 	/* starts the KeyEvent dispatch loop */
+< 	k.start();
+< 
+< 	System.out.println( "init() starting jos.system.consoled..." );
+< 	/* listens to the dispatching from j.s.k above */
+< 	consoled cd = new consoled();
+<     }
+< 
+353c353
+< 	StandardVga v = new StandardVga();
+---
+> 	standardVGA v = new standardVGA();
+383a384
+> 		if(i % 100000 == 0) System.out.print('.');
+Index: JJOS/JJOS/common/bytecode/init.java
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/bytecode/init.java,v
+retrieving revision 1.38
+diff -r1.38 init.java
+27,31c27,31
+< 		standardVGA vga = new standardVGA();
+< 		vga.startService();
+< 		vga.bitblt(312, 232, logo, 16 );
+< 		vga.delay( 0x100000 ); /* give us time to look at it */
+< 		vga.stopService();
+---
+> 	//	standardVGA vga = new standardVGA();
+> 	//	vga.startService();
+> 	//	vga.bitblt(312, 232, logo, 16 );
+> 	//	vga.delay( 0x100000 ); /* give us time to look at it */
+> 	//	vga.stopService();
+32a33,35
+> 		TestSuite suite = new TestSuite();
+> 		suite.runTests();
+> 
+Index: JJOS/JJOS/common/bytecode/jos/system/console.java
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/bytecode/jos/system/console.java,v
+retrieving revision 1.7
+diff -r1.7 console.java
+14a15
+> 	private final int id;
+16c17
+< 	public console () {
+---
+> 	public console (int id) {
+18c19,21
+< 		dc = new jos.platform.driver.console();
+---
+> 		//  This is for debugging output to help track the native bug.
+> 		this.id = id;
+> 		dc = new jos.platform.driver.console(id);
+22a26
+> 		id = 0;
+26a31,33
+> 	//  This is debugging output to help track the native bug.
+> 	//	System.out.print("KP");
+> 	//	System.out.print(id);
+30a38,40
+> 	//  This is debugging output to help track the native bug.
+> 	//	System.out.print("KR");
+> 	//	System.out.print(id);
+39a50,52
+> 	//  This is debugging output to help track the native bug.
+> 	//	System.out.print("KT");
+> 	//	System.out.print(id);
+55c68,73
+< 	public void putChar(char c) { dc.putChar(c); }
+---
+> 	public void putChar(char c) { 
+> 	//  This is debugging output to help track the native bug.
+> 	//	System.out.print("jsc.pc");
+> 	//	System.out.print(id);
+> 		dc.putChar(c); 
+> 	}
+Index: JJOS/JJOS/common/bytecode/jos/system/consoled.java
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/bytecode/jos/system/consoled.java,v
+retrieving revision 1.7
+diff -r1.7 consoled.java
+25,26c25,29
+< 		for (int x = 0; x < 12; x++ ) {
+< 			consoles[x] = new console();
+---
+> 		
+> 		// Use F1 for the native console so as to view debugging output.
+> 		consoles[0] = new console(new jos.platform.driver.consoleNative());
+> 		for (int x = 1; x < 12; x++ ) {
+> 			consoles[x] = new console(x);
+35c38
+< //		System.err.println( "consoled.init(): generating event tree..." );
+---
+> 		System.err.println( "consoled.init(): generating event tree..." );
+38c41
+< //		System.err.println( "consoled.init(): initialization complete..." );
+---
+> 		System.err.println( "consoled.init(): initialization complete..." );
+Index: JJOS/JJOS/common/decaf/d_main.cc
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/decaf/d_main.cc,v
+retrieving revision 1.34
+diff -r1.34 d_main.cc
+82a83,85
+>   internBuiltInMethod(jos_platform_driver_consoleNative_setVisible, "jos/platform/driver/consoleNative", "setVisible");
+>   internBuiltInMethod(jos_platform_driver_consoleNative_putChar, "jos/platform/driver/consoleNative", "putNativeChar");
+>   internBuiltInMethod(jos_platform_driver_consoleNative_setChar, "jos/platform/driver/consoleNative", "setNativeChar");
+Index: JJOS/JJOS/common/decaf/jvmbuiltins.cc
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/decaf/jvmbuiltins.cc,v
+retrieving revision 1.9
+diff -r1.9 jvmbuiltins.cc
+25a26,27
+> #include "jbmachin.h"
+> #include "jjconsole.h"
+448a451,473
+> jjBoolean jos_platform_driver_consoleNative_setVisible(java_word argument[], frame *f, resolved_method *rm, int n_args){
+>  // kprintf( "v is %d\n", (jint)(argument[1]) );
+>   jjBoolean v = (jjBoolean)(jint)argument[1]; //(((jint)(argument[1])) == 0 ? JJFALSE : JJTRUE);
+>   jbmp->myConsole->setVisible(v);
+>   return (JJTRUE);
+> }
+> 
+> jjBoolean jos_platform_driver_consoleNative_putChar(java_word argument[], frame *f, resolved_method *rm, int n_args) {
+>   jju8 ch = (jju8)(argument[1]);
+>   jbmp->myConsole->putChar(ch);
+>   return (JJTRUE);	
+> }
+> 
+> jjBoolean jos_platform_driver_consoleNative_setChar(java_word argument[], frame *f, resolved_method *rm, int n_args) {
+>   jint row = (jint) argument[1];
+>   jint col = (jint) argument[2];
+>   jju8 c = (jju8) argument[3];
+>   jju8 a = (jju8) VGA_MODE_7_NORMAL;
+>   
+>   jbmp->myConsole->setChar(row, col, c, a);
+>   return (JJTRUE);	
+> }
+> 
+Index: JJOS/JJOS/common/decaf/jvmbuiltins.h
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/decaf/jvmbuiltins.h,v
+retrieving revision 1.6
+diff -r1.6 jvmbuiltins.h
+51a52,54
+> jjBoolean jos_platform_driver_consoleNative_setVisible(java_word argument[], frame *f, resolved_method *rm, int n_args);
+> jjBoolean jos_platform_driver_consoleNative_putChar(java_word argument[], frame *f, resolved_method *rm, int n_args);
+> jjBoolean jos_platform_driver_consoleNative_setChar(java_word argument[], frame *f, resolved_method *rm, int n_args);
+Index: JJOS/JJOS/common/nativecode/jbconsol.h
+===================================================================
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/nativecode/jbconsol.h,v
+retrieving revision 1.2
+diff -r1.2 jbconsol.h
+32c32
+< 
+---
+>   virtual void setVisible(jjBoolean v) = 0;
+34c34
+< 
+---
+>   virtual void setChar(int row, int col, jju8 c, jju8 a) = 0;
+
+
+
+
+From hilarycheng@usa.net Sun, 2 Jan 2000 12:03:43 +0800
+Date: Sun, 2 Jan 2000 12:03:43 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] About BootLoader of the JJOS
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_000A_01BF5519.6A95AA80
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    Anyone got any problem in Booting Current Snapshot of JJOS ?
+I used bootp to boot the JJOS. But After Etherboot finish
+loading the binary, it just keep halt. I press some keys.
+But I got no response. Any Change in the Boot Loader ? I can boot it
+w/o any problem of the older version of JJOS.
+
+My Computer Config:
+1. K6 II -350
+2. NE2000 Network Card
+
+Regards,
+
+Hilary
+
+------=_NextPart_000_000A_01BF5519.6A95AA80
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML//EN">
+<HTML><HEAD>
+<META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type>
+<STYLE></STYLE>
+
+<META content=3D'"MSHTML 5.00.0910.1309"' name=3DGENERATOR></HEAD>
+<BODY bgColor=3D#d8d0c8>
+<DIV><FONT size=3D2><FONT face=3DArial>Hi All,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>&nbsp;&nbsp;&nbsp; Anyone got any =
+problem in=20
+Booting Current Snapshot of JJOS ?</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>I used bootp to boot the JJOS. =
+But After=20
+Etherboot finish</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>loading the binary, it just keep =
+halt. I=20
+press some keys.</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>But I got no response. Any Change =
+in the Boot=20
+Loader ? I can boot it</FONT></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>w/o any problem of the older version of =
+
+JJOS.</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>My Computer =
+Config:</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>1. K6 II -350</FONT></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>2. NE2000 Network Card</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>Regards,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Hilary</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_000A_01BF5519.6A95AA80--
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Mon, 3 Jan 2000 07:47:50 -0600
+Date: Mon, 3 Jan 2000 07:47:50 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] About BootLoader of the JJOS
+
+Hilary,
+
+I noticed as I was working with the console code that the Java consoles
+assume the VGA starting location for GRUB, which is different than the VGA
+memory starting location for Etherboot.  I think the problem is in
+org.jos.platform.driver.console.  Temporarily, you can just change that and
+hopefully it should boot.  Later I'll try to rearrange the console classes a
+bit and make it smart enough to tell the difference.
+
+Avery J. Regier
+
+
+> -----Original Message-----
+> From:	Hilary Cheng [SMTP:hilarycheng@usa.net]
+> Sent:	Saturday, January 01, 2000 11:04 PM
+> To:	kernel@jos.org
+> Subject:	[JOS-Kernel] About BootLoader of the JJOS
+> 
+> Hi All,
+>  
+>     Anyone got any problem in Booting Current Snapshot of JJOS ?
+> I used bootp to boot the JJOS. But After Etherboot finish
+> loading the binary, it just keep halt. I press some keys.
+> But I got no response. Any Change in the Boot Loader ? I can boot it
+> w/o any problem of the older version of JJOS.
+>  
+> My Computer Config:
+> 1. K6 II -350
+> 2. NE2000 Network Card
+>  
+> Regards,
+>  
+> Hilary
+
+
+
+From hilarycheng@usa.net Mon, 3 Jan 2000 22:32:16 +0800
+Date: Mon, 3 Jan 2000 22:32:16 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] About BootLoader of the JJOS
+
+What I should do so that I can use GRUB ? :O
+
+Regards,
+
+Hilary
+
+
+----- Original Message -----
+From: Regier Avery J <RegierAveryJ@JDCORP.deere.com>
+To: <kernel@jos.org>
+Sent: Monday, January 03, 2000 9:47 PM
+Subject: RE: [JOS-Kernel] About BootLoader of the JJOS
+
+
+>Hilary,
+>
+>I noticed as I was working with the console code that the Java consoles
+>assume the VGA starting location for GRUB, which is different than the VGA
+>memory starting location for Etherboot.  I think the problem is in
+>org.jos.platform.driver.console.  Temporarily, you can just change that and
+>hopefully it should boot.  Later I'll try to rearrange the console classes
+a
+>bit and make it smart enough to tell the difference.
+>
+>Avery J. Regier
+>
+>
+>> -----Original Message-----
+>> From: Hilary Cheng [SMTP:hilarycheng@usa.net]
+>> Sent: Saturday, January 01, 2000 11:04 PM
+>> To: kernel@jos.org
+>> Subject: [JOS-Kernel] About BootLoader of the JJOS
+>>
+>> Hi All,
+>>
+>>     Anyone got any problem in Booting Current Snapshot of JJOS ?
+>> I used bootp to boot the JJOS. But After Etherboot finish
+>> loading the binary, it just keep halt. I press some keys.
+>> But I got no response. Any Change in the Boot Loader ? I can boot it
+>> w/o any problem of the older version of JJOS.
+>>
+>> My Computer Config:
+>> 1. K6 II -350
+>> 2. NE2000 Network Card
+>>
+>> Regards,
+>>
+>> Hilary
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From R.Argentini@student.tudelft.nl Mon, 03 Jan 2000 19:17:25 +0100
+Date: Mon, 03 Jan 2000 19:17:25 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] MILESTONE! Jeps 0.001e Runs Javasoft Tutorial UDP Server!!
+
+Hello all!
+
+It is with great pleasure that i announce to all of you on the arch and
+kernel lists that my stab at an IP Stack in Java finally actually does
+something. As most of you probably already know UDP is a very simple
+protocol built on top of IP, that provides little extra features besided
+port numbers and being accessible from userspace. It was therefore not
+extremely difficult to implement rudimental UDP into JEPS once i had IP and
+ICMP sort of working.
+
+Next i started implementing clones of selected methods of some java.net
+classes in order to get sample programs to run on JEPS, and to my surprise
+it worked rather well.
+
+Incorporated into release 0.001e of JEPS is the example UDP server program
+"QuoteServer"
+(http://java.sun.com/docs/books/tutorial/networking/datagrams/clientServer.h
+tml) that replies to UDP packets on a certain port with a quote extracted
+from a file, or the current time if this file is unavailable. The
+QuoteServerThread class has been modified only slightly to fit into JEPS
+and works, as far as have been able to tell, perfectly. 
+I urge you all to give it a little more perusal :)
+
+You can get the JEPS Stack's latest version from
+http://villa28.cs.kpn.cx/jos/ as usual, or refer to the TCPIPStack and JEPS
+topics on the WIKI-web.
+
+Ranieri Argentini
+
+
+
+
+
+From tmiller@haverford.edu Tue, 4 Jan 2000 16:17:35 -0500 (EST)
+Date: Tue, 4 Jan 2000 16:17:35 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: native console & bug report
+
+> I think that the object model for the consoles is fine for the consoles
+> themselves, but as soon as we try to add real shells to them, it won't work. 
+> There isn't enough flexibility there.  I'll see what I can come up with as I
+> continue to work with it.
+
+	Not enough flexibility?  setChar() would seem to allow you to
+build whatever flexibility you might want into a wrapper (text
+output-wise).  w.r.t. unix-style piping, a consoleOutputStream class
+should be fairly easy to generate, i.e.:
+
+public class consoleOutputStream extends java.io.OutputStream {
+	proctected console c;	
+
+	public consoleInputStream( console c ) {
+		this.c = c;
+		}
+
+	public void write( int b ) {
+		c.putChar( (char)b );
+		}
+	}
+
+and consoleInputStream only slightly more difficult:
+
+public class consoleInputStream extends java.io.InputStream implements KeyListener {
+	protected keyboard k;
+	protected Queue q;
+
+	public consoleInputStream( keyboard k ) {
+		k.addKeyListener( this );
+		}
+
+	public int available() { ... }
+	public int read() {
+		/* Queue's dequeue blocks, waiting
+		   for a character from keyTyped() */ 
+		q.dequeue();
+		}
+
+	... keyTyped( ... ) { ...
+		q.enqueue(...);
+		}
+
+	}
+
+	Ignoring login for the moment, a shell would be started like so:
+
+keyboard shellK = jos.system.keyboard.getKeyboard();
+console shellC = jos.consoled.getCurrentConsole(); /* has matching setCC,
+	which also does not exist at the present time */
+
+shell theShell = new some_shell( shellK, shellC );
+theShell.start();
+
+/* end of init */
+
+	or, if we're writing the shell as an application (e.g. static
+main()), which we should be:
+
+ClassLoader cl = jos.system.proc.getCleanClassLoader();
+Class jlSystem = cl.getClass( "java.lang.System" );
+
+jlSystem.setIn( shellK );
+jlSystem.setOut( shellC );
+jlSystem.setErr( shellC );
+
+jos.system.proc.startProc( cl, cl.getClass( "org.jos.app.shell" ) );
+
+/* end of init */
+
+	-- noting, of course, that jos.system.proc doesn't exist quite yet
+:)  (Which also means that the interface sketched out above will probably
+change :))
+
+	In either case, the shell could completely ignore the streams
+and go to a fully event-based system, where it subscribes on its own to
+the keyboard.  (Where an xterminal would add, before startProc():
+
+jsK = cl.getClass( "jos.system.keyboard" );
+jsK.setKeyboard( myXKeyboard );
+
+jsCD = cl.getClass( "jos.system.consoled" );
+jsCD.setCurrentConsole( this );
+
+so that the correct keyboard/console would be found by the shell.  As an
+aside, the shell could provide its own consoled whose console drivers just
+use get/setChar on a given othe console and their own buffer -- this would
+be suitable generic for any kind of console.  Further thoughts: it might
+be worthwhile to move the currentConsole question out of consoled, and/or
+extend it in two ways: first, optionally ignore the Fx keys (and/or remap
+them), for single console situations; second, provide a class from which
+to generate new consoles in init() and/or provide a method
+init(console[]), where the initializer provides the desired mix of
+consoles.)
+
+	(BTW, aviery, do you have CVS commit privs?)
+
+-_Quinn
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Tue, 4 Jan 2000 16:08:48 -0600
+Date: Tue, 4 Jan 2000 16:08:48 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] Re: native console & bug report
+
+> -----Original Message-----
+> From:	Todd L. Miller [SMTP:tmiller@haverford.edu]
+> Sent:	Tuesday, January 04, 2000 4:18 PM
+> To:	kernel@jos.org
+> Subject:	Re: [JOS-Kernel] Re: native console & bug report
+> 
+> > I think that the object model for the consoles is fine for the consoles
+> > themselves, but as soon as we try to add real shells to them, it won't
+> work. 
+> > There isn't enough flexibility there.  I'll see what I can come up with
+> as I
+> > continue to work with it.
+> 
+> 	Not enough flexibility?  setChar() would seem to allow you to
+> build whatever flexibility you might want into a wrapper (text
+> output-wise).  
+.  
+I'm looking on it from the viewpoint that there is a lot that a shell may
+want to do with the screen that would be difficult to do on just a setChar()
+and putChar() basis.  The current implementation doesn't give access to the
+keyboard (which you do below) to the individual consoles which would have to
+hand it to the shells.  The shells would also want to be able to change
+screen colors, move the cursor about (and how is that done, BTW?  Currently
+the cursor just sits 3/4 down the screen on the native console and doesn't
+show up at all in the Java consoles.), Page up/down and all over the place,
+do text windowing (ala emacs), etc.  A lot of this we'll get with the
+JCurses library (which also doesn't deal with the cursor properly), but
+there will be a bit of changes and additions that need to take place in
+order to integrate that in.  I guess my point was that we can't do that with
+the current interface.
+
+> w.r.t. unix-style piping, a consoleOutputStream class
+> should be fairly easy to generate, i.e.:
+> 
+> public class consoleOutputStream extends java.io.OutputStream {
+> 	proctected console c;	
+> 
+> 	public consoleInputStream( console c ) {
+> 		this.c = c;
+> 		}
+> 
+> 	public void write( int b ) {
+> 		c.putChar( (char)b );
+> 		}
+> 	}
+> 
+> and consoleInputStream only slightly more difficult:
+> 
+> public class consoleInputStream extends java.io.InputStream implements
+> KeyListener {
+> 	protected keyboard k;
+> 	protected Queue q;
+> 
+> 	public consoleInputStream( keyboard k ) {
+> 		k.addKeyListener( this );
+> 		}
+> 
+> 	public int available() { ... }
+> 	public int read() {
+> 		/* Queue's dequeue blocks, waiting
+> 		   for a character from keyTyped() */ 
+> 		q.dequeue();
+> 		}
+> 
+> 	... keyTyped( ... ) { ...
+> 		q.enqueue(...);
+> 		}
+> 
+> 	}
+> 
+> 	Ignoring login for the moment, a shell would be started like so:
+> 
+> keyboard shellK = jos.system.keyboard.getKeyboard();
+> console shellC = jos.consoled.getCurrentConsole(); /* has matching setCC,
+> 	which also does not exist at the present time */
+> 
+I'm not so hot on this approach.  I'd prefer somehow that the shells are
+told what console they get and when the keyboard is theirs.  In the same
+vein, I think there needs to be a Screen object which keeps control of the
+mapped byte array.  In short, anytime there is a scarce native resource,
+there needs to be an object keeping track of it to make sure that we don't,
+for instance, have multiple consoles ever trying to write to the screen at
+the same time.
+
+> shell theShell = new some_shell( shellK, shellC );
+> theShell.start();
+> 
+> /* end of init */
+> 
+> 	or, if we're writing the shell as an application (e.g. static
+> main()), which we should be:
+> 
+> ClassLoader cl = jos.system.proc.getCleanClassLoader();
+> Class jlSystem = cl.getClass( "java.lang.System" );
+> 
+Well, there is some reflection stuff that goes here to make the following
+work, but I get the idea.  Really, though, this is the realm of JOSCore
+(org.jos.core.*) and the process model.  We can't really make this work
+until that is in place.
+
+> jlSystem.setIn( shellK );
+> jlSystem.setOut( shellC );
+> jlSystem.setErr( shellC );
+> 
+> jos.system.proc.startProc( cl, cl.getClass( "org.jos.app.shell" ) );
+> 
+> /* end of init */
+> 
+> 	-- noting, of course, that jos.system.proc doesn't exist quite yet
+> :)  (Which also means that the interface sketched out above will probably
+> change :))
+> 
+> 	In either case, the shell could completely ignore the streams
+> and go to a fully event-based system, where it subscribes on its own to
+> the keyboard.  (Where an xterminal would add, before startProc():
+> 
+> jsK = cl.getClass( "jos.system.keyboard" );
+> jsK.setKeyboard( myXKeyboard );
+> 
+> jsCD = cl.getClass( "jos.system.consoled" );
+> jsCD.setCurrentConsole( this );
+> 
+> so that the correct keyboard/console would be found by the shell.  As an
+> aside, the shell could provide its own consoled whose console drivers just
+> use get/setChar on a given othe console and their own buffer -- this would
+> be suitable generic for any kind of console.  Further thoughts: it might
+> be worthwhile to move the currentConsole question out of consoled, and/or
+> extend it in two ways: first, optionally ignore the Fx keys (and/or remap
+> them), for single console situations; second, provide a class from which
+> to generate new consoles in init() and/or provide a method
+> init(console[]), where the initializer provides the desired mix of
+> consoles.)
+> 
+A lot of this I foresee being configurable off of the registry.  It is
+almost like there needs to be a single meta shell to intercept the Fx keys
+and control the switching between shells.  Hmmm..... 
+
+> 	(BTW, aviery, do you have CVS commit privs?)
+> 
+> -_Quinn
+> 
+I have a CVS account, but I don't think I have commit privileges on JJOS.
+
+- Avery
+
+
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From RegierAveryJ@JDCORP.deere.com Tue, 4 Jan 2000 16:17:43 -0600
+Date: Tue, 4 Jan 2000 16:17:43 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] File System
+
+All,
+
+Last night I started looking at what it would take to implement a filesystem
+in JJOS.  Stephan Reich in '98 created an API for handling filesystems which
+works quite well.  He also wrote a FAT implementation.  Someone was supposed
+to write an ext2fs implementation, but it never happened.  There is an a
+Medium interface which we'll need to implement which would take care of the
+physical writing and reading from disk.
+
+Has anyone thought much about this?  I was looking last night for the EIDE
+specification but was unable to find it.  Are there any good sources of
+information on how to access disk drives?  Have those of you who looked into
+drivers done any research in this area?
+
+- Avery
+
+
+
+From gchii@mindspring.com Tue, 04 Jan 2000 19:34:33 -0500
+Date: Tue, 04 Jan 2000 19:34:33 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Re: native console
+
+At 04:08 PM 1/4/00 -0600, Regier Avery J <RegierAveryJ@JDCORP.deere.com>
+wrote:
+>...It is almost like there needs to be a single meta shell to intercept
+>the Fx keys and control the switching between shells. Hmmm.....
+
+A "single meta shell" is also known as a window manager, or virtual console
+manager. A virtual console manager must intercept keystroke or mouse events
+to switch between virtual consoles. A physical console is a limited
+resource. There might be only one keyboard, one mouse, one monitor and many
+concurrent consoles. Immediately there are two kinds of "consoles".
+
+ - A real console. This console has direct access to the keyboard, mouse
+and video adapter (and monitor).
+
+ - A virtual console. This console has only indirect access to the
+keyboard, mouse and video adapter.
+
+The virtual console manager is a third kind of object that fits between a
+virtual console and a real console. Many different implementations of a
+virtual console manager are possible.
+
+The virtual console manager outputs a copy of a virtual console to the real
+console, when a virtual console comes into focus. The virtual console
+manager dispatches keystroke and mouse events to one virtual console at a
+time. Only one virtual console has "focus". Since the virtual console
+manager is a keystroke event listener, it is the first object to read a
+keystroke event. Well-defined keystrokes and/or mouse events are used by
+the virtual console manager to change focus.
+
+When a virtual console is constructed, it is isolated and independent from
+the virtual console manager. In its lifetime, a virtual console can be
+attached and detatched many times to the virtual console manager. A virtual
+console is an object that must manage its own character-mapped or
+bit-mapped data. (A real console is not required to maintain data beyond
+the physical limits of a video adapter.)
+
+The virtual console manager reads the data from a virtual console and
+writes it to the real console. Each virtual console has a horizontal and/or
+vertical offset, modified by line-up, line-down, page-up, page-down, top
+and bottom keys. A virtual console manager might use a horizontal and/or
+vertical scroll bar to modify the horizontal/vertical offsets for the
+current virtual console.
+
+A virtual console must implement both a console and virtual console
+interface. For an example of a mouse-driven, object-oriented,
+character-based window manager, see also Turbo Vision for C++/Pascal from
+Borland.
+
+-----
+
+All functions of the JCurses library are available indirectly through
+setChar() when an escape sequence is defined and implemented. A
+"stream"-based console requires a program to use escape sequence to control
+the cursor. An escape sequence is a special interpretation of plain text.
+This is like HTML and XML, where an escape sequence starts with less-than
+(<) and ends with greater-than (>). This is like the old ANSI-terminal
+escape sequence, where ESC, [ clears a window. This is like the TELNET
+protocol, where 0xFF, 0xF0 clears a window. Through an escape sequence,
+colors can be selected and the text cursor moved.
+
+A "stream"-based console is important when implementing a console that's
+useful across the network. A socket provides a stream. The setChar() method
+would write a character to a stream. A virtual console and its video
+adapter do not have to be on the same machine.
+
+A high-level stream console would have additional methods to push standard
+escape sequences through the setChar() method.
+
+-----
+
+A shell is not a console, is it? One program might have two or more
+simultaneous virtual consoles. While one virtual console shows you the
+"normal" program, another might show a trace of program execution. Inside
+the clUtilities, there's a demo shell. Inside the Smart API, there are a
+few dozen shells.
+
+A "shell" accepts one line of text from standard input stream and
+interprets the line of text as a command line. While a shell is a program,
+not all programs are shells.
+
+-----
+
+I've been working a long time toward a CommandLineBrowser, a
+character-based version of UniversalBrowser. The bulk of these browsers are
+identical. The mechanism to get a location from the keyboard is a critical
+difference between CommandLineBrowser and UniversalBrowser. While the
+AWT-based UniversalBrowser listens for an action event, the
+CommandLineBrowser will read one line at a time from standard input,
+something like this:
+
+  public void run() {
+    DataInputStream input = new DataInputStream( System.in );
+    String line;
+    for (;;) {
+      try {
+        line = input.readLine();
+      }
+      catch( IOException e ) {
+        break;
+      }
+      if ( line == null ) {
+        break; // only if redirection (pipe)
+      }
+      onLocationSelection( line );
+    }
+  }
+
+Just like the UniversalBrowser, this browser will be URI-based and will
+display the content of any file, any web page, any registry-compatible
+file, any JDBC connection, and will run any mostly-bytecode program.
+
+A virtual console is a perfect companion to the CommandLineBrowser. The
+virtual console would enable me to scroll up and down when a URI produces
+more output than fits on a real console. The CommandLineBrowser will call
+System.exit() when the given URI is exactly equal to "quit".
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Wed, 5 Jan 2000 10:47:01 +0100
+Date: Wed, 5 Jan 2000 10:47:01 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Jeps 0.001e doesn't compile!
+
+Hi all,
+I've downloaded Jeps 0.0001e and I've tryed to compile it but I got some errors!
+In particular, the jos.platform.driver.Device was not found. By looking into
+JJOS/common/bytecode/jos/platform/driver I've found it empty! What's happened ?
+Is it my CVS image damaged or has the classes been removed from CVS server ?
+
+Any suggestion ?
+
+Cheers,
+Corrado
+
+On Wed, 05 Jan 2000, you wrote:
+> 
+> Hello all!
+> 
+> It is with great pleasure that i announce to all of you on the arch and
+> kernel lists that my stab at an IP Stack in Java finally actually does
+> something. As most of you probably already know UDP is a very simple
+> protocol built on top of IP, that provides little extra features besided
+> port numbers and being accessible from userspace. It was therefore not
+> extremely difficult to implement rudimental UDP into JEPS once i had IP and
+> ICMP sort of working.
+> 
+> Next i started implementing clones of selected methods of some java.net
+> classes in order to get sample programs to run on JEPS, and to my surprise
+> it worked rather well.
+> 
+> Incorporated into release 0.001e of JEPS is the example UDP server program
+> "QuoteServer"
+> (http://java.sun.com/docs/books/tutorial/networking/datagrams/clientServer.h
+> tml) that replies to UDP packets on a certain port with a quote extracted
+> from a file, or the current time if this file is unavailable. The
+> QuoteServerThread class has been modified only slightly to fit into JEPS
+> and works, as far as have been able to tell, perfectly. 
+> I urge you all to give it a little more perusal :)
+> 
+> You can get the JEPS Stack's latest version from
+> http://villa28.cs.kpn.cx/jos/ as usual, or refer to the TCPIPStack and JEPS
+> topics on the WIKI-web.
+> 
+> Ranieri Argentini
+> 
+> 
+> 
+> _______________________________________________
+> Arch maillist  -  Arch@jos.org
+> http://jos.org/mailman/listinfo/arch
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From hilarycheng@usa.net Wed, 5 Jan 2000 20:50:40 +0800
+Date: Wed, 5 Jan 2000 20:50:40 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] File System
+
+Hi ,
+
+    Hm, will we use FAT as the Basic FS of JJOS ? Since I would like to
+have a Journal FS for JJOS rather than a FAT.
+
+Regards,
+
+Hilary
+
+----- Original Message -----
+From: Regier Avery J <RegierAveryJ@JDCORP.deere.com>
+To: <kernel@jos.org>
+Sent: Wednesday, January 05, 2000 6:17 AM
+Subject: [JOS-Kernel] File System
+
+
+>All,
+>
+>Last night I started looking at what it would take to implement a
+filesystem
+>in JJOS.  Stephan Reich in '98 created an API for handling filesystems
+which
+>works quite well.  He also wrote a FAT implementation.  Someone was
+supposed
+>to write an ext2fs implementation, but it never happened.  There is an a
+>Medium interface which we'll need to implement which would take care of the
+>physical writing and reading from disk.
+>
+>Has anyone thought much about this?  I was looking last night for the EIDE
+>specification but was unable to find it.  Are there any good sources of
+>information on how to access disk drives?  Have those of you who looked
+into
+>drivers done any research in this area?
+>
+>- Avery
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From tmiller@haverford.edu Wed, 5 Jan 2000 08:20:59 -0500 (EST)
+Date: Wed, 5 Jan 2000 08:20:59 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] host progress
+
+	Along the way to hunting down a bug I've inserted in the i386
+build trying to to use Aviery's patch for a native #0 console, I made some
+changes to the host build's console handling.  The summary is that I've
+adapted the host build to use the ncurses library.  This allows
+char-by-char input easily, and simplifies the work in
+driver.KeyboardInterpreter.  Things left to do for this style of
+build (from the text console i/o p.o.v.):
+
+(a) handle escape sequences (eg F1) and/or activate keypad() in
+ncurses() and adjust the handling in driver.KI to use its translations.
+(b) rewrite driver.console to use ncurses so that when the Fx keys are
+available, the Right Things will happen.  (On update() and when visible,
+use native calls to addch(x,y,c) to draw.)
+(c) recognize and handle return correctly.  (This might be something
+ncurses will handle automagically with the right settings.)
+
+	None of these should be particularly difficult, though (a) will be
+time-consuming.  This will allow us to test shells (when we're ready*,
+which should be soon) on the host build.  (consoleVGA on the host build
+should be a simple re-write to pop up and use an X window.)
+
+	I'll continue to hack away at figuring what I screwed up when
+inserting Aviery's code.  (Which, btw, I did by hand so I could figure out
+what he was doing.)
+
+-_Quinn
+
+* See my prior email for options on shells.  If you go with a shell that
+isn't its own program and doesn't use too much of the java libraries, it
+could start now.  My short-term attention will be divided between
+processes and classpath; processes should be finished sooner.
+
+
+
+
+
+From tmiller@haverford.edu Wed, 5 Jan 2000 08:21:52 -0500 (EST)
+Date: Wed, 5 Jan 2000 08:21:52 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] File System
+
+>     Hm, will we use FAT as the Basic FS of JJOS ? Since I would like to
+> have a Journal FS for JJOS rather than a FAT.
+
+	FAT has the virtue of absurd simplicity, which is important when
+implementing an FS from scratch in a language, that, AFAIK, has never been
+used for a FS before.  I'd imagine we're going to a VFS-style system when
+all the dust clears.
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Wed, 5 Jan 2000 08:21:46 -0500 (EST)
+Date: Wed, 5 Jan 2000 08:21:46 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: [JOS-Arch] Jeps 0.001e doesn't compile!
+
+> I've downloaded Jeps 0.0001e and I've tryed to compile it but I got some errors!
+> In particular, the jos.platform.driver.Device was not found. By looking into
+> JJOS/common/bytecode/jos/platform/driver I've found it empty! What's happened ?
+> Is it my CVS image damaged or has the classes been removed from CVS server ?
+
+	All of the platform/driver code has been moved to arch/*/bytecode
+to allow for architecture-specific code; cvs update will need the create
+directory and purge empty options to make things synch up right.  (-p -D
+or -P -d, I forget which.)
+
+-_Quinn
+
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Wed, 5 Jan 2000 07:24:58 -0600
+Date: Wed, 5 Jan 2000 07:24:58 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] File System
+
+Hilary,
+
+FAT just happens to be what Stephan was familiar with when he made a test
+implementation of the FileSystem interfaces.  The FileSystem interfaces are
+generic enough that we can implement any kind of filesystem behind them that
+we want.
+
+ - Avery
+
+
+> -----Original Message-----
+> From:	Hilary Cheng [SMTP:hilarycheng@usa.net]
+> Sent:	Wednesday, January 05, 2000 7:51 AM
+> To:	kernel@jos.org
+> Subject:	Re: [JOS-Kernel] File System
+> 
+> Hi ,
+> 
+>     Hm, will we use FAT as the Basic FS of JJOS ? Since I would like to
+> have a Journal FS for JJOS rather than a FAT.
+> 
+> Regards,
+> 
+> Hilary
+> 
+> ----- Original Message -----
+> From: Regier Avery J <RegierAveryJ@JDCORP.deere.com>
+> To: <kernel@jos.org>
+> Sent: Wednesday, January 05, 2000 6:17 AM
+> Subject: [JOS-Kernel] File System
+> 
+> 
+> >All,
+> >
+> >Last night I started looking at what it would take to implement a
+> filesystem
+> >in JJOS.  Stephan Reich in '98 created an API for handling filesystems
+> which
+> >works quite well.  He also wrote a FAT implementation.  Someone was
+> supposed
+> >to write an ext2fs implementation, but it never happened.  There is an a
+> >Medium interface which we'll need to implement which would take care of
+> the
+> >physical writing and reading from disk.
+> >
+> >Has anyone thought much about this?  I was looking last night for the
+> EIDE
+> >specification but was unable to find it.  Are there any good sources of
+> >information on how to access disk drives?  Have those of you who looked
+> into
+> >drivers done any research in this area?
+> >
+> >- Avery
+> >
+> >_______________________________________________
+> >Kernel maillist  -  Kernel@jos.org
+> >http://jos.org/mailman/listinfo/kernel
+> >
+> >
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From hilarycheng@usa.net Wed, 5 Jan 2000 21:30:26 +0800
+Date: Wed, 5 Jan 2000 21:30:26 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] About GRUB of JJOS
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0105_01BF57C4.14EDD280
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    I would like to ask, what is the current bootloader of JJOS ?
+BOOTP or GRUB ? Since I can't boot from BOOTP right now.
+it just keep hang. Also, any giuldline to use GRUB ?
+
+Regards,
+
+Hilary
+
+------=_NextPart_000_0105_01BF57C4.14EDD280
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML//EN">
+<HTML><HEAD>
+<META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type>
+<STYLE></STYLE>
+
+<META content=3D'"MSHTML 5.00.0910.1309"' name=3DGENERATOR></HEAD>
+<BODY bgColor=3D#d8d0c8>
+<DIV><FONT size=3D2><FONT face=3DArial>Hi All,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>&nbsp;&nbsp;&nbsp; I would like =
+to ask, what=20
+is the current bootloader of JJOS ?</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>BOOTP or GRUB ? Since I can't =
+boot from BOOTP=20
+right now.</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>it just keep hang. Also, any =
+giuldline to use=20
+GRUB ?</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>Regards,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Hilary</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0105_01BF57C4.14EDD280--
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Wed, 5 Jan 2000 07:55:09 -0600
+Date: Wed, 5 Jan 2000 07:55:09 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] About GRUB of JJOS
+
+Hilary,
+
+Though I think that officially Etherboot is still supposed to work, Todd has
+moved over to using GRUB, so I don't think Etherboot has been tested much
+recently.  I've never been able to get Etherboot to work, so I can't be of
+much assistance there.  Did you at least try the fix I proposed?  How did it
+work?
+
+George Marrows has some information on how to get started with GRUB here:
+http://www.triptych.freeserve.co.uk/grub/index.html
+
+- Avery
+
+> -----Original Message-----
+> From:	Hilary Cheng [SMTP:hilarycheng@usa.net]
+> Sent:	Wednesday, January 05, 2000 8:30 AM
+> To:	kernel@jos.org
+> Subject:	[JOS-Kernel] About GRUB of JJOS
+> 
+> Hi All,
+>  
+>     I would like to ask, what is the current bootloader of JJOS ?
+> BOOTP or GRUB ? Since I can't boot from BOOTP right now.
+> it just keep hang. Also, any giuldline to use GRUB ?
+>  
+> Regards,
+>  
+> Hilary
+
+
+
+From hilarycheng@usa.net Wed, 5 Jan 2000 22:03:28 +0800
+Date: Wed, 5 Jan 2000 22:03:28 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] About GRUB of JJOS
+
+Hi All,
+
+    I am sorry about that I am not familiar with GRUB. I have read the page.
+Well, It will read the jjos program from Paritition. Can it read the file
+from a FAT/VFAT/FAT32 To Boot ?
+
+Regards,
+
+Hilary
+
+
+----- Original Message -----
+From: Regier Avery J <RegierAveryJ@JDCORP.deere.com>
+To: <kernel@jos.org>
+Sent: Wednesday, January 05, 2000 9:55 PM
+Subject: RE: [JOS-Kernel] About GRUB of JJOS
+
+
+>Hilary,
+>
+>Though I think that officially Etherboot is still supposed to work, Todd
+has
+>moved over to using GRUB, so I don't think Etherboot has been tested much
+>recently.  I've never been able to get Etherboot to work, so I can't be of
+>much assistance there.  Did you at least try the fix I proposed?  How did
+it
+>work?
+>
+>George Marrows has some information on how to get started with GRUB here:
+>http://www.triptych.freeserve.co.uk/grub/index.html
+>
+>- Avery
+>
+>> -----Original Message-----
+>> From: Hilary Cheng [SMTP:hilarycheng@usa.net]
+>> Sent: Wednesday, January 05, 2000 8:30 AM
+>> To: kernel@jos.org
+>> Subject: [JOS-Kernel] About GRUB of JJOS
+>>
+>> Hi All,
+>>
+>>     I would like to ask, what is the current bootloader of JJOS ?
+>> BOOTP or GRUB ? Since I can't boot from BOOTP right now.
+>> it just keep hang. Also, any giuldline to use GRUB ?
+>>
+>> Regards,
+>>
+>> Hilary
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Wed, 5 Jan 2000 08:15:29 -0600
+Date: Wed, 5 Jan 2000 08:15:29 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] About GRUB of JJOS
+
+Yes, it can.
+
+
+> -----Original Message-----
+> From:	Hilary Cheng [SMTP:hilarycheng@usa.net]
+> Sent:	Wednesday, January 05, 2000 9:03 AM
+> To:	kernel@jos.org
+> Subject:	Re: [JOS-Kernel] About GRUB of JJOS
+> 
+> Hi All,
+> 
+>     I am sorry about that I am not familiar with GRUB. I have read the
+> page.
+> Well, It will read the jjos program from Paritition. Can it read the file
+> from a FAT/VFAT/FAT32 To Boot ?
+> 
+> Regards,
+> 
+> Hilary
+> 
+> 
+> ----- Original Message -----
+> From: Regier Avery J <RegierAveryJ@JDCORP.deere.com>
+> To: <kernel@jos.org>
+> Sent: Wednesday, January 05, 2000 9:55 PM
+> Subject: RE: [JOS-Kernel] About GRUB of JJOS
+> 
+> 
+> >Hilary,
+> >
+> >Though I think that officially Etherboot is still supposed to work, Todd
+> has
+> >moved over to using GRUB, so I don't think Etherboot has been tested much
+> >recently.  I've never been able to get Etherboot to work, so I can't be
+> of
+> >much assistance there.  Did you at least try the fix I proposed?  How did
+> it
+> >work?
+> >
+> >George Marrows has some information on how to get started with GRUB here:
+> >http://www.triptych.freeserve.co.uk/grub/index.html
+> >
+> >- Avery
+> >
+> >> -----Original Message-----
+> >> From: Hilary Cheng [SMTP:hilarycheng@usa.net]
+> >> Sent: Wednesday, January 05, 2000 8:30 AM
+> >> To: kernel@jos.org
+> >> Subject: [JOS-Kernel] About GRUB of JJOS
+> >>
+> >> Hi All,
+> >>
+> >>     I would like to ask, what is the current bootloader of JJOS ?
+> >> BOOTP or GRUB ? Since I can't boot from BOOTP right now.
+> >> it just keep hang. Also, any giuldline to use GRUB ?
+> >>
+> >> Regards,
+> >>
+> >> Hilary
+> >
+> >_______________________________________________
+> >Kernel maillist  -  Kernel@jos.org
+> >http://jos.org/mailman/listinfo/kernel
+> >
+> >
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From Corrado.Santoro@iit.unict.it Wed, 5 Jan 2000 15:52:12 +0100 (GMT+0100)
+Date: Wed, 5 Jan 2000 15:52:12 +0100 (GMT+0100)
+From: csanto Corrado.Santoro@iit.unict.it
+Subject: [JOS-Kernel] host progress and jcurses
+
+Hi all,
+first of all, thank you for your help about my problem on Device.java.
+Secondy, I would like to try to make jcurses to work with JOS. To this
+aim, I need two things:
+1. how can I put a char with a back and fore color onto the screen (using
+console or consoled class) ?
+2. how can I read a *single* char ? (yes I have to use a KeyboardListener
+I think, but in the host build any typed char is returned only after a
+newline. I have designed a native class which, using a native method and
+some ncurses system call, is able to read a single keystroke, but I think
+it is better to integrate this inside JOS host core).
+
+My objective is to write the *first* interactive JOS application.
+
+Any suggestion ?
+Cheers
+Corrado
+
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+On Wed, 5 Jan 2000, Todd L. Miller wrote:
+
+> 	Along the way to hunting down a bug I've inserted in the i386
+> build trying to to use Aviery's patch for a native #0 console, I made some
+> changes to the host build's console handling.  The summary is that I've
+> adapted the host build to use the ncurses library.  This allows
+> char-by-char input easily, and simplifies the work in
+> driver.KeyboardInterpreter.  Things left to do for this style of
+> build (from the text console i/o p.o.v.):
+> 
+> (a) handle escape sequences (eg F1) and/or activate keypad() in
+> ncurses() and adjust the handling in driver.KI to use its translations.
+> (b) rewrite driver.console to use ncurses so that when the Fx keys are
+> available, the Right Things will happen.  (On update() and when visible,
+> use native calls to addch(x,y,c) to draw.)
+> (c) recognize and handle return correctly.  (This might be something
+> ncurses will handle automagically with the right settings.)
+> 
+> 	None of these should be particularly difficult, though (a) will be
+> time-consuming.  This will allow us to test shells (when we're ready*,
+> which should be soon) on the host build.  (consoleVGA on the host build
+> should be a simple re-write to pop up and use an X window.)
+> 
+> 	I'll continue to hack away at figuring what I screwed up when
+> inserting Aviery's code.  (Which, btw, I did by hand so I could figure out
+> what he was doing.)
+> 
+> -_Quinn
+> 
+> * See my prior email for options on shells.  If you go with a shell that
+> isn't its own program and doesn't use too much of the java libraries, it
+> could start now.  My short-term attention will be divided between
+> processes and classpath; processes should be finished sooner.
+> 
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+> 
+> 
+
+
+
+
+From tmiller@haverford.edu Wed, 5 Jan 2000 12:45:11 -0500 (EST)
+Date: Wed, 5 Jan 2000 12:45:11 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] host progress and jcurses
+
+> 1. how can I put a char with a back and fore color onto the screen (using
+> console or consoled class) ?
+
+	Er.  This is something that's not actually supported by the
+consoles right now.  (Gee, Avery, looks like I *did* forget something :))  
+It shouldn't be too difficult to add get/setAttribute() methods to the
+console classes.
+
+> 2. how can I read a *single* char ? (yes I have to use a KeyboardListener
+> I think, but in the host build any typed char is returned only after a
+> newline. I have designed a native class which, using a native method and
+> some ncurses system call, is able to read a single keystroke, but I think
+> it is better to integrate this inside JOS host core).
+
+	Scarily enough, I just finished doing this!  (See prior email,
+re: host progress.  That email also includes the to-do list.)  I guess
+your request means that I should go ahead and commit my changes to CVS.
+
+> My objective is to write the *first* interactive JOS application.
+
+	Might it, perchance, be a shell? :)
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Wed, 5 Jan 2000 12:59:12 -0500 (EST)
+Date: Wed, 5 Jan 2000 12:59:12 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: native console & bug report
+
+> The shells would also want to be able to change
+> screen colors, move the cursor about (and how is that done, BTW?  Currently
+> the cursor just sits 3/4 down the screen on the native console and doesn't
+> show up at all in the Java consoles.), 
+
+	You got me there -- I completely forgot about character
+attributes.  (get/setAttr shouldn't be too hard to manage
+though.)  w.r.t. to the cursor, I'd add get/setCursor() right away, if I
+knew how...
+
+> I'm not so hot on this approach.  I'd prefer somehow that the shells are
+> told what console they get and when the keyboard is theirs.  In the same
+> vein, I think there needs to be a Screen object which keeps control of the
+> mapped byte array.  In short, anytime there is a scarce native resource,
+> there needs to be an object keeping track of it to make sure that we don't,
+> for instance, have multiple consoles ever trying to write to the screen at
+> the same time.
+
+	The mapped byte array per console approach is Grand Hack, and yes,
+hardware resources need to be better tracked.  Unfortunately, I don't
+really have any ideas as to what the Right Way to do that is.
+
+> A lot of this I foresee being configurable off of the registry.  It is
+> almost like there needs to be a single meta shell to intercept the Fx keys
+> and control the switching between shells.  Hmmm..... 
+
+	Well, that's what consoled does.  (Rather, the consoled running in
+the `root' process, the one started by init.  Other consoled's could be
+running in other processes, but they only get the keystrokes that the
+'root' consoled doesn't eat.  And yes, the registry would be a good place
+to keep system(user?)-wide keyboard shortcuts like this.  (E.g. for that
+multiple-console xterm, its consoled would have to look at ctrl-Fx,
+instead of alt-Fx, for when to switch, because alt-Fx is handled by the
+'root' consoled.)
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Wed, 5 Jan 2000 17:24:39 -0500 (EST)
+Date: Wed, 5 Jan 2000 17:24:39 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] bug report
+
+	I committed some stuff to CVS this morning, touching a large
+number of files.  A few separate updates went into this commit.  First, a
+nearly-functional version of Avery's native <-> java console
+bridge.  Currently, it's held up by my mistaken belief that interface
+methods could never be native.  (As it turns out, the method listed in
+the interface must NOT be native, but the method body in the implementing
+class can be anything at all...)  This means that decaf kills the thread
+when consoleNative is supposed to do anything because it can't find the
+method body.  I'll try to get that fix in tonight.
+
+	Secondly, I fixed the bug Avery uncovered w.r.t. native
+methods.  The problem was that we'd never bothered to munge the classname
+into the hashtable in which we were storing built-in methods.  This is
+fixed in the commit.
+
+	Third, I included my work on a curses-based host build (apparently
+and unwittingly in part duplicated by Corrado) -- keystroke-by-keystroke
+keyboard driver & the beginnings of a console system.  (Add a native
+method to manipulate curses pads to the driver.console class; copy from
+the buffer to there, instead of the mappedByteArray, and have update() (or
+makeVisible(), etc), call the proper pad to stdscr curses function.)
+
+	As I mentioned above, the commit doesn't work as is; the fix is
+relatively simple, though, just change consoled's consoles[0] back to
+being a normal console.driver.
+
+
+	W.r.t. GRUB vs etherbooting, I've only been using GRUB booting for
+my recent set of changes, but I'd be very suprised if the etherboot didn't
+work.  Once a sufficiently large majority of active developers let me know
+that they've got a GRUB boot working, I'll change the Makefile default to
+that and stop worrying about etherboot, except for maybe public
+releases.  (Whenever /that/ might be.)  The main difference between the
+two is where the text-mode VGA buffer is located.  (BTW, the GRUB boot
+needs to clear the initial console before doing anything else, because the
+GRUB junk on screen makes things hard to read.)  This should be fixable in
+the ASM if anyone's willing to try.  ( mov ah, 0x04; int 0x10 might do it,
+but check the VGA BIOS specs for the right video mode (80x24 at 0xb8000,
+IIRC)).
+
+-_Quinn
+
+
+
+
+
+From ajregier@earthlink.net Wed, 5 Jan 2000 20:59:28 -0600
+Date: Wed, 5 Jan 2000 20:59:28 -0600
+From: Avery J. Regier ajregier@earthlink.net
+Subject: [JOS-Kernel] Oops!  consoleNative fix
+
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+
+Todd,
+
+I have noticed that the
+/arch/i386/bytecode/jos/platform/driver/consoleNative.java never made it into
+the CVS or into my previous diff!  Here are both that file and a diff off of
+the current CVS which works around the current native method implementing an
+interface problem.  Just add these and what's in CVS will work out of the box.
+
+I tried to just commit these, but I have insufficient karma for that.
+
+- Avery
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD
+Content-Type: text/plain;
+  name="JJOS-native.diff"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment; filename="JJOS-native.diff"
+
+Index: JJOS/common/decaf/d_main.cc
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/decaf/d_main.cc,v
+retrieving revision 1.35
+diff -r1.35 d_main.cc
+178,180c178,180
+<   internBuiltInMethod(jos_platform_driver_consoleNative_putChar, "jos/p=
+latform/driver/consoleNative", "putChar");
+<   internBuiltInMethod(jos_platform_driver_consoleNative_setChar, "jos/p=
+latform/driver/consoleNative", "setChar");
+<   internBuiltInMethod(jos_platform_driver_consoleNative_getChar, "jos/p=
+latform/driver/consoleNative", "getChar");
+---
+>   internBuiltInMethod(jos_platform_driver_consoleNative_putChar, "jos/p=
+latform/driver/consoleNative", "putNativeChar");
+>   internBuiltInMethod(jos_platform_driver_consoleNative_setChar, "jos/p=
+latform/driver/consoleNative", "setNativeChar");
+>   internBuiltInMethod(jos_platform_driver_consoleNative_getChar, "jos/p=
+latform/driver/consoleNative", "getNativeChar");
+
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD
+Content-Type: text/x-java;
+  name="consoleNative.java"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment; filename="consoleNative.java"
+
+/**
+ * consoleNative.java
+ *
+ * a single virtual console,
+ * implemented in (PC) VGA text mode.
+ */
+
+package jos.platform.driver;
+
+import jos.system.*;
+import jos.platform.event.*;
+
+public class consoleNative extends Object implements ConsoleDriver {
+=09public void focusGained( FocusEvent fe ) {
+=09=09setVisible(true);
+=09}
+=09public void focusLost( FocusEvent fe ) {
+=09=09setVisible(false);
+=09}
+
+=09public char getChar( int row, int column ) {
+=09=09return getNativeChar(row, column);
+=09}=20
+=09public native char getNativeChar(int row, int column );
+
+=09public void setChar( int row, int column, char c ) {
+=09=09setNativeChar(row, column, c);
+=09}=20
+=09public native void setNativeChar( int row, int column, char c );
+
+=09public void putChar( char c ) {
+=09=09putNativeChar(c);
+=09}=20
+=09public native void putNativeChar( char c );
+
+=09public native void setVisible(boolean v);
+
+} /* end class consoleNative */
+
+
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD--
+
+
+
+From tmiller@haverford.edu Wed, 5 Jan 2000 21:41:54 -0500 (EST)
+Date: Wed, 5 Jan 2000 21:41:54 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Oops!  consoleNative fix
+
+> /arch/i386/bytecode/jos/platform/driver/consoleNative.java never made it into
+> the CVS or into my previous diff!  Here are both that file and a diff off of
+> the current CVS which works around the current native method implementing an
+> interface problem.  Just add these and what's in CVS will work out of the box.
+
+	Okay.  I'll stick with the consoleNative I'm using right now and
+add/commit one or the other of them when I'm done for the night.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Wed, 5 Jan 2000 22:41:17 -0500 (EST)
+Date: Wed, 5 Jan 2000 22:41:17 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] consoleNative fix
+
+	consoleNative is now working.  (Yay!)  I've done the right things
+to the CVS, so everyone should be able to start enjoying it right
+away.  There's the possibility remaining of an unfixed bug in the invoke*
+(but not interface) methods, where a function call whose resolved_method
+points at the 'wrong' class, which prevents the native code for that
+method from being found.  If this bug bites you before I fix it, look at
+invokeinterface for the right order.  (Do the dynamic linking first, and
+use what it decides is the right java_class to look for the native
+method.)
+
+	BTW, Avery, you should have commit privs now.
+
+-_Quinn
+
+
+
+
+From hilarycheng@usa.net Thu, 6 Jan 2000 22:36:37 +0800
+Date: Thu, 6 Jan 2000 22:36:37 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] About EtherBoot Of Current CVS JJOS
+
+Hi ALl,
+
+	I have fixed the current CVS JJOS EtherBoot. The problem is that 
+Linking the Bnary Problem, 
+
+Currently,
+
+ld ..... .... entry.o head_ether.o jjidt_386.o .... ....
+
+The Correct One SHould be :
+
+ld ..... .... head_ether.o jjidt_386.o entry.o .... ....
+
+So, I can boot it under etherboot now and I use Avery Console. Cool :p
+
+Regards,
+
+Hilary
+
+
+
+From tmiller@haverford.edu Thu, 6 Jan 2000 17:48:50 -0500 (EST)
+Date: Thu, 6 Jan 2000 17:48:50 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] About EtherBoot Of Current CVS JJOS
+
+> The Correct One SHould be :
+> 
+> ld ..... .... head_ether.o jjidt_386.o entry.o .... ....
+
+	Hm.  I'll try this on my box; which version of ld are you
+using?  (I do recall having link-order problems, but I thought the version
+I had in the CVS was correct...)  Thanks for the fix.
+
+-_Quinn
+
+
+
+
+From hilarycheng@usa.net Fri, 7 Jan 2000 08:54:14 +0800
+Date: Fri, 7 Jan 2000 08:54:14 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] About EtherBoot Of Current CVS JJOS
+
+Hi Todd,
+
+    Well, I donno which LD Version I am using. I am
+using RedHat 6.0 w/o upgrading any GCC stuff. :p But
+I think some of the users may have this problem too.
+
+Regards,
+
+Hilary
+
+
+----- Original Message -----
+From: Todd L. Miller <tmiller@haverford.edu>
+To: <kernel@jos.org>
+Sent: Friday, January 07, 2000 6:48 AM
+Subject: Re: [JOS-Kernel] About EtherBoot Of Current CVS JJOS
+
+
+> > The Correct One SHould be :
+> >
+> > ld ..... .... head_ether.o jjidt_386.o entry.o .... ....
+>
+> Hm.  I'll try this on my box; which version of ld are you
+> using?  (I do recall having link-order problems, but I thought the version
+> I had in the CVS was correct...)  Thanks for the fix.
+>
+> -_Quinn
+>
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From hilarycheng@usa.net Fri, 7 Jan 2000 22:23:47 +0800
+Date: Fri, 7 Jan 2000 22:23:47 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] JJOS Long Operation Patch
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0191_01BF595D.DD919740
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_001_0192_01BF595D.DD919740"
+
+
+------=_NextPart_001_0192_01BF595D.DD919740
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    I have made a patch to Long Operation of JJOS (Well It is not a =
+patch, I just wrote a=20
+library). Currently, These Operation are implemented.
+
+xor
+or
+and
+add
+sub
+mul
+div
+mod
+shr
+shl
+neg
+
+Please have look at it.
+
+Regards,
+
+Hilary
+
+------=_NextPart_001_0192_01BF595D.DD919740
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML//EN">
+<HTML><HEAD>
+<META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type>
+<STYLE></STYLE>
+
+<META content=3D'"MSHTML 5.00.0910.1309"' name=3DGENERATOR></HEAD>
+<BODY bgColor=3D#d8d0c8>
+<DIV><FONT size=3D2><FONT face=3DArial>Hi All,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>&nbsp;&nbsp;&nbsp; I have made a =
+patch to=20
+Long Operation of JJOS (Well It is not a patch, I just wrote a=20
+</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>library). Currently, These =
+Operation are=20
+implemented.</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>xor</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>or</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>and</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>add</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>sub</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>mul</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>div</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>mod</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>shr</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>shl</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>neg</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>Please have look at =
+it.</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>Regards,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Hilary</FONT></DIV></BODY></HTML>
+
+------=_NextPart_001_0192_01BF595D.DD919740--
+
+------=_NextPart_000_0191_01BF595D.DD919740
+Content-Type: application/octet-stream;
+	name="long64.h"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+	filename="long64.h"
+
+/*=0A=
+* The contents of this file are subject to the JJOS Public License=0A=
+* Version 0.0 (the "License"); you may not use this file except in=0A=
+* compliance with the License.  You may obtain a copy of the License=0A=
+* at http://www.jos.org/=0A=
+*=0A=
+* Software distributed under the License is distributed on an "AS IS"=0A=
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See=0A=
+* the License for the specific language governing rights and limitations=0A=
+* under the License.=0A=
+*=0A=
+* The Original Code is JJOS code, released August, 1999.=0A=
+*=0A=
+* The Initial Developer of the Original Code is Hilary Cheng.=0A=
+* Portions created by Hilary Cheng are Copyright (C) 1999.=0A=
+* All rights reserved.=0A=
+*=0A=
+* Contributor(s):=0A=
+*=0A=
+*/=0A=
+=0A=
+// value =3D value << 1=0A=
+void _lshl(jlong *value, int shift);=0A=
+=0A=
+// value =3D value >> shift=0A=
+void _lshr(jlong *value, int shift);=0A=
+=0A=
+// c =3D a + b=0A=
+void _ladd(jlong *c, jlong *a, jlong *b);=0A=
+=0A=
+// value =3D -value;=0A=
+void _lneg(jlong *value);=0A=
+=0A=
+// c =3D a - b=0A=
+void _lsub(jlong *c, jlong *a, jlong *b);=0A=
+=0A=
+// c =3D a & b=0A=
+void _land(jlong *c, jlong *a, jlong *b);=0A=
+=0A=
+// c =3D a ^ b=0A=
+void _lxor(jlong *c, jlong *a, jlong *b);=0A=
+=0A=
+// c =3D a | b=0A=
+void _lor(jlong *c, jlong *a, jlong *b);=0A=
+=0A=
+// result =3D jl2 / jl1;=0A=
+void _ldiv(jlong *jl1, jlong *jl2, jlong *result);=0A=
+=0A=
+// lresult =3D jl2 % jl1;=0A=
+void _lrem(jlong *jl1, jlong *jl2, jlong *lresult);=0A=
+=0A=
+// result =3D jl1 * jl2=0A=
+void _lmul(jlong *jl1, jlong *jl2, jlong *result);=0A=
+=0A=
+
+------=_NextPart_000_0191_01BF595D.DD919740
+Content-Type: application/octet-stream;
+	name="long64.c"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+	filename="long64.c"
+
+/*=0A=
+* The contents of this file are subject to the JJOS Public License=0A=
+* Version 0.0 (the "License"); you may not use this file except in=0A=
+* compliance with the License.  You may obtain a copy of the License=0A=
+* at http://www.jos.org/=0A=
+*=0A=
+* Software distributed under the License is distributed on an "AS IS"=0A=
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See=0A=
+* the License for the specific language governing rights and limitations=0A=
+* under the License.=0A=
+*=0A=
+* The Original Code is JJOS code, released August, 1999.=0A=
+*=0A=
+* The Initial Developer of the Original Code is Hilary Cheng.=0A=
+* Portions created by Hilary Cheng are Copyright (C) 1999.=0A=
+* All rights reserved.=0A=
+*=0A=
+* Contributor(s):=0A=
+*=0A=
+*/=0A=
+=0A=
+#include "java_object.h"=0A=
+#include "long64.h"=0A=
+=0A=
+// value =3D value << 1=0A=
+void _lshl(jlong *value, int shift) {=0A=
+  int sign =3D value->myHigh32 & 0x80000000;=0A=
+  int lastbit =3D 0;=0A=
+  if (shift <=3D 0) return;=0A=
+  for (int c=3D0;c < shift;c++) {=0A=
+    lastbit =3D value->myLow32 & 0x80000000;=0A=
+    value->myHigh32 =3D value->myHigh32 << 1;=0A=
+    value->myLow32 =3D value->myLow32 << 1;=0A=
+    value->myHigh32 |=3D sign;=0A=
+    if (lastbit) value->myHigh32 |=3D 1;=0A=
+  }=0A=
+}=0A=
+=0A=
+// value =3D value >> shift=0A=
+void _lshr(jlong *value, int shift) {=0A=
+  int sign =3D value->myHigh32 & 0x80000000;=0A=
+  int lastbit =3D 0;=0A=
+  if (shift <=3D 0) return;=0A=
+  for (int c=3D0;c < shift;c++) {=0A=
+    lastbit =3D value->myHigh32 & 1;=0A=
+    value->myHigh32 =3D value->myHigh32 >> 1;=0A=
+    value->myLow32 =3D value->myLow32 >> 1;=0A=
+    value->myHigh32 |=3D sign;=0A=
+    if (lastbit) value->myLow32 |=3D 0x80000000;=0A=
+  }=0A=
+}=0A=
+=0A=
+// c =3D a + b=0A=
+void _ladd(jlong *c, jlong *a, jlong *b) {=0A=
+  int carry =3D 0;=0A=
+  jlong temp;=0A=
+  temp.myLow32 =3D c->myLow32; temp.myHigh32 =3D c->myHigh32;=0A=
+  temp.myLow32 =3D a->myLow32 + b->myLow32;=0A=
+  carry =3D (a->myLow32 > temp.myLow32) | (b->myLow32 > temp.myLow32);=0A=
+  carry =3D carry ? 1 : 0;=0A=
+  temp.myHigh32 =3D a->myHigh32 + b->myHigh32 + carry;=0A=
+  c->myHigh32 =3D temp.myHigh32; c->myLow32 =3D temp.myLow32;=0A=
+}=0A=
+=0A=
+// value =3D -value;=0A=
+void _lneg(jlong *value) {=0A=
+  jlong constant_one, copy;=0A=
+=0A=
+  constant_one.myHigh32 =3D 0; constant_one.myLow32 =3D 1;=0A=
+  value->myLow32 =3D ~value->myLow32;=0A=
+  copy.myLow32 =3D value->myLow32;=0A=
+  value->myHigh32 =3D ~value->myHigh32;=0A=
+  copy.myHigh32 =3D value->myHigh32;=0A=
+  _ladd(value, &copy, &constant_one);=0A=
+}=0A=
+=0A=
+// c =3D a - b=0A=
+void _lsub(jlong *c, jlong *a, jlong *b) {=0A=
+  jlong temp;=0A=
+  temp.myHigh32 =3D b->myHigh32;=0A=
+  temp.myLow32 =3D b->myLow32;=0A=
+  _lneg(&temp);=0A=
+  _ladd(c, a, &temp);=0A=
+}=0A=
+=0A=
+// c =3D a & b=0A=
+void _land(jlong *c, jlong *a, jlong *b) {=0A=
+  c->myLow32 =3D a->myLow32 & b->myLow32;=0A=
+  c->myHigh32 =3D a->myHigh32 & b->myHigh32;=0A=
+}=0A=
+=0A=
+// c =3D a ^ b=0A=
+void _lxor(jlong *c, jlong *a, jlong *b) {=0A=
+  c->myLow32 =3D a->myLow32 ^ b->myLow32;=0A=
+  c->myHigh32 =3D a->myHigh32 ^ b->myHigh32;=0A=
+}=0A=
+=0A=
+// c =3D a | b=0A=
+void _lor(jlong *c, jlong *a, jlong *b) {=0A=
+  c->myLow32 =3D a->myLow32 | b->myLow32;=0A=
+  c->myHigh32 =3D a->myHigh32 | b->myHigh32;=0A=
+}=0A=
+=0A=
+// result =3D jl2 / jl1;=0A=
+void _ldiv(jlong *jl1, jlong *jl2, jlong *result)=0A=
+{=0A=
+  jlong jl1temp, jl2temp, jl3, scan, temp;=0A=
+  int counter =3D 0;=0A=
+=0A=
+  jl1temp.myHigh32 =3D jl1->myHigh32;=0A=
+  jl1temp.myLow32 =3D jl1->myLow32;=0A=
+  jl2temp.myHigh32 =3D jl2->myHigh32;=0A=
+  jl2temp.myLow32 =3D jl2->myLow32;=0A=
+  scan.myHigh32 =3D 0x40000000;=0A=
+  scan.myLow32 =3D 0;=0A=
+  result->myHigh32 =3D 0; result->myLow32 =3D 0;=0A=
+=0A=
+  if (jl1->myHigh32 & 0x80000000) _lneg(&jl1temp);=0A=
+  if (jl2->myHigh32 & 0x80000000) _lneg(&jl2temp);=0A=
+=0A=
+  while (temp.myHigh32 =3D=3D 0 && temp.myLow32 =3D=3D 0) {=0A=
+    _land(&temp, &jl1temp, &scan);=0A=
+    if (temp.myHigh32 =3D=3D 0 && temp.myLow32 =3D=3D 0) {=0A=
+      _lshr(&scan, 1); counter++;=0A=
+    }=0A=
+  }=0A=
+=0A=
+  _lshl(&jl1temp, counter);=0A=
+=0A=
+  for (int loop=3D0;loop < counter + 1;loop++) {=0A=
+    _lshl(result, 1);=0A=
+    _lsub(&temp, &jl2temp, &jl1temp);=0A=
+    if (!(temp.myHigh32 & 0x80000000)) {=0A=
+      jl2temp.myHigh32 =3D temp.myHigh32;=0A=
+      jl2temp.myLow32 =3D temp.myLow32;=0A=
+      result->myLow32 |=3D 1;=0A=
+    }=0A=
+    _lshr(&jl1temp, 1);=0A=
+  }=0A=
+=0A=
+  if ((jl1->myHigh32 & 0x80000000) ^ (jl2->myHigh32 & 0x80000000)) {=0A=
+    _lneg(result);=0A=
+  }=0A=
+}=0A=
+=0A=
+// lresult =3D jl2 % jl1;=0A=
+void _lrem(jlong *jl1, jlong *jl2, jlong *lresult)=0A=
+{=0A=
+  jlong jl1temp, jl2temp, jl3, scan, temp;=0A=
+  jlong result, lresult;=0A=
+  int counter =3D 0;=0A=
+=0A=
+  jl1temp.myHigh32 =3D jl1->myHigh32;=0A=
+  jl1temp.myLow32 =3D jl1->myLow32;=0A=
+  jl2temp.myHigh32 =3D jl2->myHigh32;=0A=
+  jl2temp.myLow32 =3D jl2->myLow32;=0A=
+  scan.myHigh32 =3D 0x40000000;=0A=
+  scan.myLow32 =3D 0;=0A=
+  result.myHigh32 =3D 0; result.myLow32 =3D 0;=0A=
+  lresult->myHigh32 =3D 0; lresult->myLow32 =3D 0;=0A=
+=0A=
+  if (jl1.myHigh32 & 0x80000000) _lneg(&jl1temp);=0A=
+  if (jl2.myHigh32 & 0x80000000) _lneg(&jl2temp);=0A=
+=0A=
+  while (temp.myHigh32 =3D=3D 0 && temp.myLow32 =3D=3D 0) {=0A=
+    _land(&temp, &jl1temp, &scan);=0A=
+    if (temp.myHigh32 =3D=3D 0 && temp.myLow32 =3D=3D 0) {=0A=
+      _lshr(&scan, 1); counter++;=0A=
+    }=0A=
+  }=0A=
+=0A=
+  _lshl(&jl1temp, counter);=0A=
+=0A=
+  for (int loop=3D0;loop < counter + 1;loop++) {=0A=
+    _lsub(&temp, &jl2temp, &jl1temp);=0A=
+    _lshl(&result, 1);=0A=
+    if (!(temp.myHigh32 & 0x80000000)) {=0A=
+      jl2temp.myHigh32 =3D temp.myHigh32;=0A=
+      jl2temp.myLow32 =3D temp.myLow32;=0A=
+      lresult->myHigh32 =3D temp.myHigh32;=0A=
+      lresult->myLow32 =3D temp.myLow32;=0A=
+    }=0A=
+    _lshr(&jl1temp, 1);=0A=
+  }=0A=
+=0A=
+  if (jl2.myHigh32 & 0x80000000) _lneg(lresult);=0A=
+      =0A=
+  if ((jl1.myHigh32 & 0x80000000) ^ (jl2.myHigh32 & 0x80000000)) {=0A=
+    _lneg(result);=0A=
+  }=0A=
+}=0A=
+=0A=
+// result =3D jl1 * jl2=0A=
+void _lmul(jlong *jl1, jlong *jl2, jlong *result)=0A=
+{=0A=
+  jlong jl1temp, jl2temp, jl3, scan, temp;=0A=
+  int counter =3D 0;=0A=
+=0A=
+  jl1temp.myHigh32 =3D jl1->myHigh32;=0A=
+  jl1temp.myLow32 =3D jl1->myLow32;=0A=
+  jl2temp.myHigh32 =3D jl2->myHigh32;=0A=
+  jl2temp.myLow32 =3D jl2->myLow32;=0A=
+  scan.myHigh32 =3D 0; scan.myLow32 =3D 1;=0A=
+  result.myHigh32 =3D 0; result.myLow32 =3D 0;=0A=
+=0A=
+  if (jl1.myHigh32 & 0x80000000) _lneg(&jl1temp);=0A=
+  if (jl2.myHigh32 & 0x80000000) _lneg(&jl2temp);=0A=
+=0A=
+  counter =3D 0;=0A=
+  while (scan.myHigh32 !=3D 0x80000000 && counter < 63) {=0A=
+    _land(&temp, &jl2temp, &scan);=0A=
+    if (!(temp.myHigh32 =3D=3D 0 && temp.myLow32 =3D=3D 0)) {=0A=
+	_ladd(result, result, &jl1temp);=0A=
+    }=0A=
+    counter++; _lshl(&scan, 1);=0A=
+    _lshl(&jl1temp, 1);=0A=
+  }=0A=
+=0A=
+  if ((jl1.myHigh32 & 0x80000000) ^ (jl2.myHigh32 & 0x80000000)) {=0A=
+    _lneg(result);=0A=
+  }=0A=
+}=0A=
+
+------=_NextPart_000_0191_01BF595D.DD919740
+Content-Type: text/plain;
+	name="patch_long.txt"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+	filename="patch_long.txt"
+
+bool frame::lneg(exception_to_throw &e)=0A=
+{=0A=
+  TRACE(("lneg"));=0A=
+  jlong jl =3D op_stack.pop_jlong();=0A=
+  jlong jlneg;=0A=
+=0A=
+  jlneg.myHigh32 =3D jl.myHigh32;=0A=
+  jlneg.myLow32 =3D jl.myLow32;=0A=
+=0A=
+  _lneg(&jlneg);=0A=
+  op_stack.push_jlong(jl);=0A=
+  return(true);=0A=
+}=0A=
+=0A=
+bool frame::ladd(exception_to_throw &e)=0A=
+{=0A=
+  TRACE(("ladd"));=0A=
+  jlong jl1 =3D op_stack.pop_jlong();=0A=
+  jlong jl2 =3D op_stack.pop_jlong();=0A=
+  jlong jl3;=0A=
+=0A=
+  _ladd(&jl3, &jl1, &jl2);=0A=
+=0A=
+  op_stack.push_jlong(jl3);=0A=
+  return(true);=0A=
+}=0A=
+=0A=
+bool frame::lsub(exception_to_throw &e)=0A=
+{=0A=
+  TRACE(("lsub"));=0A=
+  jlong jl1 =3D op_stack.pop_jlong();=0A=
+  jlong jl2 =3D op_stack.pop_jlong();=0A=
+  jlong jl3;=0A=
+=0A=
+  _lsub(&jl3, &jl1, &jl2);=0A=
+=0A=
+  op_stack.push_jlong(jl3);=0A=
+  return(true);=0A=
+}=0A=
+=0A=
+bool frame::lmul(exception_to_throw &e)=0A=
+{=0A=
+  TRACE(("lmul"));=0A=
+  jlong jl1 =3D op_stack.pop_jlong();=0A=
+  jlong jl2 =3D op_stack.pop_jlong();=0A=
+  jlong jl3;=0A=
+=0A=
+  _lmul(&jl3, &jl1, &jl2);=0A=
+=0A=
+  op_stack.push_jlong(jl3);=0A=
+  return(true);=0A=
+}=0A=
+=0A=
+bool frame::ldiv(exception_to_throw &e)=0A=
+{=0A=
+  TRACE(("ldiv"));=0A=
+  jlong jl1 =3D op_stack.pop_jlong();=0A=
+  jlong jl2 =3D op_stack.pop_jlong();=0A=
+  jlong jl3;=0A=
+=0A=
+  _ldiv(&jl3, &jl1, &jl2);=0A=
+=0A=
+  op_stack.push_jlong(jl3);=0A=
+  return(true);=0A=
+}=0A=
+=0A=
+bool frame::lrem(exception_to_throw &e)=0A=
+{=0A=
+  TRACE(("lrem"));=0A=
+  jlong jl1 =3D op_stack.pop_jlong();=0A=
+  jlong jl2 =3D op_stack.pop_jlong();=0A=
+  jlong jl3;=0A=
+=0A=
+  _lrem(&jl3, &jl1, &jl2);=0A=
+=0A=
+  op_stack.push_jlong(jl3);=0A=
+  return(true);=0A=
+}=0A=
+=0A=
+bool frame::lshr(exception_to_throw &e)=0A=
+{=0A=
+  TRACE(("lshr"));=0A=
+  jint shift =3D op_stack.pop_jint();=0A=
+  jlong jl =3D op_stack.pop_jlong();=0A=
+//  jlong jl_shifted =3D jl >> shift;=0A=
+  jlong jl_shifted;=0A=
+=0A=
+  jl_shifted.myHigh32 =3D jl.myHigh32;=0A=
+  jl_shifted.myLow32 =3D jl.myLow32;=0A=
+=0A=
+  _lshr(&jl_shifted, shift);=0A=
+=0A=
+  op_stack.push_jlong(jl_shifted);=0A=
+  return(true);=0A=
+}=0A=
+=0A=
+bool frame::lshl(exception_to_throw &e)=0A=
+{=0A=
+  TRACE(("lshl"));=0A=
+  jint shift =3D op_stack.pop_jint();=0A=
+  jlong jl =3D op_stack.pop_jlong();=0A=
+//  jlong jl_shifted =3D jl >> shift;=0A=
+  jlong jl_shifted;=0A=
+=0A=
+  jl_shifted.myHigh32 =3D jl.myHigh32;=0A=
+  jl_shifted.myLow32 =3D jl.myLow32;=0A=
+=0A=
+  _lshl(&jl_shifted, shift);=0A=
+=0A=
+  op_stack.push_jlong(jl_shifted);=0A=
+  return(true);=0A=
+}=0A=
+=0A=
+bool frame::lor(exception_to_throw &e)=0A=
+{=0A=
+  TRACE(("lor"));=0A=
+  jlong jl1 =3D op_stack.pop_jlong();=0A=
+  jlong jl2 =3D op_stack.pop_jlong();=0A=
+  jlong jl3;=0A=
+=0A=
+  _lor(&jl3, &jl1, &jl2);=0A=
+=0A=
+  op_stack.push_jlong(jl3);=0A=
+  return(true);=0A=
+}=0A=
+=0A=
+bool frame::land(exception_to_throw &e)=0A=
+{=0A=
+  TRACE(("land"));=0A=
+  jlong jl1 =3D op_stack.pop_jlong();=0A=
+  jlong jl2 =3D op_stack.pop_jlong();=0A=
+  jlong jl3;=0A=
+=0A=
+  _land(&jl3, &jl1, &jl2);=0A=
+=0A=
+  op_stack.push_jlong(jl3);=0A=
+  return(true);=0A=
+}=0A=
+=0A=
+bool frame::lxor(exception_to_throw &e)=0A=
+{=0A=
+  TRACE(("lxor"));=0A=
+  jlong jl1 =3D op_stack.pop_jlong();=0A=
+  jlong jl2 =3D op_stack.pop_jlong();=0A=
+  jlong jl3;=0A=
+=0A=
+  _lxor(&jl3, &jl1, &jl2);=0A=
+=0A=
+  op_stack.push_jlong(jl3);=0A=
+  return(true);=0A=
+}
+------=_NextPart_000_0191_01BF595D.DD919740--
+
+
+
+
+From Corrado.Santoro@iit.unict.it Fri, 7 Jan 2000 18:17:01 +0100 (GMT+0100)
+Date: Fri, 7 Jan 2000 18:17:01 +0100 (GMT+0100)
+From: csanto Corrado.Santoro@iit.unict.it
+Subject: [JOS-Kernel] host progress and jcurses
+
+Hi Todd,
+I've updated my CVS and i'm happy to see a working console! i've also
+tryed to adapt jcurses to JOS removing several things like file-based
+properties or hash tables but i've found these problems:
+
+1. in the host build, the method console.setChar seems to not work. I've
+seen several consoleXX.java in host/bytecode/jos/platform/driver, but what
+is the file used in the host build ? (it seems console.java, but i think
+i'm wrong!). Adding setChar should be simple, I think, it would be
+required to add simple lines in jjconsol.c, but i have not understand in
+which way, starting from jos.system.console, we arrive to jjconsol.c.
+
+2. the java.lang.Integer class has some problems, i mean the method
+"Integer.parseInt()" seems to not work.
+
+3. what's happened in etherboot image ? after downloading jos-nbi.zip the
+booting station hangs up. I've forgot something or is there a (millennium)
+bug ?
+
+Cheers,
+	Corrado.
+
+On Wed, 5 Jan 2000, Todd L. Miller wrote:
+> > 1. how can I put a char with a back and fore color onto the screen (using
+> > console or consoled class) ?
+> 
+> 	Er.  This is something that's not actually supported by the
+> consoles right now.  (Gee, Avery, looks like I *did* forget something :))  
+> It shouldn't be too difficult to add get/setAttribute() methods to the
+> console classes.
+> 
+> > 2. how can I read a *single* char ? (yes I have to use a KeyboardListener
+> > I think, but in the host build any typed char is returned only after a
+> > newline. I have designed a native class which, using a native method and
+> > some ncurses system call, is able to read a single keystroke, but I think
+> > it is better to integrate this inside JOS host core).
+> 
+> 	Scarily enough, I just finished doing this!  (See prior email,
+> re: host progress.  That email also includes the to-do list.)  I guess
+> your request means that I should go ahead and commit my changes to CVS.
+> 
+> > My objective is to write the *first* interactive JOS application.
+> 
+> 	Might it, perchance, be a shell? :)
+> 
+> -_Quinn
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+> 
+> 
+
+
+
+
+From tmiller@haverford.edu Fri, 7 Jan 2000 16:38:22 -0500 (EST)
+Date: Fri, 7 Jan 2000 16:38:22 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] host progress and jcurses
+
+> 1. in the host build, the method console.setChar seems to not work. I've
+> seen several consoleXX.java in host/bytecode/jos/platform/driver, but what
+> is the file used in the host build ? (it seems console.java, but i think
+> i'm wrong!). Adding setChar should be simple, I think, it would be
+> required to add simple lines in jjconsol.c, but i have not understand in
+> which way, starting from jos.system.console, we arrive to jjconsol.c.
+
+	That's because it doesn't.  (I know, I know.)  If you look at the
+source for consoled, the initial (native) console is actually a
+consoleNative -- this was originally just to maintain compatibility
+between host and i386 builds.  So I wrote a very quick and dirty
+consoleNative to make things work.  The host build's driver.console class
+should (as I mentioned in an earliet email, I believe) be re-written to
+use (n)curses pads -- e.g. a whole lot of native code.  (And consoleNative
+should be fully fleshed out.)
+
+	consoleNative arrives at jjconsole.cc by a circutious route, where
+java.io.PrintStream's printX() methods are over-ridden in native
+code.  This native code calls the jjconsole.cc code, which in turns uses
+curses to get the work done.  Since jjconsole.cc uses ncurses, get/setX
+shouldn't be too hard to write, as you correctly surmised.  The difficulty
+will come in deciding and implementing multiple jos consoles.  (Though you
+many not need pads to do this; IIRC, there are linux system calls to
+generate additional virtual consoles, to which you could switch and just
+run a 'stock' consoleNative/jjconsole.cc on.)
+
+> 2. the java.lang.Integer class has some problems, i mean the method
+> "Integer.parseInt()" seems to not work.
+
+	This is a known problem, but not one that I've ever isolated.
+
+> 3. what's happened in etherboot image ? after downloading jos-nbi.zip the
+> booting station hangs up. I've forgot something or is there a (millennium)
+> bug ?
+
+	The java code is hardcoded for 0xB8000 as the VGA text buffer
+address.  Etherboot's native code leaves the buffer at 0xB0000.  I'm not
+sure if this is the problem or not -- someone else reported a similar
+problem and (and I don't think) has gotten back to us yet.  I'm using
+GRUB, which is why the hardcoded 0xB8000 works.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Sun, 9 Jan 2000 22:59:22 -0500 (EST)
+Date: Sun, 9 Jan 2000 22:59:22 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] CVS: etherboot & cursor control
+
+	I put Hilary's etherboot link-order fix into the CVS; let me know
+if it works for you.
+
+	(BTW -- I finally made GRUB the default boot-method in the
+Makefile.  If people oppose it, let me know and I'll change it
+back.)
+
+	Cursor control works perfectly on both types of text consoles on
+the i386 build; because I haven't investigated the host/curses angle, I
+haven't put get/setCursor() into the ConsoleDriver interface yet.
+
+	I realized I need to check the fixes I made in invokeinterface
+against the other invoke*'s -- that is, anywhere I use dynLink() to find
+the method code, I need to check if it's native AFTER the dynLink and not
+before...
+
+-_Quinn
+
+
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Mon, 10 Jan 2000 12:25:27 +0100
+Date: Mon, 10 Jan 2000 12:25:27 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] CVS: etherboot & cursor control
+
+Hi all,
+etherboot image now works!!! However, it has problems with cursor handling. The
+reason is that the cursor management registers doesn't works in monochrome mode.
+So my question is, why in "head-ether.s86" the VGA is initialized in monochrome
+mode ? I suggest to patch "head-ether.s86" initializing VGA in mode 0x3
+instead of mode 0x7, and then initialize always jjConsole with 0xb8000. Doing
+this makes cursor handling under etherboot to work.
+
+Todd,
+why you have used the code:
+  short cursor_addr = (80 * 2 * row) + (col * 2);
+  cursor_addr /= 2;
+it should be more simple to use:
+  short cursor_addr = (80 * row) + col;
+
+Cheers,
+	Corrado.
+On Mon, 10 Jan 2000, you wrote:
+> I put Hilary's etherboot link-order fix into the CVS; let me know
+> if it works for you.
+> 
+> 	(BTW -- I finally made GRUB the default boot-method in the
+> Makefile.  If people oppose it, let me know and I'll change it
+> back.)
+> 
+> 	Cursor control works perfectly on both types of text consoles on
+> the i386 build; because I haven't investigated the host/curses angle, I
+> haven't put get/setCursor() into the ConsoleDriver interface yet.
+> 
+> 	I realized I need to check the fixes I made in invokeinterface
+> against the other invoke*'s -- that is, anywhere I use dynLink() to find
+> the method code, I need to check if it's native AFTER the dynLink and not
+> before...
+> 
+> -_Quinn
+> 
+> 
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From hilarycheng@usa.net Mon, 10 Jan 2000 21:29:33 +0800
+Date: Mon, 10 Jan 2000 21:29:33 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] CVS: etherboot & cursor control
+
+Hi Todd,
+
+    Have u put my Long Operation Fix to Current JJOS ? :P
+Is It too complicated ?
+
+Regards,
+
+Hilary
+
+
+----- Original Message ----- 
+From: Todd L. Miller <tmiller@haverford.edu>
+To: <kernel@jos.org>
+Sent: Monday, January 10, 2000 11:59 AM
+Subject: [JOS-Kernel] CVS: etherboot & cursor control
+
+
+> I put Hilary's etherboot link-order fix into the CVS; let me know
+>if it works for you.
+>
+> (BTW -- I finally made GRUB the default boot-method in the
+>Makefile.  If people oppose it, let me know and I'll change it
+>back.)
+>
+> Cursor control works perfectly on both types of text consoles on
+>the i386 build; because I haven't investigated the host/curses angle, I
+>haven't put get/setCursor() into the ConsoleDriver interface yet.
+>
+> I realized I need to check the fixes I made in invokeinterface
+>against the other invoke*'s -- that is, anywhere I use dynLink() to find
+>the method code, I need to check if it's native AFTER the dynLink and not
+>before...
+>
+>-_Quinn
+>
+>
+>
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From tmiller@haverford.edu Mon, 10 Jan 2000 15:23:08 -0500 (EST)
+Date: Mon, 10 Jan 2000 15:23:08 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] CVS: etherboot & cursor control
+
+> etherboot image now works!!! However, it has problems with cursor handling. The
+> reason is that the cursor management registers doesn't works in monochrome mode.
+> So my question is, why in "head-ether.s86" the VGA is initialized in monochrome
+> mode ? I suggest to patch "head-ether.s86" initializing VGA in mode 0x3
+> instead of mode 0x7, and then initialize always jjConsole with 0xb8000. Doing
+> this makes cursor handling under etherboot to work.
+
+	My understanding is that JM decided to use VGA mode 7 because it
+was the simplest mode to program.  Does mode 3 use the same attribute
+constants/etc?  (I guess it does, since the GRUB code works?)  Oh -- feel
+free to write up a patch.  I'll get you on the CVS commit list shortly. :)
+
+> why you have used the code:
+>   short cursor_addr = (80 * 2 * row) + (col * 2);
+>   cursor_addr /= 2;
+> it should be more simple to use:
+>   short cursor_addr = (80 * row) + col;
+
+	Because the addresses for all other VGA attributes are as the
+previous (that is, twice the width time the desired row plus twice the
+desired column) and I, at some point, intended to put that in a function
+with bounds checking somewhere so jjconsol.cc will work for sizes other
+than 80x24.  That, and I was playing 'lucky guess' to determine how to set
+the cursor :)  If it bothers you, I'll go ahead and change it.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Mon, 10 Jan 2000 15:25:31 -0500 (EST)
+Date: Mon, 10 Jan 2000 15:25:31 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] CVS: etherboot & cursor control
+
+>     Have u put my Long Operation Fix to Current JJOS ? :P
+> Is It too complicated ?
+
+	Actually, it's still sitting in my inbox and on my to-do
+list.  Would you prefer CVS access?
+
+-_Quinn
+
+
+
+
+From hilarycheng@usa.net Tue, 11 Jan 2000 08:50:02 +0800
+Date: Tue, 11 Jan 2000 08:50:02 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] CVS: etherboot & cursor control
+
+Hi All,
+
+    Hm, I am not familiar with CVS. I am afarid that I will made a mistake
+to CVS Server :P
+What should I do to make a change to cvs ?
+
+Regards,
+
+Hilary
+
+
+----- Original Message -----
+From: Todd L. Miller <tmiller@haverford.edu>
+To: <kernel@jos.org>
+Sent: Tuesday, January 11, 2000 4:25 AM
+Subject: Re: [JOS-Kernel] CVS: etherboot & cursor control
+
+
+> >     Have u put my Long Operation Fix to Current JJOS ? :P
+> > Is It too complicated ?
+>
+> Actually, it's still sitting in my inbox and on my to-do
+> list.  Would you prefer CVS access?
+>
+> -_Quinn
+>
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+>
+>
+>
+
+
+
+
+From tmiller@haverford.edu Tue, 11 Jan 2000 11:48:10 -0500 (EST)
+Date: Tue, 11 Jan 2000 11:48:10 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] CVS: etherboot & cursor control
+
+>     Hm, I am not familiar with CVS. I am afarid that I will made a mistake
+> to CVS Server :P
+
+	Okay, if you're not familiar with CVS, then don't worry about
+it; I'll just do the patch by hand.
+
+-_Quinn
+
+
+
+
+From hilarycheng@usa.net Wed, 12 Jan 2000 21:13:35 +0800
+Date: Wed, 12 Jan 2000 21:13:35 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] CVS: etherboot & cursor control
+
+Thanks You Very MUCH :DD
+
+Regards,
+
+Hilary
+
+----- Original Message -----
+From: Todd L. Miller <tmiller@haverford.edu>
+To: <kernel@jos.org>
+Sent: Wednesday, January 12, 2000 12:48 AM
+Subject: Re: [JOS-Kernel] CVS: etherboot & cursor control
+
+
+>>     Hm, I am not familiar with CVS. I am afarid that I will made a
+mistake
+>> to CVS Server :P
+>
+> Okay, if you're not familiar with CVS, then don't worry about
+>it; I'll just do the patch by hand.
+>
+>-_Quinn
+>
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Wed, 12 Jan 2000 17:20:02 +0100
+Date: Wed, 12 Jan 2000 17:20:02 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] CVS
+
+Hi all,
+from the various e-mail messages I've understand that each developer could
+update the source files in the CVS server. Am i right ? In this sense, may I
+upload the patches to "head_ether.s86" and "jjconsol.c" to make etherbooted JOS
+to work with the color screen rather the monochrome one ? (see my previous
+e-mail messages). How can I do ?
+
+Cheers,
+	Corrado.
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Wed, 12 Jan 2000 14:04:33 -0500 (EST)
+Date: Wed, 12 Jan 2000 14:04:33 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] CVS
+
+> from the various e-mail messages I've understand that each developer could
+> update the source files in the CVS server. Am i right ? In this sense, may I
+> upload the patches to "head_ether.s86" and "jjconsol.c" to make etherbooted JOS
+> to work with the color screen rather the monochrome one ? (see my previous
+> e-mail messages). How can I do ?
+
+	Not every developer can; you have to have CVS write access.  As it
+turns out, almost everyone that's active on this list does, and for
+precisely that reason.  I just set CVS commit access for you; instructions
+and access information I'll send along privately.
+
+-_Quinn
+
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Thu, 13 Jan 2000 13:10:04 +0100
+Date: Thu, 13 Jan 2000 13:10:04 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] JOS & JCurses.. WORK TOGETHER!
+
+Hi all,
+I'm happy to announce that I've spent a night to make some patches to JJOS in
+order to make jcurses to work, AND NOW I'M ABLE TO DISPLAY THE FIRST JJOS
+WINDOW!
+As I've made many modification to the code, I don't want update the CVS server
+until Todd takes a look to the patches and approves my work.
+Everyone who would like to test my work can download the sources from:
+	"ftp://alpha2.iit.unict.it/pub/JOS/jjos-w-curses.tgz"
+This jcurses-enabled version works under grub and etherboot (also the host
+build works well even if the window frame is not displayed correctly).
+Here are the modifications:
+- added setChar,setCursor,etc. to jjconsol.cc (host & i386)
+- added console native methods to jvmbuiltins.cc and d_main.cc
+- added getCurrentConsole() method to consoled.java
+- ..... (some other little patches -- Todd please take a look at the source
+code).
+
+I've also found the following bugs in string management (maybe you already know
+it):
+- concatenation (s = s + "xxxx") generates a segmentation fault;
+- method length() returns always zero;
+- method charAt() does not work (for this reason, in init.java, I had to print
+a message char-by-char).
+
+
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From R.Argentini@student.tudelft.nl Sat, 15 Jan 2000 14:29:55 +0100
+Date: Sat, 15 Jan 2000 14:29:55 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] New JEPS release, multiple interfaces and routing.
+
+I just put up the current JEPS code.
+
+It includes a number of improvements in the IP and ARP category as well as
+incipient error signalling through exceptions (really needed that!). Please
+check it out :)
+Plans for the immidiate future are mainly fragmentation and reassembly as
+they are a fundamental part of the IP protocol.
+
+I suppose i could move JEPS development onto the CVS in order to be able to
+share access with ppl on a more dynamic basis. What do you guys think? How
+would i go about in doing this?
+
+How's the progress on native ne2000 drivers coming along? Is anyone
+bothering with it yet?
+If we get them even half working i'm willing to try the port, just to see
+if it works.
+
+I have a good feeling about this .. It might not end up to be the fastest
+stack in the block, but  i think we are going to be able to make it
+compliant to all the internet host requirements eventually.
+
+Ranieri Argentini
+
+
+
+From mgangelen@quintop.nl Sun, 16 Jan 2000 23:34:41 +0100
+Date: Sun, 16 Jan 2000 23:34:41 +0100
+From: mgangelen@quintop.nl mgangelen@quintop.nl
+Subject: [JOS-Kernel] New JEPS release, multiple interfaces and routing.
+
+Am working on some foundation for network- and other cards.
+I'm using a laptop, so I need PCI and PCMCIA support, on which I'm working
+on right now. Progress is slow, because of the CVS code I have to compile
+(and adjust) over and over again anytime there is an update(Sigh...).
+Also the absence of string concatenation is (or was... don't know if it has
+been solved yet..) a big problem.
+
+I hope to be of assistance for making ne2000 code for the native builds.
+
+PS.  If we have a poll for netboot/grub., I have to vote for GRUB !!!
+PPS. Why has the capitalization of the classnames been altered recently ?
+Why not just stick with the 'normal' JAVA naming style
+"java.package.ClassName" instead of "java.package.classname" ?
+
+
+Greetz,
+
+Fushion
+
+
+
+                                                                                                    
+                    Ranieri Argentini                                                               
+                    <R.Argentini@student.t        To:     arch@jos.org, kernel@jos.org              
+                    udelft.nl>                    cc:                                               
+                    Sent by:                      Subject:     [JOS-Kernel] New JEPS release,       
+                    kernel-admin@jos.org          multiple interfaces and routing.                  
+                                                                                                    
+                                                                                                    
+                    15-01-00 02:29 PM                                                               
+                    Please respond to                                                               
+                    kernel                                                                          
+                                                                                                    
+                                                                                                    
+
+
+
+
+I just put up the current JEPS code.
+
+It includes a number of improvements in the IP and ARP category as well as
+incipient error signalling through exceptions (really needed that!). Please
+check it out :)
+Plans for the immidiate future are mainly fragmentation and reassembly as
+they are a fundamental part of the IP protocol.
+
+I suppose i could move JEPS development onto the CVS in order to be able to
+share access with ppl on a more dynamic basis. What do you guys think? How
+would i go about in doing this?
+
+How's the progress on native ne2000 drivers coming along? Is anyone
+bothering with it yet?
+If we get them even half working i'm willing to try the port, just to see
+if it works.
+
+I have a good feeling about this .. It might not end up to be the fastest
+stack in the block, but  i think we are going to be able to make it
+compliant to all the internet host requirements eventually.
+
+Ranieri Argentini
+
+_______________________________________________
+Kernel maillist  -  Kernel@jos.org
+http://jos.org/mailman/listinfo/kernel
+
+
+
+
+
+
+
+From leston@csi.com Tue, 04 Jan 2000 16:20:32 -0800
+Date: Tue, 04 Jan 2000 16:20:32 -0800
+From: Leston Buell leston@csi.com
+Subject: [JOS-Kernel] Re: native console & bug report
+
+Regier Avery J wrote:
+> A lot of this we'll get with the
+> JCurses library (which also doesn't deal with the cursor properly), but
+
+The JCurses library is still in early but active development. 
+If you have different ideas about how the cursor should be dealt 
+with in JCurses, please share your thoughts with us soon, while 
+new ideas are still easy to consider and integrate.
+
+-- 
+Leston Buell
+bulbul@ucla.edu
+
+------------------------------
+
+"Paradise is exactly like where you are right now,
+	only much, MUCH better."
+				-- Laurie Anderson
+
+
+
+
+From johan.rydberg@netinsight.se Wed, 05 Jan 2000 10:37:13 +0100
+Date: Wed, 05 Jan 2000 10:37:13 +0100
+From: Johan Rydberg johan.rydberg@netinsight.se
+Subject: [JOS-Kernel] File System
+
+Regier Avery J wrote:
+
+> Has anyone thought much about this?  I was looking last night for the EIDE
+> specification but was unable to find it.  Are there any good sources of
+> information on how to access disk drives?  Have those of you who looked into
+> drivers done any research in this area?
+
+Search for the ATA ( == IDE) specification. You can find some
+information at
+this address: http://magic.hurrah.com/~sabre/os/
+
+
+
+-- 
+Johan Rydberg			johan.rydberg@netinsight.net
+Net Insight AB, Sweden		direct: +46-8-685 04 17
+http://www.netinsight.net	phone:  +46-8-685 04 00
+				fax:    +46-8-685 04 20
+
+
+
+
+From R.Argentini@student.tudelft.nl Mon, 17 Jan 2000 01:08:56 +0100
+Date: Mon, 17 Jan 2000 01:08:56 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] Ethernet Drivers (was: New JEPS release,
+ multiple interfaces and routing.)
+
+>Am working on some foundation for network- and other cards.
+>I'm using a laptop, so I need PCI and PCMCIA support, on which I'm working
+>on right now.
+
+I wish you all the best of luck with your code!
+
+>Progress is slow, because of the CVS code I have to compile
+>(and adjust) over and over again anytime there is an update(Sigh...).
+
+Yes, i would be nice to have the interfaces between the different pieces of
+code stabilise a bit in order to prevent breaking everything with every new
+commit. I guess that we are still in a fast evolution stage though.
+Hopefully things will get better as the code matures.
+
+If anyone is actively developing any network adapter drivers i suggests
+he/she updates the NetworkingGroup's topic on wiki to reflect this.
+
+
+
+
+From hilarycheng@usa.net Mon, 17 Jan 2000 08:29:39 +0800
+Date: Mon, 17 Jan 2000 08:29:39 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] New JEPS release, multiple interfaces and routing.
+
+Hi ,
+
+    For the Right Now, I am implementing the PCI Driver Code. If someone
+like to have a
+look, I can send them my current code.
+
+Regards,
+
+Hilary
+----- Original Message -----
+From: <mgangelen@quintop.nl>
+To: <kernel@jos.org>
+Sent: Monday, January 17, 2000 6:34 AM
+Subject: Re: [JOS-Kernel] New JEPS release, multiple interfaces and routing.
+
+
+>
+> Am working on some foundation for network- and other cards.
+> I'm using a laptop, so I need PCI and PCMCIA support, on which I'm working
+> on right now. Progress is slow, because of the CVS code I have to compile
+> (and adjust) over and over again anytime there is an update(Sigh...).
+> Also the absence of string concatenation is (or was... don't know if it
+has
+> been solved yet..) a big problem.
+>
+> I hope to be of assistance for making ne2000 code for the native builds.
+>
+> PS.  If we have a poll for netboot/grub., I have to vote for GRUB !!!
+> PPS. Why has the capitalization of the classnames been altered recently ?
+> Why not just stick with the 'normal' JAVA naming style
+> "java.package.ClassName" instead of "java.package.classname" ?
+>
+>
+> Greetz,
+>
+> Fushion
+>
+>
+>
+>
+>                     Ranieri Argentini
+>                     <R.Argentini@student.t        To:     arch@jos.org,
+kernel@jos.org
+>                     udelft.nl>                    cc:
+>                     Sent by:                      Subject:
+[JOS-Kernel] New JEPS release,
+>                     kernel-admin@jos.org          multiple interfaces and
+routing.
+>
+>
+>                     15-01-00 02:29 PM
+>                     Please respond to
+>                     kernel
+>
+>
+>
+>
+>
+>
+> I just put up the current JEPS code.
+>
+> It includes a number of improvements in the IP and ARP category as well as
+> incipient error signalling through exceptions (really needed that!).
+Please
+> check it out :)
+> Plans for the immidiate future are mainly fragmentation and reassembly as
+> they are a fundamental part of the IP protocol.
+>
+> I suppose i could move JEPS development onto the CVS in order to be able
+to
+> share access with ppl on a more dynamic basis. What do you guys think? How
+> would i go about in doing this?
+>
+> How's the progress on native ne2000 drivers coming along? Is anyone
+> bothering with it yet?
+> If we get them even half working i'm willing to try the port, just to see
+> if it works.
+>
+> I have a good feeling about this .. It might not end up to be the fastest
+> stack in the block, but  i think we are going to be able to make it
+> compliant to all the internet host requirements eventually.
+>
+> Ranieri Argentini
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+>
+>
+>
+>
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From R.Argentini@student.tudelft.nl Mon, 17 Jan 2000 09:57:43 +0100
+Date: Mon, 17 Jan 2000 09:57:43 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] New JEPS release, multiple interfaces and
+ routing.
+
+>    For the Right Now, I am implementing the PCI Driver Code. If someone
+>like to have a
+>look, I can send them my current code.
+
+I would love to, but i cannot even get the jjos host build to run!
+Everything builds ok, but when i start ./jjos it segfaults right away.
+What am i doing wrong?
+All help will be greatly appreciated ...
+
+RA.
+
+
+
+From mgangelen@quintop.nl Mon, 17 Jan 2000 10:45:48 +0100
+Date: Mon, 17 Jan 2000 10:45:48 +0100
+From: mgangelen@quintop.nl mgangelen@quintop.nl
+Subject: [JOS-Kernel] New JEPS release, multiple interfaces and routing.
+
+Give the i386 build with GRUB a try and boot it in a VMWare window
+(www.vmware.com).
+This way you don't have to boot the entire PC everytime you want to test
+something. Works better than separate host builds (for me anyway, I don't
+even use Linux yet...sorry...)
+
+
+Greetz,
+
+Fushion.
+
+
+
+                                                                                                    
+                    Ranieri Argentini                                                               
+                    <R.Argentini@student.t        To:     kernel@jos.org                            
+                    udelft.nl>                    cc:                                               
+                    Sent by:                      Subject:     Re: [JOS-Kernel] New JEPS release,   
+                    kernel-admin@jos.org          multiple interfaces and routing.                  
+                                                                                                    
+                                                                                                    
+                    17-01-00 09:57 AM                                                               
+                    Please respond to                                                               
+                    kernel                                                                          
+                                                                                                    
+                                                                                                    
+
+
+
+
+>    For the Right Now, I am implementing the PCI Driver Code. If someone
+>like to have a
+>look, I can send them my current code.
+
+I would love to, but i cannot even get the jjos host build to run!
+Everything builds ok, but when i start ./jjos it segfaults right away.
+What am i doing wrong?
+All help will be greatly appreciated ...
+
+RA.
+
+_______________________________________________
+Kernel maillist  -  Kernel@jos.org
+http://jos.org/mailman/listinfo/kernel
+
+
+
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Thu, 20 Jan 2000 09:51:08 +0100
+Date: Thu, 20 Jan 2000 09:51:08 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Todd, here you are!!
+
+Hi Todd,
+You've disappeared for some days! I'm happy that you've returned :))
+What's up with JOS-w/curses ? Have you downloaded my patched version of JOS
+which runs a curses application ? What are your remarks ?
+
+... and... to anyone in the list....
+I've seen several downloads of "JOS-w-curses.tgz". Have you tested it ? Does it
+run ? What are your remarks ?
+
+Bye,
+	Corrado.
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Thu, 20 Jan 2000 06:59:30 -0600
+Date: Thu, 20 Jan 2000 06:59:30 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] Todd, here you are!!
+
+Corado,
+
+I have downloaded and integrated JOS-w/curses into my JJOS build.  I have
+some concerns about how it is structured.  For instance, when you ask for
+the terminal from the Window object, you get the _parent_ terminal to the
+window, not a terminal contained within the window, as one would expect.  As
+I've said before, I think we need to take a step back and refactor the
+console code.  I'm concerned that in order to make things work with the
+limited functionality available, it has taken on a certain hackish aspect.
+Shared memory resources need to be encapsulated.  Has anyone thought about
+some kind of a DeviceManager or DriverManager?  Really, the current state of
+things can be tracked back to the fact that we don't have seperate statics
+for each process yet (the System.out hack).  Todd, how is the multiprocess
+support coming?  I think that is required before we can really make the
+consoles clean.
+
+Don't anyone think I'm getting down on anyone.  The development team I work
+in has a motto:
+* Make it WORK.
+* Make it work RIGHT!
+* Make it work right WELL!
+
+I just think we're getting to the second step now.
+
+Regards,
+Avery J. Regier
+
+
+
+> -----Original Message-----
+> From:	Corrado Santoro [SMTP:Corrado.Santoro@iit.unict.it]
+> Sent:	Thursday, January 20, 2000 3:51 AM
+> To:	arch@jos.org; kernel@jos.org
+> Subject:	[JOS-Kernel] Todd, here you are!!
+> 
+> Hi Todd,
+> You've disappeared for some days! I'm happy that you've returned :))
+> What's up with JOS-w/curses ? Have you downloaded my patched version of
+> JOS
+> which runs a curses application ? What are your remarks ?
+> 
+> ... and... to anyone in the list....
+> I've seen several downloads of "JOS-w-curses.tgz". Have you tested it ?
+> Does it
+> run ? What are your remarks ?
+> 
+> Bye,
+> 	Corrado.
+> 
+> --
+> ======================================================
+> Eng. Corrado Santoro - PhD Student
+> 
+> Unversity of Catania - Engineering Faculty
+> Institute of Computer Science and Telecommunications
+> Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+> 
+> Tel: +39 095 7382365           Fax: +39 095 7382397
+> 
+> EMail: csanto@iit.unict.it
+> Personal Home Page:
+>             http://www.cdc.unict.it/~csanto
+> 
+> ARCA Mobile Agent Framework Home Page:
+>             http://netra.cdc.unict.it/ARCA
+> ======================================================
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From tmiller@haverford.edu Thu, 20 Jan 2000 11:56:07 -0500 (EST)
+Date: Thu, 20 Jan 2000 11:56:07 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: [JOS-Arch] Todd, here you are!!
+
+> You've disappeared for some days! I'm happy that you've returned :))
+> What's up with JOS-w/curses ? Have you downloaded my patched version of JOS
+> which runs a curses application ? What are your remarks ?
+
+	I disappeared because I accidentally blew my hard drive away on
+Saturday.  I need the URL for your patch again, because I lost all my old
+emails (that, and the URL for jeps).
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Thu, 20 Jan 2000 15:02:09 -0500 (EST)
+Date: Thu, 20 Jan 2000 15:02:09 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Todd, here you are!!
+
+> As I've said before, I think we need to take a step back and refactor
+> the console code.  I'm concerned that in order to make things work
+> with the limited functionality available, it has taken on a certain
+> hackish aspect. Shared memory resources need to be encapsulated.  Has
+> anyone thought about some kind of a DeviceManager or DriverManager?  
+> Really, the current state of things can be tracked back to the fact
+> that we don't have seperate statics for each process yet (the
+> System.out hack).  Todd, how is the multiprocess support coming?  I
+> think that is required before we can really make the consoles clean.
+
+	JM suggests that we adopt the JavaOS/Business model for managing
+resources and drivers.  I don't, particularly, want to be the one to write
+the re-implementation; and in looking at the specs, it seems as if using
+any small part that's applicable to our needs now would entail an
+enourmous amount of back-end work.
+
+	On the other hand, we clearly do need something to manage
+resources.  What that might be, I'm not too sure, and furthermore, I think
+it will heavily depend on multiprocessing.  (I'm not too familiar with the
+Java 2 security model -- would it extend cleanly to handle h/w
+access/ownership?)
+
+	Yes, the console stuff needs to be refactored, but I think not to
+too great an extent; on FocusLost(), the console releases its physical
+resources, and on FocusGained(), it acquires them.  Something ingenous
+will have to be arranged in the native code to put kprintf()s by kernel
+code in the 'right place' (wherever that might be); with mulitprocessing,
+the System.out & err statics can be directed at the appropriate
+ConsoleStream, which will just write into its buffer until it gains focus.
+
+	
+	I haven't made any progress on multiprocessing, unfortunately; I
+wanted to work on that last weekend/this week, but that didn't happen
+because I was too busy repairing the carnage I had accidentally wreaked on
+my hard drive Saturday morning.  I think the basic mechanism should be
+relatively easy to code; efficient mechanisms and proper interaction with
+Java (esp. class loaders) will most probably take a while.
+
+-_Quinn
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Fri, 21 Jan 2000 10:05:46 +0100
+Date: Fri, 21 Jan 2000 10:05:46 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] JCurses, Terminal, Window and console...
+
+On Thu, 20 Jan 2000, you wrote:
+> Corado,
+> 
+> I have downloaded and integrated JOS-w/curses into my JJOS build.  I have
+> some concerns about how it is structured.  For instance, when you ask for
+> the terminal from the Window object, you get the _parent_ terminal to the
+> window, not a terminal contained within the window, as one would expect.
+
+Avery,
+You may be right, but this depends on some design choices concerning the OS
+layer in which we place jcurses. I mean, if jcurses is used like curses under
+Unix then, in a single terminal/console (e.g. a single shell), an application
+may open several windows. In this case, each window has the *same* terminal and
+getting the _parent_ terminal should be right. But if jcurses is used to open
+different windows that uses different terminals (e.g. different shells), my
+choice is wrong! In this sense, I think we have to suspend implementations and
+define a suitable architecure.
+
+> Don't anyone think I'm getting down on anyone.  The development team I work
+> in has a motto:
+> * Make it WORK.
+> * Make it work RIGHT!
+> * Make it work right WELL!
+> 
+> I just think we're getting to the second step now.
+
+I completely agree with you :)))
+
+Corrado.
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From gchii@mindspring.com Fri, 21 Jan 2000 12:27:35 -0500
+Date: Fri, 21 Jan 2000 12:27:35 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Simulation
+
+I am working on a independent simulation for a JOS console. It is an
+extension of a java.awt.Canvas. My simulated console implements the console
+interface.
+
+By simulation, it is possible to demonstrate how the JOS console will work
+without resorting to Linux, jJOS or decaf.
+
+
+
+
+From tmiller@haverford.edu Fri, 21 Jan 2000 12:51:41 -0500 (EST)
+Date: Fri, 21 Jan 2000 12:51:41 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Simulation
+
+> I am working on a independent simulation for a JOS console. It is an
+> extension of a java.awt.Canvas. My simulated console implements the console
+> interface.
+
+	This is exactly how the JOS equivalent of an xterm would be/is
+constructed.
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Sun, 23 Jan 2000 00:56:14 -0500
+Date: Sun, 23 Jan 2000 00:56:14 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] jos.vm.* packages?
+
+What is the purpose of the jos.vm.* packages? How does jos.vm.* relate to
+the jos.platform.* and jos.system packages?
+
+-----
+
+Why would the jos.platform.driver package defined in both of these
+directories?
+
+JJOS/arch/host/bytecode
+JJOS/arch/i386/bytecode
+
+
+
+
+From tmiller@haverford.edu Sun, 23 Jan 2000 14:58:47 -0500 (EST)
+Date: Sun, 23 Jan 2000 14:58:47 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] jos.vm.* packages?
+
+> JJOS/arch/host/bytecode
+> JJOS/arch/i386/bytecode
+
+	Because the host and i386 builds use different drivers.
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Sun, 23 Jan 2000 17:54:21 -0500
+Date: Sun, 23 Jan 2000 17:54:21 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] jos.vm.* packages?
+
+At 02:58 PM 1/23/00 -0500, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>>Why would the jos.platform.driver package defined in both of these
+>>directories?
+>>
+>> JJOS/arch/host/bytecode
+>> JJOS/arch/i386/bytecode
+>
+>Because the host and i386 builds use different drivers.
+
+But two different classes should *never* have the same name. Since host and
+i386 use different drivers, there must be three packages:
+
+jos.platform.drivers
+jos.host.drivers
+jos.i386.drivers
+
+Interfaces common to both host and i386 should be defined once inside
+jos.platform.drivers (like console). Both host-specific and i386-specific
+drivers must implement a jos.platform.drivers interface.
+
+An instance of an interface is created through a factory (like Bytecode
+Native Interface).
+
+
+
+
+From tmiller@haverford.edu Sun, 23 Jan 2000 23:22:38 -0500 (EST)
+Date: Sun, 23 Jan 2000 23:22:38 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] jos.vm.* packages?
+
+> But two different classes should *never* have the same name. Since host and
+> i386 use different drivers, there must be three packages:
+
+	I disagree utterly.  Shared code which uses these drivers should
+be platform-agnostic, which for now means having the same class names.  At
+such a point where decaf and the class libraries can support factories --
+so that common code never sees a 'naked' driver to begin with -- I'll
+reconsider my position.
+
+	In the C++ source code, we do the same thing, though with fewer
+files, where the jj* implementations have the same name in different
+builds.  There'd be more of this if C++ didn't have the preprocessor
+directives; alot of the C++ code in the 'common' directory is
+platform-specific.  (Which should change, but I have more important things
+to do right now.)
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Mon, 24 Jan 2000 13:03:21 -0500
+Date: Mon, 24 Jan 2000 13:03:21 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] jos.vm.* packages?
+
+At 11:22 PM 1/23/00 -0500, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>> But two different classes should *never* have the same name. Since host and
+>> i386 use different drivers, there must be three packages:
+>
+>	I disagree utterly.  Shared code which uses these drivers should
+>be platform-agnostic, which for now means having the same class names.  At
+>such a point where decaf and the class libraries can support factories --
+>so that common code never sees a 'naked' driver to begin with -- I'll
+>reconsider my position.
+
+Why can't we switch to factories now? It would simplify the bytecode
+directories. I can easily provide you with a factory. I can rework two
+jos.platform.driver packages into jos.host.driver and jos.i386.driver.
+Would you like me to do that?
+
+Here is one example. The common code inside the keyboard class does not
+need to know where the implementation of jos.platform.keyboard is stored.
+Here is the first few lines of the original init() method from
+jos.platform.keyboard:
+
+----- jos/platform/keyboard.java
+  public void init () {
+    /* generate the default drivers */
+    // System.err.println( "keyboard.init(): generating keyboard
+interpreter..." );
+    ki = new jos.platform.driver.KeyboardInterpreter();
+
+    // System.err.println( "keyboard.init(): generating keyboard driver..."
+);
+    kd = new jos.platform.driver.keyboard();
+-----
+
+It could be reimplemented with a factory, like this:
+
+----- jos/platform/keyboard.java
+  public Object getFactoryObject( String v ) {
+    return Factory.getFactory().getObject( v );
+  }
+  public void init () {
+    /* generate the default drivers */
+    // System.err.println( "keyboard.init(): generating keyboard
+interpreter..." );
+    ki = new jos.platform.driver.KeyboardInterpreter();
+
+    // System.err.println( "keyboard.init(): generating keyboard driver..."
+);
+    // *D! kd = new jos.platform.driver.keyboard();
+    kd = (jos.platform.keyboard) getFactoryObject( "jos.platform.keyboard" );
+-----
+
+Each variation of a build can return a different implementation of
+jos.platform.keyboard, inside a different package.
+
+For a host build, getFactoryObject( "jos.platform.keyboard" ) would return
+jos.host.driver.keyboard.
+
+For a i386 build, getFactoryObject( "jos.platform.keyboard" ) would return
+jos.i386.driver.keyboard.
+
+Where is the Factory class? It has already been distributed as the Bytecode
+Native Interface. The factory class only needs to be "configured" for each
+variation of a build.
+
+
+
+
+From gchii@mindspring.com Mon, 24 Jan 2000 16:35:23 -0500
+Date: Mon, 24 Jan 2000 16:35:23 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] jos.vm.* packages?
+
+At 11:22 PM 1/23/00 -0500, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>Shared code which uses these drivers should be platform-agnostic, which
+>for now means having the same class names.
+
+Common code is identical for all builds. The common code defines the
+platform. The jos.platform.keyboard class is an example of common code.
+
+With BCNI, I have eliminated the jos.platform.driver package.
+
+Build-specific code should be different for each build. First, before doing
+anything else, a "build" needs to install a build-specific, BCNI-compatible
+factory. The jos.host.driver.HostKeyboard is an example of build-specific
+code.
+
+The host build should install jos.host.driver.HostFactory. See also the
+jos.host.hostinit class as an example.
+
+The i386 build should install the jos.i386.driver.i386Factory. See also the
+jos.i386.i386init class as an example.
+
+>At such a point where decaf and the class libraries can support factories
+>-- so that common code never sees a 'naked' driver to begin with --
+>I'll reconsider my position.
+
+See the BCNI version of the jos.* packages:
+
+<URL:http://www.mindspring.com/~gchii/jos/jjos1e/index.html>
+
+I created a new jos.platform.VGADriver interface. Both jos.host.StandardVGA
+and jos.i386.StandardVGA implement the jos.platform.VGADriver interface.
+
+Let me clarify. When I said two different classes should not have the same
+name, I meant a fully qualified name such as jos.host.StandardVGA. I find
+it most helpful to have both StandardVGA in jos.host and jos.i386.
+
+-----
+
+Bug List
+
+For me, the TestSuite program won't compile at all. There seem to be a few
+classes without source code.
+
+
+
+
+From gchii@mindspring.com Mon, 24 Jan 2000 17:27:56 -0500
+Date: Mon, 24 Jan 2000 17:27:56 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] jJOS Bytecode w/ BCNI
+
+When jJOS Bytecode meets the BCNI, a virtual machine can always install a
+platform-specific, BCNI-compatible factory first, before calling the init
+class. Only one BCNI-compatible factory can be installed, with setFactory().
+
+Factory.setFactory( new CustomFactory() );
+
+For the latest binary and source distribution of jJOS bytecode, see also
+the JOSDistribution1e article on JOS Wiki.
+
+-----
+
+It's a start. Other system-wide classes might be obtained though BCNI
+eventually. The static BCNI factory should be static, as in one object per
+virtual machine, rather than one object per class loader.
+
+-----
+
+How is JOS CVS updated with jJOS bytecode w/ BCNI?
+
+I think all the bytecode should be organized in a bytecode directory, like
+this:
+
+JJOS/bytecode
+JJOS/bytecode/jos
+JJOS/bytecode/jos/host
+JJOS/bytecode/jos/host/driver
+JJOS/bytecode/jos/i386
+JJOS/bytecode/jos/i386/driver
+JJOS/bytecode/jos/platform
+JJOS/bytecode/jos/platform/event
+JJOS/bytecode/jos/system
+JJOS/bytecode/jos/util
+JJOS/bytecode/org/jos/bcni1a
+
+There is no arch/host or arch/i386 directory needed to re-implement the
+jos.platform.driver package. Since the bytecode is no longer "common", it
+should not be called JJOS/common/bytecode.
+
+
+
+
+From R.Argentini@student.tudelft.nl Thu, 27 Jan 2000 13:47:06 +0100
+Date: Thu, 27 Jan 2000 13:47:06 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] JEPS does fragmentation and reassembly
+
+As stated in the topic, the Jos Experimental Protocol Stack is now able to
+reassemble fragments of large IP datagrams sent to it and fragment large
+datagrams it wants to send.
+
+If you feel like giving it a shot, it's for grabs at the usual locations
+
+http://www.metamech.com/wiki/view/Main/JEPS
+http://vills28.cs.kpn.cx/jos/
+
+Looking at the java.net API i got the feeling that the natural way to
+interact with it would be through the DatagramSocketImpl/SocketImpl
+interface (that are just thin layers on top of the berkeley sockets).
+The problem is that I do not have any experience whatsoever with Factories
+etc, so i guess i could use a pointer towards appropriate documentation.
+The main question is: After i have written a class that implements the
+DatagramSocketImpl interface, how do i get java.net to actually use it?
+
+Help will be appreciated.
+
+R.A. 
+
+PS: Some admin joker over here at the uni thought it would be fun to play
+with sendmail aliases, and now for soem odd reason i can't seem to get mail
+through to the Arch list as i'm no longer sending from the exact adress i
+subscribed from. I'll sort that out ASAP.
+I'll just send to the kernel list instead, as i think almost everyone is on
+both lists.
+
+
+
+
+From tmiller@haverford.edu Thu, 27 Jan 2000 22:52:15 -0500 (EST)
+Date: Thu, 27 Jan 2000 22:52:15 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: [Biz] Define license? -- or not
+
+> The case for (L)GPL is that it might be the most practical solution in
+> terms of what reusable code is already available to you.
+
+	For instance, our class library is going to be LGPL because
+classpath is, as least the Java portions of it.
+
+	(Which license the native parts of it come under will really
+depend on if I think it'll be easier to re-write classpath to use BCNI
+(e.g. remove as much as possible of their native code and write the rest
+into the JVM (that is, statically link the library, since we don't have
+dynamic links with jJOS quite yet) -- for both builds, where we migrate
+away from classpath's native code as relevant portions of our
+emulation/codebase become available) or to add JNI support to decaf. (pro:
+it's a standard.  con: it's a whole lot of work for something we don't
+won't anyone to be doing.
+
+	IMHO, using native code in a JOS app should be
+akin to using a kernel module for a linux app.  This lets us say "it has
+to be linked into the kernel" where 'kernel' is the jJOS+decaf
+combination, and gives the right set of connotations to native code.  For
+effiency's sake, we may have to put graphics drivers (etc) in native code
+in the kernel, and step away from the X model.  If we do, we may want to
+provide a relatively high-level API so the drivers can take better
+advantage of the hardware acceleration available.  (e.g. either Java3D or
+OpenGL or 3D, and the equivalent for 2D.))
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Fri, 28 Jan 2000 18:43:00 -0500
+Date: Fri, 28 Jan 2000 18:43:00 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Opcode class
+
+Once an Opcode class is available, as documented in the PureReflectionIII
+article, it becomes possible to decode opcodes with pure reflection and
+build a bytecode verifier.
+
+Who wants to build a bytecode verifier?
+
+With an opcode class available in C++ for decaf, the size of each opcode is
+known by the frame. It is possible to pass specific bytes to each opcode
+subroutine. Each opcode method can have formal parameters based on the
+operands expected. Instead of allowing each opcode method to access pc, the
+calling method (the one with the big switch statement) can increment pc
+(once) based on the size of the opcode and its operands. The evaluation of
+opcodes is removed from opcode methods.
+
+When a current frame is installed in the Opcode class (in C++) and the
+address of each opcode method is added to the table, it is possible to use
+an instance of the Opcode class to invoke the opcode method. It optimizes
+the code almost to the level of machine code. A list of opcodes can be
+exchanged (once) for an array of instances of the Opcode class. The
+"interpreter" invokes the opcodes through the array, like this:
+
+Opcode[] list = get_opcode_from_method();
+int iMax = list.length;
+for ( int i = 0; i < iMax; i++ ) {
+  list.invoke();
+}
+
+
+
+
+From gchii@mindspring.com Sat, 29 Jan 2000 12:27:51 -0500
+Date: Sat, 29 Jan 2000 12:27:51 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Runtime distribution of JOS
+
+I would like to download a runtime distribution of JOS. I tried this before
+and it *almost* worked. Unfortunately, I was stumped by BOOTP. With help
+from Corrado Santoro <Corrado.Santoro@iit.unict.it>, I downloaded a runtime
+distribution of JOS and untar'd it on my Linux box.
+
+1. I want to download a runtime distribution of JOS to my Linux box with
+the minimum of fuss.
+
+2. I want to run JOS. I do not want to compile decaf. I do not want to
+compile classpath. I do not want to compile the jJOS/decaf bytecode.
+
+Question 1: If I assume Linux is running, is it possible to put a runtime
+distribution of JOS on CD, mount the CD at a Linux prompt and run JOS
+immediately?
+
+Question 2: If I assume GRUB is my boot-loader, it is possible to put a
+runtime distribution of JOS on CD, instruct my JOS machine to boot directly
+from CD and run JOS immediately?
+
+
+
+
+From tmiller@haverford.edu Sat, 29 Jan 2000 13:35:50 -0500 (EST)
+Date: Sat, 29 Jan 2000 13:35:50 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Runtime distribution of JOS
+
+> Question 1: If I assume Linux is running, is it possible to put a runtime
+> distribution of JOS on CD, mount the CD at a Linux prompt and run JOS
+> immediately?
+
+	Should be.  Try it and find out.  (Though it would only be the
+host build.)
+
+> Question 2: If I assume GRUB is my boot-loader, it is possible to put a
+> runtime distribution of JOS on CD, instruct my JOS machine to boot directly
+> from CD and run JOS immediately?
+
+	If GRUB handles CD boots, it should be.  You could probably even
+burn a bootable GRUB CD and the assumption, too.
+
+-_Quinn
+
+
+
+
+From hilarycheng@yahoo.com Mon, 17 Jan 2000 22:08:45 +0800
+Date: Mon, 17 Jan 2000 22:08:45 +0800
+From: Hilary Cheng hilarycheng@yahoo.com
+Subject: [JOS-Kernel] New JEPS release, multiple interfaces androuting.
+
+Hi,
+
+    try to boot it at Grub , Since Host Build will not support for PCI
+Driver.
+
+Regards,
+
+Hilary
+
+Ranieri Argentini wrote:
+
+> >    For the Right Now, I am implementing the PCI Driver Code. If someone
+> >like to have a
+> >look, I can send them my current code.
+>
+> I would love to, but i cannot even get the jjos host build to run!
+> Everything builds ok, but when i start ./jjos it segfaults right away.
+> What am i doing wrong?
+> All help will be greatly appreciated ...
+>
+> RA.
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+
+

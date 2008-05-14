@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: native console &amp; bug report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000582.html">
+   <LINK REL="Next" HREF="000623.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: native console &amp; bug report</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Kernel] Re: native console &amp; bug report">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Tue, 4 Jan 2000 16:08:48 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000582.html">[JOS-Kernel] MILESTONE! Jeps 0.001e Runs Javasoft Tutorial UDP Server!!</A></li>
+        <LI> Next message: <A HREF="000623.html">[JOS-Kernel] Re: native console &amp; bug report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#584">[ date ]</a>
+              <a href="thread.html#584">[ thread ]</a>
+              <a href="subject.html#584">[ subject ]</a>
+              <a href="author.html#584">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Todd L. Miller [SMTP:<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>]
+</I>&gt;<i> Sent:	Tuesday, January 04, 2000 4:18 PM
+</I>&gt;<i> To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+</I>&gt;<i> Subject:	Re: [JOS-Kernel] Re: native console &amp; bug report
+</I>&gt;<i> 
+</I>&gt;<i> &gt; I think that the object model for the consoles is fine for the consoles
+</I>&gt;<i> &gt; themselves, but as soon as we try to add real shells to them, it won't
+</I>&gt;<i> work. 
+</I>&gt;<i> &gt; There isn't enough flexibility there.  I'll see what I can come up with
+</I>&gt;<i> as I
+</I>&gt;<i> &gt; continue to work with it.
+</I>&gt;<i> 
+</I>&gt;<i> 	Not enough flexibility?  setChar() would seem to allow you to
+</I>&gt;<i> build whatever flexibility you might want into a wrapper (text
+</I>&gt;<i> output-wise).  
+</I>.  
+I'm looking on it from the viewpoint that there is a lot that a shell may
+want to do with the screen that would be difficult to do on just a setChar()
+and putChar() basis.  The current implementation doesn't give access to the
+keyboard (which you do below) to the individual consoles which would have to
+hand it to the shells.  The shells would also want to be able to change
+screen colors, move the cursor about (and how is that done, BTW?  Currently
+the cursor just sits 3/4 down the screen on the native console and doesn't
+show up at all in the Java consoles.), Page up/down and all over the place,
+do text windowing (ala emacs), etc.  A lot of this we'll get with the
+JCurses library (which also doesn't deal with the cursor properly), but
+there will be a bit of changes and additions that need to take place in
+order to integrate that in.  I guess my point was that we can't do that with
+the current interface.
+
+&gt;<i> w.r.t. unix-style piping, a consoleOutputStream class
+</I>&gt;<i> should be fairly easy to generate, i.e.:
+</I>&gt;<i> 
+</I>&gt;<i> public class consoleOutputStream extends java.io.OutputStream {
+</I>&gt;<i> 	proctected console c;	
+</I>&gt;<i> 
+</I>&gt;<i> 	public consoleInputStream( console c ) {
+</I>&gt;<i> 		this.c = c;
+</I>&gt;<i> 		}
+</I>&gt;<i> 
+</I>&gt;<i> 	public void write( int b ) {
+</I>&gt;<i> 		c.putChar( (char)b );
+</I>&gt;<i> 		}
+</I>&gt;<i> 	}
+</I>&gt;<i> 
+</I>&gt;<i> and consoleInputStream only slightly more difficult:
+</I>&gt;<i> 
+</I>&gt;<i> public class consoleInputStream extends java.io.InputStream implements
+</I>&gt;<i> KeyListener {
+</I>&gt;<i> 	protected keyboard k;
+</I>&gt;<i> 	protected Queue q;
+</I>&gt;<i> 
+</I>&gt;<i> 	public consoleInputStream( keyboard k ) {
+</I>&gt;<i> 		k.addKeyListener( this );
+</I>&gt;<i> 		}
+</I>&gt;<i> 
+</I>&gt;<i> 	public int available() { ... }
+</I>&gt;<i> 	public int read() {
+</I>&gt;<i> 		/* Queue's dequeue blocks, waiting
+</I>&gt;<i> 		   for a character from keyTyped() */ 
+</I>&gt;<i> 		q.dequeue();
+</I>&gt;<i> 		}
+</I>&gt;<i> 
+</I>&gt;<i> 	... keyTyped( ... ) { ...
+</I>&gt;<i> 		q.enqueue(...);
+</I>&gt;<i> 		}
+</I>&gt;<i> 
+</I>&gt;<i> 	}
+</I>&gt;<i> 
+</I>&gt;<i> 	Ignoring login for the moment, a shell would be started like so:
+</I>&gt;<i> 
+</I>&gt;<i> keyboard shellK = jos.system.keyboard.getKeyboard();
+</I>&gt;<i> console shellC = jos.consoled.getCurrentConsole(); /* has matching setCC,
+</I>&gt;<i> 	which also does not exist at the present time */
+</I>&gt;<i> 
+</I>I'm not so hot on this approach.  I'd prefer somehow that the shells are
+told what console they get and when the keyboard is theirs.  In the same
+vein, I think there needs to be a Screen object which keeps control of the
+mapped byte array.  In short, anytime there is a scarce native resource,
+there needs to be an object keeping track of it to make sure that we don't,
+for instance, have multiple consoles ever trying to write to the screen at
+the same time.
+
+&gt;<i> shell theShell = new some_shell( shellK, shellC );
+</I>&gt;<i> theShell.start();
+</I>&gt;<i> 
+</I>&gt;<i> /* end of init */
+</I>&gt;<i> 
+</I>&gt;<i> 	or, if we're writing the shell as an application (e.g. static
+</I>&gt;<i> main()), which we should be:
+</I>&gt;<i> 
+</I>&gt;<i> ClassLoader cl = jos.system.proc.getCleanClassLoader();
+</I>&gt;<i> Class jlSystem = cl.getClass( &quot;java.lang.System&quot; );
+</I>&gt;<i> 
+</I>Well, there is some reflection stuff that goes here to make the following
+work, but I get the idea.  Really, though, this is the realm of JOSCore
+(org.jos.core.*) and the process model.  We can't really make this work
+until that is in place.
+
+&gt;<i> jlSystem.setIn( shellK );
+</I>&gt;<i> jlSystem.setOut( shellC );
+</I>&gt;<i> jlSystem.setErr( shellC );
+</I>&gt;<i> 
+</I>&gt;<i> jos.system.proc.startProc( cl, cl.getClass( &quot;org.jos.app.shell&quot; ) );
+</I>&gt;<i> 
+</I>&gt;<i> /* end of init */
+</I>&gt;<i> 
+</I>&gt;<i> 	-- noting, of course, that jos.system.proc doesn't exist quite yet
+</I>&gt;<i> :)  (Which also means that the interface sketched out above will probably
+</I>&gt;<i> change :))
+</I>&gt;<i> 
+</I>&gt;<i> 	In either case, the shell could completely ignore the streams
+</I>&gt;<i> and go to a fully event-based system, where it subscribes on its own to
+</I>&gt;<i> the keyboard.  (Where an xterminal would add, before startProc():
+</I>&gt;<i> 
+</I>&gt;<i> jsK = cl.getClass( &quot;jos.system.keyboard&quot; );
+</I>&gt;<i> jsK.setKeyboard( myXKeyboard );
+</I>&gt;<i> 
+</I>&gt;<i> jsCD = cl.getClass( &quot;jos.system.consoled&quot; );
+</I>&gt;<i> jsCD.setCurrentConsole( this );
+</I>&gt;<i> 
+</I>&gt;<i> so that the correct keyboard/console would be found by the shell.  As an
+</I>&gt;<i> aside, the shell could provide its own consoled whose console drivers just
+</I>&gt;<i> use get/setChar on a given othe console and their own buffer -- this would
+</I>&gt;<i> be suitable generic for any kind of console.  Further thoughts: it might
+</I>&gt;<i> be worthwhile to move the currentConsole question out of consoled, and/or
+</I>&gt;<i> extend it in two ways: first, optionally ignore the Fx keys (and/or remap
+</I>&gt;<i> them), for single console situations; second, provide a class from which
+</I>&gt;<i> to generate new consoles in init() and/or provide a method
+</I>&gt;<i> init(console[]), where the initializer provides the desired mix of
+</I>&gt;<i> consoles.)
+</I>&gt;<i> 
+</I>A lot of this I foresee being configurable off of the registry.  It is
+almost like there needs to be a single meta shell to intercept the Fx keys
+and control the switching between shells.  Hmmm..... 
+
+&gt;<i> 	(BTW, aviery, do you have CVS commit privs?)
+</I>&gt;<i> 
+</I>&gt;<i> -_Quinn
+</I>&gt;<i> 
+</I>I have a CVS account, but I don't think I have commit privileges on JJOS.
+
+- Avery
+
+
+&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000582.html">[JOS-Kernel] MILESTONE! Jeps 0.001e Runs Javasoft Tutorial UDP Server!!</A></li>
+	<LI> Next message: <A HREF="000623.html">[JOS-Kernel] Re: native console &amp; bug report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#584">[ date ]</a>
+              <a href="thread.html#584">[ thread ]</a>
+              <a href="subject.html#584">[ subject ]</a>
+              <a href="author.html#584">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

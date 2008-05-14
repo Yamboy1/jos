@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000296.html">
+   <LINK REL="Next" HREF="000299.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Kernel] decaf updates">hilarycheng@usa.net</A><BR>
+    <I>Wed, 25 Aug 1999 20:52:28 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000296.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000299.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#297">[ date ]</a>
+              <a href="thread.html#297">[ thread ]</a>
+              <a href="subject.html#297">[ subject ]</a>
+              <a href="author.html#297">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi all,
+
+&gt;<i>Hi all
+</I>&gt;<i>
+</I>&gt;<i>I updated the vga driver, made some bugfixes, added a stop routine that
+</I>&gt;<i>switches to the previous video mode and a bitblt to draw sprites (I  hate
+</I>&gt;<i>bit shiftings *g*). Found 2 bugs in the jvm -&gt; idiv and irem.
+</I>
+Would u mind send me the latest code ? :D
+I wanna to test ur bitblt function and I would like to implement it to
+draw Font on the VGA Screen.
+Also, I have finished a drawLine and drawRect routine. These two methods
+are similar to java.awt.Graphcis. I will try to implements some more
+java.awt.Graphisc
+in device driver level.
+
+&gt;<i>I will update (send code to John-&gt; still no cvs access) the code when
+</I>&gt;<i>the general driver implementation is done (end of this week, I guess).
+</I>&gt;<i>
+</I>&gt;<i>The problem is the speed: I think we (Hilary?, you have done something
+</I>&gt;<i>similar) should implement a native memcopy to speed up the vga output.
+</I>
+Well, I found two bugs in JVM.
+1. Date Object -- When I create Date Object, JJOS Kernel will got some
+behaivour. (Show lots of Zero on the screen.)
+2. String -- String can't perform chatAt and getBytes, toCharArray
+So I can't draw Character on VGA from a Java String.
+
+I have implemented a simple fill routine. It just fill up a memory space
+in native implementation. But I think this routine is just for testing
+puporse. If speed of JJOS is fast enough, It will be deleted.
+
+&gt;<i>vga and speed:
+</I>&gt;<i>To avoid flickering, you have to write into the vga-mem when the vertical
+</I>&gt;<i>retrace is active. the memcopy should be finished before the vertical
+</I>&gt;<i>retrace ends. If not, you will see the sprite flickering. The current
+</I>&gt;<i>speed of the write8/16/32 is to slow to finish before the vertical retrace
+</I>&gt;<i>gets inactive.
+</I>&gt;<i>
+</I>
+
+&gt;<i>On Wed, 25 Aug 1999, Todd L. Miller wrote:
+</I>&gt;<i>
+</I>&gt;&gt;<i> Implemented synchronized methods; implemented virtual consoles in
+</I>&gt;&gt;<i> a java daemon, `consoled', though I've decided against implementing a
+</I>&gt;&gt;<i> screen-redraw hack, waiting for the VGA driver to mature instead.  Began
+</I>&gt;&gt;<i> to implement throws/exceptions for the native code, within interp.cc.
+</I>&gt;&gt;<i> Tried to do a little housecleaning w.r.t. to the tools/ directory in CVS.
+</I>
+For 'consoled' daemon, is it a Console Driver for System.out ?
+
+&gt;&gt;<i> Hopefully, I didn't break anything.  Added a few builtins for
+</I>&gt;&gt;<i> keyboard emulation (very basic) and to allow the vga driver to 'run.'
+</I>(At
+&gt;&gt;<i> least, with 24 MB on the emulation's heap, until the JVM halts, out of
+</I>&gt;&gt;<i> memory.)
+</I>
+I would like to know, is the current keyboard emulation fully funtional ?
+Since I havn't try to test it in my computer.
+
+&gt;&gt;<i> Up next is testing checking if a method is native before trying to
+</I>&gt;&gt;<i> look it up in the builtins hash, which may lead to classpath integration
+</I>&gt;&gt;<i> (and a fully functional class library!).  Or maybe getting GC to work,
+</I>but
+&gt;&gt;<i> we'll see.
+</I>
+Any Conservative GC has been already implemented ? If so, we can port it
+to JJOS, it can save time on it.
+
+Regards,
+
+Hilary
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000296.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000299.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#297">[ date ]</a>
+              <a href="thread.html#297">[ thread ]</a>
+              <a href="subject.html#297">[ subject ]</a>
+              <a href="author.html#297">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

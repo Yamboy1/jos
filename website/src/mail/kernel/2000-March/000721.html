@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Installation instructions (8MB Ram)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000720.html">
+   <LINK REL="Next" HREF="000722.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Installation instructions (8MB Ram)</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Installation instructions (8MB Ram)">gchii@mindspring.com</A><BR>
+    <I>Wed, 08 Mar 2000 19:26:25 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000720.html">[JOS-Kernel] Installation instructions (8MB Ram)</A></li>
+        <LI> Next message: <A HREF="000722.html">[JOS-Kernel] Installation instructions (8MB Ram)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#721">[ date ]</a>
+              <a href="thread.html#721">[ thread ]</a>
+              <a href="subject.html#721">[ subject ]</a>
+              <a href="author.html#721">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:51 AM 3/8/00 -0700, Patrick Tullmann &lt;<A HREF="mailto:tullmann@cs.utah.edu">tullmann@cs.utah.edu</A>&gt; wrote:
+&gt;<i>Todd L. Miller wrote:
+</I>&gt;&gt;<i> 	When I get a chance, I'll try to look into the size of classpath
+</I>&gt;&gt;<i> vs. Kore -- if Kore is compellingly smaller, I'll look into a switch.
+</I>&gt;<i>
+</I>&gt;<i>I don't know how big Classpath is but I know Kore is far smaller.  :)
+</I>&gt;<i>However, Kore is only JDK1.0 compliant.  I do recommend it as a
+</I>&gt;<i>stepping stone to more full featured class libraries at a later date,
+</I>&gt;<i>though---its good enough to run Javac on, for example.  The other nice
+</I>&gt;<i>property of Kore is that there are few native methods and they are all
+</I>&gt;<i>grouped together in a nice, simple static-native-method-only
+</I>&gt;<i>package-private classes.
+</I>
+We must be brave and think of Kore as a stepping stone. It is most
+efficient to support Java 0, and then Java 1, and then Java 2 -- in that
+sequence. Think of it as the first step to bootstrap jJOS/decaf into
+something you can fit into 8MB, with room left over for applications.
+
+Kore design is similar to the Bytecode Native Interface (BCNI) and alt.*
+package proposal. I like Kore and BCNI because they have few native
+methods. These native methods are &quot;concentrated&quot; together in NativeLang,
+NativeIO, NativeNet, etc. for Kore and LangBridge, IOBridge, NetBridge for
+BCNI. Concentrating native methods into single classes is easier on a C/C++
+programmer!
+
+Unlike Kore, BCNI gives you the flexibility to create many implementations
+of the bridge classes, in whatever package you want. While Kore puts its
+Native.. classes in the java.* packages, BCNI lets you put your bridges in
+your personal package. For example, a bridge for decaf should be in a decaf
+package.
+
+When Kore and BCNI are combined, wonderful things start happening. There
+are many positive implications. Suddenly, your JVM-specific classes have
+the freedom to be implemented in machine code *or* bytecode. That's the
+ticket.
+
+It is overwhelming to demonstrate this with Kaffe (Java 1) or classpath
+(Java 2). I want to run JOS. I want to use JOS. I hope you do to.
+
+&gt;<i>The .zip file is 214K uncompressed.  There are about 160 files in
+</I>&gt;<i>Kore.  It includes java.lang, java.net, and java.io.  I have a local
+</I>&gt;<i>version that has a few fixes w.r.t. v0.0.7 (the last public version).
+</I>
+I am very pleased to find out that you have fixes to Kore. I have also been
+&quot;fixing&quot; Kore. I'm sure many other people have fixed it, too. It is
+unfortunate that we can't send fixes to Kore CVS. I have already contacted
+one of the contributors to Kore. I asked if the JOS Project could use Kore
+as a starting point. He said, &quot;Yes&quot;.
+
+I think we should work toward a distribution of Kore 0.1.0 and make it
+available to the public. Why can't we put together a Kore Extension project
+on SourceForge? I have code that's ready to upload, don't you?
+
+&gt;<i>The homepage for Kore (embarassingly out of date) is 
+</I>&gt;<i>	<A HREF="http://www.cs.utah.edu/flux/java/kore/index.html">http://www.cs.utah.edu/flux/java/kore/index.html</A>
+</I>
+If we start a Kore Extension project on SourceForge -- for the purpose of
+plugging it into decaf as a stepping stone, we should be able to contact
+the author of the Kore homepage. That author should add a link to SourceForge.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000720.html">[JOS-Kernel] Installation instructions (8MB Ram)</A></li>
+	<LI> Next message: <A HREF="000722.html">[JOS-Kernel] Installation instructions (8MB Ram)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#721">[ date ]</a>
+              <a href="thread.html#721">[ thread ]</a>
+              <a href="subject.html#721">[ subject ]</a>
+              <a href="author.html#721">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

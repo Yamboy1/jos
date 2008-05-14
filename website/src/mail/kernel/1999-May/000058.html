@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: static initializer query</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000057.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: static initializer query</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Re: static initializer query">tmiller@haverford.edu</A><BR>
+    <I>Mon, 31 May 1999 01:24:21 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000057.html">[JOS-Kernel] Re: static initializer query</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#58">[ date ]</a>
+              <a href="thread.html#58">[ thread ]</a>
+              <a href="subject.html#58">[ subject ]</a>
+              <a href="author.html#58">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> When I wrote my previous message, I did not understand what was going on
+</I>&gt;<i> here.  Let me repeat it back to you to see if I understand now. 
+</I>&gt;<i> Basically, when we attempt to resolve a ur_java_class, we check to see
+</I>&gt;<i> if there's a static initializer.  If there is, we hang a java_thread
+</I>&gt;<i> which will run the static initializers off of the (in process of being
+</I>&gt;<i> resolved) java_class.  When running invoke (or under some other
+</I>&gt;<i> circumstances I haven't run under the debugger to see who calls) or
+</I>&gt;<i> getstatic opcodes for a thread, we check to see if this slot in the
+</I>&gt;<i> java_thread's corresponding java_class is non-NULL, and, if so, we then
+</I>&gt;<i> run the initializer thread to the bitter end.
+</I>
+	Right.  We can't run the static initializer during resolution
+(even if we wanted to) because you hit all sort of nastiness because of
+the recursive resolution algorithm.
+
+&gt;<i> It just feels like the potential exists for some
+</I>&gt;<i> really weird (and hard to debug) things to happen.
+</I>
+	You're definitely right.  I hadn't (in my ignorance :)) thought
+about that at all.  It's very likely a source of Bad Karma.  Much better
+to treat static initialization as a normal function call.  (Which it is,
+except that it's the ONLY call made /implicitly/ by the JVM -- everything else,
+including the instance initializers, are explicitly called by the
+bytecode.)  This would involve be /very/ careful with the stack until we
+determine if the class we're about to use has been initialized or not --
+I'll investigate how far forward we can move the initialization check.
+
+&gt;<i> Does the requesting
+</I>&gt;<i> thread get &quot;slept&quot; or &quot;waited&quot; properly, and the Right Thing happen
+</I>&gt;<i> later after the bits get loaded?
+</I>
+	No.  This way of doing things was a hack while I was rewriting
+resolution.  (and realizing that initializing during resolution was a Bad
+Idea.)  However, it *should* happen correctly if we treat it as a normal
+method call.  The other thing being that we need to treat calls to the
+static initializer as being synchronized (for obvious reasons), with the
+exception that the threads that block on some other thread's synch *don't*
+continue with the method call.  (Basically, we should implement this as a
+wait() operation with the program counter backed off one; when the
+notifyAll() op is peformed by the initializing thread, the thread will
+re-execute the initializer-causing opcode, which should no longer call the
+initializer...)  Looking this up in the JVM spec also made me realize that
+decaf isn't doing things quite right, because it has to check and make
+sure that all superclasses are initialized before the subclass is,
+starting from Object and going down.  (hooray for stacks:))  That, and it
+looks like I might be ignoring the distinction between active and passive
+uses of a class, but it's hard to tell. (sigh...)
+
+&gt;<i> (3) Speaking somewhat hypothetically and prematurely, what happens when
+</I>&gt;<i> we get real multithreading?  Won't we want to pre-empt the static
+</I>&gt;<i> initializers?
+</I>
+	Yes.  See above -- the other reason for synchronizing.
+
+&gt;<i> Well, I agree that you never ever want to leave a thread &quot;in the middle
+</I>&gt;<i> of&quot; a bytecode execution.  I believe you'd have to back it out all the
+</I>&gt;<i> way and wait for a retry.  The second part, about pushing a frame on top
+</I>&gt;<i> of the current stack, I will have to think about how bad that is (I
+</I>&gt;<i> forget what the stack discipline is like, and how the frames get
+</I>&gt;<i> popped).  I would think it could be kind of like an &quot;interrupt&quot;
+</I>&gt;<i> happened, and the interrupt affects the runnability (sp?) of the pending
+</I>&gt;<i> opcode (by side effect of resolving the required class), and then just
+</I>&gt;<i> goes away and cleans up after itself.  However, a debugger might show
+</I>&gt;<i> the extra stack stuff on top of the explicitly-called stuff.
+</I>
+	We *want* to show that the code being executed is the static
+initializer, IMHO -- it would be *very* confusing, otherwise.  I think the
+best solution here is to put the static init check as far forward as
+possible, to minimize the 'unrolling' that needs to take place, push the
+static init frame as a normal function call, except that we (don't) adjust
+the program counter to point at the initializing bytecode, so that the
+initializing bytecode is just run again.  Since static initializers don't
+return anything, the stack should be fine.
+
+&gt;<i> How do &quot;normal&quot; Java systems/debuggers treat this event (he asked,
+</I>&gt;<i> ignorantly)?
+</I>
+	No idea.  We can ask the japhar/kaffe people :)
+	
+-_Quinn
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000057.html">[JOS-Kernel] Re: static initializer query</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#58">[ date ]</a>
+              <a href="thread.html#58">[ thread ]</a>
+              <a href="subject.html#58">[ subject ]</a>
+              <a href="author.html#58">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

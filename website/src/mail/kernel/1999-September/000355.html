@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] About Memory Map</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000354.html">
+   <LINK REL="Next" HREF="000357.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] About Memory Map</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] About Memory Map">jm@mak.com</A><BR>
+    <I>Sat, 11 Sep 1999 09:00:42 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000354.html">[JOS-Kernel] About Memory Map</A></li>
+        <LI> Next message: <A HREF="000357.html">[JOS-Kernel] About Memory Map</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#355">[ date ]</a>
+              <a href="thread.html#355">[ thread ]</a>
+              <a href="subject.html#355">[ subject ]</a>
+              <a href="author.html#355">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+Hilary Cheng wrote:
+&gt;<i>     Is there any Memory Map Function in JJOS ? I am writing PCI
+</I>&gt;<i> Driver. But when I call the
+</I>&gt;<i> BIOS32 Service. It will throw 000D Exception ( Is that a Divide by
+</I>&gt;<i> Zero Exception ) ? I have
+</I>&gt;<i> several source code from other OSes. They do the same as me. If there
+</I>&gt;<i> is no MMap, probably
+</I>&gt;<i> it got some problem of my source.
+</I>
+With respect to using BIOS32 from flat, 32-bit protected mode, after
+we've already appropriated all the interrupt handlers -- I'm not sure
+that is possible right now.  I'd have to look into it further.
+
+What exactly are you trying to do?  Map a region of PCI address space
+into the CPU's address space?  We don't have virtual memory (yet).  The
+next step would be to identity-map the existing physical memory anyways
+so that nothing we'd done up until the virtual memory enablement would
+break (that's a crappy sentence, but you probably know what I mean).
+
+-jm
+
+-- 
+==== John Morrison ==== <A HREF="mailto:jm@mak.com">jm@mak.com</A> == <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== MaK Technologies Inc., 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000354.html">[JOS-Kernel] About Memory Map</A></li>
+	<LI> Next message: <A HREF="000357.html">[JOS-Kernel] About Memory Map</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#355">[ date ]</a>
+              <a href="thread.html#355">[ thread ]</a>
+              <a href="subject.html#355">[ subject ]</a>
+              <a href="author.html#355">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

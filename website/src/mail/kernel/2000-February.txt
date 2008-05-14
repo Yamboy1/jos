@@ -1,0 +1,1819 @@
+From tmiller@haverford.edu Wed, 2 Feb 2000 09:30:06 -0500 (EST)
+Date: Wed, 2 Feb 2000 09:30:06 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] progress update
+
+	After spending two weeks (or so) trying to get the classpath
+native libraries working, I've given up on them, especially since they'd
+require JNI, where doing all that work would only help the host build.  So
+I decided to just go with their class library, and write the VM-specific
+bits directly into decaf, the same way we do native methods now, and leave
+porting native->BCNI/native code to whoever uses it.  (Including myself.)
+
+	So started trying to do that, and quickly ran smack into the
+back-end ugliness that I had mentioned wanting to rewrite at some
+point.  It may well have been possible to write the VM-specific code
+without a rewrite, but it would have been unbelievably ugly -- so I've
+started a clean-slate re-write of everything in the common/decaf
+directory.  (Since JM's code tends to be much cleaner than mine, and I
+don't fully understand great big chunks of it, I'm leaving well-enough in
+common/nativecode alone.  I'll re-write whatever chunks of the
+arch/*/nativecode stuff seems appropriate, but most of that is in much
+better shape than common/decaf, and I don't think much work will be
+necessary.)  I should be done with the re-write in less than two weeks,
+and the VM work for classpath ought to be done by at most a week later.
+
+	Anyway, my apologies to those of you that have been sitting on
+their hands while I've tried to get my act together.
+
+-_Quinn
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Wed, 2 Feb 2000 10:06:56 -0600
+Date: Wed, 2 Feb 2000 10:06:56 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] progress update
+
+Todd,
+
+I have two issues that we might want to think about at this point.
+
+First, in the long term, it could be well-worth adding JNI support into the
+i386 build of decaf.  I'm thinking of two main advantages that this gives.
+First, it would help modularize decaf so that extensions could be added
+without having to recompile or possibly even reboot decaf.  Second, there
+are a number of rather large JNI implementations of things that aren't
+exactly our highest priorities now, but may be in a year or two.  I'm
+specifically thinking of things such as Java3D/Glide support.  It seems to
+me that there is an open source Java Glide implementation in the works that
+uses JNI (I could be mistaken in this though - probably am. :)  Having decaf
+able to use JNI libraries in ELF format could be extremely useful down the
+road, even if more difficult to implement now than rewriting the classpath
+native code.  This is just a decision we don't want to make without thinking
+about all of its implications down the road.  Of course, the answer may be
+just rewriting again later down the road.
+
+Second, while you are rewriting common/decaf from scratch, wouldn't this be
+a good time to implement multiple processes?  My thought is that the
+ClassLoader approach we previously discussed gets the basics, but it would
+be great to have each process have its own heap/stack. (Class definitions
+would go in a shared heap.)  I have an unfinished web page that goes into
+more detail but I haven't gotten it on my site yet. I'll try to do that
+soon.  The main advantage of this approach is that we can then detect and/or
+limit how much memory a particular process uses.  For instance, a user may
+want to limit an applet to being able to use only a third of the computer's
+memory at most as a safety precaution.  It is much easier to design
+something like this in at the beginning or during a rewrite than to kludge
+it in later.
+
+What are your thoughts?  
+Do you want to take time for this?  
+How can I best help to implement this during the rewrite?
+
+Regards,
+Avery J. Regier
+
+
+
+> -----Original Message-----
+> From:	Todd L. Miller [SMTP:tmiller@haverford.edu]
+> Sent:	Wednesday, February 02, 2000 9:30 AM
+> To:	kernel@jos.org
+> Subject:	[JOS-Kernel] progress update
+> 
+> 	After spending two weeks (or so) trying to get the classpath
+> native libraries working, I've given up on them, especially since they'd
+> require JNI, where doing all that work would only help the host build.  So
+> I decided to just go with their class library, and write the VM-specific
+> bits directly into decaf, the same way we do native methods now, and leave
+> porting native->BCNI/native code to whoever uses it.  (Including myself.)
+> 
+> 	So started trying to do that, and quickly ran smack into the
+> back-end ugliness that I had mentioned wanting to rewrite at some
+> point.  It may well have been possible to write the VM-specific code
+> without a rewrite, but it would have been unbelievably ugly -- so I've
+> started a clean-slate re-write of everything in the common/decaf
+> directory.  (Since JM's code tends to be much cleaner than mine, and I
+> don't fully understand great big chunks of it, I'm leaving well-enough in
+> common/nativecode alone.  I'll re-write whatever chunks of the
+> arch/*/nativecode stuff seems appropriate, but most of that is in much
+> better shape than common/decaf, and I don't think much work will be
+> necessary.)  I should be done with the re-write in less than two weeks,
+> and the VM work for classpath ought to be done by at most a week later.
+> 
+> 	Anyway, my apologies to those of you that have been sitting on
+> their hands while I've tried to get my act together.
+> 
+> -_Quinn
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From tmiller@haverford.edu Wed, 2 Feb 2000 14:18:08 -0500 (EST)
+Date: Wed, 2 Feb 2000 14:18:08 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] progress update
+
+	There would be a great benefit to JNI with ELF libs, I
+agree, and it might well be worth doing further down the road, if we get
+some sort of dynamic linker (port ld.so?) for jJOS.  I, personally, am not
+going to write JNI only for a build which amounts to an emulator.
+
+> Second, while you are rewriting common/decaf from scratch, wouldn't this be
+> a good time to implement multiple processes?
+
+	Yes.  I've been coding with that in mind for long enough that I
+neglected to mention it. :)
+
+> My thought is that the ClassLoader approach we previously discussed
+> gets the basics, but it would be great to have each process have its
+> own heap/stack. (Class definitions would go in a shared heap.)
+
+	The way I'm looking at it now is to take what JM did in creating a
+'JVM' class and run with it, so that you can define a JVM by handing it a
+jjmachine object (at some point, we subclass jjmachine for security) and a
+classloader.  When you ask that jvm to start, you also hand off a
+scheduler on which to run the initial thread.  For now, the schedulers
+will all be the same because jJOS is a single process.  Later on,
+scheduler could be re-written or subclassed to allow native
+threads/processes and/or a mixture of native and green threads/processes.
+
+	The classloader will initially be empty, and fill in its own set
+of classes and definitions from the (shared) ramdisk.  I intend to change
+this as soon as I verify that they work, and create a system where you can
+share as many or as few class definitions as you desire, with each
+classloader maintaining its own static data, like .System.in'.  (Although
+this will probably start out as an all-or-nothing choice, it makes sense
+to be able to have different processes use different definitions of the
+same class -- for development work on the editor you're using to do
+the development, for instance.  I'm not quite sure what the best way to
+handle this is yet.)
+
+> The main advantage of this approach is that we can then detect and/or
+> limit how much memory a particular process uses.  For instance, a user
+> may want to limit an applet to being able to use only a third of the
+> computer's memory at most as a safety precaution.  It is much easier
+> to design something like this in at the beginning or during a rewrite
+> than to kludge it in later.
+
+	So you want a model where a process is a classloader (possibly
+sharing class definitions with N other classloaders), N >= 1 threads with
+independent stacks, and a single independent heap for the process, right?
+
+	Right now, since memory allocation is done by new, all processes
+share a single heap.  (One that is logically disjoint except for
+situations where a thread specifically exported one its objects to some
+other thread.)  According to the spec, individual threads have their own
+heap space ('working memory') where they maintain working copies of class
+and instance variables (and the elements of those variables if they are
+arrays), copies which may differ from another thread's copies until they
+are read (at which main memory is directed to update that copy) until the
+main memory updates the copy.  That is, it is possible for threads which
+are not explicitly synchronized to differ, but it is not required.
+
+	If it is assured that working memory writes and reads are
+atomically bound to main-memory stores and loads, then it seems to me that
+main and working memory may be identical (that is, at the same
+location).  (Although putting them at the same location assures that those
+operations are atomic*!  I mean 'may be identical' as in, 'not forbidded
+by the Java spec'.)  So it looks like, according to my understanding of
+the JVM spec, that a single heap per process is OK.
+
+> How can I best help to implement this during the rewrite?
+
+	Figure out some elegant way to give each process a private heap,
+given that we don't have native processes.  (Implementing native processes
+would sure be nice, though, even if we just did cooperative multi-tasking
+to ensure the atomicity of a given Java bytecode.  (I'm not sure, but I'd
+think that interrupting a thread in the middle of a bytecode might confuse
+some other thread that's sharing memory with it.))  Perhaps add an
+arbitrary 'heap id' to each jjmachine instance and have me call an
+allocator from there?  (a jjmachine subclass containing a pointer to One
+True jjmachine that gets to play with the h/w.  allows the start of a
+security model, too :))  I might make JVM a superclass of everything that
+allocates memory so it automagically knows its heap and its classloader...
+
+-_Quinn
+
+
+* on multiprocessor systems, one may have to manually flush the cache, but
+we can call the cache 'working memory' and it's OK not to according to the
+spec.
+
+
+
+
+From gchii@mindspring.com Thu, 03 Feb 2000 09:20:21 -0500
+Date: Thu, 03 Feb 2000 09:20:21 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] progress update
+
+>(I'm not sure, but I'd think that interrupting a thread in the middle of
+>a bytecode might confuse some other thread that's sharing memory with it.)
+
+Any un-interruptable part of an opcode must be enclosed in a critical
+section. Within invokestatic, invokespecial and invokevirtual, the virtual
+machine must interrupt a thread in the middle of an opcode. As a
+finite-state machine, it is possible to use a critical section to control
+preemptive multitasking.
+
+A critical section is a system-wide mechanism. Either task switching is
+enabled or disabled by the kernel. Critical sections must be used
+sparingly, giving the kernel as many opportunities to task-switch as possible.
+
+In preemptive multitasking, task-switch interrupt is clock-based. It calls
+the task switcher periodically. When a task enters a critical section, the
+task-switch interrupt is disabled. When a task exits a critical section,
+the task-switch interrupt is enabled.
+
+A critical section is much different than a synchronized block. A critical
+section disables the task-switching mechanism, so that a task is never
+switched in a critical section. A synchronized block is tied to a specific
+object and thread; a critical section is system-wide, used by all threads.
+If any thread is in a critical section, a task cannot be switched.
+
+Only parts a few opcodes must be enclosed in critical sections.
+
+1. new
+
+From a shared heap, the allocation of a new object might be enclosed in a
+critical section.
+
+2. monitorenter/monitorexit
+
+Task switching must never be performed in the middle of
+monitorenter/monitorexit.
+
+It does not matter if task switching occurs in the middle of pushing or
+popping a variable on the stack frame for a method.
+
+3. garbage collection
+
+Parts of garbage collection must be protected with a critical section. From
+a shared heap, the free of an old object might be enclosed in a critical
+section.
+
+We should not put an entire opcode in a critical section. We should not by
+default make every opcode a critical section.
+
+-----
+
+In non-preemptive multitasking, the task-switch "interrupt" is called at
+the whim of the current task. The task-switch method must be written into
+the code explicitely. A programmer must determine where it is safe to
+switch tasks and add a call to the task-switcher.
+
+This is similar to Thread.yield(). Except in non-preemptive multitasking,
+calls to task_yield() are required frequently in your code. A single opcode
+might have dozens of calls to task_yield(), giving the task-switcher many
+opportunities to switch tasks.
+
+task_yield() must be embedded in the methods of all machine code. It must
+be added to each method of a stack frame and object heap. It must be added
+frequently to the bytecode interpreter, verifier, resolver and native methods.
+
+In order for non-preemptive multitasking to work, every programmer must
+write good code. Every native library must be rewritten to call task_yield().
+
+The "overhead" incurred by calling task_yield() comes from (1) calling it
+when the task-switcher is not yet ready to switch tasks, and (2) calling it
+long after the task-switcher was ready to switch tasks.
+
+This is the age-old debate between the merits of UNIX vs. MS-DOS and OS/2
+vs. Windows 3.1. While it is easier to develop the bulk of an operating
+system with non-preemptive multitasking in mind, reality pushes us to build
+a preemptive multitasking system eventually. You can't count of every
+programmer to write good code. Even system programmers with years of
+experience are capable of making a mistake.
+
+-----
+
+I recommend a hybrid between preemptive and non-preemptive multitasking for
+JOS because of JOS' special circumstances. I believe jJOS, a kernel, must
+use preemptive multitasking (for robustness) and decaf, a virtual machine,
+must use non-preemptive multitasking (for simplicity).
+
+Somewhere between jJOS and decaf, it must be possible to create preemptive
+threads. This sounds a lot like running decaf on Linux.
+
+
+
+
+From ajregier@earthlink.net Thu, 3 Feb 2000 21:47:29 -0500
+Date: Thu, 3 Feb 2000 21:47:29 -0500
+From: Avery J. Regier ajregier@earthlink.net
+Subject: [JOS-Kernel] Multi-Process Spec
+
+The beginnings of my proposal for a JVM Multi-Process Spec is up on my site at:
+http://home.earthlink.net/~ajregier/jos/process_spec.html
+
+Comments would be appreciated.  Be aware that it is sketchy and unfinished.
+
+Thanks,
+Avery
+
+
+
+
+From tullmann@cs.utah.edu Thu, 3 Feb 2000 22:40:46 -0700
+Date: Thu, 3 Feb 2000 22:40:46 -0700
+From: Patrick Tullmann tullmann@cs.utah.edu
+Subject: [JOS-Kernel] Multi-Process Spec
+
+> Comments would be appreciated.  Be aware that it is sketchy and unfinished.
+
+I've got some couple comments for you.  I've been working on this
+problem (multiple processes in a JVM) at the University of Utah for a
+while now.  Our research group has a paper which was just accepted to
+the April USENIX on just this topic.  The paper tries to provide a
+solid list of the issues involved and choices available for Java
+process models.  You can get it at [1].  My Master's thesis [2] also
+contains a lot of relevant info, but its not nearly as concise or
+readable.  :) There is also other work in java processes here at Utah
+(GVM [1], KaffeOS [3]) and at Cornell (JKernel [4], Luna [5]).  And,
+some older work at Princeton ([6]).
+
+One nit on your definition of class version.  Two classes are the same
+only if the bytecode is identical and if all the referenced classes
+are identical.  If I load a class BigButton into two different class
+loaders, and in each classloader BigButton's superclass Widget is
+different, the the two instances of BigButton are different.  The JVM
+spec makes a coarser restriction: classes loaded into separate
+classloaders are by definition different, even if all the classes are
+actually the same.
+
+Another issue is the tension between sharing objects and total
+reclaimation of memory.  If a process is terminated, but some objects
+it allocated are sitting in a global table, what do you do?  What if
+that object has pointers all of the data area of the just-terminated
+process?  There are systems (such as Luna) that can reclaim the
+object, though Luna makes changes to Java's type system and requires
+some pretty hefty optimizations to avoid significant run-time
+penalties.  Other systems, such as KaffeOS strictly limit the types
+of such shared objects, thus limiting the damage that can be done.
+Other systems (such as the one I'm working on now) disallow shared
+objects at the process level (the "system" can share objects but it is 
+trusted to clean them up).
+
+If you're going for a UNIX-like process model, I suggest you start by
+disallowing sharing (copy objects across process and process/kernel
+boundaries).  I get the feeling this is the sort of process model you
+are heading towards.
+
+Good luck.
+
+-Pat
+
+----- ----- ---- ---  ---  --   -    -      -         -               -
+Pat Tullmann                                       tullmann@cs.utah.edu
+	  This signature witticism intentionally left blank.
+
+[1] http://www.cs.utah.edu/flux/papers/javaos-tr98015-abs.html
+[2] http://www.cs.utah.edu/~tullmann/thesis/thesis.html
+[3] Godmar doesn't have a good link yet, http://www.cs.utah.edu/~gback/
+[4] http://www.cs.cornell.edu/slk/JKernel/Default.html
+[5] http://www.cs.cornell.edu/Info/People/hawblitz/PLDI2000-submit/luna-99-11-13.ps
+[6] http://www.cs.princeton.edu/sip/pub/icdcs.html
+
+
+
+
+
+From gchii@mindspring.com Fri, 04 Feb 2000 09:02:43 -0500
+Date: Fri, 04 Feb 2000 09:02:43 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Multi-Process Spec
+
+At 10:40 PM 2/3/00 -0700, Patrick Tullmann <tullmann@cs.utah.edu> wrote:
+>Another issue is the tension between sharing objects and total
+>reclaimation of memory.  If a process is terminated, but some objects
+>it allocated are sitting in a global table, what do you do?
+
+The tension between sharing objects and total reclaimation of memory is
+another aspect of the persistence barrier. A persistence barrier is
+typically a barrier between a dormant object and an active one. A dormant
+object exists when all the the electrical power has been turned off. All
+domant objects have data and only data (fields). They have no behavior
+(methods) because they have no power, no CPU.
+
+We find a persistence barrier between the active CPU and a diskette, hard
+drive or CD-ROM. We also find it between two CPUs. The persistence barrier
+has been overcome through marshalling an object's data across a
+byte-by-byte stream.
+
+When it comes to processes, we want an strong persistence barrier to be
+maintained between all processes. Each process must maintain its own
+private object graph (sub-heap) and its own garbage collection thread. Two
+processes must never share objects. When a process is complete, all of its
+objects are destroyed. If the process should fail, it is an important
+function of the operating system to insist that all of its objects are
+destroyed. An operating system is defective when it enables a process to
+leak. An object that is not destroyed by the operating system when a
+process is destroyed leaks into a frightful place where total reclaimation
+of memory is not possible.
+
+We want a very strong persistence barrier between the kernel process and
+other processes. All objects created by a kernel should be destroyed when
+the kernel is complete.
+
+And yet, there must be coordination between processes. "Shared memory" is
+often managed by a third process. The third process owns the shared memory
+and works on behalf of the other two. The persistence barrier has been
+bridged successfully by a model of asynchronous I/O. Objects are copied
+across a persistence barrier. The third process is often the kernel.
+
+1. Process 1 creates an object. When process 1 is complete, the object dies.
+
+2. Process 1 asks the kernel to clone the object. The kernel (and only the
+kernel) creates a copy of the object's data. When the kernel is complete,
+space used by this data is reclaimed.
+
+3. Process 2 asks the kernel for a clone of an object. The kernel (and only
+the kernel) creates an object from the object's data. The second active
+object is just like the original, except it has crossed the persistence
+barrier. When process 2 is complete, this copy of the object dies.
+
+At the moment an object is cloned by the kernel, only the object's data is
+copied. The object's behavior is not copied. The object's data must not
+modified by the kernel while it is in its dormant state. As the copy is
+activated, it regains its behavior. It becomes just another object, as if
+it were constructed from scratch.
+
+This is something like the old clipboard metaphore. An object in a
+clipboard is domant. The object's data must not modified by the clipboard
+while it's dormant. In one application, you copy an object to the
+system-wide clipboard. From another application, you paste an object from
+the system-wide clipboard. Thus, an object can cross the persistence barrier.
+
+The mechanism of getting objects from the kernel has been demonstrated with
+the Bytecode Native Interface (BCNI). An object returned from BCNI belongs
+to the requesting process. The BCNI typically returns a proxy to objects
+owned by the kernel process. The ultimate BCNI plugs into a native method,
+leaving the confines of a custom class loader. The JVM implements this one
+native method to get JVM-specific objects and proxies from the kernel process.
+
+The persistence barrier is bridged exactly the same way for copying objects
+from one process to another as copying objects from one machine to another.
+The byte-by-byte asynchronous I/O subsystem works across a network
+interface. And the persistence barrier is bridged in the same way for
+copying objects from an active process to a diskette, hard drive or CD-ROM.
+
+
+
+
+From gchii@mindspring.com Fri, 04 Feb 2000 09:24:22 -0500
+Date: Fri, 04 Feb 2000 09:24:22 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Multi-Process Spec
+
+At 10:40 PM 2/3/00 -0700, Patrick Tullmann <tullmann@cs.utah.edu> wrote:
+>One nit on your definition of class version.  Two classes are the same
+>only if the bytecode is identical and if all the referenced classes
+>are identical.
+
+I believe the specification meant Class File, not Class:
+
+"Version x of Class File A is equal to version y of Class File A if and
+only if x is exactly the same as y."
+
+All class files in RAM are read-only, immutable byte arrays. If the
+standard class libraries represent 4MB of class files, it is possible to
+load 4MB of class files once rather than once per process.
+
+As a read-only byte array, a class file can be internalized. In the same
+way that the Java Virtual Machine uses String.intern() to save memory for
+instances of String, a custom class loader for JOS could use Class.intern()
+to save memory for class files.
+
+The JOS version of defineClass() would compare the given class file to
+class files that have already been defined on the system. The kernel
+process would return a system-wide copy of the class file, eliminating
+duplicates of the same exact class.
+
+A kernel/virtual machine could easily save RAM by using a class file cache.
+The class files do not need to remain in RAM permanently, but virtually.
+Class files can be swapped out to disk, swapped in from disk only when they
+are needed.
+
+It does not matter where the class file came from. Even when a class file
+is downloaded across the network, if it exactly matches a class file in the
+class file cache, the existing copy of the class file in the cache will be
+used. The class file cache can be persistent, enabling the
+processor-intensive verification of every class file once, rather than once
+per process.
+
+An instance of java.lang.Class is not cached and is not cache-able. Each
+instance of java.lang.Class depends on its process and class loader.
+
+From my research in BCNI, a new virtual machine is required. A traditional
+JVM cannot save RAM by internalizing all class files. The custom class
+loader does not load class files but loads process-specific instances of
+java.lang.Class. Internalizing instances of java.lang.Class would not save RAM.
+
+
+
+
+From gchii@mindspring.com Fri, 04 Feb 2000 09:59:08 -0500
+Date: Fri, 04 Feb 2000 09:59:08 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Multi-Process Spec
+
+At 09:47 PM 2/3/00 -0500, "Avery J. Regier" <ajregier@earthlink.net> wrote:
+>Comments would be appreciated.
+
+Excellent! You have organized the JOS architecture into
+
+1. per-thread,
+2. per-process, and
+3. system-wide.
+
+Your inclusion of a custom class loader to deal with System.exit() is right
+on target. Your call for a per-process heap is the right thing to do.
+
+If I read "class file" instead of "class" in the definition of when two
+class files are the same, your specification is an excellent place to start.
+
+As you might know, I've been working with package files. A package file
+organizes all class files into a single per-package structure. While each
+class file is available individually to a virtual machine, space for the
+entire package is allocated once. Additional information is inside a
+package file so that it is easy to find a class file without reflecting the
+class file itself.
+
+To take the virtual machine to the next level, I can imagine 4MB standard
+class libraries stored in two dozen package files. Each package file is
+loaded into RAM (or virtual RAM) as an entire package, not one class at a
+time.
+
+Once an entire package is in RAM, individual classes can be defined on a
+per-process basis directly out of the package cache.
+
+When you look at the mechanism of the original defineClass() method, the
+offset and length parameters were there for good reason. An archive with
+class files from many packages could be loaded into RAM in a single
+contiguous block. As individual classes were defined, the offset and length
+were needed to pass class files within the block of RAM.
+
+-----
+
+By redefining the findSystemClass() method slightly in
+java.lang.ClassLoader, it is possible for a virtual machine to create a new
+instance of java.lang.Class from the system-wide class file cache on a
+per-process basis. In other words, the key to multiple processes within a
+virtual machine is the development of a process-aware findSystemClass().
+While a process-agnostic findSystemClass() returns a class from another
+process, a process-aware findSystemClass() will return a class on a
+per-process basis. Since the process has its own heap, each process must
+have its own instance of Runtime and System.
+
+The mechanism to create a new process is much like the java tool. You can
+pass a new classpath to a new process. You can pass new properties to a new
+process. You can pass new main class and parameters to a new process.
+
+We might support a null class loader for a heavy-weight process. The
+virtual machine must determine which heap an object belongs to. An object
+must have both a heap property and a class loader property. Each object
+must have a reference to the per-process heap that created it.
+
+The "new" opcode must respect the process scheme, so that a new object is
+created from the right per-process heap. All of the per-process heaps must
+cooperate with a system-wide memory manager.
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Tue, 8 Feb 2000 16:32:05 +0100
+Date: Tue, 8 Feb 2000 16:32:05 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] CVS Server... connection refused??
+
+What's happened to the CVS Server ?
+My CVS client replies with "connection refused"!
+
+Corrado.
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://osweb.iit.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Tue, 8 Feb 2000 12:11:37 -0500 (EST)
+Date: Tue, 8 Feb 2000 12:11:37 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] CVS Server... connection refused??
+
+> What's happened to the CVS Server ?
+> My CVS client replies with "connection refused"!
+
+	For some reason, the CVS server daemon dies on a fairly regular
+basis and I have to go restart it by hand.  It should be up now.
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Mon, 14 Feb 2000 19:21:26 -0500
+Date: Mon, 14 Feb 2000 19:21:26 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] First Boot!
+
+I am pleased to announce my first boot of JOS. It sure feels good to see
+what JOS looks like. I am using Etherboot, not GRUB. I created a boot disk.
+I use TFTP to download jjos-nbi. I'm using the JOS Binary Distribution 1d.
+
+While there were many obstacles to booting JOS across the network, I worked
+through each one. The last two are most interesting.
+
+1. The bootptab example in the /doc directory does not work on my machine.
+When bf=/tftpboot/jjos-nbi, my JOS machine searches for
+
+/tftpboot/tftpboot/jjos-nbi
+
+I changed the line for my JOS machine from this:
+
+jos:tc=.default:ha=00A024779EF5:ip=10.0.0.5:bf=/tftpboot/jjos-nbi
+
+to this:
+
+jos:tc=.default:ha=00A024779EF5:ip=10.0.0.5:bf=/jjos-nbi
+
+(Of course, I changed the MAC address to match my NIC.)
+
+2. I started bootpd manually. After configuring and re-configuring inetd, I
+have been unable to get inetd to start bootpd for my JOS machine. By
+starting bootpd manually, I can boot my JOS machine.
+
+Thanks to everyone!
+
+
+
+
+From gchii@mindspring.com Mon, 14 Feb 2000 19:54:44 -0500
+Date: Mon, 14 Feb 2000 19:54:44 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Integration
+
+The JOS project should be closer to integration. What is integration? It is
+the point when the jJOS, decaf, jCurses, JEPS, BCNI, and standard class
+libraries come together to run a command line shell. These components must
+be integrated so that I can sit down at my JOS machine and run whatever
+character-based Java program I want.
+
+I think decafJVM::internBuiltInMethod() is a better mechanism than JNI.
+This method eliminates an awkward naming convention. The
+internBuiltInMethod() binds a bytecode method to its machine code.
+
+void decafJVM::internBuiltInMethod(
+    builtInMethod fcnp,
+    char *classname,
+    char *fcnname);
+
+It should be possible to create a corresponding
+decafJVM::internOpcodeMethod(), which binds an opcode to its machine code.
+
+-----
+
+Discussion: What kind of programs need to be written to demonstrate the JOS
+machine?
+
+Many character-based programs are already available in the Smart API. While
+an AWT-compatible component is often used to display the output from
+character-based programs on my computer, a character-based program works
+from a simpler non-bitmapped VGA mode.
+
+With the Alternative Packages sub-project, I have created three classes:
+
+TestException
+TestProgram, and
+TestSuite
+
+A TestException is thrown whenever a test has failed. An optional message
+contains the reason why the test failed.
+
+A TestProgram is an implementation of ConsoleProgram and uses a
+ProgramContext. Parameters can be passed to a TestProgram from a command line.
+
+A TestSuite is an extension of TestProgram. TestSuite is given a list of
+class names (TestPrograms) to run in batch.
+
+By writing test programs, we can run and re-run individual tests as needed
+from a command line. We can get a feel for how much of JOS is finished, how
+much needs more work.
+
+
+
+
+From tmiller@haverford.edu Tue, 15 Feb 2000 00:19:44 -0500 (EST)
+Date: Tue, 15 Feb 2000 00:19:44 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Integration
+
+> I think decafJVM::internBuiltInMethod() is a better mechanism than JNI.
+
+	Unfortunately, it currently requires statically linking all native
+code into the kernel.  (BTW, internBuiltInMethod will almost certainly
+sprout some more parameters: internBuiltInMethod( builtInMethod * fcnp,
+char * classname, char * fcnname, char * fnsig, ClassLoader * cl ) --
+where fnsig is checked for overloaded native calls (which I think is a
+terrible idea, but it's apparently legal) and cl for security, identity,
+and multiprocessing reasons.)
+
+> It should be possible to create a corresponding
+> decafJVM::internOpcodeMethod(), which binds an opcode to its machine code.
+
+	A good idea for a JIT compiler down the road.  Not sure how useful
+it would be for the interpreter; my understanding is that gcc already
+converts the swith-case statement to a table-lookup.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Tue, 15 Feb 2000 02:41:53 -0500 (EST)
+Date: Tue, 15 Feb 2000 02:41:53 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] status report
+
+	The following is what's on my to-do list for the re-write of
+decaf.  Some of the elements on it entail much more work than others, but
+I hope to get things done before Feb 28.
+
+(1) implement Frame::generateFrame()
+(2) implement JavaThread::generateJavaThread()
+(3) implement Threadable (*1)
+(4) implement the scheduler (*2)
+(5) implement 'Operand' == java_word
+(6) Figure out how to handle JavaClass resolution and
+	static initialization as transparently as possible.
+	Then implement it. (*3)
+(7) Finally, the rewrite of interp.cc itself, which I've already
+	begun and will in large part be rather rote.
+
+	I've done about 6000 lines of code so far, with about half of
+that being partially converted lines from interp.cc; this is the count
+without the license text.  This as compares to 15000 in the current decaf
+source, with 4000 lines in interp and 1200 lines in c_pool.cc (with the
+license text).  
+
+-_Quinn
+
+(*1) -- should be an almost exact copy of the current threadable.
+(*2) -- likewise, an almost exact copy of the current scheduler.
+(*3) -- could take a long time; may have to end up with handles.  Possibly
+something nontransparent (e.g., you have to ask for resolution & static
+init) but with the 'raw' (classfile) representation and the resolved,
+initialized representation sharing a single (virtual) interface.  For
+example:
+
+invoke_virtual(... JavaClass * jc ) {
+	jc = jc->resolve();
+	jc = jc->staticInitialize();
+
+	.
+	.
+	.
+	}
+
+	Where RawJavaClass's resolve() implementation does something
+useful, and ResolvedJavaClass's resolve() method just returns 'this'.
+Similarly for staticInitialize().
+
+
+
+
+From Matt.Albrecht@trilogy.com Tue, 15 Feb 2000 18:16:33 -0600
+Date: Tue, 15 Feb 2000 18:16:33 -0600
+From: Matt.Albrecht@trilogy.com Matt.Albrecht@trilogy.com
+Subject: [JOS-Kernel] Bytecode Interpretation
+
+Hey folks.
+
+I'm currently writing a (for now) simple bytecode introspector to discover
+methods and fields in a class without reflection.
+
+I've been following the Java Class File specs, but I've encountered a
+Constant_Info block with a tag of "0" (which isn't documented in the class
+file specs).  I've just assumed that this means an end-of-the-blocks, but
+I've encountered it in one classfile where the count of the constant_info
+block is one more than the location of the "0" block.  What does a 0 tagged
+block mean?
+
+Thanks for all your help.
+
+"I don't think that playing hours of Pac-Man makes me want to become a
+cannibal" (Anonymous)
+-Matt
+
+
+
+
+
+
+From R.Argentini@student.tudelft.nl Wed, 16 Feb 2000 02:06:55 +0100
+Date: Wed, 16 Feb 2000 02:06:55 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] Linked lists, timers and other issues.
+
+Hello all!
+
+While working on JEPS i found that there are some pieces of code that seem
+to pop up everywhere.
+Most prominent examples of this are linked lists of miscelaneous objects
+and timers.
+I was wondering whether there are plans to share implementations of these
+constructs across kernel modules and, if so, how.
+We can of course conjure up solutions in an ad-hoc fashion, but that in my
+opinion is ugly and error prone.
+
+On another note, to integrate JEPS seamlessly into java.net by using
+socketImplFactories, i need to use at least JDK 1.3, as previous version
+have no way of setting the factory for DatagramSockets.
+I have no idea what the timeline for the 1.3 version is, and how long it
+will take for it to go final, but i have a feeling that we are not going to
+get the whole project to use 1.3 in a while.
+This is why i am thinking of sticking with 1.1 for a while, despite of the
+ugly interfacing, at least until the 1.3 is officially released and we
+start moving the whole project.
+If anyone sees a better alternative, please please tell me! ;)
+
+Ranieri.
+
+
+
+From joakim.dahlstedt@appeal.se Wed, 16 Feb 2000 11:34:09 +0100
+Date: Wed, 16 Feb 2000 11:34:09 +0100
+From: Joakim Dahlstedt joakim.dahlstedt@appeal.se
+Subject: [JOS-Kernel] Bytecode Interpretation
+
+> I've been following the Java Class File specs, but I've encountered a
+> Constant_Info block with a tag of "0" (which isn't documented in the class
+> file specs).  I've just assumed that this means an end-of-the-blocks, but
+> I've encountered it in one classfile where the count of the constant_info
+> block is one more than the location of the "0" block.  What does a 0 tagged
+> block mean?
+
+To me this looks like you have missed that doubles and longs uses 2 entries
+in the class pool. Might this be the case ?
+
+Regards,
+ Joakim Dahlstedt
+
+
+
+From gchii@mindspring.com Thu, 17 Feb 2000 09:01:00 -0500
+Date: Thu, 17 Feb 2000 09:01:00 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Bytecode Interpretation
+
+At 06:16 PM 2/15/00 -0600, Matt.Albrecht@trilogy.com wrote:
+>I'm currently writing a (for now) simple bytecode introspector to discover
+>methods and fields in a class without reflection.
+
+Matt,
+
+I am most interested in working together with you on your simple bytecode
+introspection. Simple bytecode introspection is critical. It is the basis
+of a bytecode verifier, for example.
+
+While you call it introspection, I call it pure reflection. Reflection
+comes in two flavors: pure and practical reflection. Practical reflection
+is the kind offered in java.lang and java.lang.reflect. It enables you to
+invoke methods and read/write fields of arbitrary classes.
+
+Pure reflection is a simple bytecode introspector. You can, for example,
+use JDK 1.02 to inspect classes from JDK 1.2.2. Likewise, you can use JDK
+1.2.2 to inspect classes from JDK 1.02. Plus, you can build a simple
+bytecode introspector in C/C++ to discover fields and methods in a class file.
+
+I used pure reflection to generate a list of all native methods for JDK
+1.1.6. It is implemented in my com.realignsoft.reflectionXX packages. It is
+available now, in both runtime and source version. See also Smart API -
+Release 1b.
+
+Most recently, I am having fun working with attributes and opcodes. For
+more information on pure reflection, see also the PureReflection and
+PureReflection III article on JOS Wiki.
+
+I recommend reading the O'Reilly book called "Java Virtual Machine".
+
+>I've been following the Java Class File specs, but I've encountered a
+>Constant_Info block with a tag of "0" (which isn't documented in the class
+>file specs).  I've just assumed that this means an end-of-the-blocks, but
+>I've encountered it in one classfile where the count of the constant_info
+>block is one more than the location of the "0" block.  What does a 0 tagged
+>block mean?
+
+Rest assured, no valid class file uses a "0" tag. "0" is an indication of
+an invalid tag.
+
+The first "feature" of codepool is that length is not the length of
+codepool in a class file. Instead, it is the length of codepool in Sun
+Microsystems' implementation of a virtual machine. The length stored in a
+class file is one too many; it's off by one. At runtime, an entry at index
+0 is a special entry used by Sun Microsystems.
+
+Most likely, you have discovered another "feature" of the codepool. Each
+Constant.LONG and Constant.DOUBLE are counted as if they were two entries
+in codepool. Your code might be reading past the end of the codepool,
+giving you the invalid tag of "0".
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Thu, 17 Feb 2000 18:00:21 +0100
+Date: Thu, 17 Feb 2000 18:00:21 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Bytecode Interpretation
+
+Matt,
+you may take a look at http://osweb.iit.unict.it/CFM/
+Here you can find a Java package, called "Class File Manipulator", which allows
+class file introspection. Unfortunally the documentation is in italian,
+however, I hope you'll find it interesting. If you need also the source code,
+please let me know.
+
+-Corrado
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://osweb.iit.unict.it/ARCA
+======================================================
+
+
+
+
+From Matt.Albrecht@trilogy.com Thu, 17 Feb 2000 09:58:08 -0600
+Date: Thu, 17 Feb 2000 09:58:08 -0600
+From: Matt.Albrecht@trilogy.com Matt.Albrecht@trilogy.com
+Subject: [JOS-Kernel] Bytecode Interpretation
+
+That's probably the case.  I wasn't sure as to the correct interpretation
+of this passage.  I'll try it out when I work on my memory-efficient
+re-write.  Thanks for your help.
+
+"I don't think that playing hours of Pac-Man makes me want to become a
+cannibal" (Anonymous)
+-Matt
+
+
+
+
+                                                                                                                        
+                    Joakim Dahlstedt                                                                                    
+                    <joakim.dahlstedt@        To:     kernel@jos.org                                                    
+                    appeal.se>                cc:                                                                       
+                    Sent by:                  Subject:     Re: [JOS-Kernel] Bytecode Interpretation                     
+                    kernel-admin@jos.o                                                                                  
+                    rg                                                                                                  
+                                                                                                                        
+                                                                                                                        
+                    02/16/2000 04:34                                                                                    
+                    AM                                                                                                  
+                    Please respond to                                                                                   
+                    kernel                                                                                              
+                                                                                                                        
+                                                                                                                        
+
+
+
+> I've been following the Java Class File specs, but I've encountered a
+> Constant_Info block with a tag of "0" (which isn't documented in the
+class
+> file specs).  I've just assumed that this means an end-of-the-blocks, but
+> I've encountered it in one classfile where the count of the constant_info
+> block is one more than the location of the "0" block.  What does a 0
+tagged
+> block mean?
+
+To me this looks like you have missed that doubles and longs uses 2 entries
+in the class pool. Might this be the case ?
+
+Regards,
+ Joakim Dahlstedt
+
+_______________________________________________
+Kernel maillist  -  Kernel@jos.org
+http://jos.org/mailman/listinfo/kernel
+
+
+
+
+
+
+
+
+From gchii@mindspring.com Mon, 21 Feb 2000 14:59:06 -0500
+Date: Mon, 21 Feb 2000 14:59:06 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] ping
+
+The JEPS should implement its own version of ping. The ping program should
+extend BaseConsoleProgram from the Smart API, something like this:
+
+// PingProgram.java
+package org.jos.jeps1a;
+
+import org.jos.gchii.smartprogram2a.BaseConsoleProgram;
+
+public PingProgram
+    extends BaseConsoleProgram {
+  public PingProgram() {
+  }
+  public void run() {
+  :
+  }
+}
+
+
+
+
+From tmiller@haverford.edu Fri, 25 Feb 2000 01:13:27 -0500 (EST)
+Date: Fri, 25 Feb 2000 01:13:27 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf rewrite status update
+
+	First, a question: someone sent me a large patch to the operation
+of jlong a while back, and I wanted it re-written in the same fashion of
+jju64.  (E.g. write class jji64, typedef jlong jji64.)  What happened to
+this?  (This is part of my 'things to do when I go on and clean up
+common/nativecode' list.)
+
+	The current status: another few minutes of work (handling
+getRoots() intelligently) and I'll be able to run class-file parsing
+tests.  (w00h00!)  Assuming they all pass, it shouldn't take more than
+another week to convert interp.cc to the new codebase, at which point (I
+hope!) everything will be done.  I probably will not commit at this point,
+though, and keep the code for another week or so and write in the minimal
+VM-specific native code necessary to support classpath*, and verify that
+the java side of classpath works.  (Given that I have yet to find a build
+of their native libraries that doesn't dump core immediately on loading,
+I'm not too worried about getting the host build ready yet... if anyone
+has had luck with this, please send me build/configuration information.  
+Thanks.)
+	
+	Apologies for being so late, but I've been sick recently and
+sleeping alot to throw it off.
+
+-_Quinn
+	
+* If this requires more than a few minutes of coding/architectural
+changes, I've blown the rewrite, but I'll let you know if it'll delay
+things when I get there.
+
+
+
+
+From gchii@mindspring.com Fri, 25 Feb 2000 07:42:19 -0500
+Date: Fri, 25 Feb 2000 07:42:19 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] make
+
+Unfortunately for me, I have been unable to make jJOS or decaf.
+
+1. I do not have a JDK installed on my Linux box, only gcc.
+
+I do not have all my tools on one machine. It would be more flexible for me
+if the bytecode and machine code were made separately. I can compile the
+bytecode for jos.* packages once and distribute them to others as a runtime
+edition. It does not need to be re-compiled on each machine.
+
+Java is platform-independent. For cross-compiling, I should be able to
+compile the bytecode on any platform and copy it to my jJOS/decaf
+development environment. The Java class library is pre-compiled. I should
+be able to make the bytecode separately from the C/C++ code. For example, I
+should be able to make the bytecode on any machine that has a javac tool.
+
+2. Which version of make?
+
+C/C++ for jJOS/decaf is not platform-independent. For this, I have a C/C++
+compiler installed on my Linux box. Which version of make are you using?
+I'm using GNU make version 3.74. When invoke the make command, I only get a
+syntax error.
+
+$ cd /JJOS/arch/host/nativecode
+$ make
+
+or
+
+$ cd /JJOS/arch/i386/nativecode
+$ make
+
+Can you help?
+
+
+
+
+From tmiller@haverford.edu Fri, 25 Feb 2000 09:37:01 -0500 (EST)
+Date: Fri, 25 Feb 2000 09:37:01 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] make
+
+> 1. I do not have a JDK installed on my Linux box, only gcc.
+
+	To avoid building the JOS Java libraries, change the
+'all: $(TARGET) target_zip' line in arch/host/nativecode/Makefile to
+'all: $(TARGET)'.  'make jjos' from the command line should do the same
+thing.  For the i386 build, changing 'all: $(GRUBIMAGE) $(TARGET_ZIP)' to
+'all: $GRUBIMAGE' and 'make jjos-grub' from the command line should do the
+same thing.
+
+> 2. Which version of make?
+
+	gmake, apparently.  (3.77)  pmake barfs on the 'include'
+lines; try converting them to ".include <file>".  Not sure if gmake will
+buy this.
+
+-_Quinn
+
+
+
+
+From George.Marrows@Smallworld.co.uk Fri, 25 Feb 2000 14:45:46 -0000
+Date: Fri, 25 Feb 2000 14:45:46 -0000
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] make
+
+Gilbert --
+
+2/. If that doesn't solve it, did you download the makefile using CVS on
+Windows? If so, there'll be lots of CR-LFs in there which make doesn't like.
+
+
+-- George
+
+> -----Original Message-----
+> From:	Todd L. Miller [SMTP:tmiller@haverford.edu]
+> Sent:	Friday, February 25, 2000 2:37 PM
+> To:	kernel@jos.org
+> Subject:	Re: [JOS-Kernel] make
+> 
+> > 1. I do not have a JDK installed on my Linux box, only gcc.
+> 
+> 	To avoid building the JOS Java libraries, change the
+> 'all: $(TARGET) target_zip' line in arch/host/nativecode/Makefile to
+> 'all: $(TARGET)'.  'make jjos' from the command line should do the same
+> thing.  For the i386 build, changing 'all: $(GRUBIMAGE) $(TARGET_ZIP)' to
+> 'all: $GRUBIMAGE' and 'make jjos-grub' from the command line should do the
+> same thing.
+> 
+> > 2. Which version of make?
+> 
+> 	gmake, apparently.  (3.77)  pmake barfs on the 'include'
+> lines; try converting them to ".include <file>".  Not sure if gmake will
+> buy this.
+> 
+> -_Quinn
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From hilarycheng@yahoo.com Sat, 26 Feb 2000 09:25:00 +0800
+Date: Sat, 26 Feb 2000 09:25:00 +0800
+From: Hilary Cheng hilarycheng@yahoo.com
+Subject: [JOS-Kernel] decaf rewrite status update
+
+Hi Todd,
+
+    I am sorry about that, I havn't started to write
+the jju64 class. But will u intergrate into it ?
+
+Regards,
+
+Hilary
+
+
+"Todd L. Miller" wrote:
+
+>         First, a question: someone sent me a large patch to the operation
+> of jlong a while back, and I wanted it re-written in the same fashion of
+> jju64.  (E.g. write class jji64, typedef jlong jji64.)  What happened to
+> this?  (This is part of my 'things to do when I go on and clean up
+> common/nativecode' list.)
+>
+>         The current status: another few minutes of work (handling
+> getRoots() intelligently) and I'll be able to run class-file parsing
+> tests.  (w00h00!)  Assuming they all pass, it shouldn't take more than
+> another week to convert interp.cc to the new codebase, at which point (I
+> hope!) everything will be done.  I probably will not commit at this point,
+> though, and keep the code for another week or so and write in the minimal
+> VM-specific native code necessary to support classpath*, and verify that
+> the java side of classpath works.  (Given that I have yet to find a build
+> of their native libraries that doesn't dump core immediately on loading,
+> I'm not too worried about getting the host build ready yet... if anyone
+> has had luck with this, please send me build/configuration information.
+> Thanks.)
+>
+>         Apologies for being so late, but I've been sick recently and
+> sleeping alot to throw it off.
+>
+> -_Quinn
+>
+> * If this requires more than a few minutes of coding/architectural
+> changes, I've blown the rewrite, but I'll let you know if it'll delay
+> things when I get there.
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+
+
+From tmiller@haverford.edu Sat, 26 Feb 2000 17:10:29 -0500 (EST)
+Date: Sat, 26 Feb 2000 17:10:29 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf rewrite status update
+
+>     I am sorry about that, I havn't started to write
+> the jju64 class. But will u intergrate into it ?
+
+	Would be the jji64 class ( we have the unsigned version ), but
+yes, it would be very easy to integrate -- jlong right now == jju64, so
+I'd only have to change the typedef to make it a jji64.  (If your jji64
+class provides the same operations, that's the only line of code that
+would be changed, aside from the #include "jji64.h" (or
+whatever).)  Thanks.
+
+BTW -- I'm in the middle of squashing bugs in the (sort-of) new scheduler
+right now, so I'm getting very close to done.  (I hope!)  I haven't done
+extensive testing on the classfile parsing, but since the actual parsing
+algorithm is virtually identical, I'm not too worried about it.  
+interp.cc remains to rewrite (closer to port, actually).  I've decided on
+taking a simple but (I hope) effective approach to handling resolution,
+where you always ask the potentially unresolved object for something (e.g.
+the method reference's class) expecting it to be unresolved (e.g. passing
+it a constant pool/class loader/etc) where the particular C++ class
+representing that object can cache that resolution or not, as it sees fit.  
+Basically, this moves the resolution logic from the interpreter to the
+objects, where it belongs.  Storage efficiency could be gained by unioning
+the resolved and unresolved data sets, but I'm not certain this would be
+wise, looking at potential problems in sharing class definitions across
+classloaders.  We'll see.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Sat, 26 Feb 2000 17:16:44 -0500 (EST)
+Date: Sat, 26 Feb 2000 17:16:44 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf rewrite status update
+
+	Something I forgot to mention -- I'm going to try and collect the
+contributors/authors for common/decaf into a single file there and add a
+copy of the license so that the headers in the source are smaller.  I'm
+betting many of you have contributed and not been listed in the
+'contributors' field of the current headers, especially those of you who
+sent in patches before you got write access to the CVS.  (For which
+oversight I apologise.)  So if you care about it, please take a browse
+through the common/decaf source and let me know to which files you've
+contributed, and preferably what/where.  Thanks.
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Sat, 26 Feb 2000 19:11:32 -0500
+Date: Sat, 26 Feb 2000 19:11:32 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] decaf rewrite status update
+
+At 05:10 PM 2/26/00 -0500, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>I've decided on
+>taking a simple but (I hope) effective approach to handling resolution,
+>where you always ask the potentially unresolved object for something (e.g.
+>the method reference's class) expecting it to be unresolved (e.g. passing
+>it a constant pool/class loader/etc) where the particular C++ class
+>representing that object can cache that resolution or not, as it sees fit.  
+>Basically, this moves the resolution logic from the interpreter to the
+>objects, where it belongs.
+
+Yes, I agree. I get tongue-tied trying to talk about it. Resolution goes
+into the C++ class representing java.lang.Class. There are at least three
+kinds of resolving.
+
+When speaking about a Java class, we could say java.lang.Class. What is
+java.lang.Class really? It is a byte array.
+
+There is a C++ class that provides the behavior for java.lang.Class. What
+is it called? It is nativeclass, right? There are many instances of
+nativeclass, one for each Java class for each process/class loader.
+
+The resolution of a class, field and method should be built into
+nativeclass. I thought nativeclass might become completely encapsulated, to
+resolve itself when used. The resolveClass() method must be called at the
+beginning of each method in nativeclass. Or, like you said, resolveClass()
+must be called each time before calling a method in nativeclass.
+
+Resolving a class might throw a java.lang.ClassNotFoundException.
+
+Internal to decaf, there must be a central collection of all bytecode.
+Bytecode can be intern'd to eliminate duplicate copies of identical
+bytecode. If a constructor to nativeclass accepts a byte array, the
+constructor can automatically intern the byte array.
+
+class nativeclass {
+  public:
+    nativeclass( const void *buffer, size_t size ) {
+      payload = internBytecode( buffer, size );
+    }
+  :
+  private:
+    const Bytecode *payload;
+};
+
+1. Class reference resolution.
+
+At first, a class is just a byte array. The byte array itself is read-only,
+immutable, and share-able by all class loaders everywhere. It sounds like
+the byte array should be intern'd.
+
+class Bytecode {
+  public:
+    Bytecode( const void *buffer, size_t size );
+    virtual ~Bytecode();
+
+    virtual Access getAccess() const;
+    virtual CharBuffer getThisClassSpec() const;
+    virtual CharBuffer getSuperClassSpec() const;
+    virtual int getInterfaceCount() const;
+    virtual CharBuffer getInterfaceSpec( int index ) const;
+    virtual int getFieldCount() const;
+    virtual Access getFieldAccess( int index ) const;
+    virtual CharBuffer getFieldName( int index ) const;
+    virtual int getMethodCount() const;
+    virtual Access getMethodAccess( int index ) const;
+    virtual CharBuffer getMethodName( int index ) const;
+    virtual CharBuffer getMethodDescriptor( int index ) const;
+    virtual CharBuffer getMethodAttribute( int index ) const;
+  :
+  private char *payload;
+  private size_t size;
+};
+
+The Bytecode class holds a byte array. Once an instance of Bytecode is
+constructed, it cannot be modified. It is immutable. The byte array comes
+from a class file (like java/lang/Object.class). Through its well-defined
+methods, the Bytecode class can tell your interpreter anything you want to
+know about a class.
+
+All of this has been prototyped in pure reflection
+(com.realignsoft.reflection2b) and is available from Smart API - Release 1b.
+
+Whenever a class is used, the class must first determine if it has been
+resolved. If a class has not been resolved, it must resolve itself before
+performing a request. At the class level, a class is resolved by looking
+through its codepool for other classes. Each class entry in codepool is
+converted to a pointer to an instance of a C++ object representing a class.
+
+All classes in codepool are resolved at the same time. They are resolved
+the first time the class is used. A class knows that it has not been used
+when the class lookup table is empty (null).
+
+2. Method reference resolution.
+
+Whenever a method is used, the class must determine if it has ever been
+resolved. Has it been used before? A method is resolved by looking up the
+native class and looking for its method index.
+
+Each method in codepool has a corresponding data structure:
+
+struct MethodReference {
+  NativeClass *nativeClass;
+  int methodID;
+};
+
+A class has a list of method references. When a method is invoked again,
+the method reference is non-null and points directly to the method (bytecode).
+
+3. Field reference resolution.
+
+Fields are like methods. Whenever a field is used, the class must determine
+if it has been resolved. Has it been used before? A field is resolved by
+looking up the native class and looking for its field index.
+
+Each field in codepool has a corresponding data structure:
+
+struct FieldReference {
+  NativeClass *nativeClass;
+  int fieldID;
+};
+
+A class has a list of field references. When a field is used again, the
+field reference is non-null and points directly to the right place (a
+native field).
+
+
+
+
+From gchii@mindspring.com Sun, 27 Feb 2000 11:18:30 -0500
+Date: Sun, 27 Feb 2000 11:18:30 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Shared library
+
+I'm working on the ERIC project. ERIC is for Execute, Run, Invoke and Call.
+It replaces the java/javaw/jre/jrew tools used to launch a virtual machine.
+ERIC already works on Microsoft Windows. I'm porting it to Linux.
+
+I would like ERIC for Linux to launch the decaf virtual machine. I don't
+have another virtual machine that works on Linux. I don't need JNI to
+launch decaf. Since decaf defines a decaf_main() method, it shouldn't be
+difficult for ERIC to launch decaf. All I need is for decaf to be compiled
+into a shared library, like "libdecaf.so.XXX".
+
+ERIC is written in C/C++. Some of the portable classes might be useful to
+jJOS and decaf. For example, SharedLibrary is a platform-independent C++
+interface. It is a interface for shared librarys, both dynamic shared
+libraries on Linux and dynamic link libraries on Microsoft Windows. This
+C++ class might be useful when decaf loads machine code for native methods
+dynamically.
+
+  void example() {
+    SharedLibrary *lib = createSharedLibrary( "libdecaf.so.XXX" );
+    if ( !lib ) {
+      return;
+    }
+    decaf_main = (Tdecaf_main) lib.getMethod( "decaf_main" );
+    if ( !decaf_main ) {
+      delete lib;
+      return;
+    }
+    decaf_main( argc, argv, kernel );
+    delete lib;
+  }
+
+When decaf runs in "host" mode, it can load any Linux shared library. The
+mechanism for linking bytecode and machine code can be demonstrated in
+"host" mode long before similar support is available in "i386" mode.
+
+
+
+
+From gchii@mindspring.com Mon, 28 Feb 2000 19:53:20 -0500
+Date: Mon, 28 Feb 2000 19:53:20 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Pure virtual classes
+
+What do you think? Are pure virtual classes a good idea for maintaining
+platform independence in a class library?
+
+Linux uses C and header files to maintain platform independence. It uses
+#ifdef sparingly. Platform dependent subroutines are pushed out into their
+own directories. All the platform-specific subroutines for a platform are
+in a directory together.
+
+When platform-independent code calls a subroutine declared in a header, it
+doesn't matter (much) if the implementation is platform-independent or
+platform-specific. The linker takes care of linking in the right machine
+code for a platform.
+
+When dealing with classes, you can quickly run into trouble if you define
+fields in a platform-independent class. The fields for one platform might
+not be suitable for another. Pure virtual classes are like the Java-style
+interface. The define the behavior a class is supposed to have; but, it
+does not allocate any fields.
+
+While it might look like more work to define two classes for common objects
+instead of one, it is less likely that common objects will need to be
+revised in the future to accommodate a new platform.
+
+
+
+
+From tmiller@haverford.edu Mon, 28 Feb 2000 23:31:26 -0500 (EST)
+Date: Mon, 28 Feb 2000 23:31:26 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Pure virtual classes
+
+	I use pure virtual classes as if they were Java interfaces.  This
+is one technique for maintaining platform independence -- where
+platform-specific code is abstracted out the same way a particular
+implementation of and algorithm (as represented by a class) is abstracted
+out by its public methods.  For this reason -- that the calling code
+doesn't know and doesn't care how the work is done -- I tend to code such
+that platform-specific code can be #ifdef'd or subclasses as is
+appropriate.  For instance -- the code for converting java-byte-order
+integers to host order is enscapulated away into JavaWord.  In this case I
+believe it is more appropriate for the code to be #ifdef'd than
+virtualized, as (a) the host byte order is not going to change while the
+program is running and (b) with a class used as often as JavaWord,
+overhead is an important consideration.  Furthermore, host order
+conversion does not require any significant alteration (none at all, in
+fact, in the code, because 'int' is as apropos to the machine, etc) to the
+data structures in JavaWord, so virtualizing JavaWord would not deliver
+any implementation elegance.
+
+	On the other hand, it may make more sense to virtualize something
+like Scheduler, where algorithmic changes OR architecture changes could
+cause a modification of the data.  I'm not doing now because none of
+Scheduler's data is public.  If I'd provided accessor functions, I might
+be a bit more worried (e.g. is the data to which I'm providing access
+universal accross every possible implementation?), but I didn't -- add and
+removeThread() are effectively a part of the definition of a scheduler, so
+I feel no qualms assuming the scheduler will keep track of its threads
+somehow :)  However -- if at any time any of my code ought to be
+virtualized, and you can convince me so*, I'll be more than happy to take
+a replacement, which ought to be able to drop in with only the most
+minimal of changes.  (Virtualize the class, move its current
+implementation to a default child, add whatever prompted the
+virtualization somewhere else; handle picking between the two in the
+virtual class. (e.g. Frame::generateFrame(), or any of the points where I
+use generate*()** functions, I expect that there may be more than one way
+to do things.  If I incorrectly did not expect this for some other class,
+the extent of the external changes should be converting a 'new Class()' to
+a 'Class::generateClass()' on the right-hand sides.)  Abstraction is my
+friend.***
+
+-_Quinn
+
+*: I can't think of an example off-hand where hardware requirements force
+wildly divergent algorithms/data structures AND that hardware isn't used
+often enough that it's worth the overhead to virtualize.  (Or, for that
+matter, that it'll be changing during run-time, unless our target
+architecture(s) suddenly move into the HA range.)
+
+**: Which, I don't believe, are in the CVS tree quite yet -- I've adopted
+them in my rewrite of decaf.
+
+***: Anecdotal proof of this: Having implemented everything but (I
+thought) the interpreter and the interrupt-notification part of the
+scheduler, I discovered that I had so succesfully abstracted certain parts
+of the problem out of the way that I had inadvertently neglected to
+implement JavaObject!  I think most of time estimates will come in
+correctly because writing the new code the way I am makes it really fast
+to get that code done, but spawns two or three new functions to implement,
+and so on -- the net amount of work remains the same, but chunks of it are
+in different places than I'd thought they'd be.****
+
+****: That led me to following observation: Following the maxim to write
+it once to get it done and again to get it done well (or etc) works (for
+me, anyway) because the first part builds up and the second builds down --
+I start working on the particulars of a given algorithm or data structure
+without really being able to see how it fits in, generally, which leads to
+grotty code.  The second time you can write things so that they make sense
+overall and drop in the algorithms you developed the first time in the
+'leaves' of the design -- frequently replacing commented blocks of code
+with a function call whose name derives from the comment, as so:
+
+/* This gets the java object which will be running the interrupt handler */
+.
+.
+.
+/* now, interruptHandler is set correctly. */
+
+becomes:
+
+JavaObject * interruptHandler = some_abstraction->getInterruptHandler( interruptNumber)
+
+that is, moving that particular algorithm which had initially thought
+belonged where it was used to where it 'belongs.' Then, of course, you get
+to write the abstraction and the getInterruptHandler() code, but that
+shouldn't be too hard because you can almost cargo-cult program it from
+your first try. :)  But what it does, and what it's supposed to do, is
+make the algorithms and data structures more elegant.
+
+Hope that wasn't too --pendantic for you. :)
+
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Tue, 29 Feb 2000 16:36:31 +0100
+Date: Tue, 29 Feb 2000 16:36:31 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] dos-mode makefiles
+
+Hi all,
+I've downloaded the latest JJOS CVS shapshop from JOS web site (Todd, the CVS
+server does not still work!) and I've tried to compile it, but I've found that
+*all* the text files, including Makefiles, are stored in DOS mode (with CR+LF)
+rather than Unix mode (with only LF). As the Linux "make" program does not like
+makefiles in DOS mode, I had to convert all the makefiles. This is quite
+burdensome so I would like to ask to Todd, Gilbert, etc., if they could fix
+this problem in the future snapshot of JJOS.
+
+Bye,
+Corrado.
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://osweb.iit.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Tue, 29 Feb 2000 10:40:21 -0500 (EST)
+Date: Tue, 29 Feb 2000 10:40:21 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] dos-mode makefiles
+
+	I don't have anything to do with what goes on on the website, but
+I tried fixing the CVS again. 
+
+-_Quinn
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Tue, 29 Feb 2000 17:19:28 +0100
+Date: Tue, 29 Feb 2000 17:19:28 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] dos-mode makefiles
+
+Right Todd!
+the CVS server is now OK and JJOS compiles  :)
+
+-Corrado
+
+On Tue, 29 Feb 2000, you wrote:
+> I don't have anything to do with what goes on on the website, but
+> I tried fixing the CVS again. 
+> 
+> -_Quinn
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://osweb.iit.unict.it/ARCA
+======================================================
+
+
+
+
+From gchii@mindspring.com Tue, 29 Feb 2000 11:41:33 -0500
+Date: Tue, 29 Feb 2000 11:41:33 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] dos-mode makefiles
+
+At 04:36 PM 2/29/00 +0100, Corrado Santoro <Corrado.Santoro@IIT.UNICT.IT>
+wrote:
+>I've downloaded the latest JJOS CVS shapshop from JOS web site (Todd, the CVS
+>server does not still work!) and I've tried to compile it, but I've found
+that
+>*all* the text files, including Makefiles, are stored in DOS mode (with
+CR+LF)
+>rather than Unix mode (with only LF). As the Linux "make" program does not
+>like makefiles in DOS mode, I had to convert all the makefiles. This is quite
+>burdensome so I would like to ask to Todd, Gilbert, etc., if they could fix
+>this problem in the future snapshot of JJOS.
+
+Thanks, Corrado! I volunteered to make CVS snapshots. Periodic snapshots
+are more friendly than anonymous CVS. Members can pick from a short list of
+snapshots, independent from the day-to-day activity of CVS. While our HTTP
+service is up most the time, we've experienced downtime with our CVS service.
+
+I have the CR/LF problem, too. I have been unable to make jJOS or decaf
+from my snapshot of CVS. I am using jCVS, a pure Java application, to
+download files from anonymous CVS. jCVS must assume somewhere that I'm
+downloading to Windows. In fact, I'm using my Windows box only as a gateway
+to the Internet.
+
+1. Can I re-configure jCVS to download properly? This illustrates a
+widespread problem with platform dependence in Java. If jCVS depends on
+system properties to determine UNIX or DOS mode, it is *not* platform
+independent. UNIX or DOS mode should be part of jCVS configuration. I
+should be able to use Windows to download from a CVS service to Linux.
+
+2. The snapshot should *always* be distributed in UNIX mode. Is there a
+generic tool for converting text files from LF to CR/LF? and from CR/LF to
+LF? If we ship the tool with the snapshot, a few might convert from LF to
+CF/LF.
+
+3. When it can't handle both LF and CR/LF, the tool is broken. Maybe we
+need to find a better version of make, one that is platform-independent.
+Compare this to your HTML browser.
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Tue, 29 Feb 2000 18:21:50 +0100
+Date: Tue, 29 Feb 2000 18:21:50 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] dos-mode makefiles
+
+Gilbert....
+
+On Tue, 29 Feb 2000, you wrote:
+> 1. Can I re-configure jCVS to download properly? This illustrates a
+> widespread problem with platform dependence in Java. If jCVS depends on
+> system properties to determine UNIX or DOS mode, it is *not* platform
+> independent. UNIX or DOS mode should be part of jCVS configuration. I
+> should be able to use Windows to download from a CVS service to Linux.
+
+I'm sorry, but I don't know jCVS so I cannot help you.
+
+> 2. The snapshot should *always* be distributed in UNIX mode. Is there a
+> generic tool for converting text files from LF to CR/LF? and from CR/LF to
+> LF? If we ship the tool with the snapshot, a few might convert from LF to
+> CF/LF.
+I do this using the Linux/Unix "vi" editor (however there exists a version of
+"vi" for Win32):
+
+vi <filename>
+:set notextmode
+:wq
+
+On the other hand, to use CR+LF:
+
+vi <filename>
+:set textmode
+:wq
+
+> 
+> 3. When it can't handle both LF and CR/LF, the tool is broken. Maybe we
+> need to find a better version of make, one that is platform-independent.
+...uhmmmm, the "make" utility is a part of the Linux/Unix distributions so I
+think that this is impossible. But if *ALL* the file in the CVS snapshot are
+text file, it is possible to build a Unix script which makes the translation.
+
+-Corrado
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://osweb.iit.unict.it/ARCA
+======================================================
+
+
+
+

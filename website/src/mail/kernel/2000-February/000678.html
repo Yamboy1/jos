@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Shared library</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000673.html">
+   <LINK REL="Next" HREF="000679.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Shared library</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Shared library">gchii@mindspring.com</A><BR>
+    <I>Sun, 27 Feb 2000 11:18:30 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000673.html">[JOS-Kernel] make</A></li>
+        <LI> Next message: <A HREF="000679.html">[JOS-Kernel] Pure virtual classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#678">[ date ]</a>
+              <a href="thread.html#678">[ thread ]</a>
+              <a href="subject.html#678">[ subject ]</a>
+              <a href="author.html#678">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I'm working on the ERIC project. ERIC is for Execute, Run, Invoke and Call.
+It replaces the java/javaw/jre/jrew tools used to launch a virtual machine.
+ERIC already works on Microsoft Windows. I'm porting it to Linux.
+
+I would like ERIC for Linux to launch the decaf virtual machine. I don't
+have another virtual machine that works on Linux. I don't need JNI to
+launch decaf. Since decaf defines a decaf_main() method, it shouldn't be
+difficult for ERIC to launch decaf. All I need is for decaf to be compiled
+into a shared library, like &quot;libdecaf.so.XXX&quot;.
+
+ERIC is written in C/C++. Some of the portable classes might be useful to
+jJOS and decaf. For example, SharedLibrary is a platform-independent C++
+interface. It is a interface for shared librarys, both dynamic shared
+libraries on Linux and dynamic link libraries on Microsoft Windows. This
+C++ class might be useful when decaf loads machine code for native methods
+dynamically.
+
+  void example() {
+    SharedLibrary *lib = createSharedLibrary( &quot;libdecaf.so.XXX&quot; );
+    if ( !lib ) {
+      return;
+    }
+    decaf_main = (Tdecaf_main) lib.getMethod( &quot;decaf_main&quot; );
+    if ( !decaf_main ) {
+      delete lib;
+      return;
+    }
+    decaf_main( argc, argv, kernel );
+    delete lib;
+  }
+
+When decaf runs in &quot;host&quot; mode, it can load any Linux shared library. The
+mechanism for linking bytecode and machine code can be demonstrated in
+&quot;host&quot; mode long before similar support is available in &quot;i386&quot; mode.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000673.html">[JOS-Kernel] make</A></li>
+	<LI> Next message: <A HREF="000679.html">[JOS-Kernel] Pure virtual classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#678">[ date ]</a>
+              <a href="thread.html#678">[ thread ]</a>
+              <a href="subject.html#678">[ subject ]</a>
+              <a href="author.html#678">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

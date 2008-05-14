@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [zerich] C header file for dl..()</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000695.html">
+   <LINK REL="Next" HREF="000709.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [zerich] C header file for dl..()</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [zerich] C header file for dl..()">gchii@mindspring.com</A><BR>
+    <I>Mon, 06 Mar 2000 09:45:53 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000695.html">[JOS-Kernel] [zerich] C header file for dl..()</A></li>
+        <LI> Next message: <A HREF="000709.html">[JOS-Kernel] [zerich] C header file for dl..()</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#699">[ date ]</a>
+              <a href="thread.html#699">[ thread ]</a>
+              <a href="subject.html#699">[ subject ]</a>
+              <a href="author.html#699">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 09:40 PM 3/5/00 -0500, &quot;Alain Magloire&quot; &lt;<A HREF="mailto:alain@qnx.com">alain@qnx.com</A>&gt; wrote:
+&gt;<i>Bonjour
+</I>
+Thanks for your response. If I had to guess, there are differences among
+Linux distributions. Neither my Slackware nor my SuSE distribution have an
+include file called dlfcn.h.
+
+At the moment of installation, I did not anticipate my need for dlfcn.h.
+From your description, it must an installation problem. I did not install
+the dl package, nor any of its dependencies. Could that be it?
+
+&gt;&gt;<i> Functions for loading shared libraries dynamically are implemented in
+</I>&gt;&gt;<i> libdl.so. There is a header file for this library. What is it?
+</I>&gt;&gt;<i> 
+</I>&gt;<i>
+</I>&gt;<i>#include &lt;dlfcn.h&gt;
+</I>
+Thanks. Since you definitely know the name of the include file, I know now
+that I definitely do not have it and can't find it.
+
+&gt;&gt;<i> But not on my Linux distribution! I search for all files on my computer
+</I>&gt;&gt;<i> that start with &quot;dl&quot; and end with &quot;.h&quot; and I can find none.
+</I>&gt;<i>
+</I>&gt;<i>/usr/include/dlfcn.h
+</I>
+Sorry, I have no /usr/include/dlfcn.h on my Linux machines. It is
+definitely missing. I searched for everything that starts with &quot;dl&quot;,
+something like this:
+
+$ find -name dl*.h
+
+If the find program cannot find it, it must not be there.
+
+&gt;&gt;<i> I looked up these functions on the Linux documentation project. While it
+</I>&gt;&gt;<i> gives the signatures for dlopen(), dlclose(), dlerror() and dlsym(), it
+</I>&gt;&gt;<i> does not give the values of RTLD_.. enumeration (like RTLD_LAZY) that's
+</I>&gt;&gt;<i> passed to dlopen().
+</I>&gt;<i>
+</I>&gt;<i>RTLD_* are not defines directly in dlfcn for GNU lib C, since glibc
+</I>&gt;<i>is use for many different operating systems and arch (i.e. GNU/Linux,
+</I>&gt;<i>GNU/Hurd, etc ..) the dependent parts are included, for example in
+</I>&gt;<i>bits/*.h are asm/*.h etc .. but in you case you should never include
+</I>&gt;<i>them directly but use
+</I>&gt;<i>#include &lt;dlfcnt.h&gt;
+</I>&gt;<i>
+</I>&gt;<i>Look at the man pages or info files for more, this should have been
+</I>&gt;<i>your first stop.  You may wine about info and all but how hard could
+</I>&gt;<i>it have been to do `man dlopen' ??
+</I>
+I looked on the man pages on-line at the Linux Documentation Project. I
+saved the link in the SharedLibraryOnLinux article on JOS Wiki. It helped a
+little. I bought a book. It helped a little, too. But I am still unable to
+load shared libraries dynamically.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000695.html">[JOS-Kernel] [zerich] C header file for dl..()</A></li>
+	<LI> Next message: <A HREF="000709.html">[JOS-Kernel] [zerich] C header file for dl..()</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#699">[ date ]</a>
+              <a href="thread.html#699">[ thread ]</a>
+              <a href="subject.html#699">[ subject ]</a>
+              <a href="author.html#699">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

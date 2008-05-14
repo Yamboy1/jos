@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] How to crash JOS.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tullmann%40cs.utah.edu">
+   <LINK REL="Previous"  HREF="000122.html">
+   <LINK REL="Next" HREF="000124.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] How to crash JOS.</H1>
+    <B>Patrick Tullmann</B> 
+    <A HREF="mailto:tullmann%40cs.utah.edu"
+       TITLE="[JOS-Kernel] How to crash JOS.">tullmann@cs.utah.edu</A><BR>
+    <I>Thu, 8 Jul 1999 09:29:45 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000122.html">[JOS-Kernel] How to crash JOS.</A></li>
+        <LI> Next message: <A HREF="000124.html">[JOS-Kernel] How to crash JOS.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#123">[ date ]</a>
+              <a href="thread.html#123">[ thread ]</a>
+              <a href="subject.html#123">[ subject ]</a>
+              <a href="author.html#123">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ryan Heise wrote:
+&gt;<i> Important read for jos kernel developers:
+</I>&gt;<i> 
+</I>&gt;<i> 	<A HREF="http://www.research.att.com/~vj/bug.html">http://www.research.att.com/~vj/bug.html</A>
+</I>&gt;<i> 
+</I>&gt;<i> It appears as though it is possible for _verified_ code to crash a
+</I>&gt;<i> JVM by spoofing one class with another.
+</I>
+This is a &quot;bug&quot; in the ClassLoader spec, and has been fixed in more
+JDK 1.2 (I think).  There's a paper describing a solution by
+Gilad Bracha (from Sun) at
+
+	<A HREF="http://java.sun.com/people/gbracha/classloaders.ps">http://java.sun.com/people/gbracha/classloaders.ps</A>
+
+This is a good description of ClassLoaders in any event, and probably
+worth a read.
+
+&gt;<i> Interestingly, the verifier is only executed on
+</I>&gt;<i> applets. Applications will not be verified unless you explicitly ask
+</I>&gt;<i> for this to happen. This is because loading a class takes
+</I>&gt;<i> significantly longer if it needs to be verified.
+</I>
+Its interesting to note that in both GCJ and Kaffe the verifier is
+always run over code because the compilers in both systems requires
+the flow-control graphs the verifier generates.  (In Kaffe's case this
+doesn't mean much as the verfier doesn't do any real work other than
+generate the flow-control graph... but as I understand it, GCJ
+includes a starting-to-work verifier.)
+
+&gt;<i> ... we must verify all code that is to be executed, 
+</I>
+That, or you trust the code.  For example, you shouldn't have to
+verify the core kernel classes.  Or, you can decouple the verifier and
+sign the code (or trust the delivery mechanism).  See UW's Kimera
+project which breaks a JVM into pieces and spreads them around the
+network: <A HREF="http://kimera.cs.washington.edu/.">http://kimera.cs.washington.edu/.</A>
+
+-Pat
+
+----- ----- ---- ---  ---  --   -    -      -         -               -
+Pat Tullmann                                       <A HREF="mailto:tullmann@cs.utah.edu">tullmann@cs.utah.edu</A>
+		   ${HOME} is where the .emacs is.
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000122.html">[JOS-Kernel] How to crash JOS.</A></li>
+	<LI> Next message: <A HREF="000124.html">[JOS-Kernel] How to crash JOS.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#123">[ date ]</a>
+              <a href="thread.html#123">[ thread ]</a>
+              <a href="subject.html#123">[ subject ]</a>
+              <a href="author.html#123">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

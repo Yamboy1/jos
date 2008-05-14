@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: native console &amp; bug report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000578.html">
+   <LINK REL="Next" HREF="000579.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: native console &amp; bug report</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Re: native console &amp; bug report">tmiller@haverford.edu</A><BR>
+    <I>Tue, 4 Jan 2000 16:17:35 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000578.html">[JOS-Kernel] Re: native console &amp; bug report</A></li>
+        <LI> Next message: <A HREF="000579.html">[JOS-Kernel] About BootLoader of the JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#583">[ date ]</a>
+              <a href="thread.html#583">[ thread ]</a>
+              <a href="subject.html#583">[ subject ]</a>
+              <a href="author.html#583">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I think that the object model for the consoles is fine for the consoles
+</I>&gt;<i> themselves, but as soon as we try to add real shells to them, it won't work. 
+</I>&gt;<i> There isn't enough flexibility there.  I'll see what I can come up with as I
+</I>&gt;<i> continue to work with it.
+</I>
+	Not enough flexibility?  setChar() would seem to allow you to
+build whatever flexibility you might want into a wrapper (text
+output-wise).  w.r.t. unix-style piping, a consoleOutputStream class
+should be fairly easy to generate, i.e.:
+
+public class consoleOutputStream extends java.io.OutputStream {
+	proctected console c;	
+
+	public consoleInputStream( console c ) {
+		this.c = c;
+		}
+
+	public void write( int b ) {
+		c.putChar( (char)b );
+		}
+	}
+
+and consoleInputStream only slightly more difficult:
+
+public class consoleInputStream extends java.io.InputStream implements KeyListener {
+	protected keyboard k;
+	protected Queue q;
+
+	public consoleInputStream( keyboard k ) {
+		k.addKeyListener( this );
+		}
+
+	public int available() { ... }
+	public int read() {
+		/* Queue's dequeue blocks, waiting
+		   for a character from keyTyped() */ 
+		q.dequeue();
+		}
+
+	... keyTyped( ... ) { ...
+		q.enqueue(...);
+		}
+
+	}
+
+	Ignoring login for the moment, a shell would be started like so:
+
+keyboard shellK = jos.system.keyboard.getKeyboard();
+console shellC = jos.consoled.getCurrentConsole(); /* has matching setCC,
+	which also does not exist at the present time */
+
+shell theShell = new some_shell( shellK, shellC );
+theShell.start();
+
+/* end of init */
+
+	or, if we're writing the shell as an application (e.g. static
+main()), which we should be:
+
+ClassLoader cl = jos.system.proc.getCleanClassLoader();
+Class jlSystem = cl.getClass( &quot;java.lang.System&quot; );
+
+jlSystem.setIn( shellK );
+jlSystem.setOut( shellC );
+jlSystem.setErr( shellC );
+
+jos.system.proc.startProc( cl, cl.getClass( &quot;org.jos.app.shell&quot; ) );
+
+/* end of init */
+
+	-- noting, of course, that jos.system.proc doesn't exist quite yet
+:<i>)  (Which also means that the interface sketched out above will probably
+</I>change :))
+
+	In either case, the shell could completely ignore the streams
+and go to a fully event-based system, where it subscribes on its own to
+the keyboard.  (Where an xterminal would add, before startProc():
+
+jsK = cl.getClass( &quot;jos.system.keyboard&quot; );
+jsK.setKeyboard( myXKeyboard );
+
+jsCD = cl.getClass( &quot;jos.system.consoled&quot; );
+jsCD.setCurrentConsole( this );
+
+so that the correct keyboard/console would be found by the shell.  As an
+aside, the shell could provide its own consoled whose console drivers just
+use get/setChar on a given othe console and their own buffer -- this would
+be suitable generic for any kind of console.  Further thoughts: it might
+be worthwhile to move the currentConsole question out of consoled, and/or
+extend it in two ways: first, optionally ignore the Fx keys (and/or remap
+them), for single console situations; second, provide a class from which
+to generate new consoles in init() and/or provide a method
+init(console[]), where the initializer provides the desired mix of
+consoles.)
+
+	(BTW, aviery, do you have CVS commit privs?)
+
+-_Quinn
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000578.html">[JOS-Kernel] Re: native console &amp; bug report</A></li>
+	<LI> Next message: <A HREF="000579.html">[JOS-Kernel] About BootLoader of the JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#583">[ date ]</a>
+              <a href="thread.html#583">[ thread ]</a>
+              <a href="subject.html#583">[ subject ]</a>
+              <a href="author.html#583">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

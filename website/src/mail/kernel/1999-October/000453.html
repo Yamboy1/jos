@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Static members and process model.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT">
+   <LINK REL="Previous"  HREF="000452.html">
+   <LINK REL="Next" HREF="000454.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Static members and process model.</H1>
+    <B>Corrado Santoro</B> 
+    <A HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT"
+       TITLE="[JOS-Kernel] Static members and process model.">Corrado.Santoro@IIT.UNICT.IT</A><BR>
+    <I>Fri, 29 Oct 1999 18:15:21 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000452.html">[JOS-Kernel] Static members and process model.</A></li>
+        <LI> Next message: <A HREF="000454.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#453">[ date ]</a>
+              <a href="thread.html#453">[ thread ]</a>
+              <a href="subject.html#453">[ subject ]</a>
+              <a href="author.html#453">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>OK... OK....
+so each new process has its own classloader (which is part of the context of
+the process).
+Given this hints, I'll try to design a structure for console interface. Any
+other suggestion ?
+
+Corrado.
+
+On Fri, 29 Oct 1999, you wrote:
+&gt;<i> Running the bytecode, the interpreter will come across the
+</I>&gt;<i> invokestatic, which has a symbolic reference to 'java.lang.System'.  When
+</I>&gt;<i> it asks the classloader for 'java.lang.System', what comes back?  The key
+</I>&gt;<i> is this: whatever we want to come back.  The java.lang.System static
+</I>&gt;<i> class, in this case, /as modified by the calling process/ -- that is, as
+</I>&gt;<i> the calling process has set /the child's copy/ of java.lang.System.
+</I>&gt;<i> Information included in setting up the child's process would be the
+</I>&gt;<i> console/stream that java.lang.System.* should point at.
+</I>&gt;<i> 
+</I>&gt;<i> 	Basically, support for disjoint (sets with nothing in common)
+</I>&gt;<i> classloaders allows us to have any number of copies of java.lang.System
+</I>&gt;<i> around, one for each console/stream, as necessary.
+</I>&gt;<i> 
+</I>&gt;<i> -_Quinn
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+Personal Home Page:
+            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+
+ARCA Mobile Agent Framework Home Page:
+            <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+======================================================
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000452.html">[JOS-Kernel] Static members and process model.</A></li>
+	<LI> Next message: <A HREF="000454.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#453">[ date ]</a>
+              <a href="thread.html#453">[ thread ]</a>
+              <a href="subject.html#453">[ subject ]</a>
+              <a href="author.html#453">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

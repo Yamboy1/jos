@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf &amp; classpath</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000314.html">
+   <LINK REL="Next" HREF="000321.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf &amp; classpath</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf &amp; classpath">tmiller@haverford.edu</A><BR>
+    <I>Wed, 1 Sep 1999 14:17:27 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000314.html">[JOS-Kernel] CPUID instruction problem due to use of optimizer</A></li>
+        <LI> Next message: <A HREF="000321.html">[JOS-Kernel] Interrupts again</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#319">[ date ]</a>
+              <a href="thread.html#319">[ thread ]</a>
+              <a href="subject.html#319">[ subject ]</a>
+              <a href="author.html#319">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	I've been playing with classpath for the past few days, so I'd
+figure I'd check in with my understanding so far.
+
+(A) We'll need to add JNI if we want to use classpath's native code.
+(B) Some amount of that native code will have libc stuff in it.  While
+	this shouldn't be a terrible problem for the host build (anyone
+	actually /know/?) it's a disaster for the i386 build.  It looks
+	like they put all the native code in classpath/native/*, which
+	means we should be able to point the Makefiles at something like
+	classpath/i386/* and everything will be happy.
+(C) It looks all the jvm-specific bits have been localized to
+	java classes in classpath/vm/*, which can just implement in
+	jjos/common/decaf[/vm].
+(D) The anonymous CVS server doesn't seem to have the 'configure' script
+	in it, so get the snapshot if you're interested in working on it.
+(E) Likewise, the configure script seems to want japhar to be installed
+	(looks for 'japhar-config'); someone should find out what the
+	configure script needs to know from this.  (Then implement a
+	--with-jjos option on the config?)
+(F) Because of (E), I haven't been able to build a classes.zip out of 
+	classpath, and see how well it works with jjos/decaf.
+
+	JM, you've been in contact with the classpath developers; if you
+could run my suspicions and questions by (one of) them, that would be
+great.
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000314.html">[JOS-Kernel] CPUID instruction problem due to use of optimizer</A></li>
+	<LI> Next message: <A HREF="000321.html">[JOS-Kernel] Interrupts again</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#319">[ date ]</a>
+              <a href="thread.html#319">[ thread ]</a>
+              <a href="subject.html#319">[ subject ]</a>
+              <a href="author.html#319">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

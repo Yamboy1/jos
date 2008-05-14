@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Construction of a new Java Operating System</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:vbman%40pcpros.net">
+   <LINK REL="Previous"  HREF="000149.html">
+   <LINK REL="Next" HREF="000152.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Construction of a new Java Operating System</H1>
+    <B>Cliff Baeseman</B> 
+    <A HREF="mailto:vbman%40pcpros.net"
+       TITLE="[JOS-Kernel] Construction of a new Java Operating System">vbman@pcpros.net</A><BR>
+    <I>Tue, 20 Jul 1999 18:50:40 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000149.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+        <LI> Next message: <A HREF="000152.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#151">[ date ]</a>
+              <a href="thread.html#151">[ thread ]</a>
+              <a href="subject.html#151">[ subject ]</a>
+              <a href="author.html#151">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ok here is the deal how do you plan on sharing the classes between multiple
+application instances as shared without reloading the classes. You still
+have to create the classes in memory to allow proper instancing. The classes
+have to run in your application instance in any case. This goes for jit our
+jvm makes no difference. You could share the classes right now if you wished
+to but how do you keep the data state within those classes?
+
+That is the real question, the answer is that you cannot!
+
+You have to pool the JVM it is the only way to provide speed and efficency
+and application process seperation.
+
+Cliff
+
+-----Original Message-----
+From: Regier Avery J &lt;<A HREF="mailto:RegierAveryJ@JDCORP.deere.com">RegierAveryJ@JDCORP.deere.com</A>&gt;
+To: '<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>' &lt;<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>&gt;
+Date: Tuesday, July 20, 1999 4:07 PM
+Subject: RE: [JOS-Kernel] Construction of a new Java Operating System
+
+
+&gt;&gt;<i> -----Original Message-----
+</I>&gt;&gt;<i> From: <A HREF="mailto:golubovsky@altavista.net">golubovsky@altavista.net</A> [SMTP:<A HREF="mailto:golubovsky@altavista.net">golubovsky@altavista.net</A>]
+</I>&gt;&gt;<i> Sent: Monday, July 19, 1999 6:37 AM
+</I>&gt;&gt;<i> To: <A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+</I>&gt;&gt;<i> Subject: Re: [JOS-Kernel] Construction of a new Java Operating System
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> From: <A HREF="mailto:golubovsky@altavista.net">golubovsky@altavista.net</A>
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> On Mon, 19 Jul 1999, Ryan Heise wrote:
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> &gt;Cliff Baeseman wrote:
+</I>&gt;&gt;<i> &gt;
+</I>&gt;&gt;<i> &gt;&gt; JOS is also based on a single instance JVM design. This is a very poor
+</I>&gt;&gt;<i> &gt;&gt; design in my opinion.
+</I>&gt;&gt;<i>
+</I>&gt;<i>JJOS is *currently* based on a single instance design.  In time, though, it
+</I>&gt;<i>will come to support Multiple Java Processes while still having the
+</I>&gt;<i>advantages noted below:
+</I>&gt;<i>
+</I>&gt;&gt;<i> &gt;
+</I>&gt;&gt;<i> &gt;It allows you to share 15 megs of system classes between applications.
+</I>&gt;&gt;<i> &gt;It allows you to have one thread scheduler across all applications. It
+</I>&gt;&gt;<i> &gt;allows you to have one garbage collecter and memory manager across all
+</I>&gt;&gt;<i> &gt;applications. There are a few other optimizations that are possible.
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> What about possibility of multiuser usage of such an OS (from the
+</I>security
+&gt;&gt;<i> point of view?) Or is this JOS project positioned only for client
+</I>&gt;&gt;<i> platform?
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> Dmitry M. Golubovsky
+</I>&gt;&gt;<i>       St-Petersburg, Russia
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i>
+</I>&gt;<i>The design we want to get to eventually will allow us to enforce security
+</I>&gt;<i>and memory limits on Java Processes while still only loading and compiling
+</I>&gt;<i>class bytecodes once.
+</I>&gt;<i>
+</I>&gt;<i>Here are some good pages to read and follow the links of on the Wiki:
+</I>&gt;<i><A HREF="http://jos.org/wiki/view/Main/WhyMultiProcessJVM">http://jos.org/wiki/view/Main/WhyMultiProcessJVM</A>
+</I>&gt;<i><A HREF="http://jos.org/wiki/view/Main/JOSCoreProjectUpdate">http://jos.org/wiki/view/Main/JOSCoreProjectUpdate</A>
+</I>&gt;<i><A HREF="http://jos.org/wiki/view/Main/MultiUserGroup">http://jos.org/wiki/view/Main/MultiUserGroup</A>
+</I>&gt;<i>
+</I>&gt;<i>-- Avery J. Regier
+</I>&gt;<i>
+</I>&gt;<i>_______________________________________________
+</I>&gt;<i>Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i><A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000149.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+	<LI> Next message: <A HREF="000152.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#151">[ date ]</a>
+              <a href="thread.html#151">[ thread ]</a>
+              <a href="subject.html#151">[ subject ]</a>
+              <a href="author.html#151">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

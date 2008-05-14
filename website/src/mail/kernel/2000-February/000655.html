@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Multi-Process Spec</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000654.html">
+   <LINK REL="Next" HREF="000657.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Multi-Process Spec</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Multi-Process Spec">gchii@mindspring.com</A><BR>
+    <I>Fri, 04 Feb 2000 09:59:08 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000654.html">[JOS-Kernel] Multi-Process Spec</A></li>
+        <LI> Next message: <A HREF="000657.html">[JOS-Kernel] CVS Server... connection refused??</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#655">[ date ]</a>
+              <a href="thread.html#655">[ thread ]</a>
+              <a href="subject.html#655">[ subject ]</a>
+              <a href="author.html#655">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 09:47 PM 2/3/00 -0500, &quot;Avery J. Regier&quot; &lt;<A HREF="mailto:ajregier@earthlink.net">ajregier@earthlink.net</A>&gt; wrote:
+&gt;<i>Comments would be appreciated.
+</I>
+Excellent! You have organized the JOS architecture into
+
+1. per-thread,
+2. per-process, and
+3. system-wide.
+
+Your inclusion of a custom class loader to deal with System.exit() is right
+on target. Your call for a per-process heap is the right thing to do.
+
+If I read &quot;class file&quot; instead of &quot;class&quot; in the definition of when two
+class files are the same, your specification is an excellent place to start.
+
+As you might know, I've been working with package files. A package file
+organizes all class files into a single per-package structure. While each
+class file is available individually to a virtual machine, space for the
+entire package is allocated once. Additional information is inside a
+package file so that it is easy to find a class file without reflecting the
+class file itself.
+
+To take the virtual machine to the next level, I can imagine 4MB standard
+class libraries stored in two dozen package files. Each package file is
+loaded into RAM (or virtual RAM) as an entire package, not one class at a
+time.
+
+Once an entire package is in RAM, individual classes can be defined on a
+per-process basis directly out of the package cache.
+
+When you look at the mechanism of the original defineClass() method, the
+offset and length parameters were there for good reason. An archive with
+class files from many packages could be loaded into RAM in a single
+contiguous block. As individual classes were defined, the offset and length
+were needed to pass class files within the block of RAM.
+
+-----
+
+By redefining the findSystemClass() method slightly in
+java.lang.ClassLoader, it is possible for a virtual machine to create a new
+instance of java.lang.Class from the system-wide class file cache on a
+per-process basis. In other words, the key to multiple processes within a
+virtual machine is the development of a process-aware findSystemClass().
+While a process-agnostic findSystemClass() returns a class from another
+process, a process-aware findSystemClass() will return a class on a
+per-process basis. Since the process has its own heap, each process must
+have its own instance of Runtime and System.
+
+The mechanism to create a new process is much like the java tool. You can
+pass a new classpath to a new process. You can pass new properties to a new
+process. You can pass new main class and parameters to a new process.
+
+We might support a null class loader for a heavy-weight process. The
+virtual machine must determine which heap an object belongs to. An object
+must have both a heap property and a class loader property. Each object
+must have a reference to the per-process heap that created it.
+
+The &quot;new&quot; opcode must respect the process scheme, so that a new object is
+created from the right per-process heap. All of the per-process heaps must
+cooperate with a system-wide memory manager.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000654.html">[JOS-Kernel] Multi-Process Spec</A></li>
+	<LI> Next message: <A HREF="000657.html">[JOS-Kernel] CVS Server... connection refused??</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#655">[ date ]</a>
+              <a href="thread.html#655">[ thread ]</a>
+              <a href="subject.html#655">[ subject ]</a>
+              <a href="author.html#655">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

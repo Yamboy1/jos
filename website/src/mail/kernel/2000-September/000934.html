@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000933.html">
+   <LINK REL="Next" HREF="000918.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine">gchii@mindspring.com</A><BR>
+    <I>Fri, 29 Sep 2000 21:00:12 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000933.html">[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</A></li>
+        <LI> Next message: <A HREF="000918.html">[JOS-Kernel] Starting a program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#934">[ date ]</a>
+              <a href="thread.html#934">[ thread ]</a>
+              <a href="subject.html#934">[ subject ]</a>
+              <a href="author.html#934">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 12:40 PM 9/26/00 -0400, you wrote:
+&gt;<i>We've had this discussion before, in another guise. If JOS does
+</I>&gt;<i>not require anything special from its JVM -- where I contend that it
+</I>&gt;<i>does -- than the java standard itself will provide the necessary
+</I>&gt;<i>portability.
+</I>
+JOS should not require anything special from its JVM. Any virtual machine,
+written in C/C++, should compile and run on a JOS-compatible kernel.
+
+Imagine for a moment that it is possible to build an operating system
+without changing one word of the Java Virtual Machine Specification. The
+specification provides everything that we need to build a Java-based
+operating system. We only need to implement that specification on the JOS
+platform.
+
+1. JOS is just another platform. A virtual machine on the JOS platform must
+implement the exec() method of java.lang.Runtime in order to run standard
+Java applications.
+
+2. The exec() method of java.lang.Runtime is always platform-specific
+implementation. The exec() method is a native method. The native method is
+called by a virtual machine. Therefore, the platform-specific interface is
+inside the implementation of a native method, not inside a virtual machine.
+
+3. In a platform-independent application, multiple processes are always
+created through this API. The interface is unchanged regardless of platform.
+
+The distinction is this. The critical part of multiple bytecode processes
+is found inside a native method. A virtual machine only needs to bind
+itself generically to a native method. It doesn't care what the native
+method does.
+
+&gt;<i>If JOS /does/ require something special -- e.g. java
+</I>&gt;<i>processes -- from its JVM, than there needs to be a standard interface for
+</I>&gt;<i>this.  Since that something special would require VM modifications anyway,
+</I>&gt;<i>it makes sense to define those things at the VM level.  (As opposed to at
+</I>&gt;<i>a Java wrapper level, where the VM provides its own implementation
+</I>&gt;<i>classes.)  If all that JOS requires from its JVM can exposed in this way,
+</I>&gt;<i>there's no reason to standardize on anything at a lower level than
+</I>&gt;<i>this.
+</I>
+There is already one well-known interface. A second would be redundent,
+non-standard and non-portable. It would be redundent because a virtual
+machine on the JOS platform must implement the exec() method, even if there
+is a second interface. It would be non-standard because it would require a
+change to the Java Virtual Machine Specification. A standard Java
+application always uses the exec() method to start another process. It
+would be non-portable because a second interface is not likely to work on
+other virtual machines and would limit the use of the interface to
+JOS-specific applications.
+
+So far, the following two theories have been disproven.
+
+1. Only a JOS-compatible virtual machine can save memory.
+
+Memory can be saved in other ways, including the use of read-only virtual
+memory and ROM chips for bytecode. Most of this can be done on JOS as well
+as on Linux and Windows.
+
+2. A single virtual machine must implement multiple bytecode processes.
+
+Using multiple instances of a task/virtual machine is a reasonable
+assumption of the Java Virtual Machine Specification. Multiple instances of
+a task/virtual machine does not imply a waste of memory as some have long
+suggested. When a task/virtual machine is destroyed by a kernel, its Java
+objects are destroyed immediately, neither finalized nor garbage collected.
+All threads are destroyed immediately, without throwing a Java-based
+exception. Likewise, handles are critical to the communication between
+kernel and multiple processes. Direct object references are not enough.
+
+Only a kernel is required to use boot packages. A process is a task/virtual
+machine object. Each process has its own CLASSPATH, not just its own CODEBASE.
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000933.html">[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</A></li>
+	<LI> Next message: <A HREF="000918.html">[JOS-Kernel] Starting a program</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#934">[ date ]</a>
+              <a href="thread.html#934">[ thread ]</a>
+              <a href="subject.html#934">[ subject ]</a>
+              <a href="author.html#934">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

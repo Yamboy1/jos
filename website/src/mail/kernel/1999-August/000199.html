@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Driver writing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000249.html">
+   <LINK REL="Next" HREF="000201.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Driver writing</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Kernel] Driver writing">onewith1@flash.net</A><BR>
+    <I>Sat, 7 Aug 1999 15:11:13 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000249.html">[JOS-Kernel] Garbage collection</A></li>
+        <LI> Next message: <A HREF="000201.html">[JOS-Kernel] Thomas Bocek's VGA driver L-I-V-E-S in CVS!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#199">[ date ]</a>
+              <a href="thread.html#199">[ thread ]</a>
+              <a href="subject.html#199">[ subject ]</a>
+              <a href="author.html#199">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello
+
+-----Original Message-----
+From: John Morrison &lt;<A HREF="mailto:jm@mak.com">jm@mak.com</A>&gt;
+To: <A HREF="mailto:kernel@jos.org">kernel@jos.org</A> &lt;<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>&gt;
+Date: Saturday, August 07, 1999 12:56 PM
+Subject: Re: [JOS-Kernel] Driver writing (was: Re: [JOS-Kernel] Garbage
+collection)
+
+
+
+&gt;&gt;<i> &gt; How about doing second-tier work?  Like, filesystem implementations?
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> Yes, that's a good possiblity. ext2fs would be a good starting point. I
+</I>&gt;&gt;<i> might even learn something in the process :)
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> (didn't someone write a FAT implementation a long time ago? I think I've
+</I>&gt;&gt;<i> seen it on the Wiki ages ago when I was new to the project)
+</I>&gt;<i>
+</I>&gt;<i>Hmm.. can't recall...
+</I>
+Yes, there was work done on this. Last I remember it was about a year ago.
+I think that if we are going to do file system stuff, the best way to start
+is have &quot;virtual/embedded file systems&quot;, where one file system is stored as
+a big file in the parent file system.  This way we don't tromp on the user's
+host system.  It would also enable us to easily build upon other file
+systems (like having a FAT-16 system, with a ZIP compression system above
+that, and above that one is a ext2fs), and also have RAM disks.
+
+This would mean publishing a file type with a raw disk I/O interface.  Each
+disk device (including virtual device for file system and RAM) would need an
+implementation of this type, becoming the driver.
+
+-Matt
+
+
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000249.html">[JOS-Kernel] Garbage collection</A></li>
+	<LI> Next message: <A HREF="000201.html">[JOS-Kernel] Thomas Bocek's VGA driver L-I-V-E-S in CVS!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#199">[ date ]</a>
+              <a href="thread.html#199">[ thread ]</a>
+              <a href="subject.html#199">[ subject ]</a>
+              <a href="author.html#199">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

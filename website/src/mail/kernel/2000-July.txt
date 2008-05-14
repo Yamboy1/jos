@@ -1,0 +1,324 @@
+From sean-cribbs@utulsa.edu Tue, 11 Jul 2000 10:06:15 -0500 (CDT)
+Date: Tue, 11 Jul 2000 10:06:15 -0500 (CDT)
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-Kernel] GRUB Booting
+
+I too had problems booting from a GRUB image.  Admittedly, I have
+winblows, but GRUB doesn't automatically start the JJOS kernel or
+anything.  It just gives me a "grub>" prompt.  I tried using some of the
+commands under "help" but to no avail.
+
+--------------------------------------
+ Sean Cribbs <sean-cribbs@utulsa.edu>
+ Computer Science
+ University of Tulsa class of 2001
+--------------------------------------
+
+
+
+
+
+From George.Marrows@Smallworld.co.uk Tue, 11 Jul 2000 16:16:29 +0100
+Date: Tue, 11 Jul 2000 16:16:29 +0100
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] GRUB Booting
+
+Hi Sean --
+
+See http://www.triptych.freeserve.co.uk/grub/index.html for some (admittedly
+minimal) notes on GRUB booting. The instructions are for a manual boot --
+you have to type the commands each time. You can make GRUB autoboot JOS if
+you install it on your hard disk .. you'll have to read the GRUB docs for
+how. (No details on my site as I don't really want to take the blame for
+stuffing up someone's boot sector ;-)
+
+-- George
+
+> -----Original Message-----
+> From:	Sean D Cribbs [SMTP:sean-cribbs@utulsa.edu]
+> Sent:	11 July 2000 16:06
+> To:	kernel@jos.org
+> Subject:	[JOS-Kernel] GRUB Booting
+> 
+> I too had problems booting from a GRUB image.  Admittedly, I have
+> winblows, but GRUB doesn't automatically start the JJOS kernel or
+> anything.  It just gives me a "grub>" prompt.  I tried using some of the
+> commands under "help" but to no avail.
+> 
+> --------------------------------------
+>  Sean Cribbs <sean-cribbs@utulsa.edu>
+>  Computer Science
+>  University of Tulsa class of 2001
+> --------------------------------------
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+
+From sean-cribbs@utulsa.edu Wed, 12 Jul 2000 20:29:11 -0500
+Date: Wed, 12 Jul 2000 20:29:11 -0500
+From: Sean D Cribbs sean-cribbs@utulsa.edu
+Subject: [JOS-Kernel] GRUB Booting
+
+>
+> Hi Sean --
+>
+> See http://www.triptych.freeserve.co.uk/grub/index.html for some
+> (admittedly
+> minimal) notes on GRUB booting. The instructions are for a manual boot --
+> you have to type the commands each time. You can make GRUB autoboot JOS if
+> you install it on your hard disk .. you'll have to read the GRUB docs for
+> how. (No details on my site as I don't really want to take the blame for
+> stuffing up someone's boot sector ;-)
+>
+
+Your link is broken... at least my DNS server couldn't find it.  Is there
+somewhere else to get more info?
+
+-------------------------------------
+Sean Cribbs <sean-cribbs@utulsa.edu>
+Computer Science
+University of Tulsa Class of 2001
+-------------------------------------
+
+
+
+
+
+From peter.schuller@infidyne.com Thu, 13 Jul 2000 04:07:46 +0200
+Date: Thu, 13 Jul 2000 04:07:46 +0200
+From: Peter Schuller peter.schuller@infidyne.com
+Subject: [JOS-Kernel] GRUB Booting
+
+> Your link is broken... at least my DNS server couldn't find it.  Is there
+> somewhere else to get more info?
+
+Well here's the entry in my grub config file that boots JOS on my box (not
+sure how up-to-date this particular version of JOS is though):
+
+title JOS
+kernel (hd1,1)/usr/local/jos/GRUB/jos-grub/jjos-grub init
+module (hd1,1)/usr/local/jos/GRUB/jos-grub/jjos.zip
+
+"hd1,1" is the second partition on the second drive (dev/hdb2 in Linux).
+That and the path to the files would have to be modified.
+
+And again, I don't know how up-to-date my JOS version is; I haven't been
+checking anything out of the CVS. The above works with images I got
+from somewhere on the web - but I'm not sure where.
+
+-- 
+/ Peter Schuller, InfiDyne Technologies HB
+
+PGP userID: 0x5584BD98 or 'Peter Schuller <peter.schuller@infidyne.com>'
+Key retrival: Send an E-Mail to getpgpkey@scode.infidyne.com
+E-Mail: peter.schuller@infidyne.com Web: http://scode.infidyne.com
+
+
+
+
+
+From miguelmoura@bigfoot.com Fri, 14 Jul 2000 00:12:47 +0100
+Date: Fri, 14 Jul 2000 00:12:47 +0100
+From: Miguel Moura miguelmoura@bigfoot.com
+Subject: [JOS-Kernel] How to booting JOS and what can i do for help?
+
+Hi
+
+I am interesting in Jos and i have trying to boot it but so far i get 
+nothing.
+
+need help installing it. anyone can help me?
+
+About the help i can give to the project, well
+i am interest in OS Core schedelling, memory, storeage management, etc
+just the core, but i have only some cncepts, so ... i think i will help
+more for now, helping in documentation to see what philosofy is being using
+and how the system work.
+
+Is there anyone that already have this work bieng done and need extra hands or
+do you accept my help to do it?
+
+Thanks
+
+Miguel Moura
+
+
+
+
+
+
+From a.vanefferen@mediacom4.nl Fri, 14 Jul 2000 16:09:13 +0200
+Date: Fri, 14 Jul 2000 16:09:13 +0200
+From: Arjen van Efferen a.vanefferen@mediacom4.nl
+Subject: [JOS-Kernel] Thread-objects
+
+Hi all,
+
+I hope the VM of JOS will handle Threads much faster than the VM of SUN.
+
+When i try to put a Thread in a ThreadGroup or when i change the name of
+a Thread, the program hangs for 2 SECONDS!!!!. That's way too long.
+Or does it depend on what OS i'm running?
+
+For now, i've removed all the code from my program which alters Threads.
+
+-- Arjen
+
+http://jos.mediacom4.nl/default.asp?file=/org/jos/server/nntpdaemon (to
+see my code)
+
+
+
+
+
+
+From tmiller@haverford.edu Fri, 14 Jul 2000 11:01:01 -0400 (EDT)
+Date: Fri, 14 Jul 2000 11:01:01 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Thread-objects
+
+> When i try to put a Thread in a ThreadGroup or when i change the name of
+> a Thread, the program hangs for 2 SECONDS!!!!. That's way too long.
+> Or does it depend on what OS i'm running?
+
+	I'm not sure, and some of the threading stuff is handled by the
+class library.  Thanks for the warning, though.
+
+-_Quinn
+
+
+
+
+
+From a.vanefferen@mediacom4.nl Fri, 14 Jul 2000 16:56:51 +0200
+Date: Fri, 14 Jul 2000 16:56:51 +0200
+From: Arjen van Efferen a.vanefferen@mediacom4.nl
+Subject: [JOS-Kernel] Thread-objects
+
+You're welcome :)
+
+-----Original Message-----
+From: Todd L. Miller [mailto:tmiller@haverford.edu]
+Sent: vrijdag 14 juli 2000 17:01
+To: 'kernel@jos.org'
+Subject: Re: [JOS-Kernel] Thread-objects
+
+
+> When i try to put a Thread in a ThreadGroup or when i change the name
+of
+> a Thread, the program hangs for 2 SECONDS!!!!. That's way too long.
+> Or does it depend on what OS i'm running?
+
+	I'm not sure, and some of the threading stuff is handled by the
+class library.  Thanks for the warning, though.
+
+-_Quinn
+
+
+_______________________________________________
+Kernel maillist  -  Kernel@jos.org
+http://jos.org/mailman/listinfo/kernel
+
+
+
+
+From tmiller@haverford.edu Sat, 15 Jul 2000 18:41:56 -0400 (EDT)
+Date: Sat, 15 Jul 2000 18:41:56 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] How to booting JOS and what can i do for help?
+
+> I am interesting in Jos and i have trying to boot it but so far i get 
+> nothing.
+
+	Which boot method are you trying to use?
+
+> need help installing it. anyone can help me?
+
+	There's not much of an installation process right now, really.  If
+you can get JOS up and running, it would be nice if you could write up
+some docs about it -- other people are having trouble, too.
+
+-_Quinn
+
+
+
+
+
+From miguelmoura@bigfoot.com Fri, 21 Jul 2000 23:43:01 +0100
+Date: Fri, 21 Jul 2000 23:43:01 +0100
+From: Miguel Moura miguelmoura@bigfoot.com
+Subject: [JOS-Kernel] How to booting JOS and what can i do for help?
+
+Hi
+ sorry for the delay on awsering, preper for summer holidays
+
+About get JOS up and running, i just copy it for a Disk (A DOS floppy disk)
+and try to boot it, final result  :-( doesn't boot.
+
+Get me some guidance
+
+Thks
+
+Miguel Moura
+
+PS: if find a document in PS and PDF format about "Techniques for the
+design of java operating systems"
+by Godmar, Patrick Tuttmann, and other Dep. CS of University of Utah ,
+interested paper, are you or anyone
+here interest in it?
+
+At 18:41 15-07-2000 -0400, you wrote:
+>> I am interesting in Jos and i have trying to boot it but so far i get 
+>> nothing.
+>
+>	Which boot method are you trying to use?
+>
+>> need help installing it. anyone can help me?
+>
+>	There's not much of an installation process right now, really.  If
+>you can get JOS up and running, it would be nice if you could write up
+>some docs about it -- other people are having trouble, too.
+>
+>-_Quinn
+>
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+
+From tmiller@haverford.edu Sat, 22 Jul 2000 13:07:15 -0400 (EDT)
+Date: Sat, 22 Jul 2000 13:07:15 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] How to booting JOS and what can i do for help?
+
+> About get JOS up and running, i just copy it for a Disk (A DOS floppy disk)
+> and try to boot it, final result  :-( doesn't boot.
+
+	No, JOS isn't self-booting yet.  You'll need to boot it with
+either etherboot or grub.  Both should be listed in freshmeat.  Etherboot
+is rather complicated and requires two computers, so I'll give the short
+course in GRUB: once it's booted from the floppy, try:
+
+kernel=(N,N)/path/to/jos/arch/i386/nativecode/jjos-grub
+module=(N,N)/path/to/jos/arch/i386/bytecode/jjos.zip
+boot
+
+where N,N is hd,partition.
+
+-_Quinn
+
+
+
+
+

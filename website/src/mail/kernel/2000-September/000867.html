@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] how  to use init.class ?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000866.html">
+   <LINK REL="Next" HREF="000868.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] how  to use init.class ?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] how  to use init.class ?">tmiller@haverford.edu</A><BR>
+    <I>Tue, 5 Sep 2000 18:53:45 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000866.html">[JOS-Kernel] how  to use init.class ?</A></li>
+        <LI> Next message: <A HREF="000868.html">[JOS-Kernel] how to use init.class ?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#867">[ date ]</a>
+              <a href="thread.html#867">[ thread ]</a>
+              <a href="subject.html#867">[ subject ]</a>
+              <a href="author.html#867">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I've tried to install JOS this weekend and could not understand how
+</I>&gt;<i> to use init.class to load an application.
+</I>
+	Mostly because it doesn't -- it's not complete.  'init' is named
+that more because it's the first process to start and the last to die,
+rather than for any similarity between it and linux/unix init.
+
+&gt;<i> Apparently it starts, initializes console and kbd drivers and then
+</I>&gt;<i> goes into an infinite loop (according to javap -c ). It does not seem
+</I>&gt;<i> to look into any inittab file.
+</I>
+	You're dead on.  However, that is all that init does.  (The
+infinite loop is to prevent the scheduler from exiting because there
+aren't any active threads.  When we complete the system, I intend to put a
+call to idleprocessing() or something similar there.)  We need harddrive
+and filesystem drivers before init can use an inittab-style
+scheme.  (Should probably be XML, IMHO...)
+
+&gt;<i> Also: of a FAT filesystem grub refuses to load jjos-grub because
+</I>&gt;<i> of its long name. Does it make sense in future releases to use
+</I>&gt;<i> name like jjos.bin or jjos.gb (Grub Binary) ?
+</I>
+	Hadn't thought about that.  jjosgrub is short enough, yes?  Thanks
+for trying things out, by the way.
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000866.html">[JOS-Kernel] how  to use init.class ?</A></li>
+	<LI> Next message: <A HREF="000868.html">[JOS-Kernel] how to use init.class ?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#867">[ date ]</a>
+              <a href="thread.html#867">[ thread ]</a>
+              <a href="subject.html#867">[ subject ]</a>
+              <a href="author.html#867">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

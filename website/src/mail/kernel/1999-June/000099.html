@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: decaf rewrite</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000098.html">
+   <LINK REL="Next" HREF="000100.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: decaf rewrite</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Re: decaf rewrite">tmiller@haverford.edu</A><BR>
+    <I>Tue, 22 Jun 1999 08:48:23 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000098.html">[JOS-Kernel] Re: decaf rewrite</A></li>
+        <LI> Next message: <A HREF="000100.html">[JOS-Kernel] Re: Problems w/ i386 build</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#99">[ date ]</a>
+              <a href="thread.html#99">[ thread ]</a>
+              <a href="subject.html#99">[ subject ]</a>
+              <a href="author.html#99">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> All opcodes are now methods on class frame, of the form:
+</I>&gt;<i> 	bool frame::opcode(exception_to_throw &amp;);
+</I>&gt;<i> 
+</I>&gt;<i> I made up the exception_to_throw class for a place-holder.  If you have
+</I>&gt;<i> a predefined class I should've used instead (I looked but didn't notice
+</I>&gt;<i> any obvious candidates), please reply ASAP, and I'll make the global
+</I>&gt;<i> change before I commit the sources.  If not, please feel utterly free to
+</I>&gt;<i> replace it with whatever you like.
+</I>
+	I didn't have a class ready, but exception_to_throw is not one of
+the prettier (or shorter) class names I've ever come accross :)
+
+&gt;<i> (1) Some poor bastard has got to go and chase around all the PC
+</I>&gt;<i> referencing and incrementing, and localize it to each opcode method
+</I>&gt;<i> (like we discussed, to enable &quot;backing out&quot; of not (yet) executable
+</I>&gt;<i> opcodes, the opcode must not increment the PC unless it worked, and the
+</I>&gt;<i> runOpcode demultiplexer must NOT increment the PC).  Although a
+</I>&gt;<i> separable task, this is coupled to doing the exception handling.  Please
+</I>&gt;<i> advise as to how I should or should not proceed.
+</I>
+	If the runOpcode demultiplexer can't increment the PC -- which
+makes sense -- another nice emacs macro ought to take care of that bit of
+the rewrite (thought it means we'll be weeding out myPC--; ... myPC++;
+statements for a while!); as for whether or not to proceed, IIRC, you've
+got plenty on your plate right now anyway.  I don't know when I'll be
+able to resume work on jjos+decaf; probably but not certainly this
+weekend, so you're in the clear for big changes.
+
+&gt;<i> (2) I think the various invoke opcodes arguably should each have its own
+</I>&gt;<i> method, and the &quot;common&quot; functionality they need should become new
+</I>&gt;<i> (protected? private?) methods.  I have this opinion because I think it
+</I>&gt;<i> might help readability/maintainability, and it would also certainly help
+</I>&gt;<i> efficiency (we probably don't want the execution engine to &quot;forget&quot;
+</I>&gt;<i> which invoke opcode it's executing, and have to go back and look it up
+</I>&gt;<i> repeatedly, and then set control flags for how many things are on the
+</I>&gt;<i> stack, yadda yadda yadda...).  Please advise as to how I should or
+</I>&gt;<i> should not proceed.
+</I>
+	This sounds like a good idea; hopefully it will also eliminate
+some of those ugly switch/case statements from the invocation code.  It
+might be worthwhile and/or necessary to make more than one protected
+helper function, especially if the various invoke-common bits are spread
+around and/or throw radically different exceptions.  Again, you've
+probably got quite a bit to handle already, but you'll probably get to
+this before I do.  
+
+&gt;<i> (4) Please let me know if you ran into the same problems that either
+</I>&gt;<i> Thomas or I did with respect to the i386 target.  Thomas, please let me
+</I>&gt;<i> know if upgrading to Etherboot 4.2 solved your difficulties as it did
+</I>&gt;<i> mine.
+</I>
+	No.  I tested the second-to-last set of changes I made against the
+i386 build (with the full 9.6MB ramdisk) and it worked fine; on the other
+hand, the two computers were on a null-ethernet cable, which might have
+affected things.  (I couldn't get one to find the other when plugged into
+the wall network here; I don't know if that's a problem with Etherboot or
+the wall network...)
+
+&gt;<i> (5) I am actually taking the week off from the Day Job, so if there is
+</I>&gt;<i> any power-tooling to be done, now is a really, Really, REALLY good
+</I>&gt;<i> time.  Please advise.
+</I>
+	AFAIK, the only  major thing we must get done before we can
+integrate classpath is throws.  
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000098.html">[JOS-Kernel] Re: decaf rewrite</A></li>
+	<LI> Next message: <A HREF="000100.html">[JOS-Kernel] Re: Problems w/ i386 build</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#99">[ date ]</a>
+              <a href="thread.html#99">[ thread ]</a>
+              <a href="subject.html#99">[ subject ]</a>
+              <a href="author.html#99">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

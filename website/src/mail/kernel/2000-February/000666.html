@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Bytecode Interpretation</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000665.html">
+   <LINK REL="Next" HREF="000667.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Bytecode Interpretation</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Bytecode Interpretation">gchii@mindspring.com</A><BR>
+    <I>Thu, 17 Feb 2000 09:01:00 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000665.html">[JOS-Kernel] Bytecode Interpretation</A></li>
+        <LI> Next message: <A HREF="000667.html">[JOS-Kernel] Bytecode Interpretation</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#666">[ date ]</a>
+              <a href="thread.html#666">[ thread ]</a>
+              <a href="subject.html#666">[ subject ]</a>
+              <a href="author.html#666">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 06:16 PM 2/15/00 -0600, <A HREF="mailto:Matt.Albrecht@trilogy.com">Matt.Albrecht@trilogy.com</A> wrote:
+&gt;<i>I'm currently writing a (for now) simple bytecode introspector to discover
+</I>&gt;<i>methods and fields in a class without reflection.
+</I>
+Matt,
+
+I am most interested in working together with you on your simple bytecode
+introspection. Simple bytecode introspection is critical. It is the basis
+of a bytecode verifier, for example.
+
+While you call it introspection, I call it pure reflection. Reflection
+comes in two flavors: pure and practical reflection. Practical reflection
+is the kind offered in java.lang and java.lang.reflect. It enables you to
+invoke methods and read/write fields of arbitrary classes.
+
+Pure reflection is a simple bytecode introspector. You can, for example,
+use JDK 1.02 to inspect classes from JDK 1.2.2. Likewise, you can use JDK
+1.2.2 to inspect classes from JDK 1.02. Plus, you can build a simple
+bytecode introspector in C/C++ to discover fields and methods in a class file.
+
+I used pure reflection to generate a list of all native methods for JDK
+1.1.6. It is implemented in my com.realignsoft.reflectionXX packages. It is
+available now, in both runtime and source version. See also Smart API -
+Release 1b.
+
+Most recently, I am having fun working with attributes and opcodes. For
+more information on pure reflection, see also the PureReflection and
+PureReflection III article on JOS Wiki.
+
+I recommend reading the O'Reilly book called &quot;Java Virtual Machine&quot;.
+
+&gt;<i>I've been following the Java Class File specs, but I've encountered a
+</I>&gt;<i>Constant_Info block with a tag of &quot;0&quot; (which isn't documented in the class
+</I>&gt;<i>file specs).  I've just assumed that this means an end-of-the-blocks, but
+</I>&gt;<i>I've encountered it in one classfile where the count of the constant_info
+</I>&gt;<i>block is one more than the location of the &quot;0&quot; block.  What does a 0 tagged
+</I>&gt;<i>block mean?
+</I>
+Rest assured, no valid class file uses a &quot;0&quot; tag. &quot;0&quot; is an indication of
+an invalid tag.
+
+The first &quot;feature&quot; of codepool is that length is not the length of
+codepool in a class file. Instead, it is the length of codepool in Sun
+Microsystems' implementation of a virtual machine. The length stored in a
+class file is one too many; it's off by one. At runtime, an entry at index
+0 is a special entry used by Sun Microsystems.
+
+Most likely, you have discovered another &quot;feature&quot; of the codepool. Each
+Constant.LONG and Constant.DOUBLE are counted as if they were two entries
+in codepool. Your code might be reading past the end of the codepool,
+giving you the invalid tag of &quot;0&quot;.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000665.html">[JOS-Kernel] Bytecode Interpretation</A></li>
+	<LI> Next message: <A HREF="000667.html">[JOS-Kernel] Bytecode Interpretation</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#666">[ date ]</a>
+              <a href="thread.html#666">[ thread ]</a>
+              <a href="subject.html#666">[ subject ]</a>
+              <a href="author.html#666">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

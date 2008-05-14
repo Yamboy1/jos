@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Interrupts</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000333.html">
+   <LINK REL="Next" HREF="000315.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Interrupts</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Interrupts">tmiller@haverford.edu</A><BR>
+    <I>Tue, 31 Aug 1999 14:56:00 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000333.html">[JOS-Kernel] FYI -- rumours of an MS-Office killer available via Java applet</A></li>
+        <LI> Next message: <A HREF="000315.html">[JOS-Kernel] Interrupts</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#312">[ date ]</a>
+              <a href="thread.html#312">[ thread ]</a>
+              <a href="subject.html#312">[ subject ]</a>
+              <a href="author.html#312">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> &gt; Is the current JOS version able to handle Interrupts?
+</I>&gt;<i> &gt; I tried to catch the timer-interrupt (8), but it didn't work.
+</I>&gt;<i> &gt; ....int008.wait(); waits endless.
+</I>
+	The timer interrupts aren't implemented; I believe I've mentioned
+this before and suggested we just scrap it and move on to JavaOS's APIs.
+As for int008 in particular, I've trapped it out in
+common/decaf/scheduler.cc because (being the clock) it generated enough
+interrupts to get in the way of debugging the keyboard.  The fix should be
+pretty evident.  (basically remove line 148)
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000333.html">[JOS-Kernel] FYI -- rumours of an MS-Office killer available via Java applet</A></li>
+	<LI> Next message: <A HREF="000315.html">[JOS-Kernel] Interrupts</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#312">[ date ]</a>
+              <a href="thread.html#312">[ thread ]</a>
+              <a href="subject.html#312">[ subject ]</a>
+              <a href="author.html#312">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

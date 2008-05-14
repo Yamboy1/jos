@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Kernel Tests</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:George.Marrows%40Smallworld.co.uk">
+   <LINK REL="Previous"  HREF="000710.html">
+   <LINK REL="Next" HREF="000719.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Kernel Tests</H1>
+    <B>George.Marrows@Smallworld.co.uk</B> 
+    <A HREF="mailto:George.Marrows%40Smallworld.co.uk"
+       TITLE="[JOS-Kernel] Kernel Tests">George.Marrows@Smallworld.co.uk</A><BR>
+    <I>Wed, 8 Mar 2000 09:51:45 -0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000710.html">[JOS-Kernel] Kernel Tests</A></li>
+        <LI> Next message: <A HREF="000719.html">[JOS-Kernel] Kernel Tests</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#713">[ date ]</a>
+              <a href="thread.html#713">[ thread ]</a>
+              <a href="subject.html#713">[ subject ]</a>
+              <a href="author.html#713">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Regarding testing the garbage collector, nothing beats seeing decaf survive
+three or more GCs ... as I know to my cost from trying to get this to work
+back in October/November, it all falls into a quivering heap if the
+slightest thing goes wrong. The test code I wrote was spectacularly
+underpowered in comparison.
+
+-- George
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Todd L. Miller [SMTP:<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>]
+</I>&gt;<i> Sent:	Wednesday, March 08, 2000 3:58 AM
+</I>&gt;<i> To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+</I>&gt;<i> Subject:	Re: [JOS-Kernel] Kernel Tests
+</I>&gt;<i> 
+</I>&gt;<i> &gt; It is possible, isn't it? We can write C/C++ programs to
+</I>&gt;<i> test/demonstrate
+</I>&gt;<i> &gt; kernel functions. At the point where jJOS invokes decaf, jJOS could
+</I>&gt;<i> invoke
+</I>&gt;<i> &gt; a power-on self-test, a diagnostic program, or some other
+</I>&gt;<i> &gt; test/demonstration program written in C/C++.
+</I>&gt;<i> 
+</I>&gt;<i> 	The kernel right now is cleanly (sort of) divided between the
+</I>&gt;<i> ASM, C, and C++ sections.  The C++ sections could be unit tested by class,
+</I>&gt;<i> but almost all of the ASM can't be tested without running it.  Someone
+</I>&gt;<i> who's sufficiently adventerous might be able to hack kdb or VMware to help
+</I>&gt;<i> out here, but I'm certainly note one of them :)  The C section is the
+</I>&gt;<i> garbage collector, whic is One Of Those Things I Would Someday Like To Try
+</I>&gt;<i> My Hand At.  I'm not really sure what the proper testing procedure for a
+</I>&gt;<i> garbage collector (esp. on written in C) might be, but if you're curios,
+</I>&gt;<i> ask George Marrows, who wrote it.
+</I>&gt;<i> 
+</I>&gt;<i> &gt; Where and when should we implement memory management? In the kernel? Or,
+</I>&gt;<i> in
+</I>&gt;<i> &gt; decaf? Should we do it now, when there is no swap file? Or later?
+</I>&gt;<i> 
+</I>&gt;<i> 	No, definitely not in decaf.  The memory management is going to be
+</I>&gt;<i> intimately tied with the virtual memory system and the garbage collector,
+</I>&gt;<i> so they'll need to be looked at together.  (For instance, it may be
+</I>&gt;<i> worthwhile to garbage-collect a page before swapping it out, and so on; do
+</I>&gt;<i> we prefer to garbage collect before swapping when we run out of RAM?  How
+</I>&gt;<i> does the pager's LRU list interact with the possibility of generational
+</I>&gt;<i> GC?  Etc.)
+</I>&gt;<i> 
+</I>&gt;<i> &gt; We should implement memory management in the kernel. The host build of
+</I>&gt;<i> the
+</I>&gt;<i> &gt; kernel simply uses the memory management of a foreign operating system.
+</I>&gt;<i> The
+</I>&gt;<i> &gt; i386 build of the kernel must implement memory management independently
+</I>&gt;<i> &gt; from any other operating system.
+</I>&gt;<i> 
+</I>&gt;<i> 	Since we're currently running a monolithic system, much less a
+</I>&gt;<i> monolithic kernel, I have to agree with you here.  On the other hand,
+</I>&gt;<i> Linux seems to be doing just fine with a user-space swapper, etc -- and
+</I>&gt;<i> Mach with its microkernel architecture.  Whatever we en up doing w.r.t. to
+</I>&gt;<i> memory management should be portable with the minimum of effort to
+</I>&gt;<i> whatever kernel/system design we end up `finalizing' on.
+</I>&gt;<i> 
+</I>&gt;<i> -_Quinn
+</I>&gt;<i> 	
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000710.html">[JOS-Kernel] Kernel Tests</A></li>
+	<LI> Next message: <A HREF="000719.html">[JOS-Kernel] Kernel Tests</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#713">[ date ]</a>
+              <a href="thread.html#713">[ thread ]</a>
+              <a href="subject.html#713">[ subject ]</a>
+              <a href="author.html#713">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

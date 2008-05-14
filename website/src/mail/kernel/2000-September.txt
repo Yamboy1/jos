@@ -1,0 +1,3171 @@
+From olkh@hotmail.com Tue, 05 Sep 2000 19:26:40 GMT
+Date: Tue, 05 Sep 2000 19:26:40 GMT
+From: Victor Olkhovets olkh@hotmail.com
+Subject: [JOS-Kernel] how  to use init.class ?
+
+Hi everybody,
+
+I've tried to install JOS this weekend and could not understand how
+to use init.class to load an application. Apparently it starts,
+initializes console and kbd drivers and then goes into
+an infinite loop (according to javap -c ).
+It does not seem to look into any inittab file.
+
+Also: of a FAT filesystem grub refuses to load jjos-grub because
+of its long name. Does it make sense in future releases to use
+name like jjos.bin or jjos.gb (Grub Binary) ?
+
+Best,
+Victor
+
+_________________________________________________________________________
+Get Your Private, Free E-mail from MSN Hotmail at http://www.hotmail.com.
+
+Share information about yourself, create your own public profile at 
+http://profiles.msn.com.
+
+
+
+
+
+From tmiller@haverford.edu Tue, 5 Sep 2000 18:53:45 -0400 (EDT)
+Date: Tue, 5 Sep 2000 18:53:45 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] how  to use init.class ?
+
+> I've tried to install JOS this weekend and could not understand how
+> to use init.class to load an application.
+
+	Mostly because it doesn't -- it's not complete.  'init' is named
+that more because it's the first process to start and the last to die,
+rather than for any similarity between it and linux/unix init.
+
+> Apparently it starts, initializes console and kbd drivers and then
+> goes into an infinite loop (according to javap -c ). It does not seem
+> to look into any inittab file.
+
+	You're dead on.  However, that is all that init does.  (The
+infinite loop is to prevent the scheduler from exiting because there
+aren't any active threads.  When we complete the system, I intend to put a
+call to idleprocessing() or something similar there.)  We need harddrive
+and filesystem drivers before init can use an inittab-style
+scheme.  (Should probably be XML, IMHO...)
+
+> Also: of a FAT filesystem grub refuses to load jjos-grub because
+> of its long name. Does it make sense in future releases to use
+> name like jjos.bin or jjos.gb (Grub Binary) ?
+
+	Hadn't thought about that.  jjosgrub is short enough, yes?  Thanks
+for trying things out, by the way.
+
+-_Quinn
+
+
+
+
+
+From mgangelen@quintop.nl Wed, 6 Sep 2000 09:52:41 +0200
+Date: Wed, 6 Sep 2000 09:52:41 +0200
+From: mgangelen@quintop.nl mgangelen@quintop.nl
+Subject: [JOS-Kernel] how to use init.class ?
+
+On FAT try the following for long filenames: kernel
+(hdX,X)/progra~1/jos/mykern~1.img
+
+
+
+                                                                                                                   
+                    "Todd L.                                                                                       
+                    Miller"              To:     kernel@jos.org                                                    
+                    <tmiller@have        cc:                                                                       
+                    rford.edu>           Subject:     Re: [JOS-Kernel] how to use init.class ?                     
+                    Sent by:                                                                                       
+                    kernel-admin@                                                                                  
+                    jos.org                                                                                        
+                                                                                                                   
+                                                                                                                   
+                    06-09-2000                                                                                     
+                    00:53                                                                                          
+                    Please                                                                                         
+                    respond to                                                                                     
+                    kernel                                                                                         
+                                                                                                                   
+                                                                                                                   
+
+
+
+
+> I've tried to install JOS this weekend and could not understand how
+> to use init.class to load an application.
+
+     Mostly because it doesn't -- it's not complete.  'init' is named
+that more because it's the first process to start and the last to die,
+rather than for any similarity between it and linux/unix init.
+
+> Apparently it starts, initializes console and kbd drivers and then
+> goes into an infinite loop (according to javap -c ). It does not seem
+> to look into any inittab file.
+
+     You're dead on.  However, that is all that init does.  (The
+infinite loop is to prevent the scheduler from exiting because there
+aren't any active threads.  When we complete the system, I intend to put a
+call to idleprocessing() or something similar there.)  We need harddrive
+and filesystem drivers before init can use an inittab-style
+scheme.  (Should probably be XML, IMHO...)
+
+> Also: of a FAT filesystem grub refuses to load jjos-grub because
+> of its long name. Does it make sense in future releases to use
+> name like jjos.bin or jjos.gb (Grub Binary) ?
+
+     Hadn't thought about that.  jjosgrub is short enough, yes?  Thanks
+for trying things out, by the way.
+
+-_Quinn
+
+
+_______________________________________________
+Kernel maillist  -  Kernel@jos.org
+http://jos.org/mailman/listinfo/kernel
+
+
+
+
+
+
+
+From jewel@pixie.co.za Wed, 13 Sep 2000 04:26:25 +0000 (GMT)
+Date: Wed, 13 Sep 2000 04:26:25 +0000 (GMT)
+From: jewel@pixie.co.za jewel@pixie.co.za
+Subject: [JOS-Kernel] kissme JVM + linux kernel
+
+I've managed to compile my kissme JVM as a kernel module and load it into the
+Linux kernel.
+
+This took me 3 days, I only made changes necessary to get it to run a hello
+world program, there is a lot of other broken stuff. 
+
+My aim with doing this was to get a workable "kernel+JVM" implementation
+running. I don't want to debate the merits/demerits of using Linux as a kernel. 
+
+Next I plan to neaten up the code a bit, probably get garbage collection
+working, and implement linux kernel threads as native java threads.
+
+Interesting stuff that can be explored from here:
+
+Use the linux frame buffer to start writing window managers, 2D apis for video. 
+Use the device drivers to write network stacks, file systems.
+Resurrect some kind of virtual terminal and establish a shell. 
+
+Anyone who is interested in testing / hacking, or just wants to ask questions
+please mail me.
+
+John
+Leuner
+
+---------------------------------------------
+This message was sent using M-Web Airmail.
+http://airmail.mweb.co.za/
+
+
+
+
+
+
+From iainshigeoka@yahoo.com Wed, 13 Sep 2000 09:00:33 -0500
+Date: Wed, 13 Sep 2000 09:00:33 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] kissme JVM + linux kernel
+
+At 04:26 AM 9/13/00 +0000, jewel@pixie.co.za wrote:
+>I've managed to compile my kissme JVM as a kernel module and load it into the
+>Linux kernel.
+>
+>Anyone who is interested in testing / hacking, or just wants to ask questions
+>please mail me.
+
+Very cool.  Is it available for public download somewhere?
+
+-iain
+
+
+
+
+
+From jewel@pixie.co.za Wed, 13 Sep 2000 21:10:36 +0000 (GMT)
+Date: Wed, 13 Sep 2000 21:10:36 +0000 (GMT)
+From: jewel@pixie.co.za jewel@pixie.co.za
+Subject: [JOS-Kernel] kissme JVM + linux kernel
+
+At 04:26 AM 9/13/00 +0000, jewel@pixie.co.za wrote:
+>I've managed to compile my kissme JVM as a kernel module and load it into the
+>Linux kernel.
+>
+>Anyone who is interested in testing / hacking, or just wants to ask questions
+>please mail me.
+
+>Very cool.  Is it available for public download somewhere?
+
+I'll make it available in the next day or two. 
+
+John Leuner
+           
+
+
+---------------------------------------------
+This message was sent using M-Web Airmail.
+http://airmail.mweb.co.za/
+
+
+
+
+
+
+From gchii@mindspring.com Thu, 14 Sep 2000 22:08:35 -0400
+Date: Thu, 14 Sep 2000 22:08:35 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [VM Kit] Calculator
+
+At first, I thought the prototype for calculator functions, such as iadd,
+isub, imul, idiv, irem, jadd, jsub, jmul, jdiv, jrem, etc., might look
+something like this:
+
+jint iadd( jint a, jint b );
+
+But this prototype does not allow for math errors. I am leaning toward a
+prototype that's more like this:
+
+short iadd( jint a, jint b, jint *result );
+
+where a calculated result is returned through a parameter and the literal
+return value of the function is an error code. The error code could be
+mapped like the errno in the standard C library, where zero is for success
+and non-zero is for failure. The calculator knows nothing of a virtual
+machine, so it cannot "throw" an exception object.
+
+When it uses the calculator library, the virtual machine can throw an
+appropriate exception.
+
+
+
+
+
+From gchii@mindspring.com Thu, 14 Sep 2000 22:08:44 -0400
+Date: Thu, 14 Sep 2000 22:08:44 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [VM Kit] field list
+
+A field list component is a primative part of a virtual machine. It can
+exist outside a virtual machine for extreme testing. In other words, it can
+be completely tested /before/ it is integrated into your virtual machine.
+
+A field list is a component of each object. Just as it has a method list,
+an object has a field list. A field list can be used to store static fields
+for a class and instance fields for an object. And it looks as if the field
+list component could be reusable by the stack frame for local variables, too.
+
+A field list allocates room for fields when it is open'd. To initialize a
+field list, repeatedly call its addField() method for each field. The
+addField() method has a prototype like this:
+
+void FieldList::addField( const char *fieldSpec, const char *descriptor );
+
+where fieldSpec is a full field name (java/lang/System/out) and descriptor
+is the field type (Ljava/io/InputStream;).
+
+When open'd, the FieldList also creates a cross-reference index, so that
+fields can be addressed by their ID rather than by their name. FieldList
+provides a method to get a field ID:
+
+short FieldList::getFieldID( const char *fieldSpec );
+
+To get/set a four-octet field, use
+
+getIntField( short id );
+getIntField( const char *fieldSpec );
+setIntField( short id, jint v );
+setIntField( const char *fieldSpec, jint v );
+
+To get/set an eight-octet field, use
+
+getLongField( short id );
+getLongField( const char *fieldSpec );
+setLongField( short id, jlong v );
+setLongField( const char *fieldSpec, jlong v );
+
+Different field list components are possible. Some might organize fields
+into a linked list, an array, or allocate a single block of memory for all
+fields in the list.
+
+
+
+
+
+From gchii@mindspring.com Thu, 14 Sep 2000 22:27:31 -0400
+Date: Thu, 14 Sep 2000 22:27:31 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] New moderator
+
+This mailing list was set up as a moderated list. A moderator is
+responsible for encouraging postings that "relevant" to the purpose of the
+list. Clark Evans has been the moderator of this mailing list for a long
+time. Thanks Clark!
+
+As of today, Clark has gladly handed over his role as moderator to me. This
+mailing list is what you make of it. It was intended to help members of the
+JOS Project define and refine an official JOS kernel.
+
+Look through the archives. This list contains a highly technical discussion
+about hands-on C/C++ programming for the JOS Kernel and other components.
+The discussion has included bootloaders, such as Etherboot and GRUB.
+Messages already posted should set a precedent for the kinds of messages
+that will be "relevant" in the future.
+
+Only one requirement is real: you must subscribe to the mailing list in
+order to get your message posted automatically. I look forward to more
+activity on this list.
+
+
+
+
+
+From gregm@wrq.com Thu, 31 Aug 2000 13:26:11 -0700
+Date: Thu, 31 Aug 2000 13:26:11 -0700
+From: Greg Mace gregm@wrq.com
+Subject: [JOS-Kernel] what do I do after I've built the GRUB boot disk
+
+a Newbie question, but I've been all through the web site and can't seem to
+get the next step.  I'm assuming since (from the docs) that the classes are
+to big to fit on a floppy, that I would have to direct the loader (GRUB) to
+find the kernel files some where else (like on my C-drive).  Is this true?
+Can someone help me with this?
+thx.
+
+
+
+
+
+From gchii@mindspring.com Mon, 18 Sep 2000 10:21:59 -0400
+Date: Mon, 18 Sep 2000 10:21:59 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Approval
+
+I wish to apologize for any delay in posting messages to this list. If you
+post a message without a subscription, your message will wait for moderator
+approval. You must subscribe to the mailing list to get automatic approval
+of all your messages.
+
+I'm new to my role as moderator. I promise to take less time to
+approve/reject messages in the future.
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 09:41:44 -0500
+Date: Mon, 18 Sep 2000 09:41:44 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] how to get CVS archives of kernel
+
+At 12:52 AM 1/2/80 -0800, root wrote:
+
+>I'm new to CVS, is there a link that can tell me how to get the CVS
+>tools and then the kernel for development?  thx.
+
+Go here:
+
+http://sourceforge.net/cvs/?group_id=2376
+
+Instructions and links are provided.
+
+-iain
+
+
+
+
+
+From gchii@mindspring.com Mon, 18 Sep 2000 11:01:22 -0400
+Date: Mon, 18 Sep 2000 11:01:22 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [rheise.os 0.1.4] Warning
+
+Messages are automatically approved when you subscribe. Otherwise, they
+wait (forever) for moderator approval or rejection.
+
+For the record: Ryan un-subscribed from this list and then posted a few
+messages. These message have been waiting approval from the list moderator
+ever since. I approved Ryan's messages because he must have every
+opportunity to defend himself and state his opinion.
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 10:25:14 -0500
+Date: Mon, 18 Sep 2000 10:25:14 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] How to run my JOS?
+
+At 08:04 AM 5/8/00 -0700, =?gb2312?q?Jordan=20Arthur?= wrote:
+
+>   Now I want to know very much which modules can be available such as 
+> application
+>utility, file system etc. Because these concepts remain residing out of my 
+>brain.
+>Maybe I need learned more technology about the OS.
+
+All can be made available but none of them are yet.  JOS is very much 
+pre-alpha at this stage (not really usable).
+
+>   In addition, how can I do if I want to test an application based on JOS 
+> written
+>by myself. I feel the technology most needed by me should be a basic 
+>figure about JOS.
+>otherwise, I will own a feeling in which I can not discern the correct 
+>direction in
+>the road of researching JOS.
+
+Yes.  The basic architecture is there but is not diagrammed well at 
+all.  JOS is probably not ready for you to be prototyping applications on 
+unless you're fairly comfortable doing java assembly.  In the mean time, 
+you can actually just use any java platform for starters as JOS's eventual 
+goal is to expose to all applications, an identical interface (100% pure 
+java apps will run on JOS without modifications).
+
+At the moment, your best bet is to investigate the archives for this 
+mailing list and wander around the wiki.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 10:31:54 -0500
+Date: Mon, 18 Sep 2000 10:31:54 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] Kernel Compatibility
+
+At 12:45 PM 8/23/00 +0000, Silverbyte wrote:
+>Hi,
+>    I have Linux installed on my machines . Can I use the JOS kernel
+>straight away using my Linux Kernel loader or do I need to explicitly
+>install JOS.
+
+JOS currently loads via etherboot or GRUB.  You should have those on your 
+linux box but its probably more convenient to just boot off a floppy via 
+GRUB if they aren't configured already for your box.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 11:00:22 -0500
+Date: Mon, 18 Sep 2000 11:00:22 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] JOS Performance
+
+At 12:51 PM 8/2/00 -0700, you wrote:
+
+>Can someone give me some clue on how the JOS kernel
+>performance is, comparing with other OS kernel, i.e.
+>Linux kernel, especially the context switch time,
+>interrupt response time?
+
+The kernel is at pre-alpha right now.  So performance measurements are 
+pretty moot.  We'll post benchmarks when the there's enough there to really 
+show something one way or the other.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 10:56:20 -0500
+Date: Mon, 18 Sep 2000 10:56:20 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] what do I do after I've built the GRUB boot
+ disk
+
+At 01:26 PM 8/31/00 -0700, Greg  Mace wrote:
+>a Newbie question, but I've been all through the web site and can't seem to
+>get the next step.  I'm assuming since (from the docs) that the classes are
+>to big to fit on a floppy, that I would have to direct the loader (GRUB) to
+>find the kernel files some where else (like on my C-drive).  Is this true?
+>Can someone help me with this?
+>thx.
+
+The GRUB boot image includes everything.  So you just need to jump start it 
+via GRUB and you'll get the whole enchilada.  I'm pretty darn sure the 
+entire thing fits on one floppy.  Currently that's a very simple set of 
+test runs to prove the kernel is doing what it should be doing (and that it 
+doesn't do what it shouldn't).  The class library hasn't been ported to JOS 
+yet so the classes are pretty small (just the essential basic stuff to 
+support the functionality the kernel has now).  There's a lot more work to 
+be done before it's really fully functional.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 11:06:01 -0500
+Date: Mon, 18 Sep 2000 11:06:01 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] gaining an initial perspective : JOS : why?
+
+At 10:18 PM 8/8/00 -0700, you wrote:
+
+>so what's so bad about (the) linux (ops-system) that it would not be 
+>sufficient?
+
+Well, as in everything else, a purpose specific application can be 
+optimized in several areas (functionality, performance, resource usage, 
+etc).  These optimizations are typically not available to a general purpose 
+tool.  The same applies here, JOS is an OS specifically designed to run 
+java apps.  Therefore we hope to gain advantages over a general OS which 
+happens to run java apps.
+
+Of course, if you don't believe the underlying premise that specialized 
+tools outperform general purpose tools in their area of expertise, then its 
+pretty easy to argue that JOS is a useless exercise.
+
+-iain
+
+
+
+
+
+From George.Marrows@Smallworld.co.uk Mon, 18 Sep 2000 17:38:30 +0100
+Date: Mon, 18 Sep 2000 17:38:30 +0100
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] gaining an initial perspective : JOS : why?
+
+Sorry to be negative, but I would say we'd have to pull something pretty
+amazing out of the hat, JVM-wise, to be able to beat HotSpot or IBM's JVM on
+Linux in any area at all. Personally, I think the only reason to be
+interested in writing a new JVM is for personal understanding of how they
+work and the intellectual challenge (at least that's why I've been
+involved).
+
+This overlaps with what I was going to suggest as follow-up to Robert's 'The
+JOS Project?' thread. Perhaps JOS should develop along two lines:
+
+1. JVM / low-level OS development along the current lines. If this ever bore
+fruit, then it could replace Linux in the following:
+
+2. A separate project to work on closer integration of existing JVM's into
+Linux so that shell, user-interface etc is all written in Java. Kind of a
+Java-centric KDE / Gnome initially, but it could then worm it's way further
+down to start taking over file system and other duties, if we wanted. This
+gives us something of a Java OS but without the overhead of trying to take
+on the work of writing both Linux and a JDK from the ground up ... (NB
+something like this was suggested over at the JavaLobby .. anyone know what
+happened to it?)
+
+-- George
+
+
+> -----Original Message-----
+> From:	Iain Shigeoka [SMTP:iainshigeoka@yahoo.com]
+> Sent:	18 September 2000 17:06
+> To:	kernel@jos.org; s-champ@pacbell.net
+> Subject:	Re: [JOS-Kernel] gaining an initial perspective : JOS : why?
+> 
+> At 10:18 PM 8/8/00 -0700, you wrote:
+> 
+> >so what's so bad about (the) linux (ops-system) that it would not be 
+> >sufficient?
+> 
+> Well, as in everything else, a purpose specific application can be 
+> optimized in several areas (functionality, performance, resource usage, 
+> etc).  These optimizations are typically not available to a general
+> purpose 
+> tool.  The same applies here, JOS is an OS specifically designed to run 
+> java apps.  Therefore we hope to gain advantages over a general OS which 
+> happens to run java apps.
+> 
+> Of course, if you don't believe the underlying premise that specialized 
+> tools outperform general purpose tools in their area of expertise, then
+> its 
+> pretty easy to argue that JOS is a useless exercise.
+> 
+> -iain
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+
+From tmiller@haverford.edu Mon, 18 Sep 2000 13:24:17 -0400 (EDT)
+Date: Mon, 18 Sep 2000 13:24:17 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] jos distribution 1e
+
+> The released version, works pretty well except for a bug in the ASCII
+> transfer code where the first byte is transferred incorrectly. IMAGE
+> transfer (binary) should work ok, though.
+
+	OK, thanks.  Let me know when you have a fix for this.
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Mon, 18 Sep 2000 13:26:58 -0400 (EDT)
+Date: Mon, 18 Sep 2000 13:26:58 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] what do I do after I've built the GRUB boot disk
+
+	The GRUB boot disk is used to load the kernel; it's certainly
+possibly that there's an image floating around there which includes the
+kernel and loader on one floppy, though I don't have it.  The class
+library, however, has to be loaded as a module, because it's ~8 MB in
+size.  (Unless someone's been fiddling with the releases while I haven't
+been looking.)  While it's true that the library isn't integrate yet, it's
+still necessary to run the jos-specific code included in the build.
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Mon, 18 Sep 2000 13:37:23 -0400 (EDT)
+Date: Mon, 18 Sep 2000 13:37:23 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] pls help me. (fwd)
+
+	There's not anywhere the kernel should fail after print A20 OK
+until it gets to trying to find the ramdisk.  Did you make the bootable
+image file using mknbi-jos?  If not, try that; it includes everything in
+one file (jjos-nbi), which needs to be in /tftpboot.  Also be sure that
+-DETHERBOOT is defined in the Makefile.  Hope this helps.
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Mon, 18 Sep 2000 13:58:10 -0400 (EDT)
+Date: Mon, 18 Sep 2000 13:58:10 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] [rheise.os 0.1.4] Warning
+
+	About jos.* -- it's a 'public' namespace in the sense that the JOS
+project owns it.  It seems evident that the 'proper' way to manage such a
+namespace is by defining it terms of interfaces which specific programs
+can subscribe to / replace.  (That is, there should probably only be /one/
+process manager.  It makes sense for efficiency reasons for that process
+manager just to replace the interfaces in jos.* with compliant
+classes.)  I happen to think that the way decaf uses it is nice, but I'm
+open to improvements, or just a pack-up-and-move operation.  It is further
+my intent to use rheise.os as the interface when I implement multiple
+java processes in decaf, so I will find someway that I'm comfortable with
+for the two to co-exist.  This may or may not become the JOS
+standard.  What that standard might be is another issue to discuss.
+
+	Incidentally, most of the reason I haven't put any effort into
+'standards' for JOS is the certain knowledge that they're going to change,
+and change radically, by the time decaf (or other JVM) is ready.  It seems
+more sensible to me to start with an interface that works and generalize
+it than to create a general one and instantiate it.
+
+	[Incidentally, I know of 3 JVMs that have been mentioned on this
+list -- John ('pixie') Leuner's 'kissme', Robert Fitzsimmon's 'untitled',
+and Todd L. Miller's decaf -- but only one is in CVS.  (Although I checked
+some old logs and discovered that kissme has its own SF project and
+repository.  If this suggests that decaf/JJOS should have its/their own
+project, that's fine too...
+
+	The cvs repository is on SourceForge, and should be accesible via
+cvs.jos.org.  e/m me for more information/whatever.  It would certainly
+reduce the impression that decaf was *the* JOS JVM if there were more than
+one of them in the CVS.  (Also, Robert, RJK isn't in the CVS.)  Having all
+five in CVS would also make it easier to generate a sixth with the best
+from all of them.]
+
+-_Quinn
+
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 14:15:46 -0500
+Date: Mon, 18 Sep 2000 14:15:46 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] what do I do after I've built the GRUB boot
+ disk
+
+At 01:26 PM 9/18/00 -0400, you wrote:
+>         The GRUB boot disk is used to load the kernel; it's certainly
+>possibly that there's an image floating around there which includes the
+>kernel and loader on one floppy, though I don't have it.  The class
+>library, however, has to be loaded as a module, because it's ~8 MB in
+>size.  (Unless someone's been fiddling with the releases while I haven't
+>been looking.)  While it's true that the library isn't integrate yet, it's
+>still necessary to run the jos-specific code included in the build.
+
+Whoops.  Thanks for the correction.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 18:10:18 -0500
+Date: Mon, 18 Sep 2000 18:10:18 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] [rheise.os 0.1.4] Warning
+
+At 07:50 AM 5/16/00 +1000, Ryan Heise wrote:
+
+>rheise.os-0.1.4-pre4 can be deconstructed as follows:
+>
+>The first number is the major version number. It is currently zero
+
+[snip]
+
+>The second number is odd if this is a development release, or even if it
+
+[snip]
+
+>The third number represents minor releases that includes changes
+
+[snip]
+
+>The -pre4 suffix means that this is the 4th pre-release of what is to
+
+[snip]
+
+This seems pretty standard.  Perhaps we should put this into the wiki as a 
+standard naming convention.  I assumed it was understood too but it appears 
+that its not tha standard.
+
+>the java package names, which is a different issue. The latter affects
+>backward compatibility, and my believe is that such changes should be
+>made as early as possible. This is because as more people start writing
+>OS services on top of rheise.os, it will be more and more work for
+>everyone to change their code when I rename my packages to jos.*. While
+>my product is not _the_ java layer for JOS, I still see benefit in
+>naming my classes jos.*. All I have done here is expressed my believe. I
+>know you have different opinions on backward compatibility and I do not
+>wish to argue about them here. Let's just acknowledge for the moment
+>that we have different opinions and we are entitled to go with what we
+>think is best. Later we can discuss our differences.
+
+This seems to be more a matter of what should go into the jos.* package 
+space and what shouldn't.  What I think would be really nice is to leave 
+most of the jos.* core system packages as interfaces.  Then let 
+implementations exist outside of the jos.* package space and get sucked in 
+and instantiated at run-time via property files.  This is similar to the 
+CommAPI package.  The base package specifies low level interfaces, but the 
+actual functionality is provided by packages outside of the 
+space.  Depending on the property file you put into your directory, the 
+startup code instantiates the correct serial port driver that implements 
+the interfaces that the package functionality is built on.
+
+It is my impression that this is the direction that Ryan is 
+taking.  However, at this time, due to the EXTREMELY experimental nature of 
+most of the code related to JOS, shortcuts will be made, and package names 
+will be very unstable.
+
+Gilbert, I understand your desire to keep backward compatibility but it 
+simply does not seem feasible with the current codebase.  It's way too 
+mercurial at this point.  We don't know what should be in the common 
+interfaces and what should be implemented separately.  So i think for now, 
+that we'll all have to just live with the inconsistencies and have file 
+search and replace ready when changes do happen... ;)
+
+>It is the product name that makes it unique. My proposal for the JOS
+>process API is that applications deal with a class called
+>jos.process.JavaProcess.
+
+And this seems reasonable.  In all reality, we should really only 
+standardize on interfaces and leave implementations to anyone.  That will 
+make JOS's implementation that ships the reference implementation but allow 
+anyone to replace any part with any other implementation.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 18:15:27 -0500
+Date: Mon, 18 Sep 2000 18:15:27 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] [rheise.os 0.1.4] Warning
+
+At 01:58 PM 9/18/00 -0400, you wrote:
+>         [Incidentally, I know of 3 JVMs that have been mentioned on this
+>list -- John ('pixie') Leuner's 'kissme', Robert Fitzsimmon's 'untitled',
+>and Todd L. Miller's decaf -- but only one is in CVS.  (Although I checked
+>some old logs and discovered that kissme has its own SF project and
+>repository.  If this suggests that decaf/JJOS should have its/their own
+>project, that's fine too...
+
+No.  I like the way Tomcat is being handled.  Essentially, there's a main 
+cvs tree with the name tomcat associated with a codebase.  When a 
+"competing" version was proposed, it went in under a new namespace (as a 
+separate cvs module in the same cvs tree).  A vote was taken and the 
+competing version was voted as being the successor to the current 
+tomcat.  So the old tomcat will remain tomcat3 and the new code will be 
+renamed and repackaged as tomcat4 and merged into the tree (the 3x just 
+gets branched off).
+
+Now whether the "competing" versions exist on the same cvs tree or in 
+separate sourceforge projects should probably be up to the preferences of 
+the core developers for that project.  I don't think it makes much 
+difference to anyone.
+
+>         The cvs repository is on SourceForge, and should be accesible via
+>cvs.jos.org.  e/m me for more information/whatever.  It would certainly
+>reduce the impression that decaf was *the* JOS JVM if there were more than
+>one of them in the CVS.  (Also, Robert, RJK isn't in the CVS.)  Having all
+>five in CVS would also make it easier to generate a sixth with the best
+>from all of them.]
+
+In addition, probably just updating the KernelSummary would help.  The 
+entire website needs some updating but I've just not had the time.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 18 Sep 2000 18:25:49 -0500
+Date: Mon, 18 Sep 2000 18:25:49 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] gaining an initial perspective : JOS : why?
+
+At 05:38 PM 9/18/00 +0100, you wrote:
+>Sorry to be negative, but I would say we'd have to pull something pretty
+>amazing out of the hat, JVM-wise, to be able to beat HotSpot or IBM's JVM on
+>Linux in any area at all. Personally, I think the only reason to be
+>interested in writing a new JVM is for personal understanding of how they
+>work and the intellectual challenge (at least that's why I've been
+>involved).
+
+I definitely can't argue this possibility.  And I agree that we almost 
+assuredly won't be able to outcompete head to heard replicating a standard 
+os with a jvm on it.  The hope is using a completely different paradigm
+will give us a big boost in some way.  I personally like the idea of being 
+a jini os, with a hyper optimized javaspace but who's to say.  I agree that 
+jos that looks like java on linux will probably not be that great.  But 
+something that doesn't looks like unix at all may be the ticket.
+
+>This overlaps with what I was going to suggest as follow-up to Robert's 'The
+>JOS Project?' thread. Perhaps JOS should develop along two lines:
+>
+>1. JVM / low-level OS development along the current lines. If this ever bore
+>fruit, then it could replace Linux in the following:
+>
+>2. A separate project to work on closer integration of existing JVM's into
+>Linux so that shell, user-interface etc is all written in Java. Kind of a
+>Java-centric KDE / Gnome initially, but it could then worm it's way further
+>down to start taking over file system and other duties, if we wanted. This
+>gives us something of a Java OS but without the overhead of trying to take
+>on the work of writing both Linux and a JDK from the ground up ... (NB
+>something like this was suggested over at the JavaLobby .. anyone know what
+>happened to it?)
+
+This is exactly what most of the core developers have suggested.  And Ryan 
+has been pushing, and Robert has been really pushing.  For instance, even 
+without our own os and jvm, you can actually build almost the entire jos on 
+top of any jvm on any os.  Like Ryan's rheise.os.  It runs on a jvm.  You 
+can do a heck of a lot of coding and testing without any special 
+javaos.  This is even more evident if you bring in the concept of providing 
+authentication, GUI/desktop/window manager, applications etc.  None, or 
+very few really require the low level jvm/os to code.  And all could be 
+very useful without it.
+
+Robert has been trying to bridge the completely pure java stuff, with the 
+kernel by creating a kernel interface.  That way even code that has to do 
+real level stuff can actually be written and tested on any os/jvm combo by 
+essentially writing a jos-kernel driver that implements his kernel 
+interface.  Check out rjk (an old copy should be lying around somewher).
+
+Perhaps we should really stress these alternatives as the discussions 
+evidently never make it out of a limited group of kernel developers.  Maybe 
+we should have codenames for them to really distinguish the choices and 
+emphasize the differences.
+
+-iain
+
+
+
+
+
+From jewel@mweb.co.za Sun, 17 Sep 2000 22:17:23 +0000 (UTC)
+Date: Sun, 17 Sep 2000 22:17:23 +0000 (UTC)
+From: John Leuner jewel@mweb.co.za
+Subject: [JOS-Kernel] kissme JVM + linux kernel
+
+I've uploaded the source for my hacked JVM to the sourceforge CVS
+repository. 
+
+The codename for this version of the JVM is "teaseme". To get the source:
+
+cvs -d:pserver:anonymous@cvs.teaseme.sourceforge.net:/cvsroot/teaseme login 
+                         
+cvs -z3 -d:pserver:anonymous@cvs.teaseme.sourceforge.net:/cvsroot/teaseme
+co current
+
+I duplicated the 'current' directory by mistake, so if you browse the CVS
+tree you'll see current/current/{vm files}
+
+This is just the source for the JVM. To get it to run anything you'll need
+the class library files too. I'll upload these soon. (They are the same as
+for the kissme (http://kissme.sourceforge.net) project).
+
+Building
+-----------------------
+
+To compile the JVM you need a java interpreter installed, and a copy of my
+makeme build tool, http://makeme.sourceforge.net/. Unfortunately this
+depends on the ANTLR compiler-compiler, see http://antlr.org.
+
+You can try executing the contents of the build_commands file in the
+top-level directory, this just compiles all the files. 
+
+
+Running:
+-----------------------
+
+The makefiles generate an object file called teaseme.o. 
+
+This contains the JVM. Currently it is hard-coded to look for its classes
+in /home/jewel/kissme_classpath. It is also hard-coded to run
+kissme_test.hello. 
+
+This will change. 
+
+To run the JVM, go insmod teaseme.o. It spews a whole lot of output in the
+kernel buffer (type dmesg to see it). This will change too.
+
+If the jvm didn't cause a segfault, you can remove it with 'rmmod
+teaseme'. 
+
+Currently I've only run a hello world app, getting more stuff to run is a
+matter of fixing up the class library functions to use the linux kernel
+directly (eg file access, time/date). Also threads need to implemented
+(threads mapped to linux kernel threads instead of pthreads). 
+
+That's it for now. Later I'll make it more tester friendly and provide a
+binary that people can try out. 
+
+I'm building and using this on Debian Potato, with a 2.2.17 kernel. I
+assume it will work on all 2.2 kernels.
+
+(I apologise for the delay in putting the source up, I should have done it
+before I posted to the list).
+
+John Leuner
+
+
+
+
+
+
+
+From gchii@mindspring.com Mon, 18 Sep 2000 21:27:12 -0400
+Date: Mon, 18 Sep 2000 21:27:12 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [rheise.os 0.1.4] Warning
+
+At 06:10 PM 9/18/00 -0500, you wrote:
+>What I think would be really nice is to leave most of the jos.* core system
+>packages as interfaces. Then let implementations exist outside of the jos.*
+>package space and get sucked in and instantiated at run-time via property
+>files.
+
+I agree with Iain about this. Interfaces should be used here. When there
+are five implementations of a JOS-compatible virtual machine, there should
+be binary compatibility between the JOS classes across all five. The
+JOS-compatible interfaces are implememented one time, not five.
+
+Suppose we create a package of interfaces in jos.device. Once we write the
+source code for the package, a virtual machine designer does not have to
+write them again.
+
+Abstract classes should not be confused with interfaces. The purpose of an
+interface is for compatibility among implementations. The purpose of an
+abstract class is reuse within an implementation.
+
+Unfortunately, we have bad examples of "interfaces" to a virtual machine in
+the standard Java class library, which are implemented as abstract classes.
+The java.io.InputStream concept is both an interface and abstract class. It
+should have been a java.io.InputStream interface and
+java.io.BaseInputStream abstract class. Thus, any class could implement the
+InputStream interface including other implementations of an I/O package.
+
+Any class with native methods is an abstract class. While it does not
+require the abstract keyword, its methods are elsewhere, expected to be
+implemented in machine code. This unfortunate shortcut in the design of the
+standard Java class library makes it most difficult to fully implement a
+compatible virtual machine.
+
+
+
+
+
+From gchii@mindspring.com Mon, 18 Sep 2000 22:07:27 -0400
+Date: Mon, 18 Sep 2000 22:07:27 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [rheise.os 0.1.5] Resolved
+
+Look at rheise.os 0.1.5. Ryan has already resolved the namespace conflict.
+Packages in rheise.os product are back in the rheise.* namespace. This
+namespace conflict was resolved appropriately. The rheise.os product no
+longer defines classes in the jos.system package.
+
+http://www.jos.org/redist/rheise.os/
+
+Please allow me speak with my own voice. My objection is about the
+successful integration of multiple products, specifically the integration
+of decaf and rheise.os. Let rheise.os 0.1.5 serve as an example of how it
+should be done. (Actually, it has little to do with perfect backward
+compatibility and stable/unstable products.)
+
+Rule #1: You should not re-define a package published by another member.
+
+Corrolary: Likewise, your package should not be re-defined by another member.
+
+Packages are "owned" by the person who first defines them. Otherwise, total
+chaos would result and no product could be integrated with any other product.
+
+Rule #2: You can re-define your package if you must; but, beware the hazards.
+
+Corrolary: Likewise, your applications can't trust packages written by
+anyone who practices such re-definition.
+
+Re-defining a package is likely to break all other packages that depend
+upon it. Many, many packages depend on the operating system. We can't
+afford to rewrite all applications with each minor release of the operating
+system, can we? There aren't enough hours in the day to re-write,
+re-document and re-test all applications that depend on the operating
+system. And, this is especially so when most applications are written by
+third parties.
+
+It is unnecessary and undesireable for multiple products to knowingly and
+intentionally use the same package name for different packages. Computers
+hate ambiguity. When two or more packages have the same name, bad things
+happen. They cannot be compiled together. They cannot be integrated. Their
+dependencies cannot be resolved. They cannot participate in the same
+CLASSPATH. Documentation and is far more expensive.
+
+It is unnecessary because Java has a very large namespace. There is no
+compelling reason for one application to reuse the namespace of another.
+And, there is no compelling reason for one member of the JOS project to
+overwrite another member's package.
+
+As far as rules, we should be quick to point out the conflict in namespace
+so that products are as compatible as possible. All applications must be
+integrated into JOS because JOS is an operating system.
+
+If a member wants to, they are allowed to overwrite their own package. But,
+they are not allowed to overwrite the package of another member.
+
+Say whatever you want about compatibility. We cannot afford to create a
+culture where we remain silent while one member destroys the hard work of
+another.
+
+I felt it necessary to warn anyone trying to use rheise.os 0.1.4 with decaf
+that /both/ products define the jos.system package. Since decaf published
+the package first, decaf wins. Subsequently, Ryan put his packages back in
+the rheise.* namespace. It is as it should be.
+
+
+
+
+
+From gchii@mindspring.com Mon, 18 Sep 2000 22:28:22 -0400
+Date: Mon, 18 Sep 2000 22:28:22 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Jannux
+
+Jannux is the combination of Java(tm) and Linux(r). It has its own article
+on JOS Wiki:
+
+http://www.metamech.com/wiki/view/Main/JannuxPages
+
+To help other members of the JOS Project, please document your Linux
+configuration(s).
+
+What "modules" have you installed?
+
+How have you optimized Linux for Java?
+
+Which JDK do you use?
+
+How soon are you planning to replace your Linux-only tools with
+platform-independent tools written in the Java programming language?
+
+Which Linux applications have already been ported to Java?
+
+
+
+
+
+From gchii@mindspring.com Mon, 18 Sep 2000 22:55:00 -0400
+Date: Mon, 18 Sep 2000 22:55:00 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [vm-kit] CjOS Subproject
+
+I am reluctant to build my own virtual machine. Like other members, I am
+more interested in taking apart a virtual machine to see what makes it "tick".
+
+As a hobby, I might like to optimize a few vm-related components. I am
+thinking of a virtual machine more and more as a kit. There is an OSKit to
+build an OS. Why can't we develop a VMKit to build a virtual machine?
+
+At first, a system is built from the bottom up. It is easier to generalize
+once a virtual machine has been constructed. For now, we can use decaf as a
+baseline. All other virtual machines will be measured against it. Faster
+than decaf? Smaller than decaf? More flexible than decaf?
+
+A few components of decaf can be re-worked to start a VMKit. Others are
+decaf-specific. Here is another example.
+
+The interface between the standard Java class library and a virtual machine
+depends more on the standard Java class library than a virtual machine,
+right? So why can't we abstract this interface? We can. We can define all
+of the components and their methods a virtual machine must implement in
+order to support the following versions of Java:
+
+  Java 0
+  Java 1
+  Java 2
+
+The baseline should be stub components. A stub component implements an
+interface but does none of the real work. This is the basic idea behind
+BCNI and Alt package proposal. It is possible for a virtual machine to plug
+in a file system component, a network component, an AWT component. Each
+virtual machine does not have to write a unique implementation of AWT. We
+can work together. For example, some of the AWT for Linux has been written
+by the classpath Project (http://www.classpath.org). If it were better
+organized as a vm component, we could simply plug it into decaf in host mode.
+
+My kernel/virtual machine is called "CjOS" partly because it emphasizes the
+standard C library as its kernel interface. It uses a mix of C/C++ and
+Jasmin. It depends upon bytecode resource and Pure Reflection in C++.
+
+
+
+
+
+From gregorymace@home.com Mon, 18 Sep 2000 19:29:39 -0700
+Date: Mon, 18 Sep 2000 19:29:39 -0700
+From: Gregory Mace gregorymace@home.com
+Subject: [JOS-Kernel] build errors
+
+Hi,
+
+I've downloaded snapshot for jos kernel, etc. version 1f.  I get some
+errors trying to build.  I'm sure it's something simple...
+
+common/decaf/jvmbuiltins.cc :32: file curses.h: No Such file or
+directory
+
+also
+
+common/nativecode/jbheap.cc:514: Invalid use of void expression
+
+any and all clues welcome.
+
+thanks...
+
+
+
+
+
+
+
+
+From gchii@mindspring.com Mon, 18 Sep 2000 23:16:48 -0400
+Date: Mon, 18 Sep 2000 23:16:48 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [JOS Technical Edition] Release 1h
+
+On or around October 1, 2000, I will take a snapshot of the JJOS project
+CVS on SourceForge. This will be the cornerstone of Release 1h of the JOS
+Technical Edition.
+
+(I would like to compile a binary edition on my own computer. I have been
+unable to install a new compiler. My compiler won't compile the templates
+used in JJOS.)
+
+Meanwhile, volunteers are needed. Here is the challenge. How many members
+will be able to compile the JJOS module from the snapshot? Even if you're
+an expert CVS user, please download the snapshot and make certain it
+compiles cleanly.
+
+The following binary editions are requested:
+
+- Linux(r)-compatible version (host mode)
+- GRUB-compatible version (i386 mode)
+- Etherboot-compatible version (i386 mode)
+
+The following source edition is requested:
+
+- decaf for Windows(tm)
+
+We may have a PR problem. Many people want to believe that the JOS Project
+is dead. What are we going to do about it? A binary edition of JJOS can
+help. We can demonstrate that members of the JOS Project can work together
+as a team. We can show everyone what has been accomplished.
+
+When we have the latest binary editions of JJOS, it should be announced on
+the JOS Project homepage. A binary edition is important. Anyone can take
+JJOS for a test drive. Make it a stress-free test drive.
+
+A binary edition enables any member to run JJOS even when they do not have
+a full JJOS development environment. Members would like to see JJOS
+running. We need to know what it can and can't do. Is this too much to ask?
+
+
+
+
+
+From tmiller@haverford.edu Tue, 19 Sep 2000 00:21:44 -0400 (EDT)
+Date: Tue, 19 Sep 2000 00:21:44 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] build errors
+
+> common/decaf/jvmbuiltins.cc :32: file curses.h: No Such file or
+> directory
+
+	You need to poke around in the Makefile(s) and NOT define
+USE_CURSES, or include the (n)curses header in the include path.
+
+> common/nativecode/jbheap.cc:514: Invalid use of void expression
+
+	It's doing pointer arithmetic; cast them to integers or whatever.
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Tue, 19 Sep 2000 00:24:26 -0400 (EDT)
+Date: Tue, 19 Sep 2000 00:24:26 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] [JOS Technical Edition] Release 1h
+
+	It might interest you to know that the edition of jJOS in CVS at
+SourceForge doesn't actually /do/ anything right now.  The interpreter's
+not finished.
+
+-_Quinn
+
+
+
+
+
+From jewel@pixie.co.za Wed, 20 Sep 2000 04:18:56 +0000 (UTC)
+Date: Wed, 20 Sep 2000 04:18:56 +0000 (UTC)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Kernel] kissme JVM + linux kernel (fwd)
+
+I didn't see this message come through, so I'm resending it.
+
+
+---------- Forwarded message ----------
+Date: Sun, 17 Sep 2000 22:17:23 +0000 (UTC)
+From: John Leuner <jewel@mweb.co.za>
+To: kernel@jos.org
+Subject: kissme JVM + linux kernel
+
+I've uploaded the source for my hacked JVM to the sourceforge CVS
+repository. 
+
+The codename for this version of the JVM is "teaseme". To get the source:
+
+cvs -d:pserver:anonymous@cvs.teaseme.sourceforge.net:/cvsroot/teaseme login 
+                         
+cvs -z3 -d:pserver:anonymous@cvs.teaseme.sourceforge.net:/cvsroot/teaseme
+co current
+
+I duplicated the 'current' directory by mistake, so if you browse the CVS
+tree you'll see current/current/{vm files}
+
+This is just the source for the JVM. To get it to run anything you'll need
+the class library files too. I'll upload these soon. (They are the same as
+for the kissme (http://kissme.sourceforge.net) project).
+
+Building
+-----------------------
+
+To compile the JVM you need a java interpreter installed, and a copy of my
+makeme build tool, http://makeme.sourceforge.net/. Unfortunately this
+depends on the ANTLR compiler-compiler, see http://antlr.org.
+
+You can try executing the contents of the build_commands file in the
+top-level directory, this just compiles all the files. 
+
+
+Running:
+-----------------------
+
+The makefiles generate an object file called teaseme.o. 
+
+This contains the JVM. Currently it is hard-coded to look for its classes
+in /home/jewel/kissme_classpath. It is also hard-coded to run
+kissme_test.hello. 
+
+This will change. 
+
+To run the JVM, go insmod teaseme.o. It spews a whole lot of output in the
+kernel buffer (type dmesg to see it). This will change too.
+
+If the jvm didn't cause a segfault, you can remove it with 'rmmod
+teaseme'. 
+
+Currently I've only run a hello world app, getting more stuff to run is a
+matter of fixing up the class library functions to use the linux kernel
+directly (eg file access, time/date). Also threads need to implemented
+(threads mapped to linux kernel threads instead of pthreads). 
+
+That's it for now. Later I'll make it more tester friendly and provide a
+binary that people can try out. 
+
+I'm building and using this on Debian Potato, with a 2.2.17 kernel. I
+assume it will work on all 2.2 kernels.
+
+(I apologise for the delay in putting the source up, I should have done it
+before I posted to the list).
+
+John Leuner
+
+
+
+
+
+
+
+From gchii@mindspring.com Thu, 21 Sep 2000 09:22:53 -0400
+Date: Thu, 21 Sep 2000 09:22:53 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [kernel bytecode cache] Definition
+
+A kernel bytecode cache can be combined with bytecode as a resource to put
+boot classes for virtual machines inside a kernel. This saves both space
+and time.
+
+It saves space because boot classes are the most often duplicated classes
+in an off-the-shelf virtual machine. Boot classes should be statically
+linked to a kernel and shared by multiple virtual machines and/or multiple
+bytecode processes.
+
+Also, a kernel bytecode cache is tied to the kernel's virtual memory memory
+manager so that only the bytecode that's currently being used is found in
+real memory. The bytecode in the kernel bytecode cache is marked
+read-only/executable for optimal results.
+
+It saves time because boot classes are loaded as part of the kernel.
+Instead of "downloading" classes from a file subsystem, a virtual machine
+dynamically links to its boot classes. Dynamic linking is repeated for each
+bytecode process in a MPCL-compatible machine.
+
+When using the kernel of any foreign operating system, a virtual machine
+can link to the "kernel bytecode cache" implemented as a shared library.
+This simulator may or may not be tied directly to the virtual memory manager.
+
+
+
+
+
+From gchii@mindspring.com Thu, 21 Sep 2000 09:29:59 -0400
+Date: Thu, 21 Sep 2000 09:29:59 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] No virtual machine mailing list
+
+There is no virtual machine mailing list for the JOS Project. I don't think
+we should create one because there seems to be too many mailing lists
+already. We have discussed virtual machines on this list before. We can
+continue to do so, can't we?
+
+
+
+
+
+From iainshigeoka@yahoo.com Thu, 21 Sep 2000 09:19:36 -0500
+Date: Thu, 21 Sep 2000 09:19:36 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] No virtual machine mailing list
+
+At 09:29 AM 9/21/00 -0400, Gilbert Carl Herschberger II wrote:
+>There is no virtual machine mailing list for the JOS Project. I don't think
+>we should create one because there seems to be too many mailing lists
+>already. We have discussed virtual machines on this list before. We can
+>continue to do so, can't we?
+
+Yes. In general, vm's should be discussed on the kernel list.  For us at 
+least, it falls "under" the kernel itself.
+
+-iain
+
+
+
+
+
+From jewel@pixie.co.za Wed, 20 Sep 2000 21:17:09 +0000 (UTC)
+Date: Wed, 20 Sep 2000 21:17:09 +0000 (UTC)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Kernel] Re: kissme JVM + linux kernel
+
+I've managed to get basic file IO working (reading file streams from the
+local filesystem) and have prepared the way for native kernel threads and
+garbage collection. (last 2 not working yet though). 
+
+Following on my previous message, I've uploaded the source and class files
+for the classpath files that the kissme/teaseme JVM depends on. 
+
+Check out the module "classpath" in CVS. (See instructions in previous
+email). 
+
+You can build the kernel module yourself (see the
+"current" module). You'll need the makeme utility
+(http://makeme.sourceforge.net), and you might find
+http://teaseme.sourceforget.net/antlr.jar useful for running that. 
+
+I've also built a binary object file, it's at:
+
+http://teaseme.sourceforge.net/teaseme.o 
+
+I run it with:
+
+insmod -v -x teaseme.o 
+
+You may have a version conflict, or a need to force it.
+
+Before you run it, make sure you unpack the classpath files in:
+
+/usr/share/teaseme/classpath
+
+ie, java/lang/String.class would be at:
+
+/usr/share/teaseme/classpath/java/lang/String.class
+
+It will print messages to the console. (It is hardwired to run
+kissme_test.hello)
+
+Type rmmod teaseme to unload it. 
+
+The VM does clean up the GC heap when you unload it, but it will still eat
+up kernel memory if you do this too many times. 
+
+As you should know, installing a kernel module is dangerous and could
+destroy all your data. You have been warned. 
+
+I'm going away on holiday for a week and am limited to 1 pc (I need two to
+work on this), so I'll only be able to resume work then. 
+
+
+Have fun, all questions / comments welcome.
+
+John Leuner
+
+
+
+
+
+From gchii@mindspring.com Thu, 21 Sep 2000 23:04:02 -0400
+Date: Thu, 21 Sep 2000 23:04:02 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Intel's Virtual Machine
+
+Intel has released a virtual machine as open source. Their stated goal for
+releasing an open source virtual machine is pure research.
+
+Does Intel see the need for a Java-based operating system? They should.
+They'd like all operating systems running on the Intel microprocessor.
+Intel knows what it would take to create a Java-based operating system. It
+needs virtual memory management and garbage collection. Would you like to
+see virtual machine optimized for their microprocessor? I would. That would
+solve our stated goal of memory conservation.
+
+
+
+
+
+From gchii@mindspring.com Thu, 21 Sep 2000 23:22:01 -0400
+Date: Thu, 21 Sep 2000 23:22:01 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [kernel machine code cache] Definition
+
+Just as it is feasible to statically link bytecode to a kernel, it is just
+as feasible to statically link machine code to a kernel. Let me explain.
+
+I'm thinking specifically of boot packages: java.lang, java.util, java.io
+and java.net.
+
+In order to create a bytecode resource, bytecode must be translated into a
+resource. Translation is required. My translation program reads bytecode,
+creates C++ source code, compiles it and outputs an object file (.o or
+.obj). The bytecode is stored byte-for-byte in a rc_Bytecode wrapper class
+inside the object file.
+
+.class --> .o
+
+On the other hand, a programmer could write C++ source code for each boot
+class, compile it and output an object file. Or, a translation program
+could read bytecode and output equivalent machine code. Pre-compiled for
+boot classes could be statically linked to a kernel. Like a kernel bytecode
+cache, a kernel could provide a "cache" of machine code for virtual
+machines to share.
+
+
+
+
+
+From johan.rydberg@netinsight.se Fri, 22 Sep 2000 14:58:07 +0200
+Date: Fri, 22 Sep 2000 14:58:07 +0200
+From: Johan Rydberg johan.rydberg@netinsight.se
+Subject: [JOS-Kernel] No virtual machine mailing list
+
+Iain Shigeoka wrote:
+> 
+> At 09:29 AM 9/21/00 -0400, Gilbert Carl Herschberger II wrote:
+> >There is no virtual machine mailing list for the JOS Project. I don't think
+> >we should create one because there seems to be too many mailing lists
+> >already. We have discussed virtual machines on this list before. We can
+> >continue to do so, can't we?
+> 
+> Yes. In general, vm's should be discussed on the kernel list.  For us at
+> least, it falls "under" the kernel itself.
+
+Where can I find this JVM ?
+
+
+
+-- 
+Johan Rydberg			johan.rydberg@netinsight.net
+Net Insight AB, Sweden		direct: +46-8-685 04 17
+http://www.netinsight.net	phone:  +46-8-685 04 00
+				fax:    +46-8-685 04 20
+
+
+
+
+
+From robfitz@273k.net Sun, 24 Sep 2000 03:24:34 +0000
+Date: Sun, 24 Sep 2000 03:24:34 +0000
+From: Robert Fitzsimons robfitz@273k.net
+Subject: [JOS-Kernel] Fwd: Java Virtual Machine Development
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi everybody
+
+The attached email's are from a private discussion I've been having with
+Gilbert Carl Herschberger, Todd Miller and John Leuner.  The discussion
+is about us working on a combined JVM project.  This discussion was one
+of the reasons for my email "The JOS Project?" to the general mailing
+list.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+X-POP3-Rcpt: robfitz@host4.the-web-host.com
+Received: from 273k.net
+	by localhost with POP3 (fetchmail-5.3.3)
+	for bob@localhost (single-drop); Tue, 12 Sep 2000 05:16:50 +0000 (UTC)
+Received: from tux (postfix@c851848-b.mntp1.il.home.com [24.22.234.61])
+	by host4.the-web-host.com (8.9.3/8.9.3) with ESMTP id AAA09882
+	for <robfitz@273k.net>; Tue, 12 Sep 2000 00:47:02 -0400
+Received: by tux (Postfix, from userid 1000)
+	id A2A71EABD7; Tue, 12 Sep 2000 04:44:10 +0000 (UTC)
+Date: Tue, 12 Sep 2000 04:44:10 +0000
+From: Robert Fitzsimons <robfitz@273k.net>
+To: Todd Miller <tmiller@haverfod.edu>,
+        Gilbert Carl Herschberger II <gchii@mindspring.com>
+Cc: Robert Fitzsimons <robfitz@273k.net>
+Subject: Java Virtual Machine Development
+Message-ID: <20000912044410.A4039@tux.yi.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+User-Agent: Mutt/1.0.1i
+Sender: bob@tux.yi.org
+
+Hello Todd, Gilbert
+
+As I hope you two know i've been playing around with writing my own JVM
+for the last few months.  It began as an experiment when I got a bit of
+writers block with RJK, it's goals were to share as much information
+between multiple Java processes and be fast and efficient.  It is
+currently at the stage where class files can be loaded, simple code
+executed and objects created.
+
+Now i've stopped working on one code base and restarted with a new one
+about three times so far.  I have found this a very good way to improve
+the quality of the code, and include the much better ideas you come up
+with after you've written a piece of code.  Now I reached this stage
+again and this is where you two come in.
+
+We have all been working on our own JVM related projects decafe, Pure
+Reflection, my JVM, etc.  Also as part of the architecture group we've
+also had a lot of really good ideas, including multiple Java processes,
+BCNI, MPCL, etc.  The issue is with all the work thats going on and all
+the ideas we've had this still isn't that much to show for it.
+
+So lets take all we've learned and all the ideas, and start again.  But
+this time as a group!  Lets come up with a design using all our current
+ideas and allow for future expansion, then write it so that is can be
+fast, efficient, flexible and portable.
+
+So what do you guy's think, is it worth doing, can we do it?
+
+I'm willing to listen to all ideas and issues on design, implementation,
+programming language, coding style, etc.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+PS.  I'm making my current code base available at
+<URL:http://www.273k.net/jos/jvm.20000911.tar.gz>, so if you have any
+questions or comments give me a shout.
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+X-POP3-Rcpt: robfitz@host4.the-web-host.com
+Received: from 273k.net
+	by localhost with POP3 (fetchmail-5.3.3)
+	for bob@localhost (single-drop); Tue, 12 Sep 2000 23:07:17 +0000 (UTC)
+Received: from tisch.mail.mindspring.net (tisch.mail.mindspring.net [207.69.200.157])
+	by host4.the-web-host.com (8.9.3/8.9.3) with ESMTP id OAA01108
+	for <robfitz@273k.net>; Tue, 12 Sep 2000 14:33:01 -0400
+Received: from gchii.mindspring.com (user-38lcint.dialup.mindspring.com [209.86.74.253])
+	by tisch.mail.mindspring.net (8.9.3/8.8.5) with SMTP id OAA25168
+	for <robfitz@273k.net>; Tue, 12 Sep 2000 14:32:55 -0400 (EDT)
+Message-Id: <3.0.1.32.20000912143516.006c3134@pop.mindspring.com>
+X-Sender: gchii@pop.mindspring.com
+X-Mailer: Windows Eudora Light Version 3.0.1 (32)
+Date: Tue, 12 Sep 2000 14:35:16 -0400
+To: Robert Fitzsimons <robfitz@273k.net>
+From: Gilbert Carl Herschberger II <gchii@mindspring.com>
+Subject: Re: Java Virtual Machine Development
+In-Reply-To: <20000912044410.A4039@tux.yi.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+
+As you may know, I have suggested we export existing components to a VMKit.
+We can build common vm-related components so that each of us can build our
+own virtual machine. We are not limited to building a single virtual
+machine together.
+
+Are you again suggesting that we work together on a single virtual machine?
+
+I want a virtual machine that runs on jJOS, Linux and Windows. I would like
+most of it to be written in C/C++. I don't care if some of it is written in
+x86 assembler. I don't care if it is compiled from Java source code.
+
+We should learn from the mismanagement of the decaf project. A community
+won't volunteer to work on a virtual machine that satisfies the
+requirements of only one person. No, a community finds it easy to work on
+reusable components that will satify the requirements of everyone.
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+X-POP3-Rcpt: robfitz@host4.the-web-host.com
+Received: from 273k.net
+	by localhost with POP3 (fetchmail-5.3.3)
+	for bob@localhost (single-drop); Wed, 13 Sep 2000 18:03:51 +0000 (UTC)
+Received: from maynard.mail.mindspring.net (maynard.mail.mindspring.net [207.69.200.243])
+	by host4.the-web-host.com (8.9.3/8.9.3) with ESMTP id MAA07103
+	for <robfitz@273k.net>; Wed, 13 Sep 2000 12:22:36 -0400
+Received: from gchii.mindspring.com (user-38ld411.dialup.mindspring.com [209.86.144.33])
+	by maynard.mail.mindspring.net (8.9.3/8.8.5) with SMTP id MAA03858
+	for <robfitz@273k.net>; Wed, 13 Sep 2000 12:22:32 -0400 (EDT)
+Message-Id: <3.0.1.32.20000913122310.006c0a00@pop.mindspring.com>
+X-Sender: gchii@pop.mindspring.com
+X-Mailer: Windows Eudora Light Version 3.0.1 (32)
+Date: Wed, 13 Sep 2000 12:23:10 -0400
+To: Robert Fitzsimons <robfitz@273k.net>
+From: Gilbert Carl Herschberger II <gchii@mindspring.com>
+Subject: Re: Java Virtual Machine Development
+In-Reply-To: <20000913035356.A15446@tux.yi.org>
+References: <3.0.1.32.20000912143516.006c3134@pop.mindspring.com>
+ <20000912044410.A4039@tux.yi.org>
+ <3.0.1.32.20000912143516.006c3134@pop.mindspring.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+
+At 03:53 AM 9/13/00 +0000, you wrote:
+>Yes.  I think it would be to the projects advantage for there to be a
+>single JVM.  Although it's nice to have more I don't think it's not very
+>practical at this moment in time.
+
+I believe it might be easier to attract virtual machine designers if we
+support all virtual machine designs. Diversity is good. While /we/ don't
+have to form a team to build many virtual machines at once, we should
+expect our base virtual machine to be customize-able and specialize-able. I
+embrace the idea of multiple virtual machines through extension of a base
+virtual machine. Our goal should be to build that base.
+
+>The VMKit is a good idea, we just need to figure out how to accomplish
+>it.  We should try and write each component to be reusable, but doing
+>this and writing two or more JVM at the same time is just a waste.
+
+When each member of a VMKit group is expected to write their own virtual
+machine, it forces certain issues. It forces us to think of each component
+as a plug-in. If I write a component, for example, that you can plug into
+your custom virtual machine, that's a good thing. Isn't it?
+
+By opening up the expectations, many more virtual machine designers will be
+attracted to the VMKit group...because they can get the specialized virtual
+machine they always wanted. If a group wants to work on a single virtual
+machine, that's no problem. It's a start.
+
+I am fully opposed to the one-size-fits-all approach. Members of a VMKit
+group are not required to work on a group virtual machine if they don't
+want to. They can contribute vm-related components.
+
+Also, we can salvage vm-related components from other open source project.
+
+>I wouldn't say that decaf was mismanaged it just couldn't attract many
+>long term developers like myself, and for me that was more due to JJOS
+>than anything else.
+
+This might be significant. Like you, I do not like jJOS, the decaf-specific
+kernel. I think you mean jJOS (the kernel) and not JJOS (the kernel and
+virtual machine). The jJOS kernel is so decaf-specific that it invokes
+decaf_main(). It provides no well-defined kernel interface. It uses C++ and
+classes; but, it lacks object oriented design in specialization for
+Etherboot and GRUB.
+
+What else is wrong with jJOS? Can't we replace jJOS with something better?
+I think so. We can salvage parts of jJOS to create a better kernel.
+
+Reading the Linux Programming White Papers, I see that the Linux project
+organized its header files properly, leading to a strong parallel
+development process. The header files for jJOS and decaf are organized
+horribly.
+
+Inside Pure Reflection for C++, I tried to distinguish between public
+classes and private classes. I also put classes in class libraries. jJOS
+and decaf do not distinguish between public and private classes, making all
+classes public. There isn't a single class library in the entire project!
+
+For example, Many calculator libraries can implement the public calculator
+interface. When a "calculator" is compiled into an independent library, it
+can be plugged into a custom virtual machine. Only the calculator interface
+is exposed to a virtual machine. Only the calculator interface must be
+stored in a public header file. When I pre-compile the calculator library
+and distribute it in a binary edition, any specialized tools needed to
+build the calculator library are optional, not required. That is
+encapsulation.
+
+An enhanced calculator can extend the calculator interface. That is
+inheritence. A debugging version of the calculator could log each
+calculator request. A remote calculator can run on another CPU. A backup
+calculator can be compared to a new one. Three calculators can be used
+simultaneously to reduce the chance of a math error at runtime.
+
+You could choose a calculator from a list of calculators at runtime. That
+is a good use of polymorphism.
+
+For each component in a virtual machine, there is a similar story.
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+X-POP3-Rcpt: robfitz@host4.the-web-host.com
+Received: from 273k.net
+	by localhost with POP3 (fetchmail-5.3.3)
+	for bob@localhost (single-drop); Mon, 18 Sep 2000 18:36:50 +0000 (UTC)
+Received: from azaphrael.haverford.edu (root@165-82-108-36.students.haverford.edu [165.82.108.36])
+	by host4.the-web-host.com (8.9.3/8.9.3) with ESMTP id OAA17594
+	for <robfitz@273k.net>; Mon, 18 Sep 2000 14:10:11 -0400
+Received: from localhost (tmiller@localhost [127.0.0.1])
+	by azaphrael.haverford.edu (8.9.3/8.9.3) with ESMTP id OAA00736;
+	Mon, 18 Sep 2000 14:09:03 -0400
+Date: Mon, 18 Sep 2000 14:09:03 -0400 (EDT)
+From: "Todd L. Miller" <tmiller@haverford.edu>
+To: Robert Fitzsimons <robfitz@273k.net>
+cc: Gilbert Carl Herschberger II <gchii@mindspring.com>
+Subject: Re: Java Virtual Machine Development
+In-Reply-To: <20000916001524.B3063@tux.yi.org>
+Message-ID: <Pine.LNX.4.20.0009160045060.3702-100000@azaphrael.haverford.edu>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+
+	I'm very interested in your ideas about how to implement multiple
+java processes.  Right now, I have two main priorities.  The greater
+priorities are first to write a JVM amenable to integration with a class
+library, and then perform that integration; and second, for that JVM to
+support multiple java processes.  BCNI is not as important, and though I
+haven't thought it through as much, should be a well-enscapulated change
+to make.  (That is, only invokenative should have to be changed.  And we
+have to do some thinking about handling exceptions in the 'native'
+bytecode, etc.)
+
+	I was thinking about architecture questions, and it occured to me
+that the idea of converting bytecode into an array of function calls has
+the benefit that it becomes much simpler to replace parts of it with
+JIT-compiled code or accelerated interpretation.  (For instance, many
+common sequences are longer than they 'need' to be because of the operand
+stack.  Recognizing what those sequences do allows them to be shortened
+and the stack avoided.)
+
+	What about Jay Lepreau?  ('kissme')
+
+-_Quinn
+
+
+
+
+
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+X-POP3-Rcpt: robfitz@host4.the-web-host.com
+Received: from 273k.net
+	by localhost with POP3 (fetchmail-5.3.3)
+	for bob@localhost (single-drop); Tue, 19 Sep 2000 03:55:39 +0000 (UTC)
+Received: from tux (mail@c851848-b.mntp1.il.home.com [24.22.234.61])
+	by host4.the-web-host.com (8.9.3/8.9.3) with ESMTP id XAA04974
+	for <robfitz@273k.net>; Mon, 18 Sep 2000 23:54:22 -0400
+Received: from bob by tux with local (Exim 3.12 #1 (Debian))
+	id 13bESm-0000C8-00; Tue, 19 Sep 2000 03:52:56 +0000
+Date: Tue, 19 Sep 2000 03:52:56 +0000
+From: Robert Fitzsimons <robfitz@273k.net>
+To: "Todd L. Miller" <tmiller@haverford.edu>
+Cc: Robert Fitzsimons <robfitz@273k.net>,
+        Gilbert Carl Herschberger II <gchii@mindspring.com>,
+        John Leuner <jewel@mweb.co.za>
+Subject: Re: Java Virtual Machine Development
+Message-ID: <20000919035256.A331@tux.yi.org>
+References: <20000916001524.B3063@tux.yi.org> <Pine.LNX.4.20.0009160045060.3702-100000@azaphrael.haverford.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.2.5i
+In-Reply-To: <Pine.LNX.4.20.0009160045060.3702-100000@azaphrael.haverford.edu>; from tmiller@haverford.edu on Mon, Sep 18, 2000 at 02:09:03PM -0400
+
+> 	I'm very interested in your ideas about how to implement multiple
+> Java processes.  Right now, I have two main priorities.  The greater
+> priorities are first to write a JVM amenable to integration with a class
+> library, and then perform that integration; and second, for that JVM to
+> support multiple Java processes.  BCNI is not as important, and though I
+> haven't thought it through as much, should be a well-enscapulated change
+> to make.  (That is, only invokenative should have to be changed.  And we
+> have to do some thinking about handling exceptions in the 'native'
+> bytecode, etc.)
+
+Basically the goal for multiple Java processes is to save memory by not
+having multiple copies of the same information in memory.  So what we
+need to decide is what information can be shared and what can't.
+
+It's easier to start with what can't be shared between processes:
+* instance data
+* static data
+* thread data (stack frames, ip, etc)
+
+And what can be shared between processes:
+* class data
+* method data
+* field data
+* interface data
+
+I haven't listed constant data or string data because these are a little
+fuzzy.
+
+With this list in your mind you can now start coding, but you have to
+make sure that the non shared data has no pointers to shared data.
+
++---------------------+-------------+
+| Object <---> Class -+-> ClassData |
++---------------------+-------------+
+
+It really is that easy to create the data structures for multiple
+processes.  The problem is with writing an execution engine, the code
+needs to be written so that it doesn't reference the non shared data
+directly (this is a lot easier to do with an interpreter).  This is what
+i've spent the last month or so working on.
+
+There are a lot of other things as well, I can't really explain them in
+words but the code in my JVM covers most of them.
+
+> 	I was thinking about architecture questions, and it occured to me
+> that the idea of converting bytecode into an array of function calls has
+> the benefit that it becomes much simpler to replace parts of it with
+> JIT-compiled code or accelerated interpretation.  (For instance, many
+> common sequences are longer than they 'need' to be because of the operand
+> stack.  Recognizing what those sequences do allows them to be shortened
+> and the stack avoided.)
+
+Do you mean convert each bytecode opcode into a function call?  The call
+over head is just too great for that to work.  I think we need to forget
+about interpreters and go for a native compiler or JIT.  With JOS we
+have the best chance in the world to write the fastest JVM the whole OS
+is written to run Java bytecode.
+
+Though recognizing common bytecode sequences is a good place to start with
+improving speed.
+
+> 	What about Jay Lepreau?  ('kissme')
+
+I forwarded the same email to him a day or so after I sent it to you and
+Gilbert.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+X-POP3-Rcpt: robfitz@host4.the-web-host.com
+Received: from 273k.net
+	by localhost with POP3 (fetchmail-5.3.3)
+	for bob@localhost (single-drop); Tue, 19 Sep 2000 21:11:40 +0000 (UTC)
+Received: from tisch.mail.mindspring.net (tisch.mail.mindspring.net [207.69.200.157])
+	by host4.the-web-host.com (8.9.3/8.9.3) with ESMTP id JAA09775
+	for <robfitz@273k.net>; Tue, 19 Sep 2000 09:48:59 -0400
+Received: from gchii.mindspring.com (user-38ld5es.dialup.mindspring.com [209.86.149.220])
+	by tisch.mail.mindspring.net (8.9.3/8.8.5) with SMTP id JAA07616
+	for <robfitz@273k.net>; Tue, 19 Sep 2000 09:48:56 -0400 (EDT)
+Message-Id: <3.0.1.32.20000919094941.006da2dc@pop.mindspring.com>
+X-Sender: gchii@pop.mindspring.com
+X-Mailer: Windows Eudora Light Version 3.0.1 (32)
+Date: Tue, 19 Sep 2000 09:49:41 -0400
+To: Robert Fitzsimons <robfitz@273k.net>
+From: Gilbert Carl Herschberger II <gchii@mindspring.com>
+Subject: Re: Java Virtual Machine Development
+In-Reply-To: <20000919035256.A331@tux.yi.org>
+References: <Pine.LNX.4.20.0009160045060.3702-100000@azaphrael.haverford.edu>
+ <20000916001524.B3063@tux.yi.org>
+ <Pine.LNX.4.20.0009160045060.3702-100000@azaphrael.haverford.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+
+>Basically the goal for multiple Java processes is to save memory by not
+>having multiple copies of the same information in memory.
+
+The goal is to save "memory" by /any/ mechanism, not just multiple bytecode
+processes. Multiple bytecode process is not required. It is only one
+approach to this problem. Unfortunately, it seems to be the least likely to
+succeed.
+
+Most of the potential to save "memory" seems to come from specifically
+optimizing a virtual machine to use the kernel's virtual memory manager
+properly. Bytecode in virtual memory should be marked "read-only", not
+"read-write". It should be stored in a system-wide bytecode cache.
+
+Think about it. The potential to save memory is limited. An application
+that has 10MB of object data will always have 10MB of object data. Most of
+the potential to save memory is found inside the duplication of raw
+bytecode. Is it necessary to define multiple Java processes in order to
+save memory? No. Is multiple Java processes the only way to save memory?
+No. Could there be a simpler alternative that saves just as much memory, or
+more? Yes. Is there a platform-independent solution? Yes.
+
+Without a bytecode cache, if there are 4MB of the same read/write bytecode
+per virtual machine and there are 100 virtual machines, that's 400MB of
+wasted swap space. With a bytecode cache, the same scene would require 4MB
+of swap space. By making bytecode a resource, it requires no swap space.
+
+So much effort has been consumed (wasted?) by the theory of multiple
+bytecode processes. The theory of multiple bytecode processes has been
+adopted and assumed by some without a lot of thought. It is a theory that
+may have never been challenged. I'll challenge it. By comparing multiple
+bytecode processes within a virtual machine to a highly optimized virtual
+machine, I have concluded that multiple bytecode processes within the same
+virtual machine does not "save" memory. Instead, it adds far too much
+complexity to the internal workings of a virtual machine. When the solution
+is reduced, it requires just as much memory to run multiple bytecode
+processes as it does to run multiple virtual machines. It is six of one,
+half dozen of the other.
+
+Add a bytecode cache and bytecode resource to an off-the-shelf virtual
+machine and this saves potentially all of the memory that might be saved by
+multiple bytecode processes.
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+X-POP3-Rcpt: robfitz@host4.the-web-host.com
+Received: from 273k.net
+	by localhost with POP3 (fetchmail-5.3.3)
+	for bob@localhost (single-drop); Wed, 20 Sep 2000 07:15:49 +0000 (UTC)
+Received: from tux.yi.org (root@c851848-b.mntp1.il.home.com [24.22.234.61])
+	by host4.the-web-host.com (8.9.3/8.9.3) with ESMTP id DAA30457
+	for <robfitz@273k.net>; Wed, 20 Sep 2000 03:17:05 -0400
+Received: (from bob@localhost)
+	by tux.yi.org (8.9.3/8.9.3/Debian 8.9.3-21) id HAA09684;
+	Wed, 20 Sep 2000 07:14:11 GMT
+Date: Wed, 20 Sep 2000 07:14:11 +0000
+From: Robert Fitzsimons <robfitz@273k.net>
+To: Gilbert Carl Herschberger II <gchii@mindspring.com>
+Cc: "Todd L. Miller" <tmiller@haverford.edu>, John Leuner <jewel@mweb.co.za>,
+        Robert Fitzsimons <robfitz@273k.net>
+Subject: Re: Java Virtual Machine Development
+Message-ID: <20000920071411.A9668@tux.yi.org>
+References: <Pine.LNX.4.20.0009160045060.3702-100000@azaphrael.haverford.edu> <20000916001524.B3063@tux.yi.org> <Pine.LNX.4.20.0009160045060.3702-100000@azaphrael.haverford.edu> <20000919035256.A331@tux.yi.org> <3.0.1.32.20000919094941.006da2dc@pop.mindspring.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.2.5i
+In-Reply-To: <3.0.1.32.20000919094941.006da2dc@pop.mindspring.com>; from gchii@mindspring.com on Tue, Sep 19, 2000 at 09:49:41AM -0400
+
+Hi Gilbert
+
+I don't think there's anything in your email that Todd and John couldn't
+see, so i've included them in my reply.
+
+I'm not sure what you mean by "bytecode cache".  Could you explain it in
+more detail?  Are you talking about this email from last year?
+
+<URL:http://jos.org/pipermail/arch/1999-November/000325.html>
+
+# What is a bytecode cache? There are plenty of options. You might
+# install a bytecode cache servlet in your Java-enabled HTTP server.
+# Configure it for cache size and trusted Internet websites and you're
+# done. Everyone on the network can use all your applications.
+#
+# You might install package files on a static HTTP server. You might
+# install the bytecode cache daemon on a server and skip the HTTP thing.
+# What does it really mean to install an application. For everyone that
+# just wants to take it for a test drive, they just run it. Distributing
+# the bytecode -- that is what a network is for, isn't it?
+
+What you talk about in the above email is a way of caching information
+so that you don't have to download it again.  This does not save any
+memory at the JVM level.
+
+If you look at the classfile data structure you will see that it is
+optimized for size.  This means it has to be convert into an internal
+data
+structure before it can be used by a JVM [1].  Only having to load this
+internal data structure once is where you get the saving when you use
+multiple Java processes.
+
+If the "bytecode cache" contains this internal data structure then it
+might save memory but not otherwise.
+
+Robert Fitzsimons
+robfitz@273k.net
+
+1.  Any developer that writes a JVM that used the classfile directly as
+it's internal data structure should be shot IMHO.
+
+On Tue, Sep 19, 2000 at 09:49:41AM -0400, Gilbert Carl Herschberger II wrote:
+> >Basically the goal for multiple Java processes is to save memory by not
+> >having multiple copies of the same information in memory.
+>
+> The goal is to save "memory" by /any/ mechanism, not just multiple
+> bytecode
+> processes. Multiple bytecode process is not required. It is only one
+> approach to this problem. Unfortunately, it seems to be the least
+> likely to
+> succeed.
+>
+> Most of the potential to save "memory" seems to come from specifically
+> optimizing a virtual machine to use the kernel's virtual memory
+> manager
+> properly. Bytecode in virtual memory should be marked "read-only", not
+> "read-write". It should be stored in a system-wide bytecode cache.
+>
+> Think about it. The potential to save memory is limited. An
+> application
+> that has 10MB of object data will always have 10MB of object data.
+> Most of
+> the potential to save memory is found inside the duplication of raw
+> bytecode. Is it necessary to define multiple Java processes in order
+> to
+> save memory? No. Is multiple Java processes the only way to save
+> memory?
+> No. Could there be a simpler alternative that saves just as much
+> memory, or
+> more? Yes. Is there a platform-independent solution? Yes.
+>
+> Without a bytecode cache, if there are 4MB of the same read/write
+> bytecode
+> per virtual machine and there are 100 virtual machines, that's 400MB
+> of
+> wasted swap space. With a bytecode cache, the same scene would require
+> 4MB
+> of swap space. By making bytecode a resource, it requires no swap
+> space.
+>
+>
+> So much effort has been consumed (wasted?) by the theory of multiple
+> bytecode processes. The theory of multiple bytecode processes has been
+> adopted and assumed by some without a lot of thought. It is a theory
+> that
+> may have never been challenged. I'll challenge it. By comparing
+> multiple
+> bytecode processes within a virtual machine to a highly optimized
+> virtual
+> machine, I have concluded that multiple bytecode processes within the
+> same
+> virtual machine does not "save" memory. Instead, it adds far too much
+> complexity to the internal workings of a virtual machine. When the
+> solution
+> is reduced, it requires just as much memory to run multiple bytecode
+> processes as it does to run multiple virtual machines. It is six of
+> one,
+> half dozen of the other.
+>
+> Add a bytecode cache and bytecode resource to an off-the-shelf virtual
+> machine and this saves potentially all of the memory that might be
+> saved by
+> multiple bytecode processes.
+
+--ZPt4rx8FFjLCG7dd
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+X-POP3-Rcpt: robfitz@host4.the-web-host.com
+Received: from 273k.net
+	by localhost with POP3 (fetchmail-5.3.3)
+	for bob@localhost (single-drop); Thu, 21 Sep 2000 13:46:32 +0000 (UTC)
+Received: from smtp10.atl.mindspring.net (smtp10.atl.mindspring.net [207.69.200.246])
+	by host4.the-web-host.com (8.9.3/8.9.3) with ESMTP id JAA00811
+	for <robfitz@273k.net>; Thu, 21 Sep 2000 09:12:33 -0400
+Received: from gchii.mindspring.com (user-38ld4d4.dialup.mindspring.com [209.86.145.164])
+	by smtp10.atl.mindspring.net (8.9.3/8.8.5) with SMTP id JAA13728;
+	Thu, 21 Sep 2000 09:12:26 -0400 (EDT)
+Message-Id: <3.0.1.32.20000921090909.006bec64@pop.mindspring.com>
+X-Sender: gchii@pop.mindspring.com
+X-Mailer: Windows Eudora Light Version 3.0.1 (32)
+Date: Thu, 21 Sep 2000 09:09:09 -0400
+To: Robert Fitzsimons <robfitz@273k.net>
+From: Gilbert Carl Herschberger II <gchii@mindspring.com>
+Subject: Re: Java Virtual Machine Development
+Cc: "Todd L. Miller" <tmiller@haverford.edu>, John Leuner <jewel@mweb.co.za>
+In-Reply-To: <20000920030605.A1280@tux.yi.org>
+References: <3.0.1.32.20000919094941.006da2dc@pop.mindspring.com>
+ <Pine.LNX.4.20.0009160045060.3702-100000@azaphrael.haverford.edu>
+ <20000916001524.B3063@tux.yi.org>
+ <Pine.LNX.4.20.0009160045060.3702-100000@azaphrael.haverford.edu>
+ <20000919035256.A331@tux.yi.org>
+ <3.0.1.32.20000919094941.006da2dc@pop.mindspring.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+
+Hmm. Shouldn't we discuss this openly, on the kernel mailing list?
+
+At 03:06 AM 9/20/00 +0000, you wrote:
+>I'm not sure what you mean by "bytecode cache".  Could you explain it in
+>more detail?
+
+>Are you talking about this email from last year?
+>
+><URL:http://jos.org/pipermail/arch/1999-November/000325.html>
+
+No, no. That bytecode cache is a network bytecode cache. It enables a
+network to cache bytecode at an HTTP, SQL, application or proxy server.
+
+The kernel bytecode cache is system-wide and enables a kernel to cache
+bytecode for multiple virtual machines and/or multiple bytecode processes.
+
+>What you talk about in the above email is a way of caching information
+>so that you don't have to download it again.  This does not save any
+>memory at the JVM level.
+
+A network bytecode cache reduces the amount of time required to download
+bytecode; it does not save memory.
+
+In contrast, a kernel bytecode cache saves memory; it does not reduce the
+amount of time required to download bytecode. This is the kind of bytecode
+cache I was describing.
+
+>If you look at the classfile data structure you will see that it is
+>optimized for size.  This means it has to be convert into an internal data
+>structure before it can be used by a JVM [1].  Only having to load this
+>internal data structure once is where you get the saving when you use
+>multiple Java processes.
+
+Let's see if I understand this correctly. You say that the classfile data
+structure is optimized for size. You also agree that our goal is the
+conservation of memory, a very precious resource. If the classfile is
+already optimize for size and size matters, we can use classfile data
+structure to save memory.
+
+>If the "bytecode cache" contains this internal data structure then it
+>might save memory but not otherwise.
+
+You're saying that an internal data structure cache is the /only/ way to
+save memory; but, it's not. Such a cache can contain bytecode, internal
+data structures, or both and still save memory.
+
+There is more than one way to construct a kernel bytecode cache, not just
+one. While you may desire a cache that throws away the original bytecode
+and saves internal data structures, I would like it to keep the original
+bytecode.
+
+I believe there are many reasons to save the original bytecode. Here are a
+few.
+
+1. The bytecode cache is vm-independent. An internal data structure is
+always specific to a virtual machine. The internal data structure should be
+internal to a virtual machine. It should not be exposed to a kernel and/or
+other virtual machines. Multiple virtual machines should not share a common
+internal data structure. If a virtual machine is optimized for speed, its
+internal data structure is optimized for speed. If a virtual machine is
+optimized for size, its internal data structure is optimized for size. And
+so on.
+
+2. Two classes are able to modify the state of an object if they are
+equivalent. They are obviously equivalent if they share the same bytecode.
+They are also obviously equivalent if there bytecode is matches
+byte-for-byte. The internal data structure is more difficult, but not
+impossible, to compare.
+
+3. Boot classes can be statically linked to a kernel. The java.lang,
+java.util, java.io and java.net packages, for example, can be pre-loaded in
+a kernel bytecode cache. There are many examples of where this can save
+space. When a virtual machine "loads" its boot classes directly from the
+kernel, this saves time and opens up the possibility of downloading the
+remainder of the standard Java class library from across the network.
+
+For a MPCL-compatible virtual machine, it always "loads" its boot classes
+directly from the kernel. Boot classes are guaranteed to be equivalent and
+conserve memory in every bytecode process because CLASSPATH is not used for
+boot classes. Also, static fields are unique for each primordial class
+loader making that part of a bytecode process independent from all other
+bytecode processes.
+
+On the other hand, a similar cache is required within a virtual machine. It
+is not a bytecode cache, but an internal class structure cache. The
+internal class structure cache is part of a virtual machine, not a kernel.
+It cannot be safely shared among virtual machines.
+
+The operation of an internel class structure cache seems to be redundent
+with the operation of a kernel bytecode cache. Is it? No. Here's why.
+
+If we build five virtual machines, we must build five internal class
+structure caches because the internal class structure is always unique to a
+virtual machine. It might be a class hiearchy like this:
+
+InternalClassStructureCache
+  |
+  +-- DecafInternalClassStructureCache
+  |
+  +-- KaffeInternalClassStructureCache
+  |
+  +-- JapharInternalClassStructureCache
+  |
+  +-- KissmeInternalClassStructureCache
+
+There must be five different caches because the internel class structure of
+one virtual machine does not match any other.
+
+If we build five virtual machines, we build one kernel bytecode caches, not
+five.
+
+KernelBytecodeCache
+
+There seems to be a fixation on the one kernel/one virtual machine
+implementation. Why is this? It is not the only way. When decaf, Kaffe,
+Japhar and Kissme are running at the same time on one kernel, there is one
+kernel/multiple virtual machines. The maximum amount of conservation comes
+from integrating the kernel bytecode cache with a virtual memory manager.
+Bytecode that is not "in use" does not have to be stored in real memory.
+
+In the future, it is more likely that multiple instances of a virtual
+machine will be running on a kernel. It is more likely they will use a
+preemptive multitasking kernel. This is also one kernel/multiple virtual
+machines.
+
+With John's proof of concept, it is more likely we'll use more of the Linux
+kernel. And please don't try to convince me that only one instance of decaf
+will ever be running on a kernel. Today, we're using the Linux kernel to
+run decaf in host mode. Multiple instances of decaf can be running at the
+same time on a Linux kernel. While this might not be ideal, it is real.
+
+>1.  Any developer that writes a JVM that used the classfile directly as
+>it's internal data structure should be shot IMHO.
+
+When the stated goal is optimization for size, it seems obvious that a
+classfile format is the best choice. It is already optimized for size. It
+is undesireable and unnecessary to duplicate the data that is already
+stored inside raw bytecode.
+
+1. constant pool (class names, field names, method names, attribute names)
+2. field table
+3. method table
+4. code attribute of a method
+5. exception attribute of a method
+
+Measured in bytes, more than 90% of my internal data structure is already
+stored appropriately in raw bytecode. I see no need to duplicate 90% in
+order to save 10% for each primordial class loader. I'd rather save the 90%.
+
+When the stated goal is optimization for speed, size doesn't matter.
+Conservation of memory is not an issue. The code attribute of all methods
+can be compiled into machine code. The machine code has to be stored
+somewhere in real memory. This is the domain of an internal data structure
+for a virtual machine, not a system-wide kernel bytecode cache. For
+multiple bytecode processes, classes must be compiled at least once for
+each CLASSPATH.
+
+I am doing whatever I can to understand the implications of my stated goal.
+I am building a bytecode interpreter optimized for size. I have every
+reason to believe the original bytecode is critical to my design. I
+continue to combine bytecode resource and bytecode cache to save memory.
+
+--ZPt4rx8FFjLCG7dd--
+
+
+
+
+From gchii@mindspring.com Mon, 25 Sep 2000 14:36:25 -0400
+Date: Mon, 25 Sep 2000 14:36:25 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Starting a program
+
+The following features have already been implemented as open source. They
+are platform-independent. They available for immediate download.
+
+If you're building a desktop and want to launch Java-based applications,
+here is a hint. Both the Smart API and ERIC Project provide the tools
+necessary for a desktop (written in Java) to launch other programs. The
+run: scheme provides a simple way to run a subprogram within the same
+address space or within a separate process:
+
+run:program:class-name?parameters
+
+The eric: subscheme provides a simple way for one virtual machine to launch
+another.
+
+run:eric:shortcut-name
+
+The eric shortcut provides an elegant way to click on an application icon
+to start an application. Each eric shortcut is stored in a text file with
+an .eric extension.
+
+A desktop application, like Desktop Browser, enables the collection of
+shortcuts into a single desktop file. Eric shortcuts enable the
+distribution of each shortcut as a separate file. The desktop: scheme
+enables a desktop to open other desktop files, including downloading files
+from an HTTP service.
+
+desktop:desktop-file
+
+
+
+
+
+From gchii@mindspring.com Mon, 25 Sep 2000 14:43:32 -0400
+Date: Mon, 25 Sep 2000 14:43:32 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [agenda] Clear separation of kernel and virtual machine
+
+We should discuss the development of a "JOS Kernel Specification". What
+should a standard JOS kernel include? Does a monolythic kernel/virtual
+machine meet that standard?
+
+-----
+
+About CjOS
+I believe it is important to maintain a clear separation of kernel and
+virtual machine. Clear separation is required to build a cross-platform
+virtual machine that runs on JOS, Linux and Windows kernels. Clear
+separation is required to build a virtual machine as a plug-in for a
+re-usable JOS kernel.
+
+A CjOS-compatible virtual machine uses the standard C library as an
+interface to the kernel. It works on Linux and Windows. When the CjOS
+kernel implements the standard C library, a CjOS-compatible virtual machine
+will run on CjOS kernel.
+
+
+
+
+
+From mjmead20@hotmail.com Mon, 25 Sep 2000 18:43:37 GMT
+Date: Mon, 25 Sep 2000 18:43:37 GMT
+From: Michael Mead mjmead20@hotmail.com
+Subject: [JOS-Kernel] Starting a program
+
+Gilbert,
+
+Do you have a screen shot of Desktop Browser?
+
+Mike
+
+
+
+>From: Gilbert Carl Herschberger II <gchii@mindspring.com>
+>Reply-To: kernel@jos.org
+>To: kernel@jos.org
+>Subject: [JOS-Kernel] Starting a program
+>Date: Mon, 25 Sep 2000 14:36:25 -0400
+>
+>The following features have already been implemented as open source. They
+>are platform-independent. They available for immediate download.
+>
+>If you're building a desktop and want to launch Java-based applications,
+>here is a hint. Both the Smart API and ERIC Project provide the tools
+>necessary for a desktop (written in Java) to launch other programs. The
+>run: scheme provides a simple way to run a subprogram within the same
+>address space or within a separate process:
+>
+>run:program:class-name?parameters
+>
+>The eric: subscheme provides a simple way for one virtual machine to launch
+>another.
+>
+>run:eric:shortcut-name
+>
+>The eric shortcut provides an elegant way to click on an application icon
+>to start an application. Each eric shortcut is stored in a text file with
+>an .eric extension.
+>
+>A desktop application, like Desktop Browser, enables the collection of
+>shortcuts into a single desktop file. Eric shortcuts enable the
+>distribution of each shortcut as a separate file. The desktop: scheme
+>enables a desktop to open other desktop files, including downloading files
+>from an HTTP service.
+>
+>desktop:desktop-file
+>
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+
+_________________________________________________________________________
+Get Your Private, Free E-mail from MSN Hotmail at http://www.hotmail.com.
+
+Share information about yourself, create your own public profile at 
+http://profiles.msn.com.
+
+
+
+
+
+From gchii@mindspring.com Mon, 25 Sep 2000 14:49:23 -0400
+Date: Mon, 25 Sep 2000 14:49:23 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [CjOS] Process and Thread
+
+Inside CjOS, a Process is not an extension of Thread. Rather, each Process
+has-a Thread list and each Thread has-a Process.
+
+A Process can have zero or more Threads.
+
+unsigned int Process::getThreadCount();
+Thread *Process::getThread( unsigned int index );
+
+A Thread can have zero or one Process.
+
+Process *Thread::getProcess();
+void Thread::setProcess( Process *v );
+
+The difference between a Thread and a Process is CLASSPATH. A Process has a
+CLASSPATH and a Thread gets its CLASSPATH from its Process.
+
+void Process::addDirectory( const char *v );
+
+Each Process can have zero or one "next" Process.
+
+Process *Process::getNext();
+void Process::setNext( Process *v );
+
+
+
+
+
+From gchii@mindspring.com Mon, 25 Sep 2000 14:52:55 -0400
+Date: Mon, 25 Sep 2000 14:52:55 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Optimizing Linux for Java
+
+Any effort to optimize Linux for Java should be documented and added to
+JannuxPages on JOS Wiki. The JannuxPages are designed to help other members
+optimize Linux for Java starting with off-the-shelf Linux distributions.
+
+Replacing Linux components written in C/C++ with corresponding components
+written in Java is part of the Jannux(tm) sub-project.
+
+
+
+
+
+From gchii@mindspring.com Mon, 25 Sep 2000 16:13:31 -0400
+Date: Mon, 25 Sep 2000 16:13:31 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Starting a program
+
+At 06:43 PM 9/25/00 GMT, "Michael Mead" <mjmead20@hotmail.com> wrote:
+>Do you have a screen shot of Desktop Browser?
+
+Now I do. It is found, along with other screen shots, in the following
+article on JOS Wiki:
+
+http://www.metamech.com/wiki/view/Main/UniversalBrowser
+
+The most important part of the Desktop Browser is the way it works, not the
+way it looks. I'm sure some other programmer would be able to make a
+desktop that looks better.
+
+The Desktop Browser does not yet use icons. Also, I had in mind selecting
+icons based on protocol/scheme of a link. For example, all http:// links
+would have an HTTP protocol icon, regardless of file extension.
+
+I expect the Desktop Browser to use paintable icons, not bit-mapped icons.
+Paintable icons use java.awt.Graphics to paint lines, rectangles, arcs and
+text on the desktop window. Icon color and size are determined at run-time.
+
+
+
+
+
+From gchii@mindspring.com Mon, 25 Sep 2000 16:17:09 -0400
+Date: Mon, 25 Sep 2000 16:17:09 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [agenda] Linux and Windows
+
+Linux and Windows are popular platforms for Java development. Are both
+going to be supported by your virtual machine? Strengths and weaknesses of
+cross-platform development should be discussed. Can we make this part of
+the upcoming agenda?
+
+
+
+
+
+From gchii@mindspring.com Tue, 26 Sep 2000 10:54:20 -0400
+Date: Tue, 26 Sep 2000 10:54:20 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [agenda] Is CVS required?
+
+I don't believe CVS should be a prerequisite for downloading and running an
+open source product, such as a JOS-compatible kernel or virtual machine. We
+must understand our potential market. Most of the consumer market probably
+has never heard of CVS. Many potential contributors to the JOS Project are
+dealing with CVS for the first time.
+
+How will you distribute your virtual machine?
+
+If you choose CVS, you should explain how others can contribute their code
+to your open source project.
+
+
+
+
+
+From gchii@mindspring.com Tue, 26 Sep 2000 11:00:43 -0400
+Date: Tue, 26 Sep 2000 11:00:43 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Is membership at SourceForge required?
+
+Does every member of the JOS Project have to be a member of SourceForge?
+The JJOS subproject is the only subproject currently using SourceForge. It
+is unnecessary for other subprojects to move to SourceForge, isn't it?
+
+I have decided not to become a member of SourceForge. The SourceForge
+website does not work for me. In the past, I have contributed suggestions
+and code to JJOS exclusively through e-mail. I use FTP, not CVS, to
+distribute products.
+
+
+
+
+
+From gchii@mindspring.com Tue, 26 Sep 2000 11:39:30 -0400
+Date: Tue, 26 Sep 2000 11:39:30 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Is it an app?
+
+What is the purpose of a desktop? I'd like to remind you of the following
+article on JOS Wiki.
+
+http://www.metamech.com/wiki/view/Main/UIPurposeDesktop
+
+A desktop should be written in pure bytecode. There shouldn't be anything
+inside a desktop that requires the C/C++ programming language, right?
+
+A desktop might be replace-able. I can replace my desktop on Linux and
+Windows. And, it is possible to run multiple desktops at the same time. I
+can run multiple desktops on Linux and Windows. A desktop should not be
+confused with a window manager. A desktop uses a window manager.
+
+What is the interface between a desktop and the rest of the operating
+system? Like a shell, a desktop is expected to launch other programs. To
+launch a program, there must be a command line interface. The standard Java
+class library already defines the exec() method of the java.lang.Runtime
+class to launch a program using a command line.
+
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 26 Sep 2000 11:01:34 -0500
+Date: Tue, 26 Sep 2000 11:01:34 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine
+
+At 02:43 PM 9/25/00 -0400, Gilbert Carl Herschberger II wrote:
+
+>About CjOS
+>I believe it is important to maintain a clear separation of kernel and
+>virtual machine. Clear separation is required to build a cross-platform
+>virtual machine that runs on JOS, Linux and Windows kernels. Clear
+>separation is required to build a virtual machine as a plug-in for a
+>re-usable JOS kernel.
+>
+>A CjOS-compatible virtual machine uses the standard C library as an
+>interface to the kernel. It works on Linux and Windows. When the CjOS
+>kernel implements the standard C library, a CjOS-compatible virtual machine
+>will run on CjOS kernel.
+
+I think this depends on your goals for a JOS.  Monolithic kernels are 
+faster and so if JOS is to be its own operating system, it makes sense to 
+create a monolithic kernel/jvm/class libraries image.  Separation of the 
+elements only serves to slow down the overall system.  For the transition 
+period before jos is a full os, a portable jvm may have some 
+advantages.  I'm unsure if the time and effort needed to create a portable 
+and fast jvm/kernel interface will pay back in terms of helping the jos 
+project proceed though.
+
+If the research for JOS itself only resides above the portable jvm, then 
+you might as well just use whatever jvm happens to be on your host platform 
+(allowing best of breed usage across platforms).  Java itself should 
+provide the necessary portability between jvm's.  Research in getting a jvm 
+to work fastest/most efficiently/etc will almost be guaranteed to be 
+tightly tied to the underlying kernel and hardware and I'm unsure if you 
+can get many benefits if you also constrain yourself to be portable at the 
+same time...
+
+-iain
+
+
+
+
+
+From tmiller@haverford.edu Tue, 26 Sep 2000 12:32:27 -0400 (EDT)
+Date: Tue, 26 Sep 2000 12:32:27 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Is membership at SourceForge required?
+
+	I'll respond to this and your prior mail ('[agenda] Is CVS
+required?') together.  It is my opinion, and (AFAIK) the opinion of
+virtually everyone I know, and, AFAIK, the opinion of every major OSS
+project (save the linux kernel) that CVS is the proper way to handle
+distributed development.  (Although, in some cases, CVS is pronounced
+'bitkeeper.')  The only CVS available to me -- that I don't personally
+host -- and to the project in general, without our own box and connection
+-- is at SourceForge.  The Right Way to get source for a project using CVS
+is anonymous checkout/update, which SourceForge supports.  Quite frankly,
+using CVS is not so a high an entry barrier to contributing code that I'm
+worried about the coders who will be turned away.  Contributing to the
+code via the patch manager can be done without a SourceForge account (it
+appears), though having one will simplify follow-up emails.  In general,
+direct CVS write access both requires a SourceForge account and will only
+rarely be granted.
+
+	I've addressed the issue of contributors to the project.  General
+distribution we can serve with 'release X' tarballs of the CVS tree and/or
+binary packages, as you've been attempting to do, Gilbert.  Right now,
+the code I'm working on in the JOS project's JJOS repository at
+SourceForge is not in any kind of state for a public alpha (much less
+beta).  As I've said before, once I/we have something worth releasing,
+we'll let everyone know and make some distributions.
+
+-_Quinn
+
+
+
+
+
+
+
+
+From tmiller@haverford.edu Tue, 26 Sep 2000 12:40:23 -0400 (EDT)
+Date: Tue, 26 Sep 2000 12:40:23 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] [agenda] Clear separation of kernel and  virtual
+ machine
+
+	We've had this discussion before, in another guise.  If JOS does
+not require anything special from its JVM -- where I contend that it
+does -- than the java standard itself will provide the necessary
+portability.  If JOS /does/ require something special -- e.g. java
+processes -- from its JVM, than there needs to be a standard interface for
+this.  Since that something special would require VM modifications anyway,
+it makes sense to define those things at the VM level.  (As opposed to at
+a Java wrapper level, where the VM provides its own implementation
+classes.)  If all that JOS requires from its JVM can exposed in this way,
+there's no reason to standardize on anything at a lower level than
+this.
+
+-_Quinn
+
+
+
+
+
+From iainshigeoka@yahoo.com Tue, 26 Sep 2000 15:05:56 -0500
+Date: Tue, 26 Sep 2000 15:05:56 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] Is membership at SourceForge required?
+
+At 12:32 PM 9/26/00 -0400, you wrote:
+>         I'll respond to this and your prior mail ('[agenda] Is CVS
+>required?') together.  It is my opinion, and (AFAIK) the opinion of
+>virtually everyone I know, and, AFAIK, the opinion of every major OSS
+>project (save the linux kernel) that CVS is the proper way to handle
+>distributed development.  (Although, in some cases, CVS is pronounced
+>'bitkeeper.')  The only CVS available to me -- that I don't personally
+>host -- and to the project in general, without our own box and connection
+>-- is at SourceForge.  The Right Way to get source for a project using CVS
+>is anonymous checkout/update, which SourceForge supports.  Quite frankly,
+>using CVS is not so a high an entry barrier to contributing code that I'm
+>worried about the coders who will be turned away.
+
+I agree but would highly welcome a replacement for CVS.  I find it such a 
+pain to use and I'm sure many others do to.  Anyone looking for a project 
+that would earn you much appreciation from fellow developers, make a cvs 
+replacement that's easier to use for the person that hates version control 
+yet still retains power for those that love it...  :)
+
+>Contributing to the
+>code via the patch manager can be done without a SourceForge account (it
+>appears), though having one will simplify follow-up emails.  In general,
+>direct CVS write access both requires a SourceForge account and will only
+>rarely be granted.
+
+Agreed.  The cvs write group is/should be kept really small. _Really_ 
+small.  Most people either need access to the source or just will 
+occassionally submit patches which can easily be done via the patch 
+manager.  When we re-org the structure of jos, I'm going to suggest we take 
+a similar tact to the apache (jakarta) project with a limited "committer" 
+group with cvs write access, and a large "developer" group with cvs read 
+and patch submission to committer access.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 29 Sep 2000 15:44:37 -0500
+Date: Fri, 29 Sep 2000 15:44:37 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] [agenda] Is CVS required?
+
+At 10:54 AM 9/26/00 -0400, Gilbert Carl Herschberger II wrote:
+>I don't believe CVS should be a prerequisite for downloading and running an
+>open source product, such as a JOS-compatible kernel or virtual machine. We
+>must understand our potential market. Most of the consumer market probably
+>has never heard of CVS. Many potential contributors to the JOS Project are
+>dealing with CVS for the first time.
+
+It is not.  For simply downloading the code or binaries, they are available 
+via simple ftp.  You only need to know and understand cvs if you are a 
+"committer".  Someone with write access to cvs which right now is limited 
+to 3 people.
+
+>If you choose CVS, you should explain how others can contribute their code
+>to your open source project.
+
+Yes.  They can use the patch manager, or simply email it to a committer or 
+post it to the list.  I agree that it needs to be documented though.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 29 Sep 2000 15:51:25 -0500
+Date: Fri, 29 Sep 2000 15:51:25 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] Is membership at SourceForge required?
+
+At 11:00 AM 9/26/00 -0400, Gilbert Carl Herschberger II wrote:
+>Does every member of the JOS Project have to be a member of SourceForge?
+
+no.  In fact, only the "committers" which is extremely limited, must be 
+SourceForge members.  Even "developers" that access the cvs don't need to 
+be sourceforge members as they use anonymous cvs access.
+
+>The JJOS subproject is the only subproject currently using SourceForge. It
+>is unnecessary for other subprojects to move to SourceForge, isn't it?
+
+yes.  Sub projects or even other "core" projects (jjos replacement 
+candidates) can be hosted anywhere.  SourceForge is simply the home of the 
+JOS development online site which I, as the webmaster for jos, have 
+setup.  jjos and any other "core" project is free to use the jos 
+SourceForge project (and its cvs) to develop with.  However, for 
+practicality reasons, what is happening is the "lead" core project is being 
+hosted in the jos sourceforge, and other core projects (teaseme) is being 
+hosted in their own SourceForge projects and then we'll use the website to 
+link them together.  so if teaseme replaces jjos an the lead core jos 
+project, then we'll probably have jjos get its own sourceforge project and 
+host teaseme in the jos sourceforge cvs.
+
+It seems hopelessly huge to try and host every project and subproject for 
+jos so jos itself will only host the absolute core system.  THis follows 
+linux where linux itself is really the development of the core 
+kernel.  Everything else is developed separately elsewhere but links to 
+these are provided and distributions are created to tie everything back 
+together.
+
+>I have decided not to become a member of SourceForge. The SourceForge
+>website does not work for me. In the past, I have contributed suggestions
+>and code to JJOS exclusively through e-mail. I use FTP, not CVS, to
+>distribute products.
+
+This shouldn't be a problem.
+
+-iain
+
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 29 Sep 2000 15:55:32 -0500
+Date: Fri, 29 Sep 2000 15:55:32 -0500
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine
+
+At 12:40 PM 9/26/00 -0400, you wrote:
+>         We've had this discussion before, in another guise.  If JOS does
+>not require anything special from its JVM -- where I contend that it
+>does -- than the java standard itself will provide the necessary
+>portability.  If JOS /does/ require something special -- e.g. java
+>processes -- from its JVM, than there needs to be a standard interface for
+>this.  Since that something special would require VM modifications anyway,
+>it makes sense to define those things at the VM level.  (As opposed to at
+>a Java wrapper level, where the VM provides its own implementation
+>classes.)  If all that JOS requires from its JVM can exposed in this way,
+>there's no reason to standardize on anything at a lower level than
+>this.
+
+Actually, I had an idea regarding this last night.  What if instead, you 
+build anything that's a "special" jvm need into a pure Java JVM (jjvm).  A 
+jvm written in pure java.  So the underlying "classic" jvm loads the 
+special java jvm which provides whatever hooks are needed beyond classic 
+jvm's, and then the special jvm, runs the actual java os (and java apps on 
+top of that).  The special jjvm can trap bytecodes for object creation if 
+it want to do its own memory management/garbage collection, can trap 
+bytecodes for System.exit if desired, etc, etc, etc.
+
+This is similar to that idea about a simple jvm serving to bootstrap 
+another jvm which was written in java and provided the actual jit and fancy 
+optimizations...
+
+Just a thought.
+
+-iain
+
+
+
+
+
+From gchii@mindspring.com Fri, 29 Sep 2000 19:50:01 -0400
+Date: Fri, 29 Sep 2000 19:50:01 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine
+
+At 11:01 AM 9/26/00 -0500, you wrote:
+>I think this depends on your goals for a JOS.  Monolithic kernels are 
+>faster and so if JOS is to be its own operating system, it makes sense to 
+>create a monolithic kernel/jvm/class libraries image.  Separation of the 
+>elements only serves to slow down the overall system.  For the transition 
+>period before jos is a full os, a portable jvm may have some 
+>advantages.  I'm unsure if the time and effort needed to create a portable 
+>and fast jvm/kernel interface will pay back in terms of helping the jos 
+>project proceed though.
+
+In this case, what is good for a "transition" period is good for a very
+long time. The advantage of modular design doesn't go away.
+
+Maintaining a clear separation between kernel and virtual machine is most
+likely to sustain enthusiasm for JOS. Enthusiasm is an asset.
+
+Say someone builds K1, the first kernel. They have a de facto monopoly
+because their kernel is the only one. We use the first kernel regardless of
+whether we like it or not. We have no choice. Then, someone builds K2, the
+second kernel. K1 and K2 are different. The monopoly is broken. Competition
+begins. If we maintain a clear separation of kernel and virtual machine,
+every virtual machine will run on both kernels. Otherwise, we put everyone
+in an awkward and dissatisfying position of having to choose between two
+incompatible kernels. Would you rather split developers between two
+incompatible kernels?
+
+Faster? First, it is a myth that all monolithic kernels are faster than all
+modular kernels. Once a module is bound, there is no difference in speed.
+Second, logical design is not physical implementation. A clear separation
+of kernel and virtual machine is a design issue. It has little to do with a
+single executable image. The speed of a kernel depends more upon its
+implementation than its design.
+
+Examine the history of operating systems. Modularization was a breakthrough
+in modern operating system design. The kernel became distinct from the
+remaining operating system services. The standard C library became the
+standard kernel interface. A monolithic design, mixing together kernel and
+virtual machine, would be a step backward.
+
+An executable image is an implementation detail. As you know, I have been
+working hard to combine a kernel, virtual machine and boot packages in a
+single executable image. That is a good idea. When booting with GRUB, for
+example, a single executable image is a "kernel", with no additional
+"modules". That makes it more difficult to get it wrong.
+
+Clean separation of kernel and virtual machine means you can mix and match
+kernels and virtual machines. If I have kernels K1 through K5 and virtual
+machines V1 through V5, any combination of kernel and virtual machine
+/should/ work. For example, a kernel optimized for the Pentium II processor
+should be able to host a virtual machine only optimized for i386.
+
+At link-time, it is possible to bind together a kernel and virtual machine
+into a single executable image. K1-V1, K1-V2, K1-V3...K5-V5. While any
+combination is possible, only a few are practical. Unless you limit
+everyone to use the same kernel and virtual machine, the interface between
+kernel and virtual machine must be well-defined. The traditional interface
+between kernel and virtual machine is the standard C library.
+
+>If the research for JOS itself only resides above the portable jvm, then 
+>you might as well just use whatever jvm happens to be on your host platform 
+>(allowing best of breed usage across platforms).  Java itself should 
+>provide the necessary portability between jvm's.  Research in getting a jvm 
+>to work fastest/most efficiently/etc will almost be guaranteed to be 
+>tightly tied to the underlying kernel and hardware and I'm unsure if you 
+>can get many benefits if you also constrain yourself to be portable at the 
+>same time...
+
+When JOS is my platform, I intend to use the "best" virtual machine I can
+find that runs on JOS. I don't expect my approach to change. I shop around.
+This is what I already do for Linux, Windows, OS/400, etc..
+
+The "best" virtual machine varies from application to application. What is
+best for one application may not be best for another.
+
+
+
+
+
+From gchii@mindspring.com Fri, 29 Sep 2000 21:00:12 -0400
+Date: Fri, 29 Sep 2000 21:00:12 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine
+
+At 12:40 PM 9/26/00 -0400, you wrote:
+>We've had this discussion before, in another guise. If JOS does
+>not require anything special from its JVM -- where I contend that it
+>does -- than the java standard itself will provide the necessary
+>portability.
+
+JOS should not require anything special from its JVM. Any virtual machine,
+written in C/C++, should compile and run on a JOS-compatible kernel.
+
+Imagine for a moment that it is possible to build an operating system
+without changing one word of the Java Virtual Machine Specification. The
+specification provides everything that we need to build a Java-based
+operating system. We only need to implement that specification on the JOS
+platform.
+
+1. JOS is just another platform. A virtual machine on the JOS platform must
+implement the exec() method of java.lang.Runtime in order to run standard
+Java applications.
+
+2. The exec() method of java.lang.Runtime is always platform-specific
+implementation. The exec() method is a native method. The native method is
+called by a virtual machine. Therefore, the platform-specific interface is
+inside the implementation of a native method, not inside a virtual machine.
+
+3. In a platform-independent application, multiple processes are always
+created through this API. The interface is unchanged regardless of platform.
+
+The distinction is this. The critical part of multiple bytecode processes
+is found inside a native method. A virtual machine only needs to bind
+itself generically to a native method. It doesn't care what the native
+method does.
+
+>If JOS /does/ require something special -- e.g. java
+>processes -- from its JVM, than there needs to be a standard interface for
+>this.  Since that something special would require VM modifications anyway,
+>it makes sense to define those things at the VM level.  (As opposed to at
+>a Java wrapper level, where the VM provides its own implementation
+>classes.)  If all that JOS requires from its JVM can exposed in this way,
+>there's no reason to standardize on anything at a lower level than
+>this.
+
+There is already one well-known interface. A second would be redundent,
+non-standard and non-portable. It would be redundent because a virtual
+machine on the JOS platform must implement the exec() method, even if there
+is a second interface. It would be non-standard because it would require a
+change to the Java Virtual Machine Specification. A standard Java
+application always uses the exec() method to start another process. It
+would be non-portable because a second interface is not likely to work on
+other virtual machines and would limit the use of the interface to
+JOS-specific applications.
+
+So far, the following two theories have been disproven.
+
+1. Only a JOS-compatible virtual machine can save memory.
+
+Memory can be saved in other ways, including the use of read-only virtual
+memory and ROM chips for bytecode. Most of this can be done on JOS as well
+as on Linux and Windows.
+
+2. A single virtual machine must implement multiple bytecode processes.
+
+Using multiple instances of a task/virtual machine is a reasonable
+assumption of the Java Virtual Machine Specification. Multiple instances of
+a task/virtual machine does not imply a waste of memory as some have long
+suggested. When a task/virtual machine is destroyed by a kernel, its Java
+objects are destroyed immediately, neither finalized nor garbage collected.
+All threads are destroyed immediately, without throwing a Java-based
+exception. Likewise, handles are critical to the communication between
+kernel and multiple processes. Direct object references are not enough.
+
+Only a kernel is required to use boot packages. A process is a task/virtual
+machine object. Each process has its own CLASSPATH, not just its own CODEBASE.
+
+
+
+
+
+From gchii@mindspring.com Fri, 29 Sep 2000 21:15:31 -0400
+Date: Fri, 29 Sep 2000 21:15:31 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Opcode method
+
+If a thread is passed as a parameter to each opcode method, it almost
+becomes possible to use p-code to invoke opcode methods. But I'm not sure
+how to handle exceptions.
+
+Every opcode method is capable of "throwing" an exception. The classic
+p-code uses a long jump to handle an exception. Here is basically how
+p-code works.
+
+The original code: (adds 0 and 1);
+  mc_iconst_0( thread );
+  mc_iconst_1( thread );
+  mc_iadd( thread );
+
+The p-code:
+  push thread
+  push &mc_iadd
+  push thread
+  push &mc_iconst_1
+  push thread;
+  push &mc_iconst_0
+  ret
+
+When iconst_0 "returns", it actually jumps to iconst_1. When iconst_1
+returns, it actually jumps to iadd. When an exception is thrown, all of the
+opcode methods and their parameters must be popped from the stack.
+
+When a segment is "compiled" into p-code, a buffer is filled with the
+values the method must push onto the machine code stack.
+
+
+
+
+
+From gchii@mindspring.com Fri, 29 Sep 2000 20:22:52 -0400
+Date: Fri, 29 Sep 2000 20:22:52 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Is membership at SourceForge required?
+
+At 12:32 PM 9/26/00 -0400, you wrote:
+>Quite frankly, using CVS is not so a high an entry barrier to contributing
+>code that I'm worried about the coders who will be turned away.
+
+And yet, you do not understand.
+
+There is plenty of excitement on the JOS Project unrelated to jJOS/decaf.
+You don't have a monopoly. There are only a few coders interested in your
+virtual machine. How long can you keep turning them away? You have turned
+away everyone using Microsoft Windows. You have turned away everyone that
+does not use CVS. Instead of turning people away, you should try to
+included them.
+
+By definition, an open source project is designed to enable other people to
+look at your source code. Distributing the source code is a high priority.
+
+More people read than contribute. That is the nature of open source
+projects and publication in general. You should be more concerned about
+readers than contributors. Sometimes, a reader becomes a contributor.
+
+If your software isn't ready-to-run, you should not distribute it. At some
+point, jJOS/decaf was ready-to-run. The ready-to-run project should not
+have been disturbed by a re-write.
+
+
+
+
+
+From pjdonald@cs.latrobe.edu.au Fri, 29 Sep 2000 13:00:21 +1000
+Date: Fri, 29 Sep 2000 13:00:21 +1000
+From: Peter Donald pjdonald@cs.latrobe.edu.au
+Subject: [JOS-Kernel] Is membership at SourceForge required?
+
+>>         I'll respond to this and your prior mail ('[agenda] Is CVS
+>>required?') together.  It is my opinion, and (AFAIK) the opinion of
+>>virtually everyone I know, and, AFAIK, the opinion of every major OSS
+>>project (save the linux kernel) that CVS is the proper way to handle
+>>distributed development.  (Although, in some cases, CVS is pronounced
+>>'bitkeeper.')  The only CVS available to me -- that I don't personally
+>>host -- and to the project in general, without our own box and connection
+>>-- is at SourceForge.  The Right Way to get source for a project using CVS
+>>is anonymous checkout/update, which SourceForge supports.  Quite frankly,
+>>using CVS is not so a high an entry barrier to contributing code that I'm
+>>worried about the coders who will be turned away.
+>
+>I agree but would highly welcome a replacement for CVS.  I find it such a 
+>pain to use and I'm sure many others do to.  Anyone looking for a project 
+>that would earn you much appreciation from fellow developers, make a cvs 
+>replacement that's easier to use for the person that hates version control 
+>yet still retains power for those that love it...  :)
+
+Have a look at subversion.tigris.org - not even alpha quality yet but has
+some damn fine engineers working on it
+
+
+Cheers,
+
+Pete
+
+*------------------------------------------------------*
+| "Nearly all men can stand adversity, but if you want |
+| to test a man's character, give him power."          |
+|       -Abraham Lincoln                               |
+*------------------------------------------------------*
+
+
+
+
+

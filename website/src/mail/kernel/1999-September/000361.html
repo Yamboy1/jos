@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOSSystem</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000362.html">
+   <LINK REL="Next" HREF="000393.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOSSystem</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Kernel] JOSSystem">onewith1@flash.net</A><BR>
+    <I>Wed, 15 Sep 1999 19:32:43 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000362.html">[JOS-Kernel] About jobject in JJOS</A></li>
+        <LI> Next message: <A HREF="000393.html">[JOS-Kernel] Re: [JOS-Arch] JOSSystem (-S)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#361">[ date ]</a>
+              <a href="thread.html#361">[ thread ]</a>
+              <a href="subject.html#361">[ subject ]</a>
+              <a href="author.html#361">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>[Warning: super long.  Required for reading: 4 shots espresso = 32 cups of
+coffee]
+
+I'm currently unsure about where discussions about JOSSystem are placed, so
+I'll post this to both kernel and arch in the hopes that someone knows.
+
+I've recently been rekindling my interest in Jini, and in doing so I've been
+rolling around a Jini-based OS in my head.  Don't know if we want to go that
+way (full dedication to a single technology), so here it is for your
+edification.  At least if I'm going in the wrong direction, someone can stop
+me before I go insane.
+
+First off, if we are to implement a multi-process JVM for JOS, there is a
+dire need for shared objectspace between processes (there may not be much of
+an argument against this, but here it is anyway). This could be as simple as
+a single static hashtable which is shared, or all the way up to a
+full-featured registry or Jini name server, and possibly into a whole shared
+memory API.  But whatever we do, we need to have shared memory between
+processes.  Here's why:
+
+If we want to have Java device drivers, we need a way to share access to
+them.  If we cannot share access between device drivers, then we have no way
+of restricting threads from interfering with driver access.  I don't know
+about you, but I wouldn't want two independent file systems trying to write
+files to my harddrive at the same time - can you say &quot;reformat your
+harddrive&quot;?
+
+An early wiki message suggested that JOS use the TCP/IP protocol stack for
+communication to drivers via RMI.  Note: implied in the statement is a
+/shared/ protocol stack.
+
+I suggest, at least at first, that we have a single, static, shared object
+which every process can see.  Perhaps something like a registry (see below).
+Note that any object registered to this shared object should becomes shared
+across the processes.
+
+Ok, onto my JOSSystem idea:
+=======================
+
+Jini offers Java applications a unified method of discovering all known
+devices  (technically, &quot;services&quot;) on a network (or a stand-alone PC).  Not
+only that, but it includes a unified method to interact with all discovered
+devices.
+
+I say, let's code all our device drivers to that standard.  But wait -
+doesn't Jini require a network?  But at boot time, JOS doesn't have a
+network yet, Matt!
+
+The current Jini specification talks about a network (and thus RMI) as the
+underlying &quot;bare iron&quot; for a djinn (Jini network).  However, if I read the
+small print right, using datagram broadcast for discovery, and RMI for
+across-the-wire communication, is only the /default/ implementation.  I
+believe that we can still be Jini compliant by making a non-network Jini
+network (or is that doublethink?).
+
+If we place the localized Jini lookup service in a well-defined location
+(say, the base shared object in JOS, or an parameter in the localized
+discovery method), then localized discovery is done by calling the local
+lookup service directly, without the need for a network.  Likewise for
+finding a localized Jini service.  Calling a Jini service would then be a
+direct Java call, without the need for RMI.
+
+We could create a specific localized Jini service which connects the local
+Jini lookuped devices to a real djinn.
+
+This way, all our PC (non-Jini ready) devices register themselves to the
+local Jini lookup service at boot time (really, post boot, pre shell
+startup, so we're left with device discovery in the middle, or rather
+JOSSystem boot!).  Then any application or service that requires a service,
+finds one in the localized djinn.
+
+To help with security, we should create access levels in our local djinn.
+Only services that we declaire public can be seen outside the djinn
+protection.  After all, we don't want anyone on the internet to have access
+to our PC_CLOCK device, and what could be done with a PCI_BRIDGE device?
+
+We can chain local djinns together in the common fashion of a device tree.
+This way, we can have specialized local djinns that only detect a certain
+type of device.
+
+Yeah, Matt, that all sounds good and hunky-doory.  But how do we load the
+definitions for what localized djinns to load?  We want JOS to be
+configurable, which implies a configuration file, but at the time JOSSystem
+loads, we don't have a storage access driver!  Sounds like the
+chicken-and-the-egg problem.  How do you plan to overcome that one, Mr.
+Smartypants?
+
+I'm somewhat stumped on that one.  I've been thinking about several ideas.
+One is a &quot;basic local djinn&quot; which is passed to JOSSystem from the JOS-box.
+This is about what JavaOS for Business did.  That way, though, we might have
+to recompile the JOS-box for different configurations, so that the JOSSystem
+has the basic I/O capabilities for loading the robust Java services over the
+default ones.  This is also good for JOS for Embedded Devices (tm), which
+wouldn't need this kind of configuration time, and would just pass up the
+djinn from flash memory (or whatever).
+
+Any comments? Flames?  Abuses?  All are welcome!
+
+-Matt
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000362.html">[JOS-Kernel] About jobject in JJOS</A></li>
+	<LI> Next message: <A HREF="000393.html">[JOS-Kernel] Re: [JOS-Arch] JOSSystem (-S)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#361">[ date ]</a>
+              <a href="thread.html#361">[ thread ]</a>
+              <a href="subject.html#361">[ subject ]</a>
+              <a href="author.html#361">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

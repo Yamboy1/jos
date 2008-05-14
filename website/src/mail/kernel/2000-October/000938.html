@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [shared objects] Storing shared objects inside kernel</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   
+   <LINK REL="Next" HREF="000939.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [shared objects] Storing shared objects inside kernel</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [shared objects] Storing shared objects inside kernel">gchii@mindspring.com</A><BR>
+    <I>Sun, 01 Oct 2000 11:29:54 -0400</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000939.html">[JOS-Kernel] [list administration] Adding &quot;Active&quot; to list description</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#938">[ date ]</a>
+              <a href="thread.html#938">[ thread ]</a>
+              <a href="subject.html#938">[ subject ]</a>
+              <a href="author.html#938">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>A Java object can be reduced to the following structure:
+
+structure mc_Object {
+  jint size;
+  jint list[];
+};
+
+A new object can be created list this:
+
+mc_Object *createObject( jint size ) {
+  mc_Object *o = new jint[ size + 1 ];
+  o-&gt;size = size;
+  return o;
+}
+
+A sparcely-populated collection of objects can be reduced to the following
+structure.
+
+structure mc_ObjectHolder {
+  jint descriptor;
+  mc_ObjectHolder *next;
+  mc_Object *object;
+};
+
+In order to store shared objects inside a kernel, the kernel must determine
+the object destriptor. The first object descriptor is 1, the second is 2
+and so forth.
+
+extern jint mc_lastDescriptor = 0;
+
+A call to the kernel creates a shared object, like this:
+
+jint descriptor = mc_createSharedObject( jint size );
+
+jint mc_CreateSharedObject( jint size ) {
+  mc_Object *o = mc_CreateObject( size );
+  mc_ObjectHolder *h = new mc_ObjectHolder( ++lastDescriptor, NULL, o );
+
+  mc_ObjectHolder *pcurr = ptop;
+  for (;;) {
+    if ( pcurr == NULL ) {
+      ptop = h;
+      return h-&gt;descriptor;
+    }
+
+    if ( pcurr-&gt;next == NULL ) {
+      pcurr-&gt;next = h;
+      return h-&gt;descriptor;
+    }
+
+    pcurr = pcurr-&gt;next;
+  }
+}
+
+Once a shared object has been created, its &quot;fields&quot; can be accessed and
+modified, like this:
+
+jint getSize( jint descriptor );
+jint getInt( jint descriptor, jint index );
+jint setInt( jint descriptor, jint index );
+
+Because an object descriptor from one call to mc_createSharedObject can be
+used in setInt(), it is possible to connect one shared object to another.
+
+Shared objects do not have a virtual machine garbage collector. They exist
+until they are destroyed. They are destroyed like this:
+
+void mc_destroySharedObject( jint descriptor );
+
+When a shared object has been destroyed, its descriptor is no longer valid.
+The mc_ObjectHolder structure is destroyed, destroying the mc_Object in the
+process. For an invalid descriptor, the getSize() method always returns -1.
+
+A kernel understands nothing about the layout of a shared object. This
+kernel service provides a way for multiple virtual machines or multiple
+bytecode processes to shared object data. Most likely, the first field
+(index=0) might point to another shared object, the class object. The
+second field (index=0) of a class object may be a shared object, a string,
+a class name.
+
+Obtain the class name of an arbitrary shared object like this:
+
+jint mc_getClassName( jint descriptor ) {
+  jint c = mc_getInt( descriptor, 0 ); // index=0 points to class object
+  return mc_getInt( c, 1 ); // index=1 points to a shared string
+}
+
+A long and double are stored using two indexes. Additional support must be
+provided for creating more efficent 8-bit and 16-bit arrays corresponding
+to byte[] and char[].
+
+mc_ByteArray *mc_createByteArray( jint size );
+jint mc_createSharedByteArray( jint size );
+
+mc_CharArray *mc_createCharArray( jint size );
+jint mc_createSharedCharArray( jint size );
+
+A shared string can be created from a shared character array.
+
+jint mc_createString( jint descriptor );
+
+To walk the heap of shared objects, the kernel should provide the following
+enumerator:
+
+structure mc_Enumerator {
+  bool valid;
+  jint descriptor;
+};
+
+void mc_enumerateSharedObject( mc_Enumerator *v );
+
+Here is a method that walks the heap and determines the class descriptor
+for each shared object.
+
+void example() {
+  mc_Enumerator e;
+
+  e.descriptor = 0;
+  cout &lt;&lt; &quot;object\tclass&quot; &lt;&lt; endl;
+  for (;;) {
+    mc_enumerateSharedObject( &amp;e );
+
+    if ( !e.valid ) {
+      break;
+    }
+
+    cout &lt;&lt; e.descriptor &lt;&lt; &quot;\t&quot; &lt;&lt; mc_getInt( e.descriptor, 0 ) &lt;&lt; endl;
+  }
+}
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000939.html">[JOS-Kernel] [list administration] Adding &quot;Active&quot; to list description</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#938">[ date ]</a>
+              <a href="thread.html#938">[ thread ]</a>
+              <a href="subject.html#938">[ subject ]</a>
+              <a href="author.html#938">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

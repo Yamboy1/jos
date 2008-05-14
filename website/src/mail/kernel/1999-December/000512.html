@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Next version of jjos / decaf garbage collection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000511.html">
+   <LINK REL="Next" HREF="000527.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Next version of jjos / decaf garbage collection</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Next version of jjos / decaf garbage collection">jm@mak.com</A><BR>
+    <I>Wed, 01 Dec 1999 08:30:07 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000511.html">[JOS-Kernel] realtime-systems</A></li>
+        <LI> Next message: <A HREF="000527.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#512">[ date ]</a>
+              <a href="thread.html#512">[ thread ]</a>
+              <a href="subject.html#512">[ subject ]</a>
+              <a href="author.html#512">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello All;
+
+I am so sorry to have been unavailable due to a Day Job Crisis (you have
+*no* *idea* how sorry).  Hopefully, I should be more available for the
+next few weeks.  I shall be responding to queued-up kernel emails in
+reverse chronological order...
+
+<A HREF="mailto:George.Marrows@Smallworld.co.uk">George.Marrows@Smallworld.co.uk</A> wrote:
+&gt;<i> I'm currently doing design work / back-of-envelope-scribbling for what I
+</I>&gt;<i> hope will be the next version of the garbage collector for jjos / decaf.
+</I>&gt;<i> Here's what I'm planning,  roughly in the order that I intend to do the
+</I>&gt;<i> work:
+</I>&gt;<i> 
+</I>&gt;<i> 1.  Rewrite in C++. Avoid assumptions about 32-bit pointers to simplify
+</I>&gt;<i> later ports.
+</I>&gt;<i> 2.  Rework it to be a generational collector. This should decrease the
+</I>&gt;<i> average pause time by performing lots of little garbage collects, rather
+</I>&gt;<i> than the occasional big one (these would still be needed, but less
+</I>&gt;<i> frequently).
+</I>&gt;<i> 3.  Tune and optimise.
+</I>&gt;<i> 4.  Add support for finalisation.
+</I>&gt;<i> 5.  Add support for weak references.
+</I>
+This all sounds pretty sensible to me, although I confess I am not as
+familiar with the weak references as applied to Java.  For my own
+edification, can anybody point me at some web-available (or otherwise
+available, I guess) info on them?  Are these references identifiable to
+the JVM (e.g., special markings in constant table, derived from special
+Object subclass)?
+ 
+&gt;<i> As part of this work, I'll need to put in simple support for virtual memory.
+</I>&gt;<i> This is so that the generational collector can find dirty pages that might
+</I>&gt;<i> have had inter-generational pointers stored into them. Also, the extra
+</I>&gt;<i> breathing space offered by a 4Gb virtual address space might simplify some
+</I>&gt;<i> aspects of heap layout. I'll put out a brief 'spec' before carrying out this
+</I>&gt;<i> work so that people can comment. Of course, if someone wanted to beat me to
+</I>&gt;<i> it...
+</I>
+I have looked at the VM stuff extensively (in this and past lives). 
+However, I had been punting on putting support for it in JJOS -- at no
+time in the past did it seem like the hottest fire.  This situation has
+changed radically due to your success with the GC system.  Thus, I would
+be more than happy to help.  I even (at one point) had a Plan for doing
+this, the first item of which would be identity-mapping the currently
+physical memory.  (I do not have the Plan notes in front of me now, but
+I think one of the soon-to-follow items was mapping the ramdisk way the
+hell out into left field, and mapping the single stack out into a place
+it wouldn't be likely to grow down into anything important.  I may have
+wanted to put a &quot;guard page&quot; to trap that unlikely event, too.)  I think
+there were also some issues with DMA memory address spaces, but I know
+that I'd have to crack the books to figure out exactly what they were...
+ 
+&gt;<i> One thing to ponder is whether all the above work is worthwhile - the
+</I>&gt;<i> Boehm-Demers garbage collector does all the above and more (eg concurrent gc
+</I>&gt;<i> apparently), is freely available and usable, and has been developed and
+</I>&gt;<i> widely used for over a decade, so is very stable. Integrating that might be
+</I>&gt;<i> a better way to get JOS to progress (though perhaps less fun for me :-).
+</I>
+ICBWB (I Could Be Wrong But) I do not believe the Boehm gc software, as
+distributed, is amenable to interfacing with the VM subsystem.  ICBWB I
+think that is essential here.  In particular, I should like to GC pages
+AS/BEFORE they get paged out so as to avoid physical I/O to the maximum
+extent possible.  It is my understanding (from reading the GC book you
+mentioned) that this feature alone constituted a lot of the performance
+advantages experienced by LispM users -- gc, no matter how slow, is
+always faster than hardware I/O.  
+
+There is also some question in my mind as to the relationship between
+the GC native code and any GC thread that we might want (thinking out
+loud -- there is a certain appeal to having a GC thread that can run in
+the background, and stroll through memory, and use the same paging
+daemon machinery everybody else does).
+
+BTW, I think we also need to worry about &quot;wiring down&quot; (a.k.a., &quot;locking
+down&quot;) certain important Java text and data for things like the VM
+paging machinery.  Wouldn't want that paging stuff paged out, now, would
+we?  Perhaps we can simplify any Java-language API to &quot;wire down&quot;
+classes and/or instance of a given class by using the
+pointer-identification algorithms of the gc class you're writing. 
+(I.e., we could just do:
+
+jos.PagingDaemon pd = new PagingDaemon(...);
+jos.platform.wireDown(pd); // wires down class text and all reachable
+data
+
+instead of having to write a lot of &quot;wireDown&quot; methods for all the
+reachable data and text in terms of memory addresses -- just a thought.)
+
+ 
+&gt;<i> Some other musings:
+</I>&gt;<i> 
+</I>&gt;<i> · There should be another mail of mine floating around on the arch list
+</I>&gt;<i> containing thoughts on how to deal with real-time aspects of device drivers.
+</I>&gt;<i> Does anyone have any idea if what I propose there will be sufficient, or
+</I>&gt;<i> does more thought need to be given to it?
+</I>
+I couldn't find the article -- (actually it looks like mailman is hosed
+when I try to view the November archives) -- would you please forward me
+a copy?  
+ 
+&gt;<i> · The current GC and the one proposed above are conservative (see the FAQ
+</I>&gt;<i> below for what this means). An upshot of this is that objects can't be moved
+</I>&gt;<i> once allocated, and this restricts the type of gc algorithms that can be
+</I>&gt;<i> used. There are a number of possibilities for making the garbage collector
+</I>&gt;<i> more accurate and thus able to move objects:
+</I>&gt;<i> 1. Separate C++ heap from which objects are explicitly freed.
+</I>&gt;<i> 2. Separate C++ heap which is conservatively gc'd.
+</I>
+These are all fine ideas, ...
+
+&gt;<i> 3. Get hold of C++ object and stack layout from the compiler. I haven't
+</I>&gt;<i> fully investigated this, but it would seem that the stabs debug information
+</I>&gt;<i> produced by g++ should contain all the information needed. Whether this is
+</I>&gt;<i> true when the optimisation levels are cranked up is not clear.
+</I>
+... and this is easily computable ...
+ 
+&gt;<i> Todd - didn't you let slip in a mail recently that you'd had some thoughts
+</I>&gt;<i> about Java v C++ gc? Care to elaborate?
+</I>
+... but I strongly urge (I would insist if I had that kind of leverage)
+that we not undertake any such optimizations and/or improvements until
+we actually have enough of the system hung together and run some
+profiling.  I have yet to work on any non-trivial application for which
+I was able to clairvoyantly determine which optimizations I should
+design into the system.  
+
+For example, even if our JVM is dog-slow (e.g., 10 times worse than
+competing JVMs), if we can run some threads whilst others page (unlike
+any other JVM I know of which runs under UNIX to date), and avoid
+sleeping the whole system whilst the disk drive turns, our JVM will in
+fact perform superior to any other for large Java system behavior... 
+
+&gt;<i> Anything else I should be considering? Any other comments?
+</I>
+Let me know how I can help.  At a minimum, I have some really good
+protected/virtual x86 references handy (well, at home, anyways).
+
+Keep up the good work!
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/">http://www.mak.com/</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000511.html">[JOS-Kernel] realtime-systems</A></li>
+	<LI> Next message: <A HREF="000527.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#512">[ date ]</a>
+              <a href="thread.html#512">[ thread ]</a>
+              <a href="subject.html#512">[ subject ]</a>
+              <a href="author.html#512">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

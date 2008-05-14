@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] new_decaf CVS branch</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000805.html">
+   <LINK REL="Next" HREF="000810.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] new_decaf CVS branch</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] new_decaf CVS branch">tmiller@haverford.edu</A><BR>
+    <I>Tue, 11 Apr 2000 13:35:00 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000805.html">[JOS-Kernel] new_decaf CVS branch</A></li>
+        <LI> Next message: <A HREF="000810.html">[JOS-Kernel] CVS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#809">[ date ]</a>
+              <a href="thread.html#809">[ thread ]</a>
+              <a href="subject.html#809">[ subject ]</a>
+              <a href="author.html#809">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> 1/. As you may have noticed, I didn't get chance to update stdlib with some
+</I>&gt;<i> ASSERT macros last weekend. I *might* get chance this evening (but don't
+</I>&gt;<i> hold your breath).
+</I>
+	Don't sweat it -- I've been too busy hammering out the
+multi-processing stuff to do any coding myself.
+
+&gt;<i> 2/. I meant the Java exception OutOfMemoryError and
+</I>&gt;<i> InvalidMonitorStateException .. as far as I could see, these and similar JVM
+</I>&gt;<i> exceptions aren't thrown and nor were they in the old code. But correct me
+</I>&gt;<i> if I'm wrong. As I said in my first mail, I'd be interested in trying to
+</I>&gt;<i> help sort this out if they are not yet functional.
+</I>
+	No.  Java-thrown exceptions ought to have worked in the old code
+(not sure if I ever tested them), but the JVM never threw them on its own,
+and a large part of this was the problem with getting the exception to be
+thrown to the right place without using C++ exceptions.  I'm very open to
+suggestions/help.
+
+&gt;<i> Another comment on code structure (which might have come out of the various
+</I>&gt;<i> discussions that have been going on, but I haven't had chance to read them
+</I>&gt;<i> yet): I think it would be useful to have a Process class in the C++. It
+</I>&gt;<i> would hold information about it class loader, threads/thread group, process
+</I>&gt;<i> id and, when we get some security infrastructure, the identity of the
+</I>&gt;<i> process owner etc.
+</I>
+	Right now, a 'JVM' instance is defined by a classloader, and a
+Scheduler (which maintains a list of runnable threads).  A Process class,
+or extensions to 'JVM' would probably come in handy, but I don't want to
+start anything until we've figure processes out.
+
+-_Quinn
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000805.html">[JOS-Kernel] new_decaf CVS branch</A></li>
+	<LI> Next message: <A HREF="000810.html">[JOS-Kernel] CVS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#809">[ date ]</a>
+              <a href="thread.html#809">[ thread ]</a>
+              <a href="subject.html#809">[ subject ]</a>
+              <a href="author.html#809">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

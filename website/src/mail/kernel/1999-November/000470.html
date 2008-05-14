@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Progress</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000468.html">
+   <LINK REL="Next" HREF="000503.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Progress</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Progress">tmiller@haverford.edu</A><BR>
+    <I>Sat, 20 Nov 1999 00:46:55 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000468.html">[JOS-Kernel] Getting GRUB up and running</A></li>
+        <LI> Next message: <A HREF="000503.html">[JOS-Kernel] Progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#470">[ date ]</a>
+              <a href="thread.html#470">[ thread ]</a>
+              <a href="subject.html#470">[ subject ]</a>
+              <a href="author.html#470">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	I haven't finished the optimizations for speed yet*, but the
+-DNEW_INTERRUPT_HANDLING Java code now does java-based virtual consoles
+(12 of the them!).  Once I write a correct back-end in (i.e. so that the
+VGA code can be rolled in -- which I need to look at for
+mode-change/checks), I'll probably go ahead and freeze development on it
+until I re-integrate it into the JJOS/common/bytecode tree.  (Currently,
+btw, the host and the i386 builds share the same java drivers because I'm
+trying to test them on the host.  Technically, the host should be using
+whatever drivers are for the architecture it's running on, but that would
+be a pain to set up and happens be the case now anyway...)
+
+	Anyway, the back-end should allow the consoled to manage virtual
+text and graphics consoles, because of the way things are handled
+internally.  (As a matter of fact, I hope that the console will virtualize
+to include things like telnet sessions and Xterms, but moving right
+along...)  The back-end stuff depends on a new kernel/JVM feature I've
+been yammering on about for a while, the mapped byte array, which works as
+follows:
+
+byte[] vga_text_ram = jos.system.machine.mapByteArray( 0xB0000, 80 * 24 * 2);
+byte[] vga_svga_ram = jos.system.machine.mapByteArray( 0xB0000, 640 * 480 );
+
+and so on.  Because we don't have so much as a security model at this
+point, the method is fraught with potential for problems, but at least it
+will trap pointer overruns.  At some point I should probably find the
+lower end of available physical RAM and limit the pointers to below that,
+but that's for a later day.  The code for the text-mode physical console
+(driver) then looks absolutely identical to jjconsol.h in i386/nativecode,
+so I copied it rather liberally.  (Thanks, JM!)
+
+	If anyone would happen to information on how to set the VGA mode 7
+cursor, that would be kind of nice, too.  (It would look more
+'professional,' anyway.)
+
+	Anyway, current problems: kprintf-console communication.  Right
+now there is none, which means all sorts of extremely funky things happen.
+It would be nice to have jos.system.kconsole or something that exposes the
+kernel's idea of what should be on the screen so it can be mapped to a
+virtual console somewhere and fit into the scheme.  Also, the keyboard
+driver, while it's the most correct it's ever been**, still isn't entirely
+right, and the consoled doesn't (yet) check for the ALT key in conjuction
+with the fn key to do console switching.
+
+	*: It's fast enough that's it's not noticeably slower than a Linux
+console while you're typing (at the rate that I type, anyway!), but
+there's a noticeable lag when you have to scroll lines at the bottom of
+the screen.  However -- while coding it, I didn't remember that I had
+implemented arraycopy(), so this problem ought to go away.  (Right now,
+I'm in a Java byte-by-byte copy loop, which is possibly the least
+efficient way imaginable to do stuff like this.)
+
+	**: That I recall, anyway; right now the keyboard driver picks up
+on the *lock keys, though it only executes capslock correctly &amp; doesn't
+change the keyboard leds; the FN keys work, the shifting is good (upper &amp;
+local case as proper) on all the keys to which that applies.  However, the
+numeric keypad and other keys with long escape sequences don't work right,
+return doesn't induce a linefeed/carriage-return in the console (though
+this is probably more the fault of the console than the keyboard driver
+code!); tab doesn't work, backspace/delete, etc.
+
+	It's also very stable, and doesn't seem to miss any keystrokes.
+The only problem I've had with the current build was that it nuked itself
+with some kind of bad pointer on one console switch about twenty minutes
+of testing in.  I've since changed the code; hopefully it won't crop
+again, because I've got no idea what happened.
+
+	I haven't tried rewriting the VGA driver to use the
+mapByteArray() extension, but it should be pretty easy and make
+page-switching much easier.  (That is, you can just arraycopy() from a
+normal byte [] of the right size when the time comes.)  It should also
+improve performance enourmously.  (Assignment into an array is a one
+bytecode op with two words as arguments, translating into the bastore()
+call, followed by a call to store(), which will dump the value into the
+right place.  The function call machine.write() is a bytecode
+(invokevirtual) involving several symbol table lookups, a search through
+the builtins native code, and finally an ASM call to put the value into
+the right place.)
+
+	One more thing: the consoles decide when and when not to 'draw'
+themselves based on FocusEvent messages, so as long as all of our code is
+well-behaved w.r.t. to that, the consoled will ensure that no two virtual
+consoles are trying to write into the vga memory at the same time --
+which means things should be fairly stable even w/o security and/or memory
+protection.
+
+	I think that covers the current State of the Code from my end.
+This progress on the drivers does mean, however, that I haven't put any
+time in on integrating classpath.  (I want to learn CVS's source fork
+management before I do, because it's going to be an absolute mess for
+quite a while.)  In other news, it looks like some people are trying to
+put together an IP stack, and I might take a small detour and oblige them
+with a serial driver (if I can find docs!) to test against Linux SLIP***.
+George has re-integrated the GRUB stuff, and I'll be checking it against
+the etherboot stuff sometime this weekend, hopefully.  Other updates?
+
+-_Quinn
+
+*** And with a serial port driver, hacking up a VT100 emulator so your JOS
+machine will work as a serial terminal shouldn't be too difficult, either,
+right?  (For that matter, aren't there already VT100 terminal emulators
+for Java, albeit, ones designed for telnet apps?)
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000468.html">[JOS-Kernel] Getting GRUB up and running</A></li>
+	<LI> Next message: <A HREF="000503.html">[JOS-Kernel] Progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#470">[ date ]</a>
+              <a href="thread.html#470">[ thread ]</a>
+              <a href="subject.html#470">[ subject ]</a>
+              <a href="author.html#470">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

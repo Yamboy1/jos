@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Checkins (also, please read if interested in device-related issues)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT">
+   <LINK REL="Previous"  HREF="000460.html">
+   <LINK REL="Next" HREF="000463.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Checkins (also, please read if interested in device-related issues)</H1>
+    <B>Corrado Santoro</B> 
+    <A HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT"
+       TITLE="[JOS-Kernel] Checkins (also, please read if interested in device-related issues)">Corrado.Santoro@IIT.UNICT.IT</A><BR>
+    <I>Mon, 15 Nov 1999 17:53:30 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000460.html">[JOS-Kernel] Checkins (also, please read if interested in device-related issues)</A></li>
+        <LI> Next message: <A HREF="000463.html">[JOS-Kernel] Checkins (also, please read if interested in
+ device-related issues)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#462">[ date ]</a>
+              <a href="thread.html#462">[ thread ]</a>
+              <a href="subject.html#462">[ subject ]</a>
+              <a href="author.html#462">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi John,
+I've updated the CVS today. It compiles well and the TestSuite class starts,
+but it seems a to be a bug in the interrupt handling: when I strike a key I see
+the message:
+notifyOfInterrupts(4): VM corrupted, aborting....
+what happens ? What I have forgotten ?
+
+Cheers,
+	Corrado.
+
+On Mon, 15 Nov 1999, John Morrison wrote:
+&gt;<i> Hi;
+</I>&gt;<i> 
+</I>&gt;<i> Well, I got a couple of free minutes, and made some minor changes
+</I>&gt;<i> (hope I didn't break anything -- please shriek loudly if I did).
+</I>&gt;<i> 
+</I>&gt;<i> (1) I changed common/decaf/scheduler.cc.  There seemed to me to be
+</I>&gt;<i> some code that complained if an interrupt happened that there was not
+</I>&gt;<i> a java thread waiting on it.  I got rid of that clause, because I
+</I>&gt;<i> think that is an OK thing -- not an error.
+</I>&gt;<i> 
+</I>&gt;<i> (2) I had been sitting on changes I had made to
+</I>&gt;<i> common/nativecode/jbheap.cc, for which I had made an alternative
+</I>&gt;<i> malloc/free implementation.  I just wanted to get that code into the
+</I>&gt;<i> repository.  Hopefully, it shouldn't be used (unless you change some
+</I>&gt;<i> #defines in the file), and thus it shouldn't break anything.  I'll
+</I>&gt;<i> probably nuke it the next time I touch that file, but ...
+</I>&gt;<i> 
+</I>&gt;<i> (3) I added a new file, common/bytecode/TestSuite.java.  I swept all
+</I>&gt;<i> the test* methods away from init.* and into TestSuite.*.  Obviously, I
+</I>&gt;<i> also thus had the change init.java, and also the Makefile in that
+</I>&gt;<i> directory to add the new file.
+</I>&gt;<i> 
+</I>&gt;<i> This change was important because I would like to start implementing
+</I>&gt;<i> the &quot;device tree&quot; infrastructure.  Basically, the BIOS scans the
+</I>&gt;<i> devices in the box at boot time, and is kind enough to leave a record
+</I>&gt;<i> of what it found in the &quot;BIOS data area.&quot;  I would like to scan this
+</I>&gt;<i> area from Java (early in the &quot;init&quot; code), and make Java &quot;device tree&quot;
+</I>&gt;<i> data structures (as JavaOS does) so that we can load the right drivers
+</I>&gt;<i> for the devices we actually have.  This is the analog to the /dev/*
+</I>&gt;<i> hierarchy in UNIX.  Hopefully, after this code has finished running,
+</I>&gt;<i> you'll (or the Java code will) be able to easily figure out what
+</I>&gt;<i> devices are hanging off the box, and removable and hot-swappable
+</I>&gt;<i> devices will be handled via a &quot;notification&quot; mechanism.
+</I>&gt;<i> 
+</I>&gt;<i> On a directly related note, there was recently a big discussion on the
+</I>&gt;<i> Linux kernel lists (I don't monitor these lists, but the Linux weekly
+</I>&gt;<i> news had a synopsis of the discussion) about how removable media, and
+</I>&gt;<i> large numbers of networked devices raised hell with the old UNIX-style 
+</I>&gt;<i> static device hierarchy.  I think they were headed in this general
+</I>&gt;<i> direction (technically speaking).
+</I>&gt;<i> 
+</I>&gt;<i> As usual, problems to me...
+</I>&gt;<i> 
+</I>&gt;<i> -jm
+</I>&gt;<i> 
+</I>&gt;<i> -- 
+</I>&gt;<i> ==== John Morrison
+</I>&gt;<i> ==== MaK Technologies Inc.
+</I>&gt;<i> ==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+</I>&gt;<i> ==== <A HREF="http://www.mak.com/">http://www.mak.com/</A>
+</I>&gt;<i> ==== vox:617-876-8085 x115
+</I>&gt;<i> ==== fax:617-876-9208
+</I>&gt;<i> ==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+Personal Home Page:
+            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+
+ARCA Mobile Agent Framework Home Page:
+            <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+======================================================
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000460.html">[JOS-Kernel] Checkins (also, please read if interested in device-related issues)</A></li>
+	<LI> Next message: <A HREF="000463.html">[JOS-Kernel] Checkins (also, please read if interested in
+ device-related issues)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#462">[ date ]</a>
+              <a href="thread.html#462">[ thread ]</a>
+              <a href="subject.html#462">[ subject ]</a>
+              <a href="author.html#462">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

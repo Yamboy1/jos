@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000932.html">
+   <LINK REL="Next" HREF="000934.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine">gchii@mindspring.com</A><BR>
+    <I>Fri, 29 Sep 2000 19:50:01 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000932.html">[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</A></li>
+        <LI> Next message: <A HREF="000934.html">[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#933">[ date ]</a>
+              <a href="thread.html#933">[ thread ]</a>
+              <a href="subject.html#933">[ subject ]</a>
+              <a href="author.html#933">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 11:01 AM 9/26/00 -0500, you wrote:
+&gt;<i>I think this depends on your goals for a JOS.  Monolithic kernels are 
+</I>&gt;<i>faster and so if JOS is to be its own operating system, it makes sense to 
+</I>&gt;<i>create a monolithic kernel/jvm/class libraries image.  Separation of the 
+</I>&gt;<i>elements only serves to slow down the overall system.  For the transition 
+</I>&gt;<i>period before jos is a full os, a portable jvm may have some 
+</I>&gt;<i>advantages.  I'm unsure if the time and effort needed to create a portable 
+</I>&gt;<i>and fast jvm/kernel interface will pay back in terms of helping the jos 
+</I>&gt;<i>project proceed though.
+</I>
+In this case, what is good for a &quot;transition&quot; period is good for a very
+long time. The advantage of modular design doesn't go away.
+
+Maintaining a clear separation between kernel and virtual machine is most
+likely to sustain enthusiasm for JOS. Enthusiasm is an asset.
+
+Say someone builds K1, the first kernel. They have a de facto monopoly
+because their kernel is the only one. We use the first kernel regardless of
+whether we like it or not. We have no choice. Then, someone builds K2, the
+second kernel. K1 and K2 are different. The monopoly is broken. Competition
+begins. If we maintain a clear separation of kernel and virtual machine,
+every virtual machine will run on both kernels. Otherwise, we put everyone
+in an awkward and dissatisfying position of having to choose between two
+incompatible kernels. Would you rather split developers between two
+incompatible kernels?
+
+Faster? First, it is a myth that all monolithic kernels are faster than all
+modular kernels. Once a module is bound, there is no difference in speed.
+Second, logical design is not physical implementation. A clear separation
+of kernel and virtual machine is a design issue. It has little to do with a
+single executable image. The speed of a kernel depends more upon its
+implementation than its design.
+
+Examine the history of operating systems. Modularization was a breakthrough
+in modern operating system design. The kernel became distinct from the
+remaining operating system services. The standard C library became the
+standard kernel interface. A monolithic design, mixing together kernel and
+virtual machine, would be a step backward.
+
+An executable image is an implementation detail. As you know, I have been
+working hard to combine a kernel, virtual machine and boot packages in a
+single executable image. That is a good idea. When booting with GRUB, for
+example, a single executable image is a &quot;kernel&quot;, with no additional
+&quot;modules&quot;. That makes it more difficult to get it wrong.
+
+Clean separation of kernel and virtual machine means you can mix and match
+kernels and virtual machines. If I have kernels K1 through K5 and virtual
+machines V1 through V5, any combination of kernel and virtual machine
+/should/ work. For example, a kernel optimized for the Pentium II processor
+should be able to host a virtual machine only optimized for i386.
+
+At link-time, it is possible to bind together a kernel and virtual machine
+into a single executable image. K1-V1, K1-V2, K1-V3...K5-V5. While any
+combination is possible, only a few are practical. Unless you limit
+everyone to use the same kernel and virtual machine, the interface between
+kernel and virtual machine must be well-defined. The traditional interface
+between kernel and virtual machine is the standard C library.
+
+&gt;<i>If the research for JOS itself only resides above the portable jvm, then 
+</I>&gt;<i>you might as well just use whatever jvm happens to be on your host platform 
+</I>&gt;<i>(allowing best of breed usage across platforms).  Java itself should 
+</I>&gt;<i>provide the necessary portability between jvm's.  Research in getting a jvm 
+</I>&gt;<i>to work fastest/most efficiently/etc will almost be guaranteed to be 
+</I>&gt;<i>tightly tied to the underlying kernel and hardware and I'm unsure if you 
+</I>&gt;<i>can get many benefits if you also constrain yourself to be portable at the 
+</I>&gt;<i>same time...
+</I>
+When JOS is my platform, I intend to use the &quot;best&quot; virtual machine I can
+find that runs on JOS. I don't expect my approach to change. I shop around.
+This is what I already do for Linux, Windows, OS/400, etc..
+
+The &quot;best&quot; virtual machine varies from application to application. What is
+best for one application may not be best for another.
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000932.html">[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</A></li>
+	<LI> Next message: <A HREF="000934.html">[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#933">[ date ]</a>
+              <a href="thread.html#933">[ thread ]</a>
+              <a href="subject.html#933">[ subject ]</a>
+              <a href="author.html#933">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

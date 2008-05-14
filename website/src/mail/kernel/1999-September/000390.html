@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Problem starting JJOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000402.html">
+   <LINK REL="Next" HREF="000396.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Problem starting JJOS</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Kernel] Problem starting JJOS">hilarycheng@usa.net</A><BR>
+    <I>Mon, 27 Sep 1999 08:47:50 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000402.html">[JOS-Kernel] Problem starting JJOS</A></li>
+        <LI> Next message: <A HREF="000396.html">[JOS-Kernel] Performance Issue</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#390">[ date ]</a>
+              <a href="thread.html#390">[ thread ]</a>
+              <a href="subject.html#390">[ subject ]</a>
+              <a href="author.html#390">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi,
+
+    I recommand to use i386 build rather than using Host Build. Since i386
+build got
+more feature than host build like VGA Driver, etc.
+
+    well, if u use Host build, u need to find out a zip file call
+&quot;jos_common.zip&quot; in
+arch/host/bytecode. pls include ur testing class file into this zip file so
+that u can
+run HelloWorld.
+
+Regards,
+
+Hilary
+
+&gt;<i>yo Group,
+</I>&gt;<i>
+</I>&gt;<i>I wrote to the group last week because I had trouble building JJOS;
+</I>&gt;<i>Avery J. Regier gave me the tip to do the checkout under Linux onto
+</I>&gt;<i>a ext2fs partition instead of using jcvs/windows NT4.0 onto FAT;
+</I>&gt;<i>the build worked fine (THANX Avery/J./Regier (choose your first name:-))
+</I>&gt;<i>maybe this problem could be added to a JJOS FAQ on the website (is there
+</I>&gt;<i>something like that?);
+</I>&gt;<i>
+</I>&gt;<i>but jjos didnt start; the Readme says that running build (or running
+</I>&gt;<i>make in /JJOS/arch/host/nativecode ) would start jjos;
+</I>&gt;<i>so I thought, lets do yourself; I went to the /JJOS/arch/host/nativecode
+</I>&gt;<i>dir and copied the file HelloWorld.class (guess what that does 8-) )to this
+</I>&gt;<i>dir, and then did this:
+</I>&gt;<i>
+</I>&gt;<i>[<A HREF="mailto:root@localhost">root@localhost</A> nativecode]# jjos HelloWorld
+</I>&gt;<i>jm's JOS Kernel Host!
+</I>&gt;<i>start pds:      0x40113008      end pds:        0x40139E88      (1992 page
+</I>&gt;<i>descriptors)
+</I>&gt;<i>start heap:     0x4013B000      end heap:       0x40903000      (1992
+</I>pages)
+&gt;<i>Page freelist:
+</I>&gt;<i>0x4014B000: 1976 pages
+</I>&gt;<i>heap freelists:
+</I>&gt;<i>freelist Size: 8; SPD: 0x40113008; SPDI: 0
+</I>&gt;<i>sizes mapping to this freelist: 0-8
+</I>&gt;<i>freelist Size: 12; SPD: 0x40113058; SPDI: 0
+</I>&gt;<i>sizes mapping to this freelist: 9-12
+</I>&gt;<i>freelist Size: 16; SPD: 0x401130A8; SPDI: 0
+</I>&gt;<i>sizes mapping to this freelist: 13-16
+</I>&gt;<i>freelist Size: 20; SPD: 0x401130F8; SPDI: 0
+</I>&gt;<i>sizes mapping to this freelist: 17-20
+</I>&gt;<i>freelist Size: 24; SPD: 0x40113148; SPDI: 0
+</I>&gt;<i>sizes mapping to this freelist: 21-24
+</I>&gt;<i>freelist Size: 28; SPD: 0x40113198; SPDI: 0
+</I>&gt;<i>sizes mapping to this freelist: 25-28
+</I>&gt;<i>freelist Size: 32; SPD: 0x401131E8; SPDI: 0
+</I>&gt;<i>sizes mapping to this freelist: 29-32
+</I>&gt;<i>freelist Size: 36; SPD: 0x40113238; SPDI: 0
+</I>&gt;<i>sizes mapping to this freelist: 33-36
+</I>&gt;<i>freelist Size: 40; SPD: 0x40113288; SPDI: 0
+</I>&gt;<i>sizes mapping to this freelist: 37-40
+</I>&gt;<i>freelist Size: 100; SPD: 0x401132D8; SPDI: 0
+</I>&gt;<i>sizes mapping to this freelist: 41-100
+</I>&gt;<i>freelist Size: 2048; SPD: 0x40113328; SPDI: 0
+</I>&gt;<i>sizes mapping to this freelist: 101-2048
+</I>&gt;<i>class_loader: can't load HelloWorld.class
+</I>&gt;<i>Segmentation fault (core dumped)
+</I>&gt;<i>[<A HREF="mailto:root@localhost">root@localhost</A> nativecode]#
+</I>&gt;<i>
+</I>&gt;<i>I tried a couple of other things (like going to the /JJOS/common/bytecode
+</I>&gt;<i>dir and starting &quot;jjos init&quot; (the path to jjos
+</I>&gt;<i>was in the $PATH) but it only did the same thing as with the
+</I>&gt;<i>HelloWorld.class;
+</I>&gt;<i>
+</I>&gt;<i>also: the HelloWorld.class works with java, the Classpath is correct
+</I>&gt;<i>to;
+</I>&gt;<i>
+</I>&gt;<i>I checked JJOS out on September 23. 1999 (Thursday);
+</I>&gt;<i>
+</I>&gt;<i>What could be the trouble with that?
+</I>&gt;<i>hope someone might help me here,
+</I>&gt;<i>THANX in advance
+</I>&gt;<i>
+</I>&gt;<i>murphee
+</I>&gt;<i>***************************************
+</I>&gt;<i>UNITE FOR JAVA -&gt; www.javalobby.org
+</I>&gt;<i>Check this out -&gt; www.jos.org
+</I>&gt;<i>My site -&gt; www.angelfire.com/co/werners
+</I>&gt;<i>***************************************
+</I>&gt;<i>.... and the fact, that i haven't put a gun to my mouth yet,
+</I>&gt;<i>proves that i'm a winner!
+</I>&gt;<i>Al Bundy
+</I>&gt;<i>
+</I>&gt;<i>_______________________________________________
+</I>&gt;<i>Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i><A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>&gt;<i>
+</I>
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000402.html">[JOS-Kernel] Problem starting JJOS</A></li>
+	<LI> Next message: <A HREF="000396.html">[JOS-Kernel] Performance Issue</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#390">[ date ]</a>
+              <a href="thread.html#390">[ thread ]</a>
+              <a href="subject.html#390">[ subject ]</a>
+              <a href="author.html#390">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

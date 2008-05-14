@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Static members and process model.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT">
+   <LINK REL="Previous"  HREF="000450.html">
+   <LINK REL="Next" HREF="000452.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Static members and process model.</H1>
+    <B>Corrado Santoro</B> 
+    <A HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT"
+       TITLE="[JOS-Kernel] Static members and process model.">Corrado.Santoro@IIT.UNICT.IT</A><BR>
+    <I>Fri, 29 Oct 1999 09:19:17 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000450.html">[JOS-Kernel] Static members and process model.</A></li>
+        <LI> Next message: <A HREF="000452.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#451">[ date ]</a>
+              <a href="thread.html#451">[ thread ]</a>
+              <a href="subject.html#451">[ subject ]</a>
+              <a href="author.html#451">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Thu, 28 Oct 1999, Todd L. Miller wrote:
+&gt;<i> 	I had considered it while writing the console/consoled classes.
+</I>&gt;<i> If console is implemented in such a fashion that it can be passed around
+</I>&gt;<i> as a stream, everything just happens right.  The shell (or init, etc) sets
+</I>&gt;<i> up the necessary redirections to make System.in/out/err work.  If an
+</I>&gt;<i> application wants to use the console, they can use reflection to
+</I>&gt;<i> find out if System.in/out/err is actually a console.
+</I>&gt;<i> 
+</I>&gt;<i> [cut]
+</I>&gt;<i>
+</I>&gt;<i> details; you'd also need some way of getting static classes out of the
+</I>&gt;<i> classloader so that they can be properly adjusted.  (eg:
+</I>&gt;<i> 	jls = forkClassLoader.getClass( &quot;java.lang.System&quot; );
+</I>&gt;<i>         jls.setOut( shellRedirect );
+</I>&gt;<i> 	jls.setIn( shellRedirect );
+</I>&gt;<i> 	jls.setErr( shellRedirect );)
+</I>&gt;<i> 
+</I>Right! But, I think that the problem persist (or probably I've not
+well understood your description). I mean, let us suppose that I write a &quot;Java
+Shell&quot; using my Linux/JDK. This shell will make use of System.in and System.out
+and, inside its code, there will be a lot of &quot;invokestatic&quot; on System.in and
+System.out. Now, let us suppose that I want to run this shell inside JOS,
+without making any patches to the code (suppose that I have only the bytecode).
+What's happen ? I mean, it is necessary that the &quot;invokestatic&quot; on System.in
+and System.out work in the current console! Using classloader forking,
+you are able to start another &quot;System&quot; class (which can be used from the
+running application, if it is patched), but you need to change the
+&quot;invokestatic&quot; into &quot;invokevirtual&quot; referring to the new &quot;System&quot; class. But my
+idea, is to allowing the direct execution on JOS of a bytecode compiled (and
+running) on a traditional JVM/JDK.
+
+Are you agree ?
+
+Bye,
+	Corrado.
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+Personal Home Page:
+            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+
+ARCA Mobile Agent Framework Home Page:
+            <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+======================================================
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000450.html">[JOS-Kernel] Static members and process model.</A></li>
+	<LI> Next message: <A HREF="000452.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#451">[ date ]</a>
+              <a href="thread.html#451">[ thread ]</a>
+              <a href="subject.html#451">[ subject ]</a>
+              <a href="author.html#451">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

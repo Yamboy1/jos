@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000299.html">
+   <LINK REL="Next" HREF="000298.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf updates">tmiller@haverford.edu</A><BR>
+    <I>Wed, 25 Aug 1999 13:55:57 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000299.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000298.html">[JOS-Kernel] About Current CVS Source of JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#301">[ date ]</a>
+              <a href="thread.html#301">[ thread ]</a>
+              <a href="subject.html#301">[ subject ]</a>
+              <a href="author.html#301">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Well, I found two bugs in JVM.
+</I>&gt;<i> 1. Date Object -- When I create Date Object, JJOS Kernel will got some
+</I>&gt;<i> behaivour. (Show lots of Zero on the screen.)
+</I>&gt;<i> 2. String -- String can't perform chatAt and getBytes, toCharArray
+</I>&gt;<i> So I can't draw Character on VGA from a Java String.
+</I>
+	As I've already noted, we're not working with a fully-functional
+class library.  #2 should be a (relatively) quick fix of adding
+&quot;arraycopy&quot; to the builtins...
+
+&gt;<i> For 'consoled' daemon, is it a Console Driver for System.out ?
+</I>
+	No.  It's a daemon that (for now?) is the only consumer of the
+keyboard's KeyEvents; after checking if it's a KeyEvent that causes the
+console to switch (which fires FocusEvents), it redirects the KeyEvent to
+the currently-focused console.  (Actually, KeyListener, so things like
+telnet should just fit right in.)
+
+&gt;<i> I would like to know, is the current keyboard emulation fully funtional ?
+</I>&gt;<i> Since I havn't try to test it in my computer.
+</I>
+	Yes and no.  It will convince the keyboard driver that it's
+talking to a real keyboard, but one that can only generate the single
+scancode you've hard-coded into it.  Some raw-mode hack should be possible
+to make the Right Thing happen...
+
+&gt;<i> Any Conservative GC has been already implemented ? If so, we can port it
+</I>&gt;<i> to JJOS, it can save time on it.
+</I>
+	Yes, we're working on integrating a conservative that was
+generously written for us by George Marrows.
+
+-_Quinn
+
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000299.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000298.html">[JOS-Kernel] About Current CVS Source of JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#301">[ date ]</a>
+              <a href="thread.html#301">[ thread ]</a>
+              <a href="subject.html#301">[ subject ]</a>
+              <a href="author.html#301">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

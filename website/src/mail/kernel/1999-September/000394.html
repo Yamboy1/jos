@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] (no subject)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000382.html">
+   <LINK REL="Next" HREF="000383.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] (no subject)</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] (no subject)">tmiller@haverford.edu</A><BR>
+    <I>Mon, 27 Sep 1999 17:04:58 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000382.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+        <LI> Next message: <A HREF="000383.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#394">[ date ]</a>
+              <a href="thread.html#394">[ thread ]</a>
+              <a href="subject.html#394">[ subject ]</a>
+              <a href="author.html#394">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> The bottleneck is not where you expect it to be.
+</I>
+	A lot of the bottleneck is in the scheduler, suprisingly enough,
+especially the parts where it checks for interrupts and/or if the current
+time slice has expired.  (Does everyone remember why polled I/O is bad?)
+The easiest fix for now, I think, is to adjust the number of java
+ops executed between interrupt polls, and to inline some of the scheduling
+functions.  (i.e. in scheduler::start(), loop over runOpcode() a few times
+before re-starting the main scheduling loop; make this settable somewhere
+else in the code for tuning.  A small optimization might be to make the
+myTimeSlice multiplier a #define instead of variable, just to really get
+the point across to the compiler that it's a constant...)
+
+-_Quinn
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000382.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+	<LI> Next message: <A HREF="000383.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#394">[ date ]</a>
+              <a href="thread.html#394">[ thread ]</a>
+              <a href="subject.html#394">[ subject ]</a>
+              <a href="author.html#394">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

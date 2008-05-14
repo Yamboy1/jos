@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000752.html">
+   <LINK REL="Next" HREF="000754.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS-Kernel] Device as a digital resource">al@outworld.org</A><BR>
+    <I>Sun, 19 Mar 2000 09:29:44 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000752.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000754.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#753">[ date ]</a>
+              <a href="thread.html#753">[ thread ]</a>
+              <a href="subject.html#753">[ subject ]</a>
+              <a href="author.html#753">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+
+&gt;<i> Do you like that idea of a system-wide device factory?
+</I>
+I do, and I also support that an operating system must be as wide as
+possible. The more generalized information the underlying OS can give,
+the more detailed processing of this information can be achieved at
+higher levels of execution. Don't we try to do the same thing with the
+kernel, that is, make the use of C code as little as possible, such that
+it supplies only the absolutely necessary information for a JVM to run,
+and then the rest is done in the higher-level language Java?
+
+&gt;<i> Do you like the idea that a URI is used to identify devices? If so, we
+</I>&gt;<i> can refine the scheme through experimentation.
+</I>
+I love the idea of using URI for pointing to *anything,* as URI are very
+scalable and dynamic in doing just that: pointing. I use a sort of URI
+for my Registry API, for example. The file system will use something
+like that. Browsers and network tools will use them. Why not make
+everything pointable by URI's, and then have a central engine that reads
+the URI, and appropriately initializes the correct managers, factories
+and transport protocols?
+
+&gt;<i> &gt; bnci:<A HREF="modem://localhost/serial/1/">modem://localhost/serial/1/</A>
+</I>&gt;<i> 
+</I>&gt;<i> Maybe you meant something like &quot;device:<A HREF="modem://localhost/serial/1/".">modem://localhost/serial/1/&quot;.</A>
+</I>&gt;<i> The bcni: scheme is a bridge to the BCNI factory. Both the bcni:
+</I>&gt;<i> scheme and factory require the name of a Java interface. It has no
+</I>&gt;<i> paths. It has only an interface name.
+</I>
+Yes, you are right, I have no idea how BNCI works, but the &quot;device:&quot;
+protocol is what I was talking about. I understand that if BNCI uses
+class names, then the URI's should be the way you propose. Of course,
+have in mind, that they are not truly URI, they are simply arguments to
+the BNCI interpreter, that merely *look* like URI's... The purpose of a
+URI is to map a path to location, right?
+
+&gt;<i> &gt; bnci:<A HREF="modem://localhost/serial/1/?maxspeed=57600&parity=none">modem://localhost/serial/1/?maxspeed=57600&amp;parity=none</A>
+</I>&gt;<i> 
+</I>&gt;<i> This is good. I agree that any program that wants to set parity, bits
+</I>&gt;<i> and speed should use the query string. Any parameter set in the query
+</I>&gt;<i> string should be a property of the device. If you use maxspeed=57600,
+</I>&gt;<i> the device defines a getMaxSpeed() method that returns 57600. If it is
+</I>&gt;<i> capable of changing a property after it is created, a device defines a
+</I>&gt;<i> setMaxSpeed() method, too.
+</I>
+If all devices are Beans, then this would be trivial to implement. I
+like this idea very much, and I think that's why Sun put a lot of effort
+in Beans, because they are so manageable.
+
+&gt;<i> In general, I would prefer to put port in a query string because there
+</I>&gt;<i> are many devices without a port.
+</I>
+If the URI points *generally* to a serial port, then yes, the port
+should be placed in the query section. But the URI I wrote points
+*directly* at serial port #1.
+
+&gt;<i> We disagree on the concept of path. Devices should be mapped
+</I>&gt;<i> independently from the traditional ideas of a file subsystem, like
+</I>&gt;<i> path.
+</I>
+Why? All devices on a computer, at least contemporary computers, are
+linked together on buses and through ports. We can definitely map any
+device on a computer via a path, if this path begins with the local
+computer, mainly, the motherboard. Since everything is on the
+motherboard, one way or another, then everything can be mapped starting
+at the motherboard...
+
+&gt;<i> 'device:' [ '//' host [ ':' port ] ]
+</I>
+I don't think we need the port in such URI's, because they are not
+mapping to a server/service on the machine, they are merely mapping to a
+device. The interpreter will not *contact* localhost, it will only know
+how to find the requested device. Only in the case of remote devices may
+a port be necessary, and then we would have to decide which privileged
+port JOS will use for the &quot;Network Device Manager.&quot;
+
+&gt;<i> I do not propose a network-wide device factory. I cannot create
+</I>&gt;<i> distributed devices at this point in the start-up sequence. Without
+</I>&gt;<i> TCP/IP, we could not possibly connect to another host. I propose a
+</I>&gt;<i> local URI because we don't have a network.
+</I>
+Naturally, the interpreter of the device URI's will default to
+&quot;localhost&quot; if no host is specified. And if a host is specified other
+than localhost, then it can throw something like
+&quot;ServiceUnavailableException&quot; or &quot;RemoteDeviceUnavailableException&quot; or
+equivalent. When devices are made distributed, then these exceptions
+will not be thrown any more, but programmers will not have to change
+their code in order to access this future feature.
+
+&gt;<i> Like bcni: scheme, the device: scheme would do well to specify the
+</I>&gt;<i> interface it wants, wouldn't it?
+</I>&gt;<i> 
+</I>&gt;<i> 'device:' [ '//' host [ ':' port ] ] interfacename [ '?' querystring ]
+</I>&gt;<i> 
+</I>&gt;<i> I asked myself this question: If we already have the bcni: scheme, do
+</I>&gt;<i> we need a device scheme? I think the answer is 'Yes, we do.' The
+</I>&gt;<i> device: scheme could manage additional parameters/properties on a
+</I>&gt;<i> device by device basis. This could be very flexible.
+</I>
+It can be very flexible if we can use a method such as &quot;getDevice(uri)&quot;
+which returns a device and then we are free to play with the device as
+we wish. The last URI you wrote I like a lot... I was thinking of
+possibly something like this:
+
+bnci:jos.device.Modem:<A HREF="device://localhost/ports/serial/1/?maxspeed=...">device://localhost/ports/serial/1/?maxspeed=...</A>
+
+The device manager returns the raw device, and bnci converts it into the
+specified &quot;jod.device.Modem&quot; class.
+
+Since more types of devices than modems can be attached to the serial
+port, the device manager can only return the raw version of the device:
+the port itself.
+
+Maybe, during JOS start-up, a mapping facility can create shortcuts,
+such as:
+
+<A HREF="device://localhost/mapped/modem0/?maxspeed=...">device://localhost/mapped/modem0/?maxspeed=...</A>
+
+is equivalent to:
+
+bnci:jos.device.<A HREF="Modem://localhost/ports/serial/1/?maxspeed=...">Modem://localhost/ports/serial/1/?maxspeed=...</A>
+
+What do you think?
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+________________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [URL: <A HREF="http://www.outworld.org/people/al]">http://www.outworld.org/people/al]</A>
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+PLEASE DO NOT SEND ME ANY UNSOLICITED COMMERCIAL EMAIL [DSS: 0xDBEF8ECC]
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000752.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000754.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#753">[ date ]</a>
+              <a href="thread.html#753">[ thread ]</a>
+              <a href="subject.html#753">[ subject ]</a>
+              <a href="author.html#753">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

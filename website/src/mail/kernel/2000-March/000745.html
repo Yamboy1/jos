@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOS Installation</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000760.html">
+   <LINK REL="Next" HREF="000747.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOS Installation</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] JOS Installation">gchii@mindspring.com</A><BR>
+    <I>Fri, 17 Mar 2000 20:15:18 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000760.html">[JOS-Kernel] JOS Installation</A></li>
+        <LI> Next message: <A HREF="000747.html">[JOS-Kernel] JOS Installation</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#745">[ date ]</a>
+              <a href="thread.html#745">[ thread ]</a>
+              <a href="subject.html#745">[ subject ]</a>
+              <a href="author.html#745">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 06:57 PM 3/17/00 -0500, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>	The 1.1.8 JDK classes.zip I've got is 9122642 bytes, so I guess
+</I>&gt;<i>Corrado is using a different version.  Whatever works.
+</I>
+Starting with rt.jar or classes.zip from Java 1, you can safely remove the
+JavaDoc application, the javac application, and some of the un-used,
+un-necessary packages. Here are a few packages that you can't use (yet).
+
+java.applet
+java.awt.*
+java.beans
+java.rmi.*
+java.sql
+sun.applet.*
+sun.awt.*
+sun.beans.*
+sun.jdbc.odbc
+sun.rmi.*
+
+And, here are some of the packages you can't use without a TCP/IP stack:
+
+java.net
+sun.net.*
+
+If you're not going to use them, why should you load them? If you have a
+machine with 8MB+, you should be able to load and run JOS for a few
+seconds. Our recommendation will be 16MB+ of RAM.
+
+Consumers do not want to load packages they don't use. Consumers do not
+want JavaDoc in their toaster. The rt.jar and classes.zip architecture
+doesn't work for Sun either.
+
+Regardless, Sun Microsystems frowns upon anyone removing *any* class from
+rt.jar or classes.zip.
+
+JOS should not carry the JavaDoc application around in its core classes,
+should it? JOS should not carry all those classes that use JNI-based native
+methods, should it? Ultimate JOS should load packages on demand, delaying
+the load from disk or network service until they are actually used. We are
+not required to use it.
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000760.html">[JOS-Kernel] JOS Installation</A></li>
+	<LI> Next message: <A HREF="000747.html">[JOS-Kernel] JOS Installation</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#745">[ date ]</a>
+              <a href="thread.html#745">[ thread ]</a>
+              <a href="subject.html#745">[ subject ]</a>
+              <a href="author.html#745">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

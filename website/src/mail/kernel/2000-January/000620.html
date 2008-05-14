@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOS &amp; JCurses.. WORK TOGETHER!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT">
+   <LINK REL="Previous"  HREF="000617.html">
+   <LINK REL="Next" HREF="000621.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOS &amp; JCurses.. WORK TOGETHER!</H1>
+    <B>Corrado Santoro</B> 
+    <A HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT"
+       TITLE="[JOS-Kernel] JOS &amp; JCurses.. WORK TOGETHER!">Corrado.Santoro@IIT.UNICT.IT</A><BR>
+    <I>Thu, 13 Jan 2000 13:10:04 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000617.html">[JOS-Kernel] CVS: etherboot &amp; cursor control</A></li>
+        <LI> Next message: <A HREF="000621.html">[JOS-Kernel] New JEPS release, multiple interfaces and routing.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#620">[ date ]</a>
+              <a href="thread.html#620">[ thread ]</a>
+              <a href="subject.html#620">[ subject ]</a>
+              <a href="author.html#620">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi all,
+I'm happy to announce that I've spent a night to make some patches to JJOS in
+order to make jcurses to work, AND NOW I'M ABLE TO DISPLAY THE FIRST JJOS
+WINDOW!
+As I've made many modification to the code, I don't want update the CVS server
+until Todd takes a look to the patches and approves my work.
+Everyone who would like to test my work can download the sources from:
+	&quot;<A HREF="ftp://alpha2.iit.unict.it/pub/JOS/jjos-w-curses.tgz"">ftp://alpha2.iit.unict.it/pub/JOS/jjos-w-curses.tgz&quot;</A>
+This jcurses-enabled version works under grub and etherboot (also the host
+build works well even if the window frame is not displayed correctly).
+Here are the modifications:
+- added setChar,setCursor,etc. to jjconsol.cc (host &amp; i386)
+- added console native methods to jvmbuiltins.cc and d_main.cc
+- added getCurrentConsole() method to consoled.java
+- ..... (some other little patches -- Todd please take a look at the source
+code).
+
+I've also found the following bugs in string management (maybe you already know
+it):
+- concatenation (s = s + &quot;xxxx&quot;) generates a segmentation fault;
+- method length() returns always zero;
+- method charAt() does not work (for this reason, in init.java, I had to print
+a message char-by-char).
+
+
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+Personal Home Page:
+            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+
+ARCA Mobile Agent Framework Home Page:
+            <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+======================================================
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000617.html">[JOS-Kernel] CVS: etherboot &amp; cursor control</A></li>
+	<LI> Next message: <A HREF="000621.html">[JOS-Kernel] New JEPS release, multiple interfaces and routing.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#620">[ date ]</a>
+              <a href="thread.html#620">[ thread ]</a>
+              <a href="subject.html#620">[ subject ]</a>
+              <a href="author.html#620">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] host progress</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000590.html">
+   <LINK REL="Next" HREF="000597.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] host progress</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] host progress">tmiller@haverford.edu</A><BR>
+    <I>Wed, 5 Jan 2000 08:20:59 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000590.html">[JOS-Kernel] File System</A></li>
+        <LI> Next message: <A HREF="000597.html">[JOS-Kernel] host progress and jcurses</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#589">[ date ]</a>
+              <a href="thread.html#589">[ thread ]</a>
+              <a href="subject.html#589">[ subject ]</a>
+              <a href="author.html#589">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Along the way to hunting down a bug I've inserted in the i386
+build trying to to use Aviery's patch for a native #0 console, I made some
+changes to the host build's console handling.  The summary is that I've
+adapted the host build to use the ncurses library.  This allows
+char-by-char input easily, and simplifies the work in
+driver.KeyboardInterpreter.  Things left to do for this style of
+build (from the text console i/o p.o.v.):
+
+(a) handle escape sequences (eg F1) and/or activate keypad() in
+ncurses() and adjust the handling in driver.KI to use its translations.
+(b) rewrite driver.console to use ncurses so that when the Fx keys are
+available, the Right Things will happen.  (On update() and when visible,
+use native calls to addch(x,y,c) to draw.)
+(c) recognize and handle return correctly.  (This might be something
+ncurses will handle automagically with the right settings.)
+
+	None of these should be particularly difficult, though (a) will be
+time-consuming.  This will allow us to test shells (when we're ready*,
+which should be soon) on the host build.  (consoleVGA on the host build
+should be a simple re-write to pop up and use an X window.)
+
+	I'll continue to hack away at figuring what I screwed up when
+inserting Aviery's code.  (Which, btw, I did by hand so I could figure out
+what he was doing.)
+
+-_Quinn
+
+* See my prior email for options on shells.  If you go with a shell that
+isn't its own program and doesn't use too much of the java libraries, it
+could start now.  My short-term attention will be divided between
+processes and classpath; processes should be finished sooner.
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000590.html">[JOS-Kernel] File System</A></li>
+	<LI> Next message: <A HREF="000597.html">[JOS-Kernel] host progress and jcurses</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#589">[ date ]</a>
+              <a href="thread.html#589">[ thread ]</a>
+              <a href="subject.html#589">[ subject ]</a>
+              <a href="author.html#589">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Static members and process model.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000454.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Static members and process model.</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Kernel] Static members and process model.">hilarycheng@usa.net</A><BR>
+    <I>Thu, 28 Oct 1999 21:52:41 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000454.html">[JOS-Kernel] Static members and process model.</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#449">[ date ]</a>
+              <a href="thread.html#449">[ thread ]</a>
+              <a href="subject.html#449">[ subject ]</a>
+              <a href="author.html#449">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Corrado,
+
+    I have an idea to makes a console system in Java.
+Since System.out and System.in can't capture KeyEvent.
+But in a Console System, it is very important. I would like to do it in this
+system.
+
+public class Console extends java.awt.Component;
+
+It can send Key Event to Console and allow us to customize the screen
+layout.
+most important, if someone has written a Java application depends on it,
+we can still write a implement on Linux, Win9X so that it can allows people
+to run it Linux.
+
+Regards,
+
+Hilary
+
+
+----- Original Message -----
+From: Corrado Santoro &lt;<A HREF="mailto:Corrado.Santoro@IIT.UNICT.IT">Corrado.Santoro@IIT.UNICT.IT</A>&gt;
+To: &lt;<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>&gt;
+Sent: Thursday, October 28, 1999 5:16 PM
+Subject: [JOS-Kernel] Static members and process model.
+
+
+&gt;<i>Hi all,
+</I>&gt;<i>I'm planning to work on a virtual console driver for JOS applicative
+</I>programs
+&gt;<i>enhancing the current &quot;console/consoled&quot;. My aim is to allow an applicative
+</I>&gt;<i>program to use the System.in and System.out streams to perform console
+</I>&gt;<i>operation.
+</I>&gt;<i>
+</I>&gt;<i>First of all, is there anyone that is currently working on this issue ?
+</I>&gt;<i>Secondly, I've found a problem on the &quot;scope&quot; of static members: System.in
+</I>and
+&gt;<i>System.out are static members, i.e. single instances inside the SAME
+</I>virtual
+&gt;<i>machine. This approach is valid for the &quot;standard&quot; use of Java upon a
+</I>operating
+&gt;<i>system such as WinNT/9X or Unix/Linux: different Java processes are started
+</I>&gt;<i>inside different Java Virtual Machines, thus each process uses its own
+</I>&gt;<i>System.in and System.out streams. But in the JOS environment, there is a
+</I>SINGLE
+&gt;<i>virtual machine thus, by analogy, there might be only ONE instance of
+</I>&gt;<i>System.in and System.out, shared among ALL threads (and thus all
+</I>appications) of
+&gt;<i>the machine. This means that, basically, all threads are using the SAME
+</I>console.
+&gt;<i>Obviously this is not possible and the streams System.in and System.out of
+</I>JOS
+&gt;<i>must act as &quot;wrappers&quot;, determining the current console of the current
+</I>thread
+&gt;<i>and calling then the appropriate console driver. In this case, the
+</I>'java.lang.System'
+&gt;<i>class provided by Sun can be no longer used, and it is necessary to
+</I>suitably
+&gt;<i>rewrite this class for JOS.
+</I>&gt;<i>
+</I>&gt;<i>I'm studying this problem and when I have a solution, I will prepare a
+</I>&gt;<i>descriptive document. Meanwhile, do you have any suggestion ?
+</I>&gt;<i>
+</I>&gt;<i>Bye,
+</I>&gt;<i> Corrado.
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>--
+</I>&gt;<i>======================================================
+</I>&gt;<i>Eng. Corrado Santoro - PhD Student
+</I>&gt;<i>
+</I>&gt;<i>Unversity of Catania - Engineering Faculty
+</I>&gt;<i>Institute of Computer Science and Telecommunications
+</I>&gt;<i>Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+</I>&gt;<i>
+</I>&gt;<i>Tel: +39 095 7382365           Fax: +39 095 7382397
+</I>&gt;<i>
+</I>&gt;<i>EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+</I>&gt;<i>Personal Home Page:
+</I>&gt;<i>            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+</I>&gt;<i>
+</I>&gt;<i>ARCA Mobile Agent Framework Home Page:
+</I>&gt;<i>            <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+</I>&gt;<i>======================================================
+</I>&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i>_______________________________________________
+</I>&gt;<i>Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i><A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>&gt;<i>
+</I>&gt;<i>
+</I>
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000454.html">[JOS-Kernel] Static members and process model.</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#449">[ date ]</a>
+              <a href="thread.html#449">[ thread ]</a>
+              <a href="subject.html#449">[ subject ]</a>
+              <a href="author.html#449">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

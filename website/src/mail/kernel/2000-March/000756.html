@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Systematic</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000755.html">
+   <LINK REL="Next" HREF="000758.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Systematic</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Systematic">tmiller@haverford.edu</A><BR>
+    <I>Sun, 19 Mar 2000 12:43:29 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000755.html">[JOS-Kernel] Systematic</A></li>
+        <LI> Next message: <A HREF="000758.html">[JOS-Kernel] Systematic</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#756">[ date ]</a>
+              <a href="thread.html#756">[ thread ]</a>
+              <a href="subject.html#756">[ subject ]</a>
+              <a href="author.html#756">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> As an open-source project, it is hard work by a lot of people. What is our
+</I>&gt;<i> next step? Where are we going? What do we need to concentrate and focus on?
+</I>
+	My near-term (which keeps getting further and further away, for
+which I tender my apologies) goal is to finish the decaf rewrite, which is
+a two part task.  First, to finish re-implementing the common/decaf
+codebase (all 15,000 lines, or so, of it) so as to allow the second task,
+which is to write the JVM-specific classes required by the
+[classpath|Kore] library.  This will have obvious benefits.
+
+	My focus is on infrastructure, but that's not necessarily what we
+should be focusing on.  We could claim success -- that Java works well for
+system programming -- just by being a *nix clone.  But then why work on
+JOS, if the Linux (*BSD, etc), already get the job done so well?  JOS must
+push for more, to be, as Gilbert phrases it, &quot;a next generation OS.&quot;  We
+must know what it means to do more, or do better.  An OS by itself,
+however, is useless -- it's what the JOS-specific applications can do that
+will set JOS apart, make it a success.  An application that conclusively
+demonstrated the power of JOS could also be our 'killer app;' so the
+question is, what 'impossible' application do you want to use (write)?  My
+question is, then, what makes it 'impossible'?  What kind of infastructure
+does that application need?  I have a few ideas of my own, but I'm still
+thinking them through*.
+
+	Shorter-term, though, a telnet client and server would be a good
+goal in terms of technology demonstration.  It would require (i386 build):
+booting, physical device recognition/driver installation (NIC, keyboard,
+monitor), virtual device/driver installation (TCP/IP stack, virtual
+consoles/terminals), a login facility, a shell, and quite possibly more.
+
+-_Quinn
+
+* Like the idea of a windowing system.  IIRC, the goal of a windowing
+system is to make 'the computer' easier to use, more accessible.  I'm
+looking at the question(s) of what makes a command-line interface hard to
+use, whether that would be true for all text-based interfaces, if after
+going graphical, you in fact want or need windows, if they're not some
+sort of design artifact.
+
+	Bearing in mind that the goal of any computer system is to
+manipulate data (which includes its transmission and receival, that is,
+communication), what about text (which is, after all, still the primary
+method for representing data) is so difficult?  This is not to imply that
+graphics aren't useful -- for graphics applications, they're more or less
+a necessity, and the same for the web, a function which many regard as
+integral to any computer -- but that even if re-analyzing the question
+does not lead one to a new paradigm, it will be worthwhile for the
+understanding gained of the current (WIMP) paradigm.
+
+	The windowing system is not what makes 'the computer' easier to
+use; it's what it enables applications to do and how it governs the user's
+interactions with those applications.  The X window-manager /
+display-manager separation reflects a clear understanding of
+tthe latter; the KParts &amp; Bonobo projects reflect a clear understanding of
+the former, enabling applications to do things that would otherwise be
+probitively difficult or expensive.
+
+	So what are windows for?  You don't need them to display data,
+though calling the abstraction to which an application draws a window may
+be worthwhile.  I can only think of two reasons: the first is to make
+obvious the boundary from one rule-set to another.  (That is, a text
+editor and a graphics editor operating on a picture of that text editor do
+vastly differently things.)  The second is to mark a boundary so that that
+boundary may be adjusted -- window moving, iconization, maximization,
+window-shading, etc.  Then ask the question: what happens when all
+applications operate on frames in an WM-maintained document or stack of
+documents?  Suddenly things look very different...
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000755.html">[JOS-Kernel] Systematic</A></li>
+	<LI> Next message: <A HREF="000758.html">[JOS-Kernel] Systematic</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#756">[ date ]</a>
+              <a href="thread.html#756">[ thread ]</a>
+              <a href="subject.html#756">[ subject ]</a>
+              <a href="author.html#756">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

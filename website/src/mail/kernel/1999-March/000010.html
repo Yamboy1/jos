@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: decaf update &amp; the keyboard driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000009.html">
+   <LINK REL="Next" HREF="000018.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: decaf update &amp; the keyboard driver</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Kernel] Re: decaf update &amp; the keyboard driver">onewith1@flash.net</A><BR>
+    <I>Sat, 27 Mar 1999 21:29:41 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000009.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+        <LI> Next message: <A HREF="000018.html">[JOS-Kernel] Re: decaf update &amp; the keyboard driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#10">[ date ]</a>
+              <a href="thread.html#10">[ thread ]</a>
+              <a href="subject.html#10">[ subject ]</a>
+              <a href="author.html#10">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>
+&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>   Assuming all goes well, we should be debugging the
+</I>&gt;<i> JIT/adaptive compiler this time next year...
+</I>
+wow!
+
+&gt;<i>         Okay.  I'm curious, though, about the keyboard acknowledge code
+</I>&gt;<i> you use.  What's the difference between the way I acknowledge the keyboard
+</I>&gt;<i> (returning a constant 0xAE) and yours (returning the scancode plus/minus
+</I>&gt;<i> some bitmasks)?  (Since mine seems to work... bearing in mind that my
+</I>&gt;<i> understanding of keyboard h/w is based on a loose reading of the linux
+</I>&gt;<i> source.)
+</I>
+That's from my old 8086 (XT) DOS keyboard handler code.  It mainly allows for other
+programs to mess around with the system settings (write port 61h is used for
+keyboard, I/O check enabling, RAM parity check enabling, Read low switches enabling,
+and PC Speaker access), while we only change the necessary bits.  The Linux source
+probably just sets these settings to what it wants, which is just fine for the AT
+system.
+
+&gt;<i>
+</I>&gt;<i> &gt; The PrimaryHardwareManager doesn't just have to be the i/o bus you're talking
+</I>&gt;<i> &gt; to - it could be the computer (w/o network) as a whole.  But the idea is the
+</I>&gt;<i> &gt; same - it passes off requests to allocate every kind of resource to the
+</I>&gt;<i> &gt; appropriate resource manager.
+</I>&gt;<i>
+</I>&gt;<i>         Okay; I think you worded it differently in your docs.  (Although I
+</I>&gt;<i> suppose one could construe the whole computer as a bus in some virtual
+</I>&gt;<i> sense.)  The important part of your above statement, then, is that the PHM
+</I>&gt;<i> is responsible for deciding what's appropriate, right?
+</I>
+Right, in a sense (I just want to make sure that the air is clear here).  The PHM
+has several HardwareManagers registered with it, and any requests for a particular
+type of hardware get sent off to the HardwareManager that accepts that hardware type
+requested.
+
+&gt;<i>
+</I>&gt;<i> &gt; &gt; [HardwareResourceInterface]
+</I>&gt;<i> &gt; And adding security, so you can't access non-allocated memory, I/O ports,
+</I>&gt;<i> &gt; whatever.
+</I>&gt;<i>
+</I>&gt;<i>         Hm.  Any ideas on how this would be implemented?  (esp. w.r.t. the
+</I>&gt;<i> java 1.2 security model?)
+</I>
+As per my code, when an HRI is created, it knows the ranges it was allocated.  Then
+on each call, it just checks to see if the requested range was valid.  If not, it
+throws a HardwareResourceNotAllocatedException.  This could be too much of an
+overhead, though.
+
+&gt;<i>
+</I>&gt;<i> [ InterruptInterface ]
+</I>&gt;<i>
+</I>&gt;<i>         I'm not sure what I was thinking here, on further review of the
+</I>&gt;<i> code.  I probably just didn't write the right class name in due to a brain
+</I>&gt;<i> skip; but ISAKeyboard2 *does* need to be rewritten -- or, perhaps
+</I>&gt;<i> preferably, interruptinterface (or whatever the equivalent in the new &amp;
+</I>&gt;<i> improved system is) accesses the hardware/is accessed by the hardware
+</I>&gt;<i> correctly.
+</I>
+Ok!  I never was too happy with my interrupt interface code anyway.
+
+&lt;snip&gt;
+
+&gt;<i> InterruptResourceInterface handles letting the kernel know where to
+</I>&gt;<i> dispatch interrupts by a native method register() whereas
+</I>&gt;<i> InterruptDispatcher is hard-coded into the kernel.  So long as register()
+</I>&gt;<i> only allows one dispatcher/resource interface, we're fine.  And not having
+</I>&gt;<i> the interrupt distributor hard-coded is probably the Right Thing to do
+</I>&gt;<i> anyway.
+</I>
+Yup.  BTW - I found the JavaOS book at Barnes &amp; Noble today, and the section on
+interrupts describes that JavaOS supports both native and Java interrupt handlers.
+Which makes sense, especially with time critical interrupts like USB or whatever.
+
+&gt;<i>         That's the idea, alright.  This automagically, BTW, allows for
+</I>&gt;<i> global shortcut keys, because there's no reason the keyboardinterperter
+</I>&gt;<i> couldn't generate AWT (or other) events while it's running its merry way
+</I>&gt;<i> through the decoding.
+</I>
+Such as Winblows and OS/2's Ctrl-Esc sequence?  I've been thinking about this - the
+keyboard shouldn't be sending out events to every joe shmoe application that
+registers an event listener.  That would mean that when you type the letter &quot;a&quot;, 5
+applications display the letter &quot;a&quot; in their text box.  The keyboard device should
+really restrict who gets actual key events.  Under a GUI, the window manager would
+need to replace the jos.system.keyboard for an application such that it only
+recieves key events when it has the focus.  This is a tricky spot with big warning
+messages flashing in neon.
+
+&lt;snip&gt;
+
+&gt;<i>         I finally figured this out after reading the InterruptInterface
+</I>&gt;<i> code for the third time.  *sigh*
+</I>
+I *really* need to document my code before I ship it out.  At least have a readme
+file to have a general overview of each file and how they work together.  &lt;snicker&gt;
+like I'm really going to make documentation! HA!
+
+&lt;snip&gt;
+
+&gt;<i> &gt; Ah, again I aim your attention to the newbetter specs.  I can send you the
+</I>&gt;<i> &gt; current copy if you missed it the first time through; I'm figuring out the
+</I>&gt;<i> &gt; specific details now, so it's not complete, but it gives a general overview.
+</I>&gt;<i>
+</I>&gt;<i>         You know, I had read them and then completely forgotten about
+</I>&gt;<i> them, but they do (upon re-reading) seem very well done.  I'm looking
+</I>&gt;<i> forward to some code.  What kind of time-frame are you looking at?
+</I>
+&lt;agahst&gt; uh, I dunno.  I was kind of figuring on releasing the general idea with
+some half-code thrown in.  But I'll see what I can do (It's a huge project if I was
+to do it to the hilt).  But I figure that the Platform code I wrote is either going
+to stay in the system, or will go to just raw interfaces to native code for speed
+and no security (except in the native methods...).  Right now I'm wanting to reuse
+the current code and just tweek the interrupt stuff a bit to make it more friendly
+(right now, if you let it sniff your hand it will bite you).
+
+&gt;<i>  (There
+</I>&gt;<i> are any number of things I could do with the kernel depending on how far
+</I>&gt;<i> away it is; but if it's too far off, I might go ahead and write in a
+</I>&gt;<i> subset of your work to get the self-hosting stuff started, which is where
+</I>&gt;<i> things ought to get interesting and start revealing bugs in decaf.)
+</I>
+Go for it!
+
+&lt;snip&gt;
+
+&gt;<i> which is to say archKeyboard and not ISAKeyboard, though archKeyboard
+</I>&gt;<i> will probably just redirect to ISAKeyboard except in the presence of the
+</I>&gt;<i> dread USBKeybord.  But I digress... and it will hopefully not be my
+</I>&gt;<i> problem anyway!)
+</I>
+Egads!  USB?  I'll stay away from that until I get some good documentation on the
+dread pirate Robertson, er, USB :)  Man, how much coffee have I had today?
+
+&gt;<i>         Anyway, thanks for the good feedback and the good work.
+</I>
+Thanks - you too.
+
+&gt;<i>
+</I>&gt;<i> -_Quinn
+</I>
+-Matt
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000009.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+	<LI> Next message: <A HREF="000018.html">[JOS-Kernel] Re: decaf update &amp; the keyboard driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#10">[ date ]</a>
+              <a href="thread.html#10">[ thread ]</a>
+              <a href="subject.html#10">[ subject ]</a>
+              <a href="author.html#10">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] static initializer query</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000050.html">
+   <LINK REL="Next" HREF="000052.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] static initializer query</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] static initializer query">jm@mak.com</A><BR>
+    <I>Sat, 29 May 1999 15:10:30 +0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000050.html">[JOS-Kernel] Checked in files</A></li>
+        <LI> Next message: <A HREF="000052.html">[JOS-Kernel] Re: static initializer query</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#51">[ date ]</a>
+              <a href="thread.html#51">[ thread ]</a>
+              <a href="subject.html#51">[ subject ]</a>
+              <a href="author.html#51">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd (et al);
+
+I am currently trying to move the opcode-execution code to be hanging
+off of the frame class rather than hanging about globally.  Part of this
+job entails changing some of the existing machinery to be more aware of
+which thread it is executing on behalf of (so if there are any
+scheduler-related ramifications, we can actually find the thread).  I
+have a question:
+
+I am guessing that class_loader::findStaticInit can be called in the
+context of any random thread.  I am guessing the findStaticInit tries to
+find the static initializers and actually run them.  Here are my
+confusions (where the confusion is based both upon a shallow
+understanding of Java semantics and a shallow understanding of the code,
+with a little bit of Just Plain Wrong potential thrown in for good
+measure):
+
+(1) It looks like a new, fresh thread is spawned to run the static
+initializers.  However, the thread that caused the classload doesn't
+seem to wait for the new thread to finish actually running those
+initializers (right?).  This could be bad, right?  (Actually, there seem
+to be a couple of multithreading hazards here in specific and in the
+class_loader abstraction in general  -- basically, many threads might
+share the same classloader -- that might have to be addressed regardless
+of the answer to my next question.)  
+
+(2) Is there some reason we don't just run those initializers within the
+context of the current (requesting) thread?  Maybe just &quot;push&quot; their
+stack frames onto the stack so the vanilla machinery can tackle the
+problem?  Is this a Java-ism?  Is there some other advantage to spawning
+a new thread?  (It pays to actually understand something before you
+attempt to muck with it, eh?)
+
+Thanks for any help/enlightenment you can throw this way!
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000050.html">[JOS-Kernel] Checked in files</A></li>
+	<LI> Next message: <A HREF="000052.html">[JOS-Kernel] Re: static initializer query</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#51">[ date ]</a>
+              <a href="thread.html#51">[ thread ]</a>
+              <a href="subject.html#51">[ subject ]</a>
+              <a href="author.html#51">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

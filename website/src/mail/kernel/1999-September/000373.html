@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOSSystem</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:weolopez%40yahoo.com">
+   <LINK REL="Previous"  HREF="000393.html">
+   <LINK REL="Next" HREF="000376.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOSSystem</H1>
+    <B>Mauricio Lopez</B> 
+    <A HREF="mailto:weolopez%40yahoo.com"
+       TITLE="[JOS-Kernel] JOSSystem">weolopez@yahoo.com</A><BR>
+    <I>Thu, 16 Sep 1999 07:07:58 -0700 (PDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000393.html">[JOS-Kernel] Re: [JOS-Arch] JOSSystem (-S)</A></li>
+        <LI> Next message: <A HREF="000376.html">[JOS-Kernel] JOSSystem</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#373">[ date ]</a>
+              <a href="thread.html#373">[ thread ]</a>
+              <a href="subject.html#373">[ subject ]</a>
+              <a href="author.html#373">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>--- Matt Albrecht &lt;<A HREF="mailto:onewith1@flash.net">onewith1@flash.net</A>&gt; wrote:
+--cut---
+&gt;<i> Ok, onto my JOSSystem idea:
+</I>&gt;<i> =======================
+</I>&gt;<i> 
+</I>&gt;<i> Jini offers Java applications a unified method of
+</I>&gt;<i> discovering all known
+</I>&gt;<i> devices  (technically, &quot;services&quot;) on a network (or
+</I>&gt;<i> a stand-alone PC).  Not
+</I>&gt;<i> only that, but it includes a unified method to
+</I>&gt;<i> interact with all discovered
+</I>&gt;<i> devices.
+</I>&gt;<i> 
+</I>Note:  this is with JINI devices or proxies...
+
+Here (I think) is the problem with your ideas. 
+Discovery and Join only occures with JINI(TM) enabled
+devices and proxies for those devices.  I agree we
+should make a proxie for all of hardware in JOS but
+this is independent of our java written drivers.  It
+would be interesting; however, to create general
+interfaces that can be used in a JINI network that
+allows direct access to JOS System drivers from
+accross the network(but I digress).
+
+&gt;<i> I say, let's code all our device drivers to that
+</I>&gt;<i> standard.  But wait -
+</I>&gt;<i> doesn't Jini require a network?  But at boot time,
+</I>&gt;<i> JOS doesn't have a
+</I>&gt;<i> network yet, Matt!
+</I>&gt;<i> 
+</I>&gt;<i> The current Jini specification talks about a network
+</I>&gt;<i> (and thus RMI) as the
+</I>&gt;<i> underlying &quot;bare iron&quot; for a djinn (Jini network). 
+</I>&gt;<i> However, if I read the
+</I>&gt;<i> small print right, using datagram broadcast for
+</I>&gt;<i> discovery, and RMI for
+</I>&gt;<i> across-the-wire communication, is only the /default/
+</I>&gt;<i> implementation.  I
+</I>&gt;<i> believe that we can still be Jini compliant by
+</I>&gt;<i> making a non-network Jini
+</I>&gt;<i> network (or is that doublethink?).
+</I>&gt;<i> 
+</I>&gt;<i> If we place the localized Jini lookup service in a
+</I>&gt;<i> well-defined location
+</I>&gt;<i> (say, the base shared object in JOS, or an parameter
+</I>&gt;<i> in the localized
+</I>&gt;<i> discovery method), then localized discovery is done
+</I>&gt;<i> by calling the local
+</I>&gt;<i> lookup service directly, without the need for a
+</I>&gt;<i> network.  Likewise for
+</I>&gt;<i> finding a localized Jini service.  Calling a Jini
+</I>&gt;<i> service would then be a
+</I>&gt;<i> direct Java call, without the need for RMI.
+</I>
+A jini lookup service for the JOS System devices is a
+must for JOS Server but if we are going to make a
+minimized JOS Client it is more than what is needed. 
+The JOS Client should export all of its devices to a
+jini network. 
+
+--cut--
+
+This is great but the problem with jini right now it
+that Free Software only has a partial implementation
+of RMI let alone jini.  It would be great if
+development would increase on that.  Classpath is
+currently the most active in implementation of java
+api standards.  Next to JOS of course :) (recreating
+JAVA OS API).
+
+weo
+===
+&quot;It's a damn poor mind that can only think of one way to spell
+something!&quot;
+        President Andrew Jackson
+
+
+
+__________________________________________________
+Do You Yahoo!?
+Bid and sell for free at <A HREF="http://auctions.yahoo.com">http://auctions.yahoo.com</A>
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000393.html">[JOS-Kernel] Re: [JOS-Arch] JOSSystem (-S)</A></li>
+	<LI> Next message: <A HREF="000376.html">[JOS-Kernel] JOSSystem</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#373">[ date ]</a>
+              <a href="thread.html#373">[ thread ]</a>
+              <a href="subject.html#373">[ subject ]</a>
+              <a href="author.html#373">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,581 @@
+From tmiller@haverford.edu Thu, 6 Apr 2000 00:20:00 -0400 (EDT)
+Date: Thu, 6 Apr 2000 00:20:00 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] new_decaf CVS branch
+
+	Instead of putting the new decaf stuff up on SourceForge -- to
+which I don't yet have access -- I've branched the CVS on jos.org.  To
+access it, either 'cvs co -r new_decaf JJOS' (with the appropriate -d
+information as leache from CVS/Root) or 'cvs update -r new_decaf'; once
+you've use the new_decaf tag, your revisions will be to the new_decaf
+branch of the tree.
+
+	This is not the complete port of new_decaf; it's a distribution
+mechanism for this mailing list, so that you can take a look at what I've
+been doing for the past few months, off and on.  In particular, a design
+review would be very much appreciated before I get started in on 'porting'
+interp.cc & jvmbuiltins.cc to the new design.  Generally, look for places
+where the design isn't clean because of 'home-stretch' hackery --
+functions in the wrong class, or failure to make an abstraction
+(e.g. failure recognize duplication of functionality, or failure to
+properly enscapulate, etc.).  Thanks in advance.
+
+	The major non-interpreter/JVM-builtin thing that's missing is the
+'isInstanceOf()' function for JavaClassInstance.  After completing the
+interpreter, I'll begin work on the built-ins, separating JVM/JOS lib code
+(h/w access) from the classlib code; it should be relatively soon after
+completing this that I cleanly integrate it with a class
+library (perhaps Kore), add multiple processes, and implement BCNI.  At
+some point I would like to work on per-JVM 'intern's to reduce garbage.
+
+	The current outstanding problem is the use of dynamic_cast<>(),
+which is necessary in a few locations because of the way I designed the
+class inheritance tree.  My understanding is that the implementation of
+dynamic_cast, once you understand it, is relatively straightforward but
+compiler-specific, which is very unfortunate.  If anyone knows more about
+this, let me know.  (This is only a problem for the i386 build; if there's
+someway to get dynamic_cast<>() from the compiler/statically linked from a
+library, it would very nice...)
+
+
+	For the numerically-minded, there are 5,845 lines of
+non-interpreter code in common/decaf, compared to 11,032 in the old
+common/decaf non-interpreter code.  About 800 lines of this savings will
+disappear when I put the license headers back in.  (Some of it is also
+old debug or #ifdef OBSOLETE_OPTION code.)  (This count may also be old by
+the time I actually send this message.)
+
+-_Quinn
+
+
+PS: I just checked and the main branch is OK, so that give me hope that I
+did the branch correctly; let me know about whatever problems might show
+up when you try a compile.
+
+
+
+
+From tmiller@haverford.edu Fri, 7 Apr 2000 03:04:20 -0400 (EDT)
+Date: Fri, 7 Apr 2000 03:04:20 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] jos distribution 1e
+
+	Gilbert, I finally took a look at the all packages list, and must
+say that I was pleasantly suprised by how much code we actually do have on
+site.  Thanks for setting that up.
+
+	Ryan -- I took a quick look through the ftpd code, and I like it
+alot; how well does it work?  (Don't have time to check it myself right
+now.)  Are you still working on it?
+
+-_Quinn
+
+
+
+
+From George.Marrows@Smallworld.co.uk Fri, 7 Apr 2000 12:49:18 +0100
+Date: Fri, 7 Apr 2000 12:49:18 +0100
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] new_decaf CVS branch
+
+Hi Todd --
+
+Thanks for putting up the new decaf source. I can't comment on the
+architecture as I only had a short time last night to peruse the code;
+besides, I find it far easier to see what's going on using a debugger, and
+it doesn't run yet (does it?).
+
+A couple of things I did notice:
+
+1. The code would be cleaner, shorter and more flexible if you used an
+ASSERT macro. For example, I saw a couple of places with this kind of thing:
+	if (a) {
+		b = a->blah;
+		if (b) {
+			b->do_something();
+		} else {
+			kprintf("no b");
+			abort();
+		}
+	} else {
+		kprintf("no a");
+		abort();
+	}
+with ASSERTs this becomes:
+	ASSERT(a, "no a");
+	b = a->blah;
+	ASSERT(b, "no b");
+	b->do_something();
+Then when we know the code works (ie the assertions never fail), we can
+simply define ASSERT to be nothing and all the checks go away. There's a
+crappy assert macro in j_assert.c in the gc code; I'll try and find time
+this weekend to spruce it up so it can pass variable params to kprintf.
+
+2. There seem to be quite a few places where exceptions should be thrown
+(illegal monitor state, out of memory etc) but aren't. I'd be interested in
+trying to help out in this area when the interpreter's up and running.
+
+Anyway, thanks again for the hard work!
+
+-- George
+
+
+
+
+
+From tmiller@haverford.edu Sat, 8 Apr 2000 02:37:02 -0400 (EDT)
+Date: Sat, 8 Apr 2000 02:37:02 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] new_decaf CVS branch
+
+> 1. The code would be cleaner, shorter and more flexible if you used an
+> ASSERT macro. For example, I saw a couple of places with this kind of thing:
+
+	You're right, and I'm amazed I didn't realize this on my
+own.  Thanks.
+
+> 2. There seem to be quite a few places where exceptions should be thrown
+> (illegal monitor state, out of memory etc) but aren't. I'd be interested in
+> trying to help out in this area when the interpreter's up and running.
+
+	Unfortunately, C++ exceptions aren't supported on the i386 build
+yet, so I never gave much thought to them.  They are, clearly, the Right
+Way to do things*.  I'll be looking into some static-link fu for
+dynamic_cast<>(), so maybe I'll look into exceptions at the same time.**
+I don't think, basically, that I should spend time kludging something up
+that wouldn't work as well anyway.
+
+	Anyway, I hope you get more time to look at the code; your
+comments will be valuable.
+
+-_Quinn
+
+*  outline:
+
+decaf_main () {
+	try { /* everything before the call that starts the intreperter */ }
+	catch ( Exception e ) {
+		/* Try to do something intelligent, e.g. a garbage collection
+		   and try again; if still no good, abort. */
+		}
+	scheduler->start();
+	}
+
+Frame::interpret() {
+	try { /* switching on the bytecode */ }
+	catch ( Exception e ) {
+		/* throw e into Java.  (Unless we want try and
+		   do something intelligent first.  Exceptions are JavaObject
+		   subclasses, so this shouldn't be too hard;
+		   return to scheduler after exception-handling frame
+		   is on the thread's stack, to be run on the next
+		   iteration. */
+		}
+	}
+
+**: dynamic_cast<>() should be entirely user-space.  Messing about with
+the frame stack, etc, may not be, which means it wouldn't work.
+
+
+
+
+From al@outworld.org Sun, 09 Apr 2000 09:40:06 +0300
+Date: Sun, 09 Apr 2000 09:40:06 +0300
+From: Al al@outworld.org
+Subject: [JOS-Kernel] JSDK 2
+
+I was reviewing the Java SDK2 1.3.0 (rc2) package "java.lang" source and
+found the Shutdown package-private class. It basically handles all hooks
+and is responsible for JVM termination. The only thing not done in Java
+is a native method called "halt(int status)". It has a very nice way of
+handling all finalization, closing all things that have to be closed,
+etc.
+
+The JavaDoc for its class says it's been here since JSDK 1.3, so I
+guessed it would be useful to mention it in these mailing lists.
+
+Are we interested, in JOS, to support any parts of SDK 2? Since this
+part of the SDK is licensed with source code, there would not be any
+legal considerations in adding them to JOS... Also, other nifty features
+include the StrictMath class and the "strictfp" attribute of the class
+file for Math, the BitSieve, etc.
+
+What do you think?
+
+
+-- 
+
+      "Learn from others' mistakes, for you won't live long
+          enough to make them all yourself..."
+________________________________________________________________________
+[EMAIL: mailto:al@outworld.org] [URL: http://www.outworld.org/people/al]
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+PLEASE DO NOT SEND ME ANY UNSOLICITED COMMERCIAL EMAIL [DSS: 0xDBEF8ECC]
+
+
+
+
+From tmiller@haverford.edu Sun, 9 Apr 2000 17:24:21 -0400 (EDT)
+Date: Sun, 9 Apr 2000 17:24:21 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: [JOS-Arch] JSDK 2
+
+	Right now I'm concentrating on jdk1.1 support; as far as using
+Sun's code, I'll have to take a look at their liscense, which I haven't
+yet.  Primarily, I want other (open source) projects to maintain the class
+libraries for us.  We'll see; I don't have any objections off-hand,
+though.
+
+-_Quinn
+
+
+
+
+From clark.evans@manhattanproject.com Mon, 10 Apr 2000 13:53:21 -0400 (EDT)
+Date: Mon, 10 Apr 2000 13:53:21 -0400 (EDT)
+From: clark.evans@manhattanproject.com clark.evans@manhattanproject.com
+Subject: [JOS-Kernel] (testing mailman upgrade... please ignore)
+
+Hopefully the new version of mailman will be
+a bit more stable... sorry for all of the
+problems recently.
+
+Clark Evans
+
+
+
+
+
+From George.Marrows@Smallworld.co.uk Tue, 11 Apr 2000 13:54:37 +0100
+Date: Tue, 11 Apr 2000 13:54:37 +0100
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] new_decaf CVS branch
+
+Hi again Todd --
+
+1/. As you may have noticed, I didn't get chance to update stdlib with some
+ASSERT macros last weekend. I *might* get chance this evening (but don't
+hold your breath).
+
+2/. I meant the Java exception OutOfMemoryError and
+InvalidMonitorStateException .. as far as I could see, these and similar JVM
+exceptions aren't thrown and nor were they in the old code. But correct me
+if I'm wrong. As I said in my first mail, I'd be interested in trying to
+help sort this out if they are not yet functional.
+
+Another comment on code structure (which might have come out of the various
+discussions that have been going on, but I haven't had chance to read them
+yet): I think it would be useful to have a Process class in the C++. It
+would hold information about it class loader, threads/thread group, process
+id and, when we get some security infrastructure, the identity of the
+process owner etc.
+
+-- George
+
+> -----Original Message-----
+> From:	Todd L. Miller [SMTP:tmiller@haverford.edu]
+> Sent:	08 April 2000 07:37
+> To:	kernel@jos.org
+> Subject:	RE: [JOS-Kernel] new_decaf CVS branch
+> 
+> > 1. The code would be cleaner, shorter and more flexible if you used an
+> > ASSERT macro. For example, I saw a couple of places with this kind of
+> thing:
+> 
+> 	You're right, and I'm amazed I didn't realize this on my
+> own.  Thanks.
+> 
+> > 2. There seem to be quite a few places where exceptions should be thrown
+> > (illegal monitor state, out of memory etc) but aren't. I'd be interested
+> in
+> > trying to help out in this area when the interpreter's up and running.
+> 
+> 	Unfortunately, C++ exceptions aren't supported on the i386 build
+> yet, so I never gave much thought to them.  They are, clearly, the Right
+> Way to do things*.  I'll be looking into some static-link fu for
+> dynamic_cast<>(), so maybe I'll look into exceptions at the same time.**
+> I don't think, basically, that I should spend time kludging something up
+> that wouldn't work as well anyway.
+> 
+> 	Anyway, I hope you get more time to look at the code; your
+> comments will be valuable.
+> 
+> -_Quinn
+> 
+> *  outline:
+> 
+> decaf_main () {
+> 	try { /* everything before the call that starts the intreperter */ }
+> 	catch ( Exception e ) {
+> 		/* Try to do something intelligent, e.g. a garbage
+> collection
+> 		   and try again; if still no good, abort. */
+> 		}
+> 	scheduler->start();
+> 	}
+> 
+> Frame::interpret() {
+> 	try { /* switching on the bytecode */ }
+> 	catch ( Exception e ) {
+> 		/* throw e into Java.  (Unless we want try and
+> 		   do something intelligent first.  Exceptions are
+> JavaObject
+> 		   subclasses, so this shouldn't be too hard;
+> 		   return to scheduler after exception-handling frame
+> 		   is on the thread's stack, to be run on the next
+> 		   iteration. */
+> 		}
+> 	}
+> 
+> **: dynamic_cast<>() should be entirely user-space.  Messing about with
+> the frame stack, etc, may not be, which means it wouldn't work.
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+
+From warp@spin.de Tue, 04 Apr 2000 17:59:24 +0200
+Date: Tue, 04 Apr 2000 17:59:24 +0200
+From: Markus Peter warp@spin.de
+Subject: [JOS-Kernel] JOS (fwd)
+
+Hello
+
+I received this email today, maybe one of you wants to answer as
+I'm not really involved anymore with JOS right now.
+(There must still be my email address on the website somewhere?)
+
+---------- Forwarded Message ----------
+Date: Dienstag, 4. April 2000 8:55 Uhr -0700
+From: Phil Morettini <pmorettini@ptsc.com>
+To: helmut@webby.comm, marcus peter <warpi@spin.de>
+Subject: JOS
+
+Have you thought of using the PSC1000 as the initial host processor, rather
+than a 486? It makes tremendous sense to me, and we would wholeheartedly
+support the JOS collective in any way possible if you chose this path.
+
+Regards,
+
+Phil
+Phil Morettini
+Vice President, Sales & Marketing
+Patriot Scientific Corporation
+10989 Via Frontera
+San Diego, CA 92127-1703
+(858) 674-5007 Direct
+(858) 674-5000 x271
+(858) 674-5005 Fax
+pmorettini@ptsc.com Email
+http://www.ptsc.com
+
+---------- End Forwarded Message ----------
+
+
+
+-- 
+Markus Peter - SPiN GmbH
+warp@spin.de
+
+
+
+
+
+
+From tmiller@haverford.edu Tue, 11 Apr 2000 13:35:00 -0400 (EDT)
+Date: Tue, 11 Apr 2000 13:35:00 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] new_decaf CVS branch
+
+> 1/. As you may have noticed, I didn't get chance to update stdlib with some
+> ASSERT macros last weekend. I *might* get chance this evening (but don't
+> hold your breath).
+
+	Don't sweat it -- I've been too busy hammering out the
+multi-processing stuff to do any coding myself.
+
+> 2/. I meant the Java exception OutOfMemoryError and
+> InvalidMonitorStateException .. as far as I could see, these and similar JVM
+> exceptions aren't thrown and nor were they in the old code. But correct me
+> if I'm wrong. As I said in my first mail, I'd be interested in trying to
+> help sort this out if they are not yet functional.
+
+	No.  Java-thrown exceptions ought to have worked in the old code
+(not sure if I ever tested them), but the JVM never threw them on its own,
+and a large part of this was the problem with getting the exception to be
+thrown to the right place without using C++ exceptions.  I'm very open to
+suggestions/help.
+
+> Another comment on code structure (which might have come out of the various
+> discussions that have been going on, but I haven't had chance to read them
+> yet): I think it would be useful to have a Process class in the C++. It
+> would hold information about it class loader, threads/thread group, process
+> id and, when we get some security infrastructure, the identity of the
+> process owner etc.
+
+	Right now, a 'JVM' instance is defined by a classloader, and a
+Scheduler (which maintains a list of runnable threads).  A Process class,
+or extensions to 'JVM' would probably come in handy, but I don't want to
+start anything until we've figure processes out.
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Tue, 11 Apr 2000 13:40:29 -0400 (EDT)
+Date: Tue, 11 Apr 2000 13:40:29 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] CVS
+
+	My new decaf code is in the SourceForge CVS right now, along with
+the rest of my development tree, which I don't expect to undergo a major
+revision any time soon.  (Though I will want to clean it up in places once
+I'm done with decaf.)  The decaf code is missing, rather importantly, the
+interpreter, whose progress has been stalled by the lively debate we've
+been having about multi-process JVMs.
+
+-_Quinn
+
+
+
+
+
+From ryan@whitewolf.com.au Mon, 17 Apr 2000 01:08:00 +1000 (EST)
+Date: Mon, 17 Apr 2000 01:08:00 +1000 (EST)
+From: Ryan Heise ryan@whitewolf.com.au
+Subject: [JOS-Kernel] Release of rheise.os - multiprocess Java layer for JOS
+
+After a fascinating discussion on the arch@jos.org list about how to
+support multiple processes and IPC in JOS, I have finally put together
+what could become a foundation for the Java layer of JOS:
+
+...
+rheise.os is a multiple process Java execution environment that can run
+on top of a standard JVM (with limited support) or on top of a Java
+Operating System kernel with native hooks to support multiple processes.
+It is intended to be used with the JOS kernel, in which case the
+rheise.os package prefix may be changed to jos.
+
+rheise.os provides an API for managing processes, users and security in
+a Java Operating System. This functionality is supported both when
+running on a host JVM and when running on a native kernel, thus allowing
+JOS developers to work on the upper layers of the operating system
+architecture before the kernel is complete.
+...
+
+Currently you can run multiple process in separate namespaces on a
+standard JVM. There is a sample program that demonstrates the security
+model employed. In addition, I have included a simple window manager and
+desktop environment based on swing's JDesktopPane. This only half works,
+so contributors are welcome.
+
+	http://www.progsoc.uts.edu.au/~rheise/projects/rheise.os/
+
+Please forgive the lack of docs, and lack of comments, and lack of code
+in some parts :-) It's late Sunday night over in this part of the world
+(Australia) so this release is sort of a rush job before the work week
+starts...
+
+I hope we will start to see some more programming activity on the JOS
+architecture from here on.
+
+Please direct follow-up posts to arch@jos.org only.
+
+-- 
+Ryan Heise (arch@jos.org list admin)
+
+http://www.progsoc.uts.edu.au/~rheise/
+
+
+
+
+
+From tmiller@haverford.edu Wed, 19 Apr 2000 01:04:29 -0400 (EDT)
+Date: Wed, 19 Apr 2000 01:04:29 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] code updates
+
+	First off, please take a look at decaf.cc and see if the assert
+style make sense.  (If it does, the NO_ASSERT ifdef's can be changed not
+to do anything.)  Specifically, I originally had ASSERT_NOT_NULL as
+ASSERT_CONSISTENT; I'm wondering if anyone has a good argument either way.
+
+	This is the first bit of interpreter integration; see the commit
+message for more comments.  Most of the integration/porting ought to go
+fairly smoothly.  The harder of the tasks I see ahead are as
+follows: (1) the other invocation functions (2) invokeNativeMethod()*
+(3) handling exceptions properly.  The assertions macros may help with
+this.
+
+	I'll take a closer look at rheise.os and review the java processes
+discussion before doing much more.
+
+-_Quinn
+
+*: invokeNativeMethod(): I'm still debating how to do this.  I need to
+look into BCNI (again); I may just write it using the dl* commands
+available to the host build** and write a native implementation with
+static linkage that uses hashtable lookups.  (With the interning of the
+functions is done when the 'library is loaded.')
+
+**: An interesting question now arises.  Assuming we allow user-space
+native code, we have to maintain native code separation the same way we do
+bytecode for processes, and for the same reason.  (Otherwise, all
+nativecode is in the kernel, and since it's statically linked, you have to
+restart the kernel if you want to use new native code -- and it's not
+a problem to have the native code in one place, ignoring java processes.)
+
+
+
+
+
+
+From tmiller@haverford.edu Sat, 22 Apr 2000 00:01:09 -0400 (EDT)
+Date: Sat, 22 Apr 2000 00:01:09 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf updates
+
+	I've added my current to-do list to the task manager at
+SourceForge, and assigned them all to myself.  Updated the CVS to reflect
+where I am right now.  Added several longer-term unassigned tasks to the
+task manager that you may want to look over.  (The 'final summary' on Java
+multi-processing; dealing with dynamic_cast<>() on the i386 build.)
+
+	If someone would be so kind as to review the assert macro scheme
+I've come up with, I'd be obliged, so I can not code the NO_ASSERTIONS
+ifdef's in good consience.
+
+-_Quinn
+
+
+
+
+
+
+
+
+From tmiller@haverford.edu Sun, 23 Apr 2000 01:46:14 -0400 (EDT)
+Date: Sun, 23 Apr 2000 01:46:14 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] dynamic_cast<>()
+
+	It looks like ld is willing to statically link libstdc++*.so into
+the GRUB build.  However, the -Ttext 100000 causes ld to fail with "not
+enough room for program headers".  In addition to this, it's a really
+brutal hack to include the whole standard library just to get the
+dynamic casting.  Does anyone know how one might get /just/ the
+dynamic casting bits?  Thanks.
+
+-_Quinn
+
+
+
+
+

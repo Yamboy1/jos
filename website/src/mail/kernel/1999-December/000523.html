@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] More on kernel bailout</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000522.html">
+   <LINK REL="Next" HREF="000528.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] More on kernel bailout</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] More on kernel bailout">tmiller@haverford.edu</A><BR>
+    <I>Wed, 1 Dec 1999 22:24:55 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000522.html">[JOS-Kernel] More on kernel bailout</A></li>
+        <LI> Next message: <A HREF="000528.html">[JOS-Kernel] Dispatching opcodes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#523">[ date ]</a>
+              <a href="thread.html#523">[ thread ]</a>
+              <a href="subject.html#523">[ subject ]</a>
+              <a href="author.html#523">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Okay, I was playing with this a little, and both build seem to get
+their first interrupts in before the interrupt dispatcher is ready.  (On
+grub, at least; I haven't tried my most recent set of changes on
+etherboot, but I don't expect any change there.)  One interrupt (14)
+happens just before JJOS identifies the processor type, and is printed out
+as happening, but then (possibly overwritten by kernel messages?) I never
+see an attempt to dispatch it.  Following that, interrupt 9 fires, and the
+code in scheduler.cc (was &quot;VM corrupt #3&quot;) (now) says it's assuming the
+static initialization isn't done yet; immediately thereafter, it does the
+same for interrupt 14.
+
+	I can't generate interrupts with the keyboard (normally interrupt
+9) at all/ever.  I don't know if this is because the keyboard is waiting
+for its first interrupt to be serviced (i.e. I need to initialize the kbd
+controller under grub but not etherboot for some reason) or if it's
+indicative of a deeper problem.
+
+	At any rate, I added a .clear_screen() method to jjconsol, because
+the head_grub.s86 asm doesn't do the same thing as head_ether.s86 (set vga
+text mode and clear it) -- which it probably should.
+
+	What, exactly, are the differences between how head_grub leaves
+things setup and how head_ether does?  I think the migrating VGA address
+(A20 line?) might be an indication of some problem along these lines...
+
+-_Quinn
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000522.html">[JOS-Kernel] More on kernel bailout</A></li>
+	<LI> Next message: <A HREF="000528.html">[JOS-Kernel] Dispatching opcodes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#523">[ date ]</a>
+              <a href="thread.html#523">[ thread ]</a>
+              <a href="subject.html#523">[ subject ]</a>
+              <a href="author.html#523">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

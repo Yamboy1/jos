@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] CVS activity</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000568.html">
+   <LINK REL="Next" HREF="000569.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] CVS activity</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] CVS activity">tmiller@haverford.edu</A><BR>
+    <I>Mon, 20 Dec 1999 23:06:38 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000568.html">[JOS-Kernel] JJOS lcmp bytecode patch</A></li>
+        <LI> Next message: <A HREF="000569.html">[JOS-Kernel] Some Fix On Array Copy</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#565">[ date ]</a>
+              <a href="thread.html#565">[ thread ]</a>
+              <a href="subject.html#565">[ subject ]</a>
+              <a href="author.html#565">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	After an hour or so hacking at the CVS, I've convinced it (I
+believe) to take my (rather large) set of patches &amp; corrections.  If I
+mucked it up, please let me know ASAP.  Several directories were added and
+others removed, so apply the applicable (-p and -D, I believe) options as
+necesssary.
+
+Notes:
+
+* committed the bytecode compatible with -DNEW_INTERRUPT_HANDLING,
+	which is now the preferred method.
+* committed bytecode using the new method for virtual consoles,
+	both text and VGA.  (Although the VGA console's interface
+	could use some work; many thanks to Thomas Bocek for the back-end
+	work.)
+* committed the native code changes necessary to support the above
+	two items.
+* does NOT contain the fix for lcmp just posted here because I haven't
+	had a chance to look at it yet.  (Will get right to it.)
+* should include everyone's patches prior to that.  If it doesn't, my
+	apologies -- please get back to me ASAP.
+* GRUB is now my preferred booting method, to the extent that I no longer
+	use etherboot.  This has not been reflected in the Makefiles,
+	because I'm not sure about other people.  (Thanks to George
+	Marrows!)
+* The above means I should probably commit Marrows' instructions and 
+	stage1/stage2 binaries to the CVS server...
+* I neglected to re-insert the JVM tests when I merged my bytecode
+	back against the tree, so if anyone feels an urge, go right
+	ahead.
+* I'm going to go back to work on speed improvements for switching
+	video modes; it's glacial right now, though faster than
+	Bocek's original code because I took shameless advantage of
+	the new mapByteArray() function in places where I knew enough
+	about VGA to apply it with confidence in its results.
+
+	I'm still hacking away at getting classpath to compile on my
+system (woe is me!), but integrating that on the host build is getting up
+there on my list of priorities.  (Though I might just crap out on all of
+the JNI callbacks for now, it should still make things MUCH faster
+overall, because we can turn -DFAST_NATIVE_CODE on!)  I might end up using
+BCNI for the i386 port.  (Also, I think we can get away with continuing to
+intercept .print()/.println()/etc calls by marking them native in
+classpath's source...)  For those builtins, I'm kind-of/sort-of thinking
+about a more efficient search algorithm (e.g. balanced binary trees),
+though the need for this might vanish if we're not checking it every
+function call.
+
+	The rest of the back-end code needs a lot of work also, I'm
+afraid.  It's functional, but fearfully ugly, now that I'm looking at it
+from a year or so later.  I'm not sure that making it elegant will make
+it any faster, but I'll probably be poking around in this code for the JNI
+back-end stuff anyway, so I might make some fairly large changes, though
+none of them should be visible to driver/java writers.
+
+	With classpath integrated, I'm hoping it won't be too big of a
+jump to bring the host build up to par with the native build.  (jcurses
+and X as the text/gfx console back-ends, with a little bit more native
+hackery for getting the scancodes into the keyboard driver.)  After
+integration with the host build, of course, comes the interesting work of
+porting it to the i386 build.  (Although there might be a mac port around
+by then?)
+
+	Depending on how things go, I might also work on the
+multiple java process aspect of decaf more.  Anyway, I'm hoping to get
+alot of work done in the next few weeks...
+
+	Suggestions/comments?  (Things I forgot about that need
+attention?)
+
+-_Quinn
+
+&quot;Do not meddle in the affairs of wizards, for you are crunchy and good
+with ketchup.&quot;
+
+
+
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000568.html">[JOS-Kernel] JJOS lcmp bytecode patch</A></li>
+	<LI> Next message: <A HREF="000569.html">[JOS-Kernel] Some Fix On Array Copy</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#565">[ date ]</a>
+              <a href="thread.html#565">[ thread ]</a>
+              <a href="subject.html#565">[ subject ]</a>
+              <a href="author.html#565">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

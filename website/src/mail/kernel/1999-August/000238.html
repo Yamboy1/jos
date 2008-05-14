@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jJOS speed</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:draft%40fear.ch">
+   <LINK REL="Previous"  HREF="000233.html">
+   <LINK REL="Next" HREF="000239.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jJOS speed</H1>
+    <B>Thomas Bocek</B> 
+    <A HREF="mailto:draft%40fear.ch"
+       TITLE="[JOS-Kernel] jJOS speed">draft@fear.ch</A><BR>
+    <I>Mon, 16 Aug 1999 18:52:16 +0200 (CEST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000233.html">[JOS-Kernel] jJOS speed</A></li>
+        <LI> Next message: <A HREF="000239.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#238">[ date ]</a>
+              <a href="thread.html#238">[ thread ]</a>
+              <a href="subject.html#238">[ subject ]</a>
+              <a href="author.html#238">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi John and all
+
+On Sun, 15 Aug 1999, John Morrison wrote:
+
+&gt;<i> Hi Thomas;
+</I>&gt;<i> 
+</I>&gt;<i> Thomas Bocek wrote:
+</I>&gt;<i> &gt; I made a little benchmark with the old source and with the new one:
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; old: vga fillroutine ~7 sec
+</I>&gt;<i> &gt; new: vga fillroutine ~5 sec
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; The results aren't exact, because
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; 1. made the test with a stop-watch
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; 2. the old source crashed after 7 sec, and the screen was only 1/5 filled,
+</I>&gt;<i> &gt; the new source crashes after the screen is 4/5 filled.
+</I>&gt;<i> 
+</I>&gt;<i> OK, so if I were to extrapolate, the old one would finish in 35 seconds
+</I>&gt;<i> (barring a crash - HA), and the new one would finish in about 7 seconds
+</I>&gt;<i> (barring a crash), right?  So, this means we've speeded up the
+</I>&gt;<i> calls-to-native code about 5 times, eh?  
+</I>
+it's &quot;only&quot; about 40% faster: I marked the position of the (old source)
+crash on my crt, and stopped the time, when the new source reached that
+position.
+But the clear screen seems to run much faster...
+
+&gt;<i> If so, is performance creeping
+</I>&gt;<i> into the &quot;acceptable for now&quot; range (At least, until we do the
+</I>&gt;<i> JavaOS-style memory classes -- I'm also curious as to why the write32
+</I>&gt;<i> stuff is SLOWER -- can you try that one, too?)?  If so, is the
+</I>&gt;<i> memory-management stuff now the hottest fire?  
+</I>
+hmm a write32 is still about 10 times slower than a write8, but a write16
+is about twice as fast as write8.
+
+&gt;<i> With respect to the crash:
+</I>&gt;<i> 
+</I>
+&gt;<i> (1) When my version hangs after displaying the checkmark, is that the
+</I>&gt;<i> crash's failure mode?  I mean, is this the same &quot;crash&quot; you're getting? 
+</I>&gt;<i> If so, I can try and debug it.
+</I>
+the checkmark seems to run fine (there's no switching to text console
+yet), but the pixel fillscreen test crashes after a while. Usualy I get
+the screen filled with &lt;000000&gt; (div by zero I think) or a jbHeap error.
+
+&gt;<i> (2) Do you think it would help if I wrote something that, in the case of
+</I>&gt;<i> a detectable crash, reset the VGA display to text mode and spat out some
+</I>&gt;<i> debugging info?  (Our own little BSOD!  What color should I make the
+</I>&gt;<i> screen?)
+</I>
+hmm blue? doh, sorry I mean red.
+
+&gt;<i> I could print out:
+</I>&gt;<i> (a) a diagnostic string
+</I>&gt;<i> (b) the native-code stacktrace (with &quot;nm&quot; you could see where in the JVM
+</I>&gt;<i> we were)
+</I>&gt;<i> (c) and maybe some other Java stuff (I'd have to think about how to do
+</I>&gt;<i> this, and fit it on one screen -- there could be quite a few Java
+</I>&gt;<i> threads -- too many to fit on one screen)
+</I>
+printing on screen is ok, we can change the mode to 80x50 or 116x50, so we
+could see more.
+
+&gt;<i> We don't have enough of a console/GUI/Window Mgr for me to do anything
+</I>&gt;<i> else, right?
+</I>
+a log would be nice... but still no hdc driver (still searching for a good
+manual).
+
+&gt;<i> Again, thanks for the help -- I appreciate how, er, hostile the
+</I>&gt;<i> debugging environment is at this point in time!  I shall endeavor to
+</I>&gt;<i> make it less so.
+</I>[cut]
+
+Thomas Bocek
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000233.html">[JOS-Kernel] jJOS speed</A></li>
+	<LI> Next message: <A HREF="000239.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#238">[ date ]</a>
+              <a href="thread.html#238">[ thread ]</a>
+              <a href="subject.html#238">[ subject ]</a>
+              <a href="author.html#238">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [cjos] Definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000939.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [cjos] Definition</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [cjos] Definition">gchii@mindspring.com</A><BR>
+    <I>Fri, 06 Oct 2000 18:30:58 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000939.html">[JOS-Kernel] [list administration] Adding &quot;Active&quot; to list description</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#940">[ date ]</a>
+              <a href="thread.html#940">[ thread ]</a>
+              <a href="subject.html#940">[ subject ]</a>
+              <a href="author.html#940">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>A standard C library is a good kernel interface. With support for a
+standard C library, a virtual machine can be ported to a JOS-compatible
+kernel. A virtual machine does not need a new kernel interface.
+
+Many C/C++ programmers already know the standard C library. By continuing
+to support it, many C/C++ programmers will be able to contribute their code
+to the JOS Project.
+
+The Java programming language is not yet a system programming language.
+Compatibility with the Java language specification is not as important as
+compatibility with the Java Virtual Machine Specification. There are many
+opportunities to re-write the book on Java programming. For example, much
+can be accomplished with the Jasmin assembler. Valid bytecode can be
+created in assembler that cannot be created with the Java programming
+language.
+
+The C in CJOS is for the emphasis on the standard C library. Much of the
+standard C library can be exposed to Java applications. File descriptors,
+for example, can be 32-bit integers (int in Java).
+
+package cjos.include1a;
+public interface io {
+  public abstract int open( String name, int mode );
+  public abstract int read( int fd, byte[] buf );
+  public abstract int write( int fd, byte[] buf );
+  public abstract void close( int fd );
+}
+
+Such an interface to the standard C library would enable a Java application
+to open an arbitrary file and use a file descriptor (int) to read, write
+and close that file.
+
+  public void example() {
+    byte[] buf = new byte[ 1024 ];
+
+    int fd = open( &quot;x&quot;, 3 );
+    read( fd, buf );
+    write( fd, buf );
+    close( fd );
+  }
+
+Such interfaces must not be directly connected to a native method. An
+implementation of a file system may be completely written in bytecode. The
+Bytecode Native Interface is expected to be useful here. An implementation
+of the io interface is returned by an object factory. The instance of io is
+used to open, read, write and close files.
+
+Interestingly, the instance of io returned to a method may be dependent on
+the current process in an MPCL-compatible virtual machine.
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000939.html">[JOS-Kernel] [list administration] Adding &quot;Active&quot; to list description</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#940">[ date ]</a>
+              <a href="thread.html#940">[ thread ]</a>
+              <a href="subject.html#940">[ subject ]</a>
+              <a href="author.html#940">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

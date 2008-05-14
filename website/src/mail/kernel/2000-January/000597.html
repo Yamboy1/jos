@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] host progress and jcurses</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Corrado.Santoro%40iit.unict.it">
+   <LINK REL="Previous"  HREF="000589.html">
+   <LINK REL="Next" HREF="000598.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] host progress and jcurses</H1>
+    <B>csanto</B> 
+    <A HREF="mailto:Corrado.Santoro%40iit.unict.it"
+       TITLE="[JOS-Kernel] host progress and jcurses">Corrado.Santoro@iit.unict.it</A><BR>
+    <I>Wed, 5 Jan 2000 15:52:12 +0100 (GMT+0100)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000589.html">[JOS-Kernel] host progress</A></li>
+        <LI> Next message: <A HREF="000598.html">[JOS-Kernel] host progress and jcurses</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#597">[ date ]</a>
+              <a href="thread.html#597">[ thread ]</a>
+              <a href="subject.html#597">[ subject ]</a>
+              <a href="author.html#597">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi all,
+first of all, thank you for your help about my problem on Device.java.
+Secondy, I would like to try to make jcurses to work with JOS. To this
+aim, I need two things:
+1. how can I put a char with a back and fore color onto the screen (using
+console or consoled class) ?
+2. how can I read a *single* char ? (yes I have to use a KeyboardListener
+I think, but in the host build any typed char is returned only after a
+newline. I have designed a native class which, using a native method and
+some ncurses system call, is able to read a single keystroke, but I think
+it is better to integrate this inside JOS host core).
+
+My objective is to write the *first* interactive JOS application.
+
+Any suggestion ?
+Cheers
+Corrado
+
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+Personal Home Page:
+            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+
+ARCA Mobile Agent Framework Home Page:
+            <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+======================================================
+
+
+On Wed, 5 Jan 2000, Todd L. Miller wrote:
+
+&gt;<i> 	Along the way to hunting down a bug I've inserted in the i386
+</I>&gt;<i> build trying to to use Aviery's patch for a native #0 console, I made some
+</I>&gt;<i> changes to the host build's console handling.  The summary is that I've
+</I>&gt;<i> adapted the host build to use the ncurses library.  This allows
+</I>&gt;<i> char-by-char input easily, and simplifies the work in
+</I>&gt;<i> driver.KeyboardInterpreter.  Things left to do for this style of
+</I>&gt;<i> build (from the text console i/o p.o.v.):
+</I>&gt;<i> 
+</I>&gt;<i> (a) handle escape sequences (eg F1) and/or activate keypad() in
+</I>&gt;<i> ncurses() and adjust the handling in driver.KI to use its translations.
+</I>&gt;<i> (b) rewrite driver.console to use ncurses so that when the Fx keys are
+</I>&gt;<i> available, the Right Things will happen.  (On update() and when visible,
+</I>&gt;<i> use native calls to addch(x,y,c) to draw.)
+</I>&gt;<i> (c) recognize and handle return correctly.  (This might be something
+</I>&gt;<i> ncurses will handle automagically with the right settings.)
+</I>&gt;<i> 
+</I>&gt;<i> 	None of these should be particularly difficult, though (a) will be
+</I>&gt;<i> time-consuming.  This will allow us to test shells (when we're ready*,
+</I>&gt;<i> which should be soon) on the host build.  (consoleVGA on the host build
+</I>&gt;<i> should be a simple re-write to pop up and use an X window.)
+</I>&gt;<i> 
+</I>&gt;<i> 	I'll continue to hack away at figuring what I screwed up when
+</I>&gt;<i> inserting Aviery's code.  (Which, btw, I did by hand so I could figure out
+</I>&gt;<i> what he was doing.)
+</I>&gt;<i> 
+</I>&gt;<i> -_Quinn
+</I>&gt;<i> 
+</I>&gt;<i> * See my prior email for options on shells.  If you go with a shell that
+</I>&gt;<i> isn't its own program and doesn't use too much of the java libraries, it
+</I>&gt;<i> could start now.  My short-term attention will be divided between
+</I>&gt;<i> processes and classpath; processes should be finished sooner.
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000589.html">[JOS-Kernel] host progress</A></li>
+	<LI> Next message: <A HREF="000598.html">[JOS-Kernel] host progress and jcurses</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#597">[ date ]</a>
+              <a href="thread.html#597">[ thread ]</a>
+              <a href="subject.html#597">[ subject ]</a>
+              <a href="author.html#597">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,3318 @@
+From mgangelen@quintop.nl Wed, 01 Dec 1999 00:39:28 GMT
+Date: Wed, 01 Dec 1999 00:39:28 GMT
+From: mgangelen@quintop.nl mgangelen@quintop.nl
+Subject: [JOS-Kernel] realtime-systems
+
+Some interesting reading about realtime-systems and JAVA.
+http://www.rtj.org/rtj.pdf
+
+Maybe we could use some of these ideas in JOS....
+
+Fushion.
+
+
+
+
+From jm@mak.com Wed, 01 Dec 1999 08:30:07 -0500
+Date: Wed, 01 Dec 1999 08:30:07 -0500
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Next version of jjos / decaf garbage collection
+
+Hello All;
+
+I am so sorry to have been unavailable due to a Day Job Crisis (you have
+*no* *idea* how sorry).  Hopefully, I should be more available for the
+next few weeks.  I shall be responding to queued-up kernel emails in
+reverse chronological order...
+
+George.Marrows@Smallworld.co.uk wrote:
+> I'm currently doing design work / back-of-envelope-scribbling for what I
+> hope will be the next version of the garbage collector for jjos / decaf.
+> Here's what I'm planning,  roughly in the order that I intend to do the
+> work:
+> 
+> 1.  Rewrite in C++. Avoid assumptions about 32-bit pointers to simplify
+> later ports.
+> 2.  Rework it to be a generational collector. This should decrease the
+> average pause time by performing lots of little garbage collects, rather
+> than the occasional big one (these would still be needed, but less
+> frequently).
+> 3.  Tune and optimise.
+> 4.  Add support for finalisation.
+> 5.  Add support for weak references.
+
+This all sounds pretty sensible to me, although I confess I am not as
+familiar with the weak references as applied to Java.  For my own
+edification, can anybody point me at some web-available (or otherwise
+available, I guess) info on them?  Are these references identifiable to
+the JVM (e.g., special markings in constant table, derived from special
+Object subclass)?
+ 
+> As part of this work, I'll need to put in simple support for virtual memory.
+> This is so that the generational collector can find dirty pages that might
+> have had inter-generational pointers stored into them. Also, the extra
+> breathing space offered by a 4Gb virtual address space might simplify some
+> aspects of heap layout. I'll put out a brief 'spec' before carrying out this
+> work so that people can comment. Of course, if someone wanted to beat me to
+> it...
+
+I have looked at the VM stuff extensively (in this and past lives). 
+However, I had been punting on putting support for it in JJOS -- at no
+time in the past did it seem like the hottest fire.  This situation has
+changed radically due to your success with the GC system.  Thus, I would
+be more than happy to help.  I even (at one point) had a Plan for doing
+this, the first item of which would be identity-mapping the currently
+physical memory.  (I do not have the Plan notes in front of me now, but
+I think one of the soon-to-follow items was mapping the ramdisk way the
+hell out into left field, and mapping the single stack out into a place
+it wouldn't be likely to grow down into anything important.  I may have
+wanted to put a "guard page" to trap that unlikely event, too.)  I think
+there were also some issues with DMA memory address spaces, but I know
+that I'd have to crack the books to figure out exactly what they were...
+ 
+> One thing to ponder is whether all the above work is worthwhile - the
+> Boehm-Demers garbage collector does all the above and more (eg concurrent gc
+> apparently), is freely available and usable, and has been developed and
+> widely used for over a decade, so is very stable. Integrating that might be
+> a better way to get JOS to progress (though perhaps less fun for me :-).
+
+ICBWB (I Could Be Wrong But) I do not believe the Boehm gc software, as
+distributed, is amenable to interfacing with the VM subsystem.  ICBWB I
+think that is essential here.  In particular, I should like to GC pages
+AS/BEFORE they get paged out so as to avoid physical I/O to the maximum
+extent possible.  It is my understanding (from reading the GC book you
+mentioned) that this feature alone constituted a lot of the performance
+advantages experienced by LispM users -- gc, no matter how slow, is
+always faster than hardware I/O.  
+
+There is also some question in my mind as to the relationship between
+the GC native code and any GC thread that we might want (thinking out
+loud -- there is a certain appeal to having a GC thread that can run in
+the background, and stroll through memory, and use the same paging
+daemon machinery everybody else does).
+
+BTW, I think we also need to worry about "wiring down" (a.k.a., "locking
+down") certain important Java text and data for things like the VM
+paging machinery.  Wouldn't want that paging stuff paged out, now, would
+we?  Perhaps we can simplify any Java-language API to "wire down"
+classes and/or instance of a given class by using the
+pointer-identification algorithms of the gc class you're writing. 
+(I.e., we could just do:
+
+jos.PagingDaemon pd = new PagingDaemon(...);
+jos.platform.wireDown(pd); // wires down class text and all reachable
+data
+
+instead of having to write a lot of "wireDown" methods for all the
+reachable data and text in terms of memory addresses -- just a thought.)
+
+ 
+> Some other musings:
+> 
+> · There should be another mail of mine floating around on the arch list
+> containing thoughts on how to deal with real-time aspects of device drivers.
+> Does anyone have any idea if what I propose there will be sufficient, or
+> does more thought need to be given to it?
+
+I couldn't find the article -- (actually it looks like mailman is hosed
+when I try to view the November archives) -- would you please forward me
+a copy?  
+ 
+> · The current GC and the one proposed above are conservative (see the FAQ
+> below for what this means). An upshot of this is that objects can't be moved
+> once allocated, and this restricts the type of gc algorithms that can be
+> used. There are a number of possibilities for making the garbage collector
+> more accurate and thus able to move objects:
+> 1. Separate C++ heap from which objects are explicitly freed.
+> 2. Separate C++ heap which is conservatively gc'd.
+
+These are all fine ideas, ...
+
+> 3. Get hold of C++ object and stack layout from the compiler. I haven't
+> fully investigated this, but it would seem that the stabs debug information
+> produced by g++ should contain all the information needed. Whether this is
+> true when the optimisation levels are cranked up is not clear.
+
+... and this is easily computable ...
+ 
+> Todd - didn't you let slip in a mail recently that you'd had some thoughts
+> about Java v C++ gc? Care to elaborate?
+
+... but I strongly urge (I would insist if I had that kind of leverage)
+that we not undertake any such optimizations and/or improvements until
+we actually have enough of the system hung together and run some
+profiling.  I have yet to work on any non-trivial application for which
+I was able to clairvoyantly determine which optimizations I should
+design into the system.  
+
+For example, even if our JVM is dog-slow (e.g., 10 times worse than
+competing JVMs), if we can run some threads whilst others page (unlike
+any other JVM I know of which runs under UNIX to date), and avoid
+sleeping the whole system whilst the disk drive turns, our JVM will in
+fact perform superior to any other for large Java system behavior... 
+
+> Anything else I should be considering? Any other comments?
+
+Let me know how I can help.  At a minimum, I have some really good
+protected/virtual x86 references handy (well, at home, anyways).
+
+Keep up the good work!
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From tmiller@haverford.edu Wed, 1 Dec 1999 09:22:57 -0500 (EST)
+Date: Wed, 1 Dec 1999 09:22:57 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next release (fwd)
+
+---------- Forwarded message ----------
+Date: Wed, 01 Dec 1999 08:49:29 -0500
+From: Gilbert Carl Herschberger II <gchii@mindspring.com>
+To: arch@jos.org
+Subject: [JOS-Arch] [DistributionGroup] Planning for next release
+
+Let's think about the next distribution of JOS.
+
+When the kernel group reaches a concensus that jJOS is GRUB-bootable, it
+gives us an opportunity to create the next distribution of JOS.
+
+...
+
+We also need to refine the definition of a technical distribution. A
+technical distribution requires Linux (doesn't it?). A technical
+distribution includes tools (or links to tools) so that you can (re)build
+the JOS runtime distribution from the JOS source distribution. Are there
+new tools required to build JOS? The tools.tgz archive does not include
+GRUB and other tools recently mentioned by the kernel group. And yet, a
+GRUB-bootable runtime edition needs something from GRUB.
+
+_________________________
+
+	Anyone having any luck with booting jJOS from GRUB?  (I can boot
+it, but it dies almost immediately with a corrupt VM error.  I suspect
+this is a timing problem with respect to static initialization, but I
+could be wrong -- I haven't looked into it, because I'm running it with
+the new interrupt code currently.)
+
+	The current tool chain is NASM and one of etherboot+mknbi-jos and
+GRUB, right?  Where GRUB can be distributed as that pair of images (or a
+single floppy image) that George has lying around, right?  (I.E. no need
+for a source distribution for the 'runtime' version.)  Repackacking this
+would just split NASM off from etherboot+mknbi-jos and package up GRUB.
+
+-_Quinn
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Wed, 1 Dec 1999 08:51:25 -0600
+Date: Wed, 1 Dec 1999 08:51:25 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next
+ release (fwd)
+
+Quinn wrote:
+		Anyone having any luck with booting jJOS from GRUB?  (I can
+boot
+	it, but it dies almost immediately with a corrupt VM error.  I
+suspect
+	this is a timing problem with respect to static initialization, but
+I
+	could be wrong -- I haven't looked into it, because I'm running it
+with
+	the new interrupt code currently.)
+
+I'm getting the exact same behaviour when booting from GRUB when compiling
+with -DNEW_INTERUPT_HANDLING.  When I compile without it, the run ends with
+something like:
+************00000009***************
+
+I've done System.out.println's such that I know decaf is initializing (ie
+the constructor is run) but I haven't had time to delve any deeper.
+
+Avery J. Regier
+
+
+
+> -----Original Message-----
+> From:	Todd L. Miller [SMTP:tmiller@haverford.edu]
+> Sent:	Wednesday, December 01, 1999 9:23 AM
+> To:	kernel@jos.org
+> Subject:	[JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for
+> next release (fwd)
+> 
+> ---------- Forwarded message ----------
+> Date: Wed, 01 Dec 1999 08:49:29 -0500
+> From: Gilbert Carl Herschberger II <gchii@mindspring.com>
+> To: arch@jos.org
+> Subject: [JOS-Arch] [DistributionGroup] Planning for next release
+> 
+> Let's think about the next distribution of JOS.
+> 
+> When the kernel group reaches a concensus that jJOS is GRUB-bootable, it
+> gives us an opportunity to create the next distribution of JOS.
+> 
+> ...
+> 
+> We also need to refine the definition of a technical distribution. A
+> technical distribution requires Linux (doesn't it?). A technical
+> distribution includes tools (or links to tools) so that you can (re)build
+> the JOS runtime distribution from the JOS source distribution. Are there
+> new tools required to build JOS? The tools.tgz archive does not include
+> GRUB and other tools recently mentioned by the kernel group. And yet, a
+> GRUB-bootable runtime edition needs something from GRUB.
+> 
+> _________________________
+> 
+> 	Anyone having any luck with booting jJOS from GRUB?  (I can boot
+> it, but it dies almost immediately with a corrupt VM error.  I suspect
+> this is a timing problem with respect to static initialization, but I
+> could be wrong -- I haven't looked into it, because I'm running it with
+> the new interrupt code currently.)
+> 
+> 	The current tool chain is NASM and one of etherboot+mknbi-jos and
+> GRUB, right?  Where GRUB can be distributed as that pair of images (or a
+> single floppy image) that George has lying around, right?  (I.E. no need
+> for a source distribution for the 'runtime' version.)  Repackacking this
+> would just split NASM off from etherboot+mknbi-jos and package up GRUB.
+> 
+> -_Quinn
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Wed, 1 Dec 1999 16:53:56 +0100
+Date: Wed, 1 Dec 1999 16:53:56 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Planning for next   release (fwd)
+
+On Wed, 01 Dec 1999, you wrote:
+> Quinn wrote:
+> 		Anyone having any luck with booting jJOS from GRUB?  (I can
+> boot
+> 	it, but it dies almost immediately with a corrupt VM error.  I
+> suspect
+> 	this is a timing problem with respect to static initialization, but
+> I
+> 	could be wrong -- I haven't looked into it, because I'm running it
+> with
+> 	the new interrupt code currently.)
+> 
+> I'm getting the exact same behaviour when booting from GRUB when compiling
+> with -DNEW_INTERUPT_HANDLING.  When I compile without it, the run ends with
+> something like:
+> ************00000009***************
+> 
+> I've done System.out.println's such that I know decaf is initializing (ie
+> the constructor is run) but I haven't had time to delve any deeper.
+> 
+> Avery J. Regier
+> 
+
+........... I have the same problem!
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From George.Marrows@Smallworld.co.uk Wed, 1 Dec 1999 16:11:03 -0000
+Date: Wed, 1 Dec 1999 16:11:03 -0000
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] Planning for next   release (fwd)
+
+Todd, Avery, Corrado (and anybody else who's given this a go) --
+
+I'll try and check it out this evening. 
+
+Todd, if you compile without -DNEW_INTERUPT_HANDLING, do you get the same
+behaviour as Avery and Corrado? Is it different from the behaviour you get
+with etherboot on the same machine?
+
+Avery, Corrado, is the message the GC count from heapGC() in heap.c? This
+reads 
+*** Starting gc #00000001 *** 
+or
+*** Finished gc #00000001 *** 
+with count going up by one for each gc. Do you have the 1.2 branch of the
+markstack.c code from CVS - this is correct (it has duff code #ifdef
+NOTDEF'd out)? The 1.1.1.1 branch (by anonymous! what's going on here?)
+contains old and incorrect code. Also, how much memory do your machines
+have?
+
+-- George
+
+> -----Original Message-----
+> From:	Corrado Santoro [SMTP:Corrado.Santoro@IIT.UNICT.IT]
+> Sent:	Wednesday, December 01, 1999 15:54
+> To:	kernel@jos.org; arch@jos.org
+> Subject:	[JOS-Kernel] Planning for next   release (fwd)
+> 
+> On Wed, 01 Dec 1999, you wrote:
+> > Quinn wrote:
+> > 		Anyone having any luck with booting jJOS from GRUB?  (I can
+> > boot
+> > 	it, but it dies almost immediately with a corrupt VM error.  I
+> > suspect
+> > 	this is a timing problem with respect to static initialization, but
+> > I
+> > 	could be wrong -- I haven't looked into it, because I'm running it
+> > with
+> > 	the new interrupt code currently.)
+> > 
+> > I'm getting the exact same behaviour when booting from GRUB when
+> compiling
+> > with -DNEW_INTERUPT_HANDLING.  When I compile without it, the run ends
+> with
+> > something like:
+> > ************00000009***************
+> > 
+> > I've done System.out.println's such that I know decaf is initializing
+> (ie
+> > the constructor is run) but I haven't had time to delve any deeper.
+> > 
+> > Avery J. Regier
+> > 
+> 
+> ........... I have the same problem!
+> 
+> --
+> ======================================================
+> Eng. Corrado Santoro - PhD Student
+> 
+> Unversity of Catania - Engineering Faculty
+> Institute of Computer Science and Telecommunications
+> Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+> 
+> Tel: +39 095 7382365           Fax: +39 095 7382397
+> 
+> EMail: csanto@iit.unict.it
+> Personal Home Page:
+>             http://www.cdc.unict.it/~csanto
+> 
+> ARCA Mobile Agent Framework Home Page:
+>             http://netra.cdc.unict.it/ARCA
+> ======================================================
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From RegierAveryJ@JDCORP.deere.com Wed, 1 Dec 1999 11:00:33 -0600
+Date: Wed, 1 Dec 1999 11:00:33 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] Planning for next   release (fwd)
+
+	Avery, Corrado, is the message the GC count from heapGC() in heap.c?
+This reads 
+	*** Starting gc #00000001 *** 
+	or
+	*** Finished gc #00000001 *** 
+	with count going up by one for each gc. 
+
+I don't believe that this is the case.  I only see one message something
+like:
+********** 000000009 ********
+This is the only message given after the decaf constructor returns and some
+init method (I think, I don't have the code in front of me) is run.
+
+	Do you have the 1.2 branch of the markstack.c code from CVS - this
+is correct (it has duff code #ifdef NOTDEF'd out)? The 1.1.1.1 branch (by
+anonymous! what's going on here?)contains old and incorrect code. Also, how
+much memory do your machines have?
+
+	-- George
+
+I just do a pure cvs update.  Whatever is given me by that is what I have.
+If we could get the 1.2 branch made the main branch that would be helpful.
+
+My machine has 128 Mb of memory, so I don't think I'm running out that
+quick.  :)
+
+Avery J. Regier
+
+
+
+> -----Original Message-----
+> From:	George.Marrows@Smallworld.co.uk
+> [SMTP:George.Marrows@Smallworld.co.uk]
+> Sent:	Wednesday, December 01, 1999 11:11 AM
+> To:	kernel@jos.org
+> Subject:	RE: [JOS-Kernel] Planning for next   release (fwd)
+> 
+> Todd, Avery, Corrado (and anybody else who's given this a go) --
+> 
+> I'll try and check it out this evening. 
+> 
+> Todd, if you compile without -DNEW_INTERUPT_HANDLING, do you get the same
+> behaviour as Avery and Corrado? Is it different from the behaviour you get
+> with etherboot on the same machine?
+> 
+> Avery, Corrado, is the message the GC count from heapGC() in heap.c? This
+> reads 
+> *** Starting gc #00000001 *** 
+> or
+> *** Finished gc #00000001 *** 
+> with count going up by one for each gc. Do you have the 1.2 branch of the
+> markstack.c code from CVS - this is correct (it has duff code #ifdef
+> NOTDEF'd out)? The 1.1.1.1 branch (by anonymous! what's going on here?)
+> contains old and incorrect code. Also, how much memory do your machines
+> have?
+> 
+> -- George
+> 
+> > -----Original Message-----
+> > From:	Corrado Santoro [SMTP:Corrado.Santoro@IIT.UNICT.IT]
+> > Sent:	Wednesday, December 01, 1999 15:54
+> > To:	kernel@jos.org; arch@jos.org
+> > Subject:	[JOS-Kernel] Planning for next   release (fwd)
+> > 
+> > On Wed, 01 Dec 1999, you wrote:
+> > > Quinn wrote:
+> > > 		Anyone having any luck with booting jJOS from GRUB?  (I can
+> > > boot
+> > > 	it, but it dies almost immediately with a corrupt VM error.  I
+> > > suspect
+> > > 	this is a timing problem with respect to static initialization, but
+> > > I
+> > > 	could be wrong -- I haven't looked into it, because I'm running it
+> > > with
+> > > 	the new interrupt code currently.)
+> > > 
+> > > I'm getting the exact same behaviour when booting from GRUB when
+> > compiling
+> > > with -DNEW_INTERUPT_HANDLING.  When I compile without it, the run ends
+> > with
+> > > something like:
+> > > ************00000009***************
+> > > 
+> > > I've done System.out.println's such that I know decaf is initializing
+> > (ie
+> > > the constructor is run) but I haven't had time to delve any deeper.
+> > > 
+> > > Avery J. Regier
+> > > 
+> > 
+> > ........... I have the same problem!
+> > 
+> > --
+> > ======================================================
+> > Eng. Corrado Santoro - PhD Student
+> > 
+> > Unversity of Catania - Engineering Faculty
+> > Institute of Computer Science and Telecommunications
+> > Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+> > 
+> > Tel: +39 095 7382365           Fax: +39 095 7382397
+> > 
+> > EMail: csanto@iit.unict.it
+> > Personal Home Page:
+> >             http://www.cdc.unict.it/~csanto
+> > 
+> > ARCA Mobile Agent Framework Home Page:
+> >             http://netra.cdc.unict.it/ARCA
+> > ======================================================
+> > 
+> > 
+> > _______________________________________________
+> > Kernel maillist  -  Kernel@jos.org
+> > http://jos.org/mailman/listinfo/kernel
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From tmiller@haverford.edu Wed, 1 Dec 1999 13:15:42 -0500 (EST)
+Date: Wed, 1 Dec 1999 13:15:42 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Planning for next   release (fwd)
+
+> I don't believe that this is the case.  I only see one message something
+> like:
+> ********** 000000009 ********
+> This is the only message given after the decaf constructor returns and some
+> init method (I think, I don't have the code in front of me) is run.
+
+	I have /no/ idea where this message is coming from, and grep
+doesn't find anything that looks like it (assuming "\*\*\*" will find
+'***'...).
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Wed, 1 Dec 1999 13:48:37 -0500 (EST)
+Date: Wed, 1 Dec 1999 13:48:37 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next
+ release (fwd)
+
+> I'm getting the exact same behaviour when booting from GRUB when compiling
+> with -DNEW_INTERUPT_HANDLING.  When I compile without it, the run ends with
+> something like:
+> ************00000009***************
+> 
+> I've done System.out.println's such that I know decaf is initializing (ie
+> the constructor is run) but I haven't had time to delve any deeper.
+
+	Sorry, I accidentally deleted my mention that I'm also compiling
+with -DNEW_INTERRUPT_HANDLING.  (BTW, you shouldn't be using
+-DNEW_INTERRUPT_HANDLING because the Java-side support is not (IIRC) in
+the CVS yet.)  There should be an easy fix for this; I'll look into
+tonight.  (If it is in fact a static init timing problem, that is.)
+
+	Just tried GRUB w/ the other style of interrupts, and init ran
+through and suceeded at all of its tests, but then the keyboard driver
+didn't work, but that just be because my copy of the normal bytecode
+source isn't probably in the best of shapes right now.
+
+-_Quinn
+
+
+
+
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Wed, 1 Dec 1999 13:17:00 -0600
+Date: Wed, 1 Dec 1999 13:17:00 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next
+ release (fwd)
+
+To be clear, that message was from running GRUB using the old-style
+interrupts.
+
+Avery J. Regier
+
+
+> -----Original Message-----
+> From:	Todd L. Miller [SMTP:tmiller@haverford.edu]
+> Sent:	Wednesday, December 01, 1999 1:49 PM
+> To:	'kernel@jos.org'
+> Subject:	RE: [JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for
+> next  release (fwd)
+> 
+> > I'm getting the exact same behaviour when booting from GRUB when
+> compiling
+> > with -DNEW_INTERUPT_HANDLING.  When I compile without it, the run ends
+> with
+> > something like:
+> > ************00000009***************
+> > 
+> > I've done System.out.println's such that I know decaf is initializing
+> (ie
+> > the constructor is run) but I haven't had time to delve any deeper.
+> 
+> 	Sorry, I accidentally deleted my mention that I'm also compiling
+> with -DNEW_INTERRUPT_HANDLING.  (BTW, you shouldn't be using
+> -DNEW_INTERRUPT_HANDLING because the Java-side support is not (IIRC) in
+> the CVS yet.)  There should be an easy fix for this; I'll look into
+> tonight.  (If it is in fact a static init timing problem, that is.)
+> 
+> 	Just tried GRUB w/ the other style of interrupts, and init ran
+> through and suceeded at all of its tests, but then the keyboard driver
+> didn't work, but that just be because my copy of the normal bytecode
+> source isn't probably in the best of shapes right now.
+> 
+> -_Quinn
+> 
+> 
+> 
+> 
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From mgangelen@quintop.nl Wed, 01 Dec 1999 22:50:57 GMT
+Date: Wed, 01 Dec 1999 22:50:57 GMT
+From: mgangelen@quintop.nl mgangelen@quintop.nl
+Subject: [JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next release (fwd)
+
+I finally got something booting. Maybe this sounds silly to you all using
+Linux as development platform, but I decided that I wanted to do my
+development in W*n95 (I know, bad idea but stil... I need my tools on
+W*n95...).
+
+Downloaded Cygwin (a GNU compiler for Windows), NASMW (guess what that
+means...) and made myself a crosscompiler (Windows -> Linux). Followed the
+excellent instructions from George at
+http://www.triptych.freeserve.co.uk/grub/index.html, changed some makefiles
+and sourcecode to let it compile with my 2.95 GNU crosscompiler (I could
+send the changes if you want them...) booted through GRUB and it worked !!
+Although I must say that I get the same errormessages saying that the VM is
+corrupted (at: notifyOfInterrrupts(3): VM corrupted, aborting...) with
+-DNEW_INTERUPT_HANDLING I must say.
+
+I would like to contribute more to JOS (I want to boot from a flop without
+GRUB !!) by documenting the procedure how to develop on W*n95 and by
+writing device drivers in JAVA.
+
+Another thing, maybe we could simplify the makefiles by adding
+Makefile.host and Makefile.i386 where all the tool variables needed for the
+seperate builds are defined. Unlike you Linux guys, I must use seperate
+compilers for the host- and i386-build. This could also be useful when more
+platforms are supported like AS/400. When this is the case, crosscompiling
+and the use of different compilers for each build is unavoidable...
+I would like to assist with the Makefile thing, but I should admit that my
+knowledge of Makefiles is VERY limited. I'm already happy if I can change
+current makefiles to let them make correctly...
+
+
+Fushion.
+
+
+
+<SNIP>
+We also need to refine the definition of a technical distribution. A
+technical distribution requires Linux (doesn't it?). A technical
+distribution includes tools (or links to tools) so that you can (re)build
+the JOS runtime distribution from the JOS source distribution. Are there
+new tools required to build JOS? The tools.tgz archive does not include
+GRUB and other tools recently mentioned by the kernel group. And yet, a
+GRUB-bootable runtime edition needs something from GRUB.
+
+_________________________
+
+     Anyone having any luck with booting jJOS from GRUB?  (I can boot
+it, but it dies almost immediately with a corrupt VM error.  I suspect
+this is a timing problem with respect to static initialization, but I
+could be wrong -- I haven't looked into it, because I'm running it with
+the new interrupt code currently.)
+
+     The current tool chain is NASM and one of etherboot+mknbi-jos and
+GRUB, right?  Where GRUB can be distributed as that pair of images (or a
+single floppy image) that George has lying around, right?  (I.E. no need
+for a source distribution for the 'runtime' version.)  Repackacking this
+would just split NASM off from etherboot+mknbi-jos and package up GRUB.
+
+
+
+
+
+
+
+From mgangelen@quintop.nl Thu, 02 Dec 1999 00:12:24 GMT
+Date: Thu, 02 Dec 1999 00:12:24 GMT
+From: mgangelen@quintop.nl mgangelen@quintop.nl
+Subject: [JOS-Kernel] More on kernel bailout
+
+It seems like both the build with the -DNEW_INTERRUPT_HANDLER and the build
+without, are stopping for the same reason: There is no handler installed
+for an occuring interrupt (probably interrupt 9).
+
+This gives the errormessage
+"+++++++++++(0000000009)+++++++++++"
+on the build without the NEW_INTERRUPT_HANDLER and
+"notifyOfInterrrupts(3): VM corrupted, aborting"
+on the build with the new stuff.
+
+Thought this might help some....???
+
+
+Fushion.
+
+
+
+
+From tmiller@haverford.edu Wed, 1 Dec 1999 22:24:55 -0500 (EST)
+Date: Wed, 1 Dec 1999 22:24:55 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] More on kernel bailout
+
+	Okay, I was playing with this a little, and both build seem to get
+their first interrupts in before the interrupt dispatcher is ready.  (On
+grub, at least; I haven't tried my most recent set of changes on
+etherboot, but I don't expect any change there.)  One interrupt (14)
+happens just before JJOS identifies the processor type, and is printed out
+as happening, but then (possibly overwritten by kernel messages?) I never
+see an attempt to dispatch it.  Following that, interrupt 9 fires, and the
+code in scheduler.cc (was "VM corrupt #3") (now) says it's assuming the
+static initialization isn't done yet; immediately thereafter, it does the
+same for interrupt 14.
+
+	I can't generate interrupts with the keyboard (normally interrupt
+9) at all/ever.  I don't know if this is because the keyboard is waiting
+for its first interrupt to be serviced (i.e. I need to initialize the kbd
+controller under grub but not etherboot for some reason) or if it's
+indicative of a deeper problem.
+
+	At any rate, I added a .clear_screen() method to jjconsol, because
+the head_grub.s86 asm doesn't do the same thing as head_ether.s86 (set vga
+text mode and clear it) -- which it probably should.
+
+	What, exactly, are the differences between how head_grub leaves
+things setup and how head_ether does?  I think the migrating VGA address
+(A20 line?) might be an indication of some problem along these lines...
+
+-_Quinn
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Thu, 2 Dec 1999 10:06:47 +0100
+Date: Thu, 2 Dec 1999 10:06:47 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Planning for next   release (fwd)
+
+On Wed, 01 Dec 1999, George.Marrows@Smallworld.co.uk wrote:
+> 
+> Avery, Corrado, is the message the GC count from heapGC() in heap.c? This
+> reads 
+> *** Starting gc #00000001 *** 
+> or
+> *** Finished gc #00000001 *** 
+> with count going up by one for each gc. Do you have the 1.2 branch of the
+> markstack.c code from CVS - this is correct (it has duff code #ifdef
+> NOTDEF'd out)? The 1.1.1.1 branch (by anonymous! what's going on here?)
+> contains old and incorrect code. Also, how much memory do your machines
+> have?
+> 
+I don't know if the branch is 1.2, but I think so, I've updated my sources
+using the command "cvs update". I have 128M of memory.
+Anyway, I'll add the method "clear_screen()" (as suggested by Todd) and I'll
+make other tests.
+
+Corrado
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Thu, 2 Dec 1999 13:45:14 +0100
+Date: Thu, 2 Dec 1999 13:45:14 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] JOS and Grub.. now it works!
+
+Hi all,
+finally I was able to boot and run JOS with Grub!
+The TestSuite class works fine!
+Anyway, as the interrupt handler is not complete (I think) I have to put a
+"return false" line in substitution of "abort()" in the "notifyOfInterrupts"
+method of decaf/scheduler.cc. In this way, the VM does not abort on unhandled
+interrupts and the TestSuite can proceed. However, this is only a temporary
+patch, as (I think) we are waiting the right java classes (interrupts.java and
+interrupt.java) able to support the new style interrupt handling.
+
+Bye, bye,
+	Corrado
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Thu, 2 Dec 1999 12:07:58 -0500 (EST)
+Date: Thu, 2 Dec 1999 12:07:58 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Planning for next   release (fwd)
+
+> Anyway, I'll add the method "clear_screen()" (as suggested by Todd) and I'll
+> make other tests.
+
+	A jjconsole.h and jjconsol.cc with clear_screen() are now in the
+CVS.
+
+-_Quinn
+"Do not meddle in the affairs of wizards, for you are crunchy and good
+with ketchup."
+
+
+
+
+
+From tmiller@haverford.edu Thu, 2 Dec 1999 20:05:42 -0500 (EST)
+Date: Thu, 2 Dec 1999 20:05:42 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Next version of jjos / decaf garbage collection
+
+ 
+> ICBWB (I Could Be Wrong But) I do not believe the Boehm gc software, as
+> distributed, is amenable to interfacing with the VM subsystem.  ICBWB I
+> think that is essential here.  In particular, I should like to GC pages
+> AS/BEFORE they get paged out so as to avoid physical I/O to the maximum
+> extent possible.  It is my understanding (from reading the GC book you
+> mentioned) that this feature alone constituted a lot of the performance
+> advantages experienced by LispM users -- gc, no matter how slow, is
+> always faster than hardware I/O.  
+
+	This is a good idea; I'm wondering, though:  could we run
+GC only during I/O waits (except for out-of-memory conditions) and get
+very nice performance that way?  (At least on the Java side of things,
+where there's a well-defined subset of memory to check during the I/O
+wait, so the GC time won't overrun the I/O time by that much.)
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Fri, 03 Dec 1999 11:15:11 -0500
+Date: Fri, 03 Dec 1999 11:15:11 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Dispatching opcodes
+
+Consider the following code. The address of each method is entered into a
+vtable that's indexed by opcode. A method can be found by a single pointer
+calculation vtable[ opcode ]. It interprets an opcode without the runtime
+overhead of a switch statement.
+
+// opcodemethod.cc
+#include <stdio.h>
+
+typedef bool (*TMethod)(void);
+
+static const int MAX_OPCODE = 3;
+static TMethod vtable[ MAX_OPCODE ];
+
+static bool method1() {
+  printf( "Method 1\n" );
+  return true;
+}
+
+static bool method2() {
+  printf( "Method 2\n" );
+  return true;
+}
+
+static bool method3() {
+  printf( "Method 3\n" );
+  return true;
+}
+
+static bool invokeOpcode( int index ) {
+  TMethod item = vtable[ index ];
+  return item();
+}
+
+void example() {
+  vtable[ 0 ] = method1;
+  vtable[ 1 ] = method2;
+  vtable[ 2 ] = method3;
+
+  if ( invokeOpcode( 0 ) ) {
+    if ( invokeOpcode( 1 ) ) {;
+      invokeOpcode( 2 );
+    }
+  }
+}
+
+Since all of these methods must have a similar signature, building a formal
+type definition lets the compiler do additional type checking. Inside
+interp.cc, frame::runOpcode() ends up short and sweet, something like this:
+
+typedef bool (frame::*TOpcodeMethod)(exception_to_throw &e);
+
+static TOpcodeMethod vtable[ bc::MAX_OPCODE ];
+
+bool frame::runOpcode(exception_to_throw &e)
+  TOpcodeMethod item = vtable[ cur_code->code[ myPC ] ];
+
+#ifdef PARANOID
+  if ( item == NULL ) {
+    kprintf( "frame.runOpcode(): VM corrupted, exiting.\n" );
+    abort();
+  }
+#endif
+
+  myPC++;
+  return item( e );
+}
+
+void frame::loadVTable() {
+  vtable[ bc::aaload ] = aaload;
+  vtable[ bc::aastore ] = aastore;
+  :
+  vtable[ bc::aload ] = aload;
+  vtable[ bc::aload_0 ] = aload_0;
+  vtable[ bc::aload_1 ] = aload_1;
+  vtable[ bc::aload_2 ] = aload_2;
+  vtable[ bc::aload_3 ] = aload_3;
+  vtable[ bc::anewarray ] = anewarray;
+  vtable[ bc::areturn ] = areturn;
+  vtable[ bc::arraylength ] = arraylength;
+  :
+  vtable[ bc::dup ] = dup;
+  vtable[ bc::dup_xl ] = dup_x1;
+  vtable[ bc::dup_x2 ] = dup_x2;
+  vtable[ bc::dup2 ] = dup2;
+  vtable[ bc::dup2_x1 ] = dup2_x1;
+  vtable[ bc::dup2_x2 ] = dup2_x2;
+  vtable[ bc::swap ] = swap;
+}
+
+
+
+
+From tmiller@haverford.edu Fri, 3 Dec 1999 13:02:08 -0500 (EST)
+Date: Fri, 3 Dec 1999 13:02:08 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Dispatching opcodes
+
+	John Morrison has performed analyses on the code generated by gcc
+that indicate to me that this, in fact, is what gcc is doing for us
+automagically.
+
+-_Quinn
+
+"Do not meddle in the affairs of wizards, for you are crunchy and good
+with ketchup."
+
+
+
+
+
+From iainshigeoka@yahoo.com Fri, 3 Dec 1999 12:09:56 -0600
+Date: Fri, 3 Dec 1999 12:09:56 -0600
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] Dispatching opcodes
+
+On 3 Dec 99, at 11:15, Gilbert Carl Herschberger II wrote:
+
+> Consider the following code. The address of each method is entered into a
+> vtable that's indexed by opcode. A method can be found by a single pointer
+> calculation vtable[ opcode ]. It interprets an opcode without the runtime
+> overhead of a switch statement.
+
+Actually isn't this what a compiler does with a switch statement 
+(generates a jump table)?  And if the functions are small (which 
+you would hope opcode instructions would be) and indicated as 
+inline (or optimized that way), you should get all this with a much 
+clearer source syntax of standard switch and method calls...  If this 
+is the case, IMHO it would be better to let the compiler do the 
+optimization.
+
+-iain
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Fri, 3 Dec 1999 19:19:29 +0100
+Date: Fri, 3 Dec 1999 19:19:29 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] JOS Curses - PreBeta!
+
+Hi all,
+as suggested by Todd, I've started to write a "curses" library for JOS.
+The 0.1-prebeta release is available at web address:
+
+	http://alpha2.iit.unict.it/JOS/jcurses.html
+
+There, you can download the software package or browse the documentation.
+For time reason, I've not yet prepared a document which describe the
+architecture... I hope I will have more time in future.
+I would like to ask to all of you to download the package, to test the sample
+application (set the classpath and start the "test" shell script), to read the
+source code and to send me back your comments (or any question). Anyway, I have
+a question.... I've called this package "jcurses", but I think that the right
+name should be something like "jos.platform.curses...". So, what is the
+suggested name ??
+
+Thank you,
+
+Bye,bye
+	Corrado.
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Fri, 3 Dec 1999 13:21:18 -0500 (EST)
+Date: Fri, 3 Dec 1999 13:21:18 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JOS Curses - PreBeta!
+
+> as suggested by Todd, I've started to write a "curses" library for JOS.
+> The 0.1-prebeta release is available at web address:
+
+	Good stuff!  Be aware that I'm trying to provide a standardized
+console for JOS -- though only method I'm thinking about supporting is
+putChar(x,y,char) (and possibly putStyle()) -- so that some of the
+back-end support exists/will exist (at least for the i386 build -- the
+host build will need different back-end stuff).  I'd like to see the
+curses text windowing, etc, become std equipment on JOS though.  (That is,
+anywhere a putChar() console is appropriate, so would a curses console.
+Under that assumption, jos.system.curses would be an appropriate package
+name, with jos.system.curses.console (screen?) the interface class.)
+
+-_Quinn
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Fri, 3 Dec 1999 19:43:14 +0100
+Date: Fri, 3 Dec 1999 19:43:14 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Static members, process model and JCurses!
+
+Oh Avery!!
+Only now I've seen your e-mail concerning process model and the "joscore.jar".
+I've unpacked it just now.
+I'll start the analysis of joscore. Anyway, please check if my jcurses
+implementation (see my previous e-mail) agrees with joscore architecture.
+
+Thanks, bye,
+	Corrado.
+
+On Fri, 29 Oct 1999, Regier Avery J wrote:
+> >%_Corrado,
+> 
+> I'm heading up the JOSCore project, which is aimed at being the 'glue'
+
+......
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Fri, 3 Dec 1999 19:47:29 +0100
+Date: Fri, 3 Dec 1999 19:47:29 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] JOS Curses - PreBeta!
+
+On Fri, 03 Dec 1999, Todd L. Miller wrote:
+>
+> 	Good stuff!  Be aware that I'm trying to provide a standardized
+> console for JOS -- though only method I'm thinking about supporting is
+> putChar(x,y,char) (and possibly putStyle()) -- so that some of the
+> back-end support exists/will exist (at least for the i386 build -- the
+> host build will need different back-end stuff).
+This should be enough! The standard class which writes onto the screen is
+"JavaTerminal" which uses the properties defined in "termcap.ini". However, the
+"Terminal" class file associated to a given term-type (e.g. VT100, ANSI) is
+also defined in "termcap.ini", so you may implement a class which class C
+native methods (for example). In addition, the property file "termcap.ini" is
+virtualized by the interface AbstractProperties and created by the
+TerminalPropertiesFactory class. Using this mechanism, you can use other
+terminal capability definition methods instead of a file-based one.
+
+> I'd like to see the
+> curses text windowing, etc, become std equipment on JOS though.  (That is,
+> anywhere a putChar() console is appropriate, so would a curses console.
+> Under that assumption, jos.system.curses would be an appropriate package
+> name, with jos.system.curses.console (screen?) the interface class.)
+OK!!!!
+
+Bye,
+	Corrado.
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From alain@qnx.com Fri, 3 Dec 1999 14:26:30 -0500 (EST)
+Date: Fri, 3 Dec 1999 14:26:30 -0500 (EST)
+From: Alain Magloire alain@qnx.com
+Subject: [JOS-Kernel] JOS Curses - PreBeta!
+
+Bonjour
+
+> host build will need different back-end stuff).  I'd like to see the
+> curses text windowing, etc, become std equipment on JOS though.  (That is,
+
+Hmmm ...
+Funny, you say this, I had a project(seems eons ago) that would use
+(n)curses as the default toolkit to try to mimic what AWT is doing.
+I've never actually sat down and give a go to see if this was possible.
+This may be fun/interesting.
+
+But I don't think I can do much else for JOS then being a passibe
+spectator.  I have access to Sun's VM and made the deal with the devil.
+
+
+-- 
+au revoir, alain
+----
+Aussi haut que l'on soit assis, on n'est toujours assis que sur son cul !!!
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Fri, 3 Dec 1999 13:30:53 -0600
+Date: Fri, 3 Dec 1999 13:30:53 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] Static members, process model and JCurses!
+
+Corrado,
+
+I had understood that you were writing an entire console that would be able
+to start Processes and such.  Only when you start creating processes do you
+need to start worrying about org.jos.core.*.
+
+BTW:  Beautiful work with jcurses.  i'm on an NT box right now and I had to
+scrounge to find a VT100 terminal to run it in. (It looks rather cryptic in
+a DOS prompt. :)  I ended up using a VT320 emulator written in Java to
+telnet to a Unix box where I was finally able to run in in the Unix box's
+JVM with full color.  Isn't Java wonderful?
+
+You did some good design work on this.  Keep up the good work!
+
+- Avery J. Regier
+
+
+> -----Original Message-----
+> From:	Corrado Santoro [SMTP:Corrado.Santoro@IIT.UNICT.IT]
+> Sent:	Friday, December 03, 1999 1:43 PM
+> To:	Regier Avery J; kernel@jos.org
+> Subject:	[JOS-Kernel] Static members, process model and JCurses!
+> 
+> Oh Avery!!
+> Only now I've seen your e-mail concerning process model and the
+> "joscore.jar".
+> I've unpacked it just now.
+> I'll start the analysis of joscore. Anyway, please check if my jcurses
+> implementation (see my previous e-mail) agrees with joscore architecture.
+> 
+> Thanks, bye,
+> 	Corrado.
+> 
+> On Fri, 29 Oct 1999, Regier Avery J wrote:
+> > >%_Corrado,
+> > 
+> > I'm heading up the JOSCore project, which is aimed at being the 'glue'
+> 
+> ......
+> 
+> --
+> ======================================================
+> Eng. Corrado Santoro - PhD Student
+> 
+> Unversity of Catania - Engineering Faculty
+> Institute of Computer Science and Telecommunications
+> Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+> 
+> Tel: +39 095 7382365           Fax: +39 095 7382397
+> 
+> EMail: csanto@iit.unict.it
+> Personal Home Page:
+>             http://www.cdc.unict.it/~csanto
+> 
+> ARCA Mobile Agent Framework Home Page:
+>             http://netra.cdc.unict.it/ARCA
+> ======================================================
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From tmiller@haverford.edu Fri, 3 Dec 1999 16:25:37 -0500 (EST)
+Date: Fri, 3 Dec 1999 16:25:37 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JOS Curses - PreBeta!
+
+> This should be enough! The standard class which writes onto the screen is
+> "JavaTerminal" which uses the properties defined in "termcap.ini". However, the
+> "Terminal" class file associated to a given term-type (e.g. VT100, ANSI) is
+> also defined in "termcap.ini", so you may implement a class which class C
+> native methods (for example). In addition, the property file "termcap.ini" is
+> virtualized by the interface AbstractProperties and created by the
+> TerminalPropertiesFactory class. Using this mechanism, you can use other
+> terminal capability definition methods instead of a file-based one.
+
+	Beautiful.  I'll try to look at your code this weekend.
+
+-_Quinn
+
+"Do not meddle in the affairs of wizards, for you are crunchy and good
+with ketchup."
+
+
+
+
+
+From tmiller@haverford.edu Fri, 3 Dec 1999 16:30:52 -0500 (EST)
+Date: Fri, 3 Dec 1999 16:30:52 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JOS Curses - PreBeta!
+
+> This may be fun/interesting.
+
+	At one point, I was thinking of the same, but ended up deciding
+that the split text/video modes you sometimes saw on old computers
+(remember AppleSoft Basic?  4 lines of text at the bottom.  Forget the
+resolution of the top, though) -- suitably jacked up -- would be more
+interesting.  That is, why mess around with making a shortcut to a 'run'
+command when you can make a shortcut to a full shell?  (EG, ALT-R would
+change focus to the text section of the display.  the ALT/CTRL Fx keys
+would switch gfx/text consoles.)  I'm not sure how many people would
+appreciate it, though :)
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Fri, 03 Dec 1999 17:11:08 -0500
+Date: Fri, 03 Dec 1999 17:11:08 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Dispatching opcodes
+
+At 01:02 PM 12/3/99 -0500, "Todd L. Miller" <tmiller@haverford.edu> wrote:
+>	John Morrison has performed analyses on the code generated by gcc
+>that indicate to me that this, in fact, is what gcc is doing for us
+>automagically.
+
+I was trying to emphasize the typedef for these kind of methods. gcc
+doesn't automatically make sure that all the methods have the same type; it
+makes sure they have a type indicated on each line in the frame class
+definition.
+
+typedef bool (frame::*TOpcodeMethod)(exception_to_throw &e);
+
+When all opcode methods are declare in the frame class definition with this
+type, gcc makes sure that all methods have exactly the same type. Every
+opcode method should have the same type. If (or when) the type of opcode
+methods needs to be changed, the type is enforce-able by the compiler with
+a typedef.
+
+
+
+
+From Corrado.Santoro@iit.unict.it Sat, 4 Dec 1999 10:14:43 +0100 (GMT+0100)
+Date: Sat, 4 Dec 1999 10:14:43 +0100 (GMT+0100)
+From: csanto Corrado.Santoro@iit.unict.it
+Subject: [JOS-Kernel] Static members, process model and JCurses!
+
+On Fri, 3 Dec 1999, Regier Avery J wrote:
+> Corrado,
+> 
+> I had understood that you were writing an entire console that would be able
+> to start Processes and such.  Only when you start creating processes do you
+> need to start worrying about org.jos.core.*.
+Ok!
+
+> BTW:  Beautiful work with jcurses.  i'm on an NT box right now and I had to
+> scrounge to find a VT100 terminal to run it in. (It looks rather cryptic in
+> a DOS prompt. :)  I ended up using a VT320 emulator written in Java to
+> telnet to a Unix box where I was finally able to run in in the Unix box's
+> JVM with full color.  Isn't Java wonderful?
+It is!
+
+BTW: Does anyone have a listing of the ESC sequences for the well known
+terminal types ?
+ 
+> You did some good design work on this.  Keep up the good work!
+Thank you very much Avery.
+
+Bye,
+	Corrado.
+
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+
+From tmiller@haverford.edu Sat, 4 Dec 1999 12:29:38 -0500 (EST)
+Date: Sat, 4 Dec 1999 12:29:38 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JOS Curses - PreBeta!
+
+	Just fetched the JOS Curses prebeta.  I'm impressed!  It works
+beautifully, except that it doesn't reset the console color(s) to whatever
+it was before it started -- though I'm not sure how one would implement
+JavaTerminal so that it would return the right color from a call to
+getColor() before a call to setColor().  I'll start working on a
+'JOSTerminal' as soon as I can.  (Which would also come in handy for
+writing terminal emulators -- that is, every emulator could be
+written against JOSTerminal -- though on the 'host' build, it might just
+turn around and ask JavaTerminal to do the Right Thing!)
+
+-_Quinn
+
+"Do not meddle in the affairs of wizards, for you are crunchy and good
+with ketchup."
+
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Mon, 6 Dec 1999 09:38:23 +0100
+Date: Mon, 6 Dec 1999 09:38:23 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] JCurses - prebeta2.
+
+Hi all,
+now I've posted to
+
+	http://alpha2.iit.unict.it/JOS/jcurses.html
+
+The prebeta2 of jcurses. Now it does window open and restore (see the example).
+
+Todd, your note is right.. but color restoring isn't the sole bug in my
+implementation! However, I hope you finish soon the jos console and the
+interrupt handling so I can link my package to the JOS distribution.
+
+Dimirty, thank you for your suggestions. Yes, I'm planning to implement
+stream-based terminal management. What is the POSIX GTE ? How can I find the
+specifications ?
+
+Bye,
+	Corrado.
+
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From hilarycheng@usa.net Mon, 6 Dec 1999 20:38:17 +0800
+Date: Mon, 6 Dec 1999 20:38:17 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] JCurses - prebeta2.
+
+Hi All,
+
+    Can we use JCurses in the host bulid of JJOS ? :D
+
+Regards,
+
+Hilary
+
+
+----- Original Message -----
+From: Corrado Santoro <Corrado.Santoro@IIT.UNICT.IT>
+To: <kernel@jos.org>
+Sent: Monday, December 06, 1999 4:38 PM
+Subject: [JOS-Kernel] JCurses - prebeta2.
+
+
+>Hi all,
+>now I've posted to
+>
+> http://alpha2.iit.unict.it/JOS/jcurses.html
+>
+>The prebeta2 of jcurses. Now it does window open and restore (see the
+example).
+>
+>Todd, your note is right.. but color restoring isn't the sole bug in my
+>implementation! However, I hope you finish soon the jos console and the
+>interrupt handling so I can link my package to the JOS distribution.
+>
+>Dimirty, thank you for your suggestions. Yes, I'm planning to implement
+>stream-based terminal management. What is the POSIX GTE ? How can I find
+the
+>specifications ?
+>
+>Bye,
+> Corrado.
+>
+>
+>--
+>======================================================
+>Eng. Corrado Santoro - PhD Student
+>
+>Unversity of Catania - Engineering Faculty
+>Institute of Computer Science and Telecommunications
+>Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+>
+>Tel: +39 095 7382365           Fax: +39 095 7382397
+>
+>EMail: csanto@iit.unict.it
+>Personal Home Page:
+>            http://www.cdc.unict.it/~csanto
+>
+>ARCA Mobile Agent Framework Home Page:
+>            http://netra.cdc.unict.it/ARCA
+>======================================================
+>
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From tmiller@haverford.edu Mon, 6 Dec 1999 09:36:48 -0500 (EST)
+Date: Mon, 6 Dec 1999 09:36:48 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JCurses - prebeta2.
+
+>     Can we use JCurses in the host bulid of JJOS ? :D
+
+	No.  decaf doesn't support System.getProperty() yet.
+
+-_Quinn
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Mon, 6 Dec 1999 18:25:45 +0100
+Date: Mon, 6 Dec 1999 18:25:45 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] JCurses - prebeta2.
+
+> >     Can we use JCurses in the host bulid of JJOS ? :D
+> 
+> 	No.  decaf doesn't support System.getProperty() yet.
+> 
+> -_Quinn
+
+Todd, Hilary...
+I don't think that the problem is ONLY the use of System.getProperty(), it can
+be replaced by another primitive (i.e. by coding the terminal type in the
+source just to try it). Does decaf allows filing ? (Remember the terminal
+capabilities are downloaded from the property file "termcap.ini").
+
+Corrado
+
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From tmiller@haverford.edu Mon, 6 Dec 1999 12:42:21 -0500 (EST)
+Date: Mon, 6 Dec 1999 12:42:21 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JCurses - prebeta2.
+
+> I don't think that the problem is ONLY the use of System.getProperty(), it can
+> be replaced by another primitive (i.e. by coding the terminal type in the
+> source just to try it). Does decaf allows filing ? (Remember the terminal
+> capabilities are downloaded from the property file "termcap.ini").
+
+	Oh, I was just mentioning the first problem I came across.  Alot
+of this stuff is native-code that we don't have yet.  Classpath is still
+in the future a ways because it uses JNI, which will be time-consuming to
+implement.
+
+-_Quinn
+
+
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Mon, 6 Dec 1999 18:58:41 +0100
+Date: Mon, 6 Dec 1999 18:58:41 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Oops!! JCurses version!
+
+To anyone who has downloaded jcurses prebeta2:
+
+I've made a mistake.. the tgz file includes also the directory "jcurses" which
+contains the prebeta1 distribution. Please remove this directory in order to
+not cause misunderstandings. I've fixed the problem and now the tgz file
+available on web site is correct!
+
+Corrado
+
+ --
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From gchii@mindspring.com Tue, 07 Dec 1999 10:45:21 -0500
+Date: Tue, 07 Dec 1999 10:45:21 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] TELNET
+
+I am very interested in finishing an implementation of a TELNET service.
+With the recent addition of a JCurses library (thank you!), it is more
+feasible than ever to finish a TELNET service.
+
+What does this mean? It means that I can set up a JOS machine to run a
+TELNET service. I can use any TELNET client from across the network to log
+in to my JOS machine and run all kinds of programs.
+
+I have been working exclusively with a stream-based virtual terminal
+service. There is already a open-source, free-license TELNET client
+available under GPL. It has been well documented in "Java Annotated
+Archives" at your local book store.
+
+Here are the milestones we can accomplish with parallel development:
+
+1. JOS telnetd connects to non-JOS telnet
+2. JOS telnet connects to non-JOS telnetd
+3. JOS telnet connects to JOS telnetd
+
+The "commands" for TELNET are well-documented. TELNET is a stream-based
+protocol that maps to methods. Through TELNET, a program running in telnetd
+renders output a display window like Terminal in JCurses.
+
+Once we have a telnetd service for a JOS machine, operation of a JOS
+machine can be performed across the network. When complete, TELNET requires
+TCP, the highest level of the TCP/IP stack. This is why I'm continuing to
+develop a TELNET service that runs on any Java platform, including Linux,
+OS/400 and Win32.
+
+It is critically important to maintain a strong model for object-oriented
+batch programs. The telnet daemon (telnetd) is a hostile environment for
+*visual* Java beans. The telnet daemon cannot be a bean box. Why? Because
+the telnet daemon itself needs no visual presentation in a production
+environment. It must be able to run any program written in Java and yet
+never display a graphic element.
+
+It has take a while to reduce the TELNET daemon down to a bare-bones
+reusable environment for JOS programs. Many components have already been
+distributed in the Smart API products. The following components are needed
+to finish the project:
+
+A. SocketIOSteam
+I'm working on the assumption that a socket is not the only source of input
+to a TELNET daemon. The java.net.Socket class is just like all the other
+I/O steams. It is wrapped in a SocketIOStream, implementing the
+org.jos.program2a.IOStream interface. The IOStream interface is used by all
+other components, instead of Socket. In other words, output to other
+programs can be keyboard-less and "scripted". This enables classic piping,
+the construction of batch test suites, and calling of sub-programs within
+the telnet daemon environment.
+
+B. LoginProgram
+Upon connection, the user/password is required. The login program calls a
+shell program. Which shell program do you want to use? Any shell can be
+associated with user/password. The login program closes the socket after
+the shell program has finished running.
+
+For that matter...which login program do you want to use? Any login program
+and port can be passed to TELNET daemon. The login program (and all its
+parameters) are encoded in a single "login" URI.
+
+C. ShellProgram
+The shell program accepts a URI until the URI is equal to "logout". For
+each URI, the shell program loads a digital resource and pipes the result
+back through the socket.
+
+D. TelnetDaemonProgram
+The telnet daemon is also a program. It might be implemented in a number of
+different ways. First, as a background program with no GUI capability. When
+invoked a GUI-less program runs silently until kill'd.
+
+Second, as a simple console program, incoming URIs might be printed in a
+window or logged in a file. A multiple-connection TELNET daemon might
+associate a connection ID with each connection so that a common log can be
+used for all connections. I have an example of this around here somewhere...
+
+
+
+
+From ajregier@earthlink.net Tue, 7 Dec 1999 21:34:09 -0600
+Date: Tue, 7 Dec 1999 21:34:09 -0600
+From: Avery J. Regier ajregier@earthlink.net
+Subject: [JOS-Kernel] changes to make grub work smoothly
+
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+
+All,
+
+If you are frustrated trying to figure out what to modify in order to make JJOS
+with GRUB work smoothly, I've got a fix for you.
+
+Just apply this diff after doing a clean checkout from the CVS and remake it.  
+
+Included are:
+* the return(false); instead of abort(); which will allow JJOS to run to
+completion.
+* a little bit of loop unrolling in the function to test the VGA driver to see
+if it would speed it up any.  (But only speeds it up a little.)
+* a piece of code that prints out a '.' on every 1000th memory allocation in
+the function to test garbage collection so that I could know that something was
+actually happenning during that big long wait.
+* the Makefile change to define -DMULTIBOOT
+
+Happy JOSing,
+Avery J. Regier
+
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD
+Content-Type: text/plain;
+  name="easy_grub.diff"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="easy_grub.diff"
+
+PyBKSk9TL3N0YWdlMQo/IEpKT1Mvc3RhZ2UyCj8gSkpPUy9hcmNoL2hvc3QvYnl0ZWNvZGUvampv
+cy56aXAKPyBKSk9TL2FyY2gvaG9zdC9uYXRpdmVjb2RlL21lc3NhZ2VzLnR4dAo/IEpKT1MvYXJj
+aC9ob3N0L25hdGl2ZWNvZGUvampvcwo/IEpKT1MvYXJjaC9ob3N0L25hdGl2ZWNvZGUvTWFrZWZp
+bGUubXliYWsKPyBKSk9TL2FyY2gvaTM4Ni9ieXRlY29kZS9qam9zLnppcAo/IEpKT1MvYXJjaC9p
+Mzg2L2J5dGVjb2RlL2pqb3MtbmV3LnppcAo/IEpKT1MvYXJjaC9pMzg2L25hdGl2ZWNvZGUvaGVh
+ZF9ldGhlci50eHQKPyBKSk9TL2FyY2gvaTM4Ni9uYXRpdmVjb2RlL2hlYWRfZ3J1Yi50eHQKPyBK
+Sk9TL2FyY2gvaTM4Ni9uYXRpdmVjb2RlL2pqb3MtZ3J1Yi1vbGQKPyBKSk9TL2FyY2gvaTM4Ni9u
+YXRpdmVjb2RlL2pqb3MtZ3J1Yi1uZXcKPyBKSk9TL2FyY2gvaTM4Ni9uYXRpdmVjb2RlL2pqb3Mt
+Z3J1Ygo/IEpKT1MvY29tbW9uL2J5dGVjb2RlL2pqb3NfY29tbW9uLnppcAo/IEpKT1MvdG9vbHMv
+bmFzbS0wLjk4Cj8gSkpPUy90b29scy9ldGhlcmJvb3QtNC4yCj8gSkpPUy90b29scy9uYXNtLTAu
+OTgudGFyCj8gSkpPUy90b29scy9ldGhlcmJvb3QtNC4yLjQudGFyCkluZGV4OiBKSk9TL2FyY2gv
+aTM4Ni9uYXRpdmVjb2RlL01ha2VmaWxlCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9zaXRlcy9qb3Mv
+Y3ZzL2N2c3Jvb3QvSkpPUy9hcmNoL2kzODYvbmF0aXZlY29kZS9NYWtlZmlsZSx2CnJldHJpZXZp
+bmcgcmV2aXNpb24gMS4yNgpkaWZmIC1yMS4yNiBNYWtlZmlsZQoxOGMxOAo8ICAtREVUSEVSQk9P
+VCBcCi0tLQo+ICAtRE1VTFRJQk9PVCBcCjIwYTIxLDIyCj4gIyAtREVUSEVSQk9PVCBcCj4gCklu
+ZGV4OiBKSk9TL2FyY2gvaTM4Ni9uYXRpdmVjb2RlL2VudHJ5LmNjCj09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZp
+bGU6IC9zaXRlcy9qb3MvY3ZzL2N2c3Jvb3QvSkpPUy9hcmNoL2kzODYvbmF0aXZlY29kZS9lbnRy
+eS5jYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4xOQpkaWZmIC1yMS4xOSBlbnRyeS5jYwoxNDVh
+MTQ2LDE0Nwo+ICAgY29uc29sZS5jbGVhcl9zY3JlZW4oKTsKPiAKMTUyZDE1Mwo8ICAgLy8gIGNv
+bnNvbGUuY2xlYXJTY3JlZW4oKTsKMTU0ZDE1NAo8IApJbmRleDogSkpPUy9jb21tb24vYnl0ZWNv
+ZGUvVGVzdFN1aXRlLmphdmEKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL3NpdGVzL2pvcy9jdnMvY3Zz
+cm9vdC9KSk9TL2NvbW1vbi9ieXRlY29kZS9UZXN0U3VpdGUuamF2YSx2CnJldHJpZXZpbmcgcmV2
+aXNpb24gMS4xCmRpZmYgLXIxLjEgVGVzdFN1aXRlLmphdmEKMzYwYzM2MCwzNjkKPCAJCSAgICBm
+b3IgKGludCB4PTA7IHg8NjQwOyB4KyspCi0tLQo+IAkJICAgIGZvciAoaW50IHg9MDsgeDw2NDA7
+IHgrKykgewo+IAkJCXYuZHJhd1BpeGVsKHgrKywgeSwgMSk7Cj4gCQkJdi5kcmF3UGl4ZWwoeCsr
+LCB5LCAxKTsKPiAJCQl2LmRyYXdQaXhlbCh4KyssIHksIDEpOwo+IAkJCXYuZHJhd1BpeGVsKHgr
+KywgeSwgMSk7Cj4gCQkJdi5kcmF3UGl4ZWwoeCsrLCB5LCAxKTsKPiAJCQl2LmRyYXdQaXhlbCh4
+KyssIHksIDEpOwo+IAkJCXYuZHJhd1BpeGVsKHgrKywgeSwgMSk7Cj4gCQkJdi5kcmF3UGl4ZWwo
+eCsrLCB5LCAxKTsKPiAJCQl2LmRyYXdQaXhlbCh4KyssIHksIDEpOwozNjFhMzcxCj4gCQkgICAg
+fQozODNhMzk0Cj4gCQlpZigoaSUxMDAwMCkgPT0gMCkgU3lzdGVtLm91dC5wcmludCgiLiIpOwoz
+ODZjMzk3CjwgCVN5c3RlbS5vdXQucHJpbnRsbiggInRlc3RpbmcgR0MgLi4uIiApOwotLS0KPiAJ
+U3lzdGVtLm91dC5wcmludGxuKCAiXG5GaW5pc2hlZCB0ZXN0aW5nIEdDIC4uLiIgKTsKSW5kZXg6
+IEpKT1MvY29tbW9uL2RlY2FmL3NjaGVkdWxlci5jYwo9PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvc2l0
+ZXMvam9zL2N2cy9jdnNyb290L0pKT1MvY29tbW9uL2RlY2FmL3NjaGVkdWxlci5jYyx2CnJldHJp
+ZXZpbmcgcmV2aXNpb24gMS4xMgpkaWZmIC1yMS4xMiBzY2hlZHVsZXIuY2MKMjg2YTI4NywyOTAK
+PiAjaWZkZWYgTVVMVElCT09UCj4gCQlrcHJpbnRmKCAibm90aWZ5T2ZJbnRlcnJ1cHRzKDMpOiBB
+cnJheSBub3Qgc2V0IHlldC4gIENvbnRpbnVpbmcuXG4iICk7Cj4gCQlyZXR1cm4oZmFsc2UpOwo+
+ICNlbHNlCjI4OGEyOTMKPiAjZW5kaWYK
+
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD--
+
+
+
+From tmiller@haverford.edu Wed, 8 Dec 1999 01:33:40 -0500 (EST)
+Date: Wed, 8 Dec 1999 01:33:40 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] changes to make grub work smoothly
+
+	Was going to write about this earlier today, but some things came
+up.  The problem was NOT with grub & interrupts -- though the return false
+bit did have to be in there -- I had forgotten that the console *java*
+code *also* pointed to 0xB0000 -- not 0xB8000 -- the same fix as to
+jjconsole.h applies to the console driver.  With that done, GRUB is now my
+preferred booting method (at least, for the -DNEW_INTERRUPT_HANDLING
+build).
+
+	I'm trying to figure out why startService() in the VGA driver is
+so slow.  Under GRUB/-DNEW_INTERRUPT_HANDLING, I'm not seeing any of the
+background pixel drawing -- was this removed from the code?  (The
+background fill stuff.)  Also, am I correct in supposing that the write8()
+calls can be replaces with mappedByteArray()?  (I haven't tried it yet,
+but it should speed things up enourmously -- it sure sped up the text-mode
+stuff!)
+
+	My short-term goal is to integrate the VGA driver into the virtual
+console stuff I've got set up.  This essentially means writing a 'console
+driver' that will switch into 640x480x4 mode when it gains the focus, and
+write its buffer out to the VGA ram, and then repeat it in reverse when it
+loses the focus; when we come up with some sort of frame-buffer/X/etc
+standard, this new driver should conform to it, as well.  Until then, we
+should just be able to use the StandardVga class, as long as we switch to
+a graphical console first.  Anyway, after setting that up, I'll integrate
+the new java stuff I've been working on into the tree, and make
+-DNEW_INTERRUPT_HANDLING and GRUB compiling the default.  Then I need to
+some thinking about where to go next.  (i.e. BCNI/classpath/multiple
+processes/etc).
+
+-_Quinn
+
+"Do not meddle in the affairs of wizards, for you are crunchy and good
+with ketchup."
+
+
+
+
+
+From gchii@mindspring.com Wed, 08 Dec 1999 08:41:05 -0500
+Date: Wed, 08 Dec 1999 08:41:05 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] General questions
+
+I have a few more questions.
+
+What is the current plan to test decaf for full implementation of the
+java.* packages? Is there a check-list? In other words, when will we know
+when decaf is done?
+
+-----
+
+Where the subroutines from C standard library declared? defined?
+
+memcpy()
+newStr()
+alloc()
+free()
+strcpy()
+strcat()
+
+If subroutines from the standard library are not available in decaf, we
+should declare only the subroutines that are defined. We need new header
+files, like josstdio.h, josstdlib.h, etc.
+
+A #define might make it easier to write C code:
+
+#ifdef Uses_JOSStandardLibrary
+#define memcpy jos_memcpy
+#define strcpy jos_strcpy
+#endif
+
+-----
+
+What would happen if I compiled decaf into a standard shared library
+(libdecaf.so.#)? Could I use decaf in other Linux programs?
+
+-----
+
+I have been unable to compile bytecode on my Linux server.
+
+I downloaded JDK 1.1.6 v5 from blackdown, but all JDK tools abort with the
+following message:
+
+can't load library 'libXpm.so.4'
+
+Question 1. Where do I get libXpm.so.4?
+
+All the programs I want to run on my Linux server are TCP/IP daemons --
+completely free of a GUI such as AWT or Swing. So why do I even need
+libXpm.so.4?
+
+Question 2. Does anyone have an open-source example of dynamic shared
+libraries on Linux?
+
+Linux shared libraries seem to have two mechanisms. The first is the
+compile-time reference to a library, where a program depends on a shared
+library. This is also known as a overlay. It is automatic. The shared
+library is required for a program to run.
+
+The second is the runtime reference to a library, where a program is aware
+of, but not dependent on a shared library. This is also known as a dynamic
+link library. A dynamically linked shared library is similar to the
+loadLibrary() method from Java class libraries. How is this method
+implemented on Linux?
+
+loadLibrary( "lib-name" );
+
+For example, I would like to display a plain-English message when someone
+runs my program prior to installing libdecaf.so.#. I would like my program
+to keep on running, too.
+
+
+
+
+From tmiller@haverford.edu Wed, 8 Dec 1999 16:01:21 -0500 (EST)
+Date: Wed, 8 Dec 1999 16:01:21 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] General questions
+
+> What is the current plan to test decaf for full implementation of the
+> java.* packages? Is there a check-list? In other words, when will we know
+> when decaf is done?
+
+	There are some opensource compatibility tests lying around; if
+someone can scrape up a few K-dollars, we can have Sun test it for us.
+
+> Where the subroutines from C standard library declared? defined?
+
+	common/nativecode/stdlib.[h|cc]
+
+> What would happen if I compiled decaf into a standard shared library
+> (libdecaf.so.#)? Could I use decaf in other Linux programs?
+
+	That's what the host build is.
+
+> The second is the runtime reference to a library, where a program is aware
+> of, but not dependent on a shared library. This is also known as a dynamic
+> link library. A dynamically linked shared library is similar to the
+> loadLibrary() method from Java class libraries. How is this method
+> implemented on Linux?
+
+	I would assume dlopen(), but I'm not sure.
+
+-_Quinn
+
+"Do not meddle in the affairs of wizards, for you are crunchy and good
+with ketchup."
+
+
+
+
+
+From gchii@mindspring.com Thu, 09 Dec 1999 08:06:06 -0500
+Date: Thu, 09 Dec 1999 08:06:06 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Next version of jjos / decaf garbage
+ collection
+
+I am talking out of turn again; but, why not do garbage collection for
+very-large-objects just like technique used for shared libraries?
+
+From a requestor's viewpoint, the kernel provides a system-wide unique
+handle for the instance of a shared library. A shared library has many
+simultaneous handles. When a library is open'd, a new handle is created.
+When the handle is close'd, only the handle goes away -- unless it is the
+last handle.
+
+A virtual machine could use multiple object graphs, each gc'd
+independently. Object "references" in a virtual machine are handles (aren't
+they?). So, why doesn't a virtual machine provide many simultaneous handles
+to an object? When the last handle is closed, the object is gc'd.
+
+When the virtual machine returns a handle, it can be encoded in any form
+the virtual machine wants. This is similar to the machine interface of
+OS/400. It is also like a "map" of virtual storage, where a "memory
+address" is a reference to a page on disk.
+
+It is also similar to the way "links" work on the Linux file subsystem.
+Many links can be references to a physical file. A physical file is garbage
+collected when the last link is removed.
+
+Wouldn't this be great? A a virtual machine could closely track a class
+loader with an object graph, so that an entire object graph is
+garbage-collected when the class loader is destroyed. Thinking of the
+object graph in terms of "local" and "global" underestimates the scope of a
+virtual machine. Just like C/C++ provides for "static" references, private
+to a module, a virtual machine might have an object graph for a class
+loader (and thus a process).
+
+
+
+
+From George.Marrows@Smallworld.co.uk Thu, 9 Dec 1999 14:02:32 -0000
+Date: Thu, 9 Dec 1999 14:02:32 -0000
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] Next version of jjos / decaf garbage collection
+
+Hi Gilbert --
+
+Unless I'm misunderstanding you, what you're suggesting sounds very like
+referencing counting. (With each new reference to an object, the ref count
+is increased by one; each removed reference decreases the count by one; when
+the count is zero the object is free.) It has two problems that I'm aware
+of:
+
+1. it can't cope with cycles of objects. If a refs b and b refs a, then
+their ref counts will always be at least 1, and the objects will never be
+freed.
+
+2. performance isn't great (apparently -- I've no personal experience of
+implementing this).
+
+The gc currently implemented in decaf will do the tidy up of object graphs
+when a class loader is destroyed -- if the cl is no longer referenced, then
+it, and any objects hanging off it, will be freed at the next gc (assuming
+that nothing else references the objects of course).
+
+Regarding object refs being handles, my understanding is that yes, that's
+effectively true in decaf at the moment. There's a java_object handle for
+each object, and this contains a pointer to a lump of memory holding the
+object's Java fields. It doesn't need to be this way though - see the tech
+docs on HotSpot, which doesn't use handles. An advantage of handles is that
+it simplifies implementing a moving garbage collector (such as we *don't*
+have currently); a disadvantage is that the indirection probably decreases
+performance slightly.
+
+-- George
+
+> -----Original Message-----
+> From:	Gilbert Carl Herschberger II [SMTP:gchii@mindspring.com]
+> Sent:	Thursday, December 09, 1999 13:06
+> To:	kernel@jos.org
+> Subject:	Re: [JOS-Kernel] Next version of jjos / decaf garbage
+> collection
+> 
+> I am talking out of turn again; but, why not do garbage collection for
+> very-large-objects just like technique used for shared libraries?
+> 
+> From a requestor's viewpoint, the kernel provides a system-wide unique
+> handle for the instance of a shared library. A shared library has many
+> simultaneous handles. When a library is open'd, a new handle is created.
+> When the handle is close'd, only the handle goes away -- unless it is the
+> last handle.
+> 
+> A virtual machine could use multiple object graphs, each gc'd
+> independently. Object "references" in a virtual machine are handles
+> (aren't
+> they?). So, why doesn't a virtual machine provide many simultaneous
+> handles
+> to an object? When the last handle is closed, the object is gc'd.
+> 
+> When the virtual machine returns a handle, it can be encoded in any form
+> the virtual machine wants. This is similar to the machine interface of
+> OS/400. It is also like a "map" of virtual storage, where a "memory
+> address" is a reference to a page on disk.
+> 
+> It is also similar to the way "links" work on the Linux file subsystem.
+> Many links can be references to a physical file. A physical file is
+> garbage
+> collected when the last link is removed.
+> 
+> Wouldn't this be great? A a virtual machine could closely track a class
+> loader with an object graph, so that an entire object graph is
+> garbage-collected when the class loader is destroyed. Thinking of the
+> object graph in terms of "local" and "global" underestimates the scope of
+> a
+> virtual machine. Just like C/C++ provides for "static" references, private
+> to a module, a virtual machine might have an object graph for a class
+> loader (and thus a process).
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From jewel@pixie.co.za Thu, 9 Dec 1999 15:53:25 +0200 (SAST)
+Date: Thu, 9 Dec 1999 15:53:25 +0200 (SAST)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Kernel] Building Java operating systems
+
+[Warning, this is pretty long]
+
+Most of you on this list probably recall some of my earlier postings on
+some stuff I've been doing with Utah's OSKit and a JVM that I'm working
+on. 
+
+For those who don't know about it, this is what I'm doing:
+
+I have a JVM written by a grad student at my university, it's written in C
+and is intended to be quite portable. I have spent some time recently
+integrating it with Classpath (the project making free java class
+libraries) and currently have things like file and network io working ok
+with it. Other features are a working tracing (sweep and compact) gc and
+an implementation of the JNI. 
+
+The move to classpath brings in support for most JDK 1.1 things, and
+allows a lot of work to be saved in doing things like internationalization
+etc.
+
+I have taken this JVM and converted it (slightly) to boot as a kernel with
+the OSKit. The OSKit is a large collection of modularized components
+useful for building operating systems. For example I use a C library,
+network device driver code, file system code, network tcp/ip stack, math
+library, memory manager etc from the standard OSKit build without any
+changes whatsoever. 
+
+The result is a 'kernel' that boots from a Multiboot compliant loader (eg
+GRUB) or the OSKit's netboot. Currently the OSKit does all the hardware
+related stuff, it handles interrupts, sets up the hardware, provides
+console support etc. 
+
+My experiments so far have allowed me to run simple java apps on this
+kernel (the kernel is about 700k). You need to provide the class libraries
+too, so one option is to include these in the boot image, but this posed a
+problem with size (the libraries are several megabytes). It takes too long
+to boot the kernel, so I wrote a very simple HTTP loader that just asks my
+linux machine running apache for the class files. Then what I do is make a
+barebones zip file containing the most commonly used class files (for
+running a helloworld program for example) which comes to 150k and put this
+in the boot image. 
+
+This system works pretty well, recently I have tried out once again Thomas
+Bocek's VGA driver, which works good, but seems to be slow for me
+to start writing a window manager / graphical framework (which I would
+like to do). 
+
+One of the biggest issues facing the JVM is IO. Currently it doesn't use
+native threads, it just emulates threading by using every instruction
+executed as a clock tick. This means that anything that does file IO,
+including a socket accept call, will block until the IO is finished. 
+
+Changes to the VM to do real IO will be tricky. One option is to keep IO
+state for each thread and do asynchronous calls while pretending to block.
+Another option is to implement the VM with native threads and let the OS
+underneath take care of this. 
+
+But the problem is that when you're building your OS on the VM, you don't
+know what's going to be underneath (a microkernel? Real context-switching
+like UNIX with multiple address spaces? A single address space single
+thread model?).
+
+So I'm curious to know what you guys plan for handling this sort of issue,
+what are the current plans for a memory and threading model?
+
+If anyone wants to look at what I have running you'll need a linux machine
+running NFS and Dhcp, and another machine connected via a network.
+Software needed is normal gcc and the OSKit distribution. I will probably
+make a tarball available some time. 
+
+I have spent quite a while looking at classpath and figuring out how to
+support it (although I still intend to get more thoroughly acquainted with
+it), so I'm willing to help out when you guys get to that stage. 
+
+John Leuner
+
+
+
+
+From gchii@mindspring.com Fri, 10 Dec 1999 09:13:16 -0500
+Date: Fri, 10 Dec 1999 09:13:16 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Building Java operating systems
+
+Thank you, John Leuner! <jewel@pixie.co.za>
+
+>My experiments so far have allowed me to run simple java apps on this
+>kernel (the kernel is about 700k). You need to provide the class libraries
+>too, so one option is to include these in the boot image, but this posed a
+>problem with size (the libraries are several megabytes). It takes too long
+>to boot the kernel, so I wrote a very simple HTTP loader that just asks my
+>linux machine running apache for the class files.
+
+Using the classic model of very large archives, it takes far too long to
+start a virtual machine. If you had to statically link the 20+MB rt.jar to
+the kernel/virtual machine, you would never boot.
+
+Just like you, I wrote a simple HTTP-based class loader. It downloads
+classes from my Linux machine running Apache, too.
+
+This has been bothering me for a year and a half. I have been puzzling over
+this part of the architecture far more than any other issue. Right now, I
+might be using part of the solution.  For my intranet applications,
+customers use my Cooperating Runtime Environment (CRE). cre is a tiny 60KB
+program that uses the Invocation API from JNI to start a JRE and launch any
+Java application off the network through an HTTP service. The path to an
+HTTP service is optional and configurable. The shell, or first class
+invoked, is optional and configurable. When you don't specify a shell, cre
+launches the Universal Browser.
+
+Here is the break through that makes the CRE possible.
+
+I do not store bytecode in .class files. While downloading from HTTP, that
+would consume far too many network resources. Each file requires its own
+connect-download-disconnect cycle.
+
+Neither do I store bytecode in .cab, .jar, or .zip files. Downloading a
+20+MB rt.jar from HTTP is just about as bad as having a 20+MB boot image.
+
+What do I do?
+
+I store bytecode in package files. My HTTP-based class loader downloads one
+package at a time, which matches the semantics of Java bytecode exactly.
+All package files have a .jpkg extension. For each of the HTTP servers
+where package files are stored, all package files are found in the /jpkg
+directory.
+
+Package files are given a rigorous naming convension so that you can build
+packages files with the greatest of ease and the package-based class loader
+can find package files directly. The name of a package is the name of the
+package file, plus the .jpkg extension. Here are some examples, off the top
+of my head:
+
+java.applet     java.applet.jpkg
+java.awt     java.awt.jpkg
+java.sql     java.sql.jpkg
+java.util.jar     java.util.jar
+java.util.zip     java.util.zip.jpkg
+
+org.jos.console3a     org.jos.console3a.jpkg
+org.jos.smartapi2a     org.jos.smartapi2a.jpkg
+
+>Then what I do is make a barebones zip file containing the most commonly used
+>class files (for running a helloworld program for example) which comes to
+>150k and put this in the boot image.
+
+Packages must be download *as needed*, rather than all at once. JDBC,
+JFC/Swing, JSDK, and many parts of the 20+MB rt.jar are not part of the
+core, or linked to the kernel/virtual machine, because there are many
+applications that will never use them. Only these packages are truely core:
+
+java.io
+java.lang
+java.net
+java.util
+org.jos.gchii.packageloader1a
+
+Your "barebones" zip is just like my true core zip. It contains only those
+classes that are absolutely necessary to get to a point where additional
+packages can be downloaded. It is part of a bootstrap startup sequence.
+
+Your experience with the OSKit and Classpath project would surely help the
+JOS Project finish its Java-based operating system.
+
+
+
+
+From hilarycheng@usa.net Thu, 16 Dec 1999 17:34:42 +0800
+Date: Thu, 16 Dec 1999 17:34:42 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Free CVS Web Site
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_042E_01BF47EB.D64B77E0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    I got a news from Other Mailing List. It seems that there is a web =
+site providing
+a management solution for open source software. its web site is=20
+http://www.sourceforge.com.
+Let have a look at it. :P
+
+Regards,
+
+Hilary
+
+------=_NextPart_000_042E_01BF47EB.D64B77E0
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META content=3D"text/html; charset=3Diso-8859-1" =
+http-equiv=3DContent-Type>
+<META content=3D"MSHTML 5.00.2314.1000" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hi All,</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>&nbsp;&nbsp;&nbsp; I got a news from =
+Other Mailing=20
+List. It seems that there is a web site providing</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>a management solution for open source =
+software. its=20
+web site is </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><A=20
+href=3D"http://www.sourceforge.com">http://www.sourceforge.com</A>.</FONT=
+></DIV>
+<DIV><FONT face=3DArial size=3D2>Let have a look at it. :P</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Hilary</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_042E_01BF47EB.D64B77E0--
+
+
+
+
+From warnero@theriver.com Thu, 16 Dec 1999 13:56:56 -0700
+Date: Thu, 16 Dec 1999 13:56:56 -0700
+From: warner onstine warnero@theriver.com
+Subject: [JOS-Kernel] Introduction
+
+Hi,
+I have just recently signed up for this, the architecture list and the
+gui discussion list.  I just had a few quick questions and a quick
+intro.
+
+My name is Warner Onstine, I am currently head of web-development at
+eblox.com, I have also been working on the freebuilder project for a
+number of years.  I have been watching jos for quite some time and have
+recently decided to devote some free time to the project.  My interest
+lies in OS construction/kernels etc.  In addition to the User Interface
+discussion.
+
+So, here is my quick question?  What are some good books/references on
+the web, to look at?  What areas of the kernel are in need of help (I
+just finished reading this months archives and am starting to go
+backwards)?  I have a keen interest in the Java VM as I would like a VM
+that actually runs the current version on Mac (call me a hopeless
+romantic ;-), so any pointers on the JVM would be very cool.
+
+My java experience is light, my c++ experience is almost nil, but I have
+a strong desire to learn and help this project, so let me know.  I have
+also downloaded the current dist and will be looking at it tonight.
+
+-warner
+
+
+
+
+From jewel@pixie.co.za Sun, 19 Dec 1999 18:42:11 +0200 (SAST)
+Date: Sun, 19 Dec 1999 18:42:11 +0200 (SAST)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Kernel] Free JVM released on SourceForge
+
+>     I got a news from Other Mailing List. It seems that there is a web site providing
+> a management solution for open source software. its web site is 
+> http://www.sourceforge.com.
+> Let have a look at it. :P
+
+I've had a good look at it, it's excellent. I have released my JVM,
+kissme, on the sourceforge site:
+
+http://kissme.sourceforge.net/
+
+They provide mailing lists, web space, FTP space, management of multiple
+developers etc etc.
+
+John Leuner
+
+
+
+
+
+From hilarycheng@usa.net Mon, 20 Dec 1999 21:13:18 +0800
+Date: Mon, 20 Dec 1999 21:13:18 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] About CVS Server
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0032_01BF4B2F.09C03200
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    Anyone can check out from JOS Cvs Server ? I can't download the
+latest source from CVS. What's the problem ?
+
+Regards,
+
+Hilary
+
+------=_NextPart_000_0032_01BF4B2F.09C03200
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML//EN">
+<HTML><HEAD>
+<META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type>
+<STYLE></STYLE>
+
+<META content=3D'"MSHTML 5.00.0910.1309"' name=3DGENERATOR></HEAD>
+<BODY bgColor=3D#d8d0c8>
+<DIV><FONT size=3D2><FONT face=3DArial>Hi All,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>&nbsp;&nbsp;&nbsp; Anyone can =
+check out from=20
+JOS Cvs Server ?</FONT><FONT face=3DArial> I can't download=20
+the</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>latest source from CVS. What's =
+the problem=20
+?</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>Regards,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Hilary</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0032_01BF4B2F.09C03200--
+
+
+
+
+From tmiller@haverford.edu Mon, 20 Dec 1999 12:10:18 -0500 (EST)
+Date: Mon, 20 Dec 1999 12:10:18 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] About CVS Server
+
+>     Anyone can check out from JOS Cvs Server ? I can't download the
+> latest source from CVS. What's the problem ?
+
+	On occasion, our host will either kill or let our cvs server die
+without restarting it; I just logged in and started it up, so hopefully
+it's better now.
+
+-_Quinn
+
+
+
+
+From iainshigeoka@yahoo.com Mon, 20 Dec 1999 10:17:51 -0800
+Date: Mon, 20 Dec 1999 10:17:51 -0800
+From: Iain Shigeoka iainshigeoka@yahoo.com
+Subject: [JOS-Kernel] Free JVM released on SourceForge
+
+Hello all,
+
+First, I'm moving this discussion over to the admin list.  Please 
+direct your followups there.
+
+On 19 Dec 99, at 18:42, John Leuner wrote:
+
+> >     I got a news from Other Mailing List. It seems that there is a web site providing
+> > a management solution for open source software. its web site is 
+> > http://www.sourceforge.com.
+
+> I've had a good look at it, it's excellent. I have released my JVM,
+
+> They provide mailing lists, web space, FTP space, management of multiple
+> developers etc etc.
+
+I think it looks really nice too.  There are many things that still 
+need to be worked on (that's why its still a 0.x release) but there's 
+a lot of power already in place, and many promising developments 
+on the way.  Definitely something we should keep our eyes on.  
+For JOS, I see two potential stumbling blocks. 
+
+First, we'll need to get the wiki ported in order to move the entire 
+site over to sourceforge.  We certainly can just host what 
+sourceforge offers (CVS, ftp, etc) at sourceforge and keep the wiki 
+on a separate server.  However, linking everything together with a 
+single user id would make it worth it to port.  The main impediment 
+to this right now is sourceforge is very new, and they haven't 
+designed a way for us to access the session and user login 
+information from sourceforge accounts yet.  It's on their "to do" list 
+though.  I've been following the discussion and will try and stay up 
+to date on this feature.
+
+Second, sourceforge is designed to host a group of single product 
+projects.  We actually should try setting up a separate sourceforge 
+system for jos, where the projects in the JOSSourceForge are all 
+related to JOS.  This should be possible when sourceforge 
+releases their source (which, from the discussions on their site, 
+should be "real soon now").  
+
+The advantages being, a nice, tight integration of JOS and its 
+applications.  The disadvantages being we have to setup and 
+maintain a sourceforge clone.  I like this solution best though as 
+we can perhaps do some fund raising with such a site (advertizing 
+or becoming amazon.com resellers) to help offset some of the 
+costs JOS members are currently shouldering.
+
+The alternative is porting wiki to work in sourceforge, and using 
+sourceforge as hosted at valinux.  This way, va linux shoulders the 
+costs and pain of setting up and maintaining the site.  We then let 
+all the jos projects basically splinter and form their own little 
+sourceforge projects and then do something like a web ring to link 
+them all under the JOS "umbrella".  A lot less work and will get 
+things done sooner rather than later.  It seems like an "ugly" 
+solution though.
+
+Are there other alternatives I'm not seeing?  
+
+Oh, and this is not to say sourceforge is THE solution, but we 
+basically have to do something like a SourceForge on our own (the 
+self hosting option) or try and use someone else's free/inexpensive 
+service (the "use SourceForge" option).  There are other services 
+like SourceForge out there... but none that I've seen so far that look 
+as promising.
+
+I was working on my own version of a site like SourceForge for the 
+next version of the JOS website, but now that I've seen what 
+SourceForge does (which is almost exactly what I had in mind 
+anyhow) I'm thinking that one way or the other, we might as well 
+use SourceForge (either on our own site or using their service).  
+Opinions?
+
+-iain
+
+
+
+
+
+From hilarycheng@usa.net Tue, 21 Dec 1999 07:13:21 +0800
+Date: Tue, 21 Dec 1999 07:13:21 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] JJOS lcmp bytecode patch
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_001E_01BF4B82.DD378C20
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    I have found a bug from lcmp. I have made a patch for it.
+Pls have a look at it.
+
+Regards,
+
+Hilary
+
+--------------------------Cut From Here ---------------------------
+bool frame::lcmp(exception_to_throw &e)
+{
+    TRACE(("lcmp"));
+
+    jlong jl1 =3D op_stack.pop_jlong();
+    jlong jl2 =3D op_stack.pop_jlong();
+    jji32 sign1 =3D 0, sign2 =3D 0, sign_result =3D 0;
+
+    TRACE((" %X:%X %X:%X",
+	   jl1.myHigh32, jl1.myLow32,
+	   jl2.myHigh32, jl2.myLow32));
+
+    sign1 =3D jl1.myHigh32 & 0x80000000;
+    sign2 =3D jl2.myHigh32 & 0x80000000;
+
+    if (sign1 > sign2) {
+	sign_result =3D 1;
+    } else {
+	sign_result =3D 0;
+    }
+
+    if (jl1.myHigh32 > jl2.myHigh32) {
+	op_stack.push_jint(-1);
+	return true;
+    } else {
+	if (jl1.myHigh32 =3D=3D jl2.myHigh32) {
+	    if (jl1.myLow32 > jl2.myLow32) {
+		op_stack.push_jint(-1);
+		return true;
+	    } else {
+		if (jl1.myLow32 =3D=3D jl2.myLow32) {
+		    op_stack.push_jint(0);
+		    return true;
+		} else {
+		    op_stack.push_jint(1);
+		    return true;
+		}
+	    }
+	} else {
+	    if (sign_result)
+		op_stack.push_jint(-1);
+	    else
+		op_stack.push_jint(1);
+	    return true;
+	}
+    }
+}
+--------------------------Cut From Here ---------------------------
+
+------=_NextPart_000_001E_01BF4B82.DD378C20
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML//EN">
+<HTML><HEAD>
+<META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type>
+<STYLE></STYLE>
+
+<META content=3D'"MSHTML 5.00.0910.1309"' name=3DGENERATOR></HEAD>
+<BODY bgColor=3D#d8d0c8>
+<DIV><FONT size=3D2></FONT><FONT size=3D2><FONT face=3DArial>Hi=20
+All,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>&nbsp;&nbsp;&nbsp; I have found a =
+bug from=20
+lcmp. I have made a patch for it.</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>Pls have a look at =
+it.</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>Regards,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Hilary</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>--------------------------Cut =
+From Here=20
+---------------------------</FONT></FONT></DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>bool =
+frame::lcmp(exception_to_throw=20
+&amp;e)<BR>{<BR>    TRACE((&quot;lcmp&quot;));</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>    jlong jl1 =3D =
+op_stack.pop_jlong();<BR>  =20
+ jlong jl2 =3D op_stack.pop_jlong();<BR>    jji32 sign1 =3D 0, sign2 =3D =
+0,=20
+sign_result =3D 0;</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>    TRACE((&quot; %X:%X =
+%X:%X&quot;,<BR>	  =20
+jl1.myHigh32, jl1.myLow32,<BR>	   jl2.myHigh32,=20
+jl2.myLow32));</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>    sign1 =3D jl1.myHigh32 =
+&amp;=20
+0x80000000;<BR>    sign2 =3D jl2.myHigh32 &amp; =
+0x80000000;</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>    if (sign1 &gt; sign2) {<BR>	=
+sign_result=20
+=3D 1;<BR>    } else {<BR>	sign_result =3D 0;<BR>    =
+}</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>    if (jl1.myHigh32 &gt; =
+jl2.myHigh32)=20
+{<BR>	op_stack.push_jint(-1);<BR>	return true;<BR>    } else {<BR>	if=20
+(jl1.myHigh32 =3D=3D jl2.myHigh32) {<BR>	    if (jl1.myLow32 &gt; =
+jl2.myLow32)=20
+{<BR>		op_stack.push_jint(-1);<BR>		return true;<BR>	    } else {<BR>		=
+if=20
+(jl1.myLow32 =3D=3D jl2.myLow32) {<BR>		    op_stack.push_jint(0);<BR>		 =
+   return=20
+true;<BR>		} else {<BR>		    op_stack.push_jint(1);<BR>		    return=20
+true;<BR>		}<BR>	    }<BR>	} else {<BR>	    if=20
+(sign_result)<BR>		op_stack.push_jint(-1);<BR>	   =20
+else<BR>		op_stack.push_jint(1);<BR>	    return true;<BR>	}<BR>   =20
+}<BR>}</FONT></FONT></DIV>
+<DIV><FONT face=3DArial size=3D3><FONT face=3DArial><FONT face=3DCourier =
+
+size=3D2>--------------------------Cut From Here=20
+---------------------------</FONT><FONT=20
+size=3D2></FONT></FONT></FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_001E_01BF4B82.DD378C20--
+
+
+
+
+From tmiller@haverford.edu Mon, 20 Dec 1999 23:06:38 -0500 (EST)
+Date: Mon, 20 Dec 1999 23:06:38 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] CVS activity
+
+	After an hour or so hacking at the CVS, I've convinced it (I
+believe) to take my (rather large) set of patches & corrections.  If I
+mucked it up, please let me know ASAP.  Several directories were added and
+others removed, so apply the applicable (-p and -D, I believe) options as
+necesssary.
+
+Notes:
+
+* committed the bytecode compatible with -DNEW_INTERRUPT_HANDLING,
+	which is now the preferred method.
+* committed bytecode using the new method for virtual consoles,
+	both text and VGA.  (Although the VGA console's interface
+	could use some work; many thanks to Thomas Bocek for the back-end
+	work.)
+* committed the native code changes necessary to support the above
+	two items.
+* does NOT contain the fix for lcmp just posted here because I haven't
+	had a chance to look at it yet.  (Will get right to it.)
+* should include everyone's patches prior to that.  If it doesn't, my
+	apologies -- please get back to me ASAP.
+* GRUB is now my preferred booting method, to the extent that I no longer
+	use etherboot.  This has not been reflected in the Makefiles,
+	because I'm not sure about other people.  (Thanks to George
+	Marrows!)
+* The above means I should probably commit Marrows' instructions and 
+	stage1/stage2 binaries to the CVS server...
+* I neglected to re-insert the JVM tests when I merged my bytecode
+	back against the tree, so if anyone feels an urge, go right
+	ahead.
+* I'm going to go back to work on speed improvements for switching
+	video modes; it's glacial right now, though faster than
+	Bocek's original code because I took shameless advantage of
+	the new mapByteArray() function in places where I knew enough
+	about VGA to apply it with confidence in its results.
+
+	I'm still hacking away at getting classpath to compile on my
+system (woe is me!), but integrating that on the host build is getting up
+there on my list of priorities.  (Though I might just crap out on all of
+the JNI callbacks for now, it should still make things MUCH faster
+overall, because we can turn -DFAST_NATIVE_CODE on!)  I might end up using
+BCNI for the i386 port.  (Also, I think we can get away with continuing to
+intercept .print()/.println()/etc calls by marking them native in
+classpath's source...)  For those builtins, I'm kind-of/sort-of thinking
+about a more efficient search algorithm (e.g. balanced binary trees),
+though the need for this might vanish if we're not checking it every
+function call.
+
+	The rest of the back-end code needs a lot of work also, I'm
+afraid.  It's functional, but fearfully ugly, now that I'm looking at it
+from a year or so later.  I'm not sure that making it elegant will make
+it any faster, but I'll probably be poking around in this code for the JNI
+back-end stuff anyway, so I might make some fairly large changes, though
+none of them should be visible to driver/java writers.
+
+	With classpath integrated, I'm hoping it won't be too big of a
+jump to bring the host build up to par with the native build.  (jcurses
+and X as the text/gfx console back-ends, with a little bit more native
+hackery for getting the scancodes into the keyboard driver.)  After
+integration with the host build, of course, comes the interesting work of
+porting it to the i386 build.  (Although there might be a mac port around
+by then?)
+
+	Depending on how things go, I might also work on the
+multiple java process aspect of decaf more.  Anyway, I'm hoping to get
+alot of work done in the next few weeks...
+
+	Suggestions/comments?  (Things I forgot about that need
+attention?)
+
+-_Quinn
+
+"Do not meddle in the affairs of wizards, for you are crunchy and good
+with ketchup."
+
+
+
+
+
+
+
+From tmiller@haverford.edu Wed, 22 Dec 1999 00:00:36 -0500 (EST)
+Date: Wed, 22 Dec 1999 00:00:36 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JJOS lcmp bytecode patch
+
+	Thanks for the fix, Hilary.  I've uploaded it into the CVS.
+
+-_Quinn
+
+
+
+
+
+From hilarycheng@usa.net Wed, 22 Dec 1999 13:42:36 +0800
+Date: Wed, 22 Dec 1999 13:42:36 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] JJOS lcmp bytecode patch
+
+Hi Todd,
+
+    Can It Work ? If lcmp works, others long operation may have problem.
+It seems that Linux GCC 2.7 / 2.8 doesn't support 64-bit operation.
+
+Regards,
+
+Hilary
+
+
+> Thanks for the fix, Hilary.  I've uploaded it into the CVS.
+> 
+> -_Quinn
+> 
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+> 
+> 
+
+
+
+
+From tmiller@haverford.edu Wed, 22 Dec 1999 09:32:25 -0500 (EST)
+Date: Wed, 22 Dec 1999 09:32:25 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JJOS lcmp bytecode patch
+
+>     Can It Work ? If lcmp works, others long operation may have problem.
+> It seems that Linux GCC 2.7 / 2.8 doesn't support 64-bit operation.
+
+	It does on the host build, but not on the i386 build.  (Because
+the 64-bit support uses parts of glibc, we had to roll our own for the
+i386 build, and decided that it would be easier to use our home-grown
+version on both builds.)  Now that I'm looking at the code, I'm actually
+amazed that lcmp compiled -- looking at ../nativecode/jjtypes.h, I don't
+see an operator > or < !  (impl. in jbtypes.cc) That, probably, is where
+the fix for long comparisons you've come up with should go.  (We also need
+to make jlong SIGNED, as well...)
+
+-_Quinn
+
+
+
+
+From hilarycheng@usa.net Wed, 22 Dec 1999 22:55:02 +0800
+Date: Wed, 22 Dec 1999 22:55:02 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Some Fix On Array Copy
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_000F_01BF4CCF.9471F220
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    I am working JJOS so that It can print correctly. But I found some =
+bugs of some source code.  Here it is.
+
+jvmbuiltins.cc -- array_copy
+-------------------cut here---------------------
+        for( jju32 x =3D pos; x < pos + length; x++ ) {
+           dest_array->store(x, src_array->load( offset + x ) );
+      } /* end copy loop */
+
+      return JJTRUE;
+} /* end arraycopy() */
+-------------------cut here---------------------
+Original Souce Code is using offset in the for-loop instead of pos. It =
+can't
+copy array correctly.
+
+jvmbuiltins.cc -- print_string
+-------------------cut here---------------------
+            if (*quux =3D=3D constant_utf8("java/lang/String"))
+                {
+                                /* java_object *jo =3D (java_object =
+*)(arguments[1
+]); */
+                    java_string *js =3D (java_string *)foo;
+                    if (js->myUTF8 !=3D 0)
+                        kprintf("%s", js->myUTF8->c_str()); // $$ Leaks.
+                    else
+                        kprintf("null");
+                    break;
+                }                       /* end if a string */
+            else
+                {
+                    /* if it's not a String */
+-------------------cut here---------------------
+
+Original Souce Code will not check js->myUTF8 is null or not. If it
+is null,
+it will makes core dump.
+
+After Fixiing, it stills can't fix the println problem. Since JJOS is
+using native java string. If the java source performs
+a operation like object.toString(). It will not work.
+Currently, we can use an alternative approach to print it.
+
+-------------------cut here---------------------
+       int a =3D Integer.MIN_VALUE ;
+        String b =3D new Integer(a).toString();
+        char[] buf =3D b.toCharArray();
+        for (int count=3D0;count<buf.length;count++) {
+            System.out.print(buf[count]);
+        }
+        System.out.println("");
+-------------------cut here---------------------
+It can print value from value from long, int, etc. But It will not
+works all the times. But at least, we can use this=20
+approach in native printing function in JJOS.
+
+Regards,
+
+Hilary
+
+------=_NextPart_000_000F_01BF4CCF.9471F220
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML//EN">
+<HTML><HEAD>
+<META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type>
+<STYLE></STYLE>
+
+<META content=3D'"MSHTML 5.00.0910.1309"' name=3DGENERATOR></HEAD>
+<BODY bgColor=3D#d8d0c8>
+<DIV><FONT size=3D2><FONT face=3DArial>Hi All,</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>&nbsp;&nbsp;&nbsp; I am working =
+JJOS so that=20
+It can print correctly.</FONT><FONT face=3DArial> But I found some bugs =
+of some=20
+source code.&nbsp; Here it is.</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>jvmbuiltins.cc --=20
+array_copy</FONT></FONT></DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>-------------------cut=20
+here---------------------</FONT></FONT></DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>&nbsp;       for( jju32 x =3D =
+pos; x &lt; pos=20
++ length; x++ ) {<BR> &nbsp;         dest_array-&gt;store(x, =
+src_array-&gt;load(=20
+offset + x ) );<BR>&nbsp;     } /* end copy loop */</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>&nbsp;     return JJTRUE;<BR>} =
+/* end=20
+arraycopy() */</FONT></FONT></DIV>
+<DIV><FONT face=3DArial>
+<DIV><FONT face=3DCourier size=3D2>-------------------cut=20
+here---------------------</FONT></DIV><FONT =
+size=3D2></FONT></FONT></DIV>
+<DIV>Original Souce Code is using offset in the for-loop instead of pos. =
+It=20
+can't</DIV>
+<DIV>copy array correctly.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>
+<DIV><FONT size=3D2><FONT face=3DArial>jvmbuiltins.cc --=20
+print_string</FONT></FONT></DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>-------------------cut=20
+here---------------------</FONT></FONT></DIV>
+<DIV><FONT face=3DCourier><FONT size=3D2>            if (*quux =3D=3D=20
+constant_utf8(&quot;java/lang/String&quot;))<BR>                {<BR>    =
+       =20
+                    /* java_object *jo =3D (java_object =
+*)(arguments[1<BR>]);=20
+*/<BR>                    java_string *js =3D (java_string *)foo;<BR>    =
+         =20
+      if (js-&gt;myUTF8 !=3D 0)<BR>                        =
+kprintf(&quot;%s&quot;,=20
+js-&gt;myUTF8-&gt;c_str()); // $$ Leaks.<BR>                    else<BR> =
+       =20
+               kprintf(&quot;null&quot;);<BR>                    =
+break;<BR>     =20
+          }                       /* end if a string */<BR>            =
+else<BR> =20
+              {<BR>                    /* if it's not a String=20
+*/</FONT></FONT></DIV>
+<DIV><FONT face=3DArial><FONT face=3DCourier =
+size=3D2>-------------------cut=20
+here---------------------</FONT></DIV></FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial><FONT size=3D2><FONT size=3D2>
+<DIV>Original Souce Code will not check js-&gt;myUTF8 is null or not. If =
+
+it</DIV>
+<DIV>is null,</DIV>it will makes core dump.</FONT></FONT></FONT></DIV>
+<DIV><FONT face=3DArial><FONT size=3D2><BR></FONT><FONT size=3D2>After =
+Fixiing, it=20
+stills can't fix the println problem. Since JJOS is</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>using native java string. If the =
+java source=20
+performs</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>a operation like =
+object.toString(). It will=20
+not work.</FONT></FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DArial>Currently, we can use an =
+alternative approach=20
+to print it.</FONT></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT face=3DArial>
+<DIV><FONT face=3DArial><FONT size=3D2>
+<DIV><FONT face=3DArial><FONT face=3DCourier>-------------------cut=20
+here---------------------</FONT></FONT></FONT></FONT></DIV><FONT =
+size=3D2>
+<DIV>       int a =3D Integer.MIN_VALUE ;<BR>        String b =3D new=20
+Integer(a).toString();<BR>        char[] buf =3D b.toCharArray();<BR>    =
+    for=20
+(int count=3D0;count&lt;buf.length;count++) {<BR>           =20
+System.out.print(buf[count]);<BR>        }<BR>       =20
+System.out.println(&quot;&quot;);</FONT></FONT></DIV></DIV></DIV>
+<DIV><FONT face=3DArial>
+<DIV><FONT face=3DArial>
+<DIV><FONT face=3DArial><FONT size=3D2><FONT =
+face=3DCourier>-------------------cut=20
+here---------------------</FONT></FONT></FONT></DIV><FONT=20
+size=3D2></FONT></FONT></DIV>
+<DIV><FONT face=3DArial><FONT size=3D2>It can print value from value =
+from long, int,=20
+etc. But It will not</FONT></FONT></DIV>
+<DIV><FONT size=3D2>works all the times. But at least, we can use this=20
+</FONT></DIV>
+<DIV><FONT size=3D2>approach in native printing function in =
+JJOS.</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2>Regards,</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2>Hilary</FONT></DIV></FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_000F_01BF4CCF.9471F220--
+
+
+
+
+From hilarycheng@usa.net Wed, 22 Dec 1999 22:57:33 +0800
+Date: Wed, 22 Dec 1999 22:57:33 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] JJOS lcmp bytecode patch
+
+Hi Todd,
+
+    I think the biggest problem is that, if the platform doesn't support all
+the
+numerical type like Intel One, it can't compiled/run at all the platform.
+If JJOS is supporting to run on Intel One, the simplest way to makes a
+64-bit operations for us.
+
+Regards,
+
+Hilary
+
+----- Original Message -----
+From: Todd L. Miller <tmiller@haverford.edu>
+To: <kernel@jos.org>
+Sent: Wednesday, December 22, 1999 10:32 PM
+Subject: Re: [JOS-Kernel] JJOS lcmp bytecode patch
+
+
+>>     Can It Work ? If lcmp works, others long operation may have problem.
+>> It seems that Linux GCC 2.7 / 2.8 doesn't support 64-bit operation.
+>
+> It does on the host build, but not on the i386 build.  (Because
+>the 64-bit support uses parts of glibc, we had to roll our own for the
+>i386 build, and decided that it would be easier to use our home-grown
+>version on both builds.)  Now that I'm looking at the code, I'm actually
+>amazed that lcmp compiled -- looking at ../nativecode/jjtypes.h, I don't
+>see an operator > or < !  (impl. in jbtypes.cc) That, probably, is where
+>the fix for long comparisons you've come up with should go.  (We also need
+>to make jlong SIGNED, as well...)
+>
+>-_Quinn
+>
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From tmiller@haverford.edu Wed, 22 Dec 1999 10:28:41 -0500 (EST)
+Date: Wed, 22 Dec 1999 10:28:41 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Some Fix On Array Copy
+
+> Original Souce Code is using offset in the for-loop instead of pos. It can't
+> copy array correctly.
+
+	Yup.  This was my mistake.
+
+> Original Souce Code will not check js->myUTF8 is null or not. If it
+> is null, it will makes core dump.
+
+	Fixed this one, too.
+
+	With respect to printing in general: when I tried
+'System.out.println( 100 );', it worked just fine.  'System.out.println(
+String.valueOf( 100 )' blows up and dies because I haven't implemented
+getPrimitiveClass() yet -- in large part because I'm not sure what it's
+supposed to do!  This is one of things where classpath should come in
+helpful.  (Which, I am, in fact, working on.)
+'System.out.println(obj.toString())' blows up and dies because the native
+getClass() isn't exposed quite yet -- again, this would be better handled
+with a new class library, I think.
+
+	Thanks for the fixes, though.  They'll be in the CVS shortly.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Wed, 22 Dec 1999 15:27:49 -0500 (EST)
+Date: Wed, 22 Dec 1999 15:27:49 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JJOS lcmp bytecode patch
+
+	I don't think that requiring a 32-bit processor and a
+floating-point unit is too a high a set of requirements...
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Mon, 27 Dec 1999 16:16:18 -0500
+Date: Mon, 27 Dec 1999 16:16:18 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Java Native Interface and Linux
+
+I would like to bring the ERIC Project to Linux. I have all of the bytecode
+working, but none of the native Linux code. ERIC is a Linux program that
+calculates classpath so that you don't have to. It also uses package files
+so that it is possible to distribute bytecode on demand, one package at a
+time, through HTTP. Ultimately on Linux, I want to use the Invocation API
+of Java Native Interface (JNI).
+
+I have been using it exclusively on Microsoft Windows 95. Most of the
+documentation I found is slanted toward Windows, not Linux.
+
+Does anyone have sample C or C++ code I could read? Any hint would be
+appreciated.
+
+Thanks,
+
+
+
+
+From tmiller@haverford.edu Thu, 30 Dec 1999 13:47:13 -0500 (EST)
+Date: Thu, 30 Dec 1999 13:47:13 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf fixes
+
+	The field lookup code had a serious bug in it which prevent it
+from working with jikes-compiled code, where it would not check
+super-interfaces or super-classes for fields because javac always pointed
+the field reference's class pointer at the proper class (i.e. the
+super-class / super-interface in which that field resides).  I've fixed
+this, but haven't committed it to CVS yet, in search of the other bug,
+where the constant pool is being asked for an entry it doesn't have --
+which might be masking whatever bad coding I may have done fixing the
+lookup code.
+
+	I tested with both jikes and javac, so I don't think the incorrect
+offset is a problem in the compiler, though I can't imagine what it's
+actually useful for.  The solution I came up with -- because I don't have
+the slightest idea what I'm doing wrong -- was just to skip the part of
+the code in ur_java_class.cc that attempts to verify that the give
+interface method does, in fact, exist.  I'm guessing that the indices are
+offsets into the super class's constant pool, but it's been long enough
+since I've worked on the back-end code that I'm not entirely
+sure.  dynLink() (interp.cc) seems to treating things that way...
+
+	At any rate, something in one of the initializations classpath put
+in its java code is trying to load libraries, etc, and because that
+particular chunk of native code isn't implemented yet, I think I'm
+returning a NULL object to the stack -- causing the current status of a
+segfault.  I think, however, that the missing functions will be relatively
+easy to insert.  Before I do, however, I want to check just what exactly
+is going on in the code and make sure that I want it to be happening.
+
+	For now, however, fast native code is off (on my build), and
+classpath is being checked before decaf for native methods.* This will
+probably change to allow us to bypass unimplemented bits.**
+
+-_Quinn
+
+*: And failing, because the library loading fails on the
+'LINK_ReallyLinkKnownClass' symbol not being found.  I suspect that this
+is in the JNI somewhere.
+
+**: What I want to happen is to move to -DFAST_NATIVE_CODE, and change the
+classpath sources to mark those methods we're currently over-riding as
+native.  There should be a relatively straight-forward set of
+modifications to allow us to compile jvmbuiltins.cc as a
+dynamically-linked library, and end up treating it just like classpath's
+various libs.  (Back-end would probably just be shared with the
+loadlibrary code -- that is, a list of lib handles in which to check for
+the native code.  We'll see.)
+
+PS: As the above two footnotes show, aside from JNI, the host build is
+very close to gaining classpath, which provides it with a fully-functional
+(AFAIK, this is true for 1.1 but not 1.2) class library amenable to our
+modifications.  This would be a substantial jump forward in functionality
+for decaf.
+
+(As an aside, I think we're going to have to fork classpath and set it up
+in our own CVS.  The host build should remain very similar, except for the
+native-marked decaf-over-ridden methods which we'll aim to remove.  The
+i38 build, on the other hand, is going to require, I think, some
+substantial revision, if for no other reason than the limitations of the
+'standard library' for the host build.  Some of these changes will take
+place internal to decaf -- a larger 'stdlib' and changes from dynamic to
+static linking/loading (no ld.so from JJOS!), etc -- but at the very least
+we'll need to write our own JVM-specific classes.  (classpath/vm).  This
+does not consider other possibilites like BCNI and/or multiple processes.  
+I will, of course, keep this list closely informed about my progress and
+the magnitude of the required changes to classpath.  If they look minor
+enough -- and BCNI, etc, are similarly minor -- we may be able to get by
+with a --with-decaf flag to ./configure and a CVS branch.  We'll see.)
+
+	Additionally, some i386-build drivers may be able to be
+implemented for the host.  The console driver(s) come to mind as being
+ready for a jcurses back-end; or one might be able to use the ncurses
+library directly and get better keyboard-handling for the keyboard driver
+in the deal.  The VGA console/driver should be relatively simple to
+implement on the AWT or in an X-window.
+
+	Something I do want to when decaf+classpath is functional is to
+run a benchmark (caffienemark?) against java and japhar+classpath, just to
+see how much work I need to do... :)
+
+
+
+
+From ajregier@earthlink.net Fri, 31 Dec 1999 08:53:32 -0600
+Date: Fri, 31 Dec 1999 08:53:32 -0600
+From: Avery J. Regier ajregier@earthlink.net
+Subject: [JOS-Kernel] native console & bug report
+
+Hi all,
+
+I have made a set of changes to the consoles such that F1 is now the 'native'
+console.  I did this so that you can still view the output of kprintf and
+System.out even if you are muddling around with the consoles (which would
+clear the screen.)  My next step is to increase the size of the buffer and
+somehow figure out a way to be able to page up and down on the native console
+so that we can view output that has scrolled out of view.
+
+In doing this I also discovered a bug with the decaf native methods.  I had
+made a new class, consoleNative, which implements ConsoleDriver just like
+jos.platform.drivers.console does.  In consoleNative, putChar and setChar
+became native methods.  Suddenly, all keyboard input was outputted to the
+native console instead of the java consoles.  What was happenning is that the
+native consoleNative.putChar() was being called where console.putChar() was
+supposed to be called.  I changed consoleNative.putChar() to instead call the
+native consoleNative.putNativeChar() and suddenly everything worked.  In short,
+there is a problem with how decaf resolves if a native method is supposed to be
+used.  I haven't tracked down what exactly is happenning yet, but I did leave
+the debugging messages I used to track this down in the code but commented out
+along with what to do in order to show the bug again so that someone can track
+this down later.
+
+- Avery
+
+P.S.  I was going to include a patch file with this, but the cvs server is down
+again.  Could someone with access please restart it?  I'll send the patch as
+soon as I see that cvs is up again.  - Thanks.
+
+
+

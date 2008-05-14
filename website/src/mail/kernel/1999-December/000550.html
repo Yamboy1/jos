@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] changes to make grub work smoothly</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000549.html">
+   <LINK REL="Next" HREF="000551.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] changes to make grub work smoothly</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] changes to make grub work smoothly">tmiller@haverford.edu</A><BR>
+    <I>Wed, 8 Dec 1999 01:33:40 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000549.html">[JOS-Kernel] changes to make grub work smoothly</A></li>
+        <LI> Next message: <A HREF="000551.html">[JOS-Kernel] General questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#550">[ date ]</a>
+              <a href="thread.html#550">[ thread ]</a>
+              <a href="subject.html#550">[ subject ]</a>
+              <a href="author.html#550">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Was going to write about this earlier today, but some things came
+up.  The problem was NOT with grub &amp; interrupts -- though the return false
+bit did have to be in there -- I had forgotten that the console *java*
+code *also* pointed to 0xB0000 -- not 0xB8000 -- the same fix as to
+jjconsole.h applies to the console driver.  With that done, GRUB is now my
+preferred booting method (at least, for the -DNEW_INTERRUPT_HANDLING
+build).
+
+	I'm trying to figure out why startService() in the VGA driver is
+so slow.  Under GRUB/-DNEW_INTERRUPT_HANDLING, I'm not seeing any of the
+background pixel drawing -- was this removed from the code?  (The
+background fill stuff.)  Also, am I correct in supposing that the write8()
+calls can be replaces with mappedByteArray()?  (I haven't tried it yet,
+but it should speed things up enourmously -- it sure sped up the text-mode
+stuff!)
+
+	My short-term goal is to integrate the VGA driver into the virtual
+console stuff I've got set up.  This essentially means writing a 'console
+driver' that will switch into 640x480x4 mode when it gains the focus, and
+write its buffer out to the VGA ram, and then repeat it in reverse when it
+loses the focus; when we come up with some sort of frame-buffer/X/etc
+standard, this new driver should conform to it, as well.  Until then, we
+should just be able to use the StandardVga class, as long as we switch to
+a graphical console first.  Anyway, after setting that up, I'll integrate
+the new java stuff I've been working on into the tree, and make
+-DNEW_INTERRUPT_HANDLING and GRUB compiling the default.  Then I need to
+some thinking about where to go next.  (i.e. BCNI/classpath/multiple
+processes/etc).
+
+-_Quinn
+
+&quot;Do not meddle in the affairs of wizards, for you are crunchy and good
+with ketchup.&quot;
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000549.html">[JOS-Kernel] changes to make grub work smoothly</A></li>
+	<LI> Next message: <A HREF="000551.html">[JOS-Kernel] General questions</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#550">[ date ]</a>
+              <a href="thread.html#550">[ thread ]</a>
+              <a href="subject.html#550">[ subject ]</a>
+              <a href="author.html#550">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

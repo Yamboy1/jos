@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOS Machine</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000686.html">
+   <LINK REL="Next" HREF="000688.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOS Machine</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] JOS Machine">tmiller@haverford.edu</A><BR>
+    <I>Tue, 29 Feb 2000 20:56:41 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000686.html">[JOS-Kernel] JOS Machine</A></li>
+        <LI> Next message: <A HREF="000688.html">[JOS-Kernel] JOS Machine</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#687">[ date ]</a>
+              <a href="thread.html#687">[ thread ]</a>
+              <a href="subject.html#687">[ subject ]</a>
+              <a href="author.html#687">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Question: What is the status of decaf/classpath?
+</I>
+	decaf is currently under extremely heavy development at my
+top-secret research labs located on the seafloor just outside of
+Norfolk.  Unfortunately, their fiber was cut during a Navy training
+excercise and they won't be able to code to the CVS for at least another
+week.
+
+	More seriously, I'm working on a total rewrite of the common/decaf
+code, designed so that the VM-specific native code required to run
+classpath will be as elegant and efficient as possible.  I'm giving
+consideration to writing the native code calls &amp; lookups toward ERIC,
+specifically its SharedLibrary class (I don't recall if you've posted the
+source or not).  Insulating decaf from how it fetches its native code is a
+good idea; that the native code for VM-specific classes (and /all/ native
+code on the host) will be linked in statically shouldn't prove to be too
+much of a problem, right?
+
+&gt;<i> Is it possible to develop decaf so that it is compatible with Kore *and*
+</I>&gt;<i> JDK 1.1.6 *and* classpath? We might have concurrent &quot;subplatforms&quot; defined
+</I>&gt;<i> decaf. By changing the list when decaf binds machine code to native
+</I>&gt;<i> methods, decaf works across all versions of Java.
+</I>
+	This should be possible.  I will not, however, be providing
+support for anything aside from classpath.  Kore should be fairly simple
+for someone to add; JDK 1.1.x will be very difficult, unless Kaffe (et
+al) have a remarkably clean JVM/VM class separation that allows us to look
+at their source to derive what, exactly, Sun's native code is supposed to
+be doing.
+
+
+	Just as note -- even if we can link and load classpath libraries,
+we can't do anything useful with them yet, because decaf does not
+currently (and may not ever) support JNI.  It would seem advisable to
+develop dynamic library support for the i386 build (or borrow it from
+somewhere else) for fairly straight-forward reasons about driving the
+hardware (especially hot-pluggable h/w), but I'm not quite so sure that
+JNI is a good idea.  In certain locations (e.g. h/w) we must use native
+code until such a time that decaf can run a java device driver fast enough
+to handle h/w timeouts and buffers, etc (and even then, it's probably wise
+to stick with native drivers in most cases), but no user-level task should
+require native code aside from (possibly) driver support.
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000686.html">[JOS-Kernel] JOS Machine</A></li>
+	<LI> Next message: <A HREF="000688.html">[JOS-Kernel] JOS Machine</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#687">[ date ]</a>
+              <a href="thread.html#687">[ thread ]</a>
+              <a href="subject.html#687">[ subject ]</a>
+              <a href="author.html#687">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

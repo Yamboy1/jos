@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Progress!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:R.Argentini%40student.tudelft.nl">
+   <LINK REL="Previous"  HREF="000479.html">
+   <LINK REL="Next" HREF="000503.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Progress!</H1>
+    <B>Ranieri Argentini</B> 
+    <A HREF="mailto:R.Argentini%40student.tudelft.nl"
+       TITLE="[JOS-Kernel] Progress!">R.Argentini@student.tudelft.nl</A><BR>
+    <I>Mon, 22 Nov 1999 10:22:26 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000479.html">[JOS-Kernel] Progress!</A></li>
+        <LI> Next message: <A HREF="000503.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#481">[ date ]</a>
+              <a href="thread.html#481">[ thread ]</a>
+              <a href="subject.html#481">[ subject ]</a>
+              <a href="author.html#481">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i>A TCP/IP stack is used by a network card driver. All incoming packets are
+</I>&gt;<i>stuffed into a Packet object and passed to the TCP/IP stack.
+</I>
+How would you evision multithreading in such an environment?
+I'm currently toying with the idea of giving every interface it's own
+thread  and it's own objects (that would give me a neat Multiple
+Cache/Local Replacement ARP cache and some other link level enhancements
+when we'll support other hardware then ethernet.).
+
+The problem is that this model grinds to a halt when it comes to the IP layer.
+IP is responsible for distributing packets among interfaces, and can
+therefore not be bound to any of them.
+
+The only thing that comes to mind is to have a single IP object that queues
+incoming packets for all interfaces. This requires strict serialisation on
+the incoming_packet() functions. A thread that lives in IP could then
+handle the packets (route them through, drop them or reassemble them and
+queue them to TCP/UDP objects that eventually put them into user space
+buffers).
+
+Does anyone see a problem with this strategy? Speak up now if you do!
+
+&gt;<i>From the other perspective of a sparsely populated array of PacketQueues, a
+</I>&gt;<i>PacketQueue is also a PacketListener. A packet queue is available
+</I>&gt;<i>(virtually) at every IP port (from 0 to 65,565).
+</I>
+Hmm, IP does not have ports. UDP and TCP do. This structure belongs over
+there when i get there :)
+
+Btw, quick update.
+
+I finally got the linux kernel to let me bind a PF_PACKET socket to a
+specific interface, so multiple interfaces support is coming up, probably
+with the scheme outlined above.
+I implemented a quick ARP cache that violates every RFC  in the book, but
+sort of does something. I would like to let it respond to ARP queries to
+try and get it to bind an IP adress other than the linux card one. I hope
+linux does not go bananas with this, but since i get the packets before
+they go through the linux stack i give myself decent odds of doing this :)
+
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000479.html">[JOS-Kernel] Progress!</A></li>
+	<LI> Next message: <A HREF="000503.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#481">[ date ]</a>
+              <a href="thread.html#481">[ thread ]</a>
+              <a href="subject.html#481">[ subject ]</a>
+              <a href="author.html#481">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

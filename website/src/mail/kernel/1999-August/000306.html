@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Quick jjos+decaf status</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000307.html">
+   <LINK REL="Next" HREF="000308.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Quick jjos+decaf status</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Quick jjos+decaf status">jm@mak.com</A><BR>
+    <I>Mon, 30 Aug 1999 09:00:04 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000307.html">[JOS-Kernel] Some Questions about JJOS</A></li>
+        <LI> Next message: <A HREF="000308.html">[JOS-Kernel] Quick jjos+decaf status</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#306">[ date ]</a>
+              <a href="thread.html#306">[ thread ]</a>
+              <a href="subject.html#306">[ subject ]</a>
+              <a href="author.html#306">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi All;
+
+Although we've not been posting much to the list, there actually has been a lot
+of activity lately...  Here's a ruthless summary (please follow-up if I've
+missed anything):
+
+Progress:
+
+(1) Todd implemented: synchronized methods in the JVM; virtual consoles in a
+java daemon.
+
+(2) Thomas Bocek found a bug in two of the JVM's opcodes -- irem, and idiv. 
+Either Todd or jm will integrate his fix with the other active mods to the JVM. 
+Will probably be committed to CVS within a day or two.
+
+(3) CVS pserver has been acting up again.  Todd was kind enough to restart the
+server again.
+
+(4) jm implemented an unbelievably slow (but working), malloc-free memory
+manager.  Implements hybrid best/first-fit, with sentinel words to try and
+detect writing over the end of blocks, and with status bits to detect
+multiple-freeing.  Todd and jm used it to detect and fix two memory-management
+bugs in the JVM.  This capability and the bug fixes have not yet been committed
+to CVS because of a problem with the i386 build.
+
+Ongoing, not-yet-complete efforts:
+
+(1) Todd has begun to implement throws/exceptions in the JVM.
+
+(2) The combined jjos+decaf+GC dies shortly after the first GC.  George Marrows
+and jm are looking into this.  (Fixing the memory management bugs mentioned
+above unfortunately had no effect on this problem.)  Scheduling constraints will
+likely preclude any resolution before late this weekend.
+
+(3) jm ran into a problem with the i386 build while verifying code changes prior
+to CVS commitment.  jm's P5 box complains about not having CPUID implemented. 
+Weird, because that's the box the CPUID code was debugged upon.  (Anybody else
+seen this?)  Resolution no earlier than Thursday due to schedule constraints.
+
+(4) Todd and jm are looking into integrating GNU classpath (so we can have
+sources to help us debug the low-level classes -- right now we have no idea
+what's going to be called except through time-consuming trial-and-error with
+Sun's JDK -- plus we can't redistribute it.  This is also preventing us from
+making a key, &quot;Right Thing To Do&quot; change to the JVM to radically speed-up Java
+method calls.).  jm has already contacted key classpath developers via email and
+gotten their go-ahead.
+
+As usual, please reply to me and/or the list with any errors of either omission
+or commission.
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000307.html">[JOS-Kernel] Some Questions about JJOS</A></li>
+	<LI> Next message: <A HREF="000308.html">[JOS-Kernel] Quick jjos+decaf status</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#306">[ date ]</a>
+              <a href="thread.html#306">[ thread ]</a>
+              <a href="subject.html#306">[ subject ]</a>
+              <a href="author.html#306">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

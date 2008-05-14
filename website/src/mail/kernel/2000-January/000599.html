@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: native console &amp; bug report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000623.html">
+   <LINK REL="Next" HREF="000585.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: native console &amp; bug report</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Re: native console &amp; bug report">tmiller@haverford.edu</A><BR>
+    <I>Wed, 5 Jan 2000 12:59:12 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000623.html">[JOS-Kernel] Re: native console &amp; bug report</A></li>
+        <LI> Next message: <A HREF="000585.html">[JOS-Kernel] File System</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#599">[ date ]</a>
+              <a href="thread.html#599">[ thread ]</a>
+              <a href="subject.html#599">[ subject ]</a>
+              <a href="author.html#599">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> The shells would also want to be able to change
+</I>&gt;<i> screen colors, move the cursor about (and how is that done, BTW?  Currently
+</I>&gt;<i> the cursor just sits 3/4 down the screen on the native console and doesn't
+</I>&gt;<i> show up at all in the Java consoles.), 
+</I>
+	You got me there -- I completely forgot about character
+attributes.  (get/setAttr shouldn't be too hard to manage
+though.)  w.r.t. to the cursor, I'd add get/setCursor() right away, if I
+knew how...
+
+&gt;<i> I'm not so hot on this approach.  I'd prefer somehow that the shells are
+</I>&gt;<i> told what console they get and when the keyboard is theirs.  In the same
+</I>&gt;<i> vein, I think there needs to be a Screen object which keeps control of the
+</I>&gt;<i> mapped byte array.  In short, anytime there is a scarce native resource,
+</I>&gt;<i> there needs to be an object keeping track of it to make sure that we don't,
+</I>&gt;<i> for instance, have multiple consoles ever trying to write to the screen at
+</I>&gt;<i> the same time.
+</I>
+	The mapped byte array per console approach is Grand Hack, and yes,
+hardware resources need to be better tracked.  Unfortunately, I don't
+really have any ideas as to what the Right Way to do that is.
+
+&gt;<i> A lot of this I foresee being configurable off of the registry.  It is
+</I>&gt;<i> almost like there needs to be a single meta shell to intercept the Fx keys
+</I>&gt;<i> and control the switching between shells.  Hmmm..... 
+</I>
+	Well, that's what consoled does.  (Rather, the consoled running in
+the `root' process, the one started by init.  Other consoled's could be
+running in other processes, but they only get the keystrokes that the
+'root' consoled doesn't eat.  And yes, the registry would be a good place
+to keep system(user?)-wide keyboard shortcuts like this.  (E.g. for that
+multiple-console xterm, its consoled would have to look at ctrl-Fx,
+instead of alt-Fx, for when to switch, because alt-Fx is handled by the
+'root' consoled.)
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000623.html">[JOS-Kernel] Re: native console &amp; bug report</A></li>
+	<LI> Next message: <A HREF="000585.html">[JOS-Kernel] File System</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#599">[ date ]</a>
+              <a href="thread.html#599">[ thread ]</a>
+              <a href="subject.html#599">[ subject ]</a>
+              <a href="author.html#599">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

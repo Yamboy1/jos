@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] native console &amp; bug report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ajregier%40earthlink.net">
+   <LINK REL="Previous"  HREF="000574.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] native console &amp; bug report</H1>
+    <B>Avery J. Regier</B> 
+    <A HREF="mailto:ajregier%40earthlink.net"
+       TITLE="[JOS-Kernel] native console &amp; bug report">ajregier@earthlink.net</A><BR>
+    <I>Fri, 31 Dec 1999 08:53:32 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000574.html">[JOS-Kernel] decaf fixes</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#575">[ date ]</a>
+              <a href="thread.html#575">[ thread ]</a>
+              <a href="subject.html#575">[ subject ]</a>
+              <a href="author.html#575">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi all,
+
+I have made a set of changes to the consoles such that F1 is now the 'native'
+console.  I did this so that you can still view the output of kprintf and
+System.out even if you are muddling around with the consoles (which would
+clear the screen.)  My next step is to increase the size of the buffer and
+somehow figure out a way to be able to page up and down on the native console
+so that we can view output that has scrolled out of view.
+
+In doing this I also discovered a bug with the decaf native methods.  I had
+made a new class, consoleNative, which implements ConsoleDriver just like
+jos.platform.drivers.console does.  In consoleNative, putChar and setChar
+became native methods.  Suddenly, all keyboard input was outputted to the
+native console instead of the java consoles.  What was happenning is that the
+native consoleNative.putChar() was being called where console.putChar() was
+supposed to be called.  I changed consoleNative.putChar() to instead call the
+native consoleNative.putNativeChar() and suddenly everything worked.  In short,
+there is a problem with how decaf resolves if a native method is supposed to be
+used.  I haven't tracked down what exactly is happenning yet, but I did leave
+the debugging messages I used to track this down in the code but commented out
+along with what to do in order to show the bug again so that someone can track
+this down later.
+
+- Avery
+
+P.S.  I was going to include a patch file with this, but the cvs server is down
+again.  Could someone with access please restart it?  I'll send the patch as
+soon as I see that cvs is up again.  - Thanks.
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000574.html">[JOS-Kernel] decaf fixes</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#575">[ date ]</a>
+              <a href="thread.html#575">[ thread ]</a>
+              <a href="subject.html#575">[ subject ]</a>
+              <a href="author.html#575">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

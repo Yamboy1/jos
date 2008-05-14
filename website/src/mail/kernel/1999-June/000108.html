@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf progress</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000097.html">
+   <LINK REL="Next" HREF="000098.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf progress</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf progress">tmiller@haverford.edu</A><BR>
+    <I>Fri, 25 Jun 1999 23:55:18 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000097.html">[JOS-Kernel] Problems w/ i386 build</A></li>
+        <LI> Next message: <A HREF="000098.html">[JOS-Kernel] Re: decaf rewrite</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#108">[ date ]</a>
+              <a href="thread.html#108">[ thread ]</a>
+              <a href="subject.html#108">[ subject ]</a>
+              <a href="author.html#108">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Just thought I'd let people know that I've gotten Java-language
+(only) throws working.  I haven't tested the implementation thoroughly,
+and I've left some problematic code in (noteably, taking the address of a
+reference parameter -- which should be new()d and then free()d in
+java_thread but isn't for now); once I clean the code up and do some
+more extensive testing, I'll commit it to the CVS.  It's relatively
+straightforward code; all the necessary infastructure was already in
+place.
+	This does /not/ include support for exceptions thrown by native
+code, which is by far the more difficult part.  I'll be tackling that
+support next, but progress will probably be slow.
+
+	AFAIK, this completes support the non-native, not-class-library
+portions of the JVM 1.0.2 specs.  It will be difficult, at best, to test
+compliance quite yet because we don't have a fully-functional class
+library (i.e. native calls).  However, I will make an effort to comb over
+the 1.0.2 JVM spec after I finish exception handling and verify that
+everything is coded (not necessarily correctly).
+
+-_Quinn
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000097.html">[JOS-Kernel] Problems w/ i386 build</A></li>
+	<LI> Next message: <A HREF="000098.html">[JOS-Kernel] Re: decaf rewrite</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#108">[ date ]</a>
+              <a href="thread.html#108">[ thread ]</a>
+              <a href="subject.html#108">[ subject ]</a>
+              <a href="author.html#108">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

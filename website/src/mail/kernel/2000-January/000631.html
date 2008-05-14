@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Todd, here you are!!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000629.html">
+   <LINK REL="Next" HREF="000632.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Todd, here you are!!</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Todd, here you are!!">tmiller@haverford.edu</A><BR>
+    <I>Thu, 20 Jan 2000 15:02:09 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000629.html">[JOS-Kernel] Todd, here you are!!</A></li>
+        <LI> Next message: <A HREF="000632.html">[JOS-Kernel] JCurses, Terminal, Window and console...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#631">[ date ]</a>
+              <a href="thread.html#631">[ thread ]</a>
+              <a href="subject.html#631">[ subject ]</a>
+              <a href="author.html#631">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> As I've said before, I think we need to take a step back and refactor
+</I>&gt;<i> the console code.  I'm concerned that in order to make things work
+</I>&gt;<i> with the limited functionality available, it has taken on a certain
+</I>&gt;<i> hackish aspect. Shared memory resources need to be encapsulated.  Has
+</I>&gt;<i> anyone thought about some kind of a DeviceManager or DriverManager?  
+</I>&gt;<i> Really, the current state of things can be tracked back to the fact
+</I>&gt;<i> that we don't have seperate statics for each process yet (the
+</I>&gt;<i> System.out hack).  Todd, how is the multiprocess support coming?  I
+</I>&gt;<i> think that is required before we can really make the consoles clean.
+</I>
+	JM suggests that we adopt the JavaOS/Business model for managing
+resources and drivers.  I don't, particularly, want to be the one to write
+the re-implementation; and in looking at the specs, it seems as if using
+any small part that's applicable to our needs now would entail an
+enourmous amount of back-end work.
+
+	On the other hand, we clearly do need something to manage
+resources.  What that might be, I'm not too sure, and furthermore, I think
+it will heavily depend on multiprocessing.  (I'm not too familiar with the
+Java 2 security model -- would it extend cleanly to handle h/w
+access/ownership?)
+
+	Yes, the console stuff needs to be refactored, but I think not to
+too great an extent; on FocusLost(), the console releases its physical
+resources, and on FocusGained(), it acquires them.  Something ingenous
+will have to be arranged in the native code to put kprintf()s by kernel
+code in the 'right place' (wherever that might be); with mulitprocessing,
+the System.out &amp; err statics can be directed at the appropriate
+ConsoleStream, which will just write into its buffer until it gains focus.
+
+	
+	I haven't made any progress on multiprocessing, unfortunately; I
+wanted to work on that last weekend/this week, but that didn't happen
+because I was too busy repairing the carnage I had accidentally wreaked on
+my hard drive Saturday morning.  I think the basic mechanism should be
+relatively easy to code; efficient mechanisms and proper interaction with
+Java (esp. class loaders) will most probably take a while.
+
+-_Quinn
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000629.html">[JOS-Kernel] Todd, here you are!!</A></li>
+	<LI> Next message: <A HREF="000632.html">[JOS-Kernel] JCurses, Terminal, Window and console...</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#631">[ date ]</a>
+              <a href="thread.html#631">[ thread ]</a>
+              <a href="subject.html#631">[ subject ]</a>
+              <a href="author.html#631">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

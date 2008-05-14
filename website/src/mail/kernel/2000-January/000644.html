@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Opcode class</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000643.html">
+   <LINK REL="Next" HREF="000645.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Opcode class</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Opcode class">gchii@mindspring.com</A><BR>
+    <I>Fri, 28 Jan 2000 18:43:00 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000643.html">[JOS-Kernel] Re: [Biz] Define license? -- or not</A></li>
+        <LI> Next message: <A HREF="000645.html">[JOS-Kernel] Runtime distribution of JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#644">[ date ]</a>
+              <a href="thread.html#644">[ thread ]</a>
+              <a href="subject.html#644">[ subject ]</a>
+              <a href="author.html#644">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Once an Opcode class is available, as documented in the PureReflectionIII
+article, it becomes possible to decode opcodes with pure reflection and
+build a bytecode verifier.
+
+Who wants to build a bytecode verifier?
+
+With an opcode class available in C++ for decaf, the size of each opcode is
+known by the frame. It is possible to pass specific bytes to each opcode
+subroutine. Each opcode method can have formal parameters based on the
+operands expected. Instead of allowing each opcode method to access pc, the
+calling method (the one with the big switch statement) can increment pc
+(once) based on the size of the opcode and its operands. The evaluation of
+opcodes is removed from opcode methods.
+
+When a current frame is installed in the Opcode class (in C++) and the
+address of each opcode method is added to the table, it is possible to use
+an instance of the Opcode class to invoke the opcode method. It optimizes
+the code almost to the level of machine code. A list of opcodes can be
+exchanged (once) for an array of instances of the Opcode class. The
+&quot;interpreter&quot; invokes the opcodes through the array, like this:
+
+Opcode[] list = get_opcode_from_method();
+int iMax = list.length;
+for ( int i = 0; i &lt; iMax; i++ ) {
+  list.invoke();
+}
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000643.html">[JOS-Kernel] Re: [Biz] Define license? -- or not</A></li>
+	<LI> Next message: <A HREF="000645.html">[JOS-Kernel] Runtime distribution of JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#644">[ date ]</a>
+              <a href="thread.html#644">[ thread ]</a>
+              <a href="subject.html#644">[ subject ]</a>
+              <a href="author.html#644">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

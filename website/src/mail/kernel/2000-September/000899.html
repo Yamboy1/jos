@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [rheise.os 0.1.4] Warning</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000895.html">
+   <LINK REL="Next" HREF="000896.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [rheise.os 0.1.4] Warning</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [rheise.os 0.1.4] Warning">gchii@mindspring.com</A><BR>
+    <I>Mon, 18 Sep 2000 21:27:12 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000895.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+        <LI> Next message: <A HREF="000896.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#899">[ date ]</a>
+              <a href="thread.html#899">[ thread ]</a>
+              <a href="subject.html#899">[ subject ]</a>
+              <a href="author.html#899">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 06:10 PM 9/18/00 -0500, you wrote:
+&gt;<i>What I think would be really nice is to leave most of the jos.* core system
+</I>&gt;<i>packages as interfaces. Then let implementations exist outside of the jos.*
+</I>&gt;<i>package space and get sucked in and instantiated at run-time via property
+</I>&gt;<i>files.
+</I>
+I agree with Iain about this. Interfaces should be used here. When there
+are five implementations of a JOS-compatible virtual machine, there should
+be binary compatibility between the JOS classes across all five. The
+JOS-compatible interfaces are implememented one time, not five.
+
+Suppose we create a package of interfaces in jos.device. Once we write the
+source code for the package, a virtual machine designer does not have to
+write them again.
+
+Abstract classes should not be confused with interfaces. The purpose of an
+interface is for compatibility among implementations. The purpose of an
+abstract class is reuse within an implementation.
+
+Unfortunately, we have bad examples of &quot;interfaces&quot; to a virtual machine in
+the standard Java class library, which are implemented as abstract classes.
+The java.io.InputStream concept is both an interface and abstract class. It
+should have been a java.io.InputStream interface and
+java.io.BaseInputStream abstract class. Thus, any class could implement the
+InputStream interface including other implementations of an I/O package.
+
+Any class with native methods is an abstract class. While it does not
+require the abstract keyword, its methods are elsewhere, expected to be
+implemented in machine code. This unfortunate shortcut in the design of the
+standard Java class library makes it most difficult to fully implement a
+compatible virtual machine.
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000895.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+	<LI> Next message: <A HREF="000896.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#899">[ date ]</a>
+              <a href="thread.html#899">[ thread ]</a>
+              <a href="subject.html#899">[ subject ]</a>
+              <a href="author.html#899">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

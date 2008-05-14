@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] CVS: etherboot &amp; cursor control</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000611.html">
+   <LINK REL="Next" HREF="000607.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] CVS: etherboot &amp; cursor control</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] CVS: etherboot &amp; cursor control">tmiller@haverford.edu</A><BR>
+    <I>Mon, 10 Jan 2000 15:23:08 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000611.html">[JOS-Kernel] CVS: etherboot &amp; cursor control</A></li>
+        <LI> Next message: <A HREF="000607.html">[JOS-Kernel] JJOS Long Operation Patch</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#613">[ date ]</a>
+              <a href="thread.html#613">[ thread ]</a>
+              <a href="subject.html#613">[ subject ]</a>
+              <a href="author.html#613">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> etherboot image now works!!! However, it has problems with cursor handling. The
+</I>&gt;<i> reason is that the cursor management registers doesn't works in monochrome mode.
+</I>&gt;<i> So my question is, why in &quot;head-ether.s86&quot; the VGA is initialized in monochrome
+</I>&gt;<i> mode ? I suggest to patch &quot;head-ether.s86&quot; initializing VGA in mode 0x3
+</I>&gt;<i> instead of mode 0x7, and then initialize always jjConsole with 0xb8000. Doing
+</I>&gt;<i> this makes cursor handling under etherboot to work.
+</I>
+	My understanding is that JM decided to use VGA mode 7 because it
+was the simplest mode to program.  Does mode 3 use the same attribute
+constants/etc?  (I guess it does, since the GRUB code works?)  Oh -- feel
+free to write up a patch.  I'll get you on the CVS commit list shortly. :)
+
+&gt;<i> why you have used the code:
+</I>&gt;<i>   short cursor_addr = (80 * 2 * row) + (col * 2);
+</I>&gt;<i>   cursor_addr /= 2;
+</I>&gt;<i> it should be more simple to use:
+</I>&gt;<i>   short cursor_addr = (80 * row) + col;
+</I>
+	Because the addresses for all other VGA attributes are as the
+previous (that is, twice the width time the desired row plus twice the
+desired column) and I, at some point, intended to put that in a function
+with bounds checking somewhere so jjconsol.cc will work for sizes other
+than 80x24.  That, and I was playing 'lucky guess' to determine how to set
+the cursor :)  If it bothers you, I'll go ahead and change it.
+
+-_Quinn
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000611.html">[JOS-Kernel] CVS: etherboot &amp; cursor control</A></li>
+	<LI> Next message: <A HREF="000607.html">[JOS-Kernel] JJOS Long Operation Patch</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#613">[ date ]</a>
+              <a href="thread.html#613">[ thread ]</a>
+              <a href="subject.html#613">[ subject ]</a>
+              <a href="author.html#613">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: Problems w/ i386 build</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000099.html">
+   <LINK REL="Next" HREF="000101.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: Problems w/ i386 build</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Re: Problems w/ i386 build">jm@mak.com</A><BR>
+    <I>Tue, 22 Jun 1999 14:34:27 +0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000099.html">[JOS-Kernel] Re: decaf rewrite</A></li>
+        <LI> Next message: <A HREF="000101.html">[JOS-Kernel] Committed changes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#100">[ date ]</a>
+              <a href="thread.html#100">[ thread ]</a>
+              <a href="subject.html#100">[ subject ]</a>
+              <a href="author.html#100">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello Thomas;
+
+Please note that I took the liberty of cc-ing the list, because the
+answers to your questions might satisfy some broader interest...
+
+Thomas Bocek wrote:
+&gt;<i> I tried, but some files are missing to build a netbootfloppy, so I used
+</I>&gt;<i> netboot 0.9 (0.81 din't work).
+</I>&gt;<i> what is so special about the etherboot package?
+</I>
+I use Etherboot instead of netboot.  I suppose there is not much
+difference (netboot uses (DOS?) &quot;packet mode&quot; drivers -- etherboot uses
+its own drivers).  However, Etherboot 4.2 includes netboot 8.81, which
+you say doesn't work -- I suppose this is OK because etherboot uses its
+own bootloader, not netboot's.
+
+&gt;<i> &gt; The Longer Version: Thomas Bocek just contacted me telling me that the
+</I>&gt;<i> &gt; i386 build doesn't work for him, and that he's tracked it down as far
+</I>&gt;<i> &gt; as: if he allows jbHeap::scrubMemory to scrub between 1MB and 8MB, then
+</I>&gt;<i> &gt; decaf doesn't start.  He's got 64MB DRAM.
+</I>&gt;<i> 
+</I>&gt;<i> I still don't get the point? 1-55MB heap 55-64MB ramdisk. where's the
+</I>&gt;<i> code?
+</I>
+Because one cannot have a program counter (PC) value greater than 1MB
+while in x86 &quot;real mode,&quot; the code must be below the 1MB &quot;barrier&quot; --
+actually, it's got to be below the 640K frame buffers, too.  (This means
+we can avoid a two-stage bootloader, and/or an even more baroque build
+process.)  So, the memory map is something like:
+
+10K-200K &quot;nativecode&quot; (200K = current text+data+bss)
+200K-600K nativecode stack (stack grows down from 600K)
+640K-1MB VGA frame buffer(s)
+1MB-54MB C++ heap (really, 10MB less than your max DRAM)
+54MB-64MB zipfile-format ramdisk
+
+There are some other things (e.g., bootloader code/data areas, BIOS
+code/data ares) that I have omitted (you can find these out from any
+decent PC book -- I suggest &quot;The Undocumented PC&quot;), but those are the
+jjos+decaf-specific areas.  The other etherboot/netboot specific ones
+(e.g., the location of the NBI &quot;directory,&quot; and the command-line args,
+and the BOOTP reply) are documented within the etherboot/netboot
+documentation.
+
+&gt;<i> &gt; (1) The Etherboot v4.0 floppies don't seem to want to TFTP over the
+</I>&gt;<i> &gt; entire 9MB (approx) jjos.zip file we create.  I manually deleted sun/*
+</I>&gt;<i> &gt; from the zipfile to get the 9MB file down to about 1.5MB, and it loaded
+</I>&gt;<i> &gt; successfully.
+</I>&gt;<i> 
+</I>&gt;<i> I did exactely the same thing and loaded decaf and found init.class
+</I>
+Does this mean that you have (at least) a work-around for your problems?
+
+&gt;<i> &gt; (2) When this shrunken jjos.zip was finally ran, it looked like it
+</I>&gt;<i> &gt; stalled after enabling A20, and then said something quickly about the
+</I>&gt;<i> &gt; CPU type, and then it fielded a WHOLE LOT of interrupt zeroes, and then
+</I>&gt;<i> &gt; it just got, real, REAL, quiet.
+</I>&gt;<i> 
+</I>&gt;<i> well, my pc just rebooted.
+</I>
+When, after it found init.class?  I realize it is hard to catch the text
+as it flies by at warp speed, but what's the last thing the computer
+printed before it rebooted?
+
+&gt;<i> I downloaded Etherboot 4.2 but what should I upgrade?
+</I>
+Well, if I understand correctly, you're using netboot rather than
+etherboot.  So, I am not sure what the issues are with netboot (as
+opposed to etherboot).  If what I've told you previously doesn't help,
+I'd be tempted to use Etherboot 4.2 instead of netboot, and see if the
+problems go away.
+
+Please Let me know things go.  If the problems don't go away, please let
+me know as much detailed information as possible, so I can help as much
+as possible (albeit remotely).
+
+Thanks for being so brave to run pre-pre-alpha code!
+
+-jm
+
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000099.html">[JOS-Kernel] Re: decaf rewrite</A></li>
+	<LI> Next message: <A HREF="000101.html">[JOS-Kernel] Committed changes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#100">[ date ]</a>
+              <a href="thread.html#100">[ thread ]</a>
+              <a href="subject.html#100">[ subject ]</a>
+              <a href="author.html#100">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

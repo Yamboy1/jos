@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] CVS: etherboot &amp; cursor control</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT">
+   <LINK REL="Previous"  HREF="000610.html">
+   <LINK REL="Next" HREF="000613.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] CVS: etherboot &amp; cursor control</H1>
+    <B>Corrado Santoro</B> 
+    <A HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT"
+       TITLE="[JOS-Kernel] CVS: etherboot &amp; cursor control">Corrado.Santoro@IIT.UNICT.IT</A><BR>
+    <I>Mon, 10 Jan 2000 12:25:27 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000610.html">[JOS-Kernel] CVS: etherboot &amp; cursor control</A></li>
+        <LI> Next message: <A HREF="000613.html">[JOS-Kernel] CVS: etherboot &amp; cursor control</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#611">[ date ]</a>
+              <a href="thread.html#611">[ thread ]</a>
+              <a href="subject.html#611">[ subject ]</a>
+              <a href="author.html#611">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi all,
+etherboot image now works!!! However, it has problems with cursor handling. The
+reason is that the cursor management registers doesn't works in monochrome mode.
+So my question is, why in &quot;head-ether.s86&quot; the VGA is initialized in monochrome
+mode ? I suggest to patch &quot;head-ether.s86&quot; initializing VGA in mode 0x3
+instead of mode 0x7, and then initialize always jjConsole with 0xb8000. Doing
+this makes cursor handling under etherboot to work.
+
+Todd,
+why you have used the code:
+  short cursor_addr = (80 * 2 * row) + (col * 2);
+  cursor_addr /= 2;
+it should be more simple to use:
+  short cursor_addr = (80 * row) + col;
+
+Cheers,
+	Corrado.
+On Mon, 10 Jan 2000, you wrote:
+&gt;<i> I put Hilary's etherboot link-order fix into the CVS; let me know
+</I>&gt;<i> if it works for you.
+</I>&gt;<i> 
+</I>&gt;<i> 	(BTW -- I finally made GRUB the default boot-method in the
+</I>&gt;<i> Makefile.  If people oppose it, let me know and I'll change it
+</I>&gt;<i> back.)
+</I>&gt;<i> 
+</I>&gt;<i> 	Cursor control works perfectly on both types of text consoles on
+</I>&gt;<i> the i386 build; because I haven't investigated the host/curses angle, I
+</I>&gt;<i> haven't put get/setCursor() into the ConsoleDriver interface yet.
+</I>&gt;<i> 
+</I>&gt;<i> 	I realized I need to check the fixes I made in invokeinterface
+</I>&gt;<i> against the other invoke*'s -- that is, anywhere I use dynLink() to find
+</I>&gt;<i> the method code, I need to check if it's native AFTER the dynLink and not
+</I>&gt;<i> before...
+</I>&gt;<i> 
+</I>&gt;<i> -_Quinn
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+Personal Home Page:
+            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+
+ARCA Mobile Agent Framework Home Page:
+            <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+======================================================
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000610.html">[JOS-Kernel] CVS: etherboot &amp; cursor control</A></li>
+	<LI> Next message: <A HREF="000613.html">[JOS-Kernel] CVS: etherboot &amp; cursor control</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#611">[ date ]</a>
+              <a href="thread.html#611">[ thread ]</a>
+              <a href="subject.html#611">[ subject ]</a>
+              <a href="author.html#611">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

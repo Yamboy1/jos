@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] checkPendingNotifies</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT">
+   <LINK REL="Previous"  HREF="000736.html">
+   <LINK REL="Next" HREF="000734.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] checkPendingNotifies</H1>
+    <B>Corrado Santoro</B> 
+    <A HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT"
+       TITLE="[JOS-Kernel] checkPendingNotifies">Corrado.Santoro@IIT.UNICT.IT</A><BR>
+    <I>Fri, 17 Mar 2000 16:10:23 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000736.html">[JOS-Kernel] checkPendingNotifies</A></li>
+        <LI> Next message: <A HREF="000734.html">[JOS-Kernel] Bootable version?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#739">[ date ]</a>
+              <a href="thread.html#739">[ thread ]</a>
+              <a href="subject.html#739">[ subject ]</a>
+              <a href="author.html#739">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Todd,
+I've looked at the code and I've found something interesting...
+I think you're right... something like
+	pnip = pnip-&gt;myNext
+seems to be required....
+
+On Fri, 17 Mar 2000, Todd L. Miller wrote:
+&gt;<i> In scheduler::checkPendingNotifies(), the CVS version (I believe
+</I>&gt;<i> the copy I'm looking at is the recent one), does anyone else find it odd
+</I>&gt;<i> that the terminating condition is (pnip-&gt;myNext != NULL) yet pnip -- so
+</I>&gt;<i> far as I can tell -- is never changed?  Could someone who's got an intact
+</I>&gt;<i> CVS tree point the debugger at this and figure out why the loop
+</I>&gt;<i> terminates?  (Is my copy of scheduler.cc right?  Are the jbSLL items not
+</I>&gt;<i> set up right, e.g. myNext is always NULL?  Is the list of pending notifies
+</I>&gt;<i> always empty (despite addPendingNotify() being called from threadable.cc?)  
+</I>&gt;<i> Have we, for some reason, only ever had a single thread in the pending
+</I>&gt;<i> queue?)  I'm asking because I just finished moving that code to the 'new'
+</I>&gt;<i> scheduler, and realized, contrary to the comment, that it never did walk
+</I>&gt;<i> the list, and I wanted to find out what was going on.  Thanks.
+</I>&gt;<i> 
+</I>&gt;<i> -_Quinn
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+Personal Home Page:
+            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+
+ARCA Mobile Agent Framework Home Page:
+            <A HREF="http://osweb.iit.unict.it/ARCA">http://osweb.iit.unict.it/ARCA</A>
+======================================================
+
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000736.html">[JOS-Kernel] checkPendingNotifies</A></li>
+	<LI> Next message: <A HREF="000734.html">[JOS-Kernel] Bootable version?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#739">[ date ]</a>
+              <a href="thread.html#739">[ thread ]</a>
+              <a href="subject.html#739">[ subject ]</a>
+              <a href="author.html#739">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

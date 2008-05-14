@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] general interrupts</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000346.html">
+   <LINK REL="Next" HREF="000341.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] general interrupts</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] general interrupts">tmiller@haverford.edu</A><BR>
+    <I>Thu, 9 Sep 1999 09:07:36 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000346.html">[JOS-Kernel] general interrupts</A></li>
+        <LI> Next message: <A HREF="000341.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#347">[ date ]</a>
+              <a href="thread.html#347">[ thread ]</a>
+              <a href="subject.html#347">[ subject ]</a>
+              <a href="author.html#347">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> int.wait()
+</I>&gt;<i> int.getcaughtint()
+</I>&gt;<i> 
+</I>&gt;<i> I don't know if this would be difficult/possible to write.
+</I>
+	Part of what I want to do while rewriting the keyboard driver was
+to correct this (it's broken in two or three different ways, actually),
+with a system where interrupts/InterruptDispatcher queues up interrupt
+notifications and then fires off events to the interested listeners, viz:
+
+interrupts.addInterruptListener( 8, this );
+interrupts.addInterruptListener( 14, this )
+
+void handleInterrupt( int i ) {
+	if ( i == 8 ) {
+		/* do something */
+	else if ( i == 14 ) {
+		/* do something else */
+	else {
+		/* somehow interrupts got confused */
+	}
+
+
+	The reason I was asking JM about the API docs for JavaOS/B was to
+clone their interrupt-handling design (which I don't recall right now).
+If I can't find anything soon, I'll just roll my own.
+
+-_Quinn
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000346.html">[JOS-Kernel] general interrupts</A></li>
+	<LI> Next message: <A HREF="000341.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#347">[ date ]</a>
+              <a href="thread.html#347">[ thread ]</a>
+              <a href="subject.html#347">[ subject ]</a>
+              <a href="author.html#347">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

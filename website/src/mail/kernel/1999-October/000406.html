@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Bugs in JJOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000404.html">
+   <LINK REL="Next" HREF="000407.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Bugs in JJOS</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Kernel] Bugs in JJOS">hilarycheng@usa.net</A><BR>
+    <I>Mon, 4 Oct 1999 22:00:01 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000404.html">[JOS-Kernel] decaf bug report</A></li>
+        <LI> Next message: <A HREF="000407.html">[JOS-Kernel] Makefile error on d/l-ed JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#406">[ date ]</a>
+              <a href="thread.html#406">[ thread ]</a>
+              <a href="subject.html#406">[ subject ]</a>
+              <a href="author.html#406">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi,
+
+&gt;&gt;<i> 1. no Implmentation of getPrimitiveClass in java.lang.Class
+</I>&gt;<i>
+</I>&gt;<i> Hm.  Can't seem to find this call in my docs, though it exists in
+</I>&gt;<i>Sun's library.  You pass it a string and it returns you a Class?  What's
+</I>&gt;<i>different than other functions that do the same thing?  (If you've gone
+</I>&gt;<i>over this before, my apologies; just tell me to look through my old mail.)
+</I>
+getPrimitiveClass is used for generating a Class for Primitive Type. e.g.
+int, long, double.
+Since int is not a Object in Java. But it is needed.
+
+well, it is not implemented by Sun Class. It is implemented by JVM.
+
+right now, I created a a simple java_object and return this object to
+Integer/Long/etc.
+It can run w/o any problem. But if a program get a class from this method,
+it will cause
+problem. Since it got no informiation about Primitive Type.
+
+&gt;&gt;<i> 2. arraycopy is not implmentation.
+</I>&gt;<i>
+</I>&gt;<i> It's in CVS now, though it's known to be broken in two cases (see
+</I>&gt;<i>the source code) and untested.  Enjoy!
+</I>
+well, let me test. :p
+
+&gt;&gt;<i> 3. iinc sign extension problem.
+</I>&gt;<i>
+</I>&gt;<i> Feel free to correct this one yourself &amp; u/l the change.
+</I>
+I got no cvs access. hm........I think I would like to put change on the web
+page
+and let all developers have a look be4 made any change to cvs server.
+
+One More things, lushr is not implemented in JJOS. If we don't implemented
+this instruction, Long Object can't not be created.
+
+Regards,
+
+Hilary
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000404.html">[JOS-Kernel] decaf bug report</A></li>
+	<LI> Next message: <A HREF="000407.html">[JOS-Kernel] Makefile error on d/l-ed JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#406">[ date ]</a>
+              <a href="thread.html#406">[ thread ]</a>
+              <a href="subject.html#406">[ subject ]</a>
+              <a href="author.html#406">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

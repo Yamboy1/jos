@@ -1,0 +1,203 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: stupid code proposal for decaf</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:werner.schuster%40netway.at">
+   <LINK REL="Previous"  HREF="000363.html">
+   <LINK REL="Next" HREF="000365.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: stupid code proposal for decaf</H1>
+    <B>Murphy</B> 
+    <A HREF="mailto:werner.schuster%40netway.at"
+       TITLE="[JOS-Kernel] Re: stupid code proposal for decaf">werner.schuster@netway.at</A><BR>
+    <I>Thu, 16 Sep 1999 17:29:45 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000363.html">[JOS-Kernel] troubles with making JJOS</A></li>
+        <LI> Next message: <A HREF="000365.html">[JOS-Kernel] Re: stupid code proposal for decaf</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#364">[ date ]</a>
+              <a href="thread.html#364">[ thread ]</a>
+              <a href="subject.html#364">[ subject ]</a>
+              <a href="author.html#364">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 22:24 14.09.99 -0400, you wrote:
+&gt;<i>Hi!
+</I>&gt;<i>
+</I>&gt;<i>Todd L. Miller wrote:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt; &gt; a week ago I checked out the JJOS from jos.org, and had a look
+</I>&gt;<i> &gt; &gt; at it, tried to build it, but it seems that either me or my
+</I>&gt;<i> &gt; &gt; linux(redhat 5.1)/make is to stupid to do that (you decide);
+</I>&gt;<i> &gt; &gt; after hours, i quit trying frustrated;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;         Let us know what problems you had!  We'd like to know; it'll
+</I>&gt;<i> &gt; probably clue us in on something that should be in the docs or an error we
+</I>&gt;<i> &gt; made.  And if you'd got any time for coding, we'd love your help.
+</I>&gt;<i>
+</I>&gt;<i>Ditto.  Let me know, too.  Hell, send it to the list.  I think I'm going
+</I>&gt;<i>to shortly run into problems when I try and do some machine-dependent
+</I>&gt;<i>bytecode.
+</I>&gt;<i>
+</I>
+done;
+
+
+&gt;<i> &gt;         Thanks for your suggestion about interp.cc.  I've always been
+</I>&gt;<i> &gt; worried about the main interperter switch in interp.cc.  I'm under the
+</I>&gt;<i> &gt; impression, however, that you're essentially hardcoding what the compiler
+</I>&gt;<i> &gt; will do for us when it generates the switch's jump-table.  I've forwarded
+</I>&gt;<i> &gt; your last mail to John Morrison, who knows more about this than I do;
+</I>&gt;<i> &gt; we'll see what he says.
+</I>&gt;<i>
+</I>&gt;<i>You know, it's funny you mention this.  I just ran some profiling on
+</I>&gt;<i>both &quot;normal&quot; and optimized code, and noted that frame::runOpcode took
+</I>&gt;<i>9% of the time on unoptimized code, and 12% of the time for optimized
+</I>&gt;<i>code.
+</I>
+
+by unoptimized code, do you mean that you compiled it with
+optimization turned of,
+or do you mean the code with the switch statement as unoptimized ('normal') 
+code, and my ~code as 'optimized' code?
+
+
+&gt;<i>  I then checked what the compiler was doing for the switch, and
+</I>&gt;<i>found it was generating a jump table as you suggested (you can verify
+</I>&gt;<i>this by adding a &quot;-S&quot; switch to the compilation switches for interp.cc
+</I>&gt;<i>and check out what the compiler spits out -- the array of .L### things
+</I>&gt;<i>is the set of goto-labels for the jump-table).  It's possible we might
+</I>&gt;<i>be able to do better if we paid attention to some other things like
+</I>&gt;<i>cache locality (I think the jump table might be put distantly in the
+</I>&gt;<i>.data section), but I'm not sure we could do a helluva lot better than
+</I>&gt;<i>the compiler.  However, if we can, we should...  Benchmarking should
+</I>&gt;<i>definitely be done to verify and quantify the progress if we undertake
+</I>&gt;<i>the task...
+</I>
+
+
+before I sent you my Idea, i also thought that there might be some way for 
+the compiler to optimize the switch statement; but I only found a way
+for subsequent case options
+(dont know if thats the right word; I mean code that looks like this
+swich(var) {
+case 1: some code for 1
+case 2: some code for 2
+case 3: some code for 3
+default: some default code
+}// end of switch  ),
+
+cause for this case, the compiler (I thought) could just make code 
+something like this:
+the &quot;swich statement&quot; code,
+  it takes its own adress and adds the the content of var;
+cause then, for var == 1 it would jump to this, it would add
+1 to its address; the resulting adress would contain a goto statement
+pointing to the code that handles 1;
+if var == 2, it would add 2, and the resulting adress would contain
+a goto to a handler for this case,...;
+
+this should look like this:
+0xbase  address for switch code
+0xbase+1        contains goto for case 1
+0xbase+2        contains goto for case 2
+...
+
+of course, one if is necessary to check if var contains something bigger
+than 3 (in this example), and handle that;
+
+
+as I said, I thought, that the compiler might make an optimization like this,
+but this is not possible with:
+
+swich(var) {
+case 10: some code for 10
+case 29: some code for 29
+case 222: some code for 222
+default: some default code
+}// end of switch
+---
+
+I'm not sure if you understand all my babbling above, if you don't forget it
+its not important :-)
+it only shows that I dont know how the compiler handles switch optimization;
+but I kinda feel that my approach gotta be faster than any switch 
+optimization that the compiler can do;
+cause we need no if or gotos in the code, we only have to get
+get the function pointer from the array using the bytecode as parameter;
+
+also, we don't have to do this with an array:
+- locate memory (to hold 256 function pointers),
+- then fill this with the function pointers
+
+now, in frame:runOpcode, to resolve the function, only do this:
+
+functionPointer = *base + (bytecode * sizeOf(bool) )
+
+et voila;
+I mean that gotta be [much?] faster than some switch thing;
+
+---
+
+another advantage of my approach is, that you could easily change the
+bytecode handler functions at runtime (although I don't know if that feature
+could be used; I mean, could that be used for any optimizations at runtime, 
+something hotspot like;
+or maybe to change the behaviour of the vm at runtime (are there any
+bytecode differences in the different vm versions?));
+
+
+
+&gt;<i>Having said that, there is still tons of optimizations that could be
+</I>&gt;<i>done.  Todd and I have written an awful lot of small methods (especially
+</I>&gt;<i>accessor methods) and oft-used methods (e.g., setting/getting local
+</I>&gt;<i>variables in a stack frame) that could stand to be rewritten as
+</I>&gt;<i>&quot;inlines.&quot;  There are probably even more algorithmically interesting
+</I>&gt;<i>optimizations that could be made -- we currently do no opcode
+</I>&gt;<i>rewriting...
+</I>well, I gotta ask stupidly:
+what's opcode rewriting?
+something like hotspot?
+
+murphee
+
+
+
+&gt;<i>-
+</I>
+***************************************
+UNITE FOR JAVA -&gt; www.javalobby.org
+Check this out -&gt; www.jos.org
+My site -&gt; www.angelfire.com/co/werners
+***************************************
+... and the fact, that i haven't put a gun to my mouth yet,
+proves that i'm a winner!
+Al Bundy
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000363.html">[JOS-Kernel] troubles with making JJOS</A></li>
+	<LI> Next message: <A HREF="000365.html">[JOS-Kernel] Re: stupid code proposal for decaf</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#364">[ date ]</a>
+              <a href="thread.html#364">[ thread ]</a>
+              <a href="subject.html#364">[ subject ]</a>
+              <a href="author.html#364">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

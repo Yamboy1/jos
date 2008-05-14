@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf/JJOS: keyboard driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   
+   <LINK REL="Next" HREF="000060.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf/JJOS: keyboard driver</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf/JJOS: keyboard driver">tmiller@haverford.edu</A><BR>
+    <I>Wed, 2 Jun 1999 22:45:48 -0400 (EDT)</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000060.html">[JOS-Kernel] Re: monitors in decaf</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Monitors &amp; all, decaf &amp; its keyboard driver are on CVS for your
+viewing pleasure.  It works, but is mostly incomplete.  (I have a JVM to
+work on, all you device-driver people :))
+
+	Things fixed: a nasty bug in invokeinterface (which I think I had
+found before and lost in the great refactoring); a nasty bug in
+tableswitch (which might mean lookupswitch is also broken, haven't checked
+yet); several less-nasty bugs in the Java code; a minor correction to
+checkcast ( NULL/null values cast to everything ); other minor fixes en
+route.  Made several small changes to make the output prettier.  (Turned
+off dot-each-clock printing, interrupt #9 notification, etc.)  Because
+decaf still lacks support for exceptions, I had to add some work-around
+code for the translation table.
+
+	Known problems: can't get it to boot via GRUB, even w/ robfitz's
+patch &amp; makefile.  GRUB complains that it's in an invalid file format.
+We're still stuck with EtherBoot for now.  (robfitz, if you could help me
+out with this, I'd much appreciate it.  Email me off-list.)  The
+jos.system.event.KeyEvent.VK_* constants aren't right, except for VK_A
+through VK_Z and VK_1 throught VK_10.  Someone who feels like being
+helpful could finish the rest of the mapping.  (Why not use AWT?  Long
+story.  Why not copy the source?  Possible legal complications.  Luckily, 
+most of it's ASCII... er, unicode.)  I haven't finished porting Albrecht's
+code over, so the keyboard doesn't do nifty things like type upper-case
+letters :)  Oh -- it only works with standard 102 key keyboards, so if
+you've got something funky, write us a driver.
+
+	Let us know if you hit any snags.
+
+-_Quinn
+
+&quot;All the world's a JVM, and we are but bytecodes in it, tying to remember
+our line-numbers.&quot; -- William Sunspear
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000060.html">[JOS-Kernel] Re: monitors in decaf</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:draft%40fear.ch">
+   <LINK REL="Previous"  HREF="000297.html">
+   <LINK REL="Next" HREF="000301.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>Thomas Bocek</B> 
+    <A HREF="mailto:draft%40fear.ch"
+       TITLE="[JOS-Kernel] decaf updates">draft@fear.ch</A><BR>
+    <I>Wed, 25 Aug 1999 15:52:49 +0200 (CEST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000297.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000301.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#299">[ date ]</a>
+              <a href="thread.html#299">[ thread ]</a>
+              <a href="subject.html#299">[ subject ]</a>
+              <a href="author.html#299">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>On Wed, 25 Aug 1999, Hilary Cheng wrote:
+
+&gt;<i> Hi all,
+</I>&gt;<i> 
+</I>&gt;<i> &gt;Hi all
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;I updated the vga driver, made some bugfixes, added a stop routine that
+</I>&gt;<i> &gt;switches to the previous video mode and a bitblt to draw sprites (I  hate
+</I>&gt;<i> &gt;bit shiftings *g*). Found 2 bugs in the jvm -&gt; idiv and irem.
+</I>&gt;<i> 
+</I>&gt;<i> Would u mind send me the latest code ? :D
+</I>
+yep, but first I have to clean up...
+
+&gt;<i> I wanna to test ur bitblt function and I would like to implement it to
+</I>&gt;<i> draw Font on the VGA Screen.
+</I>
+cool, do you read the fonts from the vid-mem? the start routine
+clears unforunately the hole vid-mem, so no fonts after the stop routine
+are available (yet).
+
+&gt;<i> Also, I have finished a drawLine and drawRect routine. These two methods
+</I>&gt;<i> are similar to java.awt.Graphcis. I will try to implements some more
+</I>&gt;<i> java.awt.Graphisc
+</I>&gt;<i> in device driver level.
+</I>
+hmm, does drawLine and drawRect write direct to the vidmem or is there a
+kind of a virtual screen (jdkxx?).
+
+(drawRect/drawLine/drawString-&gt;buffer-&gt;bitblt?-&gt;vidmem) or
+(drawRect/drawLine/drawString-&gt;vidmem)
+
+If there is a kind of a buffer, then we can't use the drawLine and
+drawRect which is implemented in the driver. But I really don't know!
+
+&gt;<i> &gt;I will update (send code to John-&gt; still no cvs access) the code when
+</I>&gt;<i> &gt;the general driver implementation is done (end of this week, I guess).
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;The problem is the speed: I think we (Hilary?, you have done something
+</I>&gt;<i> &gt;similar) should implement a native memcopy to speed up the vga output.
+</I>&gt;<i> 
+</I>&gt;<i> Well, I found two bugs in JVM.
+</I>&gt;<i> 1. Date Object -- When I create Date Object, JJOS Kernel will got some
+</I>&gt;<i> behaivour. (Show lots of Zero on the screen.)
+</I>
+I had the same bug, but it was a div by zero. This is now fixed.
+-&gt;idiv,irem, already sent to John.
+
+&gt;<i> 2. String -- String can't perform chatAt and getBytes, toCharArray
+</I>&gt;<i> So I can't draw Character on VGA from a Java String.
+</I>&gt;<i> 
+</I>&gt;<i> I have implemented a simple fill routine. It just fill up a memory space
+</I>&gt;<i> in native implementation. But I think this routine is just for testing
+</I>&gt;<i> puporse. If speed of JJOS is fast enough, It will be deleted.
+</I>&gt;<i> 
+</I>&gt;<i> &gt;vga and speed:
+</I>&gt;<i> &gt;To avoid flickering, you have to write into the vga-mem when the vertical
+</I>&gt;<i> &gt;retrace is active. the memcopy should be finished before the vertical
+</I>&gt;<i> &gt;retrace ends. If not, you will see the sprite flickering. The current
+</I>&gt;<i> &gt;speed of the write8/16/32 is to slow to finish before the vertical retrace
+</I>&gt;<i> &gt;gets inactive.
+</I>
+[cut]
+
+Thomas Bocek
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000297.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000301.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#299">[ date ]</a>
+              <a href="thread.html#299">[ thread ]</a>
+              <a href="subject.html#299">[ subject ]</a>
+              <a href="author.html#299">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

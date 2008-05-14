@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Garbage collection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000216.html">
+   <LINK REL="Next" HREF="000186.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Garbage collection</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Garbage collection">jm@mak.com</A><BR>
+    <I>Mon, 16 Aug 1999 07:33:30 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000216.html">[JOS-Kernel] Garbage collection</A></li>
+        <LI> Next message: <A HREF="000186.html">[JOS-Kernel] the vga driver is working now</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#237">[ date ]</a>
+              <a href="thread.html#237">[ thread ]</a>
+              <a href="subject.html#237">[ subject ]</a>
+              <a href="author.html#237">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Robert;
+
+Robert Fitzsimons wrote:
+&gt;<i> I had a look at this over the weekend, but i'm having a problem.  It seems
+</I>&gt;<i> there is a problem with the way JJOS is being linked, the data structure
+</I>&gt;<i> which GRUB needs should be in the first 8192 bytes of the file, but isn't.
+</I>&gt;<i> I'm going to have another look at it tonight and I will report my findings
+</I>&gt;<i> tomorrow.
+</I>
+Sorry if I missed your reply/follow-up.  Is there anything I can do to help
+here?  What's the &quot;data structure&quot; that GRUB needs?  
+
+I know that we do some, er, funky things in the build process (to arrive at a
+&quot;raw&quot; executable), but I think that we leave a file for each step in the build
+process around (e.g., the jjos-elf file is an ELF-format version of the eventual
+&quot;raw&quot; or &quot;binary&quot; file).  If GRUB requires ELF files (rather than &quot;raw&quot; -- I
+seem to recall it wanted ELF), we can nuke the ELF-&gt;raw conversion and use that
+instead to build the GRUB file.  Barring that, there are lots of things that
+&quot;objcopy&quot; can do...
+
+Let me know if there's anything else I can do to help.  I get the feeling that
+there are more people in the &quot;single machine&quot; developer camp than in the &quot;two
+machines&quot; camp.  Getting GRUB up would more than double the number of people
+that could help, so I'd venture to say that it's the single most important task
+any of us is working on.  (Don't feel any pressure, or anything! :=)
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000216.html">[JOS-Kernel] Garbage collection</A></li>
+	<LI> Next message: <A HREF="000186.html">[JOS-Kernel] the vga driver is working now</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#237">[ date ]</a>
+              <a href="thread.html#237">[ thread ]</a>
+              <a href="subject.html#237">[ subject ]</a>
+              <a href="author.html#237">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

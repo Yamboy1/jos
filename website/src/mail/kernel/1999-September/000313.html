@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] CPUID instruction problem due to use of optimizer</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000318.html">
+   <LINK REL="Next" HREF="000314.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] CPUID instruction problem due to use of optimizer</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] CPUID instruction problem due to use of optimizer">jm@mak.com</A><BR>
+    <I>Tue, 31 Aug 1999 19:13:02 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000318.html">[JOS-Kernel] Interrupts</A></li>
+        <LI> Next message: <A HREF="000314.html">[JOS-Kernel] CPUID instruction problem due to use of optimizer</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#313">[ date ]</a>
+              <a href="thread.html#313">[ thread ]</a>
+              <a href="subject.html#313">[ subject ]</a>
+              <a href="author.html#313">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+The latest i386 build Makefile has the optimizer turned on.  This
+breaks some of the hardware-stroking code in the i386 jjMachine (which
+contains some asm() code).
+
+In order for the optimizer to be used, I clearly have to eyeball the
+code, and probably put some &quot;volatile&quot; declarations in some places,
+etc.  Or else, I could just not use the optimizer for those places.
+
+I am curious as to the behavior of -O compiled code on other people's
+hardware and with other people's compilers.  Please let me know what
+happened when YOU tried this.  However, for now, I am disabling it,
+and I will turn it off when I next commit the Makefile and my code.
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/">http://www.mak.com/</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000318.html">[JOS-Kernel] Interrupts</A></li>
+	<LI> Next message: <A HREF="000314.html">[JOS-Kernel] CPUID instruction problem due to use of optimizer</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#313">[ date ]</a>
+              <a href="thread.html#313">[ thread ]</a>
+              <a href="subject.html#313">[ subject ]</a>
+              <a href="author.html#313">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

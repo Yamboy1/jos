@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jJOS speed</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000246.html">
+   <LINK REL="Next" HREF="000252.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jJOS speed</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Kernel] jJOS speed">hilarycheng@usa.net</A><BR>
+    <I>Mon, 16 Aug 1999 09:35:59 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000246.html">[JOS-Kernel] jJOS speed</A></li>
+        <LI> Next message: <A HREF="000252.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#235">[ date ]</a>
+              <a href="thread.html#235">[ thread ]</a>
+              <a href="subject.html#235">[ subject ]</a>
+              <a href="author.html#235">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi All,
+
+
+&gt;<i>Hi Thomas;
+</I>&gt;<i>
+</I>&gt;<i>Thomas Bocek wrote:
+</I>&gt;&gt;<i> I made a little benchmark with the old source and with the new one:
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> old: vga fillroutine ~7 sec
+</I>&gt;&gt;<i> new: vga fillroutine ~5 sec
+</I>
+My testing is much similar to Thomas one. The speed has been improved
+after I upgraded the kernel.
+
+&gt;&gt;<i>
+</I>&gt;&gt;<i> The results aren't exact, because
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> 1. made the test with a stop-watch
+</I>&gt;&gt;<i>
+</I>&gt;&gt;<i> 2. the old source crashed after 7 sec, and the screen was only 1/5
+</I>filled,
+&gt;&gt;<i> the new source crashes after the screen is 4/5 filled.
+</I>&gt;<i>
+</I>
+The Crash means the VGA class stop filling screen.
+
+What I have done, I have made some changes on Thomas VGA class.
+1. I am trying to make generic interface for Graphics Adapator
+2. I added some variables after method call.
+i.e.
+original one : jos.system.machine.write8(0xaffff, 0);
+modified one : short temp = jos.system.machine.write8(0xaffff, 0);
+
+After modifying, the VGA can fill up whole screen without any problem. But
+the color on the screen are same color of check mark -_-. I will check it
+later.
+
+Also, I have made a memfill routine. It can speed up VGA filling much much a
+lots.
+
+For the crash(I use old code), I think the problem is stack overflow. Since
+the routine got no problem (it can fill up). I have tried to fill up with
+different counter value. When more pixels
+are filled, it will hangs very easy. If I fill up a few pixels, it got no
+problems.
+
+&gt;<i>OK, so if I were to extrapolate, the old one would finish in 35 seconds
+</I>&gt;<i>(barring a crash - HA), and the new one would finish in about 7 seconds
+</I>&gt;<i>(barring a crash), right?  So, this means we've speeded up the
+</I>&gt;<i>calls-to-native code about 5 times, eh?  If so, is performance creeping
+</I>&gt;<i>into the &quot;acceptable for now&quot; range (At least, until we do the
+</I>&gt;<i>JavaOS-style memory classes -- I'm also curious as to why the write32
+</I>&gt;<i>stuff is SLOWER -- can you try that one, too?)?  If so, is the
+</I>&gt;<i>memory-management stuff now the hottest fire?
+</I>&gt;<i>
+</I>&gt;<i>With respect to the crash:
+</I>&gt;<i>
+</I>&gt;<i>(1) When my version hangs after displaying the checkmark, is that the
+</I>&gt;<i>crash's failure mode?  I mean, is this the same &quot;crash&quot; you're getting?
+</I>&gt;<i>If so, I can try and debug it.
+</I>&gt;<i>
+</I>&gt;<i>(2) Do you think it would help if I wrote something that, in the case of
+</I>&gt;<i>a detectable crash, reset the VGA display to text mode and spat out some
+</I>&gt;<i>debugging info?  (Our own little BSOD!  What color should I make the
+</I>&gt;<i>screen?)  I could print out:
+</I>&gt;<i>(a) a diagnostic string
+</I>&gt;<i>(b) the native-code stacktrace (with &quot;nm&quot; you could see where in the JVM
+</I>&gt;<i>we were)
+</I>&gt;<i>(c) and maybe some other Java stuff (I'd have to think about how to do
+</I>&gt;<i>this, and fit it on one screen -- there could be quite a few Java
+</I>&gt;<i>threads -- too many to fit on one screen)
+</I>&gt;<i>We don't have enough of a console/GUI/Window Mgr for me to do anything
+</I>&gt;<i>else, right?
+</I>
+for debugging, I think we should modified VGA Class to be a Graphical
+Console.
+(Draw Characters pixel by pixel like Linux Frame Buffer Console). Then we
+can
+print debugging information on screen.
+
+&gt;<i>Again, thanks for the help -- I appreciate how, er, hostile the
+</I>&gt;<i>debugging environment is at this point in time!  I shall endeavor to
+</I>&gt;<i>make it less so.
+</I>&gt;<i>
+</I>&gt;<i>-jm
+</I>
+Regards,
+
+Hilary
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000246.html">[JOS-Kernel] jJOS speed</A></li>
+	<LI> Next message: <A HREF="000252.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#235">[ date ]</a>
+              <a href="thread.html#235">[ thread ]</a>
+              <a href="subject.html#235">[ subject ]</a>
+              <a href="author.html#235">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

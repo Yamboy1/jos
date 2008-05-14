@@ -1,0 +1,211 @@
+From gchii@mindspring.com Sun, 01 Oct 2000 11:29:54 -0400
+Date: Sun, 01 Oct 2000 11:29:54 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [shared objects] Storing shared objects inside kernel
+
+A Java object can be reduced to the following structure:
+
+structure mc_Object {
+  jint size;
+  jint list[];
+};
+
+A new object can be created list this:
+
+mc_Object *createObject( jint size ) {
+  mc_Object *o = new jint[ size + 1 ];
+  o->size = size;
+  return o;
+}
+
+A sparcely-populated collection of objects can be reduced to the following
+structure.
+
+structure mc_ObjectHolder {
+  jint descriptor;
+  mc_ObjectHolder *next;
+  mc_Object *object;
+};
+
+In order to store shared objects inside a kernel, the kernel must determine
+the object destriptor. The first object descriptor is 1, the second is 2
+and so forth.
+
+extern jint mc_lastDescriptor = 0;
+
+A call to the kernel creates a shared object, like this:
+
+jint descriptor = mc_createSharedObject( jint size );
+
+jint mc_CreateSharedObject( jint size ) {
+  mc_Object *o = mc_CreateObject( size );
+  mc_ObjectHolder *h = new mc_ObjectHolder( ++lastDescriptor, NULL, o );
+
+  mc_ObjectHolder *pcurr = ptop;
+  for (;;) {
+    if ( pcurr == NULL ) {
+      ptop = h;
+      return h->descriptor;
+    }
+
+    if ( pcurr->next == NULL ) {
+      pcurr->next = h;
+      return h->descriptor;
+    }
+
+    pcurr = pcurr->next;
+  }
+}
+
+Once a shared object has been created, its "fields" can be accessed and
+modified, like this:
+
+jint getSize( jint descriptor );
+jint getInt( jint descriptor, jint index );
+jint setInt( jint descriptor, jint index );
+
+Because an object descriptor from one call to mc_createSharedObject can be
+used in setInt(), it is possible to connect one shared object to another.
+
+Shared objects do not have a virtual machine garbage collector. They exist
+until they are destroyed. They are destroyed like this:
+
+void mc_destroySharedObject( jint descriptor );
+
+When a shared object has been destroyed, its descriptor is no longer valid.
+The mc_ObjectHolder structure is destroyed, destroying the mc_Object in the
+process. For an invalid descriptor, the getSize() method always returns -1.
+
+A kernel understands nothing about the layout of a shared object. This
+kernel service provides a way for multiple virtual machines or multiple
+bytecode processes to shared object data. Most likely, the first field
+(index=0) might point to another shared object, the class object. The
+second field (index=0) of a class object may be a shared object, a string,
+a class name.
+
+Obtain the class name of an arbitrary shared object like this:
+
+jint mc_getClassName( jint descriptor ) {
+  jint c = mc_getInt( descriptor, 0 ); // index=0 points to class object
+  return mc_getInt( c, 1 ); // index=1 points to a shared string
+}
+
+A long and double are stored using two indexes. Additional support must be
+provided for creating more efficent 8-bit and 16-bit arrays corresponding
+to byte[] and char[].
+
+mc_ByteArray *mc_createByteArray( jint size );
+jint mc_createSharedByteArray( jint size );
+
+mc_CharArray *mc_createCharArray( jint size );
+jint mc_createSharedCharArray( jint size );
+
+A shared string can be created from a shared character array.
+
+jint mc_createString( jint descriptor );
+
+To walk the heap of shared objects, the kernel should provide the following
+enumerator:
+
+structure mc_Enumerator {
+  bool valid;
+  jint descriptor;
+};
+
+void mc_enumerateSharedObject( mc_Enumerator *v );
+
+Here is a method that walks the heap and determines the class descriptor
+for each shared object.
+
+void example() {
+  mc_Enumerator e;
+
+  e.descriptor = 0;
+  cout << "object\tclass" << endl;
+  for (;;) {
+    mc_enumerateSharedObject( &e );
+
+    if ( !e.valid ) {
+      break;
+    }
+
+    cout << e.descriptor << "\t" << mc_getInt( e.descriptor, 0 ) << endl;
+  }
+}
+
+
+
+
+
+From gchii@mindspring.com Sun, 01 Oct 2000 11:34:04 -0400
+Date: Sun, 01 Oct 2000 11:34:04 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [list administration] Adding "Active" to list description
+
+Some lists are active; some are not. I'm planning to add the word "Active"
+to the description of this mailing list. This will let anyone wanting to
+subscribe know that this list is active.
+
+
+
+
+
+From gchii@mindspring.com Fri, 06 Oct 2000 18:30:58 -0400
+Date: Fri, 06 Oct 2000 18:30:58 -0400
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [cjos] Definition
+
+A standard C library is a good kernel interface. With support for a
+standard C library, a virtual machine can be ported to a JOS-compatible
+kernel. A virtual machine does not need a new kernel interface.
+
+Many C/C++ programmers already know the standard C library. By continuing
+to support it, many C/C++ programmers will be able to contribute their code
+to the JOS Project.
+
+The Java programming language is not yet a system programming language.
+Compatibility with the Java language specification is not as important as
+compatibility with the Java Virtual Machine Specification. There are many
+opportunities to re-write the book on Java programming. For example, much
+can be accomplished with the Jasmin assembler. Valid bytecode can be
+created in assembler that cannot be created with the Java programming
+language.
+
+The C in CJOS is for the emphasis on the standard C library. Much of the
+standard C library can be exposed to Java applications. File descriptors,
+for example, can be 32-bit integers (int in Java).
+
+package cjos.include1a;
+public interface io {
+  public abstract int open( String name, int mode );
+  public abstract int read( int fd, byte[] buf );
+  public abstract int write( int fd, byte[] buf );
+  public abstract void close( int fd );
+}
+
+Such an interface to the standard C library would enable a Java application
+to open an arbitrary file and use a file descriptor (int) to read, write
+and close that file.
+
+  public void example() {
+    byte[] buf = new byte[ 1024 ];
+
+    int fd = open( "x", 3 );
+    read( fd, buf );
+    write( fd, buf );
+    close( fd );
+  }
+
+Such interfaces must not be directly connected to a native method. An
+implementation of a file system may be completely written in bytecode. The
+Bytecode Native Interface is expected to be useful here. An implementation
+of the io interface is returned by an object factory. The instance of io is
+used to open, read, write and close files.
+
+Interestingly, the instance of io returned to a method may be dependent on
+the current process in an MPCL-compatible virtual machine.
+
+
+
+
+

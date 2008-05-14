@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] bug report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000596.html">
+   <LINK REL="Next" HREF="000601.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] bug report</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] bug report">tmiller@haverford.edu</A><BR>
+    <I>Wed, 5 Jan 2000 17:24:39 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000596.html">[JOS-Kernel] About GRUB of JJOS</A></li>
+        <LI> Next message: <A HREF="000601.html">[JOS-Kernel] Oops!  consoleNative fix</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#600">[ date ]</a>
+              <a href="thread.html#600">[ thread ]</a>
+              <a href="subject.html#600">[ subject ]</a>
+              <a href="author.html#600">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	I committed some stuff to CVS this morning, touching a large
+number of files.  A few separate updates went into this commit.  First, a
+nearly-functional version of Avery's native &lt;-&gt; java console
+bridge.  Currently, it's held up by my mistaken belief that interface
+methods could never be native.  (As it turns out, the method listed in
+the interface must NOT be native, but the method body in the implementing
+class can be anything at all...)  This means that decaf kills the thread
+when consoleNative is supposed to do anything because it can't find the
+method body.  I'll try to get that fix in tonight.
+
+	Secondly, I fixed the bug Avery uncovered w.r.t. native
+methods.  The problem was that we'd never bothered to munge the classname
+into the hashtable in which we were storing built-in methods.  This is
+fixed in the commit.
+
+	Third, I included my work on a curses-based host build (apparently
+and unwittingly in part duplicated by Corrado) -- keystroke-by-keystroke
+keyboard driver &amp; the beginnings of a console system.  (Add a native
+method to manipulate curses pads to the driver.console class; copy from
+the buffer to there, instead of the mappedByteArray, and have update() (or
+makeVisible(), etc), call the proper pad to stdscr curses function.)
+
+	As I mentioned above, the commit doesn't work as is; the fix is
+relatively simple, though, just change consoled's consoles[0] back to
+being a normal console.driver.
+
+
+	W.r.t. GRUB vs etherbooting, I've only been using GRUB booting for
+my recent set of changes, but I'd be very suprised if the etherboot didn't
+work.  Once a sufficiently large majority of active developers let me know
+that they've got a GRUB boot working, I'll change the Makefile default to
+that and stop worrying about etherboot, except for maybe public
+releases.  (Whenever /that/ might be.)  The main difference between the
+two is where the text-mode VGA buffer is located.  (BTW, the GRUB boot
+needs to clear the initial console before doing anything else, because the
+GRUB junk on screen makes things hard to read.)  This should be fixable in
+the ASM if anyone's willing to try.  ( mov ah, 0x04; int 0x10 might do it,
+but check the VGA BIOS specs for the right video mode (80x24 at 0xb8000,
+IIRC)).
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000596.html">[JOS-Kernel] About GRUB of JJOS</A></li>
+	<LI> Next message: <A HREF="000601.html">[JOS-Kernel] Oops!  consoleNative fix</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#600">[ date ]</a>
+              <a href="thread.html#600">[ thread ]</a>
+              <a href="subject.html#600">[ subject ]</a>
+              <a href="author.html#600">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Problems w/ i386 build</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000096.html">
+   <LINK REL="Next" HREF="000108.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Problems w/ i386 build</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Problems w/ i386 build">jm@mak.com</A><BR>
+    <I>Sun, 20 Jun 1999 17:07:51 +0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000096.html">[JOS-Kernel] Linux kernel as the JOS kernel</A></li>
+        <LI> Next message: <A HREF="000108.html">[JOS-Kernel] decaf progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#97">[ date ]</a>
+              <a href="thread.html#97">[ thread ]</a>
+              <a href="subject.html#97">[ subject ]</a>
+              <a href="author.html#97">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Guys;
+
+The Short Version: If you're working with the i386 build (as opposed to
+the host build) of jjos+decaf, please upgrade to version Etherboot 4.2
+(from version 4.0).
+
+
+The Longer Version: Thomas Bocek just contacted me telling me that the
+i386 build doesn't work for him, and that he's tracked it down as far
+as: if he allows jbHeap::scrubMemory to scrub between 1MB and 8MB, then
+decaf doesn't start.  He's got 64MB DRAM.
+
+I just tried to build and execute the i386 target for the first time in
+a long while (longer than I care to admit).  I had to redo all that
+TFTP/BOOTP stuff under RedHat 6.0.  I ran into a couple problems worth
+mentioning -- FYI, here is what I found.
+
+(1) The Etherboot v4.0 floppies don't seem to want to TFTP over the
+entire 9MB (approx) jjos.zip file we create.  I manually deleted sun/*
+from the zipfile to get the 9MB file down to about 1.5MB, and it loaded
+successfully.
+
+(2) When this shrunken jjos.zip was finally ran, it looked like it
+stalled after enabling A20, and then said something quickly about the
+CPU type, and then it fielded a WHOLE LOT of interrupt zeroes, and then
+it just got, real, REAL, quiet.
+
+(3) I upgraded to Etherboot 4.2, which took a whole 10 minutes.  (I did
+this because of the downloading problem, but also because the release
+notes muttered something about &quot;not clearing memory&quot; to avoid hammering
+something.)  I rebuilt the jjos.zip file so as to get it back up to
+9MB.  I changed NO SOURCES at all in either java or C++/ASM between
+problematic step (2) and this step (3).
+
+(4) It ran fine (well, identically to the slightly broken arch/host
+build I am working on).
+
+Thus, Thomas (and others), please be so kind as to upgrade to Etherboot
+4.2, available from:
+	<A HREF="http://www.slug.org.au/etherboot/">http://www.slug.org.au/etherboot/</A>
+and try again, and let me know what happens.
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000096.html">[JOS-Kernel] Linux kernel as the JOS kernel</A></li>
+	<LI> Next message: <A HREF="000108.html">[JOS-Kernel] decaf progress</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#97">[ date ]</a>
+              <a href="thread.html#97">[ thread ]</a>
+              <a href="subject.html#97">[ subject ]</a>
+              <a href="author.html#97">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

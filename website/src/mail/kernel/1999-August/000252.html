@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Adventures with the tool chain</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000235.html">
+   <LINK REL="Next" HREF="000253.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Adventures with the tool chain</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Kernel] Adventures with the tool chain">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Wed, 18 Aug 1999 10:21:15 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000235.html">[JOS-Kernel] jJOS speed</A></li>
+        <LI> Next message: <A HREF="000253.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#252">[ date ]</a>
+              <a href="thread.html#252">[ thread ]</a>
+              <a href="subject.html#252">[ subject ]</a>
+              <a href="author.html#252">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi all,
+
+Last night, after a year of waiting for Linux to finally work with my
+hardware and other assorted challenges, I was finally able to get almost
+everything in the tool chain to compile!  I had to make some changes in the
+mknbi-jos Makefile and mknbi.c to get mknbi to compile with Etherboot 4.2.?.
+I also found that a few things in the tool chain are undocumented.  For
+instance, I had to get the blackdown JDK, but no where in the docs was that
+mentioned, and no mention of what version was required and/or known to work
+either.  I ended up getting the latest (1.1.7v3) and it compiles, though I
+don't know about running yet.  I am using newer version of Etherboot and
+nasm than the tested versions, so I don't know yet whether they will run or
+not (they do finally compile).  I also discovered that bootp is no longer
+recommended or distributed with RedHat 6.0.  I had to go back and find in in
+5.2.  I still don't know if this is going to work.  According to the
+Etherboot documents, DHCP(?) is now recommended instead of bootp in RedHat
+6.  I don't know why this is the case, but we may need to consider upgrading
+our tool chain in order to keep current.  I can't go back to RedHat 5.2
+because of the above mentioned hardware compatibility problems which were
+finally solved with RedHat 6.  (RedHat 6, BTW, I have found to be far
+superior and much easier to use and work with than 5.2 was.  I heartily
+recommend an upgrade if you are on 5.2.)
+
+Here are my outstanding problems:
+* The i386 build compiles, but the host build does not.  It is complaining
+about missing a file: /etc/lib/gnu/types.h (or something like that, I dont'
+have it in front of me.)  And lo and behold, the directory is there, but not
+the file.  Am I missing an RPM?  If so, which one might that be?
+* I was able to build the floppy and I tried to boot JJOS over my home
+network, but for some reason it couldn't find my NIC.  Was there maybe a
+configuration step that I could have been missing?  What are the standard
+steps you need to go through to get that to work reliably  I am reasonably
+sure I have the right driver (Tulip) for my NIC.
+* The above DHCP vs. bootp question.
+
+I also learned yesterday that the maker of one of my video cards (NVIDIA)
+has released OS-independent source code for the driver with loads of
+documentation.  There is a good chance of my being able to massage that into
+a driver for JJOS.  I will need GRUB first, because that video card is on my
+host machine, not the slave.
+
+I'm looking forward to actually seeing this thing run and be able to
+contribute!
+
+Regards,
+Avery J. Regier
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000235.html">[JOS-Kernel] jJOS speed</A></li>
+	<LI> Next message: <A HREF="000253.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#252">[ date ]</a>
+              <a href="thread.html#252">[ thread ]</a>
+              <a href="subject.html#252">[ subject ]</a>
+              <a href="author.html#252">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] progress update</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   
+   <LINK REL="Next" HREF="000648.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] progress update</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] progress update">tmiller@haverford.edu</A><BR>
+    <I>Wed, 2 Feb 2000 09:30:06 -0500 (EST)</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000648.html">[JOS-Kernel] progress update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#647">[ date ]</a>
+              <a href="thread.html#647">[ thread ]</a>
+              <a href="subject.html#647">[ subject ]</a>
+              <a href="author.html#647">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	After spending two weeks (or so) trying to get the classpath
+native libraries working, I've given up on them, especially since they'd
+require JNI, where doing all that work would only help the host build.  So
+I decided to just go with their class library, and write the VM-specific
+bits directly into decaf, the same way we do native methods now, and leave
+porting native-&gt;BCNI/native code to whoever uses it.  (Including myself.)
+
+	So started trying to do that, and quickly ran smack into the
+back-end ugliness that I had mentioned wanting to rewrite at some
+point.  It may well have been possible to write the VM-specific code
+without a rewrite, but it would have been unbelievably ugly -- so I've
+started a clean-slate re-write of everything in the common/decaf
+directory.  (Since JM's code tends to be much cleaner than mine, and I
+don't fully understand great big chunks of it, I'm leaving well-enough in
+common/nativecode alone.  I'll re-write whatever chunks of the
+arch/*/nativecode stuff seems appropriate, but most of that is in much
+better shape than common/decaf, and I don't think much work will be
+necessary.)  I should be done with the re-write in less than two weeks,
+and the VM work for classpath ought to be done by at most a week later.
+
+	Anyway, my apologies to those of you that have been sitting on
+their hands while I've tried to get my act together.
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000648.html">[JOS-Kernel] progress update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#647">[ date ]</a>
+              <a href="thread.html#647">[ thread ]</a>
+              <a href="subject.html#647">[ subject ]</a>
+              <a href="author.html#647">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

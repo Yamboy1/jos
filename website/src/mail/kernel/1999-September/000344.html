@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] bocek's interrupt eight</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000338.html">
+   <LINK REL="Next" HREF="000345.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] bocek's interrupt eight</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] bocek's interrupt eight">tmiller@haverford.edu</A><BR>
+    <I>Wed, 8 Sep 1999 09:31:41 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000338.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+        <LI> Next message: <A HREF="000345.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#344">[ date ]</a>
+              <a href="thread.html#344">[ thread ]</a>
+              <a href="subject.html#344">[ subject ]</a>
+              <a href="author.html#344">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> OK.  Do you think it's better to leave interrupts entirely *disabled* until the
+</I>&gt;<i> Java code decides it's the time to enable them?  This is an entirely reasonable
+</I>&gt;<i> approach, and (hmm....) I don't think it will break anything at all (hmm...,
+</I>&gt;<i> right?).  Actually, I don't understand why I didn't do it that way in the first
+</I>&gt;<i> place (maybe I'm forgetting something ... wouldn't be the first time).
+</I>
+	I thought there was some good reason for it (leaving them enable
+but ignoring the clock) also, but I couldn't tell you what it might have
+been.
+
+&gt;<i> So, in other words, I would not be breaking an entirely &quot;working&quot; build for
+</I>&gt;<i> you...
+</I>
+	Right.  Hopefully my commit wouldn't be breaking anything for
+anyone else...
+
+&gt;<i> OK.  Let me know when you do this ... I won't really be able to do much more
+</I>&gt;<i> until Thursday at the earliest.  Do you think you'll be able to commit your
+</I>&gt;<i> stuff by then?  I'd REALLY like to commit the changes both because I'd like to
+</I>&gt;<i> attack some of the other remaining problems, and because I'd like the sources on
+</I>&gt;<i> more than one disk for safety's sake.
+</I>
+	I'll try to commit my changes sometime today.  A note about the
+Makefiles: -DFAST_NATIVE_CODE activates the check-native-before-lookup
+code, which breaks things; -DNATIVE_CLOCK activates the code that traps
+interrupt eight in the scheduler.  (-DHANDLE_CLOCK still needs to be
+defined in the native build if you want the clock interrupt to reach the 
+scheduler at all.)
+
+&gt;<i> Isn't there a JVM compatibility/test suite around?  I can't remember the name,
+</I>&gt;<i> but I seem to recall reading about it (but I seem also to recall some
+</I>&gt;<i> licensing/NDA issues).  Anybody else heard about something like this?
+</I>
+	I believe you're thinking about /mauve/, which, the last time I
+looked at it, was more of a class-library compatibility checker than
+anything else.
+
+
+	Finally, have you been able to find the JavaOS API specs anywhere?
+The website the .pdf files point to seems to have vanished, and I can't
+find anything on the Sun or IBM websites anymore.
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000338.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+	<LI> Next message: <A HREF="000345.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#344">[ date ]</a>
+              <a href="thread.html#344">[ thread ]</a>
+              <a href="subject.html#344">[ subject ]</a>
+              <a href="author.html#344">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

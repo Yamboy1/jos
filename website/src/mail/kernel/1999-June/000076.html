@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000073.html">
+   <LINK REL="Next" HREF="000070.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]">tmiller@haverford.edu</A><BR>
+    <I>Wed, 9 Jun 1999 17:55:24 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000073.html">[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</A></li>
+        <LI> Next message: <A HREF="000070.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#76">[ date ]</a>
+              <a href="thread.html#76">[ thread ]</a>
+              <a href="subject.html#76">[ subject ]</a>
+              <a href="author.html#76">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I think you're thinking of native methods in terms of C code linked in
+</I>&gt;<i> by Java code via Runtime.loadLibrary()?  As you say, allowing that
+</I>&gt;<i> sort of thing in JOS is real bad.  The problem with this code is that
+</I>&gt;<i> is neither &quot;contained&quot; (its C not Java) nor is it trusted (A JOS
+</I>&gt;<i> kernel writer didn't necessairly write it.)
+</I>
+	On the other hand, I can almost gaurentee that someone will want
+to do it. Luckily, we don't have any shareholders, and can safely ignore
+them :)
+
+	Did a little more thinking about Pat's information.  It sounds
+like the Right Thing for decaf to do is go with the massive rewrite, so
+that all VM functions have a return code and take an exception reference
+(pointer) as an argument, and thusly /have to/ write the
+exception-handling code in at every level. -- Which because this is an o/s
+project and not app project, is a Good Thing anyway.  Because we need this
+'delayed throw' ability in native libraries, it's rather pointless to
+spend all the time it would take to implement a native throw scheme for
+the rest of decaf, given that the 'delayed throw' will work.
+
+	And here I was thinking that we were close to finishing the
+interperter because there's only one opcode left!
+
+-_Quinn
+
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000073.html">[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</A></li>
+	<LI> Next message: <A HREF="000070.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#76">[ date ]</a>
+              <a href="thread.html#76">[ thread ]</a>
+              <a href="subject.html#76">[ subject ]</a>
+              <a href="author.html#76">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

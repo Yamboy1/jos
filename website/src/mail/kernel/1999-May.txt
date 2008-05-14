@@ -1,0 +1,1156 @@
+From jm@mak.com Fri, 30 Apr 1999 20:42:20 -0400
+Date: Fri, 30 Apr 1999 20:42:20 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] jjos+decaf status/update
+
+Hi All;
+
+(Sorry for the wide distribution, but I think this might be of general
+interest.)
+
+No, Todd and I have neither dropped dead nor given up.  So, what the
+heck *have* we been up to, then?
+
+(1)  We have re-written large segments of the guts of the JVM in order
+to implement 64-bit Java types.  This involved substantial changes to
+the representations of basic JVM objects.
+
+(2) We have added an (incomplete) trace facility so you can watch the
+Java opcodes run.
+
+(3) We have fixed some bugs in the java array code.
+
+(4) We have added "#ifdef PARANOID" subscript-checking array templates
+which are now used throughout the code (e.g., the Java arrays).
+
+(5) We have added inspector and mutator member functions to create
+places one can set breakpoints to track down the places where
+C++ instances get read/written (ah, to have a "who calls" facility).
+
+(6) We have (incompletely) put in protection for member variables
+(however, where we have done so, and where it is appropriate, we have
+put in inspectors/mutators).
+
+(7) We have (incompletely) put in "const" declarations.
+
+(8) We have (incompletely) replaced explicit memory allocation calls
+with C++ allocator calls (so constructors get fired up) so as to avoid
+memory-initialization problems.
+
+(9) We have (probably incompletely) inspected code to make sure
+constructors actually initialize member variables to reasonable values.
+
+(10) We have cleaned up lots of random things too numerous to mention.
+
+(11) We have discussed coding conventions to enhance comprehensibility
+of the code.
+
+Currently in-process:
+
+(1) We are reconciling our respective changes, and testing them a little
+more thoroughly before committing the new sources to CVS.
+
+(2) We are about to make some changes to the main JVM opcode-parsing
+function to turn it into a method (probably) of the basic C++ class
+which represents a Java thread.
+
+(3) We are debating the "right" class hierarchy for java class
+instances, java class objects, and java array objects (we think we're
+converging).
+
+Still to-do:
+
+(1) We noticed that the basic 64-bit integer type we support is UNsigned
+(whoops).  This needs to be changed for the java longs to work right.
+If anybody feels so inclined, feel free to tackle this fairly
+self-contained problem!
+
+(2) We have discussed the relationship/identity of resolved vs.
+unresolved Java classes, and we think we're converging on an approach.
+
+(3) Sheesh, there are SO many other things, I'll just point you at the
+"doc/TODO" file (once it's checked-in).
+
+Sorry to be taking so long, but, hey, we're working as fast as we can
+and yet still remain in good academic standing, employed, and married
+(not necessarily in that order).
+
+Very Truly Yours,
+
+-jm
+
+
+
+
+
+From tmiller@haverford.edu Sun, 02 May 1999 00:00:56 -0400
+Date: Sun, 02 May 1999 00:00:56 -0400
+From: _Quinn tmiller@haverford.edu
+Subject: [JOS-Kernel] jjos+decaf status/update
+
+> If you want, next time you make radical changes like this you can branch
+> off the version tree and do your development there. When you're ready to
+> integrate it back onto the main tree, you can do a merge. I should
+> experiment with this and make sure it works first...
+
+	Which is half the reason I didn't want to do a tree branch.  (The
+other half being that I haven't initiated one before, and I didn't
+want to screw it up...)
+
+-_Quinn
+
+
+
+From jm@mak.com Mon, 10 May 1999 08:38:06 -0400
+Date: Mon, 10 May 1999 08:38:06 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] An idea for increasing the number of code-writers
+
+Hello All;
+
+Sorry for the wide distribution, but, as should become clear from the rest of
+this message, we're seeking programming help beyond just the "kernel" group.
+
+In general, I get the feeling that we need to increase the number of people
+writing actual code.  I'm sure there are people Out There who want to write
+code, but don't know either where or how to jump in.  In specific, as Todd and I
+work on jjos+decaf, we sometimes are held up because we have to build some
+infrastructure first before building the Java-specific functionality we're
+*really* after.
+
+For example, as we think about building some method-lookup machinery for
+"built-in" classes, we discovered we could *really* use a good hash-table C++
+template.  
+
+If Todd and/or I would put out requests for implementation of reasonably
+well-defined pieces of toolsmithing (e.g., "Help! We need a good hashtable
+template!"), would anybody Out There be interested in contributing?  
+
+Right now, I can think of two obvious things we need:
+
+(1) The hashtable template, for use with UTF8->function pointer mappings, and
+
+(2) A Boehm-something-or-other derived conservative garbage collector (I can
+provide references and pointers to other implementations).
+
+Please reply either to the various lists or to me personally.
+
+Thanks!
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== jm@mak.com               ==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+
+
+From matthew.c.albrecht@lmco.com Wed, 12 May 1999 11:08:08 -0600
+Date: Wed, 12 May 1999 11:08:08 -0600
+From: Albrecht, Matthew C matthew.c.albrecht@lmco.com
+Subject: [JOS-Kernel] Transmeta Info
+
+This isn't really JOS kernel related, but I figured you guys may be
+interested anyway.  It's about Transmeta, the Santa Clara start-up company
+with Paul Allen and Linus Torvalds.  The article seems to have gotten its
+data from the Transmeta patent application.
+
+This is a passage from Computer Technology Review, April 1999 Volume XVIIII
+Number 4 in an article titled "Stealth Processor", p. 26, 28, and 47, by
+Joshua Piven. (the quote continues until my sig)
+
+...Transmeta's chip, as yet unnamed, will be able to "translate" rather than
+emulate code from different operating systems written for other chips...
+
+Transmeta's solution is a chip, which combines a "morph host" and a "code
+morphing software," which create a "microprocessor, which is faster than
+microprocessors of the prior art, is capable of running all of the software
+for all of the operating systems, which may be run by a large number of
+families of prior art microprocessors, yet is less expensive than prior art
+microprocessors."  More specifically, the chip (the morph host) is a
+processor, which includes hardware that makes the state of a target
+application immediately available when an exception or error occurs, while
+the "code morphing software translates the instructions of a target program
+to morph host instructions and responds to exceptions and errors by
+replacing the working state with the correct target state when necessary so
+that correct retranslations occur."
+
+Transmeta makes the absolutely stunning claim that one version of the chip,
+which is designed to run all available x86 applications, includes a morph
+host that has just 25 percent of the gates of the Pentium Pro, yet run x86
+applications substantially faster than the Pentium Pro - or any other known
+microprocessor capable of supporting these applications. (Note that this was
+at the time of the patent application.)  In addition, the code morphing
+software - combined with the morph host - allows the use of techniques,
+which allow the reordering and rescheduling of primitive instructions
+generated by a sequence of target instructions, without requiring the
+addition of significant circuitry.  Presumably, this will help keep
+fabrication costs low.
+
+The chip's morph software includes technology called a "translation buffer,"
+which caches host instructions in memory and then allows these instructions
+to be recalled: 1) without rerunning the process of determining which
+primitive instructions are required to implement each target instruction;
+and 2) without addressing and fetching each primitive instruction,
+optimizing the sequence of instructions, allocating assets to each
+instruction, reordering them, and without executing each step of each
+sequence of instructions involved each time each target instruction is
+executed.  "Once a target instruction has been translated, it may be
+recalled from the translation buffer and executed without the need for any
+of these [steps]."
+
+...Transmeta's patent statement ends with this sentence: "Although the
+[technology] has been described with relation to the emulation of x86
+processors, it should be understood that [it] applies just as well to
+programs designed for other processor architectures and programs that
+execute on virtual machines, such as P code, Postscript, or Java programs."
+
+-Matt
+
+
+
+
+From jm@mak.com Sun, 23 May 1999 21:43:11 -0400
+Date: Sun, 23 May 1999 21:43:11 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Checked in run() method
+
+Hi Todd (et al);
+
+I didn't get around to getting rid of the OLD_WAY cruft in interp.cc. 
+If you feel motivated, and are just hanging about with nothing to do
+(yeah, right), feel free to do it.  If you don't, I promise to get to it
+first thing.
+
+However, I *did* get around to making run() into java_thread::run().  I
+also made the various "invoke" opcodes call
+java_thread::runInvoke(...).  This is preparatory to doing the
+environment stuff you're waiting for.
+
+The changed files included interp.h/cc, java_thread.h/cc, and
+scheduler.cc.
+
+Sorry for the delay.  I don't know if I'll have a real chance to get to
+it before Friday.  Also, I'll want to ping you this week with respect to
+exactly where I should hang the lookup machinery, and 
+
+Later!
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From jm@mak.com Thu, 27 May 1999 12:41:14 -0400
+Date: Thu, 27 May 1999 12:41:14 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Changes/progress
+
+Hi Todd;
+
+I have managed to make run a method on java_thread.  The next
+incremental step is to make it a method on the current frame (it keeps
+peeking to the current frame anyways for just about everything, and this
+will both make the code cleaner and faster by avoiding an unnecessary
+level of indirection).  The next incremental step is to make the
+"environment" stuff (probably in the class loader, right?) so that
+garbage is not produced when the various invoke bytecodes are
+encountered.
+
+I made the global isParent fcn a method of java_class.
+
+I removed some trailing "include" directives from header files, and put
+them in the (relatively few) cc files that required them for
+compilation.
+
+I separated out the various invoke opcodes into a function (for
+cleanliness' sake) -- this will be the focus of the "environment"
+effort.
+
+I think I'll have to make lots of changes to frame and java_thread --
+I'll want to cache the "helper variables" that currently get recomputed
+each bytecode, and I'll want to cache them (probably) on invocations,
+which will mean some code'll have to get divided up and reapportioned
+between the invocation code and the steady-state code.
+
+I will not get to check these in until tonight at the earliest: 
+However, here is the list of files that I have mucked about in/with (you
+can ignore the Makefile entries):
+
+[jm@linux JJOS]$ fgrep -i local status.log
+File: Makefile          Status: Locally Modified
+File: frame.cc          Status: Locally Modified
+File: frame.h           Status: Locally Modified
+File: interp.cc         Status: Locally Modified
+File: java_class.cc     Status: Locally Modified
+File: java_class.h      Status: Locally Modified
+File: java_thread.cc    Status: Locally Modified
+File: java_thread.h     Status: Locally Modified
+File: scheduler.cc      Status: Locally Modified
+File: TODO              Status: Locally Modified
+[jm@linux JJOS]$ 
+
+Gotta run!
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From robfitz@geocities.com Thu, 27 May 1999 20:20:25 -0500
+Date: Thu, 27 May 1999 20:20:25 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS-Kernel] New and improved Kernel Interface
+
+Hello everybody
+
+I've just checked into the cvs repository the first major rewrite and 
+update to the Kernel Interface in well over six months.
+
+I made this update so I can get more input on what changes need to be 
+made, and so the interface is mostly defined before I start working 
+on a jos-linux host.
+
+I've added support for atomic operations, debugging, interrupts, 
+inter thread communication, time, timer, virtual memory.  And updated 
+io ports, linear memory, monitors, threads, and data types.
+
+You can browse the changes at 
+<URL:http://www.jos.org/cvsweb.cgi/jos/interfaces/kernel/>.  You can 
+also download the files from cvs, look at 
+<URL:http://jos.org/wiki/view/main/CVS> for instructions, the module 
+name is 'jos/interfaces/kernel'.
+
+I will be moving the discussion over to the architecture mailing list 
+(arch@jos.org), so anybody interested in working on this should be 
+subscribed to that mailing list.
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+
+
+From jm@mak.com Thu, 27 May 1999 21:28:36 -0400
+Date: Thu, 27 May 1999 21:28:36 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Checked in files
+
+Hi Todd (et al);
+
+Sorry to take so long to checking these in, but they're in the CVS
+repository now.  I don't know exactly when I'll get to making the next
+set of changes...  Please let me know if I've screwed anything up for
+you, and I'll do my best to rectify anything I've broken.
+
+By the way, I still haven't gotten around to figuring out why my java
+builds fail for the VK_ESCAPE...
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From tmiller@haverford.edu Thu, 27 May 1999 21:58:25 -0400 (EDT)
+Date: Thu, 27 May 1999 21:58:25 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: Changes/progress
+
+> incremental step is to make it a method on the current frame (it keeps
+> peeking to the current frame anyways for just about everything, and this
+> will both make the code cleaner and faster by avoiding an unnecessary
+> level of indirection).
+
+	Yup.  Should have thought of that.
+
+> I made the global isParent fcn a method of java_class.
+
+	It belongs there; I'm not sure why I didn't have it there the
+first time.
+
+> I separated out the various invoke opcodes into a function (for
+> cleanliness' sake) -- this will be the focus of the "environment"
+> effort.
+
+	Once the "enviroment" for java methods is ready, it should be
+nearly trivial to extend to native methods, which will make things much
+more efficient.  (And provide an expansion point, if/when we implement
+native shared libraries...)
+
+> I think I'll have to make lots of changes to frame and java_thread --
+> I'll want to cache the "helper variables" that currently get recomputed
+> each bytecode, and I'll want to cache them (probably) on invocations,
+> which will mean some code'll have to get divided up and reapportioned
+> between the invocation code and the steady-state code.
+
+	Makes sense.  Many of the things in run() are left over from
+before it was made properly re-entrant.
+
+	Out of simple curiosity, I went ahead and let init() finish
+executing; memory consumption is down to 1664K, which is a dramatic
+improvement over the last time I checked it (~30MB, IIRC).
+
+	I've been working on monitors, mostly.  Slow going; I've been busy
+and they aren't particularly simple beasts.  On the other hand, I won't
+have to implement anything totally new; all the various subfunctions for
+the monitors are already lying around.
+
+-_Quinn
+
+
+
+
+
+
+
+
+From onewith1@flash.net Thu, 27 May 1999 21:53:48 -0500
+Date: Thu, 27 May 1999 21:53:48 -0500
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] Checked in files
+
+
+----------
+> By the way, I still haven't gotten around to figuring out why my java
+> builds fail for the VK_ESCAPE...
+> 
+> -- 
+ 
+What's the failure? Is the code in CVS? Maybe I can take a gander at it. 
+
+-Matt
+
+
+
+From jm@mak.com Thu, 27 May 1999 23:15:24 -0400
+Date: Thu, 27 May 1999 23:15:24 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Re: Changes/progress
+
+Hi Todd;
+
+> > I separated out the various invoke opcodes into a function (for
+> > cleanliness' sake) -- this will be the focus of the "environment"
+> > effort.
+> 
+>         Once the "enviroment" for java methods is ready, it should be
+> nearly trivial to extend to native methods, which will make things much
+> more efficient.  (And provide an expansion point, if/when we implement
+> native shared libraries...)
+
+Not only that, but (I think) both JIT and Hot-Spot type things will
+benefit.  Although, to be perfectly honest, I haven't really thought too
+deeply about it yet (my attention budget is a trifle, er, overspent at
+the moment).
+
+>         Out of simple curiosity, I went ahead and let init() finish
+> executing; memory consumption is down to 1664K, which is a dramatic
+> improvement over the last time I checked it (~30MB, IIRC).
+
+Well, that's certainly a step in the right direction, although I must
+admit to some surprise -- that's an awfully big improvement -- what, a
+factor of almost 20?  Don't know whether to be happy at the improvement
+or embarrassed about there being so much room for it!
+
+On the other hand, if we get our act totally together with respect to
+GC, the Perfect Performance would be closer to zero, right?  Except for
+classes that have static member variables, right?  I remember some big
+debate on the Java lists about what to do about classes that had those
+static vars (e.g., a counter that got incremented every time an instance
+got made) -- it wasn't really good form to simply gc the class after the
+last instance got reaped/gc-ed/finalized, because the count would get
+reset/hammered.  Does anybody out there know what the Party Line is on
+this issue?
+
+>         I've been working on monitors, mostly.  Slow going; I've been busy
+> and they aren't particularly simple beasts.  On the other hand, I won't
+> have to implement anything totally new; all the various subfunctions for
+> the monitors are already lying around.
+
+OK.  Best of luck.  Unfortunately, I will not get as much done as usual
+this weekend due to schedule conflicts...
+
+Later!
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From jm@mak.com Fri, 28 May 1999 00:04:38 -0400
+Date: Fri, 28 May 1999 00:04:38 -0400
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Checked in files
+
+Hi Matt (et al);
+
+Matt Albrecht wrote:
+> 
+> ----------
+> > By the way, I still haven't gotten around to figuring out why my java
+> > builds fail for the VK_ESCAPE...
+> >
+> > --
+> 
+> What's the failure? Is the code in CVS? Maybe I can take a gander at it.
+
+Matt, Old Buddy, Old Pal!
+
+The Short Version is that (for me) both javac and guavac (under stock
+RedHat 6.0), with Sun's JDK1.1.6 in CLASSPATH, both choke trying to
+build the stock (as in current CVS version of the java files)
+KeyboardInterpreterUSA.  I don't know if it's only VK_ESCAPE, or
+everything VK_* therein (haven't had time to play much with it).  If I
+yank the JDK out of the CLASSPATH, then they complain about not being
+able find java/lang/Object, so I think it's at least being searched.
+
+By the way, when given all the java files at once, guavac prints out
+which ones it succeeded on so one can deduce which it's choking on. 
+javac simply goes "Tango Uniform."
+
+Even money is that it's some stupid Pilot Error on my part.
+
+Since I've been futzing about with the guts of the native code, the old
+"init" zipfile with the floating pt and double precision tests has been
+OK up until this point.  It would be nice to figure this out reasonably
+soon, because I'm just about to the point where I'm going to stick in
+more "builtin" memory functions so somebody could do a VGA/SVGA driver.
+
+I'd really appreciate any help you can send my way (although, if it
+really looks to be Pilot Error on may part, don't feel obligated to
+carry on through to the bitter end).
+
+Thanks a ton!
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From jm@mak.com Sat, 29 May 1999 15:10:30 +0000
+Date: Sat, 29 May 1999 15:10:30 +0000
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] static initializer query
+
+Hi Todd (et al);
+
+I am currently trying to move the opcode-execution code to be hanging
+off of the frame class rather than hanging about globally.  Part of this
+job entails changing some of the existing machinery to be more aware of
+which thread it is executing on behalf of (so if there are any
+scheduler-related ramifications, we can actually find the thread).  I
+have a question:
+
+I am guessing that class_loader::findStaticInit can be called in the
+context of any random thread.  I am guessing the findStaticInit tries to
+find the static initializers and actually run them.  Here are my
+confusions (where the confusion is based both upon a shallow
+understanding of Java semantics and a shallow understanding of the code,
+with a little bit of Just Plain Wrong potential thrown in for good
+measure):
+
+(1) It looks like a new, fresh thread is spawned to run the static
+initializers.  However, the thread that caused the classload doesn't
+seem to wait for the new thread to finish actually running those
+initializers (right?).  This could be bad, right?  (Actually, there seem
+to be a couple of multithreading hazards here in specific and in the
+class_loader abstraction in general  -- basically, many threads might
+share the same classloader -- that might have to be addressed regardless
+of the answer to my next question.)  
+
+(2) Is there some reason we don't just run those initializers within the
+context of the current (requesting) thread?  Maybe just "push" their
+stack frames onto the stack so the vanilla machinery can tackle the
+problem?  Is this a Java-ism?  Is there some other advantage to spawning
+a new thread?  (It pays to actually understand something before you
+attempt to muck with it, eh?)
+
+Thanks for any help/enlightenment you can throw this way!
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From tmiller@haverford.edu Sat, 29 May 1999 14:34:16 -0400 (EDT)
+Date: Sat, 29 May 1999 14:34:16 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: static initializer query
+
+	findStaticInit() is called in the resolution phase of
+class-loading.  It basically could reside in ur_java_class without any
+complications (though I haven't tried and made sure), and isn't there
+currently because it started out as part of the resolution functions
+taking place in class_loader.cc, and was moved out as it became necessary
+to call it last.  All that it does is check if a static initializer
+function exists, and if it does, creates a thread to run, should that
+static initialization become necessary.
+
+> (1) It looks like a new, fresh thread is spawned to run the static
+> initializers.  However, the thread that caused the classload doesn't
+> seem to wait for the new thread to finish actually running those
+> initializers (right?).
+
+	`while(jt->runOpcode());' will run until the thread finishes,
+which is (normally) when the function on the bottom of the frame stack
+(the static init) returns.
+
+> This could be bad, right?  (Actually, there seem
+> to be a couple of multithreading hazards here in specific and in the
+> class_loader abstraction in general  -- basically, many threads might
+> share the same classloader -- that might have to be addressed regardless
+> of the answer to my next question.)  
+
+	One would hope many threads share the same classloader -- where
+would this be a problem?  (Something I'm missing, probably...)
+
+> (2) Is there some reason we don't just run those initializers within the
+> context of the current (requesting) thread?  Maybe just "push" their
+> stack frames onto the stack so the vanilla machinery can tackle the
+> problem?  Is this a Java-ism?  Is there some other advantage to spawning
+> a new thread?  (It pays to actually understand something before you
+> attempt to muck with it, eh?)
+
+	Because it would be Very Annoying to arrange to push a method
+frame in the middle of one bytecode and then return to that same point in
+the bytecode after that method frame finishes executing; and there are
+four such locations where static initialization is done.
+
+	Moving the method frame onto the stack (we could store a pointer
+to the frame instead of a pointer to a thread) would allow for the
+scheduler to take care of timeslicing the initialization but there are two
+problems: (A) we'd have to take care to check at each static init point if
+some other thread was mucking about with the static init also (perhaps, if
+static_init == 1?) and if so, sleep until it finished -- the sleeping part
+would probably be difficult to arrange; and (B) unwinding the stack & the
+program counter would be annoying and result in much duplicated work for
+these four locations.
+
+	It might, however, be wise to adjust the current system in some
+way: should we ever implement native processes, so that one thread sitting
+in its static_init loop *could* be interrupted by another, we'd have the
+same problems as if the method frame had been pushed onto the frame stack.
+Of course, alot of things would have to change if we ever did that, so I'm
+not sure that we want to worry about it.
+
+	IMHO, since it (seems to) work, there's no need to change it.
+Counter-arguments? 
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Sun, 30 May 1999 00:23:08 -0400 (EDT)
+Date: Sun, 30 May 1999 00:23:08 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: Changes/progress
+
+> On the other hand, if we get our act totally together with respect to
+> GC, the Perfect Performance would be closer to zero, right?  Except for
+> classes that have static member variables, right?  I remember some big
+> debate on the Java lists about what to do about classes that had those
+> static vars (e.g., a counter that got incremented every time an instance
+> got made) -- it wasn't really good form to simply gc the class after the
+> last instance got reaped/gc-ed/finalized, because the count would get
+> reset/hammered.  Does anybody out there know what the Party Line is on
+> this issue?
+
+	Er.  The measurement I'm using doesn't subtract any memory we
+might actually be freeing because there's no way to tell how large that
+block is.  (Given that jbheap doesn't bother to return freed blocks to the
+heap...)  But yes, our ideal number would be zero.
+
+	I don't know what the Party Line is, but my guess is that
+(especially because we'll be using separate processes/classloaders) we can
+safely ignore the problem of trying to GC static variables.  It's limited
+to one process (when that process terminates, its classloader reaps all
+its static instances, which are by definition private to the classloader);
+and well-behaved java programs* shouldn't have any problem.  And if it's a
+process that is designed to never terminate (i.e. init() or a system
+daemon), there's no leakage, because the process never terminates: if you
+use a static counter on startup but nowhere else, that's your problem --
+you use up some extra memory for the lifetime of your process.  The only
+way I can see to leak memory (i.e. use more memory the longer it runs)
+would be for it to create new classes on the fly (i.e. new Class c =
+...;), using 'c' each time, so as to lose the pointer (reference).  This,
+of course, leaks the entire Class each time, unless special measures are
+taken in the garbage collector -- but it's probably not worth the effort
+to take those measures.  A process creating java.lang.Class instances like
+that should be killed sooner than later, I'd think.
+
+	I can't imagine a process that would want to do this.  If a
+process arranged to stick those static class variables in shared memory
+somewhere, they would last until all the processes sharing that memory
+died (probably) -- but here we're talking about rather deliberate
+malignancies -- and coding techniques that I think we can safely classify
+as erroneous and refuse to support.
+
+	Perfect GC is probably not a requirement for this OS anyway.
+There are already 'perfect' OSes (OS/370 comes to mind) and fast,
+stable, broadly-ported server OSes (Linux, anyone?) that Java is
+ill-suited to compete against.  Even supposing we beat Sun at their own
+game and get some native-compiling/hot-spot thing to run within 5% of C
+code speed, what compelling advantage does reprogramming your server-side
+app in Java offer if the one you're already running already runs?
+
+	-- There is the advantage that will do all the sorts of things
+that it would be difficult near impossible to do with C; but it seems that
+the JOS 'goals' are towards a better *personal* OS, not a better *server*
+OS -- the better server OS already being some variant of UNIX; for many of
+us, Linux.
+
+	*'properly behaved java programs' -- does anyone know of any kind
+of enviroment where java programs are up for long enough and/or under
+enough load that the GC becomes an issue in 'system' (JVM) stability?  The
+only thing I can think of is servlets, but my (uneducated) impression is
+that it's not a big problem to restart them if their JVM dies, and code to
+this extent is included in the major servlet-using apps.
+
+-_Quinn
+
+
+
+
+
+From tmiller@haverford.edu Sun, 30 May 1999 00:23:30 -0400 (EDT)
+Date: Sun, 30 May 1999 00:23:30 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] New and improved Kernel Interface
+
+> I've added support for atomic operations, debugging, interrupts, 
+> inter thread communication, time, timer, virtual memory.  And updated 
+> io ports, linear memory, monitors, threads, and data types.
+
+	Seems to me like the kernel shouldn't be involved in monitors,
+unless you plan to have it support multiple native processes -- and then
+the katomic operations would seem to suffice for implementing monitors
+inside the JVM -- where they belong.
+
+> I made this update so I can get more input on what changes need to be 
+> made, and so the interface is mostly defined before I start working 
+> on a jos-linux host.
+
+	How will your jos-linux host differ substantially from the 'host'
+build of JJOS?  (From the p.o.v. of decaf, the JVM.)  Or were you thinking
+more broadly, along the lines of kludging something together out of other
+open source projects (linux/kaffe/classpath/etc) and write wrappers to
+this proposed standard?
+
+	I, at least (can't speak for JM), will probably not spend any time
+rewriting decaf/JJOS to match any standard we settle on any time soon, for
+the twin reasons of speed and efficiency.  Speed in development has been
+our goal -- with the end result that I expect the keyboard driver (more
+importantly, the scancode-to-unicode converter) to be fully functional
+before the end of june.  Efficiency stems from my concerns about trying to
+set an interface for something that (I would guess) none of us have ever
+done -- (build) a new kernel.  From my point of view (admittedly, I'm not
+writing the kernel half of things) it would make sense to wait until JJOS
+matured to the point where it wasn't going to be changing a whole lot
+anyway, and /then/ settle on a design, applying both our experience in
+what a kernel needs to do and our desires for improvements; refactoring by
+way of /educated/ interface design decisions.  This as opposed to
+continually rewriting the interface as new factors came out.
+
+-_Quinn
+
+
+
+
+
+
+
+
+
+From robfitz@geocities.com Sun, 30 May 1999 15:02:18 -0500
+Date: Sun, 30 May 1999 15:02:18 -0500
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS-Kernel] New and improved Kernel Interface
+
+Hello Todd
+
+>  Seems to me like the kernel shouldn't be involved in monitors,
+> unless you plan to have it support multiple native processes --
+> and then the katomic operations would seem to suffice for
+> implementing monitors inside the JVM -- where they belong. 
+
+I can see what you mean.  But I don't think I will remove it.
+
+How I see the kernel interface being used by a jvm developer.  Is 
+that the developer will wrap the kernel interface function call into 
+a jvm function, with added validation, error checking, debugging, 
+etc.  The jvm developer is free to write there own version of a 
+function, as long as it is done in a way that won't cause problems 
+with other kernels, etc.
+
+>  How will your jos-linux host differ substantially from the 'host'
+> build of JJOS?  (From the p.o.v. of decaf, the JVM.)  Or were you
+> thinking more broadly, along the lines of kludging something
+> together out of other open source projects
+> (linux/kaffe/classpath/etc) and write wrappers to this proposed
+> standard? 
+
+I don't think there will be much difference, both would be used as a 
+development aid, for testing the jvm, class libraries, etc.
+
+I'm planing on using a linux system to provided the base kernel, 
+Japhar as the jvm and maybe using classpath for the class libraries 
+(but I don't know yet).
+
+>  I, at least (can't speak for JM), will probably not spend any time
+> rewriting decaf/JJOS to match any standard we settle on any time
+> soon, for the twin reasons of speed and efficiency.  Speed in
+> development has been our goal -- with the end result that I expect
+> the keyboard driver (more importantly, the scancode-to-unicode
+> converter) to be fully functional before the end of june.
+> Efficiency stems from my concerns about trying to set an interface
+> for something that (I would guess) none of us have ever done --
+> (build) a new kernel.  From my point of view (admittedly, I'm not
+> writing the kernel half of things) it would make sense to wait
+> until JJOS matured to the point where it wasn't going to be
+> changing a whole lot anyway, and /then/ settle on a design,
+> applying both our experience in what a kernel needs to do and our
+> desires for improvements; refactoring by way of /educated/
+> interface design decisions.  This as opposed to continually
+> rewriting the interface as new factors came out. 
+
+Although I haven't look into JJOS/decaf very much, how I would port 
+JJOS/decaf to use the kernel interface, is to write a version of JJOS 
+that uses the kernel interface internally.  I don't know how hard 
+that would be, but it should be possible.  
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+
+
+
+From tmiller@haverford.edu Sun, 30 May 1999 22:43:29 -0400 (EDT)
+Date: Sun, 30 May 1999 22:43:29 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] New and improved Kernel Interface
+
+> How I see the kernel interface being used by a jvm developer.  Is 
+> that the developer will wrap the kernel interface function call into 
+> a jvm function, with added validation, error checking, debugging, 
+> etc.  The jvm developer is free to write there own version of a 
+> function, as long as it is done in a way that won't cause problems 
+> with other kernels, etc.
+
+	Okay, I see what you're saying.  Makes sense.
+
+> Although I haven't look into JJOS/decaf very much, how I would port 
+> JJOS/decaf to use the kernel interface, is to write a version of JJOS 
+> that uses the kernel interface internally.  I don't know how hard 
+> that would be, but it should be possible.  
+
+	I wasn't saying it would be terribly difficult, just a use of time
+that could be more profitably spent elsewhere.
+
+	At any rate, I finished decaf's monitors this morning, so things
+are proceeding apace.  Next thing on my list is rewriting the current
+keyboard driver not to use the AWT, which causes problems calling native
+functions.
+
+	Anyway, good luck!
+
+-_Quinn
+
+
+
+
+From jm@mak.com Mon, 31 May 1999 04:18:31 +0000
+Date: Mon, 31 May 1999 04:18:31 +0000
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Re: static initializer query
+
+Hi Todd (et al);
+
+"Todd L. Miller" wrote:
+>         findStaticInit() is called in the resolution phase of
+> class-loading.  It basically could reside in ur_java_class without any
+> complications (though I haven't tried and made sure), and isn't there
+> currently because it started out as part of the resolution functions
+> taking place in class_loader.cc, and was moved out as it became necessary
+> to call it last.  All that it does is check if a static initializer
+> function exists, and if it does, creates a thread to run, should that
+> static initialization become necessary.
+
+When I wrote my previous message, I did not understand what was going on
+here.  Let me repeat it back to you to see if I understand now. 
+Basically, when we attempt to resolve a ur_java_class, we check to see
+if there's a static initializer.  If there is, we hang a java_thread
+which will run the static initializers off of the (in process of being
+resolved) java_class.  When running invoke (or under some other
+circumstances I haven't run under the debugger to see who calls) or
+getstatic opcodes for a thread, we check to see if this slot in the
+java_thread's corresponding java_class is non-NULL, and, if so, we then
+run the initializer thread to the bitter end.
+
+If I am reasonably close to understanding how this works now, on to my
+concerns...
+
+> > (1) It looks like a new, fresh thread is spawned to run the static
+> > initializers.  However, the thread that caused the classload doesn't
+> > seem to wait for the new thread to finish actually running those
+> > initializers (right?).
+> 
+>         `while(jt->runOpcode());' will run until the thread finishes,
+> which is (normally) when the function on the bottom of the frame stack
+> (the static init) returns.
+
+(1) Well, from an OS and maybe debugger perspective, the thread that's
+running in this while loop is actually not the thread the scheduler
+thinks is running, right?  I mean, the scheduler thinks the thread that
+is running is the thread that caused the invocation that required the
+class-with-static-initializers to the loaded, resolved, and initialized,
+NOT the thread spawned (however ephemerally) to actually run the
+initializers.  Right?  If so, if there are any scheduler-related calls
+made by the static initializers, the scheduler's notion of who's running
+is actually wrong -- I don't specifically know what could go wrong
+(given the almost infinite variety of code that could be run in the
+static initializer), but, in general, having your scheduler be flat
+wrong about both what the current process is, the count of active
+processes, and the existence of the ephemeral process, could all combine
+in nefarious ways.  It just feels like the potential exists for some
+really weird (and hard to debug) things to happen.
+
+(2) As currently envisioned, we will not pre-empt during the static
+initializations, because the while loops will run to the bitter end
+without "sleeping" this thread.  However, what happens if the bytecode
+does something that requires another thread to be invoked (e.g.,
+classloading off of a TCP stream, which would, say, require our thread
+to go to sleep, and fire up an inetd-equivalent)?  Does the requesting
+thread get "slept" or "waited" properly, and the Right Thing happen
+later after the bits get loaded?
+
+(3) Speaking somewhat hypothetically and prematurely, what happens when
+we get real multithreading?  Won't we want to pre-empt the static
+initializers?
+
+
+> > This could be bad, right?  (Actually, there seem
+> > to be a couple of multithreading hazards here in specific and in the
+> > class_loader abstraction in general  -- basically, many threads might
+> > share the same classloader -- that might have to be addressed regardless
+> > of the answer to my next question.)
+> 
+>         One would hope many threads share the same classloader -- where
+> would this be a problem?  (Something I'm missing, probably...)
+
+Oh, I was probably wrong-thinking about having multiple threads sitting
+in classloader machinery methods/FSMs simulataneously.  I was thinking
+we'd be pre-empting the static initializers, and maybe have to put
+concurrency controls around the hashtables, but I think my concerns are
+all premature given the lack of multithreading (I mean, time-slicing
+pre-emption).
+
+
+> > (2) Is there some reason we don't just run those initializers within the
+> > context of the current (requesting) thread?  Maybe just "push" their
+> > stack frames onto the stack so the vanilla machinery can tackle the
+> > problem?  Is this a Java-ism?  Is there some other advantage to spawning
+> > a new thread?  (It pays to actually understand something before you
+> > attempt to muck with it, eh?)
+> 
+>         Because it would be Very Annoying to arrange to push a method
+> frame in the middle of one bytecode and then return to that same point in
+> the bytecode after that method frame finishes executing; and there are
+> four such locations where static initialization is done.
+
+Well, I agree that you never ever want to leave a thread "in the middle
+of" a bytecode execution.  I believe you'd have to back it out all the
+way and wait for a retry.  The second part, about pushing a frame on top
+of the current stack, I will have to think about how bad that is (I
+forget what the stack discipline is like, and how the frames get
+popped).  I would think it could be kind of like an "interrupt"
+happened, and the interrupt affects the runnability (sp?) of the pending
+opcode (by side effect of resolving the required class), and then just
+goes away and cleans up after itself.  However, a debugger might show
+the extra stack stuff on top of the explicitly-called stuff.
+
+How do "normal" Java systems/debuggers treat this event (he asked,
+ignorantly)?
+
+>         Moving the method frame onto the stack (we could store a pointer
+> to the frame instead of a pointer to a thread) would allow for the
+> scheduler to take care of timeslicing the initialization but there are two
+> problems: (A) we'd have to take care to check at each static init point if
+> some other thread was mucking about with the static init also (perhaps, if
+> static_init == 1?) and if so, sleep until it finished -- the sleeping part
+
+These are the multithreading hazards I mentioned before.
+
+> would probably be difficult to arrange; and (B) unwinding the stack & the
+> program counter would be annoying and result in much duplicated work for
+> these four locations.
+> 
+>         It might, however, be wise to adjust the current system in some
+> way: should we ever implement native processes, so that one thread sitting
+> in its static_init loop *could* be interrupted by another, we'd have the
+> same problems as if the method frame had been pushed onto the frame stack.
+> Of course, alot of things would have to change if we ever did that, so I'm
+> not sure that we want to worry about it.
+
+Just asking.  Given that I guess we're making a trade-off decision
+(deciding to not decide to do something is the same as deciding not to
+do it), I just wanted to know what we were trading-off.
+
+>         IMHO, since it (seems to) work, there's no need to change it.
+> Counter-arguments?
+
+Just the concerns I had above.  In short summary, which thread is really
+running?  And, what should a debugger show?
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/welcome.html
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From tmiller@haverford.edu Mon, 31 May 1999 01:24:21 -0400 (EDT)
+Date: Mon, 31 May 1999 01:24:21 -0400 (EDT)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: static initializer query
+
+> When I wrote my previous message, I did not understand what was going on
+> here.  Let me repeat it back to you to see if I understand now. 
+> Basically, when we attempt to resolve a ur_java_class, we check to see
+> if there's a static initializer.  If there is, we hang a java_thread
+> which will run the static initializers off of the (in process of being
+> resolved) java_class.  When running invoke (or under some other
+> circumstances I haven't run under the debugger to see who calls) or
+> getstatic opcodes for a thread, we check to see if this slot in the
+> java_thread's corresponding java_class is non-NULL, and, if so, we then
+> run the initializer thread to the bitter end.
+
+	Right.  We can't run the static initializer during resolution
+(even if we wanted to) because you hit all sort of nastiness because of
+the recursive resolution algorithm.
+
+> It just feels like the potential exists for some
+> really weird (and hard to debug) things to happen.
+
+	You're definitely right.  I hadn't (in my ignorance :)) thought
+about that at all.  It's very likely a source of Bad Karma.  Much better
+to treat static initialization as a normal function call.  (Which it is,
+except that it's the ONLY call made /implicitly/ by the JVM -- everything else,
+including the instance initializers, are explicitly called by the
+bytecode.)  This would involve be /very/ careful with the stack until we
+determine if the class we're about to use has been initialized or not --
+I'll investigate how far forward we can move the initialization check.
+
+> Does the requesting
+> thread get "slept" or "waited" properly, and the Right Thing happen
+> later after the bits get loaded?
+
+	No.  This way of doing things was a hack while I was rewriting
+resolution.  (and realizing that initializing during resolution was a Bad
+Idea.)  However, it *should* happen correctly if we treat it as a normal
+method call.  The other thing being that we need to treat calls to the
+static initializer as being synchronized (for obvious reasons), with the
+exception that the threads that block on some other thread's synch *don't*
+continue with the method call.  (Basically, we should implement this as a
+wait() operation with the program counter backed off one; when the
+notifyAll() op is peformed by the initializing thread, the thread will
+re-execute the initializer-causing opcode, which should no longer call the
+initializer...)  Looking this up in the JVM spec also made me realize that
+decaf isn't doing things quite right, because it has to check and make
+sure that all superclasses are initialized before the subclass is,
+starting from Object and going down.  (hooray for stacks:))  That, and it
+looks like I might be ignoring the distinction between active and passive
+uses of a class, but it's hard to tell. (sigh...)
+
+> (3) Speaking somewhat hypothetically and prematurely, what happens when
+> we get real multithreading?  Won't we want to pre-empt the static
+> initializers?
+
+	Yes.  See above -- the other reason for synchronizing.
+
+> Well, I agree that you never ever want to leave a thread "in the middle
+> of" a bytecode execution.  I believe you'd have to back it out all the
+> way and wait for a retry.  The second part, about pushing a frame on top
+> of the current stack, I will have to think about how bad that is (I
+> forget what the stack discipline is like, and how the frames get
+> popped).  I would think it could be kind of like an "interrupt"
+> happened, and the interrupt affects the runnability (sp?) of the pending
+> opcode (by side effect of resolving the required class), and then just
+> goes away and cleans up after itself.  However, a debugger might show
+> the extra stack stuff on top of the explicitly-called stuff.
+
+	We *want* to show that the code being executed is the static
+initializer, IMHO -- it would be *very* confusing, otherwise.  I think the
+best solution here is to put the static init check as far forward as
+possible, to minimize the 'unrolling' that needs to take place, push the
+static init frame as a normal function call, except that we (don't) adjust
+the program counter to point at the initializing bytecode, so that the
+initializing bytecode is just run again.  Since static initializers don't
+return anything, the stack should be fine.
+
+> How do "normal" Java systems/debuggers treat this event (he asked,
+> ignorantly)?
+
+	No idea.  We can ask the japhar/kaffe people :)
+	
+-_Quinn
+
+
+
+

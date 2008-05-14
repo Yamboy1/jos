@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000069.html">
+   <LINK REL="Next" HREF="000074.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] decaf updates">jm@mak.com</A><BR>
+    <I>Wed, 09 Jun 1999 14:33:03 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000069.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000074.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#71">[ date ]</a>
+              <a href="thread.html#71">[ thread ]</a>
+              <a href="subject.html#71">[ subject ]</a>
+              <a href="author.html#71">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+Todd L. Miller wrote:
+&gt;<i>         Maybe an example is necessary:  I'm three frames deep in a JVM
+</I>&gt;<i> call, say I'm doing getClass(), which throws a NoSuchClassDefinition
+</I>&gt;<i> exception.  I /can/ call thread::throwException( NoSuchClassDefinition ),
+</I>&gt;<i> and all the java-specific things would happen, but, here's the kicker:
+</I>&gt;<i> 
+</I>&gt;<i>         case bc::some_bytecode:
+</I>&gt;<i>                 ...
+</I>&gt;<i>                 jc = getClass();
+</I>&gt;<i>                 ...
+</I>&gt;<i>                 op_stack.push( jc-&gt;fields[x] );
+</I>&gt;<i>                 break;
+</I>&gt;<i> 
+</I>&gt;<i>         ...
+</I>&gt;<i>         return true;
+</I>
+Um, I think you *have* to check the results, because you cannot afford to
+dereference something bad.  We're in OS-land (a.k.a., systems programming land),
+not application-land.  There are no guard-rails (a.k.a., memory protection
+mechanisms).  We do not want to become (in)famous for our version of the BSOD
+(even though I am sure we could pick a more, well, tasteful color, and, perhaps,
+put a more interesting text up on the screen like &quot;Hey, at least you didn't PAY
+for this!&quot;).
+
+However, if one adopts a Lisp-ish functional programming style, in which
+routines almost always are structured:
+
+foo *bar::baz(quux *)
+{
+  if (!quux)
+  {
+     return(NULL); /* Or perror, etc. */
+  }
+  else ...
+}
+
+it's not so bad.  It will also almost always compile to a single conditional
+jump (OK, well, maybe a load followed by a conditional jump), and if the
+compiler is smart enough to make it a jump-if-zero (condition codes are usually
+set upon a load to a register), then it'll often only take a single machine
+cycle because there will be no pipeline flushes because the jump will not often
+be taken.  (On the other hand, if the compiler is stupid but predictable, you
+can change the polarity of the check, and achieve the same goal.)
+
+&gt;<i>         How does the code AFTER the getClass() call know NOT to push
+</I>&gt;<i> something on the op_stack after getClass() throws an exception?  I do NOT
+</I>&gt;<i> want to rewrite every single function call in the JVM to (a) check all of
+</I>&gt;<i> /its/ calls for exceptions and abort back to runOpcode() (which will in
+</I>&gt;<i> turn, have to abort) and (b) return true or false depending on if an
+</I>
+Throwing native exceptions is tricky, and interacts with the memory reclamation
+stuff (although, like I said before, a conservative GC can help).
+
+&gt;<i> exception was thrown or not.  It's doable now, but it won't be in the
+</I>&gt;<i> future: native methods that throw exceptions need to be handled (unravel
+</I>&gt;<i> the native stack same as I mentioned in the last email for intra-JVM
+</I>&gt;<i> throws); the native portion of the class library (classpath?) is where you
+</I>&gt;<i> can't get around exception-handling in native methods.  (Rewriting the
+</I>&gt;<i> classlibrary is a heroic effort and Not The Right Thing To Do, either, I
+</I>&gt;<i> think.)
+</I>
+Now, I'm a little out of my depth here, but here goes (somebody correct me if
+I'm wrong) -- it is my understanding that native methods are inherently
+non-portable, so we have some freedom to define how they should be
+compiled/written (if, in fact, we support them in the medium to long term -- we
+certainly won't support them in the short term).  Furthermore, given that we
+currently envision no memory protection (e.g., separate address spaces for
+native methods), allowing native methods is an huge invitation to Bad Things
+like BSODs, and viruses, etc.
+
+&gt;<i>         It is difficult but doable to arrange for the native exception to
+</I>&gt;<i> be converted into a java exception and have the necessary things happen to
+</I>&gt;<i> the thread's data structures -- the tremendous difficulty is in aborting
+</I>&gt;<i> the rest of the call(s), all the way back to where the scheduler can move
+</I>&gt;<i> on to the next timeslice.  It seems to me that we'd be re-writing C++'s
+</I>&gt;<i> exception codes by hand; further, it seems evident to me that the Right
+</I>&gt;<i> Way to handle exceptions in native code is with native exceptions, which
+</I>&gt;<i> would all be trapped and converted in runOpcode().
+</I>&gt;<i> 
+</I>&gt;<i>         Am I being clear about the problem here?
+</I>
+
+When you say &quot;native exception,&quot; do you mean C++ &quot;throw,&quot; or vanilla-C reference
+to memory that ain't there (a.k.a., bus error, address error, memory error)?
+
+-jm
+
+p.s., you want me to stop putting your specific email address on the &quot;To&quot; list
+so you get the mail slower, but get only one copy?
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000069.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000074.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#71">[ date ]</a>
+              <a href="thread.html#71">[ thread ]</a>
+              <a href="subject.html#71">[ subject ]</a>
+              <a href="author.html#71">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

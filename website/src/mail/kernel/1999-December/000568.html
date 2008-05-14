@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JJOS lcmp bytecode patch</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000567.html">
+   <LINK REL="Next" HREF="000565.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JJOS lcmp bytecode patch</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] JJOS lcmp bytecode patch">tmiller@haverford.edu</A><BR>
+    <I>Wed, 22 Dec 1999 09:32:25 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000567.html">[JOS-Kernel] JJOS lcmp bytecode patch</A></li>
+        <LI> Next message: <A HREF="000565.html">[JOS-Kernel] CVS activity</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#568">[ date ]</a>
+              <a href="thread.html#568">[ thread ]</a>
+              <a href="subject.html#568">[ subject ]</a>
+              <a href="author.html#568">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i>     Can It Work ? If lcmp works, others long operation may have problem.
+</I>&gt;<i> It seems that Linux GCC 2.7 / 2.8 doesn't support 64-bit operation.
+</I>
+	It does on the host build, but not on the i386 build.  (Because
+the 64-bit support uses parts of glibc, we had to roll our own for the
+i386 build, and decided that it would be easier to use our home-grown
+version on both builds.)  Now that I'm looking at the code, I'm actually
+amazed that lcmp compiled -- looking at ../nativecode/jjtypes.h, I don't
+see an operator &gt; or &lt; !  (impl. in jbtypes.cc) That, probably, is where
+the fix for long comparisons you've come up with should go.  (We also need
+to make jlong SIGNED, as well...)
+
+-_Quinn
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000567.html">[JOS-Kernel] JJOS lcmp bytecode patch</A></li>
+	<LI> Next message: <A HREF="000565.html">[JOS-Kernel] CVS activity</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#568">[ date ]</a>
+              <a href="thread.html#568">[ thread ]</a>
+              <a href="subject.html#568">[ subject ]</a>
+              <a href="author.html#568">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

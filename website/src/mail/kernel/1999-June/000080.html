@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: [JOS] Any volunteers?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:iainshigeoka%40yahoo.com">
+   <LINK REL="Previous"  HREF="000079.html">
+   <LINK REL="Next" HREF="000081.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: [JOS] Any volunteers?</H1>
+    <B>Iain Shigeoka</B> 
+    <A HREF="mailto:iainshigeoka%40yahoo.com"
+       TITLE="[JOS-Kernel] Re: [JOS] Any volunteers?">iainshigeoka@yahoo.com</A><BR>
+    <I>Sat, 12 Jun 1999 14:44:17 -0700 (PDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000079.html">[JOS-Kernel] Committed changes</A></li>
+        <LI> Next message: <A HREF="000081.html">[JOS-Kernel] About JOS Kernel Status</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#80">[ date ]</a>
+              <a href="thread.html#80">[ thread ]</a>
+              <a href="subject.html#80">[ subject ]</a>
+              <a href="author.html#80">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello,
+
+&gt;<i> So what I need is a group of people who can help by
+</I>&gt;<i> giving me 
+</I>&gt;<i> feedback or by writing some parts of the
+</I>&gt;<i> documentation for or with 
+</I>&gt;<i> me.  You don't need to be a kernel expert (i'm not)
+</I>&gt;<i> to help, it's 
+</I>&gt;<i> just common sense.
+</I>
+A bit of feedback.  I've looked over your interface so
+far and it looks good.  I would suggest however that
+you reconsider the thread part of the interface.  Many
+kernels don't support threads natively and I wonder if
+it might be better to try and implement threading in
+the jvm rather than the kernel.  If I recall, one of
+the goals is to try and keep the kernel as small as
+possible and move any other functionality up into
+the JVM or higher (allowing them to be written in 
+java optimally).  I also see the same issue for the
+virtual memory interface.  Much of this is coming from
+two OS's I've been looking at lately, RTEMS and QNX.
+RTEMS because its a possible kernel target for the
+interface, and QNX because I really like their OS
+design.  Neither supports threads or virtual memory.
+
+I'd think that the best option is to assume a message
+passing micro kernel that only does task switching
+(for multi-processing), resource access protection,
+and message passing from process to process.  
+All other tasks will be handled by the JVM or higher.
+This would include threading, virtual memory, and
+device drivers (device drivers are simply separate
+programs).  This is following from the QNX design.
+I'm also assuming that we even want/need 
+multi-processing.  In this design, I'd imagine many
+aspects of a full JOS system to be running as multiple
+processes with full system integration being done
+using RMI or jini (using RMI).
+
+In fact, perhaps even resource access protection 
+should be moved up into the JVM.
+
+Just some thoughts.
+
+-iain
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at <A HREF="http://mail.yahoo.com">http://mail.yahoo.com</A>
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000079.html">[JOS-Kernel] Committed changes</A></li>
+	<LI> Next message: <A HREF="000081.html">[JOS-Kernel] About JOS Kernel Status</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#80">[ date ]</a>
+              <a href="thread.html#80">[ thread ]</a>
+              <a href="subject.html#80">[ subject ]</a>
+              <a href="author.html#80">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

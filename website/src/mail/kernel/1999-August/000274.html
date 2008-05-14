@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jJOS speed</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000272.html">
+   <LINK REL="Next" HREF="000281.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jJOS speed</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] jJOS speed">tmiller@haverford.edu</A><BR>
+    <I>Thu, 19 Aug 1999 17:00:42 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000272.html">[JOS-Kernel] jJOS speed</A></li>
+        <LI> Next message: <A HREF="000281.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#274">[ date ]</a>
+              <a href="thread.html#274">[ thread ]</a>
+              <a href="subject.html#274">[ subject ]</a>
+              <a href="author.html#274">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> &gt;         Great, this is a good reason to use the JavaOS APIs.  (BTW, our
+</I>&gt;<i> &gt; IRQ handling is in dire need of fixing, so I'll go ahead and clone that
+</I>&gt;<i> 
+</I>&gt;<i> OK, I'll bite.  Given that we pretty much don't distinguish interrupts
+</I>&gt;<i> from IRQs, I'm guessing you mean interrupt handling is in a losing way. 
+</I>&gt;<i> What, specifically?  What will you be cloning (native classes? 
+</I>&gt;<i> bytecode?)?  How will cloning help?
+</I>
+	Er, I phrased this poorly because we don't distinguish between
+IRQ's and interrupts.  Basically, we don't currently use
+InterrupterDispatcher at all.  This induces a hack in the keyboard driver
+that will lose scancodes if &gt;1 is generated per interrupt.  This might be
+'fixable' by re-implementing InterrupterDispatcher.  However, I don't know
+how much work this might entail, and as long as you're cloning the JavaOS
+APIs for memory, I might as well clone the APIs for IRQs/interrupts.
+(Rather, clone the parts that I need.)
+
+&gt;<i> I'm not even sure of the requirement to have virtual consoles, frankly. 
+</I>&gt;<i> While it's a &quot;cool&quot; feature of Linux, UNIX (and just about every other
+</I>&gt;<i> operating system out of the dozen or so ones I've ever seen or used in
+</I>&gt;<i> over 20 years) gets along without it quite nicely.  Assuming I've
+</I>&gt;<i> correctly figured out what you're talking about (no better than even
+</I>&gt;<i> money, I'll wager), can't that wait?  Remember that all the native code
+</I>&gt;<i> has got to fit between about 1K and 600K in memory.
+</I>
+	Er, these virtual consoles are implemented entirely in Java, and
+besides being &quot;cool&quot; (and wonderful for debugging), it's a good test of
+the driver system.  If the VGA driver ends up doing our text-display work
+(and/or includes a text/video mode switch), I can use that method/code to
+(help) handle switching the consoles. 
+
+&gt;<i> I was planning to hook up the GC stuff this weekend.  By the flurry of
+</I>&gt;<i> email from me today, I am sure you can tell I'm at home hacking away,
+</I>&gt;<i> and not at the Day Job (and I won't be again until Monday).
+</I>
+	Hey, great, anything that makes my job easier :)
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000272.html">[JOS-Kernel] jJOS speed</A></li>
+	<LI> Next message: <A HREF="000281.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#274">[ date ]</a>
+              <a href="thread.html#274">[ thread ]</a>
+              <a href="subject.html#274">[ subject ]</a>
+              <a href="author.html#274">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000006.html">
+   <LINK REL="Next" HREF="000011.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf &amp; keyboard driver: follow-up idea">tmiller@haverford.edu</A><BR>
+    <I>Thu, 25 Mar 1999 00:18:09 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000006.html">[JOS-Kernel] A quick note on un-subscribing  (Try #2)</A></li>
+        <LI> Next message: <A HREF="000011.html">[JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#7">[ date ]</a>
+              <a href="thread.html#7">[ thread ]</a>
+              <a href="subject.html#7">[ subject ]</a>
+              <a href="author.html#7">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	How about jos.system.keyboard as a KeyEvent dispatcher (i.e.
+jos.system.keyboard.addKeyListener() will do what you'd expect) fed by
+whatever we end up naming the keyboard Driver (or Interperter,
+depending*) from Albrecht's code, and feeding whatever happens to sign up,
+i.e. a shell.  Naturally, since the shell will be signing up as (or be
+signed up as) a KeyListener, one would expect that the telnet daemon would
+also generate the appropriate KeyEvents, except from its network
+connection.
+
+-_Quinn
+
+* This depends on whether or not you think that jos.system.keyboard should
+distribute key events (AWT or not) of raw scan-codes or of
+some-degree-translated scancodes.  I would argue, as a matter of
+abstraction, that jos.system.keyboard should distribute KeyEvents of
+translated scancodes, up to the point where they are VK_* (or equivalent)
+events, but not beyond, i.e. a keyboard interperter would be (should be?)
+used to handle things like upper and lower case, control and alt key
+commands, key concatenation (i.e. ctrl-e-' to make the accented e
+character, etc), and the works.  I suppose one could call this an abstract
+raw feeding into an abstract cooker, which in turn would feed the shell.
+Things that need finer-grained input or do odd things to the keyboard
+(i.e. games) would sign up as KeyListeners on jos.system.keyboard instead
+of using the default keyboard interperter(s).
+
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000006.html">[JOS-Kernel] A quick note on un-subscribing  (Try #2)</A></li>
+	<LI> Next message: <A HREF="000011.html">[JOS-Kernel] decaf &amp; keyboard driver: follow-up idea</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#7">[ date ]</a>
+              <a href="thread.html#7">[ thread ]</a>
+              <a href="subject.html#7">[ subject ]</a>
+              <a href="author.html#7">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

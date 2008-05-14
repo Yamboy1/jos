@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: Changes/progress</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000049.html">
+   <LINK REL="Next" HREF="000045.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: Changes/progress</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Re: Changes/progress">tmiller@haverford.edu</A><BR>
+    <I>Sun, 30 May 1999 00:23:08 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000049.html">[JOS-Kernel] Re: Changes/progress</A></li>
+        <LI> Next message: <A HREF="000045.html">[JOS-Kernel] New and improved Kernel Interface</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#53">[ date ]</a>
+              <a href="thread.html#53">[ thread ]</a>
+              <a href="subject.html#53">[ subject ]</a>
+              <a href="author.html#53">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> On the other hand, if we get our act totally together with respect to
+</I>&gt;<i> GC, the Perfect Performance would be closer to zero, right?  Except for
+</I>&gt;<i> classes that have static member variables, right?  I remember some big
+</I>&gt;<i> debate on the Java lists about what to do about classes that had those
+</I>&gt;<i> static vars (e.g., a counter that got incremented every time an instance
+</I>&gt;<i> got made) -- it wasn't really good form to simply gc the class after the
+</I>&gt;<i> last instance got reaped/gc-ed/finalized, because the count would get
+</I>&gt;<i> reset/hammered.  Does anybody out there know what the Party Line is on
+</I>&gt;<i> this issue?
+</I>
+	Er.  The measurement I'm using doesn't subtract any memory we
+might actually be freeing because there's no way to tell how large that
+block is.  (Given that jbheap doesn't bother to return freed blocks to the
+heap...)  But yes, our ideal number would be zero.
+
+	I don't know what the Party Line is, but my guess is that
+(especially because we'll be using separate processes/classloaders) we can
+safely ignore the problem of trying to GC static variables.  It's limited
+to one process (when that process terminates, its classloader reaps all
+its static instances, which are by definition private to the classloader);
+and well-behaved java programs* shouldn't have any problem.  And if it's a
+process that is designed to never terminate (i.e. init() or a system
+daemon), there's no leakage, because the process never terminates: if you
+use a static counter on startup but nowhere else, that's your problem --
+you use up some extra memory for the lifetime of your process.  The only
+way I can see to leak memory (i.e. use more memory the longer it runs)
+would be for it to create new classes on the fly (i.e. new Class c =
+...;), using 'c' each time, so as to lose the pointer (reference).  This,
+of course, leaks the entire Class each time, unless special measures are
+taken in the garbage collector -- but it's probably not worth the effort
+to take those measures.  A process creating java.lang.Class instances like
+that should be killed sooner than later, I'd think.
+
+	I can't imagine a process that would want to do this.  If a
+process arranged to stick those static class variables in shared memory
+somewhere, they would last until all the processes sharing that memory
+died (probably) -- but here we're talking about rather deliberate
+malignancies -- and coding techniques that I think we can safely classify
+as erroneous and refuse to support.
+
+	Perfect GC is probably not a requirement for this OS anyway.
+There are already 'perfect' OSes (OS/370 comes to mind) and fast,
+stable, broadly-ported server OSes (Linux, anyone?) that Java is
+ill-suited to compete against.  Even supposing we beat Sun at their own
+game and get some native-compiling/hot-spot thing to run within 5% of C
+code speed, what compelling advantage does reprogramming your server-side
+app in Java offer if the one you're already running already runs?
+
+	-- There is the advantage that will do all the sorts of things
+that it would be difficult near impossible to do with C; but it seems that
+the JOS 'goals' are towards a better *personal* OS, not a better *server*
+OS -- the better server OS already being some variant of UNIX; for many of
+us, Linux.
+
+	*'properly behaved java programs' -- does anyone know of any kind
+of enviroment where java programs are up for long enough and/or under
+enough load that the GC becomes an issue in 'system' (JVM) stability?  The
+only thing I can think of is servlets, but my (uneducated) impression is
+that it's not a big problem to restart them if their JVM dies, and code to
+this extent is included in the major servlet-using apps.
+
+-_Quinn
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000049.html">[JOS-Kernel] Re: Changes/progress</A></li>
+	<LI> Next message: <A HREF="000045.html">[JOS-Kernel] New and improved Kernel Interface</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#53">[ date ]</a>
+              <a href="thread.html#53">[ thread ]</a>
+              <a href="subject.html#53">[ subject ]</a>
+              <a href="author.html#53">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

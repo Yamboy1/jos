@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] new_decaf CVS branch</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000800.html">
+   <LINK REL="Next" HREF="000802.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] new_decaf CVS branch</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] new_decaf CVS branch">tmiller@haverford.edu</A><BR>
+    <I>Sat, 8 Apr 2000 02:37:02 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000800.html">[JOS-Kernel] new_decaf CVS branch</A></li>
+        <LI> Next message: <A HREF="000802.html">[JOS-Kernel] JSDK 2</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#801">[ date ]</a>
+              <a href="thread.html#801">[ thread ]</a>
+              <a href="subject.html#801">[ subject ]</a>
+              <a href="author.html#801">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> 1. The code would be cleaner, shorter and more flexible if you used an
+</I>&gt;<i> ASSERT macro. For example, I saw a couple of places with this kind of thing:
+</I>
+	You're right, and I'm amazed I didn't realize this on my
+own.  Thanks.
+
+&gt;<i> 2. There seem to be quite a few places where exceptions should be thrown
+</I>&gt;<i> (illegal monitor state, out of memory etc) but aren't. I'd be interested in
+</I>&gt;<i> trying to help out in this area when the interpreter's up and running.
+</I>
+	Unfortunately, C++ exceptions aren't supported on the i386 build
+yet, so I never gave much thought to them.  They are, clearly, the Right
+Way to do things*.  I'll be looking into some static-link fu for
+dynamic_cast&lt;&gt;(), so maybe I'll look into exceptions at the same time.**
+I don't think, basically, that I should spend time kludging something up
+that wouldn't work as well anyway.
+
+	Anyway, I hope you get more time to look at the code; your
+comments will be valuable.
+
+-_Quinn
+
+*  outline:
+
+decaf_main () {
+	try { /* everything before the call that starts the intreperter */ }
+	catch ( Exception e ) {
+		/* Try to do something intelligent, e.g. a garbage collection
+		   and try again; if still no good, abort. */
+		}
+	scheduler-&gt;start();
+	}
+
+Frame::interpret() {
+	try { /* switching on the bytecode */ }
+	catch ( Exception e ) {
+		/* throw e into Java.  (Unless we want try and
+		   do something intelligent first.  Exceptions are JavaObject
+		   subclasses, so this shouldn't be too hard;
+		   return to scheduler after exception-handling frame
+		   is on the thread's stack, to be run on the next
+		   iteration. */
+		}
+	}
+
+**: dynamic_cast&lt;&gt;() should be entirely user-space.  Messing about with
+the frame stack, etc, may not be, which means it wouldn't work.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000800.html">[JOS-Kernel] new_decaf CVS branch</A></li>
+	<LI> Next message: <A HREF="000802.html">[JOS-Kernel] JSDK 2</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#801">[ date ]</a>
+              <a href="thread.html#801">[ thread ]</a>
+              <a href="subject.html#801">[ subject ]</a>
+              <a href="author.html#801">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] new_decaf CVS branch</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000806.html">
+   <LINK REL="Next" HREF="000799.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] new_decaf CVS branch</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] new_decaf CVS branch">tmiller@haverford.edu</A><BR>
+    <I>Thu, 6 Apr 2000 00:20:00 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000806.html">[JOS-Kernel] JOS (fwd)</A></li>
+        <LI> Next message: <A HREF="000799.html">[JOS-Kernel] jos distribution 1e</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#798">[ date ]</a>
+              <a href="thread.html#798">[ thread ]</a>
+              <a href="subject.html#798">[ subject ]</a>
+              <a href="author.html#798">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Instead of putting the new decaf stuff up on SourceForge -- to
+which I don't yet have access -- I've branched the CVS on jos.org.  To
+access it, either 'cvs co -r new_decaf JJOS' (with the appropriate -d
+information as leache from CVS/Root) or 'cvs update -r new_decaf'; once
+you've use the new_decaf tag, your revisions will be to the new_decaf
+branch of the tree.
+
+	This is not the complete port of new_decaf; it's a distribution
+mechanism for this mailing list, so that you can take a look at what I've
+been doing for the past few months, off and on.  In particular, a design
+review would be very much appreciated before I get started in on 'porting'
+interp.cc &amp; jvmbuiltins.cc to the new design.  Generally, look for places
+where the design isn't clean because of 'home-stretch' hackery --
+functions in the wrong class, or failure to make an abstraction
+(e.g. failure recognize duplication of functionality, or failure to
+properly enscapulate, etc.).  Thanks in advance.
+
+	The major non-interpreter/JVM-builtin thing that's missing is the
+'isInstanceOf()' function for JavaClassInstance.  After completing the
+interpreter, I'll begin work on the built-ins, separating JVM/JOS lib code
+(h/w access) from the classlib code; it should be relatively soon after
+completing this that I cleanly integrate it with a class
+library (perhaps Kore), add multiple processes, and implement BCNI.  At
+some point I would like to work on per-JVM 'intern's to reduce garbage.
+
+	The current outstanding problem is the use of dynamic_cast&lt;&gt;(),
+which is necessary in a few locations because of the way I designed the
+class inheritance tree.  My understanding is that the implementation of
+dynamic_cast, once you understand it, is relatively straightforward but
+compiler-specific, which is very unfortunate.  If anyone knows more about
+this, let me know.  (This is only a problem for the i386 build; if there's
+someway to get dynamic_cast&lt;&gt;() from the compiler/statically linked from a
+library, it would very nice...)
+
+
+	For the numerically-minded, there are 5,845 lines of
+non-interpreter code in common/decaf, compared to 11,032 in the old
+common/decaf non-interpreter code.  About 800 lines of this savings will
+disappear when I put the license headers back in.  (Some of it is also
+old debug or #ifdef OBSOLETE_OPTION code.)  (This count may also be old by
+the time I actually send this message.)
+
+-_Quinn
+
+
+PS: I just checked and the main branch is OK, so that give me hope that I
+did the branch correctly; let me know about whatever problems might show
+up when you try a compile.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000806.html">[JOS-Kernel] JOS (fwd)</A></li>
+	<LI> Next message: <A HREF="000799.html">[JOS-Kernel] jos distribution 1e</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#798">[ date ]</a>
+              <a href="thread.html#798">[ thread ]</a>
+              <a href="subject.html#798">[ subject ]</a>
+              <a href="author.html#798">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

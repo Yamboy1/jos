@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [kernel bytecode cache] Definition</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000911.html">
+   <LINK REL="Next" HREF="000909.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [kernel bytecode cache] Definition</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [kernel bytecode cache] Definition">gchii@mindspring.com</A><BR>
+    <I>Thu, 21 Sep 2000 09:22:53 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000911.html">[JOS-Kernel] Re: kissme JVM + linux kernel</A></li>
+        <LI> Next message: <A HREF="000909.html">[JOS-Kernel] No virtual machine mailing list</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#908">[ date ]</a>
+              <a href="thread.html#908">[ thread ]</a>
+              <a href="subject.html#908">[ subject ]</a>
+              <a href="author.html#908">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>A kernel bytecode cache can be combined with bytecode as a resource to put
+boot classes for virtual machines inside a kernel. This saves both space
+and time.
+
+It saves space because boot classes are the most often duplicated classes
+in an off-the-shelf virtual machine. Boot classes should be statically
+linked to a kernel and shared by multiple virtual machines and/or multiple
+bytecode processes.
+
+Also, a kernel bytecode cache is tied to the kernel's virtual memory memory
+manager so that only the bytecode that's currently being used is found in
+real memory. The bytecode in the kernel bytecode cache is marked
+read-only/executable for optimal results.
+
+It saves time because boot classes are loaded as part of the kernel.
+Instead of &quot;downloading&quot; classes from a file subsystem, a virtual machine
+dynamically links to its boot classes. Dynamic linking is repeated for each
+bytecode process in a MPCL-compatible machine.
+
+When using the kernel of any foreign operating system, a virtual machine
+can link to the &quot;kernel bytecode cache&quot; implemented as a shared library.
+This simulator may or may not be tied directly to the virtual memory manager.
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000911.html">[JOS-Kernel] Re: kissme JVM + linux kernel</A></li>
+	<LI> Next message: <A HREF="000909.html">[JOS-Kernel] No virtual machine mailing list</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#908">[ date ]</a>
+              <a href="thread.html#908">[ thread ]</a>
+              <a href="subject.html#908">[ subject ]</a>
+              <a href="author.html#908">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

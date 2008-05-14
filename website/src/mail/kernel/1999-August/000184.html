@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] GC and swap space</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:George.Marrows%40Smallworld.co.uk">
+   <LINK REL="Previous"  HREF="000183.html">
+   <LINK REL="Next" HREF="000185.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] GC and swap space</H1>
+    <B>George.Marrows@Smallworld.co.uk</B> 
+    <A HREF="mailto:George.Marrows%40Smallworld.co.uk"
+       TITLE="[JOS-Kernel] GC and swap space">George.Marrows@Smallworld.co.uk</A><BR>
+    <I>Wed, 4 Aug 1999 14:22:30 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000183.html">[JOS-Kernel] GC and swap space</A></li>
+        <LI> Next message: <A HREF="000185.html">[JOS-Kernel] Garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#184">[ date ]</a>
+              <a href="thread.html#184">[ thread ]</a>
+              <a href="subject.html#184">[ subject ]</a>
+              <a href="author.html#184">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Peter --
+
+As I understand it (and my knowledge only stretches as far as the bigsurv.ps
+paper and the Richard Jones Garbage Collection book), the way a garbage
+collector interacts with virtual memory is an issue whether it's at the OS
+level (JJOS, JavaOS) or at the application level ('normal' Java running on
+existing OS). However, as you'll in read in bigsurv.ps, the GC community is
+well aware of these issues and modern garbage collectors are designed with
+attention given to minimising swapping. Some types of moving GC can even
+improve VM performance, by grouping frequently accessed objects together on
+the same page, thus decreasing the size of the working set. To move down a
+level again, there's quite a bit of space in both bigsurv.ps and the book
+given to looking at how GC interacts with the processor's cache.
+
+For the record, the GC I'm working on at the moment doesn't do anything
+clever to avoid swapping - but that's OK, because JJOS doesn't do swapping
+yet :-)
+
+-- George
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	<A HREF="mailto:scode@scode.webprovider.com">scode@scode.webprovider.com</A> [SMTP:<A HREF="mailto:scode@scode.webprovider.com">scode@scode.webprovider.com</A>]
+</I>&gt;<i> Sent:	Wednesday, August 04, 1999 11:39
+</I>&gt;<i> To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+</I>&gt;<i> Subject:	[JOS-Kernel] GC and swap space
+</I>&gt;<i> 
+</I>&gt;<i> Hi!
+</I>&gt;<i> 
+</I>&gt;<i> I'm curious; has any thought been given to how garbage collection will
+</I>&gt;<i> work
+</I>&gt;<i> on a system that uses swap space (i.e. 99% of them)?
+</I>&gt;<i> 
+</I>&gt;<i> I'm in *NO* way an expert on GC (I've only started reading that bigsurv.ps
+</I>&gt;<i> that someone mentioned), but it seems to be that it will be very hard to
+</I>&gt;<i> to implement a garbage collector capable of performing GC on a system half
+</I>&gt;<i> of whose virtual RAM consists of swap space. It looks to me like at least
+</I>&gt;<i> occatoinal thrashing is unavoidable.
+</I>&gt;<i> 
+</I>&gt;<i> Is it even *possible*? Does JavaOS do it, and if so, how?
+</I>&gt;<i> 
+</I>&gt;<i> Just curious...
+</I>&gt;<i> 
+</I>&gt;<i> -- 
+</I>&gt;<i> / Peter Schuller
+</I>&gt;<i> 
+</I>&gt;<i> PGP userID: 0x5584BD98 or 'Peter Schuller &lt;<A HREF="mailto:scode@scode.webprovider.com">scode@scode.webprovider.com</A>&gt;'
+</I>&gt;<i> Key retrival: Send an E-Mail to <A HREF="mailto:scode-getpgpkey@scode.webprovider.com">scode-getpgpkey@scode.webprovider.com</A>
+</I>&gt;<i> E-Mail: <A HREF="mailto:scode@scode.webprovider.com">scode@scode.webprovider.com</A> Web: <A HREF="http://hem.passagen.se/petersch">http://hem.passagen.se/petersch</A>
+</I>
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000183.html">[JOS-Kernel] GC and swap space</A></li>
+	<LI> Next message: <A HREF="000185.html">[JOS-Kernel] Garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#184">[ date ]</a>
+              <a href="thread.html#184">[ thread ]</a>
+              <a href="subject.html#184">[ subject ]</a>
+              <a href="author.html#184">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

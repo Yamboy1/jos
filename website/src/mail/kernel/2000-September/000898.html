@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] kissme JVM + linux kernel</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40mweb.co.za">
+   <LINK REL="Previous"  HREF="000874.html">
+   <LINK REL="Next" HREF="000881.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] kissme JVM + linux kernel</H1>
+    <B>John Leuner</B> 
+    <A HREF="mailto:jewel%40mweb.co.za"
+       TITLE="[JOS-Kernel] kissme JVM + linux kernel">jewel@mweb.co.za</A><BR>
+    <I>Sun, 17 Sep 2000 22:17:23 +0000 (UTC)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000874.html">[JOS-Kernel] New moderator</A></li>
+        <LI> Next message: <A HREF="000881.html">[JOS-Kernel] Approval</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#898">[ date ]</a>
+              <a href="thread.html#898">[ thread ]</a>
+              <a href="subject.html#898">[ subject ]</a>
+              <a href="author.html#898">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I've uploaded the source for my hacked JVM to the sourceforge CVS
+repository. 
+
+The codename for this version of the JVM is &quot;teaseme&quot;. To get the source:
+
+cvs -d:pserver:<A HREF="mailto:anonymous@cvs.teaseme.sourceforge.net">anonymous@cvs.teaseme.sourceforge.net</A>:/cvsroot/teaseme login 
+                         
+cvs -z3 -d:pserver:<A HREF="mailto:anonymous@cvs.teaseme.sourceforge.net">anonymous@cvs.teaseme.sourceforge.net</A>:/cvsroot/teaseme
+co current
+
+I duplicated the 'current' directory by mistake, so if you browse the CVS
+tree you'll see current/current/{vm files}
+
+This is just the source for the JVM. To get it to run anything you'll need
+the class library files too. I'll upload these soon. (They are the same as
+for the kissme (<A HREF="http://kissme.sourceforge.net">http://kissme.sourceforge.net</A>) project).
+
+Building
+-----------------------
+
+To compile the JVM you need a java interpreter installed, and a copy of my
+makeme build tool, <A HREF="http://makeme.sourceforge.net/.">http://makeme.sourceforge.net/.</A> Unfortunately this
+depends on the ANTLR compiler-compiler, see <A HREF="http://antlr.org.">http://antlr.org.</A>
+
+You can try executing the contents of the build_commands file in the
+top-level directory, this just compiles all the files. 
+
+
+Running:
+-----------------------
+
+The makefiles generate an object file called teaseme.o. 
+
+This contains the JVM. Currently it is hard-coded to look for its classes
+in /home/jewel/kissme_classpath. It is also hard-coded to run
+kissme_test.hello. 
+
+This will change. 
+
+To run the JVM, go insmod teaseme.o. It spews a whole lot of output in the
+kernel buffer (type dmesg to see it). This will change too.
+
+If the jvm didn't cause a segfault, you can remove it with 'rmmod
+teaseme'. 
+
+Currently I've only run a hello world app, getting more stuff to run is a
+matter of fixing up the class library functions to use the linux kernel
+directly (eg file access, time/date). Also threads need to implemented
+(threads mapped to linux kernel threads instead of pthreads). 
+
+That's it for now. Later I'll make it more tester friendly and provide a
+binary that people can try out. 
+
+I'm building and using this on Debian Potato, with a 2.2.17 kernel. I
+assume it will work on all 2.2 kernels.
+
+(I apologise for the delay in putting the source up, I should have done it
+before I posted to the list).
+
+John Leuner
+
+
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000874.html">[JOS-Kernel] New moderator</A></li>
+	<LI> Next message: <A HREF="000881.html">[JOS-Kernel] Approval</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#898">[ date ]</a>
+              <a href="thread.html#898">[ thread ]</a>
+              <a href="subject.html#898">[ subject ]</a>
+              <a href="author.html#898">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

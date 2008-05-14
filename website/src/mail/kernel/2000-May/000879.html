@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [rheise.os 0.1.4] Warning</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ryan%40whitewolf.com.au">
+   <LINK REL="Previous"  HREF="000825.html">
+   <LINK REL="Next" HREF="000826.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [rheise.os 0.1.4] Warning</H1>
+    <B>Ryan Heise</B> 
+    <A HREF="mailto:ryan%40whitewolf.com.au"
+       TITLE="[JOS-Kernel] [rheise.os 0.1.4] Warning">ryan@whitewolf.com.au</A><BR>
+    <I>Tue, 16 May 2000 07:50:48 +1000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000825.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+        <LI> Next message: <A HREF="000826.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#879">[ date ]</a>
+              <a href="thread.html#879">[ thread ]</a>
+              <a href="subject.html#879">[ subject ]</a>
+              <a href="author.html#879">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Gilbert Carl Herschberger II wrote:
+&gt;<i> 
+</I>&gt;<i> Warning: Ryan Heise &lt;<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>&gt; has introduced a second and
+</I>&gt;<i> incompatible package called jos.system. Both packages should not be used at
+</I>&gt;<i> the same time. I have privately encouraged Ryan to select another package
+</I>&gt;<i> name, but without success.
+</I>
+--snip--
+
+&gt;<i> Ryan says the original jos.system must be renamed to something else so that
+</I>&gt;<i> Ryan can use jos.system for rheise.os. Ryan wants us to rewrite jJOS/decaf
+</I>&gt;<i> and rework all of its documentation to use other package names.
+</I>
+Gilbert, do you think it is fair to make people think I said this? I
+left it open to discussion on the <A HREF="mailto:arch@jos.org">arch@jos.org</A> list. It goes against my
+principles to force others into doing things, which is why I have never
+claimed rheise.os to be the official Java layer for JOS (unlike your
+claiming that the Program API is the standard way to write programs in
+JOS). In fact you have been claiming a lot of things that are untrue, in
+private, and now in public, which offends me deeply.
+
+I never said that I'm choosing jos.* and that's that, so Decaf *must*
+change it's package name... What I said to you is this:
+
+:<i> In reality either
+</I>:<i> decaf's classes can go in there, or my classes can go in there. The
+</I>:<i> productive approach is to work out where the classes should go, and
+</I>not
+:<i> to claim rheise.os is unusable.
+</I>
+Please note that Gilbert has not yet responded to this in private. He
+chose to write this email directly to the list.
+
+Also note that Gilbert was very upset with me for changing my package
+name from rheise.os to anything because he believes package names should
+never change, that software should be perfectly backward compatible. He
+made clear to me in private that his public statement:
+
+(Reference: <A HREF="http://jos.org/pipermail/arch/2000-May/000530.html">http://jos.org/pipermail/arch/2000-May/000530.html</A>)
+
+&gt;<i> Your personal implementation of the framework/API is rheise.os,
+</I>&gt;<i> and should be. There is no good reason to change it, now or ever.
+</I>
+he really did mean that it is too late for me to change the package name
+of rheise.os because I have already published it. While I don't feel at
+all bound by Gilbert's insistence on perfect backward compatibility, I
+do understand where he is coming from. He has started using rheise.os as
+an API for implementing his concept of subprograms in one of his
+products. Now that I have changed the my package names, his softare will
+not work with newer versions of rheise.os.
+
+I do not think it is appropriate to quote what Gilbert said to me in
+private, but in order to defend my reputation, I will quote the parts of
+the email which I wrote. If Gilbert wishes to post the entire email, he
+may (although I wish he would actually reply to it rather than sending
+me one offensive email and then claiming he was unsuccessful in
+encouraging me to change my package name back. It is sad that it has
+come to this, but I do not appreciate Gilbert spreading false statements
+about me in public).
+
+======================
+(TO: Gilbert)
+
+Let me start with a general response.
+
+I understand you are quite upset that I have changed the package name on
+you after you had already started writing programs against the API. This
+comes down to a misunderstanding on two levels:
+
+1. You thought rheise.os was simply an API for executing sub-programs.
+2. You thought that what I had released was a stable version.
+
+Unfortunately you were wrong on both accounts, and it is my fault for
+not making this clear beforehand. rheise.os is a multiple process Java
+execution environment as advertised. It is designed to support the four
+ways to run programs, three of which are built in to rheise.os (the
+process based ones), and the fourth (sub-program) which is handled
+entirely outside of the framework, but nevertheless supported.
+
+The second point of misunderstanding is that you thought that this was a
+stable release. The fact that the version number hasn't even reached &quot;1&quot;
+should have made it clear that this is not the case, but I see now that
+I should make it more clear. I am now writing up a proper document that
+explains my version numbering scheme. It is basically the same version
+numbering scheme that is used by the Linux kernel:
+
+rheise.os-0.1.4-pre4 can be deconstructed as follows:
+
+The first number is the major version number. It is currently zero
+meaning it is a project that is just forming. You may only be used to
+people releasing software when it has reached version 1, but I am
+following the general open source principle of &quot;Release early, and
+release often&quot;. That means, in order to allow other open source
+developers to contribute, I need a numbering sheme that allows me to
+make releases that aren't intended for the general public. This is what
+the next component is for.
+
+The second number is odd if this is a development release, or even if it
+is a stable release intended for the general public. Since you have
+started to use the development version of rheise.os in your product, you
+will have to deal with the fact that it is unstable. In these releases,
+I may change package names if I like. However, the stable releases will
+be maintained separately and the APIs will not change on you. It is only
+when the stable release number is incremented that you might get a new
+API, but my aim is to make it stabilise as soon as possible. Even the
+Linux kernel API changed a lot when it was a few months old. Yet, Linus
+still made releases so that other developers could contribute.
+
+The third number represents minor releases that includes changes
+developers contribute as soon as they can be made available. This
+doesn't happen exactly after every change, but it is still very finely
+grained. Minor updates to development versions may contain API changes,
+however minor updates to stable versions must not contain API changes.
+
+The -pre4 suffix means that this is the 4th pre-release of what is to
+become rheise.os-0.1.4. I have been making pre-releases available to
+other developers who have been working with me on rheise.os.
+
+So, you appear to be more interested in the stable line of releases
+which actually doesn't exist yet. The middle number is still odd. Once
+the development version starts to stablise, I will roll over into a new
+stable release (0.2.0) and simultaneously fire up another development
+line (0.3.0).
+
+I expect that version 0.4.0 will have API changes over 0.2.0 which means
+you should continue to use 0.2.0 until you are ready to upgrade your
+software to 0.4.0. The 0.2.0 version can still be maintained for those
+people who are still using it (eg. bug fixes), but they won't be able to
+take advantage of the new functionality in 0.4.0 until they upgrade
+their program code to use the new version. My goal is to make API
+changes minimal, but in the early phases I expect they will change a lot
+since in the early stages I am more interested in working on the
+interfaces over and over again until I've got them exactly right.
+
+--snip--
+
+Just a minor point. I have not renamed the product yet. I _have_ renamed
+the java package names, which is a different issue. The latter affects
+backward compatibility, and my believe is that such changes should be
+made as early as possible. This is because as more people start writing
+OS services on top of rheise.os, it will be more and more work for
+everyone to change their code when I rename my packages to jos.*. While
+my product is not _the_ java layer for JOS, I still see benefit in
+naming my classes jos.*. All I have done here is expressed my believe. I
+know you have different opinions on backward compatibility and I do not
+wish to argue about them here. Let's just acknowledge for the moment
+that we have different opinions and we are entitled to go with what we
+think is best. Later we can discuss our differences.
+
+--snip--
+
+You can't claim that it is unusable just because it clashes with another
+product. Once you see this, then you can focus your attention on design
+issues such as: can we reorganise the package structure so that the
+existing decaf classes in jos.system.* can go into another package,
+leaving jos.* for public APIs? I see little value on claiming that
+rheise.os is unusable if the classes are named jos.*. In reality either
+decaf's classes can go in there, or my classes can go in there. The
+productive approach is to work out where the classes should go, and not
+to claim rheise.os is unusable.
+
+--snip--
+
+As I said, I'm not interested in discussing perfect backward
+compatibility here. But I will say that I want to be able to work on a
+development version and freely restructure things. In addition, I'd like
+to release my development version so that others can help me.
+
+--snip--
+
+It is the product name that makes it unique. My proposal for the JOS
+process API is that applications deal with a class called
+jos.process.JavaProcess. THAT is my proposal. You can replace my product
+with a different product and there will be no name clash. If you someone
+else decides not to help me extend rheise.os and wishes to create their
+own Java layer, they can name their own version jos.process.JavaProcess
+too. Or maybe they'll have a different name for that class. You wouldn't
+use both their product and my product at the same time, you would choose
+to support one and program against that.
+
+It is similar to how decaf is one possible JVM that can be used in the
+JOS project, but it is not *the* JOS JVM. However, his interpreter
+allows Java programs to use the exact same bytecodes as any other JVM.
+There is no name clash. He needs to use the proper symbolic names before
+it can be useful. The same applies to rheise.os.
+
+--snip--
+
+Just as decaf is not rheise.os specific. Yet, it needs to conform to
+some standard symbolic names before it can be used across different
+environments.
+
+Namespace clashes are only a critical issue if you are using the two
+products simultaneously in the same environment. If you want to maintain
+separate incompatible package names otherwise, that's up to your own
+personal tastes. And I know you have different tastes than me. However,
+as I said, I do not wish to argue over which one is better, here.
+
+
+
+
+-- 
+Ryan Heise
+
+<A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000825.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+	<LI> Next message: <A HREF="000826.html">[JOS-Kernel] [rheise.os 0.1.4] Warning</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#879">[ date ]</a>
+              <a href="thread.html#879">[ thread ]</a>
+              <a href="subject.html#879">[ subject ]</a>
+              <a href="author.html#879">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

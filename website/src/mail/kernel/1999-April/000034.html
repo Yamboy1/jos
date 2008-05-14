@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Calling for Directory Designs!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:guanix%40softhome.net">
+   <LINK REL="Previous"  HREF="000033.html">
+   <LINK REL="Next" HREF="000035.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Calling for Directory Designs!</H1>
+    <B>Guan Yang</B> 
+    <A HREF="mailto:guanix%40softhome.net"
+       TITLE="[JOS-Kernel] Calling for Directory Designs!">guanix@softhome.net</A><BR>
+    <I>Fri, 9 Apr 1999 13:06:42 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000033.html">[JOS-Kernel] Calling for Directory Designs!</A></li>
+        <LI> Next message: <A HREF="000035.html">[JOS-Kernel] Calling for Directory Designs!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#34">[ date ]</a>
+              <a href="thread.html#34">[ thread ]</a>
+              <a href="subject.html#34">[ subject ]</a>
+              <a href="author.html#34">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I have some comments, more related to user directory design (like the Linux
+FileSystem Hierachy Standard). This is actually rather unrelated to the
+kernel. Sorry if it is irrelevant.
+
+Here I use slashes to represent directory boundaries.
+
+Definitions:
+Dynamic Classpath A classpath that is searched only after the &quot;static
+   classpath&quot; is exhausted
+
+=== Directory Structure/User Experience ===
+The Directory Structure (DS) should look like this:
+/user   /* Linked to the user's home directory, or (if it is a
+   single-user machine) a directory by itself */
+
+/user/classes  // [Write-only?] these are accesible through the
+/user/classes/jar // /classes-hierachy.
+/user/classes/exec // (Some form of RAID.)
+
+/user/system  /* All the stuff in /system that the user has access
+   to. Perhaps /system should be executable-only?
+   This should be represented in a simplefied manner.
+   (In Linux, executable on directories mean that you
+   can see what's in them.) */
+
+/classes  /* Plain-vanilla Java application classes, part of the
+   CLASSPATH (like /classes/org/jos/Hello.class) */
+
+/classes/jar  /* All JAR files in this are path of the dynamic
+   classpath. */
+
+/classes/exec  /* Only contains executable JAR files that can be
+   executed as if they were normal class files in the
+   user environment. */
+
+/jos   /* Everything in jos.*, and stuff like JVM and
+   kernel images. */
+
+/system   /* Everything system-related, including devices.
+   So we could have stuff like:
+   user.system.Audio =&gt;
+   system.local.devices.Audio =&gt;
+   jos.device.audio.SoundBlaster16 =&gt;
+   system.local.isa.slot2 */
+=== END. ===
+
+=== User Experience ===
+This is just a little fictional shell session (inspired by how I
+wanted Linux/bash to be) (comments are with '#' like bash):
+
+&lt;fictional&gt;
+[ Load stuff like JJOS, decaf, VGA logo, etc. ]
+This is guan.superman.com.
+
+Login: guan
+Password: *******
+
+jsh 1.0 (c) 1999 JOS.org
+Welcome to JOS, Guan Yang. The date is 1 January 2000.
+
+/user$ dir  # jos.command.dir; /user =&gt; /users/guan
+[classes] [system] [Work]  [Home Computer] [Fun]
+[source]
+/user$ cd system # jos.command.cd
+/user/system$ dir
+[devices] [network] [computer] [jini]  [environment]
+/user/system$ cd devices
+/user/system$ dir # abridged
+Audio  Video  ...
+/user/system$ copy /user/fun/jossong.au Audio
+JOSplayer: Playing /user/fun/jossong.au on /user/system/devices/Audio...
+End.
+# JOSplayer is &quot;assigned&quot; to /user/system/devices/Audio
+/user/system$ adduser guan2 # Interactive call of jos.command.adduser
+You do not have access to add users. Do you wish to enter password? (Y/N) y
+Supervisor password: *********
+User guan2 added.
+/user/system$ exec adduser guan3 # Non-interactive call of
+jos.command.adduser
+/user/system$ checkmesg # Check messages
+Messages: 1
+jos.command.exec Password required for task add users
+   (jos.command.adduser guan3)
+   Supervisor password was not in key library.
+/user/system$ keylib addkey supervisor password # add a new key to the key \
+library; the key is generated from password &quot;password&quot;
+/user/system$ exec adduser guan4 # Non-interactive call
+/user/system$ checkmesg
+Messages: 1
+jos.command.exec Password required for task addusers
+   (jos.command.adduser 4)
+   Supervisor password was in key library. A-OK!
+
+=== END. ===
+
+A couple of points: When invoking &quot;adduser guan2&quot; interactively, &quot;adduser&quot;
+asks for a password. But when invoking non-interactively, &quot;adduser&quot; checks
+the &quot;key library&quot; of the current user. &quot;Keys&quot; are generated from passwords
+and the system key library, because passwords can't be used
+non-interactively. Just a security thought.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000033.html">[JOS-Kernel] Calling for Directory Designs!</A></li>
+	<LI> Next message: <A HREF="000035.html">[JOS-Kernel] Calling for Directory Designs!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#34">[ date ]</a>
+              <a href="thread.html#34">[ thread ]</a>
+              <a href="subject.html#34">[ subject ]</a>
+              <a href="author.html#34">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

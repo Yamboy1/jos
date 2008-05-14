@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: static initializer query</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000052.html">
+   <LINK REL="Next" HREF="000058.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: static initializer query</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Re: static initializer query">jm@mak.com</A><BR>
+    <I>Mon, 31 May 1999 04:18:31 +0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000052.html">[JOS-Kernel] Re: static initializer query</A></li>
+        <LI> Next message: <A HREF="000058.html">[JOS-Kernel] Re: static initializer query</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#57">[ date ]</a>
+              <a href="thread.html#57">[ thread ]</a>
+              <a href="subject.html#57">[ subject ]</a>
+              <a href="author.html#57">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd (et al);
+
+&quot;Todd L. Miller&quot; wrote:
+&gt;<i>         findStaticInit() is called in the resolution phase of
+</I>&gt;<i> class-loading.  It basically could reside in ur_java_class without any
+</I>&gt;<i> complications (though I haven't tried and made sure), and isn't there
+</I>&gt;<i> currently because it started out as part of the resolution functions
+</I>&gt;<i> taking place in class_loader.cc, and was moved out as it became necessary
+</I>&gt;<i> to call it last.  All that it does is check if a static initializer
+</I>&gt;<i> function exists, and if it does, creates a thread to run, should that
+</I>&gt;<i> static initialization become necessary.
+</I>
+When I wrote my previous message, I did not understand what was going on
+here.  Let me repeat it back to you to see if I understand now. 
+Basically, when we attempt to resolve a ur_java_class, we check to see
+if there's a static initializer.  If there is, we hang a java_thread
+which will run the static initializers off of the (in process of being
+resolved) java_class.  When running invoke (or under some other
+circumstances I haven't run under the debugger to see who calls) or
+getstatic opcodes for a thread, we check to see if this slot in the
+java_thread's corresponding java_class is non-NULL, and, if so, we then
+run the initializer thread to the bitter end.
+
+If I am reasonably close to understanding how this works now, on to my
+concerns...
+
+&gt;<i> &gt; (1) It looks like a new, fresh thread is spawned to run the static
+</I>&gt;<i> &gt; initializers.  However, the thread that caused the classload doesn't
+</I>&gt;<i> &gt; seem to wait for the new thread to finish actually running those
+</I>&gt;<i> &gt; initializers (right?).
+</I>&gt;<i> 
+</I>&gt;<i>         `while(jt-&gt;runOpcode());' will run until the thread finishes,
+</I>&gt;<i> which is (normally) when the function on the bottom of the frame stack
+</I>&gt;<i> (the static init) returns.
+</I>
+(1) Well, from an OS and maybe debugger perspective, the thread that's
+running in this while loop is actually not the thread the scheduler
+thinks is running, right?  I mean, the scheduler thinks the thread that
+is running is the thread that caused the invocation that required the
+class-with-static-initializers to the loaded, resolved, and initialized,
+NOT the thread spawned (however ephemerally) to actually run the
+initializers.  Right?  If so, if there are any scheduler-related calls
+made by the static initializers, the scheduler's notion of who's running
+is actually wrong -- I don't specifically know what could go wrong
+(given the almost infinite variety of code that could be run in the
+static initializer), but, in general, having your scheduler be flat
+wrong about both what the current process is, the count of active
+processes, and the existence of the ephemeral process, could all combine
+in nefarious ways.  It just feels like the potential exists for some
+really weird (and hard to debug) things to happen.
+
+(2) As currently envisioned, we will not pre-empt during the static
+initializations, because the while loops will run to the bitter end
+without &quot;sleeping&quot; this thread.  However, what happens if the bytecode
+does something that requires another thread to be invoked (e.g.,
+classloading off of a TCP stream, which would, say, require our thread
+to go to sleep, and fire up an inetd-equivalent)?  Does the requesting
+thread get &quot;slept&quot; or &quot;waited&quot; properly, and the Right Thing happen
+later after the bits get loaded?
+
+(3) Speaking somewhat hypothetically and prematurely, what happens when
+we get real multithreading?  Won't we want to pre-empt the static
+initializers?
+
+
+&gt;<i> &gt; This could be bad, right?  (Actually, there seem
+</I>&gt;<i> &gt; to be a couple of multithreading hazards here in specific and in the
+</I>&gt;<i> &gt; class_loader abstraction in general  -- basically, many threads might
+</I>&gt;<i> &gt; share the same classloader -- that might have to be addressed regardless
+</I>&gt;<i> &gt; of the answer to my next question.)
+</I>&gt;<i> 
+</I>&gt;<i>         One would hope many threads share the same classloader -- where
+</I>&gt;<i> would this be a problem?  (Something I'm missing, probably...)
+</I>
+Oh, I was probably wrong-thinking about having multiple threads sitting
+in classloader machinery methods/FSMs simulataneously.  I was thinking
+we'd be pre-empting the static initializers, and maybe have to put
+concurrency controls around the hashtables, but I think my concerns are
+all premature given the lack of multithreading (I mean, time-slicing
+pre-emption).
+
+
+&gt;<i> &gt; (2) Is there some reason we don't just run those initializers within the
+</I>&gt;<i> &gt; context of the current (requesting) thread?  Maybe just &quot;push&quot; their
+</I>&gt;<i> &gt; stack frames onto the stack so the vanilla machinery can tackle the
+</I>&gt;<i> &gt; problem?  Is this a Java-ism?  Is there some other advantage to spawning
+</I>&gt;<i> &gt; a new thread?  (It pays to actually understand something before you
+</I>&gt;<i> &gt; attempt to muck with it, eh?)
+</I>&gt;<i> 
+</I>&gt;<i>         Because it would be Very Annoying to arrange to push a method
+</I>&gt;<i> frame in the middle of one bytecode and then return to that same point in
+</I>&gt;<i> the bytecode after that method frame finishes executing; and there are
+</I>&gt;<i> four such locations where static initialization is done.
+</I>
+Well, I agree that you never ever want to leave a thread &quot;in the middle
+of&quot; a bytecode execution.  I believe you'd have to back it out all the
+way and wait for a retry.  The second part, about pushing a frame on top
+of the current stack, I will have to think about how bad that is (I
+forget what the stack discipline is like, and how the frames get
+popped).  I would think it could be kind of like an &quot;interrupt&quot;
+happened, and the interrupt affects the runnability (sp?) of the pending
+opcode (by side effect of resolving the required class), and then just
+goes away and cleans up after itself.  However, a debugger might show
+the extra stack stuff on top of the explicitly-called stuff.
+
+How do &quot;normal&quot; Java systems/debuggers treat this event (he asked,
+ignorantly)?
+
+&gt;<i>         Moving the method frame onto the stack (we could store a pointer
+</I>&gt;<i> to the frame instead of a pointer to a thread) would allow for the
+</I>&gt;<i> scheduler to take care of timeslicing the initialization but there are two
+</I>&gt;<i> problems: (A) we'd have to take care to check at each static init point if
+</I>&gt;<i> some other thread was mucking about with the static init also (perhaps, if
+</I>&gt;<i> static_init == 1?) and if so, sleep until it finished -- the sleeping part
+</I>
+These are the multithreading hazards I mentioned before.
+
+&gt;<i> would probably be difficult to arrange; and (B) unwinding the stack &amp; the
+</I>&gt;<i> program counter would be annoying and result in much duplicated work for
+</I>&gt;<i> these four locations.
+</I>&gt;<i> 
+</I>&gt;<i>         It might, however, be wise to adjust the current system in some
+</I>&gt;<i> way: should we ever implement native processes, so that one thread sitting
+</I>&gt;<i> in its static_init loop *could* be interrupted by another, we'd have the
+</I>&gt;<i> same problems as if the method frame had been pushed onto the frame stack.
+</I>&gt;<i> Of course, alot of things would have to change if we ever did that, so I'm
+</I>&gt;<i> not sure that we want to worry about it.
+</I>
+Just asking.  Given that I guess we're making a trade-off decision
+(deciding to not decide to do something is the same as deciding not to
+do it), I just wanted to know what we were trading-off.
+
+&gt;<i>         IMHO, since it (seems to) work, there's no need to change it.
+</I>&gt;<i> Counter-arguments?
+</I>
+Just the concerns I had above.  In short summary, which thread is really
+running?  And, what should a debugger show?
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000052.html">[JOS-Kernel] Re: static initializer query</A></li>
+	<LI> Next message: <A HREF="000058.html">[JOS-Kernel] Re: static initializer query</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#57">[ date ]</a>
+              <a href="thread.html#57">[ thread ]</a>
+              <a href="subject.html#57">[ subject ]</a>
+              <a href="author.html#57">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

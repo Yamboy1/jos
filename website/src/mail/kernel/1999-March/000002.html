@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf update &amp; the keyboard driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000001.html">
+   <LINK REL="Next" HREF="000004.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf update &amp; the keyboard driver</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf update &amp; the keyboard driver">tmiller@haverford.edu</A><BR>
+    <I>Wed, 24 Mar 1999 14:22:19 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000001.html">[JOS-Kernel] Linus's thoughts on open source kernel development</A></li>
+        <LI> Next message: <A HREF="000004.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	decaf's bytecode instruction set, excepting monitorenter and
+monitorexit, which are only used in explicit synchronized(){} blocks, is
+complete.  Large chunks have not been thoroughly tested; in particular,
+doubles and longs are known not to work; checkcast and instanceof will
+fail on interfaces (probably -- they certainly aren't coded correctly);
+the code (lookup and table switch) supporting switch/case statements is
+untested and probably chock-full of bugs; the full semantics of any JDK
+are not implemented yet; notably, support for the 1.1 inner classes
+specification is completely lacking; ditto security concerns, bytecode
+verification, and implicit monitor locking.  (Monitors, period, aren't
+implemented.)  The Makefile in common/bytecode does NOT build a class
+library that decaf can properly exploit; this is lacking in part to
+straight-up incompatibilities between decaf and Sun's java interperter,
+as well as the abysmal (but present!) support for native methods.  This
+list is almost certainly not comprehensive.  Work at your own risk;
+cross-check what you can against a known-to-be-behaving JVM.
+
+	Having only recently completed this rounding-out of decaf, and
+feeling loathe to test it at this juncture, I examined Matt Albrecht's
+code for resource allocation &amp; control and his keyboard driver &amp; scancode
+converter, etc.  I'm presenting here a short overview in hopes that Matt
+will correct any oversights or misunderstandings of mine before I start
+implementing his code for/with decaf; suggestions, based on my current
+understandings, are below as well.
+
+In general:
+
+'Device'(s) return 'Driver'(s) via the PrimaryHardwareManager, which is
+java object in charge of a particular i/o bus; the Device class/object
+returns 'Driver'(s) based on its interactions with the PHM via
+'HardwareRequests' of various types.
+
+A 'HardwareResourceInterface' is responsible for implementing the
+(presumambly kernel) wrapper of the native code handling a particular
+HardwareResource (for the i386, interrupts, ioports, memory, etc;
+different architectures will, of course, get their own HardwareResources).
+
+More specifically:
+
+InterruptInterface (and the Driver) model is based on the old,
+non-Listener style of things, and hence, must be changed.  The most
+obvious question is if the InterruptInterface should be more or less
+basically replaced by the InterruptDispatcher or if it should subscribe to
+it; especially w.r.t. the IRQResource concept that seems to be Matt's
+vehicle for allowing interrupt sharing, which is necessary for a variety
+of reasons, not the least of which is the serial port driver.
+
+As far as my stated goal of making jos.system.keyboard as much an
+abstraction as possible, and NOT a driver, necessarily, I looked at the
+KeyboardDevice class idea; where jos.system.keyboard
+would be the default system-wide KeyboardDevice, which hides it back-end
+KeyboardInterperter, which could be replaced on the fly.  (For i18n
+purposes, one would wonders how non-latin character sets are handled in
+the current VK_* system; but since we're almost certain to extend it, that
+question can be safely ignored for now.  Something about unicode...
+perhaps a unicode character set that defines navigation/function keys?)
+
+The basic idea of the above being that at the level where an application,
+including ones like the shell, might get keystoke data, it's safely been
+platform de-dependincied ( how does one verb that? ).  It would, of
+course, be Good Programming to make the shell independent of the Keyboard
+itself, but the telnet daemon feeding the input stream should and could
+just as easily feed the stream with the VK_* series we've defined -- as
+mapped by its ANSI/vt100/vt220 (etc) termcap-equivalent.
+
+Three questions, perhaps induced by not reading the code closely enough:
+first, what use(s) is the DeviceManager intended for?  Second, why have
+two ISAKeyboards?  The method overloads don't appear to be necessary or
+desirous.  Thirdly, how easy (or difficult) is it for this framework to
+handle driver updates on the fly?  I seem to recall several Driver/Device
+constructors that took other Devices or Drivers?
+
+At any rate, before I go any further re: this, I want some feedback from
+the list; and I will have to build the Makefiles for handling the
+architecture-dependent parts of this, so as to get the idea and structure
+firmly in place before the driver-writing really gets off the ground.
+(i.e. ISAKeyboard is probably an architecture-specific bit of code;
+whereas KeyboardDevice probably is not.  This will require a closer
+reading of the code.)
+
+As far as things on my todo list aside from the keyboard driver is
+rewriting the native-code support in interp.cc to handle argument types,
+especially in print() and println(), which will ease the debugging
+immensely, as well as lay a groundwork for 'real' native-code handling
+later.  The end goal of this, for now, being to make a clean &amp; extensible
+keyboard-to-screen echo, and, perhaps, some sort of &quot;hello, world!&quot;-style
+shell, to test things out and demonstrate the way it might be done.
+
+And of course, the procession of things which must be done to
+bring decaf into full compability w/ the 1.2 JDK.  Does anyone know of a
+good compatibility aside from Sun's JCK, which (AFAIK), is not a
+particularly cheap (or at-home) kind of thing?
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000001.html">[JOS-Kernel] Linus's thoughts on open source kernel development</A></li>
+	<LI> Next message: <A HREF="000004.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

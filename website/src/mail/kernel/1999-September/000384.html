@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Some Idea About Speed Up JJOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000383.html">
+   <LINK REL="Next" HREF="000393.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Some Idea About Speed Up JJOS</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Some Idea About Speed Up JJOS">jm@mak.com</A><BR>
+    <I>Mon, 20 Sep 1999 14:21:45 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000383.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+        <LI> Next message: <A HREF="000393.html">[JOS-Kernel] decaf bug report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#384">[ date ]</a>
+              <a href="thread.html#384">[ thread ]</a>
+              <a href="subject.html#384">[ subject ]</a>
+              <a href="author.html#384">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+Hilary Cheng wrote:
+&gt;<i>     What do u think the critical part that makes JJOS slow ? :O
+</I>
+How much time do you have? ;=)
+
+Seriously, since you asked, in no particular order (based upon a cursory
+examination of profiling output)...
+
+(1) Obligation to &quot;intercept&quot; method calls to Sun's JDK for methods that will
+break decaf+jjos.  Entails examining each and every method call to see if it is
+one such.  This should go away when we use classpath.
+
+(2) Failure to do &quot;invoke&quot; opcode rewriting so that we can avoid overhead of
+method lookup.
+
+(3) Failure to inline &quot;obvious&quot; candidates (e.g., all the local_variable
+accessor and mutators methods, some constructors).
+
+(4) Scheduler/interrupt polling overhead is way too high...
+
+(5) Given that the heap implementation zeroes memory, some common constructors
+(e.g., java_object) could skip re-initializing member variables...
+
+(6) Failure to do JIT compilation...
+
+BTW, here are the top couple of offenders for the host build WITHOUT
+optimization:
+
+&gt;<i>   %   cumulative   self              self     total           
+</I>&gt;<i>  time   seconds   seconds    calls  ms/call  ms/call  name    
+</I>&gt;<i>   9.92      5.95     5.95  2336461     0.00     0.01  frame::runOpcode(java_object &amp;)
+</I>&gt;<i>   9.20     11.47     5.52  2334752     0.00     0.00  jjMachine::interruptFIFOEmpty(void)
+</I>&gt;<i>   3.67     13.67     2.20        1  2200.00 58806.54  scheduler::start(jjMachine *, java_class *)
+</I>&gt;<i>   3.60     15.83     2.16  2334752     0.00     0.00  scheduler::notifyOfInterrupts(jjMachine *, java_class *)
+</I>&gt;<i>   3.32     17.82     1.99  2350034     0.00     0.00  java_object::java_object(java_class *)
+</I>&gt;<i>   3.25     19.77     1.95  2334752     0.00     0.00  scheduler::currentTimeSliceExpired(void)
+</I>&gt;<i>   2.98     21.56     1.79  2336461     0.00     0.01  java_thread::runOpcode(void)
+</I>&gt;<i>   2.85     23.27     1.71   910386     0.00     0.00  local_variables::load_jint(unsigned int)
+</I>&gt;<i>   2.80     24.95     1.68  4678122     0.00     0.00  scheduler::currentThread(void)
+</I>&gt;<i>   2.80     26.63     1.68  2354659     0.00     0.00  typed_data::~typed_data(void)
+</I>&gt;<i>   2.57     28.17     1.54   456252     0.00     0.00  jbSLL&lt;java_thread *&gt;::_lookup(jbSLLItem&lt;java_thread *&gt; *, java_thread *const &amp;)
+</I>&gt;<i>   2.55     29.70     1.53  2337693     0.00     0.00  d_stack&lt;frame&gt;::peek(void)
+</I>&gt;<i>   2.48     31.19     1.49  2350238     0.00     0.00  threadable::threadable(void)
+</I>&gt;<i>   2.35     32.60     1.41  2336461     0.00     0.00  java_object::~java_object(void)
+</I>&gt;<i>   2.25     33.95     1.35   388818     0.00     0.00  wcscmp(unsigned short const *, unsigned short const *)
+</I>&gt;<i>   2.02     35.16     1.21  1113591     0.00     0.00  operand_stack::pop_jint(void)
+</I>&gt;<i>   1.98     36.35     1.19  2336461     0.00     0.00  java_thread::currentFrame(void) const
+</I>&gt;<i>   1.95     37.52     1.17        1  1170.00  1170.00  jbHeap::scrubMemory(void)
+</I>&gt;<i>   1.73     38.56     1.04  2393897     0.00     0.00  typed_data::typed_data(void)
+</I>&gt;<i>   1.72     39.59     1.03  1189224     0.00     0.00  s_stack&lt;java_word&gt;::push(java_word)
+</I>&gt;<i>   1.70     40.61     1.02  2024179     0.00     0.00  java_word::operator int(void) const
+</I>&gt;<i>   1.53     41.53     0.92   984558     0.00     0.00  operand_stack::push_java_word(java_word)
+</I>&gt;<i>   1.32     42.32     0.79   361580     0.00     0.01  frame::if_icmplt(java_object &amp;)
+</I>&gt;<i>   1.25     43.07     0.75  2334752     0.00     0.00  java_thread::priority(void)
+</I>&gt;<i>   1.17     43.77     0.70  1189224     0.00     0.00  s_stack&lt;java_word&gt;::pop(void)
+</I>&gt;<i>   1.15     44.46     0.69   364244     0.00     0.00  frame::bipush(java_object &amp;)
+</I>&gt;<i>   1.15     45.15     0.69    78375     0.01     0.01  jbZipFileLocalFileHeader::getMyFileName(char *)
+</I>&gt;<i>   1.07     45.79     0.64  4700476     0.00     0.00  thread_list::thread_list(void)
+</I>&gt;<i>   1.05     46.42     0.63  2854961     0.00     0.00  heapMark(void *)
+</I>&gt;<i>   1.05     47.05     0.63  2334753     0.00     0.00  scheduler::noThreadsLeftToRun(void)
+</I>&gt;<i>   1.00     47.65     0.60    50290     0.01     0.04  heapMarkBlock(void *, void *)
+</I>&gt;<i>   0.98     48.24     0.59    78375     0.01     0.01  jbZipFileLocalFileHeader::isValidZipFile(void)
+</I>&gt;<i>   0.97     48.82     0.58   362498     0.00     0.01  frame::iinc(java_object &amp;)
+</I>
+Here are the top couple of offenders for the -O3 (max optimization) host build:
+
+&gt;<i>   %   cumulative   self              self     total           
+</I>&gt;<i>  time   seconds   seconds    calls  ms/call  ms/call  name    
+</I>&gt;<i>  12.49      5.68     5.68  2336461     0.00     0.01  frame::runOpcode(java_object &amp;)
+</I>&gt;<i>  11.26     10.80     5.12  2334752     0.00     0.00  jjMachine::interruptFIFOEmpty(void)
+</I>&gt;<i>   7.48     14.20     3.40  2338911     0.00     0.00  java_object::java_object(java_class *)
+</I>&gt;<i>   7.06     17.41     3.21        1  3210.00 44877.76  scheduler::start(jjMachine *, java_class *)
+</I>&gt;<i>   5.02     19.69     2.28  2334752     0.00     0.00  java_thread::priority(void)
+</I>&gt;<i>   4.95     21.94     2.25  2337693     0.00     0.00  d_stack&lt;frame&gt;::peek(void)
+</I>&gt;<i>   4.95     24.19     2.25  2334753     0.00     0.00  jbSLL&lt;java_thread *&gt;::isEmpty(void)
+</I>&gt;<i>   4.60     26.28     2.09  2336461     0.00     0.00  java_thread::runOpcode(void)
+</I>&gt;<i>   3.50     27.87     1.59  2350238     0.00     0.00  threadable::threadable(void)
+</I>&gt;<i>   2.75     29.12     1.25   910386     0.00     0.00  local_variables::load_jint(unsigned int)
+</I>&gt;<i>   2.33     30.18     1.06  1113591     0.00     0.00  operand_stack::pop_jint(void)
+</I>&gt;<i>   2.11     31.14     0.96  2354659     0.00     0.00  typed_data::~typed_data(void)
+</I>&gt;<i>   1.67     31.90     0.76  2024179     0.00     0.00  java_word::operator int(void) const
+</I>&gt;<i>   1.65     32.65     0.75  1189224     0.00     0.00  s_stack&lt;java_word&gt;::pop(void)
+</I>&gt;<i>   1.61     33.38     0.73   456252     0.00     0.00  jbSLL&lt;java_thread *&gt;::lookup(java_thread *const &amp;)
+</I>&gt;<i>   1.58     34.10     0.72   388818     0.00     0.00  wcscmp(unsigned short const *, unsigned short const *)
+</I>&gt;<i>   1.56     34.81     0.71  4700476     0.00     0.00  thread_list::thread_list(void)
+</I>&gt;<i>   1.50     35.49     0.68    78375     0.01     0.01  jbZipFileLocalFileHeader::isValidZipFile(void)
+</I>&gt;<i>   1.36     36.11     0.62  1189224     0.00     0.00  s_stack&lt;java_word&gt;::push(java_word)
+</I>&gt;<i>   1.34     36.72     0.61   968658     0.00     0.00  operand_stack::push_java_word(java_word)
+</I>&gt;<i>   1.25     37.29     0.57        1   570.00   570.00  jbHeap::scrubMemory(void)
+</I>&gt;<i>   1.23     37.85     0.56   456252     0.00     0.00  scheduler::switchToNextThread(void)
+</I>&gt;<i>   1.08     38.34     0.49    51002     0.01     0.02  my_calloc(unsigned int, unsigned int)
+</I>&gt;<i>   0.97     38.78     0.44  3152254     0.00     0.00  pagerDescriptorForPage(pager *, void *)
+</I>&gt;<i>   0.95     39.21     0.43  1658416     0.00     0.00  java_word::operator=(java_word const &amp;)
+</I>
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/">http://www.mak.com/</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000383.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+	<LI> Next message: <A HREF="000393.html">[JOS-Kernel] decaf bug report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#384">[ date ]</a>
+              <a href="thread.html#384">[ thread ]</a>
+              <a href="subject.html#384">[ subject ]</a>
+              <a href="author.html#384">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

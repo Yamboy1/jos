@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000749.html">
+   <LINK REL="Next" HREF="000753.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Device as a digital resource">gchii@mindspring.com</A><BR>
+    <I>Sat, 18 Mar 2000 15:14:15 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000749.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000753.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#752">[ date ]</a>
+              <a href="thread.html#752">[ thread ]</a>
+              <a href="subject.html#752">[ subject ]</a>
+              <a href="author.html#752">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 05:05 PM 3/18/00 +0200, Al &lt;<A HREF="mailto:al@outworld.org">al@outworld.org</A>&gt; wrote:
+&gt;<i>I don't really like the scheme, because it is not the normal way a URI
+</I>&gt;<i>works. The above URI actually does not point to a device, but merely
+</I>&gt;<i>informs how to search for a device.
+</I>
+I propose a system-wide device factory. I propose that we can treat
+JVM-specific classes and devices in a uniform way. I'm sorry you don't like
+the scheme. Oh well, it was my first attempt to map devices independently
+from the traditional ideas of a file subsystem.
+
+Do you like that idea of a system-wide device factory?
+
+Do you like the idea that a URI is used to identify devices? If so, we can
+refine the scheme through experimentation.
+
+I was thinking this URI should specify the interface you would like to use.
+The same interface might be used for all serial ports. Like BCNI, it would
+be much easier to finish this project if there is a direct link between a
+URI and the JOS Platform API.
+
+Properties can be set before or after a device is returned. Either way a
+device is returned. While the device: scheme can set properties before, the
+bcni: scheme requires you to set properties after.
+
+&gt;<i>The above URI could *point* to a modem device like this:
+</I>&gt;<i>
+</I>&gt;<i>for the serial port 1,
+</I>&gt;<i>
+</I>&gt;<i>bnci:<A HREF="modem://localhost/serial/1/">modem://localhost/serial/1/</A>
+</I>
+Maybe you meant something like &quot;device:<A HREF="modem://localhost/serial/1/".">modem://localhost/serial/1/&quot;.</A> The
+bcni: scheme is a bridge to the BCNI factory. Both the bcni: scheme and
+factory require the name of a Java interface. It has no paths. It has only
+an interface name.
+
+&gt;<i>The parameter indicator question mark ('?') should, IMHO, be used for
+</I>&gt;<i>parametric information only, such as:
+</I>&gt;<i>
+</I>&gt;<i>bnci:<A HREF="modem://localhost/serial/1/?maxspeed=57600&parity=none">modem://localhost/serial/1/?maxspeed=57600&amp;parity=none</A>
+</I>
+This is good. I agree that any program that wants to set parity, bits and
+speed should use the query string. Any parameter set in the query string
+should be a property of the device. If you use maxspeed=57600, the device
+defines a getMaxSpeed() method that returns 57600. If it is capable of
+changing a property after it is created, a device defines a setMaxSpeed()
+method, too.
+
+Once a modem device is created, port is one of its properties. Since port
+is a property, I put it in the query string with all of the other
+properties. In general, I would prefer to put port in a query string
+because there are many devices without a port.
+
+We disagree on the concept of path. Devices should be mapped independently
+from the traditional ideas of a file subsystem, like path.
+
+&gt;<i><A HREF="device://localhost/devices/ports/parallel/0/?bidirectorial=true">device://localhost/devices/ports/parallel/0/?bidirectorial=true</A>
+</I>
+Look! See how easy it would be to set properties of a device with a URI.
+After a device is created, you change its properties with methods.
+
+Host and port should be optional, not required. At first, none of these
+devices are capable of distribution. They are always local host. A device:
+scheme could start out like this:
+
+'device:' [ '//' host [ ':' port ] ]
+
+I do not propose a network-wide device factory. I cannot create distributed
+devices at this point in the start-up sequence. Without TCP/IP, we could
+not possibly connect to another host. I propose a local URI because we
+don't have a network. Like bcni: scheme, the device: scheme would do well
+to specify the interface it wants, wouldn't it?
+
+'device:' [ '//' host [ ':' port ] ] interfacename [ '?' querystring ]
+
+I asked myself this question: If we already have the bcni: scheme, do we
+need a device scheme? I think the answer is 'Yes, we do.' The device:
+scheme could manage additional parameters/properties on a device by device
+basis. This could be very flexible.
+
+Once we see the similarity between JVM-specific classes and devices,
+devices can be designed and used in all kinds of Java programs.
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000749.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000753.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#752">[ date ]</a>
+              <a href="thread.html#752">[ thread ]</a>
+              <a href="subject.html#752">[ subject ]</a>
+              <a href="author.html#752">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

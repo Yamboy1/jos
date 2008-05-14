@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOS Machine</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000689.html">
+   <LINK REL="Next" HREF="000691.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOS Machine</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Kernel] JOS Machine">hilarycheng@usa.net</A><BR>
+    <I>Thu, 02 Mar 2000 09:30:52 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000689.html">[JOS-Kernel] JOS Machine</A></li>
+        <LI> Next message: <A HREF="000691.html">[JOS-Kernel] JOS Machine</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#690">[ date ]</a>
+              <a href="thread.html#690">[ thread ]</a>
+              <a href="subject.html#690">[ subject ]</a>
+              <a href="author.html#690">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>HI ALl,
+
+    As u propose the code as below, some what like a JNI. If we need it,
+better to port decaf to JNI compatible one. :P
+
+Regards,
+
+Hilary
+
+
+
+&gt;<i>
+</I>&gt;<i> When compiled to a shared library, I can invoke the decaf virtual machine
+</I>&gt;<i> through a function like this:
+</I>&gt;<i>
+</I>&gt;<i>   const char *libname = &quot;decaf&quot;;
+</I>&gt;<i>
+</I>&gt;<i>   void example() {
+</I>&gt;<i>     SharedLibrary lib = createSharedLibrary( libname );
+</I>&gt;<i>     decaf_main = lib.getMethod( &quot;decaf_main&quot; );
+</I>&gt;<i>
+</I>&gt;<i>     decaf_main( argc, argv, Kernel *k );
+</I>&gt;<i>   }
+</I>&gt;<i>
+</I>&gt;<i> To extend it as you describe, we *could* get a shared library for &quot;classes&quot;
+</I>&gt;<i> within decaf virtual machine through a similar function:
+</I>&gt;<i>
+</I>&gt;<i>   const char *libname = &quot;decaf&quot;;
+</I>&gt;<i>   const char *classname = &quot;java.lang.Object&quot;;
+</I>&gt;<i>
+</I>&gt;<i>   void example() {
+</I>&gt;<i>     SharedLibrary lib = createSharedLibrary( libname );
+</I>&gt;<i>     void *(*getNativeClass)(const char *);
+</I>&gt;<i>     getNativeClass = lib.getMethod( &quot;getNativeClass&quot; );
+</I>&gt;<i>
+</I>&gt;<i>     SharedLibrary o = getNativeClass( classname );
+</I>&gt;<i>     jclass *(*object_getClass)(jobject *);
+</I>&gt;<i>     object_getClass = o.getMethod( &quot;getClass&quot; );
+</I>&gt;<i>
+</I>&gt;<i>     jclass v = object_getClass( jobject );
+</I>&gt;<i>   }
+</I>&gt;<i>
+</I>&gt;<i> Of course, getNativeClass() is JVM-specific. For decaf, it can return an
+</I>&gt;<i> instance of SharedLibrary appropriate to the requested class. Using the
+</I>&gt;<i> existing decaf mechanism to bind methods to machine code, each decaf
+</I>&gt;<i> sublibrary might return pointers to methods of a single class.
+</I>&gt;<i>
+</I>&gt;<i> I would prefer to Kore-like approach used in the Alt packages. It uses a
+</I>&gt;<i> shared library for each *package*, instead of for each class. While both
+</I>&gt;<i> are functionally equivalent, one shared library per package is simpler.
+</I>&gt;<i>
+</I>&gt;<i>   const char *libname = &quot;decaf&quot;;
+</I>&gt;<i>   const char *classname = &quot;java.lang&quot;;
+</I>&gt;<i>
+</I>&gt;<i>   void example() {
+</I>&gt;<i>     SharedLibrary lib = createSharedLibrary( libname );
+</I>&gt;<i>     void *(*getNativeClass)(const char *);
+</I>&gt;<i>     getNativeClass = lib.getMethod( &quot;getNativeClass&quot; );
+</I>&gt;<i>
+</I>&gt;<i>     SharedLibrary lang = getNativeClass( classname );
+</I>&gt;<i>     jclass *(*object_getClass)(jobject *);
+</I>&gt;<i>     object_getClass = lang.getMethod( &quot;Object.getClass&quot; );
+</I>&gt;<i>
+</I>&gt;<i>     jclass v = object_getClass( jobject );
+</I>&gt;<i>   }
+</I>&gt;<i>
+</I>&gt;<i> At the next level, the above code *could* be reduced using a multi-stage
+</I>&gt;<i> factory to create a shared library:
+</I>&gt;<i>
+</I>&gt;<i>   const char *libname = &quot;decaf:java.lang&quot;;
+</I>&gt;<i>
+</I>&gt;<i>   void example() {
+</I>&gt;<i>     SharedLibrary lang = createSharedLibrary( libname );
+</I>&gt;<i>     jclass *(*object_getClass)(jobject *);
+</I>&gt;<i>     object_getClass = lang.getMethod( &quot;Object.getClass&quot; );
+</I>&gt;<i>
+</I>&gt;<i>     jclass v = object_getClass( jobject );
+</I>&gt;<i>   }
+</I>&gt;<i>
+</I>&gt;<i> All features of the shared library factory can be delegated to a
+</I>&gt;<i> platform-specific implementation of createSharedLibrary(). Or, a
+</I>&gt;<i> platform-specific behavior can be implemented as plug-ins.
+</I>&gt;<i>
+</I>&gt;<i> Note: Method names are mapped to machine code by each shared library. The
+</I>&gt;<i> name of a Java native method can be *anything*; it does not have to use the
+</I>&gt;<i> JNI naming convention. In C++, I want a method called object_getClass
+</I>&gt;<i> instead of a method called Java_java_lang_object_getClass.
+</I>&gt;<i>
+</I>&gt;<i> &gt;&gt; Is it possible to develop decaf so that it is compatible with Kore *and*
+</I>&gt;<i> &gt;&gt; JDK 1.1.6 *and* classpath? We might have concurrent &quot;subplatforms&quot; defined
+</I>&gt;<i> &gt;&gt; decaf. By changing the list when decaf binds machine code to native
+</I>&gt;<i> &gt;&gt; methods, decaf works across all versions of Java.
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;       This should be possible.  I will not, however, be providing
+</I>&gt;<i> &gt;support for anything aside from classpath.  Kore should be fairly simple
+</I>&gt;<i> &gt;for someone to add; JDK 1.1.x will be very difficult, unless Kaffe (et
+</I>&gt;<i> &gt;al) have a remarkably clean JVM/VM class separation that allows us to look
+</I>&gt;<i> &gt;at their source to derive what, exactly, Sun's native code is supposed to
+</I>&gt;<i> &gt;be doing.
+</I>&gt;<i>
+</I>&gt;<i> Thanks for the clarification. I'd like to continue working on Kore/BCNI.
+</I>&gt;<i>
+</I>&gt;<i> &gt;       Just as note -- even if we can link and load classpath libraries,
+</I>&gt;<i> &gt;we can't do anything useful with them yet, because decaf does not
+</I>&gt;<i> &gt;currently (and may not ever) support JNI.  It would seem advisable to
+</I>&gt;<i> &gt;develop dynamic library support for the i386 build (or borrow it from
+</I>&gt;<i> &gt;somewhere else) for fairly straight-forward reasons about driving the
+</I>&gt;<i> &gt;hardware (especially hot-pluggable h/w), but I'm not quite so sure that
+</I>&gt;<i> &gt;JNI is a good idea.  In certain locations (e.g. h/w) we must use native
+</I>&gt;<i> &gt;code until such a time that decaf can run a java device driver fast enough
+</I>&gt;<i> &gt;to handle h/w timeouts and buffers, etc (and even then, it's probably wise
+</I>&gt;<i> &gt;to stick with native drivers in most cases), but no user-level task should
+</I>&gt;<i> &gt;require native code aside from (possibly) driver support.
+</I>&gt;<i>
+</I>&gt;<i> The SharedLibrary mechanism shown above might be simpler than JNI. I prefer
+</I>&gt;<i> BCNI over JNI. decaf works without JNI. To start decaf after its a shared
+</I>&gt;<i> library, any program can call decaf_main() to start the virtual machine.
+</I>&gt;<i> decaf returns from decaf_main() after all of non-daemon threads are
+</I>&gt;<i> complete (doesn't it?).
+</I>&gt;<i>
+</I>&gt;<i> The interface between jJOS and decaf (and any other virtual machine for
+</I>&gt;<i> that matter) might be reduced to an interface like that of a command line,
+</I>&gt;<i> similar to the java tool. A caller must assemble argv and pass it to
+</I>&gt;<i> decaf_main().
+</I>&gt;<i>
+</I>&gt;<i> void decaf_main( int argc, char *argv[], Kernel *k );
+</I>&gt;<i>
+</I>&gt;<i> This is what jJOS does, isn't it?
+</I>&gt;<i>
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000689.html">[JOS-Kernel] JOS Machine</A></li>
+	<LI> Next message: <A HREF="000691.html">[JOS-Kernel] JOS Machine</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#690">[ date ]</a>
+              <a href="thread.html#690">[ thread ]</a>
+              <a href="subject.html#690">[ subject ]</a>
+              <a href="author.html#690">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Next version of jjos / decaf garbage collection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000491.html">
+   <LINK REL="Next" HREF="000507.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Next version of jjos / decaf garbage collection</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Next version of jjos / decaf garbage collection">tmiller@haverford.edu</A><BR>
+    <I>Sun, 28 Nov 1999 03:53:10 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000491.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+        <LI> Next message: <A HREF="000507.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#506">[ date ]</a>
+              <a href="thread.html#506">[ thread ]</a>
+              <a href="subject.html#506">[ subject ]</a>
+              <a href="author.html#506">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> 2.  Rework it to be a generational collector. This should decrease the
+</I>&gt;<i> average pause time by performing lots of little garbage collects, rather
+</I>&gt;<i> than the occasional big one (these would still be needed, but less
+</I>&gt;<i> frequently).
+</I>
+	See below for my idea about 'incremental' garbage collection,
+which has the same hope.
+
+&gt;<i> One thing to ponder is whether all the above work is worthwhile - the
+</I>&gt;<i> Boehm-Demers garbage collector does all the above and more (eg concurrent gc
+</I>&gt;<i> apparently), is freely available and usable, and has been developed and
+</I>&gt;<i> widely used for over a decade, so is very stable. Integrating that might be
+</I>&gt;<i> a better way to get JOS to progress (though perhaps less fun for me :-).
+</I>
+	Never heard of it -- any links so I can do my reading?
+
+&gt;<i> · There should be another mail of mine floating around on the arch list
+</I>&gt;<i> containing thoughts on how to deal with real-time aspects of device drivers.
+</I>&gt;<i> Does anyone have any idea if what I propose there will be sufficient, or
+</I>&gt;<i> does more thought need to be given to it?
+</I>
+	It should be sufficient, but we can just wait and see it.
+
+&gt;<i> Todd - didn't you let slip in a mail recently that you'd had some thoughts
+</I>&gt;<i> about Java v C++ gc? Care to elaborate?
+</I>
+	Well, first that we should separate the two.  The Java GC we can
+make perfect without too much difficulty.  (That is, the roots are well
+known, and what is and is not a pointer is also well known.)  The C++ GC
+then becomes the hard bit.  This note is note particular to a specific
+algorithm.  (Any algorithm that works on 'all memory' can be restricted to
+the lower or upper N megabytes by having the c_alloc()/java_alloc()
+functions return into the lower or upper N megabytes.)
+
+	(An aside here: does Linux do fully dynamic library loading?  That
+is, can I do something like:
+
+LIBR * lib = LoadLibrary( &quot;classpath.so&quot; );
+JNI * func = lib-&gt;getFunc( some_string_from_java );
+if ( func != NULL ) { 
+	(* func)( JNI_ARGS );
+	} else { throw_NoSuchNativeMethod_exception(); }
+
+	This would make integrating classpath on the host build very
+easy.)
+
+[Fair warning: this gets rather long.]
+
+	Anyway, the idea I was referring to earlier needs to be researched
+better, but for now I'm calling it incremental gc.  The idea is similar to
+that of generational GC in that it tries to take advantage of the fact
+that most garbage is created and thrown away very quickly -- in the same
+function.  The basic idea is to reap at every stack push or pop, by having
+tracked which pointers exist only in local variables.  On the frame pop,
+any local-only pointers obviously become garbage; on the frame push, any
+pointer that was only in a local and had been overwritten can be reaped.
+(I'm guessing the GC overhead would be preferred in function
+calls/returns, not in assignments, though this might have to change if we
+encounter alot of tight garbage-spewing loops.  (That is, where it would
+be better to reap as soon as we can, rather than filling memory and
+inserting an expensive pause.))  I'm working on a specific set of actions
+to be taken at specific points in the program (here, I'm targeting the
+java memory, where we don't have to fiddle with the compiler to execute
+certain code on assignments and the like) that will enable the above
+distinctions to be made, and hopefully a few potentially useful other
+ones.
+
+	In general, three things happen with a pointer: creation,
+assignment, and dereferencing.  Our objective is to provide a minimal set
+of pointers that will correctly dereference, and we'll ignore that from
+here on out.  Creation, too, is relatively uninteresting, though it will
+work for us later on by marking created pointers as initially local.
+(Where, exactly, that marking takes place is another matter entirely.)
+Assignment is the interesing and difficult part, though a few cases we can
+dismiss easily.
+
+Obj o = new Object(); or o = new Object();
+creation -&gt; local : The pointer remains local; if the assigned-into local
+		was a valid local pointer, mark it garbage.
+
+o = p;
+local -&gt; local : The pointer remains local; if the assigned into local
+		was a valid local pointer, mark it garbage.
+
+o.o = p;
+	If o is local, and p is local, o, p, and o.o remain local.
+	Otherwise, o.o (should have already) inherits o's type,
+		and so does p.
+	If o.o was local, mark it garbage.
+
+o.o = p.p;
+	If o.o and p.p are local (which requires that o and p are local),
+		then all four remain local.
+	Otherwise, p.p gains the type of o.o (which should be the type of
+		o), and p retains its current type.
+	If o.o was local, mark it garbage.
+
+o = fn();
+	o inherits the type of the return of fn(); if it was returning a
+		local variable, o becomes local, and so forth.
+
+fn(o, p);
+	Similar to o = p, where o is not local (where p inherits the type
+		of o).  Function arguments are non-locals that may return
+		to being local (I need a name) if their type is unchanged
+		during fn() -- that is, when fn() pops its frame, o and p
+		return to being local (if they initially were).  If o and
+		p were not local, they remain not local.
+
+	When the frame is pushed, free the marked-garbage pointers (and
+their subtrees); when it's popped, free those and the marked-local pointer
+(and their subtrees).
+
+	I believe, though I haven't proved, that a four-tier scheme like
+this will work (though it might need a backup collector for some cases; in
+the case where the system runs out of memory before the leaking frame is
+popped, I'm hoping to prove that the leaking frame can't be proven to be
+leaky until its popped -- that is, it's not incr.gc's problem :)) -- will
+work (and efficiently) for cases where no two local variables point into
+different positions in a single pointer tree.
+
+	That is, if you're holding the root of a tree and traversing it,
+when the traversal pointer is overwritten, the scheme above says to
+declare its subtree garbage, which is utterly ridiculous, because it's
+still referenced from the root pointer.  Verifying this at each push/pop
+means that every local pointer tree needs to be traversed and marked used
+before trying to free the marked-garbage trees (where the used mark wins
+any conflicts).  This would be horribly inefficient, I'd think (though it
+would remove the need for a 'marked garbage' category.)  With the
+necessary guarantee that any constructed tree is properly marked, I think
+this problem ONLY occurs with entirely local trees (that is, with trees
+whose roots are local and whose nodes are also local -- created or
+returned), because the proper construction gaurantee insures that the
+traversing pointer will be marked as non-local, and immune to being marked
+as garbage.  Getting rid of the marked-garbage category I believe solves
+the problem, though it will make the gc less efficient because memory can
+only be freed on a frame return.
+
+	After the proof of correctness, the next extremely difficult bit
+will coming up with a way to mark pointers in an efficient manner.  I'm
+thinking only a global atomic table of some variety will serve, but we'll
+see.
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000491.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+	<LI> Next message: <A HREF="000507.html">[JOS-Kernel] Next version of jjos / decaf garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#506">[ date ]</a>
+              <a href="thread.html#506">[ thread ]</a>
+              <a href="subject.html#506">[ subject ]</a>
+              <a href="author.html#506">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

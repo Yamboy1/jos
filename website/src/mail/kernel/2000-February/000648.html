@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] progress update</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000647.html">
+   <LINK REL="Next" HREF="000649.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] progress update</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Kernel] progress update">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Wed, 2 Feb 2000 10:06:56 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000647.html">[JOS-Kernel] progress update</A></li>
+        <LI> Next message: <A HREF="000649.html">[JOS-Kernel] progress update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#648">[ date ]</a>
+              <a href="thread.html#648">[ thread ]</a>
+              <a href="subject.html#648">[ subject ]</a>
+              <a href="author.html#648">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Todd,
+
+I have two issues that we might want to think about at this point.
+
+First, in the long term, it could be well-worth adding JNI support into the
+i386 build of decaf.  I'm thinking of two main advantages that this gives.
+First, it would help modularize decaf so that extensions could be added
+without having to recompile or possibly even reboot decaf.  Second, there
+are a number of rather large JNI implementations of things that aren't
+exactly our highest priorities now, but may be in a year or two.  I'm
+specifically thinking of things such as Java3D/Glide support.  It seems to
+me that there is an open source Java Glide implementation in the works that
+uses JNI (I could be mistaken in this though - probably am. :)  Having decaf
+able to use JNI libraries in ELF format could be extremely useful down the
+road, even if more difficult to implement now than rewriting the classpath
+native code.  This is just a decision we don't want to make without thinking
+about all of its implications down the road.  Of course, the answer may be
+just rewriting again later down the road.
+
+Second, while you are rewriting common/decaf from scratch, wouldn't this be
+a good time to implement multiple processes?  My thought is that the
+ClassLoader approach we previously discussed gets the basics, but it would
+be great to have each process have its own heap/stack. (Class definitions
+would go in a shared heap.)  I have an unfinished web page that goes into
+more detail but I haven't gotten it on my site yet. I'll try to do that
+soon.  The main advantage of this approach is that we can then detect and/or
+limit how much memory a particular process uses.  For instance, a user may
+want to limit an applet to being able to use only a third of the computer's
+memory at most as a safety precaution.  It is much easier to design
+something like this in at the beginning or during a rewrite than to kludge
+it in later.
+
+What are your thoughts?  
+Do you want to take time for this?  
+How can I best help to implement this during the rewrite?
+
+Regards,
+Avery J. Regier
+
+
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Todd L. Miller [SMTP:<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>]
+</I>&gt;<i> Sent:	Wednesday, February 02, 2000 9:30 AM
+</I>&gt;<i> To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+</I>&gt;<i> Subject:	[JOS-Kernel] progress update
+</I>&gt;<i> 
+</I>&gt;<i> 	After spending two weeks (or so) trying to get the classpath
+</I>&gt;<i> native libraries working, I've given up on them, especially since they'd
+</I>&gt;<i> require JNI, where doing all that work would only help the host build.  So
+</I>&gt;<i> I decided to just go with their class library, and write the VM-specific
+</I>&gt;<i> bits directly into decaf, the same way we do native methods now, and leave
+</I>&gt;<i> porting native-&gt;BCNI/native code to whoever uses it.  (Including myself.)
+</I>&gt;<i> 
+</I>&gt;<i> 	So started trying to do that, and quickly ran smack into the
+</I>&gt;<i> back-end ugliness that I had mentioned wanting to rewrite at some
+</I>&gt;<i> point.  It may well have been possible to write the VM-specific code
+</I>&gt;<i> without a rewrite, but it would have been unbelievably ugly -- so I've
+</I>&gt;<i> started a clean-slate re-write of everything in the common/decaf
+</I>&gt;<i> directory.  (Since JM's code tends to be much cleaner than mine, and I
+</I>&gt;<i> don't fully understand great big chunks of it, I'm leaving well-enough in
+</I>&gt;<i> common/nativecode alone.  I'll re-write whatever chunks of the
+</I>&gt;<i> arch/*/nativecode stuff seems appropriate, but most of that is in much
+</I>&gt;<i> better shape than common/decaf, and I don't think much work will be
+</I>&gt;<i> necessary.)  I should be done with the re-write in less than two weeks,
+</I>&gt;<i> and the VM work for classpath ought to be done by at most a week later.
+</I>&gt;<i> 
+</I>&gt;<i> 	Anyway, my apologies to those of you that have been sitting on
+</I>&gt;<i> their hands while I've tried to get my act together.
+</I>&gt;<i> 
+</I>&gt;<i> -_Quinn
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000647.html">[JOS-Kernel] progress update</A></li>
+	<LI> Next message: <A HREF="000649.html">[JOS-Kernel] progress update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#648">[ date ]</a>
+              <a href="thread.html#648">[ thread ]</a>
+              <a href="subject.html#648">[ subject ]</a>
+              <a href="author.html#648">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

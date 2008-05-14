@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: decaf rewrite</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000108.html">
+   <LINK REL="Next" HREF="000099.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: decaf rewrite</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Re: decaf rewrite">jm@mak.com</A><BR>
+    <I>Mon, 21 Jun 1999 13:09:26 +0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000108.html">[JOS-Kernel] decaf progress</A></li>
+        <LI> Next message: <A HREF="000099.html">[JOS-Kernel] Re: decaf rewrite</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#98">[ date ]</a>
+              <a href="thread.html#98">[ thread ]</a>
+              <a href="subject.html#98">[ subject ]</a>
+              <a href="author.html#98">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd (et al);
+
+&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i>         Just realized that it looks like the throws rewrite will require
+</I>&gt;<i> function calls of the form
+</I>&gt;<i> 
+</I>&gt;<i> int fn( ..., exception* e )
+</I>&gt;<i> 
+</I>&gt;<i> so you should bear that in mind while moving the stuff in interp about.
+</I>
+OK.  I factored out each of the 250 (or so) opcodes into its own method,
+with the exception that I did not change the &quot;all invoke opcodes handled
+in a single function&quot; scheme, although that should almost certainly be
+changed.  God, emacs macros are wonderful, powerful things.  
+
+All opcodes are now methods on class frame, of the form:
+	bool frame::opcode(exception_to_throw &amp;);
+
+I made up the exception_to_throw class for a place-holder.  If you have
+a predefined class I should've used instead (I looked but didn't notice
+any obvious candidates), please reply ASAP, and I'll make the global
+change before I commit the sources.  If not, please feel utterly free to
+replace it with whatever you like.
+
+Items of note:
+
+(1) Some poor bastard has got to go and chase around all the PC
+referencing and incrementing, and localize it to each opcode method
+(like we discussed, to enable &quot;backing out&quot; of not (yet) executable
+opcodes, the opcode must not increment the PC unless it worked, and the
+runOpcode demultiplexer must NOT increment the PC).  Although a
+separable task, this is coupled to doing the exception handling.  Please
+advise as to how I should or should not proceed.
+
+(2) I think the various invoke opcodes arguably should each have its own
+method, and the &quot;common&quot; functionality they need should become new
+(protected? private?) methods.  I have this opinion because I think it
+might help readability/maintainability, and it would also certainly help
+efficiency (we probably don't want the execution engine to &quot;forget&quot;
+which invoke opcode it's executing, and have to go back and look it up
+repeatedly, and then set control flags for how many things are on the
+stack, yadda yadda yadda...).  Please advise as to how I should or
+should not proceed.
+
+(3) In an attempt to be less, er, cavalier about whether the committed
+sources actually RUN on the i386 target (Hi, Thomas!), I actually BUILT
+the sources and ran them successfully on the i386 target.  If you wish
+me to do anything about items (1) &amp; (2), I promise (cross my heart,
+etc.) to verify that any changes I make actually run on the i386 target.
+
+(4) Please let me know if you ran into the same problems that either
+Thomas or I did with respect to the i386 target.  Thomas, please let me
+know if upgrading to Etherboot 4.2 solved your difficulties as it did
+mine.
+
+(5) I am actually taking the week off from the Day Job, so if there is
+any power-tooling to be done, now is a really, Really, REALLY good
+time.  Please advise.
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000108.html">[JOS-Kernel] decaf progress</A></li>
+	<LI> Next message: <A HREF="000099.html">[JOS-Kernel] Re: decaf rewrite</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#98">[ date ]</a>
+              <a href="thread.html#98">[ thread ]</a>
+              <a href="subject.html#98">[ subject ]</a>
+              <a href="author.html#98">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

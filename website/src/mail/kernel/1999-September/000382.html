@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Some Idea About Speed Up JJOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000381.html">
+   <LINK REL="Next" HREF="000394.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Some Idea About Speed Up JJOS</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Some Idea About Speed Up JJOS">jm@mak.com</A><BR>
+    <I>Mon, 20 Sep 1999 07:06:52 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000381.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+        <LI> Next message: <A HREF="000394.html">[JOS-Kernel] (no subject)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#382">[ date ]</a>
+              <a href="thread.html#382">[ thread ]</a>
+              <a href="subject.html#382">[ subject ]</a>
+              <a href="author.html#382">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+&gt;<i> Hilary Cheng wrote:
+</I>&gt;<i> swtich (bytecodes) {
+</I>&gt;<i> case 0: do_opcode_0();
+</I>&gt;<i> break;
+</I>&gt;<i> case 1: do_opcode_1();
+</I>&gt;<i> break;
+</I>&gt;<i> ............
+</I>&gt;<i> ............
+</I>&gt;<i> ............
+</I>&gt;<i> ............
+</I>&gt;<i> }
+</I>&gt;<i> 
+</I>&gt;<i> It is slow. every opcodes needs one to hundred comparsion so that they can
+</I>&gt;<i> perform the operation.
+</I>
+Well, jjos+decaf *is* slow, but it isn't due to this.
+
+The compiler is actually emitting a jump table for the switch statement.  For
+your convenience, I have attached excerpts from my not-too-out-of-date version
+of interp.cc (compiled with the optimizer OFF) -- The jump table proper begins
+at label L1562.  The first entry (for value zero) jumps to label L1535, which,
+as included below, you can see is the call to the NOP instruction.  Having said
+this, there is still a lot of things we could do to speed the system up in its
+entirety.  I have run the host version with profiling enabled, and have learned
+lots of interesting stuff (well, to me, anyways).   I would be happy to discuss
+this with anybody who was willing to concentrate upon performance.
+ 
+runOpcode__5frameR11java_object:
+.LFB208:
+        pushl %ebp
+.LCFI1871:
+        movl %esp,%ebp
+.LCFI1872:
+        subl $4,%esp
+.LCFI1873:
+        pushl %ebx
+.LCFI1874:
+        movl 8(%ebp),%ebx
+        movb $1,-1(%ebp)
+        cmpl $0,debug
+        je .L1359
+        movl 4(%ebx),%eax
+        pushl %eax
+        pushl %ebx
+        movl 32(%ebx),%eax
+        pushl %eax
+        pushl $.LC263
+.LCFI1875:
+        call kprintf__FPCce
+        addl $16,%esp
+.L1359:
+        movl 24(%ebx),%eax
+        movl 16(%eax),%edx
+        movl 4(%ebx),%eax
+        addl %eax,%edx
+        movzbl (%edx),%eax
+        cmpl $201,%eax
+        ja .L1561
+        movl .L1562(,%eax,4),%eax
+        jmp *%eax
+        .p2align 4,,7
+.section        .rodata
+        .align 4
+        .align 4
+.L1562:
+        .long .L1535
+        .long .L1363
+        .long .L1456
+        .long .L1450
+        .long .L1451
+        .long .L1452
+        .long .L1453
+        .long .L1454
+        .long .L1455
+        .long .L1507
+        .long .L1508
+        .long .L1418
+        .long .L1419
+        .long .L1420
+        .long .L1392
+        .long .L1393
+        .long .L1380
+
+[ The rest of the jump table deleted for brevity's sake. -jm ]
+
+.L1535:
+        movl 12(%ebp),%eax
+        pushl %eax
+        pushl %ebx
+        call nop__5frameR11java_object
+        addl $8,%esp
+        movb %al,%al
+        movb %al,-1(%ebp)
+        jmp .L1360
+        .p2align 4,,7
+
+[ Lots more stuff deleted -jm ]
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/">http://www.mak.com/</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000381.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+	<LI> Next message: <A HREF="000394.html">[JOS-Kernel] (no subject)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#382">[ date ]</a>
+              <a href="thread.html#382">[ thread ]</a>
+              <a href="subject.html#382">[ subject ]</a>
+              <a href="author.html#382">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000063.html">
+   <LINK REL="Next" HREF="000068.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf updates">tmiller@haverford.edu</A><BR>
+    <I>Wed, 9 Jun 1999 11:58:56 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000063.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000068.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Based upon a whole 5 seconds of thought, I think you can handle both the &quot;code
+</I>&gt;<i> itself&quot; and &quot;functions called from w/in runOpcode&quot; cases the same way.  Since
+</I>&gt;<i> they're (just about) frame methods, you can call a frame/java_thread method to
+</I>&gt;<i> pop the appropriate stack frames in the classical fashion.  Right?
+</I>
+	 Now that you've written the thread pointer in, yes.  Otherwise,
+whose stack do I pop/pc do I manipulate?  I want to call
+thread-&gt;throwExecption( new IndexOutOfBoundsException() ) and have
+everything happen automagically.  The problem is the return values --
+runOpcode() /must/ return, which (AFAIK) means that the function called
+from runOpcode() /must itself/ return, and in some fashion that prevents
+runOpcode() from doing Bad Things.  The obvious way would be C++
+exceptions causing a jump to the throwException() handler, which does the
+Right Thing w.r.t. to its java_thread (and, BTW, also means that I don't
+have to make sure that /every/ function gets the current thread pointer),
+so that the next time the java_thread runs, it's running the 
+exception-handling opcodes, and then returns to the scheduler (which
+might be somewhat problematic).  Since, AFAIK, JJOS doesn't support 
+exceptions, that route is closed.
+
+	Without exceptions, you can pass the thread along, (just modifying
+all the function headers is non-trivial) but the problem
+of returning to the scheduler still exists.*
+
+&gt;<i> Based upon another whole 5 seconds of thought, the only nasty problem I can
+</I>&gt;<i> think of is (if there is?) an &quot;out of memory&quot; exception (it would Truly Suck to
+</I>&gt;<i> be out of memory and then have to allocate an &quot;out of memory&quot; exception to
+</I>&gt;<i> throw).  One might want to have a preallocated exception allocated for that
+</I>&gt;<i> case.
+</I>
+	Yes.  The problem I was thinking about had more to deal with the
+problem of creating a java instance (i.e. IndexOutOfBoundsException) from
+the nativecode that didn't have access to the classloader.  Though this
+could probably be gotten around.
+
+-_Quinn
+
+* The only idea that would save me from having to rewrite all the return
+values and function calls would be some bit of (machine?) code that would
+pop the stack until it got back to scheduler, perhaps set at the beginning
+of the runOpcode() call.  But I have no idea how to do this.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000063.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000068.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

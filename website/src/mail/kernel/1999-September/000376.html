@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOSSystem</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000373.html">
+   <LINK REL="Next" HREF="000378.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOSSystem</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Kernel] JOSSystem">onewith1@flash.net</A><BR>
+    <I>Fri, 17 Sep 1999 19:21:29 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000373.html">[JOS-Kernel] JOSSystem</A></li>
+        <LI> Next message: <A HREF="000378.html">[JOS-Kernel] JOSSystem</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#376">[ date ]</a>
+              <a href="thread.html#376">[ thread ]</a>
+              <a href="subject.html#376">[ subject ]</a>
+              <a href="author.html#376">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I'll try to answer two messages at once.
+
+But before that, I'll try and specify my philosophy behind using Jini as the
+device driver setup.
+
+The current implementation with drivers and networks in OSs is that local PC
+resources/services are seen as local devices.  Then when remote services are
+tried to use, a large API framework is created to try to emulate the
+local-ness of the local drivers, so that the remote drivers act like they
+are local.  This is because most current OSs were originally for stand alone
+computers, with a limited set of remote capabilities.  Once the technologies
+such as CORBA, COM, and RMI became available, the OSs were retrofit to make
+it all work.
+
+I'm trying to switch this design philosophy.  This design views all services
+and devices as remote.  There is a central local service which is used to
+access all other services - whether they are remote or local.
+
+First, a response to the sceptic:
+
+Mauricio Lopez &lt;<A HREF="mailto:weolopez@yahoo.com">weolopez@yahoo.com</A>&gt; wrote:
+&gt;<i> Note:  this is with JINI devices or proxies...
+</I>Note: JINI stands for &quot;Jini Is Not Initials&quot; (i.e. it doesn't stand for
+anything)
+
+&gt;<i>
+</I>&gt;<i> Here (I think) is the problem with your ideas.
+</I>&gt;<i> Discovery and Join only occures with JINI(TM) enabled
+</I>&gt;<i> devices and proxies for those devices.  I agree we
+</I>&gt;<i> should make a proxie for all of hardware in JOS but
+</I>&gt;<i> this is independent of our java written drivers.  It
+</I>&gt;<i> would be interesting; however, to create general
+</I>&gt;<i> interfaces that can be used in a JINI network that
+</I>&gt;<i> allows direct access to JOS System drivers from
+</I>&gt;<i> accross the network(but I digress).
+</I>
+Well, I started looking at the Jini specification again, and I'll re-do my
+terminology to make it match the specs.  Maybe this will clear things up.
+
+We're in agreement with the local proxy of the PC hardware to the djinn
+(Jini network), so that when the local proxy is registered to the network,
+it registers its known services via remote stubs (if the service does not
+have a rmi stub, it is not registered).  Also, I believe, we are in
+agreement (from below) that a slimmed-down PC setup may not need a local
+proxy to the djinn.
+
+Since the PC devices are (obviously) not Jini enabled, the drivers operating
+these devices need to pick up the slack and become Jini proxies.  Since they
+are known to be on a local system, their discovery/join mechanisms only work
+locally.  It would be up to the local proxy to perform the discovery/join
+to the network in the proper Jini method.
+
+So if we specify that all drivers need both RMI stubs and a local version
+(which isn't a stretch), any device can be placed onto the network djinn for
+anyone to use.  Thus, we could possibly emulate a parallel computer without
+too much work on the device level (that was based on a whole 2 seconds of
+thought).
+
+&gt;<i> This is great but the problem with jini right now it
+</I>&gt;<i> that Free Software only has a partial implementation
+</I>&gt;<i> of RMI let alone jini.  It would be great if
+</I>&gt;<i> development would increase on that.  Classpath is
+</I>&gt;<i> currently the most active in implementation of java
+</I>&gt;<i> api standards.  Next to JOS of course :) (recreating
+</I>&gt;<i> JAVA OS API).
+</I>
+Ok, you got me there.  However, I don't believe there is anything like the
+local Jini lookup service I described in my message.  So this would be our
+own development, anyway.  Then we would need to develop the local Jini proxy
+like I described above so the JOS computer can interact with the djinn.  So
+this is all our development anyway, all based on the Jini specs, not the
+actual code.
+
+For the actual Jini code, that could be downloaded by the individual user,
+but the system-wide Jini implementation we can provide, along with the Jini
+device proxies.
+
+For the boot-level questions:
+
+Thomas Bocek wrote:
+&gt;<i>1. what about the boot drivers, that has to be loaded to handle the other
+</I>&gt;<i>drivers (fdc/hdc).
+</I>
+I don't know.  That's where I'm in a gray area.  For the moment, I'll do the
+cop-out and say the JOSBox layer needs their own simple versions of these
+drivers.  These would only need to be the bare-minimum drivers to get the
+system to a state where the next level can start.
+
+&gt;<i>2. There has to be a standard -&gt; all vga driver must have e.g. the method
+</I>&gt;<i>setpixel. I don't know if that is allready handled by JINI.
+</I>
+I doubt it.  Jini is in the begining stages where most of this hasn't been
+specified.  This is where JOS can come in and blaze a trail for the rest of
+the world.  Still, for Video I believe that something along the lines of the
+java.awt.GraphicsContext and java.awt.GraphicsConfiguration should do the
+trick.  That's only for graphics, though.  We'd need to make an extention to
+support text mode.
+
+Didn't we already have a discussion about this?  Have I forgotten so
+quickly?
+
+-Matt
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000373.html">[JOS-Kernel] JOSSystem</A></li>
+	<LI> Next message: <A HREF="000378.html">[JOS-Kernel] JOSSystem</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#376">[ date ]</a>
+              <a href="thread.html#376">[ thread ]</a>
+              <a href="subject.html#376">[ subject ]</a>
+              <a href="author.html#376">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

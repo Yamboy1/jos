@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] native console &amp; bug report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   
+   <LINK REL="Next" HREF="000577.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] native console &amp; bug report</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] native console &amp; bug report">tmiller@haverford.edu</A><BR>
+    <I>Fri, 31 Dec 1999 18:42:37 -0500 (EST)</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000577.html">[JOS-Kernel] Linux and JNI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#576">[ date ]</a>
+              <a href="thread.html#576">[ thread ]</a>
+              <a href="subject.html#576">[ subject ]</a>
+              <a href="author.html#576">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I have made a set of changes to the consoles such that F1 is now the 'native'
+</I>&gt;<i> console.
+</I>
+	Hey, good stuff!  I'd been thinking about this but coudn't come up
+with an elegant way to do it before I had to move on.  I'll be interested
+in seeing your code.  (thanks!)
+
+&gt;<i> My next step is to increase the size of the buffer and somehow figure
+</I>&gt;<i> out a way to be able to page up and down on the native console so that
+</I>&gt;<i> we can view output that has scrolled out of view.
+</I>
+	As long as you're adding scrolling/buffering to the native
+console, feel free to add it to the virtual consoles, as well :)
+
+&gt;<i> In doing this I also discovered a bug with the decaf native methods.  I had
+</I>&gt;<i> made a new class, consoleNative, which implements ConsoleDriver just like
+</I>&gt;<i> jos.platform.drivers.console does.
+</I>
+	BTW -- having worked with this way of doing the drivers/consoles,
+do you have any structural-style suggestions?
+
+&gt;<i> In consoleNative, putChar and setChar became native methods.  
+</I>&gt;<i> Suddenly, all keyboard input was outputted to the native console
+</I>&gt;<i> instead of the java consoles.  What was happenning is that the native
+</I>&gt;<i> consoleNative.putChar() was being called where console.putChar() was
+</I>&gt;<i> supposed to be called.  I changed consoleNative.putChar() to instead
+</I>&gt;<i> call the native consoleNative.putNativeChar() and suddenly everything
+</I>&gt;<i> worked.  In short, there is a problem with how decaf resolves if a
+</I>&gt;<i> native method is supposed to be used.  I haven't tracked down what
+</I>&gt;<i> exactly is happenning yet, but I did leave the debugging messages I
+</I>&gt;<i> used to track this down in the code but commented out along with what
+</I>&gt;<i> to do in order to show the bug again so that someone can track this
+</I>&gt;<i> down later.
+</I>
+	That is a truly twisted bug, if I understand what you're saying
+correctly.  You've got N consoles, where the first one is
+driver.consoleNative.  For consoles 1 to N, which are driver.console
+instances.  When 1 to N .putChar() is called, decaf calls the
+driver.consoleNative.putChar()?  -- That is, decaf called not only the
+wrong type of method, but also a method in the wrong class?
+
+&gt;<i> P.S.  I was going to include a patch file with this, but the cvs server is down
+</I>&gt;<i> again.  Could someone with access please restart it?  I'll send the patch as
+</I>&gt;<i> soon as I see that cvs is up again.  - Thanks.
+</I>
+	I turned it back on.
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000577.html">[JOS-Kernel] Linux and JNI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#576">[ date ]</a>
+              <a href="thread.html#576">[ thread ]</a>
+              <a href="subject.html#576">[ subject ]</a>
+              <a href="author.html#576">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

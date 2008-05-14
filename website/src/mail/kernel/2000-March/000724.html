@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] LangBridge example</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000719.html">
+   <LINK REL="Next" HREF="000725.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] LangBridge example</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] LangBridge example">gchii@mindspring.com</A><BR>
+    <I>Wed, 08 Mar 2000 19:48:46 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000719.html">[JOS-Kernel] Kernel Tests</A></li>
+        <LI> Next message: <A HREF="000725.html">[JOS-Kernel] [zerich] Release 1 is available</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#724">[ date ]</a>
+              <a href="thread.html#724">[ thread ]</a>
+              <a href="subject.html#724">[ subject ]</a>
+              <a href="author.html#724">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Here is an example of a BCNI-compatible bridge for the java.lang package:
+
+package alt;
+
+public interface LangBridge {
+  public abstract Object ClassForName( String className );
+  public abstract String ClassGetName( Object o );
+  public abstract boolean ClassIsInterface( Object o );
+  public abstract Object ClassGetSuperclass( Object o );
+  public abstract Object[] ClassGetInterfaces( Object o );
+  public abstract ClassLoader ClassGetClassLoader( Object o );
+  public abstract Object ClassNewInstance( Object o );
+
+  public abstract Object[] ThrowableGetStackTrace( Object o );
+
+  public abstract Class ClassLoaderDefineClass( Object o, byte[] data, int
+offset, int length );
+  public abstract void ClassLoaderResolveClass( Object o, Class c );
+  public abstract Class ClassLoaderFindSystemClass( Object o, String
+className );
+
+  public abstract Class ObjectGetClass( Object o );
+  public abstract void ObjectNotify( Object o )
+      throws IllegalMonitorStateException;
+  public abstract void ObjectNotifyAll( Object o )
+      throws IllegalMonitorStateException;
+  public abstract void ObjectWait( Object o, long millis, int nanos )
+      throws IllegalMonitorStateException, InterruptedException;
+  public abstract int ObjectHashCode( Object o );
+  public abstract Object ObjectClone( Object o )
+      throws CloneNotSupportedException;
+
+  public abstract Class[] SecurityManagerGetClassContext( Object o );
+
+  public abstract String[] SystemGetVMProperties();
+  public abstract String SystemDefaultPropertiesFile();
+  public abstract String[] SystemGetCommandLineProperties();
+  public abstract long SystemCurrentTimeMillis();
+
+  public abstract Thread ThreadCurrentThread();
+  public abstract void ThreadSleep(long millis, int nanos) 
+      throws InterruptedException;
+  public abstract void ThreadYield();
+  public abstract void ThreadSetThreadState( Object o, int state );
+  public abstract int ThreadCountStackFrames( Object o );
+  public abstract void ThreadStop( Object o, Throwable error );
+  public abstract void ThreadSetPriority(int priority);
+}
+
+This interface is implemented by a JVM-specific class, such as
+decaf.BasicLangBridge. It is returned by a generic BCNI factory, like this:
+
+String in = &quot;alt.LangBridge&quot;;
+LangBridge bridge = (LangBridge) Factory.getFactory().getObject( in );
+
+You ask the BCNI factory for an interface; it gives you the JVM-specific
+implementation of that interface. Once you have the interface, you can use
+it to perform functions supported by a virtual machine.
+
+BCNI supports well-known interfaces, like alt.LangBridge. Plus, it is
+open-ended. It support JVM-specific interfaces to JVM-specific classes, too.
+
+Because it is open-ended, it supports all platforms:
+
+Java 0, Java 1, Java 2, Java 3, Java 4, etc.
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000719.html">[JOS-Kernel] Kernel Tests</A></li>
+	<LI> Next message: <A HREF="000725.html">[JOS-Kernel] [zerich] Release 1 is available</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#724">[ date ]</a>
+              <a href="thread.html#724">[ thread ]</a>
+              <a href="subject.html#724">[ subject ]</a>
+              <a href="author.html#724">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

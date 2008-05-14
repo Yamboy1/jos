@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [native methods] Learn from JNI</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jewel%40pixie.co.za">
+   <LINK REL="Previous"  HREF="000831.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [native methods] Learn from JNI</H1>
+    <B>jewel@pixie.co.za</B> 
+    <A HREF="mailto:jewel%40pixie.co.za"
+       TITLE="[JOS-Kernel] [native methods] Learn from JNI">jewel@pixie.co.za</A><BR>
+    <I>Wed, 17 May 2000 22:19:43 -0200 (GMT+2)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000831.html">[JOS-Kernel] [native methods] Learn from JNI</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#832">[ date ]</a>
+              <a href="thread.html#832">[ thread ]</a>
+              <a href="subject.html#832">[ subject ]</a>
+              <a href="author.html#832">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> JNI is incomplete. It has no C/C++ methods to set and get individual native
+</I>&gt;<i> methods. Instead of a C structure like JNINativeMethod, I would like to see
+</I>&gt;<i> a NativeMethod class in C++.
+</I>&gt;<i> 
+</I>&gt;<i> class NativeMethod {
+</I>&gt;<i>   public:
+</I>&gt;<i>     NativeMethod(
+</I>&gt;<i>         const char *name,
+</I>&gt;<i>         const char *signature,
+</I>&gt;<i>         const void *fnPtr );
+</I>&gt;<i> 
+</I>&gt;<i>     const char *getName() const;
+</I>&gt;<i>     const char *getSignature() const;
+</I>&gt;<i>     const void *fnPtr() const;
+</I>&gt;<i>     // *A! invoke();
+</I>&gt;<i>   :
+</I>&gt;<i> };
+</I>
+Yes JNI doesn't cater for this. But it is easy to build a list of all the
+native methods for a class (with a structure like you just described).
+When a ACC_NATIVE attribute is discovered, you could put a pointer to the
+JNI method / Optimised method (by JIT for example) directly into the
+Method structure.
+
+John
+
+
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000831.html">[JOS-Kernel] [native methods] Learn from JNI</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#832">[ date ]</a>
+              <a href="thread.html#832">[ thread ]</a>
+              <a href="subject.html#832">[ subject ]</a>
+              <a href="author.html#832">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

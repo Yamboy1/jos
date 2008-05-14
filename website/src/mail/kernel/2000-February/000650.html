@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] progress update</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000649.html">
+   <LINK REL="Next" HREF="000651.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] progress update</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] progress update">gchii@mindspring.com</A><BR>
+    <I>Thu, 03 Feb 2000 09:20:21 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000649.html">[JOS-Kernel] progress update</A></li>
+        <LI> Next message: <A HREF="000651.html">[JOS-Kernel] Multi-Process Spec</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#650">[ date ]</a>
+              <a href="thread.html#650">[ thread ]</a>
+              <a href="subject.html#650">[ subject ]</a>
+              <a href="author.html#650">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i>(I'm not sure, but I'd think that interrupting a thread in the middle of
+</I>&gt;<i>a bytecode might confuse some other thread that's sharing memory with it.)
+</I>
+Any un-interruptable part of an opcode must be enclosed in a critical
+section. Within invokestatic, invokespecial and invokevirtual, the virtual
+machine must interrupt a thread in the middle of an opcode. As a
+finite-state machine, it is possible to use a critical section to control
+preemptive multitasking.
+
+A critical section is a system-wide mechanism. Either task switching is
+enabled or disabled by the kernel. Critical sections must be used
+sparingly, giving the kernel as many opportunities to task-switch as possible.
+
+In preemptive multitasking, task-switch interrupt is clock-based. It calls
+the task switcher periodically. When a task enters a critical section, the
+task-switch interrupt is disabled. When a task exits a critical section,
+the task-switch interrupt is enabled.
+
+A critical section is much different than a synchronized block. A critical
+section disables the task-switching mechanism, so that a task is never
+switched in a critical section. A synchronized block is tied to a specific
+object and thread; a critical section is system-wide, used by all threads.
+If any thread is in a critical section, a task cannot be switched.
+
+Only parts a few opcodes must be enclosed in critical sections.
+
+1. new
+
+From a shared heap, the allocation of a new object might be enclosed in a
+critical section.
+
+2. monitorenter/monitorexit
+
+Task switching must never be performed in the middle of
+monitorenter/monitorexit.
+
+It does not matter if task switching occurs in the middle of pushing or
+popping a variable on the stack frame for a method.
+
+3. garbage collection
+
+Parts of garbage collection must be protected with a critical section. From
+a shared heap, the free of an old object might be enclosed in a critical
+section.
+
+We should not put an entire opcode in a critical section. We should not by
+default make every opcode a critical section.
+
+-----
+
+In non-preemptive multitasking, the task-switch &quot;interrupt&quot; is called at
+the whim of the current task. The task-switch method must be written into
+the code explicitely. A programmer must determine where it is safe to
+switch tasks and add a call to the task-switcher.
+
+This is similar to Thread.yield(). Except in non-preemptive multitasking,
+calls to task_yield() are required frequently in your code. A single opcode
+might have dozens of calls to task_yield(), giving the task-switcher many
+opportunities to switch tasks.
+
+task_yield() must be embedded in the methods of all machine code. It must
+be added to each method of a stack frame and object heap. It must be added
+frequently to the bytecode interpreter, verifier, resolver and native methods.
+
+In order for non-preemptive multitasking to work, every programmer must
+write good code. Every native library must be rewritten to call task_yield().
+
+The &quot;overhead&quot; incurred by calling task_yield() comes from (1) calling it
+when the task-switcher is not yet ready to switch tasks, and (2) calling it
+long after the task-switcher was ready to switch tasks.
+
+This is the age-old debate between the merits of UNIX vs. MS-DOS and OS/2
+vs. Windows 3.1. While it is easier to develop the bulk of an operating
+system with non-preemptive multitasking in mind, reality pushes us to build
+a preemptive multitasking system eventually. You can't count of every
+programmer to write good code. Even system programmers with years of
+experience are capable of making a mistake.
+
+-----
+
+I recommend a hybrid between preemptive and non-preemptive multitasking for
+JOS because of JOS' special circumstances. I believe jJOS, a kernel, must
+use preemptive multitasking (for robustness) and decaf, a virtual machine,
+must use non-preemptive multitasking (for simplicity).
+
+Somewhere between jJOS and decaf, it must be possible to create preemptive
+threads. This sounds a lot like running decaf on Linux.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000649.html">[JOS-Kernel] progress update</A></li>
+	<LI> Next message: <A HREF="000651.html">[JOS-Kernel] Multi-Process Spec</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#650">[ date ]</a>
+              <a href="thread.html#650">[ thread ]</a>
+              <a href="subject.html#650">[ subject ]</a>
+              <a href="author.html#650">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

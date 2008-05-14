@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] bocek's interrupt eight</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000325.html">
+   <LINK REL="Next" HREF="000329.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] bocek's interrupt eight</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] bocek's interrupt eight">tmiller@haverford.edu</A><BR>
+    <I>Sun, 5 Sep 1999 22:15:11 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000325.html">[JOS-Kernel] status</A></li>
+        <LI> Next message: <A HREF="000329.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#328">[ date ]</a>
+              <a href="thread.html#328">[ thread ]</a>
+              <a href="subject.html#328">[ subject ]</a>
+              <a href="author.html#328">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	First, a quick question: did I fluff my cvs update, or has none of
+the gc stuff made it in yet?
+
+	About interupt eight: the reason Bad Things happened to the i386
+build is that the clock interrupt fires before everything (i.e. the
+static variables interrupts.intXXX) is ready.  Testing with all the tests
+off (except the console drivers, which need work, btw) and w/o the
+function trace reveals that the java_word slurped up from
+interrupts.int008, the one that's supposed to be an interrupt object, is
+in fact a null object, so that when the threadable object is cast out of
+it, Bad Things happen.
+
+	At any rate, on my Celery 400, this happens three times before the
+initialization goes through, and everything seems to work fine.  The
+current check &amp; abort correction I've got set up [ if ( jw.isNull() ) {
+kprintf(...); return; } ]* is rather kludgy.  I'd imagine that we could
+forcibly initialize the interrupts class before start()ing the scheduler,
+but I'm not sure what this would do to the system or the classes required
+by the clock driver.  What might work best is to offer a
+jos.system.machine method switching off/on native clock handling, so that
+init() could handle what was necessary to ensure the clock-handler was
+ready before it was allowed to run.
+
+	I haven't committed the changed scheduler.cc in light of my
+uncertainty about the correctness of my tree at this point; I've just
+moved into a new Slackware 4.0 system and I'm still being very careful
+about things.
+
+	I'll be trying the new vga driver later tonight and doing a bit of
+fiddling with the console driver(s).
+
+-_Quinn
+
+* right after &quot;ft-&gt;getOffsetWord(...);&quot; in scheduler.cc in the function
+  &quot;notifyOfInterrupts()&quot;
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000325.html">[JOS-Kernel] status</A></li>
+	<LI> Next message: <A HREF="000329.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#328">[ date ]</a>
+              <a href="thread.html#328">[ thread ]</a>
+              <a href="subject.html#328">[ subject ]</a>
+              <a href="author.html#328">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] bocek's interrupt eight</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000329.html">
+   <LINK REL="Next" HREF="000338.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] bocek's interrupt eight</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] bocek's interrupt eight">tmiller@haverford.edu</A><BR>
+    <I>Mon, 6 Sep 1999 09:08:10 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000329.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+        <LI> Next message: <A HREF="000338.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#330">[ date ]</a>
+              <a href="thread.html#330">[ thread ]</a>
+              <a href="subject.html#330">[ subject ]</a>
+              <a href="author.html#330">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I sent a message to the list earlier today asking whether I should
+</I>
+	[...]  Of course, I read this AFTER asking...
+
+&gt;<i> (1) The &quot;static variables&quot; are exactly which ones?  We shouldn't have
+</I>&gt;<i> any static variables that require initialization code to be run -- given
+</I>&gt;<i> the limitations of the current initialization code, it *won't* be run
+</I>&gt;<i> for the i386 target.
+</I>
+	Er, the JAVA /class/-static variables in &quot;jos.system.interrupts&quot;,
+name intXXX, from 001 to 015.  Sorry for any confusion.  You (next
+paragraph) disabled all the interrupts and then turned them back on for
+the java code to play with, which is the Right Thing to do; we just punted
+on what to do with the clock interrupt back when we were doing that part
+of the design.  (Say!  That means we've made it pretty far downfield.:))
+
+&gt;<i> Let me know what the status of your i386 build is, so I can tell whether
+</I>&gt;<i> I'm either degrading things terribly, or the new changes are no-ops. 
+</I>&gt;<i> Like I said, I'm sitting on a whole bunch of changes...
+</I>
+	If I've got FN_TRACE turned on and all the VM tests running, it
+dies after the first keystroke in the consoled; haven't tested the new VGA
+driver at all; if I turn off FN_TRACE and all the VM tests, it runs long
+enough that I can confirm the various console driver changes I've been
+making; I've not crashed it yet there.  (Though now that I think about it,
+FN_TRACE shouldn't have any effect on how long things run and I've not
+bothered to see if it actually does...)
+
+	If you're sitting on a whole bunch of changes, it'll probably be
+easier for me to committ my stuff first.  (Not much, yet, unfortunately.)
+
+	Oh, given that some of the corrections JM &amp; Bocek made were to
+math ops that /should/ have been checked before this, if anyone feels like
+writing up a more comprehensive suite of test for init.java, do, with my
+encouragement.
+
+-_Quinn
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000329.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+	<LI> Next message: <A HREF="000338.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#330">[ date ]</a>
+              <a href="thread.html#330">[ thread ]</a>
+              <a href="subject.html#330">[ subject ]</a>
+              <a href="author.html#330">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

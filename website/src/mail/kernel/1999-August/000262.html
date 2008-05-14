@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Adventures with the tool chain</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000260.html">
+   <LINK REL="Next" HREF="000271.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Adventures with the tool chain</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Kernel] Adventures with the tool chain">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Thu, 19 Aug 1999 08:03:03 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000260.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+        <LI> Next message: <A HREF="000271.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#262">[ date ]</a>
+              <a href="thread.html#262">[ thread ]</a>
+              <a href="subject.html#262">[ subject ]</a>
+              <a href="author.html#262">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	&gt; Here are my outstanding problems:
+	&gt; * The i386 build compiles, but the host build does not.  It is
+complaining
+	&gt; about missing a file: /etc/lib/gnu/types.h (or something like
+that, I dont'
+	&gt; have it in front of me.)  And lo and behold, the directory is
+there, but not
+	&gt; the file.  Am I missing an RPM?  If so, which one might that be?
+
+John Morrison wrote:
+	Ah.  You probably need to remake the &quot;dependencies&quot; in the Makefile
+by building the &quot;depend&quot; target.  I seem to recall an issue concerning the
+exact format of the &quot;Don't delete this line, makedepend depends upon it&quot;
+between Todd's distribution and my RedHat one.  We should probably separate
+out that into a separate &quot;included&quot; part of the Makefile so as to make this
+easier.
+
+Todd Miller wrote:
+	gnu/types.h is included by sys/types.h, and should be in
+/usr/include (at least, on my slackware system.)  It should not be directly
+included by any file in JJOS/decaf (which includes sys/types.h).
+
+I did the make on the 'depend' target, but that didn't solve the problem.
+Could someone please do a 
+'rpm -q -f /usr/include/gnu/types.h' on their RedHat system and tell me what
+package that belongs to?  it would help greatly.
+
+Thanks,
+Avery J. Regier
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000260.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+	<LI> Next message: <A HREF="000271.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#262">[ date ]</a>
+              <a href="thread.html#262">[ thread ]</a>
+              <a href="subject.html#262">[ subject ]</a>
+              <a href="author.html#262">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

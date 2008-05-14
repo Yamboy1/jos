@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000757.html">
+   <LINK REL="Next" HREF="000763.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Device as a digital resource">gchii@mindspring.com</A><BR>
+    <I>Mon, 20 Mar 2000 21:40:31 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000757.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000763.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#762">[ date ]</a>
+              <a href="thread.html#762">[ thread ]</a>
+              <a href="subject.html#762">[ subject ]</a>
+              <a href="author.html#762">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Thank you so much for your contribution to this discussion. Before this, I
+couldn't see how devices and the I/O streams are very much alike. After all
+this, one multiple stage object factory *is* the same as any other.
+
+I put all devices under a device: scheme. Individual devices should be
+sub-schemes, right? Here is one subscheme I would like to try:
+
+&quot;device:ram:?size=0xFF&quot;
+
+and
+
+&quot;device:ram:?start=0x0CC00&amp;end=0xCCFF&quot;
+
+and
+
+&quot;device:ram:?start=0xCC00&amp;size=0xFF&quot;
+
+In Java, this URI might return a byte array. Since memory is a limited
+digital resource, it can be used if no other process is using it. If any
+part of memory start to finish has already been allocated, the device
+factory must return null.
+
+At 12:29 AM 3/20/00 +0200, Al &lt;<A HREF="mailto:al@outworld.org">al@outworld.org</A>&gt; wrote:
+&gt;<i>Actually, this could be even better... The above URI point to the serial
+</I>&gt;<i>port, not the device *attached* to the serial port. Why not use this,
+</I>&gt;<i>instead:
+</I>&gt;<i>
+</I>&gt;<i>modem:<A HREF="device://localhost/ports/serial/1/attached?maxspeed=...">device://localhost/ports/serial/1/attached?maxspeed=...</A>
+</I>&gt;<i>
+</I>&gt;<i>Take note of the alternating modem:device beginning of this URI...
+</I>
+I understand your point. There must be symetry between the schemes and the
+kind of objects it can produce. If we are creating a serial port, we should
+have a serial port subscheme. From previous experience with the global
+nature of URIs, I would put this whole discussion under a device: scheme.
+It might be something like this:
+
+<A HREF="port://localhost/ports/serial/1/attached?maxspeed=...">port://localhost/ports/serial/1/attached?maxspeed=...</A>
+and
+modem:<A HREF="port://localhost/ports/serial/1/attached?maxspeed=...">port://localhost/ports/serial/1/attached?maxspeed=...</A>
+
+or
+
+device:<A HREF="port://localhost/ports/serial/1/attached?maxspeed=...">port://localhost/ports/serial/1/attached?maxspeed=...</A>
+and
+device:modem:<A HREF="port://localhost/ports/serial/1/attached?maxspeed=...">port://localhost/ports/serial/1/attached?maxspeed=...</A>
+
+While working on the Smart API for I/O streams, I discovered a powerful
+concept of scheme chaining. Let me explain it here from a classic example.
+To create a buffered, data input stream, we typically write code something
+like this:
+
+  public void example1() {
+    String n = &quot;example.txt&quot;;
+    FileInputStream is = new FileInputStream( n );
+    BufferedInputStream bis = new BufferedInputStream( is );
+    DataInputStream dis = new DataInputStream( bis );
+  }
+
+From the first release of the Smart API, it supported scheme chaining, or
+putting schemes together by repeatedly going back to the factory. Scheme
+chaining is both powerful and flexible. It gets a program exactly what it
+wants in a very dense URI. This is the Smart API equivalent for example1():
+
+  public void example2() {
+    URI uri = new URI( &quot;in:data:buffer:file:example.txt&quot; );
+    DataInputStream dis = (DataInputStream) uri.getObject();
+  }
+
+The in: scheme directs a request to the input stream factory. Each scheme
+in the chain recursively uses the input stream factory. An input stream
+factory returns any class derived from java.io.Inputstream. Subschemes know
+how to convert from InputStream to the desired type.
+
+&quot;in:file:example.txt&quot; -&gt; InputStream (FileInputStream)
+&quot;in:buffer:file:example.txt&quot; -&gt; InputStream (BufferedInputStream)
+&quot;in:data:buffer:file:example.txt&quot; -&gt; InputStream (DataInputStream)
+
+Likewise, I have become convinced that scheme chaining would work with
+devices. If one scheme expects a certain kind of interface from another
+scheme, we can use scheme chaining.
+
+&quot;device:port:/ports/serial/1&quot; -&gt; Port (SerialPort)
+&quot;device:modem:port:/ports/serial/1&quot; -&gt; Modem (USRoboticsModem)
+
+&gt;<i>If the JOS specific interpreter of these URI's is told that the &quot;modem:&quot;
+</I>&gt;<i>protocol means &quot;turn the object returned from device: into an object of
+</I>&gt;<i>type jos.devices.Modem&quot; then this would work.
+</I>
+With scheme chaining, the &quot;modem:&quot; protocol means exactly that. It does
+whatever it takes to convert the object created by the chain into an object
+that implements &quot;jos.device.Modem&quot;.
+
+&gt;<i>Thus, for a VERY custom device, you could use this:
+</I>&gt;<i>
+</I>&gt;<i>com.mycompany.devices.CardioPulseMeter:<A HREF="device://localhost/...">device://localhost/...</A>
+</I>&gt;<i>
+</I>&gt;<i>of you can set up and use custom drivers:
+</I>&gt;<i>
+</I>&gt;<i>com.3com.modems.56KVoiceFaxModem:modem:<A HREF="device://localhost/...">device://localhost/...</A>
+</I>&gt;<i>
+</I>&gt;<i>What do you think?
+</I>
+Yes, something like that. Potentially, a subscheme can accept an arbitrary
+class name and figure out the necessary conversion. On the other hand, we
+have to return an object. This is an object factory. It returns an instance
+of java.lang.Object or null. After it is created, an object must be cast to
+an appropriate type.
+
+  public Object getObject();
+
+For example, special features of a 3com driver won't work with a Hayes
+modem. If you really want to use the special features of
+com.3com.modems.56KVoiceFaxModem, you might need to use the instanceof
+operator, like this:
+
+URI uri = new URI( &quot;modem:<A HREF="port://localhost/ports/serial/1"">port://localhost/ports/serial/1&quot;</A> );
+56KVoiceFaxModem modem = (56KVoiceFaxModem) uri.getObject();
+
+&gt;&gt;<i> Since more types of devices than modems can be attached to the serial
+</I>&gt;&gt;<i> port, the device manager can only return the raw version of the
+</I>&gt;&gt;<i> device: the port itself.
+</I>&gt;<i>
+</I>&gt;<i>That is only if you wish the URI to return a fully expressed device. You
+</I>&gt;<i>may have defined protocols such as &quot;modem:&quot; that knows to convert the
+</I>&gt;<i>device attached to the port into a modem object, and you may just have a
+</I>&gt;<i>simple, raw device, which you can query, and then determine what it is.
+</I>&gt;<i>But you should also have access to the port itself, independently. For
+</I>&gt;<i>example, if I wish to set the maximum speed for the serial port, I have
+</I>&gt;<i>to tell this to the serial port, *not* the attached device...
+</I>
+Hmm. This crosses over to system information. This is a good idea. It might
+be possible for many processes at the same time to query the device
+subsystem. Opening a device for exclusive use is not the only possible
+function of a device factory. How do you find out the maximum speed of
+serial port 1? How do you find out what is really attached to serial port 1?
+
+The ports themselves are detected by JOS at start-up. The system-wide
+configuration of a JOS machine must explain to JOS what it is exactly
+that's attached. Where does the system-wide configuration come from? You
+can type it in manually. That is the classic way. You can run a probe to
+let the machine try to figure out what is attached. A probe does not have
+to be build into an operating system. It only needs to show you what you
+need to type in manually. A modem probe can be sold separately.
+
+&gt;&gt;<i> To get at the raw serial port, you might use a URI like this:
+</I>&gt;&gt;<i> 
+</I>&gt;&gt;<i> device:<A HREF="serial://localhost/ports/serial/1/?maxspeed=...">serial://localhost/ports/serial/1/?maxspeed=...</A>
+</I>&gt;<i>
+</I>&gt;<i>Once again, I think &quot;serial:&quot; should be *before* &quot;device:&quot; But anyway:
+</I>
+I think device: should be a major scheme. I start a device URI with device:
+to keep it separate from other major URI schemes like desktop:, fpt:,
+http:, in:, out: jdbc:, mailto:, x-registry:, applet: and servlet:.
+
+&gt;<i>In this case, every &quot;sub directory&quot; of the URI will in reality also
+</I>&gt;<i>signify a protocol. Such as:
+</I>&gt;<i>
+</I>&gt;<i>com.custom.CustomModem:modem:serial:<A HREF="device://localhost/ports/serial/1/attac">device://localhost/ports/serial/1/attac</A>
+</I>hed?maxspeed=...
+&gt;<i>
+</I>
+I don't understand.
+
+&gt;&gt;<i> Starting with interfaces we have already named:
+</I>&gt;&gt;<i> 
+</I>&gt;&gt;<i> ParallelPort
+</I>&gt;&gt;<i> SerialPort
+</I>&gt;&gt;<i> Modem
+</I>&gt;<i>
+</I>&gt;<i>We can post a list of proposed device names, and have people comment on
+</I>&gt;<i>device names which they don't like, while also adding their own proposed
+</I>&gt;<i>device names. These device names should be as general as possible, and
+</I>&gt;<i>should follow the typical class naming schemes we have accepted in JOS a
+</I>&gt;<i>(or two?) year ago. Something like starting with a capital, using full
+</I>&gt;<i>words, etc..
+</I>
+Excellent idea!
+
+&gt;<i>Things like:
+</I>&gt;<i>
+</I>&gt;<i>Keyboard?keycount=104&amp;functionkeys=true&amp;layout=us-ascii
+</I>&gt;<i>PointingDevice?commandcount=4
+</I>&gt;<i>Mouse?buttoncount=3&amp;wheel=true
+</I>&gt;<i>ISDNAdapter?lines=2&amp;dataline=true
+</I>&gt;<i>EthernetAdapter?baud=100&amp;encrypted=true
+</I>&gt;<i>Monitor?toomanyparameters=very_true  :)
+</I>&gt;<i>etc..
+</I>
+And maybe RAM, MemoryManager, DMAChannel, Floppy, CDROM, GraphicsTablet,
+LightPen, TouchScreen.
+
+&gt;<i>An apparent issue is: do we add the word &quot;Device&quot; after these things?
+</I>
+When these interfaces are already part of the org.jos.device package,
+adding the word &quot;Device&quot; is mostly redundent and, in general, should not be
+used. Exceptions are allowed, such as PointingDevice.
+
+&gt;&gt;<i> Like any smart factory, it must use a separate plug-in controller for
+</I>&gt;&gt;<i> each sub-scheme.
+</I>&gt;<i>
+</I>&gt;<i>Apparently... Any piece of software must come in changeable modules. If
+</I>&gt;<i>that cannot happen, it has the fate and performance of things like
+</I>&gt;<i>Solaris, Windows, OS/2, etc... Look at Linux: everybody can put his
+</I>&gt;<i>little piece inside, and thus everybody (almost, other story) is happy.
+</I>
+Plug-ins are a good thing. Never before has an operating system had so many
+plug-ins as JOS. The general Java architecture makes everything a plug-in.
+
+&gt;<i>What happens if the Modem is on a PCI slot? Maybe the modem should not
+</I>&gt;<i>be responsible for knowing what port it's attached to, rather, the port
+</I>&gt;<i>knowing what modem is attached to it?
+</I>
+We have to throw system-wide configuration into this somewhere. JOS doesn't
+know for sure it has a PCI slot until start-up. If it depends on a
+persistent system-wide configuration, that might expect to find a modem on
+a PCI slot. If it probes for a modem, that might find a modem on a PCI
+slot. If JOS known that it's a modem, I should be able to tell it manually
+and use the modem without restarting my computer.
+
+As a diagnostic tool, I look forward to using the Universal Browser with
+the device: scheme. It looks like we can create a Device Browser. I should
+be able to type in &quot;device:port:/ports/serial/1&quot; and my browser should show
+me (1) if it exists, and (2) its current status. For example, I should be
+able to use a browser to quickly determine which process (if any) is
+currently using my modem.
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000757.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000763.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#762">[ date ]</a>
+              <a href="thread.html#762">[ thread ]</a>
+              <a href="subject.html#762">[ subject ]</a>
+              <a href="author.html#762">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

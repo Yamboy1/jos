@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Garbage collection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:George.Marrows%40Smallworld.co.uk">
+   <LINK REL="Previous"  HREF="000184.html">
+   <LINK REL="Next" HREF="000187.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Garbage collection</H1>
+    <B>George.Marrows@Smallworld.co.uk</B> 
+    <A HREF="mailto:George.Marrows%40Smallworld.co.uk"
+       TITLE="[JOS-Kernel] Garbage collection">George.Marrows@Smallworld.co.uk</A><BR>
+    <I>Wed, 4 Aug 1999 14:48:54 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000184.html">[JOS-Kernel] GC and swap space</A></li>
+        <LI> Next message: <A HREF="000187.html">[JOS-Kernel] Garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#185">[ date ]</a>
+              <a href="thread.html#185">[ thread ]</a>
+              <a href="subject.html#185">[ subject ]</a>
+              <a href="author.html#185">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	John / Todd - 
+
+&gt;<i> &gt; &gt; That's OK.  I'm assuming we can just recompile it with the C++
+</I>&gt;<i> compiler
+</I>&gt;<i> &gt; &gt; (it's ANSI C, right?) and link it on in.
+</I>&gt;<i> &gt; &gt;
+</I>&gt;<i> &gt;         [GAM] Yes it should compile fine with g++ (I'll check this).
+</I>&gt;<i> 
+</I>&gt;<i> OK.  Just let us all know!
+</I>&gt;<i> 
+</I>	[GAM]  Hmm.. plenty of warnings about doing arithmetic with void*.
+I'll sort them out.
+
+&gt;<i> That's great!  Hopefully, we'll have something with which it can be
+</I>&gt;<i> integrated
+</I>&gt;<i> (Todd and I can thus be advised to be sure to finish anything we start by
+</I>&gt;<i> roughly the 14th).
+</I>&gt;<i> 
+</I>	[GAM]  I propose to put the gc code in a separate directory:
+common/nativecode/gc. How does that sound? It's currently in
+common/nativecode, but it bloats that directory somewhat. Now I've just got
+to sort out the accursed makefile :-(
+
+&gt;<i> &gt; In the meantime, it would be very useful if you could go through the
+</I>&gt;<i> kernel
+</I>&gt;<i> &gt; and decaf and identify the roots for garbage collection. Issues I
+</I>&gt;<i> foresee
+</I>&gt;<i> 
+</I>&gt;<i> OK.  We'll start that effort...
+</I>&gt;<i> 
+</I>	[GAM]  I'll see if I can work out a modified interface for jbheap
+earlier than the 14th. It needs to allow the rest of JJOS pass back
+information about roots and kick off an on-demand garbage collect, in
+addition to jbheap's current allocate functionality.
+
+&gt;<i> &gt; with this: do we need to look in registers; how to find top and bottom
+</I>&gt;<i> of
+</I>&gt;<i> &gt; the native code stack for scanning.
+</I>&gt;<i> 
+</I>&gt;<i> I'm thinking with green threads we won't have to, but that's based upon a
+</I>&gt;<i> whole
+</I>&gt;<i> 10 seconds of thought...  Todd, what sayest thou?
+</I>&gt;<i> 
+</I>	[GAM]  But if I'm also doing gc for the C++ code, and the only ref
+to some C++ heap object is in a local variable somewhere on the native code
+stack, I'll need to find that ref. Otherwise that object is gone (or rather,
+the memory for it doesn't get marked as in use and could end up being reused
+for something else, which in turn could lead to some very nasty bugs).
+
+	-- George
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000184.html">[JOS-Kernel] GC and swap space</A></li>
+	<LI> Next message: <A HREF="000187.html">[JOS-Kernel] Garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#185">[ date ]</a>
+              <a href="thread.html#185">[ thread ]</a>
+              <a href="subject.html#185">[ subject ]</a>
+              <a href="author.html#185">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Multi-Process Spec</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tullmann%40cs.utah.edu">
+   <LINK REL="Previous"  HREF="000651.html">
+   <LINK REL="Next" HREF="000653.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Multi-Process Spec</H1>
+    <B>Patrick Tullmann</B> 
+    <A HREF="mailto:tullmann%40cs.utah.edu"
+       TITLE="[JOS-Kernel] Multi-Process Spec">tullmann@cs.utah.edu</A><BR>
+    <I>Thu, 3 Feb 2000 22:40:46 -0700</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000651.html">[JOS-Kernel] Multi-Process Spec</A></li>
+        <LI> Next message: <A HREF="000653.html">[JOS-Kernel] Multi-Process Spec</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#652">[ date ]</a>
+              <a href="thread.html#652">[ thread ]</a>
+              <a href="subject.html#652">[ subject ]</a>
+              <a href="author.html#652">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Comments would be appreciated.  Be aware that it is sketchy and unfinished.
+</I>
+I've got some couple comments for you.  I've been working on this
+problem (multiple processes in a JVM) at the University of Utah for a
+while now.  Our research group has a paper which was just accepted to
+the April USENIX on just this topic.  The paper tries to provide a
+solid list of the issues involved and choices available for Java
+process models.  You can get it at [1].  My Master's thesis [2] also
+contains a lot of relevant info, but its not nearly as concise or
+readable.  :) There is also other work in java processes here at Utah
+(GVM [1], KaffeOS [3]) and at Cornell (JKernel [4], Luna [5]).  And,
+some older work at Princeton ([6]).
+
+One nit on your definition of class version.  Two classes are the same
+only if the bytecode is identical and if all the referenced classes
+are identical.  If I load a class BigButton into two different class
+loaders, and in each classloader BigButton's superclass Widget is
+different, the the two instances of BigButton are different.  The JVM
+spec makes a coarser restriction: classes loaded into separate
+classloaders are by definition different, even if all the classes are
+actually the same.
+
+Another issue is the tension between sharing objects and total
+reclaimation of memory.  If a process is terminated, but some objects
+it allocated are sitting in a global table, what do you do?  What if
+that object has pointers all of the data area of the just-terminated
+process?  There are systems (such as Luna) that can reclaim the
+object, though Luna makes changes to Java's type system and requires
+some pretty hefty optimizations to avoid significant run-time
+penalties.  Other systems, such as KaffeOS strictly limit the types
+of such shared objects, thus limiting the damage that can be done.
+Other systems (such as the one I'm working on now) disallow shared
+objects at the process level (the &quot;system&quot; can share objects but it is 
+trusted to clean them up).
+
+If you're going for a UNIX-like process model, I suggest you start by
+disallowing sharing (copy objects across process and process/kernel
+boundaries).  I get the feeling this is the sort of process model you
+are heading towards.
+
+Good luck.
+
+-Pat
+
+----- ----- ---- ---  ---  --   -    -      -         -               -
+Pat Tullmann                                       <A HREF="mailto:tullmann@cs.utah.edu">tullmann@cs.utah.edu</A>
+	  This signature witticism intentionally left blank.
+
+[1] <A HREF="http://www.cs.utah.edu/flux/papers/javaos-tr98015-abs.html">http://www.cs.utah.edu/flux/papers/javaos-tr98015-abs.html</A>
+[2] <A HREF="http://www.cs.utah.edu/~tullmann/thesis/thesis.html">http://www.cs.utah.edu/~tullmann/thesis/thesis.html</A>
+[3] Godmar doesn't have a good link yet, <A HREF="http://www.cs.utah.edu/~gback/">http://www.cs.utah.edu/~gback/</A>
+[4] <A HREF="http://www.cs.cornell.edu/slk/JKernel/Default.html">http://www.cs.cornell.edu/slk/JKernel/Default.html</A>
+[5] <A HREF="http://www.cs.cornell.edu/Info/People/hawblitz/PLDI2000-submit/luna-99-11-13.ps">http://www.cs.cornell.edu/Info/People/hawblitz/PLDI2000-submit/luna-99-11-13.ps</A>
+[6] <A HREF="http://www.cs.princeton.edu/sip/pub/icdcs.html">http://www.cs.princeton.edu/sip/pub/icdcs.html</A>
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000651.html">[JOS-Kernel] Multi-Process Spec</A></li>
+	<LI> Next message: <A HREF="000653.html">[JOS-Kernel] Multi-Process Spec</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#652">[ date ]</a>
+              <a href="thread.html#652">[ thread ]</a>
+              <a href="subject.html#652">[ subject ]</a>
+              <a href="author.html#652">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

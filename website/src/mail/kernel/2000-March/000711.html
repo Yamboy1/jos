@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOS Installation</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000702.html">
+   <LINK REL="Next" HREF="000712.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOS Installation</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] JOS Installation">tmiller@haverford.edu</A><BR>
+    <I>Tue, 7 Mar 2000 23:34:59 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000702.html">[JOS-Kernel] JOS Installation</A></li>
+        <LI> Next message: <A HREF="000712.html">[JOS-Kernel] JOS Installation</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#711">[ date ]</a>
+              <a href="thread.html#711">[ thread ]</a>
+              <a href="subject.html#711">[ subject ]</a>
+              <a href="author.html#711">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Generally:
+
+	You keep giving a 4 MB figure for the distribution size -- does
+that include the (required) class library (uncompressed zipfile)?
+
+<A HREF="http://www.metamech.com/wiki/view/Main/InstallOptions">http://www.metamech.com/wiki/view/Main/InstallOptions</A>
+
+	Monolithic is spelled with an i.  The 'preferred' boot method is
+now GRUB -- I won't be checking to make sure the Etherboot version works
+as often because the GRUB booter is more convenient for me, now that
+George Marrows has down the grunt work :)  Whether or not the GRUB or
+Etherboot installation is preferred 'in the real world' is open to
+question...
+
+<A HREF="http://www.metamech.com/wiki/view/Main/InstallWithLinux">http://www.metamech.com/wiki/view/Main/InstallWithLinux</A>
+
+What are the minimum requirements of Linux in order to install JOS?
+
+	JOS should not be using any libraries from your system except in
+its 'kernel emulation', where it uses bits and pieces of the standard C++
+library and the math library.  Optionally, it uses ncurses and libdl.  In
+general, it depends on how the binary was compiled.
+
+Which Linux distribution(s) should I use?
+
+	I haven't noticed a particular preference on the list for
+one; jJOS/decaf isn't terribly demanding.
+
+What Linux packages should I install to run JOS? to build JOS?
+
+	Running jJOS/decaf will only require whatever libraries it was
+compiled to link against, hopefully.  To build the host target of
+jJOS/decaf will require g++, gmake, javac, zip, optionally libncurses, and
+optionally libdl.  Work-alikes might work also, though I have no idea if
+they do or not.  (gmake for the makefile, g++ for the nativecode, javac
+and zip for creating the jJOS/decaf classfiles and ramdisk image)  The
+i386 build also needs the jjos-nbi softs (should be in CVS or somewhere on
+the website?), etherboot or grub (GM gave a link to where his build of a
+bootdisk is), and NASM. (a build of which should also be lying around on
+the website somewhere.  Probably named 'tools.tgz', though I wouldn't
+count on it.)
+
+Runtime Edition
+
+How do I install a runtime/binary distribution of JOS on Linux?
+
+	Presumably, you untar it.  The distributor may well include a
+tarball-root script file to execute jJOS/decaf from the right place and
+with the default options.
+
+	The host build creates a Linux executable. Where should it be
+installed?
+
+	In the deepest and darkest dungeon of your filesystem, where
+nobody (uid 99) and the grues (in 'thedark' group) gather to celebrate
+lossage by the light of a flaming core...
+
+	... jJOS/decaf is so amazingly alpha that it emits bad bits as it
+decays; its half-life is inversely proportional to the free time of the
+developers.  (Wave, everybody!)
+
+	In other words, anywhere other than where it will feel safe and
+happy surrounded by its source is probably A Bad Idea.
+
+How many Linux executables -- including shared libraries -- are created by
+the build process? What are their names?
+
+	only 'jjos', AFAIK, for the host build; the i386 build has either
+jjos-grub or jjos-nbi depending on which boot process you selected, and a
+group of intermediate binaries that are utterly useless.
+
+Is there a runtime edition of the host build? If not, what prevents us
+from creating one?
+
+	Laziness?
+
+Is there a runtime edition of the JVM-specific classes? If not, what
+prevents us from creating one?
+
+	That they don't actually exist yet?
+
+
+Technical Edition
+
+How do I download jJOS/decaf from CVS?
+
+	With lead-lined packets; see &quot;alpha (-radiation-leaking&quot;
+software)&quot; in manual section 9.  The particular incantation used here at
+the top-secret jJOS labs buried somewhere under the appalachians, is, of
+course, top secret, but the following approximation will probably work:
+
+cvs -d :pserver:<A HREF="mailto:anonymous@jos.org">anonymous@jos.org</A>:/sites/jos/cvs/cvsroot login
+cvs -d :pserver:<A HREF="mailto:anonymous@jos.org">anonymous@jos.org</A>:/sites/jos/cvs/cvsroot co JJOS
+
+How do I make jJOS?, decaf? JVM-specific classes?
+
+	'cd JJOS/arch/*/nativecode; make' usually takes care of
+it.  Options for * are currently limited to i386 and host.
+
+Which standard Java class library should I use? How do I obtain it?
+
+	Right now, the Sun libraries from the Blackdown (for me, anyway,
+YMMV) JDK 1.1.x series.  Hopefully sooner than later, classpath.
+
+
+	I'd be more specific in some sections, but my build process is
+broken in all sorts of interesting ways right now, so I can't do some of
+this stuff and find out...
+
+-_Quinn
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000702.html">[JOS-Kernel] JOS Installation</A></li>
+	<LI> Next message: <A HREF="000712.html">[JOS-Kernel] JOS Installation</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#711">[ date ]</a>
+              <a href="thread.html#711">[ thread ]</a>
+              <a href="subject.html#711">[ subject ]</a>
+              <a href="author.html#711">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

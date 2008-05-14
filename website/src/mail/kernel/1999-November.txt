@@ -1,0 +1,2585 @@
+From mgangelen@quintop.nl Tue, 09 Nov 1999 09:23:59 GMT
+Date: Tue, 09 Nov 1999 09:23:59 GMT
+From: mgangelen@quintop.nl mgangelen@quintop.nl
+Subject: [JOS-Kernel] host-build also works on win32
+
+Hi anyone,
+
+Great work on this JOS kernel stuff.
+This weekend I CVS'd the sources and tried to make it work on the win32
+platform (yes, I know... it hurts but I'm used to it...). The good news is
+that after a few adjustments in the makefiles and a headerfile, the
+host-build works !!
+The only thing I couldn't (yet) get to work is the linkage of the i386
+build, just because my version of ld does not support elf linkage.
+
+To prove my writings, I'll include a stdout of the jjos.exe at the end.
+
+PS. _Quinn might know me from some time ago.... We met working on the
+Q2JAVA project and you should know that I could not get the output from a
+Linux-build :-)
+
+Oh, I used java-classes from SDK 1.3 Beta in the zip so that could explain
+some tests not working properly..
+
+
+Greetz,
+
+Fushion.
+
+===================================================================
+jm's JOS Kernel Host!
+jbHeap::setPhysicalLowAndHigh(0x02660F78, 0x02E50F79)
+jbHeap::setPhysicalLowAndHigh -- scrubbing memory...Done!
+fixme: hashtable.cc: hashtable overflow
+fixme: hashtable.cc: hashtable overflow
+frame::invokestatic -- will/can not call native method (registerNatives).
+init for decaf, version 0.0.1
+testing the VM...
+testing integer comparisons... ops failed:
+testing double comparisons... ops failed:
+Testing float comparisons... ops failed:
+Testing float ops... ops failed:
+Testing double ops... ops failed:
+testing array operations...
+"one" should be printed: one
+init() testing casting...
+frame::invokestatic -- will/can not call native method (registerNatives).
+o = (Object)Vector; (OK)
+Vector = (Vector)o; (OK)
+o = Object; Vector = (Vector)o (NOT OK)
+fixme: class cast exception should be thrown.
+ser = new String(); (OK)
+o = (Object)int[]; (OK)
+o = (Object)String[]; (OK)
+o = (Object)int[]; int[] = (int[])o; (OK)
+e = (Enumeration)v; (NOT OK)
+fixme: class cast exception should be thrown.
+v = (Vector)e; (NOT OK)
+fixme: class cast exception should be thrown.
+ser = new String(); (OK)
+does 56 = 56?
+is true = true?
+This sentence should end with a period.
+init(): testing threading.
+init() starting counter...
+counter ready.
+init() starting decounter...
+counter ready.
+init() entering .wait() loop...
+init() has caught 10 interrupts.
+init() testing exceptions()
+init(): caught exception #1!
+init(): caught exception #2!
+init(): caught exception #3!
+init() skipping VGA tests...
+init() skipping GC tests...
+init() starting console daemons...
+init() starting jos.system.keyboard...
+initializing keyboard... done.
+init() starting jos.system.consoled...
+consoled starting... done.
+init() for decaf v0.0.1, exiting...
+decounter exiting...
+counter exiting...
+===================================================================
+
+
+
+
+From rui.gil@inesc.pt Tue, 9 Nov 1999 16:13:43 -0000
+Date: Tue, 9 Nov 1999 16:13:43 -0000
+From: Rui Gil rui.gil@inesc.pt
+Subject: [JOS-Kernel] javalobby
+
+Hi everybody !
+
+I don't know if JOS has a PR person,
+but an article appeared in JavaLobby (www.javalobby.org)
+asking about the current status os JOS.
+
+Perhaps someone better informed could respond.
+
+thank's
+
+Rui Gil
+
+
+
+
+From tmiller@haverford.edu Wed, 10 Nov 1999 23:58:39 -0500 (EST)
+Date: Wed, 10 Nov 1999 23:58:39 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] javalobby
+
+	Right now, JOS is alive, but moving very slowly.  I simply don't
+have the time to push the JVM/kernel along any faster than I am, and the
+code is still too incomplete for a snowball effect to take place.  (That
+is, JOS has not yet integrated classpath, so a library support is very
+thing on the ground, and virtually all of the rest of the code will be in 
+Java...)  *sigh*
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Thu, 11 Nov 1999 03:05:23 -0500 (EST)
+Date: Thu, 11 Nov 1999 03:05:23 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] CVS updates
+
+	George, I managed to integrate your changes into the tree, but
+didn't finish the 'grub' section of the Makefile because I haven't had
+time to test it -- but the etherboot side of things is working fine.
+
+	The rest of the new stuff is -DNEW_INTERRUPT_HANDLING support
+code, which I'm still finishing up on the Java side (whose updates were
+not included in this, because it's already way too late and they're
+incredibly extensive).
+
+	I think that should cover it.  George, if you want to finish the
+'grub' section in the new Makefile (and test it!), I'll put it into the
+tree.  (Unless you want direct tree access, which can probably be
+arranged.  Considering you're doing more coding than I am right now :))
+
+	I should have the new keyboard driver finished 'soon' -- that is,
+it shouldn't take much coding time, but I don't when I'll next get it --
+at which point I'll move the new Java code over.  (And hopefully fix the
+drivers I break doing it...)  I think next on my list after that are
+direct-address arrays, unless someone else is cranking on it.  (For the
+VGA driver, something along the lines of new AddressArray( 640*480*4,
+0xb0000).  BTW -- 0xb0000 worked for me on both my PCI and AGP video
+cards.  I have no idea why some people seem to need 0xb8000, unless it's
+some random broken BIOS thing...)
+
+	Anyway, happy coding.
+
+-_Quinn
+
+
+
+
+From George.Marrows@Smallworld.co.uk Mon, 15 Nov 1999 09:28:44 -0000
+Date: Mon, 15 Nov 1999 09:28:44 -0000
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] GRUB (was [JOS-Arch] Binary Distribution)
+
+Unfortunately, the makefile is a bit ill when it comes to grub support --
+the executable doesn't get linked at the moment. I'll try to find time to
+tweak it back into shape.
+
+-- George
+
+---------------------------------------------------------------
+If you have the latest CVS code, one of the build options is 'make
+grub' (i386/nativecode); this will produce what ought to be a
+GRUB-bootable image of JJOS.  The GRUB instructions, according to George
+Marrows (who developed the JOS suport) are as follows:
+
+kernel=<path to kernel> init
+module=<path to jjos-common.zip>
+boot
+
+Ask around on the kernel list for more help if you need it.  GRUB will
+boot from a floppy; if you've got installed as your bootloader already,
+JOS will boot straight off your HD.  (Though it won't do much in its
+present state :))
+
+
+
+From jm@mak.com Mon, 15 Nov 1999 07:30:27 -0500
+Date: Mon, 15 Nov 1999 07:30:27 -0500
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Checkins (also, please read if interested in device-related issues)
+
+Hi;
+
+Well, I got a couple of free minutes, and made some minor changes
+(hope I didn't break anything -- please shriek loudly if I did).
+
+(1) I changed common/decaf/scheduler.cc.  There seemed to me to be
+some code that complained if an interrupt happened that there was not
+a java thread waiting on it.  I got rid of that clause, because I
+think that is an OK thing -- not an error.
+
+(2) I had been sitting on changes I had made to
+common/nativecode/jbheap.cc, for which I had made an alternative
+malloc/free implementation.  I just wanted to get that code into the
+repository.  Hopefully, it shouldn't be used (unless you change some
+#defines in the file), and thus it shouldn't break anything.  I'll
+probably nuke it the next time I touch that file, but ...
+
+(3) I added a new file, common/bytecode/TestSuite.java.  I swept all
+the test* methods away from init.* and into TestSuite.*.  Obviously, I
+also thus had the change init.java, and also the Makefile in that
+directory to add the new file.
+
+This change was important because I would like to start implementing
+the "device tree" infrastructure.  Basically, the BIOS scans the
+devices in the box at boot time, and is kind enough to leave a record
+of what it found in the "BIOS data area."  I would like to scan this
+area from Java (early in the "init" code), and make Java "device tree"
+data structures (as JavaOS does) so that we can load the right drivers
+for the devices we actually have.  This is the analog to the /dev/*
+hierarchy in UNIX.  Hopefully, after this code has finished running,
+you'll (or the Java code will) be able to easily figure out what
+devices are hanging off the box, and removable and hot-swappable
+devices will be handled via a "notification" mechanism.
+
+On a directly related note, there was recently a big discussion on the
+Linux kernel lists (I don't monitor these lists, but the Linux weekly
+news had a synopsis of the discussion) about how removable media, and
+large numbers of networked devices raised hell with the old UNIX-style 
+static device hierarchy.  I think they were headed in this general
+direction (technically speaking).
+
+As usual, problems to me...
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From jm@mak.com Mon, 15 Nov 1999 07:36:17 -0500
+Date: Mon, 15 Nov 1999 07:36:17 -0500
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Optimizer-related problems...
+
+Hi;
+
+One semi-background task that I've been working on is trying to get
+the code to run a little faster for the embedded target.  We don't use
+a source-level debugger there anyways, why not turn on the optimizer?
+
+Well, one reason is that the code doesn't work if I turn on the
+optimizer.  I have tracked the (first of probably several such)
+problem down to the "asm" primitives in jjMachine::getCPUID().  When I 
+rebuilt everything other than jjmachin.o to use the optimizer, then it 
+ran (and perceptibly faster than without the optimizer).
+
+I will look into this more later this weekend.
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From Corrado.Santoro@IIT.UNICT.IT Mon, 15 Nov 1999 17:53:30 +0100
+Date: Mon, 15 Nov 1999 17:53:30 +0100
+From: Corrado Santoro Corrado.Santoro@IIT.UNICT.IT
+Subject: [JOS-Kernel] Checkins (also, please read if interested in device-related issues)
+
+Hi John,
+I've updated the CVS today. It compiles well and the TestSuite class starts,
+but it seems a to be a bug in the interrupt handling: when I strike a key I see
+the message:
+notifyOfInterrupts(4): VM corrupted, aborting....
+what happens ? What I have forgotten ?
+
+Cheers,
+	Corrado.
+
+On Mon, 15 Nov 1999, John Morrison wrote:
+> Hi;
+> 
+> Well, I got a couple of free minutes, and made some minor changes
+> (hope I didn't break anything -- please shriek loudly if I did).
+> 
+> (1) I changed common/decaf/scheduler.cc.  There seemed to me to be
+> some code that complained if an interrupt happened that there was not
+> a java thread waiting on it.  I got rid of that clause, because I
+> think that is an OK thing -- not an error.
+> 
+> (2) I had been sitting on changes I had made to
+> common/nativecode/jbheap.cc, for which I had made an alternative
+> malloc/free implementation.  I just wanted to get that code into the
+> repository.  Hopefully, it shouldn't be used (unless you change some
+> #defines in the file), and thus it shouldn't break anything.  I'll
+> probably nuke it the next time I touch that file, but ...
+> 
+> (3) I added a new file, common/bytecode/TestSuite.java.  I swept all
+> the test* methods away from init.* and into TestSuite.*.  Obviously, I
+> also thus had the change init.java, and also the Makefile in that
+> directory to add the new file.
+> 
+> This change was important because I would like to start implementing
+> the "device tree" infrastructure.  Basically, the BIOS scans the
+> devices in the box at boot time, and is kind enough to leave a record
+> of what it found in the "BIOS data area."  I would like to scan this
+> area from Java (early in the "init" code), and make Java "device tree"
+> data structures (as JavaOS does) so that we can load the right drivers
+> for the devices we actually have.  This is the analog to the /dev/*
+> hierarchy in UNIX.  Hopefully, after this code has finished running,
+> you'll (or the Java code will) be able to easily figure out what
+> devices are hanging off the box, and removable and hot-swappable
+> devices will be handled via a "notification" mechanism.
+> 
+> On a directly related note, there was recently a big discussion on the
+> Linux kernel lists (I don't monitor these lists, but the Linux weekly
+> news had a synopsis of the discussion) about how removable media, and
+> large numbers of networked devices raised hell with the old UNIX-style 
+> static device hierarchy.  I think they were headed in this general
+> direction (technically speaking).
+> 
+> As usual, problems to me...
+> 
+> -jm
+> 
+> -- 
+> ==== John Morrison
+> ==== MaK Technologies Inc.
+> ==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+> ==== http://www.mak.com/
+> ==== vox:617-876-8085 x115
+> ==== fax:617-876-9208
+> ==== jm@mak.com
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: csanto@iit.unict.it
+Personal Home Page:
+            http://www.cdc.unict.it/~csanto
+
+ARCA Mobile Agent Framework Home Page:
+            http://netra.cdc.unict.it/ARCA
+======================================================
+
+
+
+
+From jm@mak.com Mon, 15 Nov 1999 13:01:46 -0500
+Date: Mon, 15 Nov 1999 13:01:46 -0500
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Checkins (also, please read if interested in
+ device-related issues)
+
+Hi;
+
+Corrado Santoro wrote:
+> 
+> Hi John,
+> I've updated the CVS today. It compiles well and the TestSuite class starts,
+> but it seems a to be a bug in the interrupt handling: when I strike a key I see
+> the message:
+> notifyOfInterrupts(4): VM corrupted, aborting....
+> what happens ? What I have forgotten ?
+
+Hmm... It was my intention to only change the old
+scheduler::notifyOfInterrupts method, which actually shouldn't even be
+used if you've got the NEW_INTERRUPT_HANDLING preprocessor symbol
+defined.  And, it is my understanding that the symbol is defined in the
+makefile.  
+
+What's *your* makefile say with respect to that symbol?
+
+Sorry for any difficulty...
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From tmiller@haverford.edu Mon, 15 Nov 1999 14:42:59 -0500 (EST)
+Date: Mon, 15 Nov 1999 14:42:59 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Checkins (also, please read if interested in
+ device-related issues)
+
+> Hmm... It was my intention to only change the old
+> scheduler::notifyOfInterrupts method, which actually shouldn't even be
+> used if you've got the NEW_INTERRUPT_HANDLING preprocessor symbol
+> defined.  And, it is my understanding that the symbol is defined in the
+> makefile.  
+
+	Which it shouldn't be, because I haven't comitted the Java source
+on which the mew interrupt handling depends yet.  Error #4 is usually that
+the java class passed in as the interrupt handler isn't the same one as
+was expected by the interrupt handler...
+
+-_Quinn
+
+
+
+
+From jm@mak.com Mon, 15 Nov 1999 15:13:41 -0500
+Date: Mon, 15 Nov 1999 15:13:41 -0500
+From: John Morrison jm@mak.com
+Subject: [JOS-Kernel] Checkins (also, please read if interested in
+ device-related issues)
+
+"Todd L. Miller" wrote:
+> 
+> > Hmm... It was my intention to only change the old
+> > scheduler::notifyOfInterrupts method, which actually shouldn't even be
+> > used if you've got the NEW_INTERRUPT_HANDLING preprocessor symbol
+> > defined.  And, it is my understanding that the symbol is defined in the
+> > makefile.
+> 
+>         Which it shouldn't be, because I haven't comitted the Java source
+> on which the mew interrupt handling depends yet.  Error #4 is usually that
+> the java class passed in as the interrupt handler isn't the same one as
+> was expected by the interrupt handler...
+
+http://www.jos.org/cvsweb.cgi/JJOS/arch/i386/nativecode/Makefile?rev=1.24
+
+???????
+
+I saw the comment about "shouldn't use," but it's in the makefile... 
+Maybe we should elide the -DNEW_INTERRUPT_HANDLING from the makefile?
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== http://www.mak.com/
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== jm@mak.com
+
+
+
+From tmiller@haverford.edu Mon, 15 Nov 1999 16:20:41 -0500 (EST)
+Date: Mon, 15 Nov 1999 16:20:41 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Checkins (also, please read if interested in
+ device-related issues)
+
+> http://www.jos.org/cvsweb.cgi/JJOS/arch/i386/nativecode/Makefile?rev=1.24
+> 
+> ???????
+> 
+> I saw the comment about "shouldn't use," but it's in the makefile... 
+> Maybe we should elide the -DNEW_INTERRUPT_HANDLING from the makefile?
+
+	Yup.  Sorry about this one guys, it snuck past me -- I had
+compiled the new-style java code for testing and not bothered to switch
+back to test the etherbooting with the new GRUB-useable makefile.  I'll
+put in the CVS once I send this off.
+
+-_Quinn
+
+
+
+
+From gilead@linart.pl Tue, 16 Nov 1999 22:42:44 +0100
+Date: Tue, 16 Nov 1999 22:42:44 +0100
+From: Max Gilead gilead@linart.pl
+Subject: [JOS-Kernel] Has my mail reached this list?
+
+Hi!
+
+Some days ago I've sent a mail to this list talking about possible
+J3D/OpenGL implementation for JOS. Nobody answered. Because it is
+uninteresting or this mail didn't reach you?
+
+Please, email me directly if THIS mail reaches the list.
+
+Bye,
+Max
+
+---------- Max Gilead (gilead@linart.pl) ----------
+| http://3d.linart.krakow.pl/OfficinaArtificialis |
+---------------------------------------------------
+{EOF}
+
+
+
+
+
+
+
+
+
+From ajregier@earthlink.net Fri, 19 Nov 1999 22:52:52 -0500
+Date: Fri, 19 Nov 1999 22:52:52 -0500
+From: Avery J. Regier ajregier@earthlink.net
+Subject: [JOS-Kernel] Getting GRUB up and running
+
+I can do a 'make grub' and that apparently works, however I haven't a clue 
+what grub-related file that produces.  Can someone please give a short hint 
+as to what to do to get a JJOS GRUB floppy created and running?
+
+Thanks,
+Avery J. Regier
+
+
+
+
+From onewith1@flash.net Fri, 19 Nov 1999 21:57:02 -0600
+Date: Fri, 19 Nov 1999 21:57:02 -0600
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] Has my mail reached this list?
+
+I believe that there was some work on this started many moons ago.  Check
+out the subject "GraphicsTasks" under JOS Wiki.  It seems that JohnDeCuir
+started this out.
+
+-Matt
+
+Max Gilead <gilead@linart.pl> wrote:
+> Hi!
+>
+> Some days ago I've sent a mail to this list talking about possible
+> J3D/OpenGL implementation for JOS. Nobody answered. Because it is
+> uninteresting or this mail didn't reach you?
+>
+> Please, email me directly if THIS mail reaches the list.
+>
+> Bye,
+> Max
+>
+> ---------- Max Gilead (gilead@linart.pl) ----------
+> | http://3d.linart.krakow.pl/OfficinaArtificialis |
+> ---------------------------------------------------
+> {EOF}
+>
+>
+>
+>
+>
+>
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From tmiller@haverford.edu Sat, 20 Nov 1999 00:46:55 -0500 (EST)
+Date: Sat, 20 Nov 1999 00:46:55 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Progress
+
+	I haven't finished the optimizations for speed yet*, but the
+-DNEW_INTERRUPT_HANDLING Java code now does java-based virtual consoles
+(12 of the them!).  Once I write a correct back-end in (i.e. so that the
+VGA code can be rolled in -- which I need to look at for
+mode-change/checks), I'll probably go ahead and freeze development on it
+until I re-integrate it into the JJOS/common/bytecode tree.  (Currently,
+btw, the host and the i386 builds share the same java drivers because I'm
+trying to test them on the host.  Technically, the host should be using
+whatever drivers are for the architecture it's running on, but that would
+be a pain to set up and happens be the case now anyway...)
+
+	Anyway, the back-end should allow the consoled to manage virtual
+text and graphics consoles, because of the way things are handled
+internally.  (As a matter of fact, I hope that the console will virtualize
+to include things like telnet sessions and Xterms, but moving right
+along...)  The back-end stuff depends on a new kernel/JVM feature I've
+been yammering on about for a while, the mapped byte array, which works as
+follows:
+
+byte[] vga_text_ram = jos.system.machine.mapByteArray( 0xB0000, 80 * 24 * 2);
+byte[] vga_svga_ram = jos.system.machine.mapByteArray( 0xB0000, 640 * 480 );
+
+and so on.  Because we don't have so much as a security model at this
+point, the method is fraught with potential for problems, but at least it
+will trap pointer overruns.  At some point I should probably find the
+lower end of available physical RAM and limit the pointers to below that,
+but that's for a later day.  The code for the text-mode physical console
+(driver) then looks absolutely identical to jjconsol.h in i386/nativecode,
+so I copied it rather liberally.  (Thanks, JM!)
+
+	If anyone would happen to information on how to set the VGA mode 7
+cursor, that would be kind of nice, too.  (It would look more
+'professional,' anyway.)
+
+	Anyway, current problems: kprintf-console communication.  Right
+now there is none, which means all sorts of extremely funky things happen.
+It would be nice to have jos.system.kconsole or something that exposes the
+kernel's idea of what should be on the screen so it can be mapped to a
+virtual console somewhere and fit into the scheme.  Also, the keyboard
+driver, while it's the most correct it's ever been**, still isn't entirely
+right, and the consoled doesn't (yet) check for the ALT key in conjuction
+with the fn key to do console switching.
+
+	*: It's fast enough that's it's not noticeably slower than a Linux
+console while you're typing (at the rate that I type, anyway!), but
+there's a noticeable lag when you have to scroll lines at the bottom of
+the screen.  However -- while coding it, I didn't remember that I had
+implemented arraycopy(), so this problem ought to go away.  (Right now,
+I'm in a Java byte-by-byte copy loop, which is possibly the least
+efficient way imaginable to do stuff like this.)
+
+	**: That I recall, anyway; right now the keyboard driver picks up
+on the *lock keys, though it only executes capslock correctly & doesn't
+change the keyboard leds; the FN keys work, the shifting is good (upper &
+local case as proper) on all the keys to which that applies.  However, the
+numeric keypad and other keys with long escape sequences don't work right,
+return doesn't induce a linefeed/carriage-return in the console (though
+this is probably more the fault of the console than the keyboard driver
+code!); tab doesn't work, backspace/delete, etc.
+
+	It's also very stable, and doesn't seem to miss any keystrokes.
+The only problem I've had with the current build was that it nuked itself
+with some kind of bad pointer on one console switch about twenty minutes
+of testing in.  I've since changed the code; hopefully it won't crop
+again, because I've got no idea what happened.
+
+	I haven't tried rewriting the VGA driver to use the
+mapByteArray() extension, but it should be pretty easy and make
+page-switching much easier.  (That is, you can just arraycopy() from a
+normal byte [] of the right size when the time comes.)  It should also
+improve performance enourmously.  (Assignment into an array is a one
+bytecode op with two words as arguments, translating into the bastore()
+call, followed by a call to store(), which will dump the value into the
+right place.  The function call machine.write() is a bytecode
+(invokevirtual) involving several symbol table lookups, a search through
+the builtins native code, and finally an ASM call to put the value into
+the right place.)
+
+	One more thing: the consoles decide when and when not to 'draw'
+themselves based on FocusEvent messages, so as long as all of our code is
+well-behaved w.r.t. to that, the consoled will ensure that no two virtual
+consoles are trying to write into the vga memory at the same time --
+which means things should be fairly stable even w/o security and/or memory
+protection.
+
+	I think that covers the current State of the Code from my end.
+This progress on the drivers does mean, however, that I haven't put any
+time in on integrating classpath.  (I want to learn CVS's source fork
+management before I do, because it's going to be an absolute mess for
+quite a while.)  In other news, it looks like some people are trying to
+put together an IP stack, and I might take a small detour and oblige them
+with a serial driver (if I can find docs!) to test against Linux SLIP***.
+George has re-integrated the GRUB stuff, and I'll be checking it against
+the etherboot stuff sometime this weekend, hopefully.  Other updates?
+
+-_Quinn
+
+*** And with a serial port driver, hacking up a VT100 emulator so your JOS
+machine will work as a serial terminal shouldn't be too difficult, either,
+right?  (For that matter, aren't there already VT100 terminal emulators
+for Java, albeit, ones designed for telnet apps?)
+
+
+
+
+From R.Argentini@student.tudelft.nl Sat, 20 Nov 1999 08:12:03 +0100
+Date: Sat, 20 Nov 1999 08:12:03 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] Progress!
+
+There was soemthing wrong with my subscriptio, and now the moderator got
+his own personal copy! Cheers moderator! :)
+
+>there's a noticeable lag when you have to scroll lines at the bottom of
+>the screen.
+
+If i remember correctly both Linux and it predecessor (minix) use hardware
+scrolling.
+You might want to add that functionality to either the console or the vga
+driver.
+
+>In other news, it looks like some people are trying to
+>put together an IP stack, and I might take a small detour and oblige them
+>with a serial driver (if I can find docs!) to test against Linux SLIP***.
+
+I'm sorry to sound so negative, but the stack is going to take a while to
+reach useable (tcp) level. Don't expect it to be fast either. Usually this
+code uses some tyical C approaches to memory, arrays, structs, unions and
+typecasts that force me to do most of my packet parsing with byte to byte
+copies.
+As a i said on the Arch list, tcp is going to be a major hassle to implement.
+
+On a lighter note, i would like JEPS (as i like to call the stack) to be
+more or less compatible with the way jjos handles its classes
+(NetworkInterfaceDriver is already a superclass of
+jos.platform.driver.Device), do any of you kernel persons have any hints on
+that?
+
+One other thing, if i have to handle multiple interfaces, i can't allow a
+call to any of them to block. The neat way of handling this would be the
+windows WaitForMultipleEvent way ..
+Pass it a list of events and wake me when one arrives. Then i can service
+it and wait upon that event list again. 
+Is an event structure like this going to be implemented?
+
+Ranieri Argentini. 
+
+
+
+From tmiller@haverford.edu Sat, 20 Nov 1999 03:11:29 -0500 (EST)
+Date: Sat, 20 Nov 1999 03:11:29 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Progress!
+
+> If i remember correctly both Linux and it predecessor (minix) use hardware
+> scrolling.
+> You might want to add that functionality to either the console or the vga
+> driver.
+
+	I don't know how to do this, and it would reduce the generality of
+the upper-level console driver to implement it.  Someone who knows more
+about hardware hackery than I is welcome to implement something like this
+in the lower edge, though.
+
+> >put together an IP stack, and I might take a small detour and oblige them
+> >with a serial driver (if I can find docs!) to test against Linux SLIP***.
+> 
+> I'm sorry to sound so negative, but the stack is going to take a while to
+> reach useable (tcp) level. Don't expect it to be fast either. Usually this
+> code uses some tyical C approaches to memory, arrays, structs, unions and
+> typecasts that force me to do most of my packet parsing with byte to byte
+> copies.
+
+	Okay, just let me know if/when a serial driver would come in handy
+for testing.  As for terrible C approaches to data structures, doesn't
+DataInputStream let you pull out varying primitive types? (They probably
+won't be in the right byte order, though...)
+
+> On a lighter note, i would like JEPS (as i like to call the stack) to be
+> more or less compatible with the way jjos handles its classes
+> (NetworkInterfaceDriver is already a superclass of
+> jos.platform.driver.Device), do any of you kernel persons have any hints on
+> that?
+
+	The driver architecture is about to undergo a fairly substantial
+change, and probably another one a few months after that, so I wouldn't
+get too attatched to your package names.  Aside from that, no, not really.
+John, you have anything more substantial to add?
+
+> One other thing, if i have to handle multiple interfaces, i can't allow a
+> call to any of them to block. The neat way of handling this would be the
+> windows WaitForMultipleEvent way ..
+> Pass it a list of events and wake me when one arrives. Then i can service
+> it and wait upon that event list again. 
+> Is an event structure like this going to be implemented?
+
+	Your driver can listen to any number of event sources, viz:
+
+interrupts.addInterruptListener( 9, this );
+interrupts.addInterruptListener( 10, this );
+interrupts.addInterruptListener( 11, this );
+
+	for three different interrupts, or
+
+driver-tree.interface0.addPacketListener(this);
+driver-tree.interface1.addPacketListener(this);
+driver-tree.interface2.addPacketListener(this);
+
+	and so on.  When its init() (or whatever) method exits,
+handleInterrupt() or packetReceived() method will be called; if the
+PacketEvent is done right, it would include the source object.  The
+only tricky bit is that the packetReceived() method might be called by
+three different threads.  It would therefore be wise to synchronize the
+method and have it do a minimum of work and wake up its own dedicated
+servicing thread(s).  Likewise, if you're listening for more than one type
+of event, two different functions might be executing 'simultaneously'.
+
+	On the other hand, does your stack have to be a soliton/static
+class?  Why not create stack objects (who share code but not state data),
+one to an interface?
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Sat, 20 Nov 1999 17:57:53 -0500
+Date: Sat, 20 Nov 1999 17:57:53 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Booting JOS from HD
+
+My JOS machine has an empty 500MB hard drive. It is a IBM PC compatible
+with 32MB RAM and a network card.
+
+I have heard that jJOS (or decaf?) can "boot" from within Linux. I haven't
+tried that yet. I have heard that jJOS/decaf can "boot" from a floppy,
+across the network, with Etherboot. I have heard that jJOS/decaf can "boot"
+from a master boot record of a hard drive with GRUB or its equivalent.
+
+Here is my question: It is possible to boot jJOS/decaf from LILO, the Linux
+loader? IF I installed Linux on my 500MB drive and replaced vmlinux boot
+image with jJOS/decaf, would that work? I'm familiar with the LILO and
+multiple boot on a single hard drive. I don't know much about GRUB or
+Etherboot.
+
+
+
+
+From tmiller@haverford.edu Sat, 20 Nov 1999 19:49:12 -0500 (EST)
+Date: Sat, 20 Nov 1999 19:49:12 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Booting JOS from HD
+
+> Here is my question: It is possible to boot jJOS/decaf from LILO, the Linux
+> loader? IF I installed Linux on my 500MB drive and replaced vmlinux boot
+> image with jJOS/decaf, would that work? I'm familiar with the LILO and
+> multiple boot on a single hard drive. I don't know much about GRUB or
+> Etherboot.
+
+	It wouldn't work.  LILO expects either (a) something with its own
+bootloader (eg. Win95, the other= lines) or (b) a linux kernel.  jJOS
+doesn't have (a) because it can use other solutions.  jJOS is not (b) and
+it would be enourmously difficult to make it look it were.  However, you
+should be able to parition your HD and make GRUB (b), and then load things
+from there.  However, I'd recommend poking around on the net for LILO/GRUB
+cross-booting.
+
+-_Quinn
+
+
+
+
+From mbz@starbellysoftware.com Sat, 20 Nov 1999 19:59:45 -0500
+Date: Sat, 20 Nov 1999 19:59:45 -0500
+From: Maciej Zawadzki mbz@starbellysoftware.com
+Subject: [JOS-Kernel] JOS from Floppy
+
+Hello,
+
+In various postings to this news group, I've heard about booting JOS from
+floppy.  I would be very interrested in finding out more about this.
+Personally, I do not have the epertise with GRUB or BOOTP or even LILO where
+I would feel comfortable getting things going.  Also, I do not have a spare
+machine with a HD that I can use as a JOS machine.  If possible to boot JOS
+from floppy, that would allow me to share my machine between JOS and my
+normal OS with minimum effects and possibilities of corruption of existing
+OS and data.
+
+If there is a way to boot JOS from floppy, I'd like to suggest that we put
+together a disk image with JOS that can be downloaded and trasferred onto a
+floppy.
+
+thanks,
+
+maciej
+
+
+
+
+From tmiller@haverford.edu Sun, 21 Nov 1999 02:07:46 -0500 (EST)
+Date: Sun, 21 Nov 1999 02:07:46 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] JOS from Floppy
+
+	The JOS boot-from-floppy is either (a) an etherboot floppy which
+then needs a bootp server or (b) a GRUB boot-floppy which means you'd need
+to learn GRUB.  My understanding is that a GRUB boot-floppy is not too
+hard to make.  While the JOS kernel/JVM will fit on a floppy, the class
+library is simply much too large...
+
+-_Quinn
+
+
+
+
+From R.Argentini@student.tudelft.nl Sun, 21 Nov 1999 13:36:48 +0100
+Date: Sun, 21 Nov 1999 13:36:48 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] Progress!
+
+>> Usually this
+>> code uses some tyical C approaches to memory, arrays, structs, unions and
+>> typecasts ... 
+>doesn't
+>DataInputStream let you pull out varying primitive types? 
+
+Hmm, it would appear it does .. how do i get the stream to pull its bytes
+from an array though? Or is an Array a child of InputStream so i can pass
+it directly to DatInputStream's only constructor?
+I'll play with it a bit as soon as i reboot into linux .. if i get it to
+work it might speed things up a bit and make code more readeable.
+
+>(They probably
+>won't be in the right byte order, though...)
+
+I'm afraid they won't be anyway because the network order is Big Endian and
+Intels aren't, although the virtual machine might be big endian, in which
+case we're set! (no more pesky htons() and ntohs() calls!!)
+
+>On the other hand, does your stack have to be a soliton/static
+>class?  Why not create stack objects (who share code but not state data),
+>one to an interface?
+
+I suppose that's a possibility. We would need the same degree of
+synchronisation for accessing the shared information (like routing etc)
+though. The fact is that there aren't many examples of OO IP stacks out
+there, so i'm working from striclty monolithic procedural sources (Linux
+and Internetworking with TCP/IP vol2 's Xinu) instead of modular OO like
+Jos is supposed to be.
+If anyone knows where to find an example of an OO tcp/ip stack, please tell
+me. I could really use some more info in analysing this..
+
+RA
+
+
+
+From tmiller@haverford.edu Sun, 21 Nov 1999 12:09:02 -0500 (EST)
+Date: Sun, 21 Nov 1999 12:09:02 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] GRUB fixes
+
+	Committed George Marrow's GRUB fixes to the CVS after testing the
+etherboot stuff.  George, if you'd be so kind, could you write up GRUB
+instructions for inclusions in JJOS/docs?
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Sun, 21 Nov 1999 19:22:23 -0500
+Date: Sun, 21 Nov 1999 19:22:23 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Progress!
+
+At 01:36 PM 11/21/99 +0100, Ranieri Argentini
+<R.Argentini@student.tudelft.nl> wrote:
+>If anyone knows where to find an example of an OO tcp/ip stack, please tell
+>me. I could really use some more info in analysing this..
+
+Building a prototype in Java code might explain how the IP stack does what
+it does. The "source" of the packets can be a OS file. Or, a program can
+create packets pseudo-randomly. A TCP/IP stack is a sparsely populated
+array of IP packet queues and a kind of IP packet listener.
+
+While it manages 65,536 ports, all of these ports are rarely used at once.
+In addition, the low-level network driver is not complex. It is a packet
+source; it passes the raw packet from native code to an entry point in
+bytecode. The bytecode constructs a incoming packet queue, so that no
+packets are lost.
+
+The first class is a model of a network packet.
+
+public interface Packet {
+:
+  int getSourceHost();
+  int getSourcePort();
+  int getTargetHost();
+  int getTargetPort();
+:
+  byte[] getData();
+}
+
+public class BasicPacket
+    implements Packet {
+  public BasicPacket( byte[] v ) {
+  }
+:
+  private byte[] raw_data;
+}
+
+public interface PacketListener {
+  public void onPacket( Packet v );
+}
+
+A TCP/IP stack is used by a network card driver. All incoming packets are
+stuffed into a Packet object and passed to the TCP/IP stack.
+
+  public void incoming_packet( byte[] v ) {
+    listener.onPacket( new Packet( v ) );
+  }
+
+From the other perspective of a sparsely populated array of PacketQueues, a
+PacketQueue is also a PacketListener. A packet queue is available
+(virtually) at every IP port (from 0 to 65,565).
+
+I believe the TCP/IP project is important for the future of the JOS project
+because it enables critical inter-process communication (IPC) and
+inter-machine communication. With a TCP/IP stack, a single-step mechanism
+and non-console trace can be introduced into a JOS JVM for additional
+debugging.
+
+While the driver software constantly reads all incoming packets, throws
+away packets that are not targeted for this TCP/IP stack, throws away
+packets that have no corresponding packet queue associated with a port.
+When a ServerSocket "opens" a port, a PacketQueue is opened for that port.
+Only that ServerSocket can read the packets in its PacketQueue. Each
+connection, of course, creates an incoming packet queue for the
+stack-assigned port. Only that Socket can read the packets in its PacketQueue.
+
+Almost all of this OO design can be written and refined in Java. Incoming
+packets can be single- or double-queued. Outgoing packets should be
+single-queued, one outgoing queue for the stack instead of one outgoing
+queue for each port.
+
+The only non-Java part is between the NIC and native code that calls
+incoming_packet( byte[] v ).
+
+Interface
+  Packet
+  Stack
+  PacketQueue
+  PacketSource
+  Socket
+  ServerSocket
+Class
+  BasicPacket
+  BasicStack
+  BasicPacketQueue
+  BasicSocket
+  BasicServerSocket
+  FilePacketSource
+  RandomPacketSource
+
+I look forward to using it.
+
+
+
+
+From onewith1@flash.net Sun, 21 Nov 1999 21:26:33 -0600
+Date: Sun, 21 Nov 1999 21:26:33 -0600
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] Progress!
+
+Ranieri Argentini <R.Argentini@student.tudelft.nl> wrote:
+> >> Usually this
+> >> code uses some tyical C approaches to memory, arrays, structs, unions
+and
+> >> typecasts ...
+> >doesn't
+> >DataInputStream let you pull out varying primitive types?
+>
+> Hmm, it would appear it does .. how do i get the stream to pull its bytes
+> from an array though? Or is an Array a child of InputStream so i can pass
+> it directly to DatInputStream's only constructor?
+> I'll play with it a bit as soon as i reboot into linux .. if i get it to
+> work it might speed things up a bit and make code more readeable.
+>
+
+You can always use ArrayInputStream, giving the Array as the input, then use
+that in the paramter to DataInputStream's constructor.
+
+-Matt
+
+
+
+
+From R.Argentini@student.tudelft.nl Mon, 22 Nov 1999 10:22:26 +0100
+Date: Mon, 22 Nov 1999 10:22:26 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] Progress!
+
+>A TCP/IP stack is used by a network card driver. All incoming packets are
+>stuffed into a Packet object and passed to the TCP/IP stack.
+
+How would you evision multithreading in such an environment?
+I'm currently toying with the idea of giving every interface it's own
+thread  and it's own objects (that would give me a neat Multiple
+Cache/Local Replacement ARP cache and some other link level enhancements
+when we'll support other hardware then ethernet.).
+
+The problem is that this model grinds to a halt when it comes to the IP layer.
+IP is responsible for distributing packets among interfaces, and can
+therefore not be bound to any of them.
+
+The only thing that comes to mind is to have a single IP object that queues
+incoming packets for all interfaces. This requires strict serialisation on
+the incoming_packet() functions. A thread that lives in IP could then
+handle the packets (route them through, drop them or reassemble them and
+queue them to TCP/UDP objects that eventually put them into user space
+buffers).
+
+Does anyone see a problem with this strategy? Speak up now if you do!
+
+>From the other perspective of a sparsely populated array of PacketQueues, a
+>PacketQueue is also a PacketListener. A packet queue is available
+>(virtually) at every IP port (from 0 to 65,565).
+
+Hmm, IP does not have ports. UDP and TCP do. This structure belongs over
+there when i get there :)
+
+Btw, quick update.
+
+I finally got the linux kernel to let me bind a PF_PACKET socket to a
+specific interface, so multiple interfaces support is coming up, probably
+with the scheme outlined above.
+I implemented a quick ARP cache that violates every RFC  in the book, but
+sort of does something. I would like to let it respond to ARP queries to
+try and get it to bind an IP adress other than the linux card one. I hope
+linux does not go bananas with this, but since i get the packets before
+they go through the linux stack i give myself decent odds of doing this :)
+
+
+
+
+
+From George.Marrows@Smallworld.co.uk Mon, 22 Nov 1999 09:55:48 -0000
+Date: Mon, 22 Nov 1999 09:55:48 -0000
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] FW: [JOS-Kernel] GRUB fixes
+
+All would be GRUB booters --
+
+I've written some instructions on how to create a bootable GRUB floppy, and
+how to use that floppy to boot a JJOS kernel sitting on a local hard drive.
+They're at:
+
+http://www.triptych.freeserve.co.uk/grub/index.html
+
+There's no need to worry about compiling GRUB as I've put the necessary exes
+there too. You will still need to compile the JOS code, though. Now that
+Todd's checked in the fixes, you don't need the grubfix.tgz - skip to the
+make jjos-grub bit.
+
+This is the least invasive way of using GRUB - nothing gets written to your
+hard disk at all, so it is perfectly save to give it a whirl. (Please do!
+I'd love to hear from someone who's got it working...)
+
+The GRUB source source is there too, and this contains full (if slightly
+cryptic) instructions on how to install GRUB on your hard disk as your
+standard boot loader. If this scares the pants off you (it did me!), I'll
+try and help out. It does work very nicely though ...
+
+I'll make sure the JJOS/docs get updated.
+
+-- George
+
+> -----Original Message-----
+> From:	Todd L. Miller [SMTP:tmiller@haverford.edu]
+> Sent:	Sunday, November 21, 1999 17:09
+> To:	kernel@jos.org
+> Subject:	[JOS-Kernel] GRUB fixes
+> 
+> 	Committed George Marrow's GRUB fixes to the CVS after testing the
+> etherboot stuff.  George, if you'd be so kind, could you write up GRUB
+> instructions for inclusions in JJOS/docs?
+> 
+> -_Quinn
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From hilarycheng@usa.net Mon, 22 Nov 1999 21:58:48 +0800
+Date: Mon, 22 Nov 1999 21:58:48 +0800
+From: Hilary Cheng hilarycheng@usa.net
+Subject: [JOS-Kernel] Progress!
+
+Hi All,
+
+    For the Networking Issue, is that EDLC Protocol need to implement ?
+Is that we send IP Data directly to Network Chip ?
+
+Regards,
+
+Hilary
+
+----- Original Message -----
+From: Ranieri Argentini <R.Argentini@student.tudelft.nl>
+To: <kernel@jos.org>
+Sent: Monday, November 22, 1999 5:22 PM
+Subject: Re: [JOS-Kernel] Progress!
+
+
+>>A TCP/IP stack is used by a network card driver. All incoming packets are
+>>stuffed into a Packet object and passed to the TCP/IP stack.
+>
+>How would you evision multithreading in such an environment?
+>I'm currently toying with the idea of giving every interface it's own
+>thread  and it's own objects (that would give me a neat Multiple
+>Cache/Local Replacement ARP cache and some other link level enhancements
+>when we'll support other hardware then ethernet.).
+>
+>The problem is that this model grinds to a halt when it comes to the IP
+layer.
+>IP is responsible for distributing packets among interfaces, and can
+>therefore not be bound to any of them.
+>
+>The only thing that comes to mind is to have a single IP object that queues
+>incoming packets for all interfaces. This requires strict serialisation on
+>the incoming_packet() functions. A thread that lives in IP could then
+>handle the packets (route them through, drop them or reassemble them and
+>queue them to TCP/UDP objects that eventually put them into user space
+>buffers).
+>
+>Does anyone see a problem with this strategy? Speak up now if you do!
+>
+>>From the other perspective of a sparsely populated array of PacketQueues,
+a
+>>PacketQueue is also a PacketListener. A packet queue is available
+>>(virtually) at every IP port (from 0 to 65,565).
+>
+>Hmm, IP does not have ports. UDP and TCP do. This structure belongs over
+>there when i get there :)
+>
+>Btw, quick update.
+>
+>I finally got the linux kernel to let me bind a PF_PACKET socket to a
+>specific interface, so multiple interfaces support is coming up, probably
+>with the scheme outlined above.
+>I implemented a quick ARP cache that violates every RFC  in the book, but
+>sort of does something. I would like to let it respond to ARP queries to
+>try and get it to bind an IP adress other than the linux card one. I hope
+>linux does not go bananas with this, but since i get the packets before
+>they go through the linux stack i give myself decent odds of doing this :)
+>
+>
+>
+>_______________________________________________
+>Kernel maillist  -  Kernel@jos.org
+>http://jos.org/mailman/listinfo/kernel
+>
+>
+
+
+
+
+From gchii@mindspring.com Mon, 22 Nov 1999 10:49:39 -0500
+Date: Mon, 22 Nov 1999 10:49:39 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Progress!
+
+At 10:22 AM 11/22/99 +0100, Ranieri Argentini
+<R.Argentini@student.tudelft.nl> wrote:
+>How would you evision multithreading in such an environment?
+
+A packet queue is a packet queue. The outgoing packet queue and packet
+queue for each port are identical, just wired in different directions. It
+does not run in its own thread.
+
+When incoming packets are double-queued, network driver and IP layer are
+running in two separate threads. The network driver pushes packets onto the
+IP packet queue. The IP layer pushes packets into the UDP or TCP packet
+queue, where there is a packet queue for each port used. This allows the
+network driver to run ahead of the incoming packet queue without losing
+packets. It allows the IP layer to run ahead of applications programs
+without losing packets.
+
+TCP usually has duplicate packet elimination. TCP is responsible for
+resequencing/eliminating packets so they arrive in a packet queue for a TCP
+port in the order they were sent. This doesn't need to run in a separate
+thread.
+
+A network driver and IP layer can be integrated in a single thread. When
+incoming packets are single-queued, a network driver does both. It recieves
+packets and pushes them to the right packet queue for each port.
+
+Outgoing packets are much easier to implement than incoming packets. Any
+thread, including high-level application threads, can write a packet into
+the outgoing queue. It does not run in a separate thread; it uses the
+timeslice of calling threads. While running in its own thread, the network
+driver reads from this queue whenever there's an opportunity to send an
+outgoing packet.
+
+When an application writes a packet for its own machine, an outgoing packet
+is immediately -- without delay -- written into the TCP/IP stack, with its
+packet queue for each port. Again, this mechanism uses the timeslice of a
+calling thread. The IP layer needs no thread of its own.
+
+>I'm currently toying with the idea of giving every interface it's own
+>thread  and it's own objects (that would give me a neat Multiple
+>Cache/Local Replacement ARP cache and some other link level enhancements
+>when we'll support other hardware then ethernet.).
+
+Threads should be used when they are required. It might be a clean design
+to given each layer of the network model its own thread. Threads are
+refined after you build a class library and work with the model. It isn't a
+decision you must make on day one.
+
+>The problem is that this model grinds to a halt when it comes to the IP
+layer.
+>IP is responsible for distributing packets among interfaces, and can
+>therefore not be bound to any of them.
+
+The IP layer can be integrated or separate from a network driver. It is a
+question of whether the IP layer has its own thread, or not.
+
+>The only thing that comes to mind is to have a single IP object that queues
+>incoming packets for all interfaces. This requires strict serialisation on
+>the incoming_packet() functions. A thread that lives in IP could then
+>handle the packets (route them through, drop them or reassemble them and
+>queue them to TCP/UDP objects that eventually put them into user space
+>buffers).
+
+A single IP object queues incoming packets and recieves outgoing packets.
+When the IP object is asked to send an outgoing packet to itself, there is
+no delay. Such a packet is *never* sent to hardware.
+
+>Hmm, IP does not have ports. UDP and TCP do. This structure belongs over
+>there when i get there :)
+
+You're right. IP does not have ports. UDP and TCP have ports.
+
+An IP address is four octets. It is generally written in decimal dot
+notation, like 4.65.6.119. An IP datagram starts with an IP header. This
+header has a source IP address and a target IP address. The UDP and TCP
+port is considered raw data to the IP layer.
+
+Personally, I recommend Pete Loshin's simple description of TCP/IP in his
+boot "TCP/IP Clearly Explained," published by Academic Press.
+
+
+
+
+From R.Argentini@student.tudelft.nl Mon, 22 Nov 1999 20:55:18 +0100
+Date: Mon, 22 Nov 1999 20:55:18 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] Progress!
+
+>    For the Networking Issue, is that EDLC Protocol need to implement ?
+>Is that we send IP Data directly to Network Chip ?
+
+Actually i have no idea.
+I momentarily use a linux PF_PACKET socket to do my I/O. I finally managed
+binding this thing to an interface (e.g. eth0) and use a single native
+method to read info from that socket.
+The way i'm thinking about this is that the network interface layer
+assembles an ethernet 802.3 frame and then in some magical way (i.e.
+through a device driver that might be either Java or native) gets it onto
+the network.
+I am not making any assumptions yet as on how this exactly will work.
+The thing i would like most is of the form
+
+NE2000EthernetDriver.write(byte[]) or (on a slightly higher level)
+NE2000EthernetDriver.write(EthernetPacket);
+
+Hope this sort of cleared it up ...
+
+RA.
+
+
+
+From ajregier@earthlink.net Mon, 22 Nov 1999 21:30:31 -0600
+Date: Mon, 22 Nov 1999 21:30:31 -0600
+From: Avery J. Regier ajregier@earthlink.net
+Subject: [JOS-Kernel] Adventures with GRUB
+
+George,
+
+I tried it....
+
+...it didn't work.  :(
+
+I created the floppy and compiled JJOS as per instructions.
+Putting in the GRUB commands worked well.
+After the boot command, I recieved a screen's worth of data and at the bottom:
+	argvlocal[00000001] = init
+	bailing out on #00000002
+
+So apparently it didn't like just having one argument to the
+kernel=..../jjos-grub init?
+
+Any ideas?
+
+Thanks,
+Avery J. Regier
+
+
+
+From tmiller@haverford.edu Mon, 22 Nov 1999 22:26:20 -0500 (EST)
+Date: Mon, 22 Nov 1999 22:26:20 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Adventures with GRUB
+
+> After the boot command, I recieved a screen's worth of data and at the bottom:
+> 	argvlocal[00000001] = init
+> 	bailing out on #00000002
+
+	Nope.  Bailing out on #2 means that it only found two arguments,
+which is the Right Thing (.../jjos-grub and init).  I just finished trying
+it last night myself, and it worked fine over here.  Did you get the
+latest CVS stuff?
+
+-_Quinn
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Tue, 23 Nov 1999 07:20:16 -0600
+Date: Tue, 23 Nov 1999 07:20:16 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] Adventures with GRUB
+
+Yes, I got the latest CVS stuff.
+
+So you are saying that the grub messages were fine?  I guess this means that
+JJOS didn't start correctly for some reason.  
+
+I did have some trouble with making the jjos-common.zip file.  The Makefiles
+seem to be out of whack.  For instance the /JJOS/common/bytecode/Makefile
+has as the Prefix ../../../common/bytecode/ .  That is one ../ too many, and
+doing make in that directory fails.  If I edit out one of the ../ it still
+doesn't create the .zip file.  I probably could have figured it out if I had
+a little more time, but I didn't.  I was able to use a zip file in
+/JJOS/arch/i386/bytecode/jjos.zip.  It seemed to be the same thing.  I
+thought that /common was supposed to be under /JJOS/arch.  Did somehow the
+directory structure get screwed up?
+
+Thanks,
+Avery J. Regier
+
+> -----Original Message-----
+> From:	Todd L. Miller [SMTP:tmiller@haverford.edu]
+> Sent:	Monday, November 22, 1999 10:26 PM
+> To:	kernel@jos.org
+> Subject:	Re: [JOS-Kernel] Adventures with GRUB
+> 
+> > After the boot command, I recieved a screen's worth of data and at the
+> bottom:
+> > 	argvlocal[00000001] = init
+> > 	bailing out on #00000002
+> 
+> 	Nope.  Bailing out on #2 means that it only found two arguments,
+> which is the Right Thing (.../jjos-grub and init).  I just finished trying
+> it last night myself, and it worked fine over here.  Did you get the
+> latest CVS stuff?
+> 
+> -_Quinn
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From tmiller@haverford.edu Tue, 23 Nov 1999 16:23:35 -0500 (EST)
+Date: Tue, 23 Nov 1999 16:23:35 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Adventures with GRUB
+
+> So you are saying that the grub messages were fine?  I guess this means that
+> JJOS didn't start correctly for some reason.  
+
+	Actually, 'bailing out on #N' comes from the jJOS argument
+parsing that goes on right before /decaf/ starts up, so I'm not sure what,
+exactly, the problem is.  (Look in entry.cc: the last call before
+decaf_main() is process_args, which will print the 'bailing out' bit if
+debug is on. (ln 89))
+
+> I did have some trouble with making the jjos-common.zip file. The Makefiles
+> seem to be out of whack.  For instance the /JJOS/common/bytecode/Makefile
+> has as the Prefix ../../../common/bytecode/ .  That is one ../ too many, and
+> doing make in that directory fails.  If I edit out one of the ../ it still
+> doesn't create the .zip file.  I probably could have figured it out if I had
+> a little more time, but I didn't.  I was able to use a zip file in
+> /JJOS/arch/i386/bytecode/jjos.zip.  It seemed to be the same thing.  I
+> thought that /common was supposed to be under /JJOS/arch.  Did somehow the
+> directory structure get screwed up?
+
+	JJOS/arch/i386/bytecode/jjos.zip is the right zipfile.  The
+Makefile in JJOS/common/bytecode -- any Makefile NOT in arch/*/nativecode
+(except possibly the GC) is NOT used directly.  They're included into the
+arch/*/nativecode Makefile and built from there.  That is, your build
+sequence should look like this:
+
+JJOS/arch/i386/nativecode$ make clean
+...[There should be no *.o files, and ../bytecode/jjos.zip, along with all
+	the class files in ../../../common/bytecode, should vanish.]
+JJOS/arch/i386/nativecode$ make jjos-grub
+...[The object files are rebuilt, and javac is called to rebuild the class
+	files; find is used to pass arguments in to zip, which will print
+	out the name of the classes its including in the zipfile.  This
+	zipfile (../../../common/bytecode/jjos-common.zip) is just copied
+	into the ../bytecode/jjos.zip location.  This will change.]
+JJOS/arch/i386/nativecode$ 
+
+	'make jjos-grub' should rebuild the classfile and copy it into
+../bytecode/jjos.zip.  The three '..' in the common/bytecode Makefile
+refere to its position relative to arch/*/nativecode.  The whole Java side
+of the Makefile system will probably be redone when I commit the new
+interrupt handling stuff; it's really quite a hack right now, and probably
+won't work too well with architecture-specific bytecode.
+
+	W.r.t. to the directory structure, 'common' and 'arch' are at the
+same depth from 'JJOS'.
+
+-_Quinn
+
+
+
+
+From gchii@mindspring.com Tue, 23 Nov 1999 19:49:30 -0500
+Date: Tue, 23 Nov 1999 19:49:30 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Bulk Make for Java
+
+We need all kinds of programming tools for JOS (right?). JOS is going to be
+pure bytecode someday (right?). Who is going to developing these
+mostly-bytecode tools?
+
+We should programs written in bytecode to "make" JJOS/decaf on Linux. I
+created a few bulk "make" programs for myself in order to finish a JOS
+distribution. Each program is "package-oriented" so that you make a
+package, not individual classes.
+
+Bulk Clean - removes all .class files in a package
+$ bulkclean path=$ package=org.jos.demo [show=all]
+
+Bulk Copy - copies .java files package-by-package
+$ bulkcopy path=/usr/local/example package=org.jos.demo [show=all]
+
+Bulk Compile - compiles all .class files (if necessary)
+$ bulkcompile extrapath=/usr/local/extra.jar package=org.jos.demo [show=all]
+
+Bulk Archive - archives all .class files in a package
+$ bulkarchive archive=demo.jar
+
+All of this can be scripted. All of this can be interactive.
+
+My questions are these: Is anyone else working on mostly-bytecode tools?
+
+My shell scripts work only for me on my machine. JNI is used to create an
+executable program that runs on any Linux machine (like make and find). Has
+anyone written a Java Native Interface program on Linux?
+
+
+
+
+From George.Marrows@Smallworld.co.uk Wed, 24 Nov 1999 17:14:43 -0000
+Date: Wed, 24 Nov 1999 17:14:43 -0000
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] Next version of jjos / decaf garbage collection
+
+I'm currently doing design work / back-of-envelope-scribbling for what I
+hope will be the next version of the garbage collector for jjos / decaf.
+Here's what I'm planning,  roughly in the order that I intend to do the
+work:
+
+1.  Rewrite in C++. Avoid assumptions about 32-bit pointers to simplify
+later ports.
+2.  Rework it to be a generational collector. This should decrease the
+average pause time by performing lots of little garbage collects, rather
+than the occasional big one (these would still be needed, but less
+frequently).
+3.  Tune and optimise.
+4.  Add support for finalisation.
+5.  Add support for weak references.
+
+As part of this work, I'll need to put in simple support for virtual memory.
+This is so that the generational collector can find dirty pages that might
+have had inter-generational pointers stored into them. Also, the extra
+breathing space offered by a 4Gb virtual address space might simplify some
+aspects of heap layout. I'll put out a brief 'spec' before carrying out this
+work so that people can comment. Of course, if someone wanted to beat me to
+it...
+
+One thing to ponder is whether all the above work is worthwhile - the
+Boehm-Demers garbage collector does all the above and more (eg concurrent gc
+apparently), is freely available and usable, and has been developed and
+widely used for over a decade, so is very stable. Integrating that might be
+a better way to get JOS to progress (though perhaps less fun for me :-).
+
+Some other musings:
+
+· There should be another mail of mine floating around on the arch list
+containing thoughts on how to deal with real-time aspects of device drivers.
+Does anyone have any idea if what I propose there will be sufficient, or
+does more thought need to be given to it?
+
+· The current GC and the one proposed above are conservative (see the FAQ
+below for what this means). An upshot of this is that objects can't be moved
+once allocated, and this restricts the type of gc algorithms that can be
+used. There are a number of possibilities for making the garbage collector
+more accurate and thus able to move objects:
+1. Separate C++ heap from which objects are explicitly freed.
+2. Separate C++ heap which is conservatively gc'd.
+3. Get hold of C++ object and stack layout from the compiler. I haven't
+fully investigated this, but it would seem that the stabs debug information
+produced by g++ should contain all the information needed. Whether this is
+true when the optimisation levels are cranked up is not clear.
+
+Todd - didn't you let slip in a mail recently that you'd had some thoughts
+about Java v C++ gc? Care to elaborate?
+
+Anything else I should be considering? Any other comments?
+
+And finally, a handy GC FAQ: http://www.iecc.com/gclist/GC-faq.html
+
+-- George
+
+
+
+
+
+From gchii@mindspring.com Wed, 24 Nov 1999 16:11:52 -0500
+Date: Wed, 24 Nov 1999 16:11:52 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Booting JOS - RARP and BOOTP
+
+I am looking forward to using GRUB to boot JOS from a hard drive.
+
+Meanwhile, I haven't given up booting my JOS machine across the network
+from my Linux server. My JOS machine doesn't "connect" with BOOTP.
+
+Question: Is a Reverse Address Resolution Protocol (RARP) service required
+for BOOTP to work?
+
+My book on TCP/IP hints that it might be.
+
+Question: Does my Linux server run a RARP service automatically?
+
+If I had to guess, I would say that Linux doesn't run RARP unless you
+configure it that way.
+
+
+
+
+From whooops@gmx.de Thu, 25 Nov 1999 00:20:59 +0000
+Date: Thu, 25 Nov 1999 00:20:59 +0000
+From: Mark Andreas Meyer whooops@gmx.de
+Subject: [JOS-Kernel] Booting JOS - RARP and BOOTP
+
+Gilbert Carl Herschberger II wrote:
+> 
+> I am looking forward to using GRUB to boot JOS from a hard drive.
+> 
+> Meanwhile, I haven't given up booting my JOS machine across the network
+> >from my Linux server. My JOS machine doesn't "connect" with BOOTP.
+> 
+> Question: Is a Reverse Address Resolution Protocol (RARP) service required
+> for BOOTP to work?
+> 
+> My book on TCP/IP hints that it might be.
+
+The Stevens reads on page 222:
+"BOOTP uses UDP and is intended as an alternative to RARP for bootstrapping a
+diskless system to find its IP address."
+
+> Question: Does my Linux server run a RARP service automatically?
+
+I don't know your GNU/Linux server.
+
+> If I had to guess, I would say that Linux doesn't run RARP unless you
+> configure it that way.
+
+On the 2.0 you'll even have to tell the kernel to do it.
+
+Regards, Mark#
+-- 
+"C combines all the power of assembly language with all the 
+ease of use of assembly language"  - trad
+
+
+
+From jewel@pixie.co.za Wed, 24 Nov 1999 10:35:10 +0200 (SAST)
+Date: Wed, 24 Nov 1999 10:35:10 +0200 (SAST)
+From: John Leuner jewel@pixie.co.za
+Subject: [JOS-Kernel] Bulk Make for Java
+
+> We need all kinds of programming tools for JOS (right?). JOS is going to be
+> pure bytecode someday (right?). Who is going to developing these
+> mostly-bytecode tools?
+> 
+> We should programs written in bytecode to "make" JJOS/decaf on Linux. I
+> created a few bulk "make" programs for myself in order to finish a JOS
+> distribution. Each program is "package-oriented" so that you make a
+> package, not individual classes.
+
+Are these programs just normal java programs, or do they use a UNIX 'make'
+type language?
+
+I would far prefer a version of 'make' written in Java, since it allows
+you to do all the stuff mentioned below (although it doesn't know about
+packages) and much much more.
+
+ 
+> Bulk Clean - removes all .class files in a package
+> $ bulkclean path=$ package=org.jos.demo [show=all]
+> 
+> Bulk Copy - copies .java files package-by-package
+> $ bulkcopy path=/usr/local/example package=org.jos.demo [show=all]
+> 
+> Bulk Compile - compiles all .class files (if necessary)
+> $ bulkcompile extrapath=/usr/local/extra.jar package=org.jos.demo [show=all]
+> 
+> Bulk Archive - archives all .class files in a package
+> $ bulkarchive archive=demo.jar
+> 
+> All of this can be scripted. All of this can be interactive.
+> 
+> My questions are these: Is anyone else working on mostly-bytecode tools?
+> 
+> My shell scripts work only for me on my machine. JNI is used to create an
+> executable program that runs on any Linux machine (like make and find). Has
+> anyone written a Java Native Interface program on Linux?
+
+I don't see why you want to use JNI to accomplish this. You can call
+system processes with something like System.exec if you want to run
+processes on the Host Os. Programs like make and find don't need 'native'
+access, they just need to access the file system in the normal java way.
+
+John Leuner
+
+
+
+
+
+From gchii@mindspring.com Thu, 25 Nov 1999 18:17:13 -0500
+Date: Thu, 25 Nov 1999 18:17:13 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Bulk Make for Java
+
+At 10:35 AM 11/24/99 +0200, John Leuner <jewel@pixie.co.za> wrote:
+>Are these programs just normal java programs, or do they use a UNIX 'make'
+>type language?
+
+These are exclusively for making Java programs. I put them on auto-pilot.
+Nothing to configure. Nothing to script.
+
+>I would far prefer a version of 'make' written in Java, since it allows
+>you to do all the stuff mentioned below (although it doesn't know about
+>packages) and much much more.
+
+I've heard about a JMake that runs UNIX 'make' scripts.
+
+>I don't see why you want to use JNI to accomplish this. You can call
+>system processes with something like System.exec if you want to run
+>processes on the Host Os. Programs like make and find don't need 'native'
+>access, they just need to access the file system in the normal java way.
+
+There are two very different sides to JNI. I'm thinking of the Invocation
+API. You're thinking of the native method API. I want to use the Invocation
+API in a Linux program.
+
+The Invocation API is used to start one or more Java virtual machines. A
+Java-enabled browser is expected to use the JNI to start applets. The
+Netscape Navigator browser, for example, uses the Invocation API to create
+a virtual machine for your applets.
+
+While the native method API integrates the native OS into the Java
+platform, the Invocation API integrates the Java platform into the native OS.
+
+All the tools use the Invocation API: java, javac, javah, javap, javadoc,
+rmiserver and servletrunner.
+
+
+
+
+From gchii@mindspring.com Thu, 25 Nov 1999 22:09:49 -0500
+Date: Thu, 25 Nov 1999 22:09:49 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Progress!
+
+I am very much interested in (re)compiling jeps0001a on my Linux box.
+
+Which JDK are you using?
+
+Where can I get a copy?
+
+You are using JNI the way JNI should be used for the JOS Project.
+Regardless of speed, it is a great way to develop in a mixed C/C++ and Java
+environment.
+
+
+
+
+From gchii@mindspring.com Thu, 25 Nov 1999 22:04:52 -0500
+Date: Thu, 25 Nov 1999 22:04:52 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [TCP/IP Stack] HWAddr suggestions
+
+Here are my first suggestion for HWAddr.
+
+class HWAddr
+{
+  static final int SIZE = 6;
+
+  byte[] addr = new byte[ SIZE ];
+
+  HWAddr( byte[] raw, int offset )
+  {
+    System.arraycopy( raw, offset, addr, 0, SIZE );
+  }
+};
+
+Pass the entire raw array to HWAddr constructor. In C, it is just like
+
+    char *raw = "a-very-long-string";
+    puts( raw );
+
+Inside EtherPacket.java,
+
+    dest = new HWAddr(raw[0],raw[1],raw[2],raw[3],raw[4],raw[5]);
+
+becomes
+
+    dest = new HWAddr( raw, 0 );
+
+and
+
+    src = new HWAddr(raw[6],raw[7],raw[8],raw[9],raw[10],raw[11]);
+
+becomes
+
+    src = new HWAddr( raw, 6 );
+
+-----
+
+Going to the next level...
+
+In the interest of high performance, bytes from an ethernet packet do not
+have to be duplicated in HWAddr. The HWAddr object is immutable. It points
+to the MAC Address. It might be written something like this:
+
+class HWAddr
+{
+  byte[] raw;
+  int offset;
+
+  HWAddr( byte[] r, int o )
+  {
+    raw = r;
+    offset = o;
+  }
+};
+
+-----
+
+Going to the next level: If you wanted to split HWAddr into SourceAddr and
+TargetAddress, you'd have this:
+
+    dest = new HWAddr( raw, 0 );
+
+becomes
+
+    dest = new SourceAddr( raw );
+
+and
+
+    src = new HWAddr( raw, 6 );
+
+becomes
+
+    src = new TargetAddr( raw );
+
+SourceAddr and TargetAddr share all of the same behavior, except for offset
+and class name.
+
+class SourceAddr
+{
+  static final int OFFSET = 0;
+
+  byte[] raw;
+
+  SourceAddr( byte[] r )
+  {
+    raw = r
+  }
+};
+
+and
+
+class TargetAddr
+{
+  static final int OFFSET = 6;
+
+  byte[] raw;
+
+  TargetAddr( byte[] r )
+  {
+    raw = r;
+  }
+};
+
+
+
+
+From gchii@mindspring.com Thu, 25 Nov 1999 22:13:20 -0500
+Date: Thu, 25 Nov 1999 22:13:20 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] [TCP/IP Stack] JNI on Linux
+
+I am very much interested in (re)compiling jeps0001a on my Linux box.
+
+Which JDK are you using?
+
+Where can I get a copy?
+
+You are using JNI the way JNI should be used for the JOS Project.
+Regardless of speed, it is a great way to develop in a mixed C/C++ and Java
+environment.
+
+
+
+
+From R.Argentini@student.tudelft.nl Fri, 26 Nov 1999 23:28:18 +0100
+Date: Fri, 26 Nov 1999 23:28:18 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] Progress!
+
+>Which JDK are you using?
+
+I'm using blackdown.org's 1.1.6 (or .8 .. can't seem to remember), but i'm
+not using any not-1.0 functions that i'm aware of, so it should work on
+almost everything.
+Btw, i put up a new version (0.001b) that does some ARP. 
+
+>Where can I get a copy?
+
+http://villa28.cs.kpn.cx/jos/
+
+Or look on the TCPIPStack topic of the wiki.
+
+
+
+
+From R.Argentini@student.tudelft.nl Fri, 26 Nov 1999 23:36:50 +0100
+Date: Fri, 26 Nov 1999 23:36:50 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] Progress!
+
+>> Hmm, it would appear it does .. how do i get the stream to pull its bytes
+>> from an array though? Or is an Array a child of InputStream so i can pass
+>> it directly to DatInputStream's only constructor?
+>You can always use ArrayInputStream, giving the Array as the input, then use
+>that in the paramter to DataInputStream's constructor.
+
+Ok, you lost me here ... my java.io.* or java.lang.* don't seem to have an
+ArrayInputStream class. I'm a using an old version of the JDK or something?
+If so, which one should i get?
+
+RA
+
+
+
+From gchii@mindspring.com Fri, 26 Nov 1999 21:16:24 -0500
+Date: Fri, 26 Nov 1999 21:16:24 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Progress!
+
+At 11:36 PM 11/26/99 +0100, Ranieri Argentini
+<R.Argentini@student.tudelft.nl> wrote:
+>Ok, you lost me here ... my java.io.* or java.lang.* don't seem to have an
+>ArrayInputStream class. I'm a using an old version of the JDK or something?
+>If so, which one should i get?
+
+ByteArrayInputStream and ByteArrayOutputStream have been around a while,
+since Java 1.0.x. I'm sure you don't need a new JDK.
+
+If you have a byte array and want to read it as if it were an input stream,
+you create a ByteArrayInputStream, something like this:
+
+byte[] buf;
+InputStream is = new ByteArrayInputStream( buf );
+
+If you find some component that sends its data to an output stream and you
+really want a byte array, you create a ByteArrayOutputStream and use it to
+catch the output. After all the data is written, you can get a byte array,
+something like this:
+
+ByteArrayOutputStream os = new ByteArrayOutputStream();
+:
+byte[] buf = os.getByteArray();
+
+The ByteArrayOutputStream uses a byte array to store its data. When it
+fills up its buffer, it creates a bigger array. The old array is garbage
+collected eventually. The idiom is something like this:
+
+  public void write( byte b ) {
+    try {
+      buf[ size ] = b;
+      size++;
+    }
+    catch( ArrayIndexOutOfBoundsException e ) {
+      byte[] temp = new byte[ size + STEP ];
+      System.arraycopy( buf, 0, temp, 0, size );
+      buf = temp;
+
+      buf[ size ] = b;
+      size++;
+    }
+  }
+
+
+
+
+From gchii@mindspring.com Fri, 26 Nov 1999 21:24:07 -0500
+Date: Fri, 26 Nov 1999 21:24:07 -0500
+From: Gilbert Carl Herschberger II gchii@mindspring.com
+Subject: [JOS-Kernel] Progress!
+
+At 11:28 PM 11/26/99 +0100, Ranieri Argentini
+<R.Argentini@student.tudelft.nl> wrote:
+>I'm using blackdown.org's 1.1.6 (or .8 .. can't seem to remember), but i'm
+>not using any not-1.0 functions that i'm aware of, so it should work on
+>almost everything.
+
+So, you're saying that the Java Native Interface is supported in
+blackdown.org's JDK? and that it runs on Linux? I might have a copy of it
+around here somewhere already. I have SuSE Linux Distribution 6.0 on CD.
+
+I have been to blackdown.org. I downloaded JDK 1.0.x. As for JDK 1.1.x, I
+can't figure out which file(s) to download.
+
+>Btw, i put up a new version (0.001b) that does some ARP. 
+
+I'll look for the new version.
+
+
+
+
+From onewith1@flash.net Sat, 27 Nov 1999 09:25:35 -0600
+Date: Sat, 27 Nov 1999 09:25:35 -0600
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] Progress!
+
+----- Original Message -----
+From: Ranieri Argentini <R.Argentini@student.tudelft.nl>
+To: <kernel@jos.org>
+Sent: Friday, November 26, 1999 4:36 PM
+Subject: Re: [JOS-Kernel] Progress!
+
+
+> >> Hmm, it would appear it does .. how do i get the stream to pull its
+bytes
+> >> from an array though? Or is an Array a child of InputStream so i can
+pass
+> >> it directly to DatInputStream's only constructor?
+> >You can always use ArrayInputStream, giving the Array as the input, then
+use
+> >that in the paramter to DataInputStream's constructor.
+>
+> Ok, you lost me here ... my java.io.* or java.lang.* don't seem to have an
+> ArrayInputStream class. I'm a using an old version of the JDK or
+something?
+> If so, which one should i get?
+>
+> RA
+>
+
+There I go again, not checking my docs before I spew from my fingers.  I'm
+referring to "ByteArrayInputStream", which has been around since JDK 1.0.
+You pass it, in the constructor, the byte array to be used as the input
+stream, then use it as you would any other input stream.  This uses your
+given array as the buffer to read from.
+
+-Matt
+
+
+
+
+From golubovsky@altavista.net Wed, 24 Nov 1999 10:50:51 +0300 (MSK)
+Date: Wed, 24 Nov 1999 10:50:51 +0300 (MSK)
+From: golubovsky@altavista.net golubovsky@altavista.net
+Subject: [JOS-Kernel] zlib implementation
+
+Hi,
+
+Which zlib (compression library) implementation is planned to be used within
+JOS, if any? Now I try to pick a Java-implemented one (it looks like I'll have
+to write it by myself if my search fails) for my project. Both Sun and Kaffe
+use native methods which in turn call zlib functions.
+
+Dmitry M. Golubovsky
+      St-Petersburg, Russia
+
+
+
+
+
+
+
+From abc@abc.com Tue, 23 Nov 1999 08:41:33 +0800
+Date: Tue, 23 Nov 1999 08:41:33 +0800
+From: Hilary Cheng abc@abc.com
+Subject: [JOS-Kernel] Progress!
+
+Hi,
+
+    Anyone has investage this issue already ? Since for the right now,
+implement a Network Card Device Driver is not a hard problem.
+(My PCI Driver will finish soon).
+
+Regards,
+
+Hilary
+
+Ranieri Argentini wrote:
+
+> >    For the Networking Issue, is that EDLC Protocol need to implement ?
+> >Is that we send IP Data directly to Network Chip ?
+>
+> Actually i have no idea.
+> I momentarily use a linux PF_PACKET socket to do my I/O. I finally managed
+> binding this thing to an interface (e.g. eth0) and use a single native
+> method to read info from that socket.
+> The way i'm thinking about this is that the network interface layer
+> assembles an ethernet 802.3 frame and then in some magical way (i.e.
+> through a device driver that might be either Java or native) gets it onto
+> the network.
+> I am not making any assumptions yet as on how this exactly will work.
+> The thing i would like most is of the form
+>
+> NE2000EthernetDriver.write(byte[]) or (on a slightly higher level)
+> NE2000EthernetDriver.write(EthernetPacket);
+>
+> Hope this sort of cleared it up ...
+>
+> RA.
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+
+
+From R.Argentini@student.tudelft.nl Sat, 20 Nov 1999 07:53:16 +0100
+Date: Sat, 20 Nov 1999 07:53:16 +0100
+From: Ranieri Argentini R.Argentini@student.tudelft.nl
+Subject: [JOS-Kernel] Progress
+
+>there's a noticeable lag when you have to scroll lines at the bottom of
+>the screen.
+
+If i remember correctly both Linux and it predecessor (minix) use hardware
+scrolling.
+You might want to add that functionality to either the console or the vga
+driver.
+
+>In other news, it looks like some people are trying to
+>put together an IP stack, and I might take a small detour and oblige them
+>with a serial driver (if I can find docs!) to test against Linux SLIP***.
+
+I'm sorry to sound so negative, but the stack is going to take a while to
+reach useable (tcp) level. Don't expect it to be fast either. Usually this
+code uses some tyical C approaches to memory, arrays, structs, unions and
+typecasts that force me to do most of my packet parsing with byte to byte
+copies.
+As a i said on the Arch list, tcp is going to be a major hassle to implement.
+
+On a lighter note, i would like JEPS (as i like to call the stack) to be
+more or less compatible with the way jjos handles its classes
+(NetworkInterfaceDriver is already a superclass of
+jos.platform.driver.Device), do any of you kernel persons have any hints on
+that?
+
+One other thing, if i have to handle multiple interfaces, i can't allow a
+call to any of them to block. The neat way of handling this would be the
+windows WaitForMultipleEvent way ..
+Pass it a list of events and wake me when one arrives. Then i can service
+it and wait upon that event list again. 
+Is an event structure like this going to be implemented?
+
+Ranieri Argentini.
+
+
+
+
+From johan.rydberg@netinsight.se Mon, 22 Nov 1999 16:12:04 +0100
+Date: Mon, 22 Nov 1999 16:12:04 +0100
+From: Johan Rydberg johan.rydberg@netinsight.se
+Subject: [JOS-Kernel] Progress!
+
+Ranieri Argentini wrote:
+
+> The problem is that this model grinds to a halt when it comes to the IP layer.
+> IP is responsible for distributing packets among interfaces, and can
+> therefore not be bound to any of them.
+> 
+> The only thing that comes to mind is to have a single IP object that queues
+> incoming packets for all interfaces. This requires strict serialisation on
+> the incoming_packet() functions. A thread that lives in IP could then
+> handle the packets (route them through, drop them or reassemble them and
+> queue them to TCP/UDP objects that eventually put them into user space
+> buffers).
+
+BSD* operating systems solves this problem with a number of routines:
+
+	o ether_input
+	o ip_input
+	o tcp_input
+	o ...
+
+When a device driver (i.e., a netword card driver) receives a packet it
+calls
+"ether_input," passing information about which interface the packet was
+received
+on (and ofcouse the packet data).
+
+The "ether_input" then passes the packet to the right protocol stack. 
+
+Why not implement this in a similar manner?
+
+-- 
+Johan Rydberg			johan.rydberg@netinsight.net
+Net Insight AB, Sweden		direct: +46-8-685 04 17
+http://www.netinsight.net	phone:  +46-8-685 04 00
+				fax:    +46-8-685 04 20
+
+
+
+
+From george.marrows@triptych.freeserve.co.uk Sat, 20 Nov 1999 15:01:31 -0000
+Date: Sat, 20 Nov 1999 15:01:31 -0000
+From: George Marrows george.marrows@triptych.freeserve.co.uk
+Subject: [JOS-Kernel] Getting GRUB up and running
+
+Avery --
+
+What's currently in CVS is broken. I've supplied some patches to Todd - he's
+going to test them and check them in. In the meantime, if you wanted to do
+some testing of your own, check out
+
+http://www.triptych.freeserve.co.uk/grub/index.html
+
+for some moderately detailled instructions. Feel free to mail me if you need
+any help (after Sunday evening GMT, try george.marrows@smallworld.co.uk for
+a faster reponse). Let me know how you get on in any case.
+
+-- George
+
+
+
+
+
+From tmiller@haverford.edu Sun, 28 Nov 1999 02:36:24 -0500 (EST)
+Date: Sun, 28 Nov 1999 02:36:24 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Getting GRUB up and running
+
+> What's currently in CVS is broken. I've supplied some patches to Todd - he's
+> going to test them and check them in. In the meantime, if you wanted to do
+> some testing of your own, check out
+
+	Hm.  Just checked by i386/nativecode directory, and CVS seems to
+think that it's up-to-date, and it looks like I've included your last set
+of fixes.  Let me know.
+
+-_Quinn
+
+
+
+
+From tmiller@haverford.edu Sun, 28 Nov 1999 03:53:10 -0500 (EST)
+Date: Sun, 28 Nov 1999 03:53:10 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Next version of jjos / decaf garbage collection
+
+> 2.  Rework it to be a generational collector. This should decrease the
+> average pause time by performing lots of little garbage collects, rather
+> than the occasional big one (these would still be needed, but less
+> frequently).
+
+	See below for my idea about 'incremental' garbage collection,
+which has the same hope.
+
+> One thing to ponder is whether all the above work is worthwhile - the
+> Boehm-Demers garbage collector does all the above and more (eg concurrent gc
+> apparently), is freely available and usable, and has been developed and
+> widely used for over a decade, so is very stable. Integrating that might be
+> a better way to get JOS to progress (though perhaps less fun for me :-).
+
+	Never heard of it -- any links so I can do my reading?
+
+> · There should be another mail of mine floating around on the arch list
+> containing thoughts on how to deal with real-time aspects of device drivers.
+> Does anyone have any idea if what I propose there will be sufficient, or
+> does more thought need to be given to it?
+
+	It should be sufficient, but we can just wait and see it.
+
+> Todd - didn't you let slip in a mail recently that you'd had some thoughts
+> about Java v C++ gc? Care to elaborate?
+
+	Well, first that we should separate the two.  The Java GC we can
+make perfect without too much difficulty.  (That is, the roots are well
+known, and what is and is not a pointer is also well known.)  The C++ GC
+then becomes the hard bit.  This note is note particular to a specific
+algorithm.  (Any algorithm that works on 'all memory' can be restricted to
+the lower or upper N megabytes by having the c_alloc()/java_alloc()
+functions return into the lower or upper N megabytes.)
+
+	(An aside here: does Linux do fully dynamic library loading?  That
+is, can I do something like:
+
+LIBR * lib = LoadLibrary( "classpath.so" );
+JNI * func = lib->getFunc( some_string_from_java );
+if ( func != NULL ) { 
+	(* func)( JNI_ARGS );
+	} else { throw_NoSuchNativeMethod_exception(); }
+
+	This would make integrating classpath on the host build very
+easy.)
+
+[Fair warning: this gets rather long.]
+
+	Anyway, the idea I was referring to earlier needs to be researched
+better, but for now I'm calling it incremental gc.  The idea is similar to
+that of generational GC in that it tries to take advantage of the fact
+that most garbage is created and thrown away very quickly -- in the same
+function.  The basic idea is to reap at every stack push or pop, by having
+tracked which pointers exist only in local variables.  On the frame pop,
+any local-only pointers obviously become garbage; on the frame push, any
+pointer that was only in a local and had been overwritten can be reaped.
+(I'm guessing the GC overhead would be preferred in function
+calls/returns, not in assignments, though this might have to change if we
+encounter alot of tight garbage-spewing loops.  (That is, where it would
+be better to reap as soon as we can, rather than filling memory and
+inserting an expensive pause.))  I'm working on a specific set of actions
+to be taken at specific points in the program (here, I'm targeting the
+java memory, where we don't have to fiddle with the compiler to execute
+certain code on assignments and the like) that will enable the above
+distinctions to be made, and hopefully a few potentially useful other
+ones.
+
+	In general, three things happen with a pointer: creation,
+assignment, and dereferencing.  Our objective is to provide a minimal set
+of pointers that will correctly dereference, and we'll ignore that from
+here on out.  Creation, too, is relatively uninteresting, though it will
+work for us later on by marking created pointers as initially local.
+(Where, exactly, that marking takes place is another matter entirely.)
+Assignment is the interesing and difficult part, though a few cases we can
+dismiss easily.
+
+Obj o = new Object(); or o = new Object();
+creation -> local : The pointer remains local; if the assigned-into local
+		was a valid local pointer, mark it garbage.
+
+o = p;
+local -> local : The pointer remains local; if the assigned into local
+		was a valid local pointer, mark it garbage.
+
+o.o = p;
+	If o is local, and p is local, o, p, and o.o remain local.
+	Otherwise, o.o (should have already) inherits o's type,
+		and so does p.
+	If o.o was local, mark it garbage.
+
+o.o = p.p;
+	If o.o and p.p are local (which requires that o and p are local),
+		then all four remain local.
+	Otherwise, p.p gains the type of o.o (which should be the type of
+		o), and p retains its current type.
+	If o.o was local, mark it garbage.
+
+o = fn();
+	o inherits the type of the return of fn(); if it was returning a
+		local variable, o becomes local, and so forth.
+
+fn(o, p);
+	Similar to o = p, where o is not local (where p inherits the type
+		of o).  Function arguments are non-locals that may return
+		to being local (I need a name) if their type is unchanged
+		during fn() -- that is, when fn() pops its frame, o and p
+		return to being local (if they initially were).  If o and
+		p were not local, they remain not local.
+
+	When the frame is pushed, free the marked-garbage pointers (and
+their subtrees); when it's popped, free those and the marked-local pointer
+(and their subtrees).
+
+	I believe, though I haven't proved, that a four-tier scheme like
+this will work (though it might need a backup collector for some cases; in
+the case where the system runs out of memory before the leaking frame is
+popped, I'm hoping to prove that the leaking frame can't be proven to be
+leaky until its popped -- that is, it's not incr.gc's problem :)) -- will
+work (and efficiently) for cases where no two local variables point into
+different positions in a single pointer tree.
+
+	That is, if you're holding the root of a tree and traversing it,
+when the traversal pointer is overwritten, the scheme above says to
+declare its subtree garbage, which is utterly ridiculous, because it's
+still referenced from the root pointer.  Verifying this at each push/pop
+means that every local pointer tree needs to be traversed and marked used
+before trying to free the marked-garbage trees (where the used mark wins
+any conflicts).  This would be horribly inefficient, I'd think (though it
+would remove the need for a 'marked garbage' category.)  With the
+necessary guarantee that any constructed tree is properly marked, I think
+this problem ONLY occurs with entirely local trees (that is, with trees
+whose roots are local and whose nodes are also local -- created or
+returned), because the proper construction gaurantee insures that the
+traversing pointer will be marked as non-local, and immune to being marked
+as garbage.  Getting rid of the marked-garbage category I believe solves
+the problem, though it will make the gc less efficient because memory can
+only be freed on a frame return.
+
+	After the proof of correctness, the next extremely difficult bit
+will coming up with a way to mark pointers in an efficient manner.  I'm
+thinking only a global atomic table of some variety will serve, but we'll
+see.
+
+-_Quinn
+
+
+
+
+From joakim.dahlstedt@appeal.se Sun, 28 Nov 1999 12:41:37 +0100
+Date: Sun, 28 Nov 1999 12:41:37 +0100
+From: Joakim Dahlstedt joakim.dahlstedt@appeal.se
+Subject: [JOS-Kernel] Next version of jjos / decaf garbage collection
+
+>         Anyway, the idea I was referring to earlier needs to be researched
+> better, but for now I'm calling it incremental gc.  The idea is similar to
+
+The idea you are describing has been researched quite well...and it works 
+pretty well. The slower garbage collector the better it is. People usual
+call your algorithm Escape Analysis.
+
+See the proceeedings of OOPSLA'99 for further reference:
+
+  Escape Analysis for Java...IBM Watson Research Center (Jalapeño)
+    Choi et.al  
+
+  Escape Analysis for Object-Oriented Languages. Application to Java
+    Bruno Blanchet (INRIA)
+
+  Removing Unnecessary Synchronization in Java
+    Jeff Bogda, Urs Hölzle (UCSB)
+
+  Compositional Pointers and Escape Analysis for Java Programs (MIT/IBM)
+    John Whaley, Martin Rinard
+
+/Joakim  
+
+-- JRockit   http://www.fasterjava.com
+
+
+
+From tmiller@haverford.edu Sun, 28 Nov 1999 14:53:47 -0500 (EST)
+Date: Sun, 28 Nov 1999 14:53:47 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Next version of jjos / decaf garbage collection
+
+> >         Anyway, the idea I was referring to earlier needs to be researched
+> > better, but for now I'm calling it incremental gc.  The idea is similar to
+> 
+> The idea you are describing has been researched quite well...and it works 
+> pretty well. The slower garbage collector the better it is. People usual
+> call your algorithm Escape Analysis.
+
+	Okay, thanks!  I'll look into this.
+
+-_Quinn
+
+
+
+
+From George.Marrows@Smallworld.co.uk Mon, 29 Nov 1999 09:25:54 -0000
+Date: Mon, 29 Nov 1999 09:25:54 -0000
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] Getting GRUB up and running
+
+Todd --
+
+You're quite right -- what's in CVS now is fine. The mail was sent on the
+20th from my home account, and has, I guess, been sitting in the moderator's
+in-box since then -- only my work account (this one) is registered for
+direct access to the mailing list. 
+
+So, apologies to you, Todd, for the mix-up, and apologies to the moderator
+(Clark, is it?) for the extra work -- it won't happen again!
+
+-- George
+
+> -----Original Message-----
+> From:	Todd L. Miller [SMTP:tmiller@haverford.edu]
+> Sent:	Sunday, November 28, 1999 07:36
+> To:	kernel@jos.org
+> Cc:	ajregier@earthlink.net
+> Subject:	Re: [JOS-Kernel] Getting GRUB up and running
+> 
+> > What's currently in CVS is broken. I've supplied some patches to Todd -
+> he's
+> > going to test them and check them in. In the meantime, if you wanted to
+> do
+> > some testing of your own, check out
+> 
+> 	Hm.  Just checked by i386/nativecode directory, and CVS seems to
+> think that it's up-to-date, and it looks like I've included your last set
+> of fixes.  Let me know.
+> 
+> -_Quinn
+> 
+> 
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+From George.Marrows@Smallworld.co.uk Tue, 30 Nov 1999 09:31:01 -0000
+Date: Tue, 30 Nov 1999 09:31:01 -0000
+From: George.Marrows@Smallworld.co.uk George.Marrows@Smallworld.co.uk
+Subject: [JOS-Kernel] Next version of jjos / decaf garbage collection
+
+Todd --
+
+Try http://www.hpl.hp.com/personal/Hans_Boehm/gc/ for details of the
+Boehm-Demers-Weiser garbage collector.
+
+I've yet to check out your mail and Joakim's references on escape analysis,
+but will do so ...
+
+-- George
+
+
+
+From rolandpj@bigfoot.com Sun, 28 Nov 1999 09:33:46 -0000
+Date: Sun, 28 Nov 1999 09:33:46 -0000
+From: Roland PJ rolandpj@bigfoot.com
+Subject: [JOS-Kernel] Next version of jjos / decaf garbage collection
+
+-----Original Message-----
+From: Todd L. Miller <tmiller@haverford.edu>
+To: kernel@jos.org <kernel@jos.org>
+Date: 28 November 1999 08:51
+Subject: Re: [JOS-Kernel] Next version of jjos / decaf garbage collection
+
+
+>o.o = p.p;
+> If o.o and p.p are local (which requires that o and p are local),
+> then all four remain local.
+> Otherwise, p.p gains the type of o.o (which should be the type of
+> o), and p retains its current type.
+> If o.o was local, mark it garbage.
+
+What about
+
+o.o = p.p
+o2.o2 = p.p
+o.o = q.q
+
+assuming they're all local, then the last would mark p.p as garbage while
+o2.o2 still holds a ref?
+
+B.t.w., some of what you're proposing sounds like '1-bit' reference
+counting, I think, which I've heard of before.
+
+Regards
+Roland
+
+
+
+
+
+

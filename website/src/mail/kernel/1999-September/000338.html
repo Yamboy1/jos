@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] bocek's interrupt eight</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000330.html">
+   <LINK REL="Next" HREF="000344.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] bocek's interrupt eight</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] bocek's interrupt eight">jm@mak.com</A><BR>
+    <I>Wed, 08 Sep 1999 08:47:46 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000330.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+        <LI> Next message: <A HREF="000344.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#338">[ date ]</a>
+              <a href="thread.html#338">[ thread ]</a>
+              <a href="subject.html#338">[ subject ]</a>
+              <a href="author.html#338">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; I sent a message to the list earlier today asking whether I should
+</I>&gt;<i> 
+</I>&gt;<i>         [...]  Of course, I read this AFTER asking...
+</I>&gt;<i> 
+</I>&gt;<i> &gt; (1) The &quot;static variables&quot; are exactly which ones?  We shouldn't have
+</I>&gt;<i> &gt; any static variables that require initialization code to be run -- given
+</I>&gt;<i> &gt; the limitations of the current initialization code, it *won't* be run
+</I>&gt;<i> &gt; for the i386 target.
+</I>&gt;<i> 
+</I>&gt;<i>         Er, the JAVA /class/-static variables in &quot;jos.system.interrupts&quot;,
+</I>&gt;<i> name intXXX, from 001 to 015.  Sorry for any confusion.  You (next
+</I>&gt;<i> paragraph) disabled all the interrupts and then turned them back on for
+</I>&gt;<i> the java code to play with, which is the Right Thing to do; we just punted
+</I>&gt;<i> on what to do with the clock interrupt back when we were doing that part
+</I>&gt;<i> of the design.  (Say!  That means we've made it pretty far downfield.:))
+</I>
+OK.  Do you think it's better to leave interrupts entirely *disabled* until the
+Java code decides it's the time to enable them?  This is an entirely reasonable
+approach, and (hmm....) I don't think it will break anything at all (hmm...,
+right?).  Actually, I don't understand why I didn't do it that way in the first
+place (maybe I'm forgetting something ... wouldn't be the first time).
+
+&gt;<i> &gt; Let me know what the status of your i386 build is, so I can tell whether
+</I>&gt;<i> &gt; I'm either degrading things terribly, or the new changes are no-ops.
+</I>&gt;<i> &gt; Like I said, I'm sitting on a whole bunch of changes...
+</I>&gt;<i> 
+</I>&gt;<i>         If I've got FN_TRACE turned on and all the VM tests running, it
+</I>&gt;<i> dies after the first keystroke in the consoled; haven't tested the new VGA
+</I>&gt;<i> driver at all; if I turn off FN_TRACE and all the VM tests, it runs long
+</I>&gt;<i> enough that I can confirm the various console driver changes I've been
+</I>&gt;<i> making; I've not crashed it yet there.  (Though now that I think about it,
+</I>&gt;<i> FN_TRACE shouldn't have any effect on how long things run and I've not
+</I>&gt;<i> bothered to see if it actually does...)
+</I>
+So, in other words, I would not be breaking an entirely &quot;working&quot; build for
+you...
+
+&gt;<i>         If you're sitting on a whole bunch of changes, it'll probably be
+</I>&gt;<i> easier for me to committ my stuff first.  (Not much, yet, unfortunately.)
+</I>
+OK.  Let me know when you do this ... I won't really be able to do much more
+until Thursday at the earliest.  Do you think you'll be able to commit your
+stuff by then?  I'd REALLY like to commit the changes both because I'd like to
+attack some of the other remaining problems, and because I'd like the sources on
+more than one disk for safety's sake.
+
+&gt;<i>         Oh, given that some of the corrections JM &amp; Bocek made were to
+</I>&gt;<i> math ops that /should/ have been checked before this, if anyone feels like
+</I>&gt;<i> writing up a more comprehensive suite of test for init.java, do, with my
+</I>&gt;<i> encouragement.
+</I>
+Isn't there a JVM compatibility/test suite around?  I can't remember the name,
+but I seem to recall reading about it (but I seem also to recall some
+licensing/NDA issues).  Anybody else heard about something like this?
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/">http://www.mak.com/</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000330.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+	<LI> Next message: <A HREF="000344.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#338">[ date ]</a>
+              <a href="thread.html#338">[ thread ]</a>
+              <a href="subject.html#338">[ subject ]</a>
+              <a href="author.html#338">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

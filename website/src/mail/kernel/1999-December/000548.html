@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] TELNET</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000547.html">
+   <LINK REL="Next" HREF="000549.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] TELNET</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] TELNET">gchii@mindspring.com</A><BR>
+    <I>Tue, 07 Dec 1999 10:45:21 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000547.html">[JOS-Kernel] Oops!! JCurses version!</A></li>
+        <LI> Next message: <A HREF="000549.html">[JOS-Kernel] changes to make grub work smoothly</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#548">[ date ]</a>
+              <a href="thread.html#548">[ thread ]</a>
+              <a href="subject.html#548">[ subject ]</a>
+              <a href="author.html#548">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I am very interested in finishing an implementation of a TELNET service.
+With the recent addition of a JCurses library (thank you!), it is more
+feasible than ever to finish a TELNET service.
+
+What does this mean? It means that I can set up a JOS machine to run a
+TELNET service. I can use any TELNET client from across the network to log
+in to my JOS machine and run all kinds of programs.
+
+I have been working exclusively with a stream-based virtual terminal
+service. There is already a open-source, free-license TELNET client
+available under GPL. It has been well documented in &quot;Java Annotated
+Archives&quot; at your local book store.
+
+Here are the milestones we can accomplish with parallel development:
+
+1. JOS telnetd connects to non-JOS telnet
+2. JOS telnet connects to non-JOS telnetd
+3. JOS telnet connects to JOS telnetd
+
+The &quot;commands&quot; for TELNET are well-documented. TELNET is a stream-based
+protocol that maps to methods. Through TELNET, a program running in telnetd
+renders output a display window like Terminal in JCurses.
+
+Once we have a telnetd service for a JOS machine, operation of a JOS
+machine can be performed across the network. When complete, TELNET requires
+TCP, the highest level of the TCP/IP stack. This is why I'm continuing to
+develop a TELNET service that runs on any Java platform, including Linux,
+OS/400 and Win32.
+
+It is critically important to maintain a strong model for object-oriented
+batch programs. The telnet daemon (telnetd) is a hostile environment for
+*visual* Java beans. The telnet daemon cannot be a bean box. Why? Because
+the telnet daemon itself needs no visual presentation in a production
+environment. It must be able to run any program written in Java and yet
+never display a graphic element.
+
+It has take a while to reduce the TELNET daemon down to a bare-bones
+reusable environment for JOS programs. Many components have already been
+distributed in the Smart API products. The following components are needed
+to finish the project:
+
+A. SocketIOSteam
+I'm working on the assumption that a socket is not the only source of input
+to a TELNET daemon. The java.net.Socket class is just like all the other
+I/O steams. It is wrapped in a SocketIOStream, implementing the
+org.jos.program2a.IOStream interface. The IOStream interface is used by all
+other components, instead of Socket. In other words, output to other
+programs can be keyboard-less and &quot;scripted&quot;. This enables classic piping,
+the construction of batch test suites, and calling of sub-programs within
+the telnet daemon environment.
+
+B. LoginProgram
+Upon connection, the user/password is required. The login program calls a
+shell program. Which shell program do you want to use? Any shell can be
+associated with user/password. The login program closes the socket after
+the shell program has finished running.
+
+For that matter...which login program do you want to use? Any login program
+and port can be passed to TELNET daemon. The login program (and all its
+parameters) are encoded in a single &quot;login&quot; URI.
+
+C. ShellProgram
+The shell program accepts a URI until the URI is equal to &quot;logout&quot;. For
+each URI, the shell program loads a digital resource and pipes the result
+back through the socket.
+
+D. TelnetDaemonProgram
+The telnet daemon is also a program. It might be implemented in a number of
+different ways. First, as a background program with no GUI capability. When
+invoked a GUI-less program runs silently until kill'd.
+
+Second, as a simple console program, incoming URIs might be printed in a
+window or logged in a file. A multiple-connection TELNET daemon might
+associate a connection ID with each connection so that a common log can be
+used for all connections. I have an example of this around here somewhere...
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000547.html">[JOS-Kernel] Oops!! JCurses version!</A></li>
+	<LI> Next message: <A HREF="000549.html">[JOS-Kernel] changes to make grub work smoothly</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#548">[ date ]</a>
+              <a href="thread.html#548">[ thread ]</a>
+              <a href="subject.html#548">[ subject ]</a>
+              <a href="author.html#548">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

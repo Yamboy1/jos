@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Dispatching opcodes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000523.html">
+   <LINK REL="Next" HREF="000529.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Dispatching opcodes</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Dispatching opcodes">gchii@mindspring.com</A><BR>
+    <I>Fri, 03 Dec 1999 11:15:11 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000523.html">[JOS-Kernel] More on kernel bailout</A></li>
+        <LI> Next message: <A HREF="000529.html">[JOS-Kernel] Dispatching opcodes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#528">[ date ]</a>
+              <a href="thread.html#528">[ thread ]</a>
+              <a href="subject.html#528">[ subject ]</a>
+              <a href="author.html#528">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Consider the following code. The address of each method is entered into a
+vtable that's indexed by opcode. A method can be found by a single pointer
+calculation vtable[ opcode ]. It interprets an opcode without the runtime
+overhead of a switch statement.
+
+// opcodemethod.cc
+#include &lt;stdio.h&gt;
+
+typedef bool (*TMethod)(void);
+
+static const int MAX_OPCODE = 3;
+static TMethod vtable[ MAX_OPCODE ];
+
+static bool method1() {
+  printf( &quot;Method 1\n&quot; );
+  return true;
+}
+
+static bool method2() {
+  printf( &quot;Method 2\n&quot; );
+  return true;
+}
+
+static bool method3() {
+  printf( &quot;Method 3\n&quot; );
+  return true;
+}
+
+static bool invokeOpcode( int index ) {
+  TMethod item = vtable[ index ];
+  return item();
+}
+
+void example() {
+  vtable[ 0 ] = method1;
+  vtable[ 1 ] = method2;
+  vtable[ 2 ] = method3;
+
+  if ( invokeOpcode( 0 ) ) {
+    if ( invokeOpcode( 1 ) ) {;
+      invokeOpcode( 2 );
+    }
+  }
+}
+
+Since all of these methods must have a similar signature, building a formal
+type definition lets the compiler do additional type checking. Inside
+interp.cc, frame::runOpcode() ends up short and sweet, something like this:
+
+typedef bool (frame::*TOpcodeMethod)(exception_to_throw &amp;e);
+
+static TOpcodeMethod vtable[ bc::MAX_OPCODE ];
+
+bool frame::runOpcode(exception_to_throw &amp;e)
+  TOpcodeMethod item = vtable[ cur_code-&gt;code[ myPC ] ];
+
+#ifdef PARANOID
+  if ( item == NULL ) {
+    kprintf( &quot;frame.runOpcode(): VM corrupted, exiting.\n&quot; );
+    abort();
+  }
+#endif
+
+  myPC++;
+  return item( e );
+}
+
+void frame::loadVTable() {
+  vtable[ bc::aaload ] = aaload;
+  vtable[ bc::aastore ] = aastore;
+  :
+  vtable[ bc::aload ] = aload;
+  vtable[ bc::aload_0 ] = aload_0;
+  vtable[ bc::aload_1 ] = aload_1;
+  vtable[ bc::aload_2 ] = aload_2;
+  vtable[ bc::aload_3 ] = aload_3;
+  vtable[ bc::anewarray ] = anewarray;
+  vtable[ bc::areturn ] = areturn;
+  vtable[ bc::arraylength ] = arraylength;
+  :
+  vtable[ bc::dup ] = dup;
+  vtable[ bc::dup_xl ] = dup_x1;
+  vtable[ bc::dup_x2 ] = dup_x2;
+  vtable[ bc::dup2 ] = dup2;
+  vtable[ bc::dup2_x1 ] = dup2_x1;
+  vtable[ bc::dup2_x2 ] = dup2_x2;
+  vtable[ bc::swap ] = swap;
+}
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000523.html">[JOS-Kernel] More on kernel bailout</A></li>
+	<LI> Next message: <A HREF="000529.html">[JOS-Kernel] Dispatching opcodes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#528">[ date ]</a>
+              <a href="thread.html#528">[ thread ]</a>
+              <a href="subject.html#528">[ subject ]</a>
+              <a href="author.html#528">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

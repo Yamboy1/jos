@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOS and BOCHS.. they works!!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000431.html">
+   <LINK REL="Next" HREF="000434.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOS and BOCHS.. they works!!</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] JOS and BOCHS.. they works!!">tmiller@haverford.edu</A><BR>
+    <I>Sun, 24 Oct 1999 08:10:26 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000431.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+        <LI> Next message: <A HREF="000434.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#432">[ date ]</a>
+              <a href="thread.html#432">[ thread ]</a>
+              <a href="subject.html#432">[ subject ]</a>
+              <a href="author.html#432">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> 4. if JOS is compiled without the option -DNATIVE_CLOCK, when JOS boots
+</I>&gt;<i> (only under Bochs), it display continuosly &quot;notifyOfInterrupt(3):VM
+</I>&gt;<i> corrupted. abort notify...&quot;. Anyone knows what's happen ? I think
+</I>&gt;<i> interrupt handling needs a lot of patches.
+</I>
+	Yup.  It means that something is Terribly Wrong, in this
+particular case, that the 8th index into the field table of the interrupt
+class (which is usually jos.system.interrupts) is null, i.e.
+uninitialized.  This is usually means that the static initializers haven't
+been run yet.  You should (eventually) get to where that static
+initializer is run; remember that the clock interrupt fires ALOT.  That's
+the reason for the NATIVE_CLOCK flag: to allow the native code to directly
+handle the clock, which is MUCH more efficient.
+	The reasoning is that the clock interrupt mostly concerns the
+scheduler; all the java-language device drivers could be written in terms
+of abstract timers implemented by the scheduler instead of clock
+interrupt handlers.  (But the timers and their interface don't exist yet,
+so some drivers use the clock -- like the fd driver currently under
+construction.)  Hopes this clears things up for you.
+
+&gt;<i> However, please let me know if you are interested in obtaining the JOS HD
+</I>&gt;<i> boot loader. If yes, I'll prepare a tar.gz version which I'll post on my
+</I>&gt;<i> web site so you can download it.
+</I>
+	Is there a particular reason the boot loader needs to run JOS in
+the emulator?
+
+-_Quinn
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000431.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+	<LI> Next message: <A HREF="000434.html">[JOS-Kernel] JOS and BOCHS.. they works!!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#432">[ date ]</a>
+              <a href="thread.html#432">[ thread ]</a>
+              <a href="subject.html#432">[ subject ]</a>
+              <a href="author.html#432">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

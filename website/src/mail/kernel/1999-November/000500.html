@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Progress!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000499.html">
+   <LINK REL="Next" HREF="000502.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Progress!</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Progress!">gchii@mindspring.com</A><BR>
+    <I>Fri, 26 Nov 1999 21:16:24 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000499.html">[JOS-Kernel] Progress!</A></li>
+        <LI> Next message: <A HREF="000502.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#500">[ date ]</a>
+              <a href="thread.html#500">[ thread ]</a>
+              <a href="subject.html#500">[ subject ]</a>
+              <a href="author.html#500">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 11:36 PM 11/26/99 +0100, Ranieri Argentini
+&lt;<A HREF="mailto:R.Argentini@student.tudelft.nl">R.Argentini@student.tudelft.nl</A>&gt; wrote:
+&gt;<i>Ok, you lost me here ... my java.io.* or java.lang.* don't seem to have an
+</I>&gt;<i>ArrayInputStream class. I'm a using an old version of the JDK or something?
+</I>&gt;<i>If so, which one should i get?
+</I>
+ByteArrayInputStream and ByteArrayOutputStream have been around a while,
+since Java 1.0.x. I'm sure you don't need a new JDK.
+
+If you have a byte array and want to read it as if it were an input stream,
+you create a ByteArrayInputStream, something like this:
+
+byte[] buf;
+InputStream is = new ByteArrayInputStream( buf );
+
+If you find some component that sends its data to an output stream and you
+really want a byte array, you create a ByteArrayOutputStream and use it to
+catch the output. After all the data is written, you can get a byte array,
+something like this:
+
+ByteArrayOutputStream os = new ByteArrayOutputStream();
+:<i>
+</I>byte[] buf = os.getByteArray();
+
+The ByteArrayOutputStream uses a byte array to store its data. When it
+fills up its buffer, it creates a bigger array. The old array is garbage
+collected eventually. The idiom is something like this:
+
+  public void write( byte b ) {
+    try {
+      buf[ size ] = b;
+      size++;
+    }
+    catch( ArrayIndexOutOfBoundsException e ) {
+      byte[] temp = new byte[ size + STEP ];
+      System.arraycopy( buf, 0, temp, 0, size );
+      buf = temp;
+
+      buf[ size ] = b;
+      size++;
+    }
+  }
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000499.html">[JOS-Kernel] Progress!</A></li>
+	<LI> Next message: <A HREF="000502.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#500">[ date ]</a>
+              <a href="thread.html#500">[ thread ]</a>
+              <a href="subject.html#500">[ subject ]</a>
+              <a href="author.html#500">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] status</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000335.html">
+   <LINK REL="Next" HREF="000328.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] status</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] status">jm@mak.com</A><BR>
+    <I>Sun, 5 Sep 1999 09:17:29 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000335.html">[JOS-Kernel] Utah's OSKit + VGA works</A></li>
+        <LI> Next message: <A HREF="000328.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#325">[ date ]</a>
+              <a href="thread.html#325">[ thread ]</a>
+              <a href="subject.html#325">[ subject ]</a>
+              <a href="author.html#325">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi All;
+
+
+(1) Thomas Bocek found and fixed a bug in idiv (operands transposed).
+    jm fixed isomorphic bugs in fdiv and ldiv (but curiously not
+    ddiv).
+
+(2) Thomas also found and fixed a similar operand transposition error
+    in irem.  jm fixed isomorphic bugs in drem, frem, and lrem.
+
+(3) George Marrows found a use of &quot;interior pointers&quot; to C++ objects,
+    wherein decaf retained a pointer to the &quot;middle&quot; of an object (as
+    opposed to a pointer to its reasonably easy-to-identify head).  He
+    updated his gc code to cope with most of these problems.  jm
+    incorporated George's fixes in the host build, which ran overnight
+    through 179 garbage collections before jm terminated it this
+    morning.
+
+(4) However (and this is a big &quot;however&quot;), the i386 build (as built by
+    jm from the same sources as the host build) does NOT seem to
+    survive (much after?) the first gc.  If the &quot;vga.test()&quot; method is
+    run, the program seems to hang for a bit, but then eventually
+    resets the box after drawing about 400 horizontal lines (anybody
+    else seen this?).  If repeated testVM() (and other methods) are
+    run, then the program runs a long time (hours), but it is not
+    clear, as of this writing, whether a successful GC has occurred
+    prior to crashing.  jm is continuing to work the issue this
+    weekend.
+
+(5) jm's sources are pretty much up to date with respect to the CVS
+    repository (only init.java and vga.java need updating, and jm has
+    extensively modified init.java).  jm has modified 8 files in
+    decaf, and 3 files in jjos.  
+
+My question, pursuant to (5) -- the conservative GC is a Big Win for
+those doing host development.  It's not necessarily a Big Win for
+those doing i386 development.  Would those people doing i386
+development PLEASE let me know whether I should commit the sources to
+CVS, which include the fixes in items (1) through (3)???  I don't want
+to commit sources which contain known bugs (e.g., (5) above), even if
+it fixes some problems, unless people tell me it's OK to do so.
+
+Thanks, and sorry for the slow progress.
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/">http://www.mak.com/</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000335.html">[JOS-Kernel] Utah's OSKit + VGA works</A></li>
+	<LI> Next message: <A HREF="000328.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#325">[ date ]</a>
+              <a href="thread.html#325">[ thread ]</a>
+              <a href="subject.html#325">[ subject ]</a>
+              <a href="author.html#325">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Adventures with the tool chain</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000252.html">
+   <LINK REL="Next" HREF="000254.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Adventures with the tool chain</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Adventures with the tool chain">jm@mak.com</A><BR>
+    <I>Wed, 18 Aug 1999 16:33:01 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000252.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+        <LI> Next message: <A HREF="000254.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#253">[ date ]</a>
+              <a href="thread.html#253">[ thread ]</a>
+              <a href="subject.html#253">[ subject ]</a>
+              <a href="author.html#253">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello;
+
+Regier Avery J wrote:
+&gt;<i> Last night, after a year of waiting for Linux to finally work with my
+</I>&gt;<i> hardware and other assorted challenges, I was finally able to get almost
+</I>&gt;<i> everything in the tool chain to compile!  I had to make some changes in the
+</I>&gt;<i> mknbi-jos Makefile and mknbi.c to get mknbi to compile with Etherboot 4.2.?.
+</I>&gt;<i> I also found that a few things in the tool chain are undocumented.  For
+</I>&gt;<i> instance, I had to get the blackdown JDK, but no where in the docs was that
+</I>
+I don't actually use either Kaffe or blackdown (I could never seem to get Kaffe
+happy anything), but instead use the &quot;guavac&quot; Java compiler which comes with
+RedHat 6.0.
+
+&gt;<i> mentioned, and no mention of what version was required and/or known to work
+</I>&gt;<i> either.  I ended up getting the latest (1.1.7v3) and it compiles, though I
+</I>&gt;<i> don't know about running yet.  I am using newer version of Etherboot and
+</I>&gt;<i> nasm than the tested versions, so I don't know yet whether they will run or
+</I>&gt;<i> not (they do finally compile).  I also discovered that bootp is no longer
+</I>&gt;<i> recommended or distributed with RedHat 6.0.  I had to go back and find in in
+</I>
+Hmm...  I am using stock RedHat 6.0, and bootp is there and works fine (I think
+I had to enable it via either chkconfig or linuxconf).
+
+&gt;<i> 5.2.  I still don't know if this is going to work.  According to the
+</I>&gt;<i> Etherboot documents, DHCP(?) is now recommended instead of bootp in RedHat
+</I>&gt;<i> 6.  I don't know why this is the case, but we may need to consider upgrading
+</I>&gt;<i> our tool chain in order to keep current.  I can't go back to RedHat 5.2
+</I>&gt;<i> because of the above mentioned hardware compatibility problems which were
+</I>&gt;<i> finally solved with RedHat 6.  (RedHat 6, BTW, I have found to be far
+</I>&gt;<i> superior and much easier to use and work with than 5.2 was.  I heartily
+</I>&gt;<i> recommend an upgrade if you are on 5.2.)
+</I>
+Like I said, I am using RedHat 6.0 with the existing toolchain.  I'll be more
+than happy to help you get this working.  I do not think that there should be
+any issue with respect to the version of NASM you're using -- we don't really do
+anything, er, creative with it (I think there's only some 300 lines of asm).  I
+*do* know there *are* problems with pre-4.0 Etherboot (related to the maximum
+workable size of the downloaded image, and, at 9MB, we're pretty much pushing
+the envelope).
+
+&gt;<i> Here are my outstanding problems:
+</I>&gt;<i> * The i386 build compiles, but the host build does not.  It is complaining
+</I>&gt;<i> about missing a file: /etc/lib/gnu/types.h (or something like that, I dont'
+</I>&gt;<i> have it in front of me.)  And lo and behold, the directory is there, but not
+</I>&gt;<i> the file.  Am I missing an RPM?  If so, which one might that be?
+</I>
+Ah.  You probably need to remake the &quot;dependencies&quot; in the Makefile by building
+the &quot;depend&quot; target.  I seem to recall an issue concerning the exact format of
+the &quot;Don't delete this line, makedepend depends upon it&quot; between Todd's
+distribution and my RedHat one.  We should probably separate out that into a
+separate &quot;included&quot; part of the Makefile so as to make this easier.
+
+&gt;<i> * I was able to build the floppy and I tried to boot JJOS over my home
+</I>&gt;<i> network, but for some reason it couldn't find my NIC.  Was there maybe a
+</I>&gt;<i> configuration step that I could have been missing?  What are the standard
+</I>&gt;<i> steps you need to go through to get that to work reliably  I am reasonably
+</I>&gt;<i> sure I have the right driver (Tulip) for my NIC.
+</I>
+There is a configuration step in how you build the floppy -- you must also &quot;dd&quot;
+onto the floppy the right NIC-specific driver (the directions that come with
+Etherboot explain this).  Please also be advised that somebody else (I forget
+who) uses Netboot instead, which uses NDIS packet-drivers (which I understand
+are easier to come by) instead of custom assembly drivers.  Either should work
+fine.
+
+&gt;<i> * The above DHCP vs. bootp question.
+</I>
+I am using BOOTP.  I do not know of anybody who has successfully used DHCP. 
+(Hell, I don't know anybody who even *tried*.)
+
+&gt;<i> I'm looking forward to actually seeing this thing run and be able to
+</I>&gt;<i> contribute!
+</I>
+Great!  Let me know what else I can do to help!
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000252.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+	<LI> Next message: <A HREF="000254.html">[JOS-Kernel] Adventures with the tool chain</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#253">[ date ]</a>
+              <a href="thread.html#253">[ thread ]</a>
+              <a href="subject.html#253">[ subject ]</a>
+              <a href="author.html#253">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Construction of a new Java Operating System</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000161.html">
+   <LINK REL="Next" HREF="000155.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Construction of a new Java Operating System</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Kernel] Construction of a new Java Operating System">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Wed, 21 Jul 1999 07:48:28 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000161.html">[JOS-Kernel] About Graphics Device</A></li>
+        <LI> Next message: <A HREF="000155.html">[JOS-Kernel] Processenvironment, was: &quot;Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings&quot;</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#154">[ date ]</a>
+              <a href="thread.html#154">[ thread ]</a>
+              <a href="subject.html#154">[ subject ]</a>
+              <a href="author.html#154">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Ryan is absolutely correct.  On my way to JavaOne this year, I sat down on
+the plane and did a careful reading of the Java Virtrual Machine
+Specification, 2nd Edition, and came up with an overall strategy for sharing
+class definitions, but not static class data, between processes.  You *can*
+do this and still remain 100% compatible with the JVM spec.  My notes are at
+home on how to do this, but I'll try to get the design posted on the Wiki in
+the next few days.
+
+While I was at JavaOne, I spoke with one of the original members of the team
+that wrote JavaOS.  I ran my ideas by him, and he told me they were
+reasonable.  He no longer works for Sun, and would have liked to help with
+the project, but he is too tainted with Sun code.  :)
+
+Regards,
+Avery J. Regier
+
+
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Ryan Heise [SMTP:<A HREF="mailto:ryan@whitewolf.com.au">ryan@whitewolf.com.au</A>]
+</I>&gt;<i> Sent:	Tuesday, July 20, 1999 10:37 PM
+</I>&gt;<i> To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+</I>&gt;<i> Subject:	Re: [JOS-Kernel] Construction of a new Java Operating System
+</I>&gt;<i> 
+</I>&gt;<i> Cliff Baeseman wrote:
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; Ok here is the deal how do you plan on sharing the classes between
+</I>&gt;<i> multiple
+</I>&gt;<i> &gt; application instances as shared without reloading the classes. You still
+</I>&gt;<i> &gt; have to create the classes in memory to allow proper instancing. The
+</I>&gt;<i> classes
+</I>&gt;<i> &gt; have to run in your application instance in any case. This goes for jit
+</I>&gt;<i> our
+</I>&gt;<i> &gt; jvm makes no difference. You could share the classes right now if you
+</I>&gt;<i> wished
+</I>&gt;<i> &gt; to but how do you keep the data state within those classes?
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; That is the real question, the answer is that you cannot!
+</I>&gt;<i> 
+</I>&gt;<i> We can. The JVM can keep static class data separate from the class
+</I>&gt;<i> definition itself, thus allowing the classes to be shared and static
+</I>&gt;<i> data to be kept separate per process.
+</I>&gt;<i> 
+</I>&gt;<i> I think the first of the documents referred to by Avery also answers the
+</I>&gt;<i> question.
+</I>&gt;<i> 
+</I>&gt;<i> -- 
+</I>&gt;<i> Ryan Heise
+</I>&gt;<i> 
+</I>&gt;<i> <A HREF="http://www.progsoc.uts.edu.au/~rheise/">http://www.progsoc.uts.edu.au/~rheise/</A>
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000161.html">[JOS-Kernel] About Graphics Device</A></li>
+	<LI> Next message: <A HREF="000155.html">[JOS-Kernel] Processenvironment, was: &quot;Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings&quot;</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#154">[ date ]</a>
+              <a href="thread.html#154">[ thread ]</a>
+              <a href="subject.html#154">[ subject ]</a>
+              <a href="author.html#154">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] bocek's interrupt eight</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000328.html">
+   <LINK REL="Next" HREF="000330.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] bocek's interrupt eight</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] bocek's interrupt eight">jm@mak.com</A><BR>
+    <I>Sun, 05 Sep 1999 23:15:02 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000328.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+        <LI> Next message: <A HREF="000330.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#329">[ date ]</a>
+              <a href="thread.html#329">[ thread ]</a>
+              <a href="subject.html#329">[ subject ]</a>
+              <a href="author.html#329">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+Todd L. Miller wrote:
+&gt;<i>         First, a quick question: did I fluff my cvs update, or has none of
+</I>&gt;<i> the gc stuff made it in yet?
+</I>
+I sent a message to the list earlier today asking whether I should
+commit the new gc stuff given that it doesn't work too well on the i386
+build, and I haven't heard Word One (oh, we're computer types -- Word
+Zero) about whether I should.  (See more below...)
+
+&gt;<i>         About interupt eight: the reason Bad Things happened to the i386
+</I>&gt;<i> build is that the clock interrupt fires before everything (i.e. the
+</I>&gt;<i> static variables interrupts.intXXX) is ready.  Testing with all the tests
+</I>&gt;<i> off (except the console drivers, which need work, btw) and w/o the
+</I>&gt;<i> function trace reveals that the java_word slurped up from
+</I>&gt;<i> interrupts.int008, the one that's supposed to be an interrupt object, is
+</I>&gt;<i> in fact a null object, so that when the threadable object is cast out of
+</I>&gt;<i> it, Bad Things happen.
+</I>
+OK.  A couple of questions --
+
+(1) The &quot;static variables&quot; are exactly which ones?  We shouldn't have
+any static variables that require initialization code to be run -- given
+the limitations of the current initialization code, it *won't* be run
+for the i386 target.
+
+(2) I should've disabled interrupts (*all* interrupts) at head.s86 on
+line 124 (on my copy).  Theoretically (famous last words), there
+shouldn't be any interrupts happening until about line 161 in entry.cc
+(after the assignInterrupts() call).  If this isn't the case, something
+weird is going on, and it needs to be tracked down.  Maybe I need to
+disable them really early -- but I think that *not* having interrupts
+enabled breaks the BIOS calls.
+
+&gt;<i>         At any rate, on my Celery 400, this happens three times before the
+</I>&gt;<i> initialization goes through, and everything seems to work fine.  The
+</I>&gt;<i> current check &amp; abort correction I've got set up [ if ( jw.isNull() ) {
+</I>&gt;<i> kprintf(...); return; } ]* is rather kludgy.  I'd imagine that we could
+</I>&gt;<i> forcibly initialize the interrupts class before start()ing the scheduler,
+</I>&gt;<i> but I'm not sure what this would do to the system or the classes required
+</I>&gt;<i> by the clock driver.  What might work best is to offer a
+</I>&gt;<i> jos.system.machine method switching off/on native clock handling, so that
+</I>&gt;<i> init() could handle what was necessary to ensure the clock-handler was
+</I>&gt;<i> ready before it was allowed to run.
+</I>&gt;<i> 
+</I>&gt;<i>         I haven't committed the changed scheduler.cc in light of my
+</I>&gt;<i> uncertainty about the correctness of my tree at this point; I've just
+</I>&gt;<i> moved into a new Slackware 4.0 system and I'm still being very careful
+</I>&gt;<i> about things.
+</I>&gt;<i> 
+</I>&gt;<i>         I'll be trying the new vga driver later tonight and doing a bit of
+</I>&gt;<i> fiddling with the console driver(s).
+</I>
+Let me know what the status of your i386 build is, so I can tell whether
+I'm either degrading things terribly, or the new changes are no-ops. 
+Like I said, I'm sitting on a whole bunch of changes...
+ 
+-jm
+
+-- 
+==== John Morrison ==== <A HREF="mailto:jm@mak.com">jm@mak.com</A> == <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== MaK Technologies Inc., 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000328.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+	<LI> Next message: <A HREF="000330.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#329">[ date ]</a>
+              <a href="thread.html#329">[ thread ]</a>
+              <a href="subject.html#329">[ subject ]</a>
+              <a href="author.html#329">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

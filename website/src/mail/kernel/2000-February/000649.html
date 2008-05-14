@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] progress update</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000648.html">
+   <LINK REL="Next" HREF="000650.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] progress update</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] progress update">tmiller@haverford.edu</A><BR>
+    <I>Wed, 2 Feb 2000 14:18:08 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000648.html">[JOS-Kernel] progress update</A></li>
+        <LI> Next message: <A HREF="000650.html">[JOS-Kernel] progress update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#649">[ date ]</a>
+              <a href="thread.html#649">[ thread ]</a>
+              <a href="subject.html#649">[ subject ]</a>
+              <a href="author.html#649">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	There would be a great benefit to JNI with ELF libs, I
+agree, and it might well be worth doing further down the road, if we get
+some sort of dynamic linker (port ld.so?) for jJOS.  I, personally, am not
+going to write JNI only for a build which amounts to an emulator.
+
+&gt;<i> Second, while you are rewriting common/decaf from scratch, wouldn't this be
+</I>&gt;<i> a good time to implement multiple processes?
+</I>
+	Yes.  I've been coding with that in mind for long enough that I
+neglected to mention it. :)
+
+&gt;<i> My thought is that the ClassLoader approach we previously discussed
+</I>&gt;<i> gets the basics, but it would be great to have each process have its
+</I>&gt;<i> own heap/stack. (Class definitions would go in a shared heap.)
+</I>
+	The way I'm looking at it now is to take what JM did in creating a
+'JVM' class and run with it, so that you can define a JVM by handing it a
+jjmachine object (at some point, we subclass jjmachine for security) and a
+classloader.  When you ask that jvm to start, you also hand off a
+scheduler on which to run the initial thread.  For now, the schedulers
+will all be the same because jJOS is a single process.  Later on,
+scheduler could be re-written or subclassed to allow native
+threads/processes and/or a mixture of native and green threads/processes.
+
+	The classloader will initially be empty, and fill in its own set
+of classes and definitions from the (shared) ramdisk.  I intend to change
+this as soon as I verify that they work, and create a system where you can
+share as many or as few class definitions as you desire, with each
+classloader maintaining its own static data, like .System.in'.  (Although
+this will probably start out as an all-or-nothing choice, it makes sense
+to be able to have different processes use different definitions of the
+same class -- for development work on the editor you're using to do
+the development, for instance.  I'm not quite sure what the best way to
+handle this is yet.)
+
+&gt;<i> The main advantage of this approach is that we can then detect and/or
+</I>&gt;<i> limit how much memory a particular process uses.  For instance, a user
+</I>&gt;<i> may want to limit an applet to being able to use only a third of the
+</I>&gt;<i> computer's memory at most as a safety precaution.  It is much easier
+</I>&gt;<i> to design something like this in at the beginning or during a rewrite
+</I>&gt;<i> than to kludge it in later.
+</I>
+	So you want a model where a process is a classloader (possibly
+sharing class definitions with N other classloaders), N &gt;= 1 threads with
+independent stacks, and a single independent heap for the process, right?
+
+	Right now, since memory allocation is done by new, all processes
+share a single heap.  (One that is logically disjoint except for
+situations where a thread specifically exported one its objects to some
+other thread.)  According to the spec, individual threads have their own
+heap space ('working memory') where they maintain working copies of class
+and instance variables (and the elements of those variables if they are
+arrays), copies which may differ from another thread's copies until they
+are read (at which main memory is directed to update that copy) until the
+main memory updates the copy.  That is, it is possible for threads which
+are not explicitly synchronized to differ, but it is not required.
+
+	If it is assured that working memory writes and reads are
+atomically bound to main-memory stores and loads, then it seems to me that
+main and working memory may be identical (that is, at the same
+location).  (Although putting them at the same location assures that those
+operations are atomic*!  I mean 'may be identical' as in, 'not forbidded
+by the Java spec'.)  So it looks like, according to my understanding of
+the JVM spec, that a single heap per process is OK.
+
+&gt;<i> How can I best help to implement this during the rewrite?
+</I>
+	Figure out some elegant way to give each process a private heap,
+given that we don't have native processes.  (Implementing native processes
+would sure be nice, though, even if we just did cooperative multi-tasking
+to ensure the atomicity of a given Java bytecode.  (I'm not sure, but I'd
+think that interrupting a thread in the middle of a bytecode might confuse
+some other thread that's sharing memory with it.))  Perhaps add an
+arbitrary 'heap id' to each jjmachine instance and have me call an
+allocator from there?  (a jjmachine subclass containing a pointer to One
+True jjmachine that gets to play with the h/w.  allows the start of a
+security model, too :))  I might make JVM a superclass of everything that
+allocates memory so it automagically knows its heap and its classloader...
+
+-_Quinn
+
+
+* on multiprocessor systems, one may have to manually flush the cache, but
+we can call the cache 'working memory' and it's OK not to according to the
+spec.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000648.html">[JOS-Kernel] progress update</A></li>
+	<LI> Next message: <A HREF="000650.html">[JOS-Kernel] progress update</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#649">[ date ]</a>
+              <a href="thread.html#649">[ thread ]</a>
+              <a href="subject.html#649">[ subject ]</a>
+              <a href="author.html#649">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Processenvironment, was: &quot;Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings&quot;</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:whooops%40gmx.de">
+   <LINK REL="Previous"  HREF="000154.html">
+   <LINK REL="Next" HREF="000158.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Processenvironment, was: &quot;Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings&quot;</H1>
+    <B>Mark Andreas Meyer</B> 
+    <A HREF="mailto:whooops%40gmx.de"
+       TITLE="[JOS-Kernel] Processenvironment, was: &quot;Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings&quot;">whooops@gmx.de</A><BR>
+    <I>Thu, 22 Jul 1999 12:12:04 +0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000154.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+        <LI> Next message: <A HREF="000158.html">[JOS-Kernel] Processenvironment, was: &quot;Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings&quot;</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#155">[ date ]</a>
+              <a href="thread.html#155">[ thread ]</a>
+              <a href="subject.html#155">[ subject ]</a>
+              <a href="author.html#155">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi.
+I don't know how the Kernel group approached this problem (despite having
+digged through the Wiki), so I'll just start...
+
+On JOS-Arch Gilbert Carl Herschberger II wrote:
+
+&gt;<i> We can do something about it. We can build a JOS platform that has one JOS
+</I>&gt;<i> kernel. The JOS kernel loads and runs one or more JVMs, each in a separate
+</I>&gt;<i> process. You can start and stop JVMs. There should be three JVMs to choose
+</I>&gt;<i> from. Java 1.0, 1.1 or 2.0 (1.2). And when Java 3.0 is available, there
+</I>&gt;<i> will be four. You can run multiple copies of Java 1.0 JVM...but only one
+</I>&gt;<i> copy of its bytecode will be loaded. Same with 1.1 and 1.2.
+</I>
+What do you think about the following concept?
+
+We'll use a standard vm that provides everything jos needs (basically hardware
+access), on top of this processes will be executed in a ProcessEnvironment,
+that uses jos.vm.&lt;impl&gt; to execute bytecode in a protected environment. jos.vm
+provides a generic interface for executing bytecode that is controlled by
+ProcessEnvironment (ie. you create a new ProcessEnvironment and then customize
+its &quot;transparency&quot; and customize Factorys to create certain objects (nobody in
+the ProcessEnvironment will know, what is going on)).
+
+jos.vm will satisfy our needs as a vm with lots of features at a lightening
+speed and controlled by ProcessEnvironment we can build customized
+(=downgraded to Suns Java) and really safe SubVMs. Imagine: Jos supports J3
+before Suns beta test finishes. Additionaly the concept can be extended to
+include hardware accelerators and other VMs (ie. Smalltalk ).
+
+Waiting for the enlightenment in the form of your comments, Mark :)
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000154.html">[JOS-Kernel] Construction of a new Java Operating System</A></li>
+	<LI> Next message: <A HREF="000158.html">[JOS-Kernel] Processenvironment, was: &quot;Re: [JOS-Arch] RE: [JOS-UI] peer-ui mappings&quot;</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#155">[ date ]</a>
+              <a href="thread.html#155">[ thread ]</a>
+              <a href="subject.html#155">[ subject ]</a>
+              <a href="author.html#155">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

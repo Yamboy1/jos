@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Planning for next   release (fwd)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000526.html">
+   <LINK REL="Next" HREF="000518.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Planning for next   release (fwd)</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Kernel] Planning for next   release (fwd)">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Wed, 1 Dec 1999 11:00:33 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000526.html">[JOS-Kernel] Planning for next   release (fwd)</A></li>
+        <LI> Next message: <A HREF="000518.html">[JOS-Kernel] Planning for next   release (fwd)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#517">[ date ]</a>
+              <a href="thread.html#517">[ thread ]</a>
+              <a href="subject.html#517">[ subject ]</a>
+              <a href="author.html#517">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	Avery, Corrado, is the message the GC count from heapGC() in heap.c?
+This reads 
+	*** Starting gc #00000001 *** 
+	or
+	*** Finished gc #00000001 *** 
+	with count going up by one for each gc. 
+
+I don't believe that this is the case.  I only see one message something
+like:
+********** 000000009 ********
+This is the only message given after the decaf constructor returns and some
+init method (I think, I don't have the code in front of me) is run.
+
+	Do you have the 1.2 branch of the markstack.c code from CVS - this
+is correct (it has duff code #ifdef NOTDEF'd out)? The 1.1.1.1 branch (by
+anonymous! what's going on here?)contains old and incorrect code. Also, how
+much memory do your machines have?
+
+	-- George
+
+I just do a pure cvs update.  Whatever is given me by that is what I have.
+If we could get the 1.2 branch made the main branch that would be helpful.
+
+My machine has 128 Mb of memory, so I don't think I'm running out that
+quick.  :)
+
+Avery J. Regier
+
+
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	<A HREF="mailto:George.Marrows@Smallworld.co.uk">George.Marrows@Smallworld.co.uk</A>
+</I>&gt;<i> [SMTP:<A HREF="mailto:George.Marrows@Smallworld.co.uk">George.Marrows@Smallworld.co.uk</A>]
+</I>&gt;<i> Sent:	Wednesday, December 01, 1999 11:11 AM
+</I>&gt;<i> To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+</I>&gt;<i> Subject:	RE: [JOS-Kernel] Planning for next   release (fwd)
+</I>&gt;<i> 
+</I>&gt;<i> Todd, Avery, Corrado (and anybody else who's given this a go) --
+</I>&gt;<i> 
+</I>&gt;<i> I'll try and check it out this evening. 
+</I>&gt;<i> 
+</I>&gt;<i> Todd, if you compile without -DNEW_INTERUPT_HANDLING, do you get the same
+</I>&gt;<i> behaviour as Avery and Corrado? Is it different from the behaviour you get
+</I>&gt;<i> with etherboot on the same machine?
+</I>&gt;<i> 
+</I>&gt;<i> Avery, Corrado, is the message the GC count from heapGC() in heap.c? This
+</I>&gt;<i> reads 
+</I>&gt;<i> *** Starting gc #00000001 *** 
+</I>&gt;<i> or
+</I>&gt;<i> *** Finished gc #00000001 *** 
+</I>&gt;<i> with count going up by one for each gc. Do you have the 1.2 branch of the
+</I>&gt;<i> markstack.c code from CVS - this is correct (it has duff code #ifdef
+</I>&gt;<i> NOTDEF'd out)? The 1.1.1.1 branch (by anonymous! what's going on here?)
+</I>&gt;<i> contains old and incorrect code. Also, how much memory do your machines
+</I>&gt;<i> have?
+</I>&gt;<i> 
+</I>&gt;<i> -- George
+</I>&gt;<i> 
+</I>&gt;<i> &gt; -----Original Message-----
+</I>&gt;<i> &gt; From:	Corrado Santoro [SMTP:<A HREF="mailto:Corrado.Santoro@IIT.UNICT.IT">Corrado.Santoro@IIT.UNICT.IT</A>]
+</I>&gt;<i> &gt; Sent:	Wednesday, December 01, 1999 15:54
+</I>&gt;<i> &gt; To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>; <A HREF="mailto:arch@jos.org">arch@jos.org</A>
+</I>&gt;<i> &gt; Subject:	[JOS-Kernel] Planning for next   release (fwd)
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; On Wed, 01 Dec 1999, you wrote:
+</I>&gt;<i> &gt; &gt; Quinn wrote:
+</I>&gt;<i> &gt; &gt; 		Anyone having any luck with booting jJOS from GRUB?  (I can
+</I>&gt;<i> &gt; &gt; boot
+</I>&gt;<i> &gt; &gt; 	it, but it dies almost immediately with a corrupt VM error.  I
+</I>&gt;<i> &gt; &gt; suspect
+</I>&gt;<i> &gt; &gt; 	this is a timing problem with respect to static initialization, but
+</I>&gt;<i> &gt; &gt; I
+</I>&gt;<i> &gt; &gt; 	could be wrong -- I haven't looked into it, because I'm running it
+</I>&gt;<i> &gt; &gt; with
+</I>&gt;<i> &gt; &gt; 	the new interrupt code currently.)
+</I>&gt;<i> &gt; &gt; 
+</I>&gt;<i> &gt; &gt; I'm getting the exact same behaviour when booting from GRUB when
+</I>&gt;<i> &gt; compiling
+</I>&gt;<i> &gt; &gt; with -DNEW_INTERUPT_HANDLING.  When I compile without it, the run ends
+</I>&gt;<i> &gt; with
+</I>&gt;<i> &gt; &gt; something like:
+</I>&gt;<i> &gt; &gt; ************00000009***************
+</I>&gt;<i> &gt; &gt; 
+</I>&gt;<i> &gt; &gt; I've done System.out.println's such that I know decaf is initializing
+</I>&gt;<i> &gt; (ie
+</I>&gt;<i> &gt; &gt; the constructor is run) but I haven't had time to delve any deeper.
+</I>&gt;<i> &gt; &gt; 
+</I>&gt;<i> &gt; &gt; Avery J. Regier
+</I>&gt;<i> &gt; &gt; 
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; ........... I have the same problem!
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; --
+</I>&gt;<i> &gt; ======================================================
+</I>&gt;<i> &gt; Eng. Corrado Santoro - PhD Student
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; Unversity of Catania - Engineering Faculty
+</I>&gt;<i> &gt; Institute of Computer Science and Telecommunications
+</I>&gt;<i> &gt; Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; Tel: +39 095 7382365           Fax: +39 095 7382397
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+</I>&gt;<i> &gt; Personal Home Page:
+</I>&gt;<i> &gt;             <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; ARCA Mobile Agent Framework Home Page:
+</I>&gt;<i> &gt;             <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+</I>&gt;<i> &gt; ======================================================
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; 
+</I>&gt;<i> &gt; _______________________________________________
+</I>&gt;<i> &gt; Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> &gt; <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000526.html">[JOS-Kernel] Planning for next   release (fwd)</A></li>
+	<LI> Next message: <A HREF="000518.html">[JOS-Kernel] Planning for next   release (fwd)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#517">[ date ]</a>
+              <a href="thread.html#517">[ thread ]</a>
+              <a href="subject.html#517">[ subject ]</a>
+              <a href="author.html#517">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

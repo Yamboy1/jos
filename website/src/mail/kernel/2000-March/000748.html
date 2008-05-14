@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] What does JOS look like?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000744.html">
+   <LINK REL="Next" HREF="000746.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] What does JOS look like?</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] What does JOS look like?">tmiller@haverford.edu</A><BR>
+    <I>Fri, 17 Mar 2000 21:38:04 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000744.html">[JOS-Kernel] What does JOS look like?</A></li>
+        <LI> Next message: <A HREF="000746.html">[JOS-Kernel] JDK 1.1.6 vs. JDK 1.1.8</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#748">[ date ]</a>
+              <a href="thread.html#748">[ thread ]</a>
+              <a href="subject.html#748">[ subject ]</a>
+              <a href="author.html#748">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Wow! This is the first time that the keyboard worked for me. I noticed that
+</I>&gt;<i> key combinations aren't being interpreted as I expected. For example, A,
+</I>&gt;<i> Alt+A and Control+A is printed as 'a'. So, we need a terminal application
+</I>&gt;<i> for JOS.
+</I>
+	*shrug* The console driver(s) are still about as basic as they
+get, that is, they ignore the (available) ALT/CTRL information.  On the
+other hand, your build may not to be up-to-date; v1.3 of the i386 build's
+platform/driver/console.java has support for moving the hardware cursor.
+
+	For I/O we currently have a two-teir system: jos.platform.iodevice
+and jos.platform.driver.iodevice, where platform.iodevice is the
+abstraction of the device we wish to present considering it as part of the
+JOS platform.  Non-platform devices could very well be accessed as you've
+suggested previously (URIs).  driver.iodevice implements the platform
+interface (superclass) and either runs or makes calls to run the
+device.  It is set up as an event-based system, with the exception of
+interrupts, whose handlers are run in their own un-interruptable threads
+-- where it's strongly recommended that the handleInterrupt() code do the
+bare minimum necessary to take h/w timeouts into account and let the rest
+of the processing and event generation be handled by some other thread
+which it wakes up after handling the interrupt.
+
+-_Quinn
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000744.html">[JOS-Kernel] What does JOS look like?</A></li>
+	<LI> Next message: <A HREF="000746.html">[JOS-Kernel] JDK 1.1.6 vs. JDK 1.1.8</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#748">[ date ]</a>
+              <a href="thread.html#748">[ thread ]</a>
+              <a href="subject.html#748">[ subject ]</a>
+              <a href="author.html#748">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] code updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000811.html">
+   <LINK REL="Next" HREF="000813.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] code updates</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] code updates">tmiller@haverford.edu</A><BR>
+    <I>Wed, 19 Apr 2000 01:04:29 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000811.html">[JOS-Kernel] Release of rheise.os - multiprocess Java layer for JOS</A></li>
+        <LI> Next message: <A HREF="000813.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#812">[ date ]</a>
+              <a href="thread.html#812">[ thread ]</a>
+              <a href="subject.html#812">[ subject ]</a>
+              <a href="author.html#812">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	First off, please take a look at decaf.cc and see if the assert
+style make sense.  (If it does, the NO_ASSERT ifdef's can be changed not
+to do anything.)  Specifically, I originally had ASSERT_NOT_NULL as
+ASSERT_CONSISTENT; I'm wondering if anyone has a good argument either way.
+
+	This is the first bit of interpreter integration; see the commit
+message for more comments.  Most of the integration/porting ought to go
+fairly smoothly.  The harder of the tasks I see ahead are as
+follows: (1) the other invocation functions (2) invokeNativeMethod()*
+(3) handling exceptions properly.  The assertions macros may help with
+this.
+
+	I'll take a closer look at rheise.os and review the java processes
+discussion before doing much more.
+
+-_Quinn
+
+*: invokeNativeMethod(): I'm still debating how to do this.  I need to
+look into BCNI (again); I may just write it using the dl* commands
+available to the host build** and write a native implementation with
+static linkage that uses hashtable lookups.  (With the interning of the
+functions is done when the 'library is loaded.')
+
+**: An interesting question now arises.  Assuming we allow user-space
+native code, we have to maintain native code separation the same way we do
+bytecode for processes, and for the same reason.  (Otherwise, all
+nativecode is in the kernel, and since it's statically linked, you have to
+restart the kernel if you want to use new native code -- and it's not
+a problem to have the native code in one place, ignoring java processes.)
+
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000811.html">[JOS-Kernel] Release of rheise.os - multiprocess Java layer for JOS</A></li>
+	<LI> Next message: <A HREF="000813.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#812">[ date ]</a>
+              <a href="thread.html#812">[ thread ]</a>
+              <a href="subject.html#812">[ subject ]</a>
+              <a href="author.html#812">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

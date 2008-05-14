@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] NATIVE_CLOCK?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000386.html">
+   <LINK REL="Next" HREF="000388.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] NATIVE_CLOCK?</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] NATIVE_CLOCK?">jm@mak.com</A><BR>
+    <I>Fri, 24 Sep 1999 17:03:13 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000386.html">[JOS-Kernel] Re: stupid code proposal for decaf</A></li>
+        <LI> Next message: <A HREF="000388.html">[JOS-Kernel] Re: NATIVE_CLOCK?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#387">[ date ]</a>
+              <a href="thread.html#387">[ thread ]</a>
+              <a href="subject.html#387">[ subject ]</a>
+              <a href="author.html#387">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Guys;
+
+I think I made a mistake in failing to recognize a fairly nasty (and
+pretty obvious in hindsight) interrupt-related hazard in the interrupt
+notification schema.  In order to fix it, I'd like to muck about the
+scheduler::notifyOfInterrupts and other related routines.
+
+I notice that scheduler.cc contains some ifdefs related to NATIVE_CLOCK,
+which looks like it blows off notifying Java threads if the interrupt is
+number 8 (which is, BTW, unfortunately, a machine-dependent thing,
+located in a machine-independent file).  Doing this would preclude Java
+drivers from waiting on the clock interrupt.  In fact, I would like to
+use the clock interrupt to help debug the problem.  Unless I hear some
+objections from you all out there in kernel-land, I'm going to elide
+this logic prior to rewriting the notification handler(s).
+
+Also, has anybody else seen similar problems?  I know Todd must've been
+bitten, because of the PARANOID printouts in the notifyOfInterrupts
+method.
+
+-jm
+
+-- 
+==== John Morrison ==== <A HREF="mailto:jm@mak.com">jm@mak.com</A> == <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== MaK Technologies Inc., 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000386.html">[JOS-Kernel] Re: stupid code proposal for decaf</A></li>
+	<LI> Next message: <A HREF="000388.html">[JOS-Kernel] Re: NATIVE_CLOCK?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#387">[ date ]</a>
+              <a href="thread.html#387">[ thread ]</a>
+              <a href="subject.html#387">[ subject ]</a>
+              <a href="author.html#387">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

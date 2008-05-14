@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] What does JOS look like?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000783.html">
+   <LINK REL="Next" HREF="000748.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] What does JOS look like?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] What does JOS look like?">gchii@mindspring.com</A><BR>
+    <I>Fri, 17 Mar 2000 19:53:36 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000783.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000748.html">[JOS-Kernel] What does JOS look like?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#744">[ date ]</a>
+              <a href="thread.html#744">[ thread ]</a>
+              <a href="subject.html#744">[ subject ]</a>
+              <a href="author.html#744">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Here is what JOS looks like on my machine. The &quot;hardware&quot; cursor always
+stays at line 3, column 1. For sake of discussion, the first line at the
+top of the screen is line 1.
+
+[1] jJOS/decaf
+
+[2] Processor type: &quot;CyrixInstead&quot;
+
+[3] A20 OK, loading decaf...
+
+[4] process_args(&quot;arch/i386/nativecode/jjos-binary  init arg0 arg1&quot;)
+
+[5] argvlocal[00000000] = arch/i386/nativecode/jjos-binary
+
+[6] argvlocal[00000001] = init
+
+[7] argvlocal[00000002] = arg0
+
+[8] argvlocal[00000003] = arg1
+
+[9] bailing out on #00000004
+
+[10] init for jJOS/decaf, version 0.2
+
+[11] init: generating keyboard driver...
+
+[12] init: initializing keyboard driver...
+
+[13] init: generating console daemon...
+
+[14] init: initializing console daemon...
+
+-----
+
+Wow! This is the first time that the keyboard worked for me. I noticed that
+key combinations aren't being interpreted as I expected. For example, A,
+Alt+A and Control+A is printed as 'a'. So, we need a terminal application
+for JOS.
+
+-----
+
+We must have a mechanism to load classes dynamically. There are lots of
+classes that do not and should not go inside classes.zip.
+
+When booting with Etherboot, I would like to use the network. If I have
+java.sql in a package file called /jpkg/java.sql.package on my HTTP
+service, JOS should be able to download it using the java.net package.
+
+When booting with GRUB, I would like to load additional package files from
+the /jpkg directory. It seems that GRUB might be less complex. It might use
+a class that reads sectors from a disk. If such a class were added to
+classes.zip, a program could use it to read additional packages. If code
+for this class were compiled directly into jJOS/decaf, it could load
+classes.zip.
+
+-----
+
+For asynchonous I/O, each device has a corresponding listener interface.
+The run() method might run a device until it is closed. I think we might
+need both a low-level keyboard class and a high-level keyboard class. The
+low-level class should be jos.device.keyboard (right?) The high-level class
+could be org.jos.device.Keyboard. Here is more about a asynchronous
+user-level keyboard driver:
+
+// Shell.java
+import org.jos.device.Keyboard;
+import org.jos.device.KeyboardEvent;
+public class Terminal
+    implements KeyboardListener {
+  private static final char LF = '\n';
+  public Terminal() {
+  }
+  public void run() {
+    String s = &quot;bcni:org.jos.device.Keyboard&quot;;
+    keyboard = (Keyboard) Factory.getObject( s );
+    if ( keyboard == null ) {
+      return;
+    }
+    keyboard.setListener( this );
+    keyboard.run();
+  }
+  public void onKey( Key v ) {
+    if ( v.equals( Key.ctrlC ) ) {
+      keyboard.close();
+    }
+
+    print( v.toChar() );
+  }
+  public void print( String v ) {
+    int iMax = v.length();
+    for ( int i = 0; i &lt; iMax; i++ ) {
+      char ch = v.charAt( i );
+      if ( ch == BS ) {
+        gotoxy( row, column-- );
+        continue;
+      }
+      if ( ch == LF ) {
+        gotoxy( row++, (column = 0) );
+        continue;
+      }
+      gotoxy( row, column++ );
+      putch( ch );
+    }
+  }
+  public void println( String v ) {
+    print( v + LF );
+  }
+  private Keyboard keyboard;
+}
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000783.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000748.html">[JOS-Kernel] What does JOS look like?</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#744">[ date ]</a>
+              <a href="thread.html#744">[ thread ]</a>
+              <a href="subject.html#744">[ subject ]</a>
+              <a href="author.html#744">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

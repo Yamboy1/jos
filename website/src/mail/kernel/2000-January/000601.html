@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Oops!  consoleNative fix</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ajregier%40earthlink.net">
+   <LINK REL="Previous"  HREF="000600.html">
+   <LINK REL="Next" HREF="000602.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Oops!  consoleNative fix</H1>
+    <B>Avery J. Regier</B> 
+    <A HREF="mailto:ajregier%40earthlink.net"
+       TITLE="[JOS-Kernel] Oops!  consoleNative fix">ajregier@earthlink.net</A><BR>
+    <I>Wed, 5 Jan 2000 20:59:28 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000600.html">[JOS-Kernel] bug report</A></li>
+        <LI> Next message: <A HREF="000602.html">[JOS-Kernel] Oops!  consoleNative fix</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#601">[ date ]</a>
+              <a href="thread.html#601">[ thread ]</a>
+              <a href="subject.html#601">[ subject ]</a>
+              <a href="author.html#601">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+
+Todd,
+
+I have noticed that the
+/arch/i386/bytecode/jos/platform/driver/consoleNative.java never made it into
+the CVS or into my previous diff!  Here are both that file and a diff off of
+the current CVS which works around the current native method implementing an
+interface problem.  Just add these and what's in CVS will work out of the box.
+
+I tried to just commit these, but I have insufficient karma for that.
+
+- Avery
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD
+Content-Type: text/plain;
+  name=&quot;JJOS-native.diff&quot;
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment; filename=&quot;JJOS-native.diff&quot;
+
+Index: JJOS/common/decaf/d_main.cc
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+RCS file: /sites/jos/cvs/cvsroot/JJOS/common/decaf/d_main.cc,v
+retrieving revision 1.35
+diff -r1.35 d_main.cc
+178,180c178,180
+&lt;   internBuiltInMethod(jos_platform_driver_consoleNative_putChar, &quot;jos/p=
+latform/driver/consoleNative&quot;, &quot;putChar&quot;);
+&lt;   internBuiltInMethod(jos_platform_driver_consoleNative_setChar, &quot;jos/p=
+latform/driver/consoleNative&quot;, &quot;setChar&quot;);
+&lt;   internBuiltInMethod(jos_platform_driver_consoleNative_getChar, &quot;jos/p=
+latform/driver/consoleNative&quot;, &quot;getChar&quot;);
+---
+&gt;<i>   internBuiltInMethod(jos_platform_driver_consoleNative_putChar, &quot;jos/p=
+</I>latform/driver/consoleNative&quot;, &quot;putNativeChar&quot;);
+&gt;<i>   internBuiltInMethod(jos_platform_driver_consoleNative_setChar, &quot;jos/p=
+</I>latform/driver/consoleNative&quot;, &quot;setNativeChar&quot;);
+&gt;<i>   internBuiltInMethod(jos_platform_driver_consoleNative_getChar, &quot;jos/p=
+</I>latform/driver/consoleNative&quot;, &quot;getNativeChar&quot;);
+
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD
+Content-Type: text/x-java;
+  name=&quot;consoleNative.java&quot;
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment; filename=&quot;consoleNative.java&quot;
+
+/**
+ * consoleNative.java
+ *
+ * a single virtual console,
+ * implemented in (PC) VGA text mode.
+ */
+
+package jos.platform.driver;
+
+import jos.system.*;
+import jos.platform.event.*;
+
+public class consoleNative extends Object implements ConsoleDriver {
+=09public void focusGained( FocusEvent fe ) {
+=09=09setVisible(true);
+=09}
+=09public void focusLost( FocusEvent fe ) {
+=09=09setVisible(false);
+=09}
+
+=09public char getChar( int row, int column ) {
+=09=09return getNativeChar(row, column);
+=09}=20
+=09public native char getNativeChar(int row, int column );
+
+=09public void setChar( int row, int column, char c ) {
+=09=09setNativeChar(row, column, c);
+=09}=20
+=09public native void setNativeChar( int row, int column, char c );
+
+=09public void putChar( char c ) {
+=09=09putNativeChar(c);
+=09}=20
+=09public native void putNativeChar( char c );
+
+=09public native void setVisible(boolean v);
+
+} /* end class consoleNative */
+
+
+--Boundary-=_nWlrBbmQBhCDarzOwKkYHIDdqSCD--
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000600.html">[JOS-Kernel] bug report</A></li>
+	<LI> Next message: <A HREF="000602.html">[JOS-Kernel] Oops!  consoleNative fix</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#601">[ date ]</a>
+              <a href="thread.html#601">[ thread ]</a>
+              <a href="subject.html#601">[ subject ]</a>
+              <a href="author.html#601">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

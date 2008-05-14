@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: Big changes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000226.html">
+   <LINK REL="Next" HREF="000234.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: Big changes</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Re: Big changes">jm@mak.com</A><BR>
+    <I>Sat, 14 Aug 1999 13:38:32 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000226.html">[JOS-Kernel] Re: Big changes</A></li>
+        <LI> Next message: <A HREF="000234.html">[JOS-Kernel] Re: Big changes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#228">[ date ]</a>
+              <a href="thread.html#228">[ thread ]</a>
+              <a href="subject.html#228">[ subject ]</a>
+              <a href="author.html#228">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+Todd L. Miller wrote:
+&gt;<i>         Whatever system you end up with should be relatively simple to
+</I>&gt;<i> extend to dynamically loaded native libraries, as well.  On my end of
+</I>
+I would venture to say the DLL/DSO native libraries are not on the
+horizon for now.  There are so many other things that need doing that
+native libraries have fallen over (beyond?) the horizon.  (Like, maybe
+getting to the point where we can run an interesting Java program at
+all?)
+
+On the off-chance that this is a performance-related need: the solution
+to bad performance should be better performance (e.g., optimized JVM,
+JIT, HotSpot, etc.), not native libraries.  JNI should be used to get to
+large, pre-existing machine-dependent code bases (e.g., OpenGL), of
+which we have none for JOS.
+
+On a more concrete level, the solution I have is not optimal (although
+it's better than the Order(N) performing solution it replaced), and it
+doesn't extend to native libraries well. This is, in part, because I
+don't have access to rebuildable Sun JDK sources, and we're not yet
+using GNU classpath.  Right now, we're trapping calls to non-native
+methods, which means I can't just see if the resolved_method is native,
+and only THEN look up the built-in method in the hashtable.  I have to
+pre-screen all the calls to ALL methods, and then trap to the overriding
+built-in.  I figure I've got two options:
+
+(1) If we use GNU classpath, we can simply make the built-ins &quot;native&quot;
+Java methods, and then we can change those 10 (or so) lines of code in
+the JVM, and make things run much faster.  (I think this is the Right
+Way to do this.)  Much later (in the distant future?) we could extend
+this to write a whole bunch of code to intern native methods, and use
+that same mechanism.
+
+(2) If we don't want to wait that long, alternatively, I think I could
+force a loading of all the classes for which I have built-in methods,
+and then traverse the resolved method tables and find and hammer all the
+ones I want to be overriden with &quot;native&quot; methods.  This one would
+entail some changes to the decaf initialization (slowing it down, and
+being more memory-consumptive, because we'd have to load all these
+classes whether we needed them or not -- don't know how many this is),
+and to the method-invocation machinery (I think).
+
+&gt;<i> things, I've been hammering away at decaf (mostly interp.cc), writing in
+</I>&gt;<i> some changes here and there that I don't recall right now, having decided
+</I>&gt;<i> to go ahead and work on starting the merge.  The most recent was
+</I>&gt;<i> implementing synchronized methods, as well as some work on the java end of
+</I>&gt;<i> things trying to get the virtual console switching to work.
+</I>
+OK.  I hope I haven't changed things too much so that you can't easily
+find your way around!  Once we plug in the memory management stuff,
+things should be much better!
+
+-jm
+
+-- 
+==== John Morrison ==== <A HREF="mailto:jm@mak.com">jm@mak.com</A> == <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== MaK Technologies Inc., 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000226.html">[JOS-Kernel] Re: Big changes</A></li>
+	<LI> Next message: <A HREF="000234.html">[JOS-Kernel] Re: Big changes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#228">[ date ]</a>
+              <a href="thread.html#228">[ thread ]</a>
+              <a href="subject.html#228">[ subject ]</a>
+              <a href="author.html#228">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

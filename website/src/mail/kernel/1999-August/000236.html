@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: Big changes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000234.html">
+   <LINK REL="Next" HREF="000244.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: Big changes</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Re: Big changes">jm@mak.com</A><BR>
+    <I>Mon, 16 Aug 1999 07:23:30 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000234.html">[JOS-Kernel] Re: Big changes</A></li>
+        <LI> Next message: <A HREF="000244.html">[JOS-Kernel] Re: Big changes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#236">[ date ]</a>
+              <a href="thread.html#236">[ thread ]</a>
+              <a href="subject.html#236">[ subject ]</a>
+              <a href="author.html#236">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd;
+
+Todd L. Miller wrote:
+&gt;<i> 
+</I>&gt;<i>         w.r.t. dynamic libraries, no, it's not a priority right now, but a
+</I>&gt;<i> little foresight is always worthwhile...
+</I>&gt;<i> 
+</I>&gt;<i>         w.r.t. to speeding up native-code access even farther: why don't
+</I>&gt;<i> we check if the method is native before handing it off to builtins lookup?
+</I>
+Obviously, this is a much better way to do things.  However, I didn't do that
+because I thought there were some methods in the JDK we absolutely didn't want
+to run (I deduced this, apparently incorrectly, from the way the original code
+was written).
+
+&gt;<i> Originally, it was set up this way because Bad Things would happen trying
+</I>&gt;<i> to use System.[in|err].print[ln] as a debugging tool... however, decaf has
+</I>&gt;<i> gotten much more capabale since I wrote those methods in.  It would be
+</I>
+Great, I completely misinterpreted the reasons for this, then.  (That's a good
+thing, actually.)
+
+&gt;<i> worthwhile to try adding a native check before the builtin lookup, and see
+</I>
+We are already checking (and thus paying a cost for) this...  So, I will just
+change the code around to only check the built-in table if and only if the
+resolved_method* tells me that it's a native method.  This should be a
+reasonably big performance win.
+
+&gt;<i> if things got far enough along to write in a native-only call.  (Likewise,
+</I>&gt;<i> make sure that in8(), etc, calls were actually marked as native.)
+</I>
+It is my understanding that this is already the case (except maybe for the
+print() and println() methods...).  Any idea how that works from your prior
+experience with this?
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000234.html">[JOS-Kernel] Re: Big changes</A></li>
+	<LI> Next message: <A HREF="000244.html">[JOS-Kernel] Re: Big changes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#236">[ date ]</a>
+              <a href="thread.html#236">[ thread ]</a>
+              <a href="subject.html#236">[ subject ]</a>
+              <a href="author.html#236">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

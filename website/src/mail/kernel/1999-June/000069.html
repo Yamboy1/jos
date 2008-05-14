@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000068.html">
+   <LINK REL="Next" HREF="000071.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf updates">tmiller@haverford.edu</A><BR>
+    <I>Wed, 9 Jun 1999 14:35:24 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000068.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000071.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#69">[ date ]</a>
+              <a href="thread.html#69">[ thread ]</a>
+              <a href="subject.html#69">[ subject ]</a>
+              <a href="author.html#69">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I'm afraid I don't understand: why can't you just call some sort of member
+</I>&gt;<i> function like:
+</I>&gt;<i> 	bool frame::throwException(java_object *);
+</I>&gt;<i> or
+</I>&gt;<i> 	bool java_thread::throwException(java_object *);
+</I>&gt;<i>
+</I>&gt;<i> It would unwind the frame stack to the &quot;right&quot; frame (based upon either an
+</I>&gt;<i> explicit exception stack or a traversal of the frames).  frame::runOpcode would
+</I>&gt;<i> simply return &quot;true&quot; to indicate that the thread should continue execution.  The
+</I>&gt;<i> next java_thread::runOpcode calls currentFrame()-&gt;runOpcode(), and you get the
+</I>&gt;<i> &quot;right&quot; frame.  (I'm presuming that exception handlers are simply different PC
+</I>&gt;<i> locations within a given frame -- right?)  I'm thinking this will All Just Work.
+</I>
+	Maybe an example is necessary:  I'm three frames deep in a JVM
+call, say I'm doing getClass(), which throws a NoSuchClassDefinition
+exception.  I /can/ call thread::throwException( NoSuchClassDefinition ),
+and all the java-specific things would happen, but, here's the kicker:
+
+	case bc::some_bytecode:
+		...
+		jc = getClass();
+		...
+		op_stack.push( jc-&gt;fields[x] );
+		break;
+
+	...
+	return true;
+
+	How does the code AFTER the getClass() call know NOT to push
+something on the op_stack after getClass() throws an exception?  I do NOT
+want to rewrite every single function call in the JVM to (a) check all of
+/its/ calls for exceptions and abort back to runOpcode() (which will in 
+turn, have to abort) and (b) return true or false depending on if an
+exception was thrown or not.  It's doable now, but it won't be in the
+future: native methods that throw exceptions need to be handled (unravel
+the native stack same as I mentioned in the last email for intra-JVM
+throws); the native portion of the class library (classpath?) is where you
+can't get around exception-handling in native methods.  (Rewriting the
+classlibrary is a heroic effort and Not The Right Thing To Do, either, I
+think.)
+
+	It is difficult but doable to arrange for the native exception to
+be converted into a java exception and have the necessary things happen to
+the thread's data structures -- the tremendous difficulty is in aborting
+the rest of the call(s), all the way back to where the scheduler can move
+on to the next timeslice.  It seems to me that we'd be re-writing C++'s
+exception codes by hand; further, it seems evident to me that the Right
+Way to handle exceptions in native code is with native exceptions, which
+would all be trapped and converted in runOpcode().
+
+	Am I being clear about the problem here?
+
+-_Quinn
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000068.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000071.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#69">[ date ]</a>
+              <a href="thread.html#69">[ thread ]</a>
+              <a href="subject.html#69">[ subject ]</a>
+              <a href="author.html#69">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

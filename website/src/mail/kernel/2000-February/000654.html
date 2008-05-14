@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Multi-Process Spec</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000653.html">
+   <LINK REL="Next" HREF="000655.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Multi-Process Spec</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Multi-Process Spec">gchii@mindspring.com</A><BR>
+    <I>Fri, 04 Feb 2000 09:24:22 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000653.html">[JOS-Kernel] Multi-Process Spec</A></li>
+        <LI> Next message: <A HREF="000655.html">[JOS-Kernel] Multi-Process Spec</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#654">[ date ]</a>
+              <a href="thread.html#654">[ thread ]</a>
+              <a href="subject.html#654">[ subject ]</a>
+              <a href="author.html#654">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 10:40 PM 2/3/00 -0700, Patrick Tullmann &lt;<A HREF="mailto:tullmann@cs.utah.edu">tullmann@cs.utah.edu</A>&gt; wrote:
+&gt;<i>One nit on your definition of class version.  Two classes are the same
+</I>&gt;<i>only if the bytecode is identical and if all the referenced classes
+</I>&gt;<i>are identical.
+</I>
+I believe the specification meant Class File, not Class:
+
+&quot;Version x of Class File A is equal to version y of Class File A if and
+only if x is exactly the same as y.&quot;
+
+All class files in RAM are read-only, immutable byte arrays. If the
+standard class libraries represent 4MB of class files, it is possible to
+load 4MB of class files once rather than once per process.
+
+As a read-only byte array, a class file can be internalized. In the same
+way that the Java Virtual Machine uses String.intern() to save memory for
+instances of String, a custom class loader for JOS could use Class.intern()
+to save memory for class files.
+
+The JOS version of defineClass() would compare the given class file to
+class files that have already been defined on the system. The kernel
+process would return a system-wide copy of the class file, eliminating
+duplicates of the same exact class.
+
+A kernel/virtual machine could easily save RAM by using a class file cache.
+The class files do not need to remain in RAM permanently, but virtually.
+Class files can be swapped out to disk, swapped in from disk only when they
+are needed.
+
+It does not matter where the class file came from. Even when a class file
+is downloaded across the network, if it exactly matches a class file in the
+class file cache, the existing copy of the class file in the cache will be
+used. The class file cache can be persistent, enabling the
+processor-intensive verification of every class file once, rather than once
+per process.
+
+An instance of java.lang.Class is not cached and is not cache-able. Each
+instance of java.lang.Class depends on its process and class loader.
+
+From my research in BCNI, a new virtual machine is required. A traditional
+JVM cannot save RAM by internalizing all class files. The custom class
+loader does not load class files but loads process-specific instances of
+java.lang.Class. Internalizing instances of java.lang.Class would not save RAM.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000653.html">[JOS-Kernel] Multi-Process Spec</A></li>
+	<LI> Next message: <A HREF="000655.html">[JOS-Kernel] Multi-Process Spec</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#654">[ date ]</a>
+              <a href="thread.html#654">[ thread ]</a>
+              <a href="subject.html#654">[ subject ]</a>
+              <a href="author.html#654">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

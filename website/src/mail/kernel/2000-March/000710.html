@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Kernel Tests</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000704.html">
+   <LINK REL="Next" HREF="000713.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Kernel Tests</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Kernel Tests">tmiller@haverford.edu</A><BR>
+    <I>Tue, 7 Mar 2000 22:58:24 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000704.html">[JOS-Kernel] Kernel Tests</A></li>
+        <LI> Next message: <A HREF="000713.html">[JOS-Kernel] Kernel Tests</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#710">[ date ]</a>
+              <a href="thread.html#710">[ thread ]</a>
+              <a href="subject.html#710">[ subject ]</a>
+              <a href="author.html#710">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> It is possible, isn't it? We can write C/C++ programs to test/demonstrate
+</I>&gt;<i> kernel functions. At the point where jJOS invokes decaf, jJOS could invoke
+</I>&gt;<i> a power-on self-test, a diagnostic program, or some other
+</I>&gt;<i> test/demonstration program written in C/C++.
+</I>
+	The kernel right now is cleanly (sort of) divided between the
+ASM, C, and C++ sections.  The C++ sections could be unit tested by class,
+but almost all of the ASM can't be tested without running it.  Someone
+who's sufficiently adventerous might be able to hack kdb or VMware to help
+out here, but I'm certainly note one of them :)  The C section is the
+garbage collector, whic is One Of Those Things I Would Someday Like To Try
+My Hand At.  I'm not really sure what the proper testing procedure for a
+garbage collector (esp. on written in C) might be, but if you're curios,
+ask George Marrows, who wrote it.
+
+&gt;<i> Where and when should we implement memory management? In the kernel? Or, in
+</I>&gt;<i> decaf? Should we do it now, when there is no swap file? Or later?
+</I>
+	No, definitely not in decaf.  The memory management is going to be
+intimately tied with the virtual memory system and the garbage collector,
+so they'll need to be looked at together.  (For instance, it may be
+worthwhile to garbage-collect a page before swapping it out, and so on; do
+we prefer to garbage collect before swapping when we run out of RAM?  How
+does the pager's LRU list interact with the possibility of generational
+GC?  Etc.)
+
+&gt;<i> We should implement memory management in the kernel. The host build of the
+</I>&gt;<i> kernel simply uses the memory management of a foreign operating system. The
+</I>&gt;<i> i386 build of the kernel must implement memory management independently
+</I>&gt;<i> from any other operating system.
+</I>
+	Since we're currently running a monolithic system, much less a
+monolithic kernel, I have to agree with you here.  On the other hand,
+Linux seems to be doing just fine with a user-space swapper, etc -- and
+Mach with its microkernel architecture.  Whatever we en up doing w.r.t. to
+memory management should be portable with the minimum of effort to
+whatever kernel/system design we end up `finalizing' on.
+
+-_Quinn
+	
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000704.html">[JOS-Kernel] Kernel Tests</A></li>
+	<LI> Next message: <A HREF="000713.html">[JOS-Kernel] Kernel Tests</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#710">[ date ]</a>
+              <a href="thread.html#710">[ thread ]</a>
+              <a href="subject.html#710">[ subject ]</a>
+              <a href="author.html#710">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

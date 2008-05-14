@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000066.html">
+   <LINK REL="Next" HREF="000069.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] decaf updates">jm@mak.com</A><BR>
+    <I>Wed, 09 Jun 1999 12:50:58 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000066.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000069.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#68">[ date ]</a>
+              <a href="thread.html#68">[ thread ]</a>
+              <a href="subject.html#68">[ subject ]</a>
+              <a href="author.html#68">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+Todd L. Miller wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; Based upon a whole 5 seconds of thought, I think you can handle both the &quot;code
+</I>&gt;<i> &gt; itself&quot; and &quot;functions called from w/in runOpcode&quot; cases the same way.  Since
+</I>&gt;<i> &gt; they're (just about) frame methods, you can call a frame/java_thread method to
+</I>&gt;<i> &gt; pop the appropriate stack frames in the classical fashion.  Right?
+</I>&gt;<i> 
+</I>&gt;<i>          Now that you've written the thread pointer in, yes.  Otherwise,
+</I>&gt;<i> whose stack do I pop/pc do I manipulate?  I want to call
+</I>&gt;<i> thread-&gt;throwExecption( new IndexOutOfBoundsException() ) and have
+</I>&gt;<i> everything happen automagically.  The problem is the return values --
+</I>&gt;<i> runOpcode() /must/ return, which (AFAIK) means that the function called
+</I>&gt;<i> from runOpcode() /must itself/ return, and in some fashion that prevents
+</I>&gt;<i> runOpcode() from doing Bad Things.  The obvious way would be C++
+</I>&gt;<i> exceptions causing a jump to the throwException() handler, which does the
+</I>&gt;<i> Right Thing w.r.t. to its java_thread (and, BTW, also means that I don't
+</I>&gt;<i> have to make sure that /every/ function gets the current thread pointer),
+</I>&gt;<i> so that the next time the java_thread runs, it's running the
+</I>&gt;<i> exception-handling opcodes, and then returns to the scheduler (which
+</I>&gt;<i> might be somewhat problematic).  Since, AFAIK, JJOS doesn't support
+</I>&gt;<i> exceptions, that route is closed.
+</I>
+I'm afraid I don't understand: why can't you just call some sort of member
+function like:
+	bool frame::throwException(java_object *);
+or
+	bool java_thread::throwException(java_object *);
+
+It would unwind the frame stack to the &quot;right&quot; frame (based upon either an
+explicit exception stack or a traversal of the frames).  frame::runOpcode would
+simply return &quot;true&quot; to indicate that the thread should continue execution.  The
+next java_thread::runOpcode calls currentFrame()-&gt;runOpcode(), and you get the
+&quot;right&quot; frame.  (I'm presuming that exception handlers are simply different PC
+locations within a given frame -- right?)  I'm thinking this will All Just Work.
+
+&gt;<i>         Without exceptions, you can pass the thread along, (just modifying
+</I>&gt;<i> all the function headers is non-trivial) but the problem
+</I>&gt;<i> of returning to the scheduler still exists.*
+</I>&gt;<i> 
+</I>&gt;<i> &gt; Based upon another whole 5 seconds of thought, the only nasty problem I can
+</I>&gt;<i> &gt; think of is (if there is?) an &quot;out of memory&quot; exception (it would Truly Suck to
+</I>&gt;<i> &gt; be out of memory and then have to allocate an &quot;out of memory&quot; exception to
+</I>&gt;<i> &gt; throw).  One might want to have a preallocated exception allocated for that
+</I>&gt;<i> &gt; case.
+</I>&gt;<i> 
+</I>&gt;<i>         Yes.  The problem I was thinking about had more to deal with the
+</I>&gt;<i> problem of creating a java instance (i.e. IndexOutOfBoundsException) from
+</I>&gt;<i> the nativecode that didn't have access to the classloader.  Though this
+</I>&gt;<i> could probably be gotten around.
+</I>
+I think the java_thread's java_class keeps a reference to its class loader lying
+about, although I'll have to check.
+
+&gt;<i> * The only idea that would save me from having to rewrite all the return
+</I>&gt;<i> values and function calls would be some bit of (machine?) code that would
+</I>&gt;<i> pop the stack until it got back to scheduler, perhaps set at the beginning
+</I>&gt;<i> of the runOpcode() call.  But I have no idea how to do this.
+</I>
+Obviously, I'm hoping we don't need to do this...
+
+-jm
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000066.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000069.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#68">[ date ]</a>
+              <a href="thread.html#68">[ thread ]</a>
+              <a href="subject.html#68">[ subject ]</a>
+              <a href="author.html#68">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

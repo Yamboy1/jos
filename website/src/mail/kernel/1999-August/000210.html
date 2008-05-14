@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Thomas Bocek's VGA driver L-I-V-E-S in CVS!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000209.html">
+   <LINK REL="Next" HREF="000213.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Thomas Bocek's VGA driver L-I-V-E-S in CVS!</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Thomas Bocek's VGA driver L-I-V-E-S in CVS!">jm@mak.com</A><BR>
+    <I>Mon, 09 Aug 1999 12:54:45 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000209.html">[JOS-Kernel] Thomas Bocek's VGA driver L-I-V-E-S in CVS!</A></li>
+        <LI> Next message: <A HREF="000213.html">[JOS-Kernel] bug in decaf</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#210">[ date ]</a>
+              <a href="thread.html#210">[ thread ]</a>
+              <a href="subject.html#210">[ subject ]</a>
+              <a href="author.html#210">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+John Morrison wrote:
+&gt;<i> Two suggestions:
+</I>&gt;<i> 
+</I>&gt;<i> (1) Find out why the write* routines are so slow (I can think of several reasons
+</I>&gt;<i> right off of the top of my head... why not just re-order the built-in-routine
+</I>&gt;<i> checks to check the read/write operations first, before the other ones?), and
+</I>&gt;<i> 
+</I>&gt;<i> (2) See if the JavaOS &quot;memory&quot; classes have any interfaces for block memory
+</I>&gt;<i> operations, and then implement them.
+</I>
+More suggestions:
+
+(3) Find out if writing directly to VGA display memory is inherently any slower
+than writing to main system (vanilla RAM) memory or if there's any speed
+difference when the VGA page is selected...  If so, then we might need to do
+something algorithmically cleverer for clearing...
+
+(4) Find out if there are any VGA device controls which will clear/set banks of
+display memory for you.  I have a fabulous &quot;Guide to VGA/SVGA&quot; book at home --
+can't remember the title right now...
+
+However, suggestion #1 is the most important.  If there's something that's
+causing these operations to be slow, we need to speed it up.  There are other
+bytecodes being executed, too, and maybe the whole enchilada needs speeding
+up... or nobody will ever use the thing...
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000209.html">[JOS-Kernel] Thomas Bocek's VGA driver L-I-V-E-S in CVS!</A></li>
+	<LI> Next message: <A HREF="000213.html">[JOS-Kernel] bug in decaf</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#210">[ date ]</a>
+              <a href="thread.html#210">[ thread ]</a>
+              <a href="subject.html#210">[ subject ]</a>
+              <a href="author.html#210">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

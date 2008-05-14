@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Matt.Albrecht%40trilogy.com">
+   <LINK REL="Previous"  HREF="000777.html">
+   <LINK REL="Next" HREF="000786.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Matt.Albrecht@trilogy.com</B> 
+    <A HREF="mailto:Matt.Albrecht%40trilogy.com"
+       TITLE="[JOS-Kernel] Device as a digital resource">Matt.Albrecht@trilogy.com</A><BR>
+    <I>Wed, 22 Mar 2000 12:24:13 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000777.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000786.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#781">[ date ]</a>
+              <a href="thread.html#781">[ thread ]</a>
+              <a href="subject.html#781">[ subject ]</a>
+              <a href="author.html#781">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>
+
+
+Gilbert wrote:
+&gt;<i>At 11:01 AM 3/21/00 -0600, <A HREF="mailto:Matt.Albrecht@trilogy.com">Matt.Albrecht@trilogy.com</A> wrote:
+</I>&gt;&gt;<i>But wouldn't it be &quot;nicer&quot; if, instead of returning null, it returns an
+</I>&gt;&gt;<i>error message describing what's wrong with the request, such as &quot;out of
+</I>&gt;&gt;<i>bounds memory allocation&quot;, or &quot;XYZ has already allocated that resource&quot;,
+</I>&gt;&gt;<i>and so on.
+</I>&gt;<i>
+</I>&gt;<i>For BCNI and Smart API, no exception should be thrown by a controller or
+</I>&gt;<i>factory. This has been a difficult architectural decision. In a multiple
+</I>&gt;<i>stage factory, null can be returned much faster than an exception.
+</I>Throwing
+&gt;<i>an exception complicates every Smart API interface. It complicates
+</I>&gt;<i>interprocess communication.
+</I>
+Ok.  How about if we return a &quot;container&quot; object, which is an instance of
+what needs to be returned, but actually contains an error message?
+
+So, we could have, say, a RAM controller which is actually an error
+wrapper.  If the user tried to access an area of memory in which they don't
+have the security permissions, (say) a RamDeviceErrorController is
+returned.  Any access to it's methods would either throw an exception, or
+do nothing, or print to a log file, or any other countless possibilities.
+This way, the programmer still will not be able to access the requested
+device, but errors can still be found.
+
+Perhaps there's another way?  If we re-do the URI structure, perhaps we
+could do it in such a way that error messages can be stored internally:
+     public void example()
+     {
+          URI uri = &quot;ram:<A HREF="device://localhost/iobus?start=0x220&end=0x22f";">device://localhost/iobus?start=0x220&amp;end=0x22f&quot;;</A>
+          RamDevice ram = (RamDevice) uri.getObject();
+          if (ram == null)
+          {
+               System.err.println(&quot;Got an error:&quot; + uri.getErrorMessage()
+);
+               return;
+          }
+          ...
+     }
+
+
+&gt;&gt;<i>Also, how would one deallocate the resource?  Would this need to be
+</I>&gt;&gt;<i>specified in the finalize method of the resource's returned object?  What
+</I>&gt;&gt;<i>if the particular JVM that allocated this resource crashed, would the
+</I>&gt;&gt;<i>resource then be unavailable to everyone, requiring a reboot?  These
+</I>&gt;&gt;<i>questions aren't just limited to your particular implementation; they are
+</I>&gt;&gt;<i>serious things to consider for any system.
+</I>&gt;<i>
+</I>&gt;<i>After a resource has been &quot;opened&quot; by the URI-based subsystem, we need a
+</I>&gt;<i>corresponding way to &quot;close&quot; it. I expected that objects would implement a
+</I>&gt;<i>close() method. The close() method cannot fail. This would be consistent
+</I>&gt;<i>with work that has already been done on asynchronous I/O. (And a finalize
+</I>()
+&gt;<i>method should invoke close().)
+</I>
+But, if the JVM crashes (say, a kernel function core dumps), then the
+finalize() never gets called.  That process which allocated the controller
+is dead.  The only way around this is to make the controller a system
+shared object, which may not be that far off if the system shared resource
+created the controller.
+
+Perhaps this is for a larger scope.  If a system shared object creates
+another object, what memory space is that created object in?  From what
+I've gleaned from learning about JVM GCing, every shared object needs to
+have all its created objects in the same memory space.  But then, if the
+controller creates objects specific for its current JVM process... What
+kind of mess is this?
+
+
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000777.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000786.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#781">[ date ]</a>
+              <a href="thread.html#781">[ thread ]</a>
+              <a href="subject.html#781">[ subject ]</a>
+              <a href="author.html#781">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

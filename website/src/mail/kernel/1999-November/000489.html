@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Adventures with GRUB</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000488.html">
+   <LINK REL="Next" HREF="000490.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Adventures with GRUB</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Adventures with GRUB">tmiller@haverford.edu</A><BR>
+    <I>Tue, 23 Nov 1999 16:23:35 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000488.html">[JOS-Kernel] Adventures with GRUB</A></li>
+        <LI> Next message: <A HREF="000490.html">[JOS-Kernel] Bulk Make for Java</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#489">[ date ]</a>
+              <a href="thread.html#489">[ thread ]</a>
+              <a href="subject.html#489">[ subject ]</a>
+              <a href="author.html#489">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> So you are saying that the grub messages were fine?  I guess this means that
+</I>&gt;<i> JJOS didn't start correctly for some reason.  
+</I>
+	Actually, 'bailing out on #N' comes from the jJOS argument
+parsing that goes on right before /decaf/ starts up, so I'm not sure what,
+exactly, the problem is.  (Look in entry.cc: the last call before
+decaf_main() is process_args, which will print the 'bailing out' bit if
+debug is on. (ln 89))
+
+&gt;<i> I did have some trouble with making the jjos-common.zip file. The Makefiles
+</I>&gt;<i> seem to be out of whack.  For instance the /JJOS/common/bytecode/Makefile
+</I>&gt;<i> has as the Prefix ../../../common/bytecode/ .  That is one ../ too many, and
+</I>&gt;<i> doing make in that directory fails.  If I edit out one of the ../ it still
+</I>&gt;<i> doesn't create the .zip file.  I probably could have figured it out if I had
+</I>&gt;<i> a little more time, but I didn't.  I was able to use a zip file in
+</I>&gt;<i> /JJOS/arch/i386/bytecode/jjos.zip.  It seemed to be the same thing.  I
+</I>&gt;<i> thought that /common was supposed to be under /JJOS/arch.  Did somehow the
+</I>&gt;<i> directory structure get screwed up?
+</I>
+	JJOS/arch/i386/bytecode/jjos.zip is the right zipfile.  The
+Makefile in JJOS/common/bytecode -- any Makefile NOT in arch/*/nativecode
+(except possibly the GC) is NOT used directly.  They're included into the
+arch/*/nativecode Makefile and built from there.  That is, your build
+sequence should look like this:
+
+JJOS/arch/i386/nativecode$ make clean
+...[There should be no *.o files, and ../bytecode/jjos.zip, along with all
+	the class files in ../../../common/bytecode, should vanish.]
+JJOS/arch/i386/nativecode$ make jjos-grub
+...[The object files are rebuilt, and javac is called to rebuild the class
+	files; find is used to pass arguments in to zip, which will print
+	out the name of the classes its including in the zipfile.  This
+	zipfile (../../../common/bytecode/jjos-common.zip) is just copied
+	into the ../bytecode/jjos.zip location.  This will change.]
+JJOS/arch/i386/nativecode$ 
+
+	'make jjos-grub' should rebuild the classfile and copy it into
+../bytecode/jjos.zip.  The three '..' in the common/bytecode Makefile
+refere to its position relative to arch/*/nativecode.  The whole Java side
+of the Makefile system will probably be redone when I commit the new
+interrupt handling stuff; it's really quite a hack right now, and probably
+won't work too well with architecture-specific bytecode.
+
+	W.r.t. to the directory structure, 'common' and 'arch' are at the
+same depth from 'JJOS'.
+
+-_Quinn
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000488.html">[JOS-Kernel] Adventures with GRUB</A></li>
+	<LI> Next message: <A HREF="000490.html">[JOS-Kernel] Bulk Make for Java</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#489">[ date ]</a>
+              <a href="thread.html#489">[ thread ]</a>
+              <a href="subject.html#489">[ subject ]</a>
+              <a href="author.html#489">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

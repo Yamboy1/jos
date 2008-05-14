@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: [JOS-Admin] An idea for increasing the number of
+ code-writers</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   
+   <LINK REL="Next" HREF="000176.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: [JOS-Admin] An idea for increasing the number of
+ code-writers</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Re: [JOS-Admin] An idea for increasing the number of
+ code-writers">jm@mak.com</A><BR>
+    <I>Sun, 01 Aug 1999 17:16:57 -0400</I>
+    <P><UL>
+        
+        <LI> Next message: <A HREF="000176.html">[JOS-Kernel] Garbage collection (was [JOS-Kernel] Re: [JOS-Admin] An idea for
+ increasing the number of  code-writers)
+ increasing the number of  code-writers)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#175">[ date ]</a>
+              <a href="thread.html#175">[ thread ]</a>
+              <a href="subject.html#175">[ subject ]</a>
+              <a href="author.html#175">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi George (et al);
+
+George Marrows wrote:
+&gt;<i> 
+</I>&gt;<i> &gt;(1) The decaf JVM we're using uses pointers, not handles, to represent Java
+</I>&gt;<i> &gt;objects (although all Java objects are subclassed from a single C++ base
+</I>&gt;<i> &gt;class
+</I>&gt;<i> &gt;in the JVM so we could probably change this if it became necessary).  This
+</I>&gt;<i> &gt;rules
+</I>&gt;<i> &gt;out a whole bunch of &quot;moving&quot; or &quot;copying&quot; GC approaches.
+</I>&gt;<i> 
+</I>&gt;<i> That's certainly true if you want conservative gc, but if you know what is a
+</I>&gt;<i> pointer and what is not, then you can update the pointers directly. This is
+</I>&gt;<i> what HotSpot does -- Sun seem vey proud of this fact, so I guess it's not so
+</I>&gt;<i> easy (either that or their marketing dept have been working hard..) See
+</I>&gt;<i> <A HREF="http://developer.java.sun.com/developer/technicalArticles/Networking/HotSpot">http://developer.java.sun.com/developer/technicalArticles/Networking/HotSpot</A>
+</I>
+Yeah, we probably could, but it would involve extensive changes.  The
+conservative GC seems so much simpler for the moment in that we can
+treat (pretty much) everything the same.
+
+&gt;<i> A moving (compacting like HotSpot?) gc is something I'd maybe like to take a
+</I>&gt;<i> look at later.
+</I>
+Same here.
+
+&gt;<i> &gt;(2) The decaf JVM and the jjos nano/pico/femto/whatever kernel uses C++ and
+</I>&gt;<i> &gt;dynamic memory allocation as well. Currently, both the jjos C++ objects and
+</I>&gt;<i> &gt;the
+</I>&gt;<i> &gt;Java objects (which are, after all, C++ objects as far as the JVM is
+</I>&gt;<i> &gt;concerned)
+</I>&gt;<i> &gt;are allocated out of the same heap.
+</I>&gt;<i> 
+</I>&gt;<i> I must admit I hadn't considered the heap requirements of the JVM and
+</I>&gt;<i> kernel. I'll get to thinking about what this might mean for JJOS's gc.
+</I>
+Again, I'm thinking we can treat everything exactly the same.  There's a
+certain appeal to the economy of effort (especially when it's YOUR
+effort, not mine!  &lt;== this is an attempt at humor).
+
+&gt;<i> &gt;(3) The JVM uses &quot;green threads&quot; right now (i.e., simulated, not &quot;real&quot;
+</I>&gt;<i> &gt;threads).  However, when the underlying kernel implements native threads,
+</I>&gt;<i> &gt;we're
+</I>&gt;<i> &gt;really going to have both a Java and a native code stack for each Java
+</I>&gt;<i> &gt;thread.
+</I>&gt;<i> &gt;Wouldn't it be nice if we just used a conservative GC to scan both data
+</I>&gt;<i> &gt;structures the same way?
+</I>&gt;<i> 
+</I>&gt;<i> This has confused me whenever it's been mentioned on the JOS mailing lists -
+</I>&gt;<i> at the low level of the JOS kernel, is there that much to distinguish native
+</I>&gt;<i> threads and green threads? What benefit is there to the kernel implementing
+</I>&gt;<i> the threads rather than the VM? Explanations welcome ..
+</I>
+To the best of my knowledge, yes, there is a whole lot of difference. 
+Using &quot;green threads,&quot; or &quot;simulated threads,&quot; it is (relatively)
+straightforward to ensure that Java bytecodes are &quot;atomic&quot; with respect
+to each other and with respect to hardware operations.  This simplifies
+the writing of the JVM, especially with respect to the thread
+synchronization primitives.  One never has to worry about pre-emption of
+the C++ code which implements, well, just about everything in the JVM.
+
+On the other hand, by using native threads, we can avail ourselves of
+the CPU's (well, the x86 CPUs, anyway) ability to schedule threads via
+interrupts (etc.), which will likely be faster and entail less overhead
+than anything we can do via a polled, &quot;is it time to switch threads
+yet?&quot; kind of top-level loop.  Based upon a whole 10 seconds of thought,
+I'm thinking that this will have to happen prior to getting JIT
+capability (assuming that we need JIT eventually).  I mean, once we
+vector off to native code, that whole polling scheduler thing we're
+using now pretty much doesn't work anymore.
+
+&gt;<i> &gt;With respect to design considerations, a couple of not-quite-typical
+</I>&gt;<i> &gt;requirements:
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;(1) Currently, decaf does not call destructors (and thence heap
+</I>&gt;<i> &gt;deallocators)
+</I>&gt;<i> &gt;everywhere it is possible to know that the memory object has
+</I>&gt;<i> instantaneously
+</I>&gt;<i> &gt;become garbage.  Either Todd or I can track those down so you don't have
+</I>&gt;<i> to.
+</I>&gt;<i> &gt;We
+</I>&gt;<i> &gt;have, of late, become more conscientious about calling destructors.  Please
+</I>&gt;<i> &gt;advise us if there is a suitable entry point in your conservative heap
+</I>&gt;<i> &gt;implementation for us to mark a memory block as unused...
+</I>&gt;<i> 
+</I>&gt;<i> I hadn't considered calls to the heap to explicitly free memory, since you
+</I>&gt;<i> can't do it from Java, and that's what I was concentrating on. I think it
+</I>&gt;<i> would be helpful to null out pointers when they are known to be rubbish,
+</I>&gt;<i> even if I didn't provide a mechanism for explicit freeing.
+</I>
+That much, I think we do already.  Well, OK, we *try* to do it.  Well,
+maybe, we try to *remember* to try to do it.  Seriously, it's your
+call.  If you give it to us, we'll use it.  I'm sure there's more to it
+than this (e.g., there's a school of thought that says don't free it
+when you know it becomes garbage, because then you're paying the
+overhead of GC/memory management in the user's time, instead of in the
+GC's time).  Let me know what you think.
+
+&gt;<i> &gt;(5) Java requires that we call any &quot;finalize&quot; Java methods upon Java
+</I>&gt;<i> objects
+</I>&gt;<i> &gt;prior to their being GC-ed/reclaimed.  Todd can perhaps shed more light
+</I>&gt;<i> upon
+</I>&gt;<i> &gt;which context the methods must be executed in ...
+</I>&gt;<i> 
+</I>&gt;<i> Again, I've not considered this yet -- I'll have to come back to it after
+</I>&gt;<i> the thing actually manages to gc at all!
+</I>
+OK.  However, it might affect your design (e.g., some blocks can be
+instantly reclaimed -- some others might have to go somewhere else (with
+respect to Java code execution) to have their finalizers run).
+
+&gt;<i> &gt;&gt; - Look at other types of gc: is generational gc useful for Java?
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;Without having either a copying/compacting collector, I don't know right
+</I>&gt;<i> &gt;now...
+</I>&gt;<i> 
+</I>&gt;<i> I hadn't read about HotSpot when I asked my question -- Sun certainly seem
+</I>&gt;<i> to think generational is good.
+</I>
+LispMs used to do this to great effect.
+
+&gt;<i> &gt;&gt; My guiding light in all this has been &quot;Garbage Collection : Algorithms
+</I>&gt;<i> for
+</I>&gt;<i> &gt;&gt; Automatic Dynamic Memory Management&quot; by Richard Jones and Rafael Lins.
+</I>&gt;<i> &gt;&gt;
+</I>&gt;<i> &gt;
+</I>&gt;<i> &gt;An absolutely fabulous book -- read it cover-to-cover.  Please pay
+</I>
+Uh, that should've read &quot;*I* read it cover-to-cover.&quot;  Whoops.  Didn't
+mean to appear to be handing out reading assignments by Imperial Fiat. 
+Sorry.
+
+&gt;<i> &gt;particular
+</I>&gt;<i> &gt;attention to the brief bits about how Lisp Machines availed themselves of
+</I>&gt;<i> &gt;the
+</I>&gt;<i> &gt;special virtual memory hardware to increase performance (I do not have the
+</I>&gt;<i> &gt;book
+</I>&gt;<i> &gt;with me at work, but I recall finding some of these bits via the index).
+</I>&gt;<i> In
+</I>&gt;<i> &gt;particular, I hope that we can scan pages BEFORE they have to get paged
+</I>&gt;<i> out,
+</I>&gt;<i> &gt;as
+</I>&gt;<i> &gt;part of the &quot;regular&quot; paging process, and reclaim instantly those pages
+</I>&gt;<i> &gt;which
+</I>&gt;<i> &gt;only contain garbage, and thus avoid the overhead of &quot;throwing the page
+</I>&gt;<i> over
+</I>&gt;<i> &gt;the
+</I>&gt;<i> &gt;wall&quot; and sleeping any threads at all.  This is supposed to be a Really Big
+</I>&gt;<i> &gt;Win.
+</I>&gt;<i> 
+</I>&gt;<i> Yes. Because the gc is part of the kernel, I hope that eventually that we
+</I>&gt;<i> can work very closely with the the virtual memory system and take advantage
+</I>&gt;<i> of various gubbins in the memory mgt unit that are inaccessible to user
+</I>&gt;<i> processes.
+</I>
+There are also some weird things we can do by availing ourselves of the
+x86's ability to trap accesses to pages that we've already scanned,
+etc.  These seem to be useful for incremental GC, although I seem to
+recall reading papers that said that it might not be such a Big Win. 
+However, I have no problem with a stop-and-GC scheme at this point in
+time.
+
+&gt;<i> &gt;I have other GC-related URLs, too, if you are interested...
+</I>&gt;<i> 
+</I>&gt;<i> One of the best sources I've discovered (only in the last day or two) is
+</I>&gt;<i> <A HREF="ftp://ftp.cs.utexas.edu/pub/garbage.">ftp://ftp.cs.utexas.edu/pub/garbage.</A> bigsurv.ps is a survey of gc
+</I>&gt;<i> techniques - it covers a lot of the same ground as the Jones' book - and
+</I>&gt;<i> allocsrv.ps covers heap management.
+</I>
+Yeah, I've read those, too.  Lots of useful stuff in there.  Too bad not
+many of the GC/DMA experts seem to agree with one another!
+
+&gt;<i> Finally, a word of warning: what I've currently written is in C. This is for
+</I>&gt;<i> two reasons:
+</I>&gt;<i> 
+</I>&gt;<i> 1) I've never written any C++
+</I>&gt;<i> 2) I intended to try integrating it with Kaffe for testing purposes. (I'm
+</I>&gt;<i> not sure this is relevant now.)
+</I>&gt;<i> 
+</I>&gt;<i> I'll carry on in C until it's up and working. Then I'll try rewriting it in
+</I>&gt;<i> C++ -- should be a good way to learn ..
+</I>
+That's OK.  I'm assuming we can just recompile it with the C++ compiler
+(it's ANSI C, right?) and link it on in.
+
+With respect to schedule, when is the first likely time we can have a
+simple allocate/deallocate-capable heap implementation, without the
+conservative GC?  I'm not trying to lean on you, but we'll need
+something Real Soon Now that will enable us to keep jjos+decaf up long
+enough to do something interesting (right now we leak like a sieve
+because we don't have a heap implementation at all).  I can always
+kludge together, er, cons together, er, write a simple heap, but I'd
+prefer not to if you've got something that'll be the right solution...
+
+&gt;<i> Again, thanks for the warm welcome.
+</I>
+Looking forward to working with you...
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI> Next message: <A HREF="000176.html">[JOS-Kernel] Garbage collection (was [JOS-Kernel] Re: [JOS-Admin] An idea for
+ increasing the number of  code-writers)
+ increasing the number of  code-writers)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#175">[ date ]</a>
+              <a href="thread.html#175">[ thread ]</a>
+              <a href="subject.html#175">[ subject ]</a>
+              <a href="author.html#175">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

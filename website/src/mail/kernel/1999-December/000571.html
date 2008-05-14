@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Some Fix On Array Copy</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000569.html">
+   <LINK REL="Next" HREF="000570.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Some Fix On Array Copy</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Some Fix On Array Copy">tmiller@haverford.edu</A><BR>
+    <I>Wed, 22 Dec 1999 10:28:41 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000569.html">[JOS-Kernel] Some Fix On Array Copy</A></li>
+        <LI> Next message: <A HREF="000570.html">[JOS-Kernel] JJOS lcmp bytecode patch</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#571">[ date ]</a>
+              <a href="thread.html#571">[ thread ]</a>
+              <a href="subject.html#571">[ subject ]</a>
+              <a href="author.html#571">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Original Souce Code is using offset in the for-loop instead of pos. It can't
+</I>&gt;<i> copy array correctly.
+</I>
+	Yup.  This was my mistake.
+
+&gt;<i> Original Souce Code will not check js-&gt;myUTF8 is null or not. If it
+</I>&gt;<i> is null, it will makes core dump.
+</I>
+	Fixed this one, too.
+
+	With respect to printing in general: when I tried
+'System.out.println( 100 );', it worked just fine.  'System.out.println(
+String.valueOf( 100 )' blows up and dies because I haven't implemented
+getPrimitiveClass() yet -- in large part because I'm not sure what it's
+supposed to do!  This is one of things where classpath should come in
+helpful.  (Which, I am, in fact, working on.)
+'System.out.println(obj.toString())' blows up and dies because the native
+getClass() isn't exposed quite yet -- again, this would be better handled
+with a new class library, I think.
+
+	Thanks for the fixes, though.  They'll be in the CVS shortly.
+
+-_Quinn
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000569.html">[JOS-Kernel] Some Fix On Array Copy</A></li>
+	<LI> Next message: <A HREF="000570.html">[JOS-Kernel] JJOS lcmp bytecode patch</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#571">[ date ]</a>
+              <a href="thread.html#571">[ thread ]</a>
+              <a href="subject.html#571">[ subject ]</a>
+              <a href="author.html#571">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

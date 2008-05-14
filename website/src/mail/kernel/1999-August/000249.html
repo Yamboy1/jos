@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Garbage collection</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:george.marrows%40triptych.freeserve.co.uk">
+   <LINK REL="Previous"  HREF="000196.html">
+   <LINK REL="Next" HREF="000199.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Garbage collection</H1>
+    <B>George Marrows</B> 
+    <A HREF="mailto:george.marrows%40triptych.freeserve.co.uk"
+       TITLE="[JOS-Kernel] Garbage collection">george.marrows@triptych.freeserve.co.uk</A><BR>
+    <I>Fri, 6 Aug 1999 18:45:44 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000196.html">[JOS-Kernel] work on decaf</A></li>
+        <LI> Next message: <A HREF="000199.html">[JOS-Kernel] Driver writing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#249">[ date ]</a>
+              <a href="thread.html#249">[ thread ]</a>
+              <a href="subject.html#249">[ subject ]</a>
+              <a href="author.html#249">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>John, Todd and all --
+
+I hereby promise to make my mails clearer in future! To elaborate:
+
+&gt;<i> &gt;         [GAM]  Hmm.. plenty of warnings about doing arithmetic with
+</I>&gt;<i> void*.
+</I>&gt;<i> &gt; I'll sort them out.
+</I>&gt;<i>
+</I>&gt;<i> Yeah, this particular embarrassment is my fault, not Todd's.  It worked,
+</I>&gt;<i> so I
+</I>&gt;<i> focussed upon new functionality, not cleaning it up.  If you have already
+</I>&gt;<i> done
+</I>&gt;<i> so, please let me know.  If not, this would be a good time to also put in
+</I>&gt;<i> Robert
+</I>&gt;<i> Fitzsimons' (Hi, Robert!) code to enable booting via GRUB (I seem to
+</I>&gt;<i> recall
+</I>&gt;<i> that, amongst the worst offenders in generating warnings, was the code
+</I>&gt;<i> which
+</I>&gt;<i> looked for the Etherboot-specific data structures located in various bits
+</I>&gt;<i> of
+</I>&gt;<i> memory...)
+</I>&gt;<i>
+</I>[GAM]  The source of the void* warnings is _my_ code (unfortunately). gcc
+didn't complain about what I was doing, but g++ does (vociferously). I'll
+sort them out before handing the code over -- there's so much noise from
+spurious warnings, it's all too easy to miss the important stuff. I only got
+2 or 3 warnings from the jjos code from CVS.
+
+BTW, I'd be very interested in booting via GRUB -- I only have the one PC,
+so Etherboot is not an option.
+
+&gt;<i> &gt;         [GAM]  I propose to put the gc code in a separate directory:
+</I>&gt;<i> &gt; common/nativecode/gc. How does that sound? It's currently in
+</I>&gt;<i> &gt; common/nativecode, but it bloats that directory somewhat. Now I've just
+</I>&gt;<i> got
+</I>&gt;<i> &gt; to sort out the accursed makefile :-(
+</I>&gt;<i>
+</I>&gt;<i> OK.  Works for me.  Sorry about the makefile trouble.  If there's a better
+</I>&gt;<i> way
+</I>&gt;<i> to do this, I'd sure be interested...  I think we have similar problems in
+</I>&gt;<i> the
+</I>&gt;<i> bytecode directory, in that we have no platform-specific bytecode files
+</I>&gt;<i> (e.g.,
+</I>&gt;<i> VGA driver) yet.
+</I>&gt;<i>
+</I>
+[GAM]  The &quot;accursed&quot; was meant to apply to make files in general, not the
+jjos ones. I'm not in any way an expert on makefiles, so I don't have any
+suggestions for improvements. (My lack of expertise is probably why I end up
+cursing makefiles  - though I doubt anyone actually loves them, do they? ;-)
+
+&gt;<i> The location of the sole native-code stack (sole because we're not doing
+</I>&gt;<i> multithreading yet in the kernel) is easily-computable at the point where
+</I>&gt;<i> you
+</I>&gt;<i> need to scan for the GC roots.  Right now (I don't have the sources in
+</I>&gt;<i> front of
+</I>&gt;<i> me, so this is from memory), I think there's a magic value that gets
+</I>&gt;<i> crammed
+</I>&gt;<i> into the stack pointer register (2MB?), but I don't think this is saved
+</I>&gt;<i> into any
+</I>&gt;<i> easily-accessible-from-C++ variable, although the heap-initialization code
+</I>&gt;<i> *does* avoid stepping on the stack.  Sorry...  I can fix this...  Really!
+</I>&gt;<i>
+</I>[GAM]  That sounds good, thanks.
+
+I've just been rereading bigsurv.ps and come across a couple of potential
+unpleasantnesses:
+
+1. Do the kernel or decaf ever only have a handle on an object by the middle
+(as it were) while maintaining the necessary info to find the head of the
+object again. eg it might have pointer into element 100 of a 150 element
+array, but keep the offset from the start (100) in some other variable so
+that the start of the object can be rediscovered. The GC at the moment will
+only mark objects for which there is a pointer to the head somewhere, so
+will fail to mark the example array as in use. If necessary, I think I can
+change it so that pointers to the middle of an object lead to that object
+being marked. I'd prefer not to though, cos it will make the mark phase more
+inaccurate and slower.
+
+2. A similar problem, but at the C++ compiler level. bigsurv.ps claims that
+some compilers, particularly when doing heavy optimisation, perform
+algebraic transforms / bit ops on pointers which can disguise them or make
+them temporarily not point at the head of the object (or even, I suppose,
+into the heap). I have no idea if g++ does this, but it is something to be
+aware of as it will break a conservative garbage collector.
+
+-- George
+
+
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000196.html">[JOS-Kernel] work on decaf</A></li>
+	<LI> Next message: <A HREF="000199.html">[JOS-Kernel] Driver writing</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#249">[ date ]</a>
+              <a href="thread.html#249">[ thread ]</a>
+              <a href="subject.html#249">[ subject ]</a>
+              <a href="author.html#249">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

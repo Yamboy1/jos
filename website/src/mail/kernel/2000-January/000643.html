@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: [Biz] Define license? -- or not</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000642.html">
+   <LINK REL="Next" HREF="000644.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: [Biz] Define license? -- or not</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Re: [Biz] Define license? -- or not">tmiller@haverford.edu</A><BR>
+    <I>Thu, 27 Jan 2000 22:52:15 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000642.html">[JOS-Kernel] JEPS does fragmentation and reassembly</A></li>
+        <LI> Next message: <A HREF="000644.html">[JOS-Kernel] Opcode class</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#643">[ date ]</a>
+              <a href="thread.html#643">[ thread ]</a>
+              <a href="subject.html#643">[ subject ]</a>
+              <a href="author.html#643">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> The case for (L)GPL is that it might be the most practical solution in
+</I>&gt;<i> terms of what reusable code is already available to you.
+</I>
+	For instance, our class library is going to be LGPL because
+classpath is, as least the Java portions of it.
+
+	(Which license the native parts of it come under will really
+depend on if I think it'll be easier to re-write classpath to use BCNI
+(e.g. remove as much as possible of their native code and write the rest
+into the JVM (that is, statically link the library, since we don't have
+dynamic links with jJOS quite yet) -- for both builds, where we migrate
+away from classpath's native code as relevant portions of our
+emulation/codebase become available) or to add JNI support to decaf. (pro:
+it's a standard.  con: it's a whole lot of work for something we don't
+won't anyone to be doing.
+
+	IMHO, using native code in a JOS app should be
+akin to using a kernel module for a linux app.  This lets us say &quot;it has
+to be linked into the kernel&quot; where 'kernel' is the jJOS+decaf
+combination, and gives the right set of connotations to native code.  For
+effiency's sake, we may have to put graphics drivers (etc) in native code
+in the kernel, and step away from the X model.  If we do, we may want to
+provide a relatively high-level API so the drivers can take better
+advantage of the hardware acceleration available.  (e.g. either Java3D or
+OpenGL or 3D, and the equivalent for 2D.))
+
+-_Quinn
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000642.html">[JOS-Kernel] JEPS does fragmentation and reassembly</A></li>
+	<LI> Next message: <A HREF="000644.html">[JOS-Kernel] Opcode class</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#643">[ date ]</a>
+              <a href="thread.html#643">[ thread ]</a>
+              <a href="subject.html#643">[ subject ]</a>
+              <a href="author.html#643">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

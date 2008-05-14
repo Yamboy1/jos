@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] checkPendingNotifies</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000732.html">
+   <LINK REL="Next" HREF="000735.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] checkPendingNotifies</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] checkPendingNotifies">tmiller@haverford.edu</A><BR>
+    <I>Thu, 16 Mar 2000 19:31:05 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000732.html">[JOS-Kernel] Good article on JVM's</A></li>
+        <LI> Next message: <A HREF="000735.html">[JOS-Kernel] checkPendingNotifies</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#733">[ date ]</a>
+              <a href="thread.html#733">[ thread ]</a>
+              <a href="subject.html#733">[ subject ]</a>
+              <a href="author.html#733">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	In scheduler::checkPendingNotifies(), the CVS version (I believe
+the copy I'm looking at is the recent one), does anyone else find it odd
+that the terminating condition is (pnip-&gt;myNext != NULL) yet pnip -- so
+far as I can tell -- is never changed?  Could someone who's got an intact
+CVS tree point the debugger at this and figure out why the loop
+terminates?  (Is my copy of scheduler.cc right?  Are the jbSLL items not
+set up right, e.g. myNext is always NULL?  Is the list of pending notifies
+always empty (despite addPendingNotify() being called from threadable.cc?)  
+Have we, for some reason, only ever had a single thread in the pending
+queue?)  I'm asking because I just finished moving that code to the 'new'
+scheduler, and realized, contrary to the comment, that it never did walk
+the list, and I wanted to find out what was going on.  Thanks.
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000732.html">[JOS-Kernel] Good article on JVM's</A></li>
+	<LI> Next message: <A HREF="000735.html">[JOS-Kernel] checkPendingNotifies</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#733">[ date ]</a>
+              <a href="thread.html#733">[ thread ]</a>
+              <a href="subject.html#733">[ subject ]</a>
+              <a href="author.html#733">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

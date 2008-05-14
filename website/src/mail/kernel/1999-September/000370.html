@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] troubles with making JJOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000375.html">
+   <LINK REL="Next" HREF="000372.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] troubles with making JJOS</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Kernel] troubles with making JJOS">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Fri, 17 Sep 1999 08:04:42 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000375.html">[JOS-Kernel] Problems with JJOS i386 build</A></li>
+        <LI> Next message: <A HREF="000372.html">[JOS-Kernel] Problems with JJOS i386 build</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#370">[ date ]</a>
+              <a href="thread.html#370">[ thread ]</a>
+              <a href="subject.html#370">[ subject ]</a>
+              <a href="author.html#370">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Murphy,
+
+I had similar problems when I tried to compile JJOS on a FAT partition  (I
+also originally used jCVS).  I even tried copying it over and that failed
+too.  What I discovered is in my situation was that putting it on the FAT
+partition caused all of the security settings to get screwed up, which is
+why it didn't work when I moved it over to the ext2fs partition. 
+
+Do this:  Boot into linux and use the command line cvs to download JJOS
+afresh.  After that, you may need to update your dependencies.  Do a 'make
+depend' in the JJOS/arch/host/nativecode/ directory (or in whatever
+directories you are having that problem).  That should take care of it
+complaining about the missing seperators.
+
+Hope this helps,
+Avery J. Regier
+
+
+
+&gt;<i> -----Original Message-----
+</I>&gt;<i> From:	Murphy [SMTP:<A HREF="mailto:werner.schuster@netway.at">werner.schuster@netway.at</A>]
+</I>&gt;<i> Sent:	Thursday, September 16, 1999 10:41 AM
+</I>&gt;<i> To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+</I>&gt;<i> Subject:	[JOS-Kernel] troubles with making JJOS
+</I>&gt;<i> 
+</I>&gt;<i> yo group,
+</I>&gt;<i> 
+</I>&gt;<i> I used jcvs (in windows nt 4.0 )to checkout the JJOS project; i looked at 
+</I>&gt;<i> the code and found it extremely interesting;
+</I>&gt;<i> so I booted linux (redhat 5.1) to build it;
+</I>&gt;<i> 
+</I>&gt;<i> I went to the directory where jcvs put the files (c:\temp\jjos, in linux
+</I>&gt;<i> as /dos/temp/jjos);
+</I>&gt;<i> 
+</I>&gt;<i> the dir contains readme &amp; install files, and also the a file called
+</I>&gt;<i> build ( a shell script that calls the makefiles for making
+</I>&gt;<i> the nativecode for host &amp; i386);
+</I>&gt;<i> the build file also has the rights to be executed (ie the file got xrw
+</I>&gt;<i> rights, it should be executable);
+</I>&gt;<i> but when I enter build (or ./build) it only tells me that it doesnt find
+</I>&gt;<i> the file;
+</I>&gt;<i> 
+</I>&gt;<i> I then tried to do manually what the build file would do (go to the
+</I>&gt;<i> /arch/host/nativecode dir &amp; call make);
+</I>&gt;<i> but make didn't get far, it immediatly stopped complaining about
+</I>&gt;<i> missing separators;
+</I>&gt;<i> I looked at the make files, and found that some lines were lacking
+</I>&gt;<i> a &quot;\&quot; at the end, so I inserted this in (I think) all makefiles;
+</I>&gt;<i> after that, make didn't complain about the separators,
+</I>&gt;<i> 
+</I>&gt;<i> but seemed to have troubles with the relative paths:
+</I>&gt;<i> 
+</I>&gt;<i> : No such file or directory../../common/bytecode/Makefile
+</I>&gt;<i> '.  Stop. No rule to make target `../../common/bytecode/Makefile
+</I>&gt;<i> 
+</I>&gt;<i> when calling make in /jjos/arch/host/nativecode/;
+</I>&gt;<i> well, thats obvious, cause if after doing &quot;..&quot; twice, you're only in
+</I>&gt;<i> /jjos/arch/ while the common dir, is in /jjos;
+</I>&gt;<i> 
+</I>&gt;<i> so to solve this problem, I looked at some makefiles for this code and
+</I>&gt;<i> changed that relative path to an absolute path, but that didnt change
+</I>&gt;<i> anything;
+</I>&gt;<i> 
+</I>&gt;<i> after all that trouble, I copied the jjos dir to my linux partition,
+</I>&gt;<i> I thought that my troubles might be caused, because I had the jjos
+</I>&gt;<i> dir on my fat partition;
+</I>&gt;<i> but that didnt change anything;
+</I>&gt;<i> 
+</I>&gt;<i> so I kept fooling around, and found some other make output:
+</I>&gt;<i> 
+</I>&gt;<i> [<A HREF="mailto:root@localhost">root@localhost</A> bytecode]# make
+</I>&gt;<i> : No such file or directoryystem/Makefile:1: 
+</I>&gt;<i> /jjos/common/bytecode/jos/system/event/Makefile
+</I>&gt;<i> /jjos/common/bytecode/jos/system/Makefile:4: *** missing separator.  Stop.
+</I>&gt;<i> 
+</I>&gt;<i> the path is valid; it seems that I forgot to add the separator in this
+</I>&gt;<i> file;
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> so, I think that's all; I hope my description is detailed enough;
+</I>&gt;<i> maybe my system in short again:
+</I>&gt;<i> cvs client: jcvs;
+</I>&gt;<i> linux:  redhat 5.1, german version, I didnt change anything
+</I>&gt;<i> 	in the development tools;
+</I>&gt;<i> 	also installed the nasm &amp; etherboot correctly;
+</I>&gt;<i> jdk:  blackdown jdk 1.1.7;
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> hope someone can help me there;
+</I>&gt;<i> 
+</I>&gt;<i> murphee
+</I>&gt;<i> ***************************************
+</I>&gt;<i> UNITE FOR JAVA -&gt; www.javalobby.org
+</I>&gt;<i> Check this out -&gt; www.jos.org
+</I>&gt;<i> My site -&gt; www.angelfire.com/co/werners
+</I>&gt;<i> ***************************************
+</I>&gt;<i> ... and the fact, that i haven't put a gun to my mouth yet,
+</I>&gt;<i> proves that i'm a winner!
+</I>&gt;<i> Al Bundy
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000375.html">[JOS-Kernel] Problems with JJOS i386 build</A></li>
+	<LI> Next message: <A HREF="000372.html">[JOS-Kernel] Problems with JJOS i386 build</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#370">[ date ]</a>
+              <a href="thread.html#370">[ thread ]</a>
+              <a href="subject.html#370">[ subject ]</a>
+              <a href="author.html#370">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

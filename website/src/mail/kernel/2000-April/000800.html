@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] new_decaf CVS branch</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:George.Marrows%40Smallworld.co.uk">
+   <LINK REL="Previous"  HREF="000799.html">
+   <LINK REL="Next" HREF="000801.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] new_decaf CVS branch</H1>
+    <B>George.Marrows@Smallworld.co.uk</B> 
+    <A HREF="mailto:George.Marrows%40Smallworld.co.uk"
+       TITLE="[JOS-Kernel] new_decaf CVS branch">George.Marrows@Smallworld.co.uk</A><BR>
+    <I>Fri, 7 Apr 2000 12:49:18 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000799.html">[JOS-Kernel] jos distribution 1e</A></li>
+        <LI> Next message: <A HREF="000801.html">[JOS-Kernel] new_decaf CVS branch</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#800">[ date ]</a>
+              <a href="thread.html#800">[ thread ]</a>
+              <a href="subject.html#800">[ subject ]</a>
+              <a href="author.html#800">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd --
+
+Thanks for putting up the new decaf source. I can't comment on the
+architecture as I only had a short time last night to peruse the code;
+besides, I find it far easier to see what's going on using a debugger, and
+it doesn't run yet (does it?).
+
+A couple of things I did notice:
+
+1. The code would be cleaner, shorter and more flexible if you used an
+ASSERT macro. For example, I saw a couple of places with this kind of thing:
+	if (a) {
+		b = a-&gt;blah;
+		if (b) {
+			b-&gt;do_something();
+		} else {
+			kprintf(&quot;no b&quot;);
+			abort();
+		}
+	} else {
+		kprintf(&quot;no a&quot;);
+		abort();
+	}
+with ASSERTs this becomes:
+	ASSERT(a, &quot;no a&quot;);
+	b = a-&gt;blah;
+	ASSERT(b, &quot;no b&quot;);
+	b-&gt;do_something();
+Then when we know the code works (ie the assertions never fail), we can
+simply define ASSERT to be nothing and all the checks go away. There's a
+crappy assert macro in j_assert.c in the gc code; I'll try and find time
+this weekend to spruce it up so it can pass variable params to kprintf.
+
+2. There seem to be quite a few places where exceptions should be thrown
+(illegal monitor state, out of memory etc) but aren't. I'd be interested in
+trying to help out in this area when the interpreter's up and running.
+
+Anyway, thanks again for the hard work!
+
+-- George
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000799.html">[JOS-Kernel] jos distribution 1e</A></li>
+	<LI> Next message: <A HREF="000801.html">[JOS-Kernel] new_decaf CVS branch</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#800">[ date ]</a>
+              <a href="thread.html#800">[ thread ]</a>
+              <a href="subject.html#800">[ subject ]</a>
+              <a href="author.html#800">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] JOS for StrongARM</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000268.html">
+   <LINK REL="Next" HREF="000272.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] JOS for StrongARM</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] JOS for StrongARM">jm@mak.com</A><BR>
+    <I>Thu, 19 Aug 1999 18:55:09 +0000</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000268.html">[JOS-Kernel] JOS for StrongARM</A></li>
+        <LI> Next message: <A HREF="000272.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#273">[ date ]</a>
+              <a href="thread.html#273">[ thread ]</a>
+              <a href="subject.html#273">[ subject ]</a>
+              <a href="author.html#273">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+thomas olausson wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; Whoops -- if it's running Linux, I *think* you should be able to build
+</I>&gt;<i> &gt; the &quot;host&quot; target.
+</I>&gt;<i> 
+</I>&gt;<i> The binutils are only for ELF and other output formats.
+</I>&gt;<i> :(
+</I>
+I am pretty darned sure that the binutils (e.g., objcopy) are only used
+in the arch/i386 built target.  The arch/host target should only use the
+vanilla linker/loader (e.g., ld).
+
+If you've got a linker/loader for AIF, you should be OK.  (You gotta
+give the bootloader what it expects, and it expects AIF, right?  Our
+Ethernet bootloader expects, in part, a &quot;raw&quot; file, and we needed to use
+objcopy only to turn the default ELF format into a &quot;raw&quot; file whose
+entry point was at the zeroth byte, and whose .bss section was actually
+represented as zeroes in the file.)
+
+In summary, if I understand what you're trying to do (and maybe I
+*STILL* don't), I don't think you need the binutils.
+
+-jm
+
+-- 
+==== John Morrison
+==== MaK Technologies Inc.
+==== 185 Alewife Brook Parkway, Cambridge, MA 02138
+==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000268.html">[JOS-Kernel] JOS for StrongARM</A></li>
+	<LI> Next message: <A HREF="000272.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#273">[ date ]</a>
+              <a href="thread.html#273">[ thread ]</a>
+              <a href="subject.html#273">[ subject ]</a>
+              <a href="author.html#273">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

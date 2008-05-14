@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000071.html">
+   <LINK REL="Next" HREF="000072.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf updates">tmiller@haverford.edu</A><BR>
+    <I>Wed, 9 Jun 1999 17:34:37 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000071.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000072.html">[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Um, I think you *have* to check the results, because you cannot afford to
+</I>&gt;<i> dereference something bad.  We're in OS-land (a.k.a., systems programming land),
+</I>&gt;<i> not application-land.  There are no guard-rails (a.k.a., memory protection
+</I>&gt;<i> mechanisms).  We do not want to become (in)famous for our version of the BSOD
+</I>&gt;<i> (even though I am sure we could pick a more, well, tasteful color, and, perhaps,
+</I>&gt;<i> put a more interesting text up on the screen like &quot;Hey, at least you didn't PAY
+</I>&gt;<i> for this!&quot;).
+</I>
+	I'm aware that we have to check our results.  Having exceptions
+just obviates the need to do it on every single call -- you're writing the
+'check' into the function, not its caller.  At any rate, your suggestion
+below seems fairly reasonable.  (If painful in terms of coding time.)
+
+&gt;<i> Now, I'm a little out of my depth here, but here goes (somebody correct me if
+</I>&gt;<i> I'm wrong) -- it is my understanding that native methods are inherently
+</I>&gt;<i> non-portable, so we have some freedom to define how they should be
+</I>&gt;<i> compiled/written (if, in fact, we support them in the medium to long term -- we
+</I>&gt;<i> certainly won't support them in the short term).  Furthermore, given that we
+</I>&gt;<i> currently envision no memory protection (e.g., separate address spaces for
+</I>&gt;<i> native methods), allowing native methods is an huge invitation to Bad Things
+</I>&gt;<i> like BSODs, and viruses, etc.
+</I>
+	It might be premature to be worrying about native methods, but as
+long as I'm going to be rewriting runOpCode on a line-by-line basis, I
+figure I might as well be doing it /right/ and not have to do it /again/
+when we do allow native methods, however they may be protected.
+
+&gt;<i> When you say &quot;native exception,&quot; do you mean C++ &quot;throw,&quot; or vanilla-C reference
+</I>&gt;<i> to memory that ain't there (a.k.a., bus error, address error, memory error)?
+</I>
+	C++ &quot;throw.&quot;
+
+&gt;<i> p.s., you want me to stop putting your specific email address on the &quot;To&quot; list
+</I>&gt;<i> so you get the mail slower, but get only one copy?
+</I>
+	I don't particularly care either way.  It's nice when I'm actually
+here when the mail arrives, and worth it, but otherwise it's not much of
+an annoyance.
+
+-_Quinn
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000071.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000072.html">[JOS-Kernel] Native methods [Was Re: [JOS-Kernel] decaf updates]</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

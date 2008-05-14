@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next release (fwd)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:mgangelen%40quintop.nl">
+   <LINK REL="Previous"  HREF="000520.html">
+   <LINK REL="Next" HREF="000522.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next release (fwd)</H1>
+    <B>mgangelen@quintop.nl</B> 
+    <A HREF="mailto:mgangelen%40quintop.nl"
+       TITLE="[JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next release (fwd)">mgangelen@quintop.nl</A><BR>
+    <I>Wed, 01 Dec 1999 22:50:57 GMT</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000520.html">[JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next
+ release (fwd)</A></li>
+        <LI> Next message: <A HREF="000522.html">[JOS-Kernel] More on kernel bailout</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#521">[ date ]</a>
+              <a href="thread.html#521">[ thread ]</a>
+              <a href="subject.html#521">[ subject ]</a>
+              <a href="author.html#521">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I finally got something booting. Maybe this sounds silly to you all using
+Linux as development platform, but I decided that I wanted to do my
+development in W*n95 (I know, bad idea but stil... I need my tools on
+W*n95...).
+
+Downloaded Cygwin (a GNU compiler for Windows), NASMW (guess what that
+means...) and made myself a crosscompiler (Windows -&gt; Linux). Followed the
+excellent instructions from George at
+<A HREF="http://www.triptych.freeserve.co.uk/grub/index.html,">http://www.triptych.freeserve.co.uk/grub/index.html,</A> changed some makefiles
+and sourcecode to let it compile with my 2.95 GNU crosscompiler (I could
+send the changes if you want them...) booted through GRUB and it worked !!
+Although I must say that I get the same errormessages saying that the VM is
+corrupted (at: notifyOfInterrrupts(3): VM corrupted, aborting...) with
+-DNEW_INTERUPT_HANDLING I must say.
+
+I would like to contribute more to JOS (I want to boot from a flop without
+GRUB !!) by documenting the procedure how to develop on W*n95 and by
+writing device drivers in JAVA.
+
+Another thing, maybe we could simplify the makefiles by adding
+Makefile.host and Makefile.i386 where all the tool variables needed for the
+seperate builds are defined. Unlike you Linux guys, I must use seperate
+compilers for the host- and i386-build. This could also be useful when more
+platforms are supported like AS/400. When this is the case, crosscompiling
+and the use of different compilers for each build is unavoidable...
+I would like to assist with the Makefile thing, but I should admit that my
+knowledge of Makefiles is VERY limited. I'm already happy if I can change
+current makefiles to let them make correctly...
+
+
+Fushion.
+
+
+
+&lt;SNIP&gt;
+We also need to refine the definition of a technical distribution. A
+technical distribution requires Linux (doesn't it?). A technical
+distribution includes tools (or links to tools) so that you can (re)build
+the JOS runtime distribution from the JOS source distribution. Are there
+new tools required to build JOS? The tools.tgz archive does not include
+GRUB and other tools recently mentioned by the kernel group. And yet, a
+GRUB-bootable runtime edition needs something from GRUB.
+
+_________________________
+
+     Anyone having any luck with booting jJOS from GRUB?  (I can boot
+it, but it dies almost immediately with a corrupt VM error.  I suspect
+this is a timing problem with respect to static initialization, but I
+could be wrong -- I haven't looked into it, because I'm running it with
+the new interrupt code currently.)
+
+     The current tool chain is NASM and one of etherboot+mknbi-jos and
+GRUB, right?  Where GRUB can be distributed as that pair of images (or a
+single floppy image) that George has lying around, right?  (I.E. no need
+for a source distribution for the 'runtime' version.)  Repackacking this
+would just split NASM off from etherboot+mknbi-jos and package up GRUB.
+
+
+
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000520.html">[JOS-Kernel] [JOS-Arch] [DistributionGroup] Planning for next
+ release (fwd)</A></li>
+	<LI> Next message: <A HREF="000522.html">[JOS-Kernel] More on kernel bailout</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#521">[ date ]</a>
+              <a href="thread.html#521">[ thread ]</a>
+              <a href="subject.html#521">[ subject ]</a>
+              <a href="author.html#521">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

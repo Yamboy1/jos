@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Progress report.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000075.html">
+   <LINK REL="Next" HREF="000064.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Progress report.</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Progress report.">jm@mak.com</A><BR>
+    <I>Wed, 09 Jun 1999 09:39:41 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000075.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000064.html">[JOS-Kernel] Re: Progress report.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#62">[ date ]</a>
+              <a href="thread.html#62">[ thread ]</a>
+              <a href="subject.html#62">[ subject ]</a>
+              <a href="author.html#62">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd et al;
+
+I am so sorry to be taking so long to finish what I'm doing.
+
+Here's the Short Version:  The opcode-execution global fcns are now frame
+methods.  I have neither merged my local mods with Todd's latest committed
+changes nor committed my own changes.  Yet.
+
+The Longer Version:
+
+(1) The opcode-execution functions should now be much more efficient (and
+significantly simpler to read/understand) as methods of the frame class, in that
+they now avoid at least one level of indirection for almost everything they do. 
+This actually entailed more extensive mods than I originally thought.
+
+(2) I have made moved duplicative code from the global functions into methods of
+the various classes (java_thread, java_class, frame).
+
+(3) I propagated the active thread throughout the class loading, linking,
+preparing, and resolving steps because I thought I could, at this stage, and
+prior to having native threads, handle this entirely WITHOUT keeping context in
+native stacks.  This would enable the scheduler to know which thread was
+running, and it would enable a debugger to know, and it would enable pre-emption
+of static initializers.  I was wrong, wrong, wrong.  I do not know whether I
+should back these changes out, or leave them in (they don't seem to break
+anything).
+
+(4) In perusing this machinery, I think there are some further changes I might
+like to make with respect to how classes are known to be
+resolved/linked/whatever, and, in specific, when the initializer threads get
+spawned (right now they get spawned really early, but don't get executed, so
+there are a LOT of dormant threads lying about).  I shall discuss these with
+Todd after I commit the merged changes.
+
+(5) I need to merge Todd's latest changes in, retest, and then commit.
+
+(6) I have not (cannot?) build the latest Java source successfully.  Todd, would
+you please be so kind as to put your latest successful zipfile (compressed, of
+course) somewhere I can FTP it from?  Then I can test my merged changes before I
+commit them so as not to break anything.  It would also help if you put a
+logfile (obviously, host build only) showing me what output to expect.
+
+Thanks,
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000075.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000064.html">[JOS-Kernel] Re: Progress report.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#62">[ date ]</a>
+              <a href="thread.html#62">[ thread ]</a>
+              <a href="subject.html#62">[ subject ]</a>
+              <a href="author.html#62">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

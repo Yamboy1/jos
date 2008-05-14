@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf update &amp; the keyboard driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000016.html">
+   <LINK REL="Next" HREF="000009.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf update &amp; the keyboard driver</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Kernel] decaf update &amp; the keyboard driver">onewith1@flash.net</A><BR>
+    <I>Fri, 26 Mar 1999 22:31:00 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000016.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+        <LI> Next message: <A HREF="000009.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#8">[ date ]</a>
+              <a href="thread.html#8">[ thread ]</a>
+              <a href="subject.html#8">[ subject ]</a>
+              <a href="author.html#8">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Before I get started, again good work on the JVM.
+
+But, geez, a comment on my code?  Even *I* have trouble understanding it at
+times.  The purpose was to have a level of security, and PnP resource
+allocation all in the same shoe... but I digress.
+
+About the keyboard driver itself - the driver registration and so forth that I
+sent you in code, I'm currently redesigning that whole system. But the
+interface with the platform services currenlty has no plans for major
+modification.  So the reading and interpreting of the keystrokes, and the
+layers of abstraction for the keyboard drivers, is pretty much what I
+currently have in mind as a final cut (pending changes from the group, of
+course).
+
+&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>         Having only recently completed this rounding-out of decaf, and
+</I>&gt;<i> feeling loathe to test it at this juncture, I examined Matt Albrecht's
+</I>&gt;<i> code for resource allocation &amp; control and his keyboard driver &amp; scancode
+</I>&gt;<i> converter, etc.  I'm presenting here a short overview in hopes that Matt
+</I>&gt;<i> will correct any oversights or misunderstandings of mine before I start
+</I>&gt;<i> implementing his code for/with decaf; suggestions, based on my current
+</I>&gt;<i> understandings, are below as well.
+</I>
+I'll try - and possibly show off my misunderstandings too, as well as my
+flightiness of mind.
+
+&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i> In general:
+</I>&gt;<i>
+</I>&gt;<i> 'Device'(s) return 'Driver'(s) via the PrimaryHardwareManager, which is
+</I>&gt;<i> java object in charge of a particular i/o bus; the Device class/object
+</I>&gt;<i> returns 'Driver'(s) based on its interactions with the PHM via
+</I>&gt;<i> 'HardwareRequests' of various types.
+</I>
+The PrimaryHardwareManager doesn't just have to be the i/o bus you're talking
+to - it could be the computer (w/o network) as a whole.  But the idea is the
+same - it passes off requests to allocate every kind of resource to the
+appropriate resource manager.
+
+&gt;<i>
+</I>&gt;<i> A 'HardwareResourceInterface' is responsible for implementing the
+</I>&gt;<i> (presumambly kernel) wrapper of the native code handling a particular
+</I>&gt;<i> HardwareResource (for the i386, interrupts, ioports, memory, etc;
+</I>&gt;<i> different architectures will, of course, get their own HardwareResources).
+</I>&gt;<i>
+</I>
+And adding security, so you can't access non-allocated memory, I/O ports,
+whatever.
+
+&gt;<i>
+</I>&gt;<i> More specifically:
+</I>&gt;<i>
+</I>&gt;<i> InterruptInterface (and the Driver) model is based on the old,
+</I>&gt;<i> non-Listener style of things, and hence, must be changed.
+</I>
+I tried to keep it open, so that some &quot;black box&quot;, either at the kernel level
+or wherever, in an event thread or a separate thread, invokes all registered
+interrupt handlers (via postEvent() call), which would call the device's
+handlers.  So the handlers are a &quot;listener&quot; paradigm - they don't poll for an
+interrupt, but rather are only called when an interrupt occurs.  The names I
+gave everything probably confuse this, so they should be changed to clear
+everything up. (btw - the ISAKeyboardDriver2 follows the design of the
+original kernel idea of polling for the interrupts so that you could use it in
+your current setup - this may be what you were referring to, but I dunno)
+
+&gt;<i>  The most
+</I>&gt;<i> obvious question is if the InterruptInterface should be more or less
+</I>&gt;<i> basically replaced by the InterruptDispatcher or if it should subscribe to
+</I>&gt;<i> it; especially w.r.t. the IRQResource concept that seems to be Matt's
+</I>&gt;<i> vehicle for allowing interrupt sharing, which is necessary for a variety
+</I>&gt;<i> of reasons, not the least of which is the serial port driver.
+</I>
+That's been the current line of debate (If I follow what you're saying) - how
+to deal with interrupt calls.  We may want to put this in a category of an
+&quot;OS-wide event system&quot;, either asynchronous or synchronous events; that way we
+can expand this idea to an extremely generic fashion, and possibly (much later
+on) include distributable events under this system.  But that's a discussion
+all into itself.
+
+&gt;<i>
+</I>&gt;<i> As far as my stated goal of making jos.system.keyboard as much an
+</I>&gt;<i> abstraction as possible, and NOT a driver, necessarily, I looked at the
+</I>&gt;<i> KeyboardDevice class idea; where jos.system.keyboard
+</I>&gt;<i> would be the default system-wide KeyboardDevice, which hides it back-end
+</I>&gt;<i> KeyboardInterperter, which could be replaced on the fly.
+</I>
+That's fine - it would save the users a heck of a lot of time trying to
+remember how to query for the keyboard driver and handle errors, all wrapped
+up in a neat package.
+
+&gt;<i>  (For i18n
+</I>&gt;<i> purposes, one would wonders how non-latin character sets are handled in
+</I>&gt;<i> the current VK_* system; but since we're almost certain to extend it, that
+</I>&gt;<i> question can be safely ignored for now.  Something about unicode...
+</I>&gt;<i> perhaps a unicode character set that defines navigation/function keys?)
+</I>
+Sun says in its KeyEvent file that it retains the right to change the VK_*
+mappings at any time, hence add support for additional keyboards.  So we (in
+our infinite wisdom) could just make a Kernel version of the
+java.awt.events.KeyEvent class without all the awt overhead, which uses our
+own VK_* mappings for any keyboard we come across.
+
+&gt;<i>
+</I>&gt;<i> The basic idea of the above being that at the level where an application,
+</I>&gt;<i> including ones like the shell, might get keystoke data, it's safely been
+</I>&gt;<i> platform de-dependincied ( how does one verb that? ).
+</I>
+That's a double negative - how about &quot;it has safely attained platform
+independance&quot;?
+
+&gt;<i>  It would, of
+</I>&gt;<i> course, be Good Programming to make the shell independent of the Keyboard
+</I>&gt;<i> itself, but the telnet daemon feeding the input stream should and could
+</I>&gt;<i> just as easily feed the stream with the VK_* series we've defined -- as
+</I>&gt;<i> mapped by its ANSI/vt100/vt220 (etc) termcap-equivalent.
+</I>
+Right - along with the jos.System.keyboard, which returns VK_* key events, we
+add on an InputStream interface for it which becomes our java.lang.System.in.
+
+&gt;<i>
+</I>&gt;<i>
+</I>&gt;<i> Three questions, perhaps induced by not reading the code closely enough:
+</I>&gt;<i> first, what use(s) is the DeviceManager intended for?
+</I>
+For branching devices.  Mainly for maintenance purposes, so you can clearly
+see under the device configuration &quot;oh, my PCI bus (a DeviceManager) has a
+Modem and a Sound Card (plain Devices, under the DeviceManager)&quot;.  It may not
+be all that important.  My newbetter system under design solves this in a more
+efficient way (and more logically, too).
+
+&gt;<i>  Second, why have
+</I>&gt;<i> two ISAKeyboards?
+</I>
+One was the &quot;true&quot; driver using my hardwareResources package, and the other
+used the published driver specs.  That was the only difference, and to show
+just how easy it is to create a device hierarchy with inheritence.
+
+&gt;<i>  The method overloads don't appear to be necessary or
+</I>&gt;<i> desirous.
+</I>
+alright.  I'll give you that.
+
+&gt;<i>  Thirdly, how easy (or difficult) is it for this framework to
+</I>&gt;<i> handle driver updates on the fly?  I seem to recall several Driver/Device
+</I>&gt;<i> constructors that took other Devices or Drivers?
+</I>
+Ah, again I aim your attention to the newbetter specs.  I can send you the
+current copy if you missed it the first time through; I'm figuring out the
+specific details now, so it's not complete, but it gives a general overview.
+
+&gt;<i>
+</I>&gt;<i> At any rate, before I go any further re: this, I want some feedback from
+</I>&gt;<i> the list; and I will have to build the Makefiles for handling the
+</I>&gt;<i> architecture-dependent parts of this, so as to get the idea and structure
+</I>&gt;<i> firmly in place before the driver-writing really gets off the ground.
+</I>&gt;<i> (i.e. ISAKeyboard is probably an architecture-specific bit of code;
+</I>&gt;<i> whereas KeyboardDevice probably is not.  This will require a closer
+</I>&gt;<i> reading of the code.)
+</I>&gt;<i>
+</I>
+This was the intention - have a generic abstract class to encapsulate the
+generally used functions, then the subclasses (concrete device
+implementations) fill in the architecture-specific parts.  I may have failed
+in a few points, though.
+
+&gt;<i>
+</I>&gt;<i> As far as things on my todo list aside from the keyboard driver is
+</I>&gt;<i> rewriting the native-code support in interp.cc to handle argument types,
+</I>&gt;<i> especially in print() and println(), which will ease the debugging
+</I>&gt;<i> immensely, as well as lay a groundwork for 'real' native-code handling
+</I>&gt;<i> later.  The end goal of this, for now, being to make a clean &amp; extensible
+</I>&gt;<i> keyboard-to-screen echo, and, perhaps, some sort of &quot;hello, world!&quot;-style
+</I>&gt;<i> shell, to test things out and demonstrate the way it might be done.
+</I>&gt;<i>
+</I>&gt;<i> And of course, the procession of things which must be done to
+</I>&gt;<i> bring decaf into full compability w/ the 1.2 JDK.  Does anyone know of a
+</I>&gt;<i> good compatibility aside from Sun's JCK, which (AFAIK), is not a
+</I>&gt;<i> particularly cheap (or at-home) kind of thing?
+</I>&gt;<i>
+</I>&gt;<i> -_Quinn
+</I>&gt;<i>
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000016.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+	<LI> Next message: <A HREF="000009.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#8">[ date ]</a>
+              <a href="thread.html#8">[ thread ]</a>
+              <a href="subject.html#8">[ subject ]</a>
+              <a href="author.html#8">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

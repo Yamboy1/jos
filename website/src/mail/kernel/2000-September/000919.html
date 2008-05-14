@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [CjOS] Process and Thread</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000921.html">
+   <LINK REL="Next" HREF="000920.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [CjOS] Process and Thread</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [CjOS] Process and Thread">gchii@mindspring.com</A><BR>
+    <I>Mon, 25 Sep 2000 14:49:23 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000921.html">[JOS-Kernel] Starting a program</A></li>
+        <LI> Next message: <A HREF="000920.html">[JOS-Kernel] Optimizing Linux for Java</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#919">[ date ]</a>
+              <a href="thread.html#919">[ thread ]</a>
+              <a href="subject.html#919">[ subject ]</a>
+              <a href="author.html#919">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Inside CjOS, a Process is not an extension of Thread. Rather, each Process
+has-a Thread list and each Thread has-a Process.
+
+A Process can have zero or more Threads.
+
+unsigned int Process::getThreadCount();
+Thread *Process::getThread( unsigned int index );
+
+A Thread can have zero or one Process.
+
+Process *Thread::getProcess();
+void Thread::setProcess( Process *v );
+
+The difference between a Thread and a Process is CLASSPATH. A Process has a
+CLASSPATH and a Thread gets its CLASSPATH from its Process.
+
+void Process::addDirectory( const char *v );
+
+Each Process can have zero or one &quot;next&quot; Process.
+
+Process *Process::getNext();
+void Process::setNext( Process *v );
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000921.html">[JOS-Kernel] Starting a program</A></li>
+	<LI> Next message: <A HREF="000920.html">[JOS-Kernel] Optimizing Linux for Java</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#919">[ date ]</a>
+              <a href="thread.html#919">[ thread ]</a>
+              <a href="subject.html#919">[ subject ]</a>
+              <a href="author.html#919">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

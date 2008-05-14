@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: decaf update &amp; the keyboard driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:onewith1%40flash.net">
+   <LINK REL="Previous"  HREF="000018.html">
+   <LINK REL="Next" HREF="000003.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: decaf update &amp; the keyboard driver</H1>
+    <B>Matt Albrecht</B> 
+    <A HREF="mailto:onewith1%40flash.net"
+       TITLE="[JOS-Kernel] Re: decaf update &amp; the keyboard driver">onewith1@flash.net</A><BR>
+    <I>Mon, 29 Mar 1999 21:22:45 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000018.html">[JOS-Kernel] Re: decaf update &amp; the keyboard driver</A></li>
+        <LI> Next message: <A HREF="000003.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#20">[ date ]</a>
+              <a href="thread.html#20">[ thread ]</a>
+              <a href="subject.html#20">[ subject ]</a>
+              <a href="author.html#20">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>
+&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>         *shrug*  Is one better than the other for the AT?  (As that the
+</I>&gt;<i> target architecture is i386.)
+</I>
+I guess the Linux version works better, as it is faster (doesn't do a read, no bit
+masking).
+
+&gt;<i>         So who's registering the various HardwareManagers?  Other Devices?
+</I>&gt;<i> (The system builds from the PHM by adding the PCI/ISA/AGP/USB bus devices,
+</I>&gt;<i> then devices on those busses?  (Although I suppose that PCI, ISA, and AGP
+</I>&gt;<i> unregister after scanning for devices.  One would expect the PCI bus
+</I>&gt;<i> to discover other busses like SCSI and FireWire, as well?)  That seems to
+</I>&gt;<i> be the direction you're heading in with the newbetter approach.)
+</I>
+Ah - now I see that i have not been clear.  Since this the PHM is under the Platform
+section, it knows nothing about buses and whatnot (buses are a later abstraction,
+technically classified under &quot;driver&quot;).  The &quot;hardware resources&quot; under the Platform
+section are things like I/O Addresses, IRQs/Interrupts, DMA channels, and Memory addresses
+- the most basic physical hardware available.  These are registered at boot time to
+reflect the underlying hardware (most probably under the platform-specialized PHM's static
+block).  An i386 system would have I/O Address ranges 0x000 - 0xFFF, interrupts 0 - 255,
+DMA channels 0-7, and memory addresses 0x00000000 - 0xFFFFFFFF (physical addresses would
+depend on the size of physical memory).
+
+&gt;<i>         Two questions: who decides if the range is valid?
+</I>
+The HardwareResource in charge of the requested resource.  If the range is invalid, the
+request does not go through and an exception is thrown (or a null is returned, whichever).
+
+&gt;<i>  Secondly, are we allowing only certain user's processes to request hardware resources?
+</I>&gt;<i> (Probably.  If so, how implement that?  But we can punt on that question
+</I>&gt;<i> because we don't have the concept of `users' in JOS yet.  Which will
+</I>&gt;<i> probably be another world of pain...)
+</I>
+Well, first off only JOS aware products could even access them (I hope - O, save Us from
+Reflection! :).  We could add to the JOS system a security manager which the PHM could
+call for a security violation exception (probably a good idea anyway).  It would be up to
+the &quot;main&quot; program to decree the security priveledge of its applications.
+
+&gt;<i>         I think I mentioned this elsewhere: the InterruptInterface becomes
+</I>&gt;<i> either a constructor or the primary reciever or &quot;interrupt events.&quot;  (i.e.
+</I>&gt;<i> either addInterruptListener to jos.system.interruptdispatcher -- which
+</I>&gt;<i> should probably be in Machine, but I digress -- or implement
+</I>&gt;<i> interruptdispatcher by itself.)
+</I>
+I was thinking of having InterruptInterface be a receiver for interrupt events.  JavaOS
+has a (somewhat) good idea behind this.  They have 3 levels of interrupt handlers.  The
+first level is registered as a real-time native code handler (run when the interrupt
+happens), second is a deferred native code handler (run in a separate thread from the
+interrupt), and the third is a Java-code deferred handler.  I was thinking that we could
+have two layers, a real-time and deferred layer - all routines registered can be native or
+Java.  This is very run-time specific, of course.
+
+
+&gt;<i>         We can support support both [native and Java interrupts] also; whether a
+</I>&gt;<i> particular
+</I>&gt;<i> distribution does or not depends on the philosophical outlook of the
+</I>&gt;<i> distributor and/or the necessary effiencies.  (There is a single,
+</I>&gt;<i> well-known point where the scheduler considers interrupts.  What various
+</I>&gt;<i> coders do with it is up to them.  I would, however, suggest that they
+</I>&gt;<i> implement their native drivers as native java methods rather than do
+</I>&gt;<i> kernel hacking...)
+</I>
+Sounds right.  We don't want driver developers releasing kernel patches to use their
+drivers (beware of Sun's endless OS patches!).
+
+-Matt
+
+
+</pre>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000018.html">[JOS-Kernel] Re: decaf update &amp; the keyboard driver</A></li>
+	<LI> Next message: <A HREF="000003.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#20">[ date ]</a>
+              <a href="thread.html#20">[ thread ]</a>
+              <a href="subject.html#20">[ subject ]</a>
+              <a href="author.html#20">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

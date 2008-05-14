@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jJOS speed</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:joakim.dahlstedt%40appeal.se">
+   <LINK REL="Previous"  HREF="000239.html">
+   <LINK REL="Next" HREF="000243.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jJOS speed</H1>
+    <B>Joakim Dahlstedt</B> 
+    <A HREF="mailto:joakim.dahlstedt%40appeal.se"
+       TITLE="[JOS-Kernel] jJOS speed">joakim.dahlstedt@appeal.se</A><BR>
+    <I>Mon, 16 Aug 1999 20:24:28 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000239.html">[JOS-Kernel] jJOS speed</A></li>
+        <LI> Next message: <A HREF="000243.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#240">[ date ]</a>
+              <a href="thread.html#240">[ thread ]</a>
+              <a href="subject.html#240">[ subject ]</a>
+              <a href="author.html#240">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Speaking of bounds checking, I understand that in at least some JVMs,
+</I>&gt;<i> it'd be even faster to write code like:
+</I>&gt;<i>
+</I>&gt;<i>   try
+</I>&gt;<i>     {
+</I>&gt;<i>     byte[] vgaBuffer = jos.system.machine.getBytes(0xa0000, 0x10000);
+</I>&gt;<i>     int i = 0;
+</I>&gt;<i>     while (true)
+</I>&gt;<i>       vgaBuffer[i++] = 0;
+</I>&gt;<i>     }
+</I>&gt;<i>   catch (ArrayIndexOutOfBoundsException aioobe)
+</I>&gt;<i>     {
+</I>&gt;<i>     }
+</I>&gt;<i>
+</I>&gt;<i> basically, don't bother explicitly checking the value of i (like the
+</I>&gt;<i> &quot;for&quot; loop does) since the JVM will be checking it itself anyhow.
+</I>
+I have to comment on this one.
+Please, please, please... don't do that..
+Don't!
+You will make life much harder for an optimizing compiler.
+Constant ranged loops can easily be optimized
+(bounds checking removed, loopunrolling, etc.).
+Please, don't rely on Exception-handling mechanism to handle cases that
+are quite common. Exception handlers should handle exceptions from the
+ordinary,
+things that may take long time.
+
+Joakim Dahlstedt
+
+
+</pre>
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000239.html">[JOS-Kernel] jJOS speed</A></li>
+	<LI> Next message: <A HREF="000243.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#240">[ date ]</a>
+              <a href="thread.html#240">[ thread ]</a>
+              <a href="subject.html#240">[ subject ]</a>
+              <a href="author.html#240">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

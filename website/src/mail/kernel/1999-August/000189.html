@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] the vga driver is working now</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000200.html">
+   <LINK REL="Next" HREF="000193.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] the vga driver is working now</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] the vga driver is working now">jm@mak.com</A><BR>
+    <I>Thu, 05 Aug 1999 09:22:26 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000200.html">[JOS-Kernel] Re: [JOS-Arch] Re: [JOS-Kernel] the vga driver is working now</A></li>
+        <LI> Next message: <A HREF="000193.html">[JOS-Kernel] the vga driver is working now</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#189">[ date ]</a>
+              <a href="thread.html#189">[ thread ]</a>
+              <a href="subject.html#189">[ subject ]</a>
+              <a href="author.html#189">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello Thomas (et al);
+
+Thomas Bocek wrote:
+&gt;<i> I found the problem with the vga registers. It was a bug in the in8 (in32)
+</I>&gt;<i> method. I fixed it, and now the vga driver works. 640x480x16 (YES!!).
+</I>
+Hey, this is great (except for my embarrassment with respect to the bug in
+in8/in32)!
+
+&gt;<i> Now we should start with a generic device loader (what do you think,
+</I>&gt;<i> Hilary? The shark examples are quite good). I'm also very interested in
+</I>&gt;<i> writing an IDE driver.
+</I>
+The following paragraph is based upon only what I can remember from a cursory
+reading of both the &quot;Inside JavaOS&quot; book and the IBM &quot;JavaOS for Business&quot;
+documentation (neither is in front of me now), so there's a distinct possibility
+that I can be really mistaken:
+
+JavaOS has this concept where they (apparently) unify the concept of a registry
+and the traditional UNIX &quot;/dev&quot; device entries, and driver entries, too.  This
+Java-object tree gets populated when the device discovery is done at boot time,
+and then drivers are also elements of the tree.  Also, user preferences are
+stored the same way somehow (serialization?).  Finally, they seem to one-up the
+concept of a registry in that, when a member of the tree is updated (e.g., a
+hot-swappable device is discovered, or a new driver is loaded), then other Java
+objects can get notified, so they can remain in synchrony with the database.  It
+seems neat and elegant (which implies that maybe it'll be simpler to
+implement?), and I'm thinking we should clone it.
+
+(With respect to device-discovery, I have some pretty good documentation on the
+BIOS data areas, in which the BIOS stores the results of its device-probing
+activities.  Now that we can read physical memory, we can stroll through this
+area and find out exactly what devices are in the box.  I'm more than willing to
+help out here...)
+
+With respect to Shark Windows, the author, Michael Emmel (whom I have blind
+cc-ed upon this response so that he can know what we're up to but will not get
+inundated with pleas for help), has been kind enough to indicate a willingness
+to help us out (but I have been remiss in following up on his generous offer).
+
+&gt;<i> well, I've made some modifications in the source code, but I don't know
+</I>&gt;<i> how to upload these changes. Can anybody help me?
+</I>
+For expediency's sake, how about you send me the bug fixes for the existing
+native code and I'll plug them in?  Either diffs with context or just the new
+files in their entirety will do...  For the new Java source, either Todd or I
+can check it in for you -- I'm getting the feeling that we'll need to modify the
+CVS access lists (aren't you?)...  Who's in charge of the CVS access lists,
+anyways?
+
+&gt;<i> another speed question: write8 is much faster than write 32 why? I wanted
+</I>&gt;<i> to scrub the vga memory with write32, but it was too slow.
+</I>
+If I had to guess (and I can only hazard a guess at this point), I'd say that
+it's maybe because the write32 stuff is Java 64-bit based so that we can avoid
+sign-extension problems (maybe we really don't have to do that -- but I'll have
+to think a little bit harder about that -- Pat had some thoughts he posted
+earlier on this issue...).
+
+Fabulous work -- congratulations!!
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000200.html">[JOS-Kernel] Re: [JOS-Arch] Re: [JOS-Kernel] the vga driver is working now</A></li>
+	<LI> Next message: <A HREF="000193.html">[JOS-Kernel] the vga driver is working now</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#189">[ date ]</a>
+              <a href="thread.html#189">[ thread ]</a>
+              <a href="subject.html#189">[ subject ]</a>
+              <a href="author.html#189">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Re: Progress report.</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000062.html">
+   <LINK REL="Next" HREF="000065.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Re: Progress report.</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Re: Progress report.">tmiller@haverford.edu</A><BR>
+    <I>Wed, 9 Jun 1999 11:32:47 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000062.html">[JOS-Kernel] Progress report.</A></li>
+        <LI> Next message: <A HREF="000065.html">[JOS-Kernel] Re: Progress report.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#64">[ date ]</a>
+              <a href="thread.html#64">[ thread ]</a>
+              <a href="subject.html#64">[ subject ]</a>
+              <a href="author.html#64">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> (2) I have made moved duplicative code from the global functions
+</I>&gt;<i> into methods of the various classes (java_thread, java_class, frame).
+</I>
+	Increasing their efficiency as well, I'd imagine.
+
+&gt;<i> (3) I propagated the active thread throughout the class loading, linking,
+</I>&gt;<i> preparing, and resolving steps because I thought I could, at this stage, and
+</I>&gt;<i> prior to having native threads, handle this entirely WITHOUT keeping context in
+</I>&gt;<i> native stacks.  This would enable the scheduler to know which thread was
+</I>&gt;<i> running, and it would enable a debugger to know, and it would enable pre-emption
+</I>&gt;<i> of static initializers.  I was wrong, wrong, wrong.  I do not know whether I
+</I>&gt;<i> should back these changes out, or leave them in (they don't seem to break
+</I>&gt;<i> anything).
+</I>
+	They might be useful later on (viz: exceptions).  But why doesn't
+propogating the thread throughout allow for pre-emptive static
+initializers?
+
+&gt;<i> (4) In perusing this machinery, I think there are some further changes I might
+</I>&gt;<i> like to make with respect to how classes are known to be
+</I>&gt;<i> resolved/linked/whatever, and, in specific, when the initializer threads get
+</I>&gt;<i> spawned (right now they get spawned really early, but don't get executed, so
+</I>&gt;<i> there are a LOT of dormant threads lying about).  I shall discuss these with
+</I>&gt;<i> Todd after I commit the merged changes.
+</I>
+	Right now, threads don't cost a whole lot more than frames do, and
+they're a little more convenient.  We could get away with nothing more
+than a pointer to the opcodes, but that's probably inflicting unnecessary
+pain on ourselves.
+
+&gt;<i> (6) I have not (cannot?) build the latest Java source successfully.  Todd, would
+</I>&gt;<i> you please be so kind as to put your latest successful zipfile (compressed, of
+</I>&gt;<i> course) somewhere I can FTP it from?  Then I can test my merged changes before I
+</I>&gt;<i> commit them so as not to break anything.  It would also help if you put a
+</I>&gt;<i> logfile (obviously, host build only) showing me what output to expect.
+</I>
+	Sure thing.  Has anyone else had problems building the latest java
+sources?
+
+-_Quinn
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000062.html">[JOS-Kernel] Progress report.</A></li>
+	<LI> Next message: <A HREF="000065.html">[JOS-Kernel] Re: Progress report.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#64">[ date ]</a>
+              <a href="thread.html#64">[ thread ]</a>
+              <a href="subject.html#64">[ subject ]</a>
+              <a href="author.html#64">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

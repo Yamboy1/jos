@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Pure virtual classes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000678.html">
+   <LINK REL="Next" HREF="000680.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Pure virtual classes</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Pure virtual classes">gchii@mindspring.com</A><BR>
+    <I>Mon, 28 Feb 2000 19:53:20 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000678.html">[JOS-Kernel] Shared library</A></li>
+        <LI> Next message: <A HREF="000680.html">[JOS-Kernel] Pure virtual classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#679">[ date ]</a>
+              <a href="thread.html#679">[ thread ]</a>
+              <a href="subject.html#679">[ subject ]</a>
+              <a href="author.html#679">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>What do you think? Are pure virtual classes a good idea for maintaining
+platform independence in a class library?
+
+Linux uses C and header files to maintain platform independence. It uses
+#ifdef sparingly. Platform dependent subroutines are pushed out into their
+own directories. All the platform-specific subroutines for a platform are
+in a directory together.
+
+When platform-independent code calls a subroutine declared in a header, it
+doesn't matter (much) if the implementation is platform-independent or
+platform-specific. The linker takes care of linking in the right machine
+code for a platform.
+
+When dealing with classes, you can quickly run into trouble if you define
+fields in a platform-independent class. The fields for one platform might
+not be suitable for another. Pure virtual classes are like the Java-style
+interface. The define the behavior a class is supposed to have; but, it
+does not allocate any fields.
+
+While it might look like more work to define two classes for common objects
+instead of one, it is less likely that common objects will need to be
+revised in the future to accommodate a new platform.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000678.html">[JOS-Kernel] Shared library</A></li>
+	<LI> Next message: <A HREF="000680.html">[JOS-Kernel] Pure virtual classes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#679">[ date ]</a>
+              <a href="thread.html#679">[ thread ]</a>
+              <a href="subject.html#679">[ subject ]</a>
+              <a href="author.html#679">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

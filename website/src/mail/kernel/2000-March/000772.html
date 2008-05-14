@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000771.html">
+   <LINK REL="Next" HREF="000768.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS-Kernel] Device as a digital resource">al@outworld.org</A><BR>
+    <I>Tue, 21 Mar 2000 18:38:32 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000771.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000768.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#772">[ date ]</a>
+              <a href="thread.html#772">[ thread ]</a>
+              <a href="subject.html#772">[ subject ]</a>
+              <a href="author.html#772">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&quot;Todd L. Miller&quot; wrote:
+
+&gt;<i>         Okay, so there's another of level indirection in here that I
+</I>&gt;<i> missed.  That is, Controller.getObject() may well return itself, but
+</I>&gt;<i> the Controller for a Device is the only object in the system which
+</I>&gt;<i> keeps a driver reference?)
+</I>
+I have absolutely no idea, as nobody else has either. We have not
+discussed this issue. I am just certain that it will be considered
+insane to allow applications raw access to hardware - it's just
+completely opposite to all aims of Java's abstraction and inherent
+security features. System components must have access to devices, but
+they will be JOS specific, and could thus implement an interface for
+informing them when a device has changed status. Something like this:
+
+
+package jos.system.device;
+
+public interface DeviceListener extends EventListener {
+
+	public void deviceConnected(Device device);
+	public void deviceDisconnected(Device device);
+	public void deviceStatusChanged(Device device, String name,
+	                                              Object newvalue);
+
+}
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+________________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [URL: <A HREF="http://www.outworld.org/people/al]">http://www.outworld.org/people/al]</A>
+[TEL1: (30) +31 422392] [TEL2: (30) +31 428154] [CELL: (30) +937 110247]
+[ADDRESS: 14 Argonafton St., Kalamaria, 551 31, Thessaloniki, Greece GR]
+PLEASE DO NOT SEND ME ANY UNSOLICITED COMMERCIAL EMAIL [DSS: 0xDBEF8ECC]
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000771.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000768.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#772">[ date ]</a>
+              <a href="thread.html#772">[ thread ]</a>
+              <a href="subject.html#772">[ subject ]</a>
+              <a href="author.html#772">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

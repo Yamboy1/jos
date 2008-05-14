@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jJOS speed</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000281.html">
+   <LINK REL="Next" HREF="000245.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jJOS speed</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] jJOS speed">jm@mak.com</A><BR>
+    <I>Mon, 16 Aug 1999 14:35:00 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000281.html">[JOS-Kernel] jJOS speed</A></li>
+        <LI> Next message: <A HREF="000245.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#242">[ date ]</a>
+              <a href="thread.html#242">[ thread ]</a>
+              <a href="subject.html#242">[ subject ]</a>
+              <a href="author.html#242">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+Thomas Bocek wrote:
+&gt;<i> it's &quot;only&quot; about 40% faster: I marked the position of the (old source)
+</I>&gt;<i> crash on my crt, and stopped the time, when the new source reached that
+</I>&gt;<i> position.
+</I>&gt;<i> But the clear screen seems to run much faster...
+</I>
+Hmm....
+
+&gt;<i> hmm a write32 is still about 10 times slower than a write8, but a write16
+</I>&gt;<i> is about twice as fast as write8.
+</I>
+I'll take a look.  You would think that 4x fewer Java/native boundary crossing
+would make up for any double-length operations.  Maybe there's a Real Bug (I
+have noticed that, the way the x86 architecture works, that there is no &quot;bus
+error&quot; exception when writing to non-existent memory (unless you are on a P5 or
+above, and set some magical machine-specific register bit(s))) - but when I was
+debugging the heap stuff, I noticed that writes to non-existent memory would
+time-out in hardware, and thus appear to take WAY longer than writes to existing
+memory.  (BTW, this should be better when I/we implement virtual memory.)
+
+&gt;<i> &gt; With respect to the crash:
+</I>&gt;<i> &gt;
+</I>&gt;<i> 
+</I>&gt;<i> &gt; (1) When my version hangs after displaying the checkmark, is that the
+</I>&gt;<i> &gt; crash's failure mode?  I mean, is this the same &quot;crash&quot; you're getting?
+</I>&gt;<i> &gt; If so, I can try and debug it.
+</I>&gt;<i> 
+</I>&gt;<i> the checkmark seems to run fine (there's no switching to text console
+</I>&gt;<i> yet), but the pixel fillscreen test crashes after a while. Usualy I get
+</I>&gt;<i> the screen filled with &lt;000000&gt; (div by zero I think) or a jbHeap error.
+</I>
+How can you tell which error occurs once the screen has gone to VGA mode?
+ 
+&gt;<i> &gt; (2) Do you think it would help if I wrote something that, in the case of
+</I>&gt;<i> &gt; a detectable crash, reset the VGA display to text mode and spat out some
+</I>&gt;<i> &gt; debugging info?  (Our own little BSOD!  What color should I make the
+</I>&gt;<i> &gt; screen?)
+</I>&gt;<i> 
+</I>&gt;<i> hmm blue? doh, sorry I mean red.
+</I>
+Red Screen of Death?
+
+&gt;<i> printing on screen is ok, we can change the mode to 80x50 or 116x50, so we
+</I>&gt;<i> could see more.
+</I>
+OK.
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000281.html">[JOS-Kernel] jJOS speed</A></li>
+	<LI> Next message: <A HREF="000245.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#242">[ date ]</a>
+              <a href="thread.html#242">[ thread ]</a>
+              <a href="subject.html#242">[ subject ]</a>
+              <a href="author.html#242">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

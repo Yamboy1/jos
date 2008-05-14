@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000753.html">
+   <LINK REL="Next" HREF="000757.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Device as a digital resource">gchii@mindspring.com</A><BR>
+    <I>Sun, 19 Mar 2000 10:31:46 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000753.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000757.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#754">[ date ]</a>
+              <a href="thread.html#754">[ thread ]</a>
+              <a href="subject.html#754">[ subject ]</a>
+              <a href="author.html#754">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I applaud your comments. I salute you. An operating system must be as
+wide-open and future-oriented as possible. The more generalized it is the
+better I like it. I want a new OS.
+
+At 09:29 AM 3/19/00 +0200, Al &lt;<A HREF="mailto:al@outworld.org">al@outworld.org</A>&gt; wrote:
+&gt;<i>I love the idea of using URI for pointing to *anything,* as URI are very
+</I>&gt;<i>scalable and dynamic in doing just that: pointing. I use a sort of URI
+</I>&gt;<i>for my Registry API, for example. The file system will use something
+</I>&gt;<i>like that. Browsers and network tools will use them. Why not make
+</I>&gt;<i>everything pointable by URI's, and then have a central engine that reads
+</I>&gt;<i>the URI, and appropriately initializes the correct managers, factories
+</I>&gt;<i>and transport protocols?
+</I>
+Everything's a digital resource, right? So far, we have two &quot;central&quot;
+engines developed with JOS in mind. These are URI-based object factories.
+
+The BCNI factory is intended for one instance per virtual machine. Each
+virtual machine can have a unique configuration of BCNI. It supplies
+JVM-specific classes. It is one system-wide digital resource factory shared
+by all processes. From this discussion, devices are system-wide digital
+resources and might fall into the BCNI engine.
+
+The Smart API factory is intended for one instance per process. Each
+process can have a unique configuration of Smart API. Smart API is
+connected to BCNI through the bcni: scheme. If your Smart API is configured
+with the bcni: scheme, you can get system-wide and process-wide resources
+from one central engine.
+
+&gt;<i>It can be very flexible if we can use a method such as &quot;getDevice(uri)&quot;
+</I>&gt;<i>which returns a device and then we are free to play with the device as
+</I>&gt;<i>we wish. The last URI you wrote I like a lot... I was thinking of
+</I>&gt;<i>possibly something like this:
+</I>&gt;<i>
+</I>&gt;<i>bnci:jos.device.Modem:<A HREF="device://localhost/ports/serial/1/?maxspeed=...">device://localhost/ports/serial/1/?maxspeed=...</A>
+</I>
+This is better than what I had in mind. Although I'd rearrange it slightly,
+this is the essence of the uniform device identifier. Just as you said, a
+serial device is connected to a modem. Devices can be chained. For a
+moment, let's think about what is possible, not what is popular.
+
+A device: scheme should map &quot;modem:&quot; to &quot;bcni:jos.device.Modem&quot;. When you
+used the modem: subscheme, you're asking for modem interface, not a serial
+port interface.
+
+IF a modem is connected to serial port 1, I could write this:
+
+device:<A HREF="modem://localhost/ports/serial/1?maxspeed=...">modem://localhost/ports/serial/1?maxspeed=...</A>
+
+IF a modem is connected to USB port 1, I could write this:
+
+device:<A HREF="modem://localhost/ports/usb/1?maxspeed=...">modem://localhost/ports/usb/1?maxspeed=...</A>
+
+Have you ever seen a modem connected to a parallel port? It is possible,
+but not popular. IF a modem is connected to a parallel port 1, I could
+write this:
+
+device:<A HREF="modem://localhost/ports/parallel/1?maxspeed=...">modem://localhost/ports/parallel/1?maxspeed=...</A>
+
+&gt;<i>The device manager returns the raw device, and bnci converts it into the
+</I>&gt;<i>specified &quot;jod.device.Modem&quot; class.
+</I>
+I see it the other way around. BCNI returns a system-wide device and the
+modem: sub-scheme converts it into a modem interface.
+
+We have not yet talked about a device manager. We have not yet talked about
+how system-wide devices are activated, how the device: scheme is
+configured, how the central engine makes certain that only one application
+has a port open at a time.
+
+&gt;<i>Since more types of devices than modems can be attached to the serial
+</I>&gt;<i>port, the device manager can only return the raw version of the device:
+</I>&gt;<i>the port itself.
+</I>
+Exactly. That is why the serial port you specify by path is different than
+the scheme that specifies the interface.
+
+&gt;<i>Maybe, during JOS start-up, a mapping facility can create shortcuts,
+</I>&gt;<i>such as:
+</I>&gt;<i>
+</I>&gt;<i><A HREF="device://localhost/mapped/modem0/?maxspeed=...">device://localhost/mapped/modem0/?maxspeed=...</A>
+</I>&gt;<i>
+</I>&gt;<i>is equivalent to:
+</I>&gt;<i>
+</I>&gt;<i>bnci:jos.device.<A HREF="Modem://localhost/ports/serial/1/?maxspeed=...">Modem://localhost/ports/serial/1/?maxspeed=...</A>
+</I>
+During JOS start-up, the modem: sub-scheme must be plugged into the device:
+scheme factory. The serial: sub-scheme must be plugged in, too.
+
+To get at the raw serial port, you might use a URI like this:
+
+device:<A HREF="serial://localhost/ports/serial/1/?maxspeed=...">serial://localhost/ports/serial/1/?maxspeed=...</A>
+
+&gt;<i>What do you think?
+</I>
+I think we're making progress. In fact, we're close enough for the
+following sub-projects:
+
+1. Creating device interfaces
+
+Someone needs to populate a package with examples of device-related
+interfaces. The most important part of this sub-project is the interface
+names, not their methods. Sample methods are thought-provoking. Methods
+must be refined over time. Starting with interfaces we have already named:
+
+ParallelPort
+SerialPort
+Modem
+
+2. Creating the device: scheme and its corresponding factory
+
+We need a smart factory that interprets a URI for the device: scheme. Like
+any smart factory, it must use a separate plug-in controller for each
+sub-scheme.
+
+3. Creating basic implementations
+
+For each interface, a Java programmer should create a basic implementation
+of the interface. The interface and implementation must be kept separate in
+order for this to work. The basic implementation could be abstract like we
+talked about before.
+
+package org.jos.device;
+public interface Modem
+
+package decaf.device;
+public abstract class BaseModem
+    implements Modem
+public class BasicModem
+    extends BaseModem
+
+package usrobotics.device;
+public class USRoboticsModem
+    extends BaseModem
+
+package practicalperipherals.device;
+public class PracticalPeripheralsModem
+    extends BaseModem
+
+For example, it seems to me that Modem has-a SerialPort. Or rather, a Modem
+has-a port. A port might be implemented as a real object.
+
+public interface Modem {
+  public Port getPort();
+  public void setPort( Port v );
+}
+
+Then, all kinds of ports could extends the Port interface:
+
+public interface Port {
+  public int getID();
+  public void close();
+}
+
+And we could easily create a port factory based on your paths:
+
+Port s1 = getPort( &quot;/ports/serial/1&quot; );
+Port s2 = getPort( &quot;/ports/serial/2&quot; );
+Port usb1 = getPort( &quot;/ports/usb/1&quot; );
+Port usb2 = getPort( &quot;/ports/usb/2&quot; );
+Port usb3 = getPort( &quot;/ports/usb/3&quot; );
+Port usb4 = getPort( &quot;/ports/usb/4&quot; );
+Port p1 = getPort( &quot;/ports/parallel/1&quot; );
+Port p2 = getPort( &quot;/ports/parallel/2&quot; );
+
+AND the port factory would only provide ports that actually exist in
+hardware. The exact kind of port must be determined by instanceof. In other
+words, the port factory can be automatically configured upon startup. The
+port factory can keep track of which ports are &quot;busy&quot;.
+
+There should be a URI for a port factory itself. When you ask for port
+factory status, it shows which ports you have and which ports are busy. The
+port factory is an example of a system-wide factory. It should be plugged
+into BCNI.
+
+There should be a URI for a device factory itself. If the port factory is
+system wide, a device factory does not need to be. A device factory uses a
+port factory. If the device factory is process-wide, it can keep track of
+ports used by a process. It can close all ports used by a process when a
+process is killed by the operating system.
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000753.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000757.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#754">[ date ]</a>
+              <a href="thread.html#754">[ thread ]</a>
+              <a href="subject.html#754">[ subject ]</a>
+              <a href="author.html#754">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

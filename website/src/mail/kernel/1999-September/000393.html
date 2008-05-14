@@ -1,0 +1,465 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf bug report</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:ajregier%40earthlink.net">
+   <LINK REL="Previous"  HREF="000384.html">
+   <LINK REL="Next" HREF="000395.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf bug report</H1>
+    <B>Avery J. Regier</B> 
+    <A HREF="mailto:ajregier%40earthlink.net"
+       TITLE="[JOS-Kernel] decaf bug report">ajregier@earthlink.net</A><BR>
+    <I>Mon, 20 Sep 1999 20:42:49 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000384.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+        <LI> Next message: <A HREF="000395.html">[JOS-Kernel] decaf bug report / Status of RessourceManager</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#393">[ date ]</a>
+              <a href="thread.html#393">[ thread ]</a>
+              <a href="subject.html#393">[ subject ]</a>
+              <a href="author.html#393">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I downloaded the latest CVS with the interp.cc fix, but I still have this
+problem on the host build.  Here is the init.java file I use to show the
+problem.  The testVoidReturn function is what I was playing with to try and
+narrow down the cause.
+
+- Avery J. Regier
+
+/*
+ *    The contents of this file are subject to the JJOS Public License
+ *    Version 0.0 (the &quot;License&quot;); you may not use this file except in
+ *    compliance with the License. You may obtain a copy of the License at
+ *    <A HREF="http://www.jos.org/">http://www.jos.org/</A>
+ *
+ *    Software distributed under the License is distributed on an &quot;AS IS&quot;
+ *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *    License for the specific language governing rights and limitations
+ *    under the License.
+ *
+ *    The Original Code is decaf's code, released October, 1998.
+ *
+ *    The Initial Developer of the Original Code is Todd L. Miller.
+ *    Portions created by Todd L. Miller  are Copyright (C) 1998 &amp; 1999.
+ *    All Rights Reserved.
+ *
+ */
+
+/**
+ * init
+ *
+ * The first thread run and the last to die.
+ */
+
+import jos.system.interrupts;
+import jos.system.keyboard;
+import jos.system.consoled;
+import java.util.Vector;
+import java.util.Enumeration;
+
+import java.io.*;
+import jos.platform.driver.StandardVga;
+
+
+public class init {
+	public static boolean testVM = true;
+	public static boolean testThreads = true;
+	public static boolean testExceptions = true;
+	public static boolean testConsoleDaemons = true;
+	public static boolean testVGADriver = false;
+        public static boolean exitWhenDone = true;
+        public static boolean testGC = true;
+
+	/* the jos logo -&gt; just for testing */
+	final static int[] logo =
+       {0,0,0,0,0,14,15,15,15,15,14,0,0,0,0,0,
+	0,0,0,14,15,7,3,7,3,7,3,15,14,0,0,0,
+	0,0,14,15,7,3,7,3,7,3,7,3,15,14,0,0,
+	0,14,15,6,6,6,3,7,3,7,3,7,3,15,14,0,
+	0,15,6,1,1,1,6,3,7,3,7,3,7,3,15,0,
+	14,6,1,1,1,1,1,6,3,7,3,7,3,7,3,14,
+	15,1,1,1,1,1,1,6,7,3,7,3,7,3,7,15,
+	15,1,1,3,7,1,1,6,3,7,3,1,1,7,3,15,
+	15,1,1,7,3,1,1,1,6,3,7,1,1,3,7,15,
+	15,1,1,1,1,1,1,1,6,7,3,7,3,7,3,15,
+	14,1,1,1,1,1,1,1,6,3,7,3,7,3,6,14,
+	0,15,1,1,1,1,1,1,1,6,3,7,3,6,15,0,
+	0,14,1,1,1,1,1,1,1,1,6,6,6,1,14,0,
+	0,0,14,1,1,1,1,1,1,1,1,1,1,14,0,0,
+	0,0,0,14,15,1,1,1,1,1,1,15,14,0,0,0,
+	0,0,0,0,0,14,15,15,15,15,14,0,0,0,0,0};
+
+    public static void main( String[] argv ) {
+	System.out.println( &quot;init for decaf, version 0.0.1&quot; );
+
+	if (init.testVM)
+	    testVM();
+	else
+	    System.out.println( &quot;skipping VM tests...&quot; );
+
+	if (init.testThreads)
+	    testThreads();
+	else
+	    System.out.println( &quot;skipping threading tests...&quot; );
+
+	if (init.testExceptions)
+	    testExceptions();
+	else
+	    System.out.println( &quot;skipping exception tests...&quot; );
+
+	if (init.testConsoleDaemons)
+	    testConsoleDaemons();
+	else
+	    System.out.println( &quot;init() skipping console daemon tests...&quot; );
+
+	if (testVGADriver)
+	    testVGADriver();
+	else
+	    System.out.println( &quot;init() skipping VGA tests...&quot; );
+		
+	if (testGC)
+	    testGC();
+	else
+	    System.out.println( &quot;init() skipping GC tests...&quot; );
+
+	if (exitWhenDone)
+	    {
+		System.out.println( &quot;init() for decaf v0.0.1, exiting...&quot; );
+	    }
+	else
+	    {
+		System.out.println( &quot;init() entering idle time...&quot; );
+		while ( true ); /* or, j.s.system.isNotShuttingDown(), etc. */
+	    }
+    }
+
+    public static void testCasting() {
+	System.out.println( &quot;init() testing casting...&quot; );
+
+	Object o = new Object();
+	Vector v = new Vector();
+	int[] array_i = new int[10];
+	String[] array_s = new String[10];
+	
+	System.out.println( &quot;o = (Object)Vector; (OK)&quot; );
+	o = (Object)v;
+
+	System.out.println( &quot;Vector = (Vector)o; (OK)&quot; );
+	v = (Vector)o;
+
+	System.out.println( &quot;o = Object; Vector = (Vector)o (NOT OK)&quot; );
+	o = new Object();
+	v = (Vector)o;
+
+	System.out.println( &quot;ser = new String(); (OK)&quot; );
+	System.out.println( &quot;o = (Object)int[]; (OK)&quot; );
+	o = (Object)array_i;
+
+	System.out.println( &quot;o = (Object)String[]; (OK)&quot; );
+	o = (Object)array_s;
+
+	System.out.println( &quot;o = (Object)int[]; int[] = (int[])o; (OK)&quot; );
+	o = (Object)array_i;
+	array_i = (int[])o;
+
+	// Failed by compiler.
+	// System.out.println( &quot;s = (String[])int[]; (NOT OK)&quot; );
+	// array_s = (String[])array_i;
+
+	// Failed by compiler.
+	// System.out.println( &quot;i = (int[])Vector; (NOT OK)&quot; );
+	// array_i = (int[])v;
+
+	o = new Object();
+	v = new Vector();
+	Enumeration e = v.elements();
+	System.out.println( &quot;e = (Enumeration)v; (NOT OK)&quot; );
+	e = (Enumeration)v;
+
+	e = v.elements();
+	System.out.println( &quot;v = (Vector)e; (NOT OK)&quot; );
+	v = (Vector)e;
+
+	System.out.println( &quot;ser = new String(); (OK)&quot; );
+	Serializable ser = new String();
+    } /* end testCasting() */
+		
+
+public static boolean testFunctionCalls() {
+	// return true on error.
+	testVoidReturn();
+	System.out.println(&quot;Void return successful&quot;);
+	if ( testStaticDoubleReturn() != (double)5.77 ) {
+		System.out.println( &quot;Static double return failed.&quot; );
+		return true;
+		}	
+	if ( testDynamicDoubleReturn((double)5.77) != (double)5.77 ) {
+		System.out.println( &quot;Dynamic double return failed.&quot; );
+		return true;
+		}
+
+	// float, int, reference(array), void(null) remain to test.
+
+	return false;	
+} // end testFunctionCalls()
+
+public static double testStaticDoubleReturn() { return (double)5.77; }
+public static double testDynamicDoubleReturn( double d ) { return d; }
+public static int testVoidReturn() {
+	System.out.println(&quot;Having fun with testing&quot;);
+	int i=0;
+	for(; i&lt;10; i++);
+	return i;
+}
+
+public static void testMathOps() {
+	System.out.print( &quot;testing integer comparisons... &quot; );
+       
+	int k = 1;
+	int l = 10;
+	System.out.print( &quot;ops failed: &quot; );
+	if ( k == l ) { System.out.print( &quot;== &quot; ); }
+        if ( k != l ) { ; } else { System.out.print( &quot;!= &quot; ); }
+        if ( k &gt; l ) { System.out.print( &quot;&gt; &quot; ); }
+        if ( l &lt; k ) { System.out.print( &quot;&lt; &quot; ); }
+        if ( k &gt;= l ) { System.out.print( &quot;&gt;= &quot; ); }
+        if ( l &lt;= k ) { System.out.print( &quot;&lt;=&quot; ); }
+	System.out.print( &quot;\n&quot; );
+
+	System.out.print( &quot;testing double comparisons... &quot; );
+
+        double o = (double)55.3;
+        double p = (double)11.1;
+	System.out.print( &quot;ops failed: &quot; );
+        if ( o == p ) { System.out.print( &quot;== &quot; ); }
+        if ( o != p ) { ; } else { System.out.print( &quot;!= &quot;); }
+        if ( o &lt; p ) { System.out.print( &quot;&lt; &quot; ); }
+        if ( p &gt; o ) { System.out.print( &quot;&gt; &quot; ); }
+        if ( o &lt;= p ) { System.out.print( &quot;&lt;= &quot; ); }
+        if ( p &gt;= o ) { System.out.print( &quot;&gt;=&quot; ); }
+	System.out.print( &quot;\n&quot; );
+
+        System.out.print( &quot;Testing float comparisons... &quot; );
+
+        float q = (float)4.5;
+        float r = (float)4.5;
+	System.out.print( &quot;ops failed: &quot; );
+        if ( q == r ) { ; } else { System.out.print( &quot;== &quot;); }
+        if ( q != r ) { System.out.print( &quot;!= &quot; ); }
+        if ( q &lt; r ) { System.out.print( &quot;&lt; &quot; ); }
+        if ( r &gt; q ) { System.out.print( &quot;&gt; &quot; ); }
+        if ( r &lt;= q ) { ; } else { System.out.print( &quot;&lt;= &quot; ); }
+        if ( q &gt;= r ) { ; } else { System.out.print( &quot;&gt;=&quot; ); }
+	System.out.print( &quot;\n&quot; );
+
+        System.out.print( &quot;Testing float ops... &quot; );
+
+	System.out.print( &quot;ops failed: &quot; );
+        if ( q + r != (float)9.0 ) { System.out.print( &quot;add &quot; ); }
+        if ( q - r != (float)0.0 ) { System.out.print( &quot;sub &quot; ); }
+        if ( q / r != (float)1.0 ) { System.out.print( &quot;div &quot; ); }
+        if ( q % r != (float)0.0 ) { System.out.print( &quot;mod &quot; ); }
+        if (    -q != (float)-4.5 ) { System.out.print( &quot;neg &quot; ); }
+        if ( q * r != (float)20.25 ) { System.out.print( &quot;mul&quot; ); }
+        System.out.print( &quot;\n&quot; );
+
+        System.out.print( &quot;Testing double ops... &quot; );
+
+	double result;
+	System.out.print( &quot;ops failed: &quot; );
+	result = o + p;
+        if ( result &lt; 66.0 || result &gt; 67.0 ) { System.out.print(&quot;add &quot;); }
+	result = o - p;
+        if ( result &lt; 44.0 || result &gt; 45.0 ) { System.out.print(&quot;sub &quot;); }
+	result = -o;
+        if ( result &gt; -55 || result &lt; -56 ) { System.out.print(&quot;neg &quot;); }
+	result = o * p;
+        if ( result &lt; 613 || result &gt; 614 ) { System.out.print( &quot;mul&quot; ); }
+        System.out.print( &quot;\n&quot; );
+
+	// need long ops &amp; comparisons, integer ops;
+  	// byte &amp; char ops * comparisons.
+	System.out.print( &quot;Math ops finished\n&quot;);
+testArrayOps();
+	} // end testMathOps()
+
+public static void testArrayOps() {
+	System.out.print( &quot;testing array operations... &quot; );	
+
+	int[][][] array_three = new int [5][5][5];
+	array_three[4][4][4] = 3;
+
+	int[][] array_two = new int [4][4];
+	array_two[3][3] = 2;
+
+	int[] array_one = new int [3];
+	array_one[2] = 1;
+
+	int two = array_two[3][3];
+	int three = array_three[4][4][4];
+	int one = array_one[2];
+
+	if( one != 1 ) { System.out.print( &quot;1-dim int array failed. &quot; ); }
+	if( two != 2 ) { System.out.print( &quot;2-dim int array failed. &quot; ); }
+	if( three != 3 ) { System.out.print( &quot;3-dim int array failed.&quot; ); }
+	System.out.print( &quot;\n&quot; );
+
+	String[] strings = new String[3];
+	strings[1] = &quot;one&quot;;
+	System.out.print( &quot;\&quot;one\&quot; should be printed: &quot; );
+	System.out.println( strings[1] );
+	} // end testArrayOps()
+
+    public static void testVM() {
+	System.out.println( &quot;testing the VM...&quot; );
+			
+	if ( testFunctionCalls() ) {
+	    System.out.println( &quot;testFunctionCalls() failed!&quot; );
+	    System.out.println( &quot;the remaining tests are probably invalid.&quot; );
+	}	
+	testMathOps();
+	System.out.print( &quot;Now testing Arrays\n&quot;);
+	testArrayOps();
+	testCasting();
+
+	/* test print/println */
+	System.out.print( &quot;does 56 = &quot; );
+	System.out.print( 56 );
+	System.out.println( &quot;?&quot; );
+
+	System.out.print( &quot;is true = &quot; );
+	System.out.print( true );
+	System.out.println( &quot;?&quot; ) ;
+
+	System.out.print( &quot;This sentence should end with a period&quot; );
+	System.out.println( (char)'.' );	
+    }
+
+    public static void testThreads() {
+	System.out.println( &quot;init(): testing threading.&quot; );
+	System.out.println( &quot;init() starting counter...&quot; );
+	counter c = new counter();
+	c.start();
+
+	System.out.println( &quot;init() starting decounter...&quot; );
+	counter d = new counter( false );
+	d.start();
+
+	System.out.println( &quot;init() entering .wait() loop...&quot; );
+	int interrupt_count = 0;
+	while ( interrupt_count &lt; 10 ) {
+				/* Bad Karma w/o this. */
+	    synchronized( jos.system.interrupts.int000 ) {
+		/* because wait() calls release
+		   locks, this doesn't actually
+		   cause any blockage. */
+		try { jos.system.interrupts.int000.wait(); }
+		catch ( InterruptedException ie ) {
+		    System.out.println( &quot;init() interrupted waiting for notify&quot; );
+		    continue;
+		}
+	    } /* end synchlock on interrupt. */
+				// System.out.println( &quot;init() caught interrupt.&quot; );
+	    interrupt_count++;
+	} /* end .wait() loop */
+	System.out.println( &quot;init() has caught 10 interrupts.&quot; );
+    }
+
+    public static void testExceptions() {
+	/* run exception tests */
+	System.out.println( &quot;init() testing exceptions()&quot; );
+
+	/* throw/catch pair #1 -- basic mechanism */
+	try {
+	    throw new Exception();
+	} /* end throw #1 */
+	catch ( Exception e ) {
+	    System.out.println( &quot;init(): caught exception #1!&quot; );
+	} /* end catch #1 */
+
+	/* throw/catch pair #2 -- casting exceptions up */
+	try { throw new java.io.IOException(); }
+	catch ( Exception e ) {
+	    System.out.println( &quot;init(): caught exception #2!&quot; );
+	} /* end catch #2 */
+
+	/* throw/catch pair #3 -- data preservation */
+	try { throw new Exception( &quot;init(): caught exception #3!&quot; ); }
+	catch ( Exception e ) {
+	    System.out.println( e.getMessage() );
+	}
+    }
+
+    public static void testConsoleDaemons() {			
+	System.out.println( &quot;init() starting console daemons...&quot; );
+
+	System.out.println( &quot;init() starting jos.system.keyboard...&quot; );
+	/* sets up the hardware driver */
+	keyboard k = new keyboard();
+	/* starts the KeyEvent dispatch loop */
+	k.start();
+
+	System.out.println( &quot;init() starting consoled...&quot; );
+	/* listens to the dispatching from j.s.k above */
+	consoled cd = new consoled();
+    }
+
+    public static void testVGADriver() {
+	System.out.println( &quot;init() testing VGA driver...&quot; );
+	StandardVga v = new StandardVga();
+	if(v.setVideoMode(640,480,4)==0)
+	    {
+		v.startService();
+		v.bitblt(312,232,logo,16);
+		v.delay(0x100000);
+		v.stopService();
+		System.out.println(&quot;back to textmode&quot;);
+	    }
+	/* end VGA test routine */
+    }
+
+    public static void testGC() {
+	int i=0;
+
+	while (i&lt;1000000)
+	    {
+		int size = i%1000;
+		int[] garbage = new int[size];
+		i = i+1;
+
+		testVM();
+		testThreads();
+		testExceptions();
+		testCasting();
+	    }
+    }
+
+} // end init.
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000384.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+	<LI> Next message: <A HREF="000395.html">[JOS-Kernel] decaf bug report / Status of RessourceManager</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#393">[ date ]</a>
+              <a href="thread.html#393">[ thread ]</a>
+              <a href="subject.html#393">[ subject ]</a>
+              <a href="author.html#393">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

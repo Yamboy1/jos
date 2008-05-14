@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf fixes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000573.html">
+   <LINK REL="Next" HREF="000575.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf fixes</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf fixes">tmiller@haverford.edu</A><BR>
+    <I>Thu, 30 Dec 1999 13:47:13 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000573.html">[JOS-Kernel] Java Native Interface and Linux</A></li>
+        <LI> Next message: <A HREF="000575.html">[JOS-Kernel] native console &amp; bug report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#574">[ date ]</a>
+              <a href="thread.html#574">[ thread ]</a>
+              <a href="subject.html#574">[ subject ]</a>
+              <a href="author.html#574">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	The field lookup code had a serious bug in it which prevent it
+from working with jikes-compiled code, where it would not check
+super-interfaces or super-classes for fields because javac always pointed
+the field reference's class pointer at the proper class (i.e. the
+super-class / super-interface in which that field resides).  I've fixed
+this, but haven't committed it to CVS yet, in search of the other bug,
+where the constant pool is being asked for an entry it doesn't have --
+which might be masking whatever bad coding I may have done fixing the
+lookup code.
+
+	I tested with both jikes and javac, so I don't think the incorrect
+offset is a problem in the compiler, though I can't imagine what it's
+actually useful for.  The solution I came up with -- because I don't have
+the slightest idea what I'm doing wrong -- was just to skip the part of
+the code in ur_java_class.cc that attempts to verify that the give
+interface method does, in fact, exist.  I'm guessing that the indices are
+offsets into the super class's constant pool, but it's been long enough
+since I've worked on the back-end code that I'm not entirely
+sure.  dynLink() (interp.cc) seems to treating things that way...
+
+	At any rate, something in one of the initializations classpath put
+in its java code is trying to load libraries, etc, and because that
+particular chunk of native code isn't implemented yet, I think I'm
+returning a NULL object to the stack -- causing the current status of a
+segfault.  I think, however, that the missing functions will be relatively
+easy to insert.  Before I do, however, I want to check just what exactly
+is going on in the code and make sure that I want it to be happening.
+
+	For now, however, fast native code is off (on my build), and
+classpath is being checked before decaf for native methods.* This will
+probably change to allow us to bypass unimplemented bits.**
+
+-_Quinn
+
+*: And failing, because the library loading fails on the
+'LINK_ReallyLinkKnownClass' symbol not being found.  I suspect that this
+is in the JNI somewhere.
+
+**: What I want to happen is to move to -DFAST_NATIVE_CODE, and change the
+classpath sources to mark those methods we're currently over-riding as
+native.  There should be a relatively straight-forward set of
+modifications to allow us to compile jvmbuiltins.cc as a
+dynamically-linked library, and end up treating it just like classpath's
+various libs.  (Back-end would probably just be shared with the
+loadlibrary code -- that is, a list of lib handles in which to check for
+the native code.  We'll see.)
+
+PS: As the above two footnotes show, aside from JNI, the host build is
+very close to gaining classpath, which provides it with a fully-functional
+(AFAIK, this is true for 1.1 but not 1.2) class library amenable to our
+modifications.  This would be a substantial jump forward in functionality
+for decaf.
+
+(As an aside, I think we're going to have to fork classpath and set it up
+in our own CVS.  The host build should remain very similar, except for the
+native-marked decaf-over-ridden methods which we'll aim to remove.  The
+i38 build, on the other hand, is going to require, I think, some
+substantial revision, if for no other reason than the limitations of the
+'standard library' for the host build.  Some of these changes will take
+place internal to decaf -- a larger 'stdlib' and changes from dynamic to
+static linking/loading (no ld.so from JJOS!), etc -- but at the very least
+we'll need to write our own JVM-specific classes.  (classpath/vm).  This
+does not consider other possibilites like BCNI and/or multiple processes.  
+I will, of course, keep this list closely informed about my progress and
+the magnitude of the required changes to classpath.  If they look minor
+enough -- and BCNI, etc, are similarly minor -- we may be able to get by
+with a --with-decaf flag to ./configure and a CVS branch.  We'll see.)
+
+	Additionally, some i386-build drivers may be able to be
+implemented for the host.  The console driver(s) come to mind as being
+ready for a jcurses back-end; or one might be able to use the ncurses
+library directly and get better keyboard-handling for the keyboard driver
+in the deal.  The VGA console/driver should be relatively simple to
+implement on the AWT or in an X-window.
+
+	Something I do want to when decaf+classpath is functional is to
+run a benchmark (caffienemark?) against java and japhar+classpath, just to
+see how much work I need to do... :)
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000573.html">[JOS-Kernel] Java Native Interface and Linux</A></li>
+	<LI> Next message: <A HREF="000575.html">[JOS-Kernel] native console &amp; bug report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#574">[ date ]</a>
+              <a href="thread.html#574">[ thread ]</a>
+              <a href="subject.html#574">[ subject ]</a>
+              <a href="author.html#574">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

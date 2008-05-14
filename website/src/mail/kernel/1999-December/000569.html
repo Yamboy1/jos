@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Some Fix On Array Copy</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000565.html">
+   <LINK REL="Next" HREF="000571.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Some Fix On Array Copy</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Kernel] Some Fix On Array Copy">hilarycheng@usa.net</A><BR>
+    <I>Wed, 22 Dec 1999 22:55:02 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000565.html">[JOS-Kernel] CVS activity</A></li>
+        <LI> Next message: <A HREF="000571.html">[JOS-Kernel] Some Fix On Array Copy</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#569">[ date ]</a>
+              <a href="thread.html#569">[ thread ]</a>
+              <a href="subject.html#569">[ subject ]</a>
+              <a href="author.html#569">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is a multi-part message in MIME format.
+
+------=_NextPart_000_000F_01BF4CCF.9471F220
+Content-Type: text/plain;
+	charset=&quot;big5&quot;
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    I am working JJOS so that It can print correctly. But I found some =
+bugs of some source code.  Here it is.
+
+jvmbuiltins.cc -- array_copy
+-------------------cut here---------------------
+        for( jju32 x =3D pos; x &lt; pos + length; x++ ) {
+           dest_array-&gt;store(x, src_array-&gt;load( offset + x ) );
+      } /* end copy loop */
+
+      return JJTRUE;
+} /* end arraycopy() */
+-------------------cut here---------------------
+Original Souce Code is using offset in the for-loop instead of pos. It =
+can't
+copy array correctly.
+
+jvmbuiltins.cc -- print_string
+-------------------cut here---------------------
+            if (*quux =3D=3D constant_utf8(&quot;java/lang/String&quot;))
+                {
+                                /* java_object *jo =3D (java_object =
+*)(arguments[1
+]); */
+                    java_string *js =3D (java_string *)foo;
+                    if (js-&gt;myUTF8 !=3D 0)
+                        kprintf(&quot;%s&quot;, js-&gt;myUTF8-&gt;c_str()); // $$ Leaks.
+                    else
+                        kprintf(&quot;null&quot;);
+                    break;
+                }                       /* end if a string */
+            else
+                {
+                    /* if it's not a String */
+-------------------cut here---------------------
+
+Original Souce Code will not check js-&gt;myUTF8 is null or not. If it
+is null,
+it will makes core dump.
+
+After Fixiing, it stills can't fix the println problem. Since JJOS is
+using native java string. If the java source performs
+a operation like object.toString(). It will not work.
+Currently, we can use an alternative approach to print it.
+
+-------------------cut here---------------------
+       int a =3D Integer.MIN_VALUE ;
+        String b =3D new Integer(a).toString();
+        char[] buf =3D b.toCharArray();
+        for (int count=3D0;count&lt;buf.length;count++) {
+            System.out.print(buf[count]);
+        }
+        System.out.println(&quot;&quot;);
+-------------------cut here---------------------
+It can print value from value from long, int, etc. But It will not
+works all the times. But at least, we can use this=20
+approach in native printing function in JJOS.
+
+Regards,
+
+Hilary
+
+------=_NextPart_000_000F_01BF4CCF.9471F220
+Content-Type: text/html;
+	charset=&quot;big5&quot;
+Content-Transfer-Encoding: quoted-printable
+
+&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD W3 HTML//EN&quot;&gt;
+&lt;HTML&gt;&lt;HEAD&gt;
+&lt;META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type&gt;
+&lt;STYLE&gt;&lt;/STYLE&gt;
+
+&lt;META content=3D'&quot;MSHTML 5.00.0910.1309&quot;' name=3DGENERATOR&gt;&lt;/HEAD&gt;
+&lt;BODY bgColor=3D#d8d0c8&gt;
+&lt;DIV&gt;&lt;FONT size=3D2&gt;&lt;FONT face=3DArial&gt;Hi All,&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT size=3D2&gt;&lt;FONT face=3DArial&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; I am working =
+JJOS so that=20
+It can print correctly.&lt;/FONT&gt;&lt;FONT face=3DArial&gt; But I found some bugs =
+of some=20
+source code.&amp;nbsp; Here it is.&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT size=3D2&gt;&lt;FONT face=3DArial&gt;jvmbuiltins.cc --=20
+array_copy&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DCourier&gt;&lt;FONT size=3D2&gt;-------------------cut=20
+here---------------------&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DCourier&gt;&lt;FONT size=3D2&gt;&amp;nbsp;       for( jju32 x =3D =
+pos; x &amp;lt; pos=20
++ length; x++ ) {&lt;BR&gt; &amp;nbsp;         dest_array-&amp;gt;store(x, =
+src_array-&amp;gt;load(=20
+offset + x ) );&lt;BR&gt;&amp;nbsp;     } /* end copy loop */&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DCourier&gt;&lt;FONT size=3D2&gt;&amp;nbsp;     return JJTRUE;&lt;BR&gt;} =
+/* end=20
+arraycopy() */&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial&gt;
+&lt;DIV&gt;&lt;FONT face=3DCourier size=3D2&gt;-------------------cut=20
+here---------------------&lt;/FONT&gt;&lt;/DIV&gt;&lt;FONT =
+size=3D2&gt;&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;Original Souce Code is using offset in the for-loop instead of pos. =
+It=20
+can't&lt;/DIV&gt;
+&lt;DIV&gt;copy array correctly.&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;
+&lt;DIV&gt;&lt;FONT size=3D2&gt;&lt;FONT face=3DArial&gt;jvmbuiltins.cc --=20
+print_string&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DCourier&gt;&lt;FONT size=3D2&gt;-------------------cut=20
+here---------------------&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DCourier&gt;&lt;FONT size=3D2&gt;            if (*quux =3D=3D=20
+constant_utf8(&amp;quot;java/lang/String&amp;quot;))&lt;BR&gt;                {&lt;BR&gt;    =
+       =20
+                    /* java_object *jo =3D (java_object =
+*)(arguments[1&lt;BR&gt;]);=20
+*/&lt;BR&gt;                    java_string *js =3D (java_string *)foo;&lt;BR&gt;    =
+         =20
+      if (js-&amp;gt;myUTF8 !=3D 0)&lt;BR&gt;                        =
+kprintf(&amp;quot;%s&amp;quot;,=20
+js-&amp;gt;myUTF8-&amp;gt;c_str()); // $$ Leaks.&lt;BR&gt;                    else&lt;BR&gt; =
+       =20
+               kprintf(&amp;quot;null&amp;quot;);&lt;BR&gt;                    =
+break;&lt;BR&gt;     =20
+          }                       /* end if a string */&lt;BR&gt;            =
+else&lt;BR&gt; =20
+              {&lt;BR&gt;                    /* if it's not a String=20
+*/&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial&gt;&lt;FONT face=3DCourier =
+size=3D2&gt;-------------------cut=20
+here---------------------&lt;/FONT&gt;&lt;/DIV&gt;&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial&gt;&lt;FONT size=3D2&gt;&lt;FONT size=3D2&gt;
+&lt;DIV&gt;Original Souce Code will not check js-&amp;gt;myUTF8 is null or not. If =
+
+it&lt;/DIV&gt;
+&lt;DIV&gt;is null,&lt;/DIV&gt;it will makes core dump.&lt;/FONT&gt;&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial&gt;&lt;FONT size=3D2&gt;&lt;BR&gt;&lt;/FONT&gt;&lt;FONT size=3D2&gt;After =
+Fixiing, it=20
+stills can't fix the println problem. Since JJOS is&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT size=3D2&gt;&lt;FONT face=3DArial&gt;using native java string. If the =
+java source=20
+performs&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT size=3D2&gt;&lt;FONT face=3DArial&gt;a operation like =
+object.toString(). It will=20
+not work.&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT size=3D2&gt;&lt;FONT face=3DArial&gt;Currently, we can use an =
+alternative approach=20
+to print it.&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial&gt;&lt;FONT size=3D2&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial&gt;&lt;FONT face=3DCourier&gt;-------------------cut=20
+here---------------------&lt;/FONT&gt;&lt;/FONT&gt;&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;&lt;FONT =
+size=3D2&gt;
+&lt;DIV&gt;       int a =3D Integer.MIN_VALUE ;&lt;BR&gt;        String b =3D new=20
+Integer(a).toString();&lt;BR&gt;        char[] buf =3D b.toCharArray();&lt;BR&gt;    =
+    for=20
+(int count=3D0;count&amp;lt;buf.length;count++) {&lt;BR&gt;           =20
+System.out.print(buf[count]);&lt;BR&gt;        }&lt;BR&gt;       =20
+System.out.println(&amp;quot;&amp;quot;);&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;&lt;/DIV&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial&gt;&lt;FONT size=3D2&gt;&lt;FONT =
+face=3DCourier&gt;-------------------cut=20
+here---------------------&lt;/FONT&gt;&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;&lt;FONT=20
+size=3D2&gt;&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial&gt;&lt;FONT size=3D2&gt;It can print value from value =
+from long, int,=20
+etc. But It will not&lt;/FONT&gt;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT size=3D2&gt;works all the times. But at least, we can use this=20
+&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT size=3D2&gt;approach in native printing function in =
+JJOS.&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT size=3D2&gt;Regards,&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT size=3D2&gt;Hilary&lt;/FONT&gt;&lt;/DIV&gt;&lt;/FONT&gt;&lt;/DIV&gt;&lt;/BODY&gt;&lt;/HTML&gt;
+
+------=_NextPart_000_000F_01BF4CCF.9471F220--
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000565.html">[JOS-Kernel] CVS activity</A></li>
+	<LI> Next message: <A HREF="000571.html">[JOS-Kernel] Some Fix On Array Copy</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#569">[ date ]</a>
+              <a href="thread.html#569">[ thread ]</a>
+              <a href="subject.html#569">[ subject ]</a>
+              <a href="author.html#569">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

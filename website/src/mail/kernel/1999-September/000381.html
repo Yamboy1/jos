@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Some Idea About Speed Up JJOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:hilarycheng%40usa.net">
+   <LINK REL="Previous"  HREF="000380.html">
+   <LINK REL="Next" HREF="000382.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Some Idea About Speed Up JJOS</H1>
+    <B>Hilary Cheng</B> 
+    <A HREF="mailto:hilarycheng%40usa.net"
+       TITLE="[JOS-Kernel] Some Idea About Speed Up JJOS">hilarycheng@usa.net</A><BR>
+    <I>Mon, 20 Sep 1999 09:59:51 +0800</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000380.html">[JOS-Kernel] decaf bug report</A></li>
+        <LI> Next message: <A HREF="000382.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#381">[ date ]</a>
+              <a href="thread.html#381">[ thread ]</a>
+              <a href="subject.html#381">[ subject ]</a>
+              <a href="author.html#381">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is a multi-part message in MIME format.
+
+------=_NextPart_000_01B5_01BF034E.E186BF20
+Content-Type: text/plain;
+	charset=&quot;big5&quot;
+Content-Transfer-Encoding: quoted-printable
+
+Hi All,
+
+    I got a idea to speed up JJOS a little bit.=20
+
+    For the right now, we are using switch statement to interrupt the =
+Java Bytecodes.
+i.e.=20
+
+swtich (bytecodes) {
+case 0: do_opcode_0();
+break;
+case 1: do_opcode_1();
+break;
+............
+............
+............
+............
+}
+
+It is slow. every opcodes needs one to hundred comparsion so that they =
+can perform the operation.
+
+well, yup, we can store all the bytecode operation function into a =
+array. It can run a little faster.
+i.e.
+
+function_list =3D { do_opcode_0, do_opcode_1, ...........};
+
+(*function_list[bytecodes * sizeof(function_list[]])();
+
+But It needs several mulitplation(*) and addition(+). and then we make a =
+call. It is not fast enough.
+
+maybe we can do it in another way.
+
+For the right now, Java bytecode in JJOS are a serial of i386 &quot;Call&quot; =
+instruction (in general). i.e.
+
+push variable_a
+Call Do_OpCode_0
+mov ax, [bp+12]
+mov variable_a , ax
+push variable_b
+Call Do_OpCode_1
+mov ax, [bp+10]
+mov variable_b , ax
+push variable_c
+Call Do_OpCode_1
+.............
+
+sths like that. When we load the class from Disk/Memory into JVM, we =
+convert each bytecodes into
+a i386 &quot;Call&quot; Instruction and store into Memory. When a Java method =
+call, we simple jump to
+the start of code. Will It be faster ? I think it will. Since We Remove =
+All the Comparsion / Multiplation(*) / Addition (+) for
+each bytecodes. For Each Java Method Call , we just simply jump to =
+instruction set that we are already compiled. it will
+be faster. But we need to precompile each Class when Class is uploaded =
+into memory. It is the time we need to pay.
+
+Any Opinion ?
+
+Regards,
+
+Hilary
+
+
+
+------=_NextPart_000_01B5_01BF034E.E186BF20
+Content-Type: text/html;
+	charset=&quot;big5&quot;
+Content-Transfer-Encoding: quoted-printable
+
+&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot;&gt;
+&lt;HTML&gt;&lt;HEAD&gt;
+&lt;META content=3Dtext/html;charset=3Dbig5 http-equiv=3DContent-Type&gt;
+&lt;META content=3D&quot;MSHTML 5.00.2014.210&quot; name=3DGENERATOR&gt;
+&lt;STYLE&gt;&lt;/STYLE&gt;
+&lt;/HEAD&gt;
+&lt;BODY bgColor=3D#ffffff&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;Hi All,&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; I got a idea to =
+speed up JJOS a=20
+little bit. &lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; For the right now, =
+we are using=20
+switch statement to interrupt the Java Bytecodes.&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;i.e. &lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;swtich (bytecodes) {&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;case 0: do_opcode_0();&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;break;&lt;/FONT&gt;&lt;/DIV&gt;&lt;FONT face=3DArial =
+size=3D2&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;case 1: do_opcode_1();&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;break;&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;............&lt;/DIV&gt;
+&lt;DIV&gt;
+&lt;DIV&gt;............&lt;/DIV&gt;
+&lt;DIV&gt;
+&lt;DIV&gt;............&lt;/DIV&gt;&lt;/DIV&gt;&lt;/DIV&gt;
+&lt;DIV&gt;............&lt;/DIV&gt;
+&lt;DIV&gt;}&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;It is slow. every opcodes needs one to hundred comparsion so that =
+they can=20
+perform the operation.&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;well, yup, we can store all the bytecode operation function into a =
+array.=20
+It can run a little faster.&lt;/DIV&gt;
+&lt;DIV&gt;i.e.&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;function_list =3D { do_opcode_0, do_opcode_1, ...........};&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;(*function_list[bytecodes * sizeof(function_list[]])();&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;But It needs several mulitplation(*) and addition(+). and then we =
+make a=20
+call. It is not fast enough.&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;maybe we can do it in another way.&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;For the right now, Java bytecode in JJOS are a serial of i386 =
+&quot;Call&quot;=20
+instruction (in general). i.e.&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;push variable_a&lt;/DIV&gt;
+&lt;DIV&gt;Call Do_OpCode_0&lt;/DIV&gt;
+&lt;DIV&gt;mov ax, [bp+12]&lt;/DIV&gt;
+&lt;DIV&gt;mov variable_a , ax&lt;/DIV&gt;
+&lt;DIV&gt;
+&lt;DIV&gt;
+&lt;DIV&gt;push variable_b&lt;/DIV&gt;Call Do_OpCode_1&lt;/DIV&gt;
+&lt;DIV&gt;
+&lt;DIV&gt;mov ax, [bp+10]&lt;/DIV&gt;
+&lt;DIV&gt;mov variable_b , ax&lt;/DIV&gt;
+&lt;DIV&gt;
+&lt;DIV&gt;
+&lt;DIV&gt;push variable_c&lt;/DIV&gt;Call Do_OpCode_1&lt;/DIV&gt;
+&lt;DIV&gt;.............&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;sths like that. When we load the class from Disk/Memory into JVM, =
+we=20
+convert each bytecodes into&lt;/DIV&gt;
+&lt;DIV&gt;a i386 &quot;Call&quot; Instruction and store into Memory. When a Java method =
+call,=20
+we simple jump to&lt;/DIV&gt;
+&lt;DIV&gt;the start of&amp;nbsp;code. Will It be faster ? I think it will. Since =
+We=20
+Remove All the Comparsion / Multiplation(*) / Addition (+) for&lt;/DIV&gt;
+&lt;DIV&gt;each bytecodes. For Each Java Method Call , we just simply jump to=20
+instruction set that we are already compiled. it will&lt;/DIV&gt;
+&lt;DIV&gt;be faster. But we need to precompile each Class when Class is =
+uploaded into=20
+memory. It is the time we need to pay.&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;Any Opinion ?&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;Regards,&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;Hilary&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&amp;nbsp;&lt;/DIV&gt;&lt;/DIV&gt;&lt;/DIV&gt;&lt;/FONT&gt;&lt;/DIV&gt;&lt;/BODY&gt;&lt;/HTML&gt;
+
+------=_NextPart_000_01B5_01BF034E.E186BF20--
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000380.html">[JOS-Kernel] decaf bug report</A></li>
+	<LI> Next message: <A HREF="000382.html">[JOS-Kernel] Some Idea About Speed Up JJOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#381">[ date ]</a>
+              <a href="thread.html#381">[ thread ]</a>
+              <a href="subject.html#381">[ subject ]</a>
+              <a href="author.html#381">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

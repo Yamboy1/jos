@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] bocek's interrupt eight</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000344.html">
+   <LINK REL="Next" HREF="000346.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] bocek's interrupt eight</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] bocek's interrupt eight">jm@mak.com</A><BR>
+    <I>Thu, 09 Sep 1999 06:56:08 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000344.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+        <LI> Next message: <A HREF="000346.html">[JOS-Kernel] general interrupts</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#345">[ date ]</a>
+              <a href="thread.html#345">[ thread ]</a>
+              <a href="subject.html#345">[ subject ]</a>
+              <a href="author.html#345">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd;
+
+&quot;Todd L. Miller&quot; wrote:
+&gt;<i> 
+</I>&gt;<i> &gt; OK.  Do you think it's better to leave interrupts entirely *disabled* until the
+</I>&gt;<i> &gt; Java code decides it's the time to enable them?  This is an entirely reasonable
+</I>&gt;<i> &gt; approach, and (hmm....) I don't think it will break anything at all (hmm...,
+</I>&gt;<i> &gt; right?).  Actually, I don't understand why I didn't do it that way in the first
+</I>&gt;<i> &gt; place (maybe I'm forgetting something ... wouldn't be the first time).
+</I>&gt;<i> 
+</I>&gt;<i>         I thought there was some good reason for it (leaving them enable
+</I>&gt;<i> but ignoring the clock) also, but I couldn't tell you what it might have
+</I>&gt;<i> been.
+</I>
+So, I'll leave them disabled and see what (if anything) breaks.
+
+&gt;<i> &gt; So, in other words, I would not be breaking an entirely &quot;working&quot; build for
+</I>&gt;<i> &gt; you...
+</I>&gt;<i> 
+</I>&gt;<i>         Right.  Hopefully my commit wouldn't be breaking anything for
+</I>&gt;<i> anyone else...
+</I>
+Well, everybody's had a chance to respond, and I haven't heard anything, so I'm
+going to do it later (after I &quot;merge&quot; or &quot;update&quot; with your changes).  Probably
+not until tomorrow mid-afternoon at the earliest.
+
+&gt;<i>         I'll try to commit my changes sometime today.  A note about the
+</I>&gt;<i> Makefiles: -DFAST_NATIVE_CODE activates the check-native-before-lookup
+</I>&gt;<i> code, which breaks things; -DNATIVE_CLOCK activates the code that traps
+</I>&gt;<i> interrupt eight in the scheduler.  (-DHANDLE_CLOCK still needs to be
+</I>&gt;<i> defined in the native build if you want the clock interrupt to reach the
+</I>&gt;<i> scheduler at all.)
+</I>
+Disabling interrupts will probably solve this problem.
+
+&gt;<i> &gt; Isn't there a JVM compatibility/test suite around?  I can't remember the name,
+</I>&gt;<i> &gt; but I seem to recall reading about it (but I seem also to recall some
+</I>&gt;<i> &gt; licensing/NDA issues).  Anybody else heard about something like this?
+</I>&gt;<i> 
+</I>&gt;<i>         I believe you're thinking about /mauve/, which, the last time I
+</I>&gt;<i> looked at it, was more of a class-library compatibility checker than
+</I>&gt;<i> anything else.
+</I>
+Yes, I think Patrick also mentioned this, too (thanks!), and was kind enough to
+provide a URL.  It would be great if somebody would step up to trying to check
+compatibility here (although maybe it's premature given the state of the
+integration with classpath).
+
+&gt;<i>         Finally, have you been able to find the JavaOS API specs anywhere?
+</I>&gt;<i> The website the .pdf files point to seems to have vanished, and I can't
+</I>&gt;<i> find anything on the Sun or IBM websites anymore.
+</I>
+There's a broken link to the &quot;JavaOS for Business&quot; documents on:
+	<A HREF="http://wwwwswest2.sun.com/software/quick_index.html">http://wwwwswest2.sun.com/software/quick_index.html</A>
+I sent a &quot;you've got a broken link&quot; message back to them.  I don't expect any
+action on this point.  If you need them, I'm sure we can figure out a way to get
+them.
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/">http://www.mak.com/</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000344.html">[JOS-Kernel] bocek's interrupt eight</A></li>
+	<LI> Next message: <A HREF="000346.html">[JOS-Kernel] general interrupts</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#345">[ date ]</a>
+              <a href="thread.html#345">[ thread ]</a>
+              <a href="subject.html#345">[ subject ]</a>
+              <a href="author.html#345">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

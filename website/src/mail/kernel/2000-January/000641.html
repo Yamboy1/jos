@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jJOS Bytecode w/ BCNI</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000640.html">
+   <LINK REL="Next" HREF="000642.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jJOS Bytecode w/ BCNI</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] jJOS Bytecode w/ BCNI">gchii@mindspring.com</A><BR>
+    <I>Mon, 24 Jan 2000 17:27:56 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000640.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+        <LI> Next message: <A HREF="000642.html">[JOS-Kernel] JEPS does fragmentation and reassembly</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#641">[ date ]</a>
+              <a href="thread.html#641">[ thread ]</a>
+              <a href="subject.html#641">[ subject ]</a>
+              <a href="author.html#641">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>When jJOS Bytecode meets the BCNI, a virtual machine can always install a
+platform-specific, BCNI-compatible factory first, before calling the init
+class. Only one BCNI-compatible factory can be installed, with setFactory().
+
+Factory.setFactory( new CustomFactory() );
+
+For the latest binary and source distribution of jJOS bytecode, see also
+the JOSDistribution1e article on JOS Wiki.
+
+-----
+
+It's a start. Other system-wide classes might be obtained though BCNI
+eventually. The static BCNI factory should be static, as in one object per
+virtual machine, rather than one object per class loader.
+
+-----
+
+How is JOS CVS updated with jJOS bytecode w/ BCNI?
+
+I think all the bytecode should be organized in a bytecode directory, like
+this:
+
+JJOS/bytecode
+JJOS/bytecode/jos
+JJOS/bytecode/jos/host
+JJOS/bytecode/jos/host/driver
+JJOS/bytecode/jos/i386
+JJOS/bytecode/jos/i386/driver
+JJOS/bytecode/jos/platform
+JJOS/bytecode/jos/platform/event
+JJOS/bytecode/jos/system
+JJOS/bytecode/jos/util
+JJOS/bytecode/org/jos/bcni1a
+
+There is no arch/host or arch/i386 directory needed to re-implement the
+jos.platform.driver package. Since the bytecode is no longer &quot;common&quot;, it
+should not be called JJOS/common/bytecode.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000640.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+	<LI> Next message: <A HREF="000642.html">[JOS-Kernel] JEPS does fragmentation and reassembly</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#641">[ date ]</a>
+              <a href="thread.html#641">[ thread ]</a>
+              <a href="subject.html#641">[ subject ]</a>
+              <a href="author.html#641">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

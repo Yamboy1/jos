@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] host progress and jcurses</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000608.html">
+   <LINK REL="Next" HREF="000592.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] host progress and jcurses</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] host progress and jcurses">tmiller@haverford.edu</A><BR>
+    <I>Fri, 7 Jan 2000 16:38:22 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000608.html">[JOS-Kernel] host progress and jcurses</A></li>
+        <LI> Next message: <A HREF="000592.html">[JOS-Kernel] File System</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#609">[ date ]</a>
+              <a href="thread.html#609">[ thread ]</a>
+              <a href="subject.html#609">[ subject ]</a>
+              <a href="author.html#609">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> 1. in the host build, the method console.setChar seems to not work. I've
+</I>&gt;<i> seen several consoleXX.java in host/bytecode/jos/platform/driver, but what
+</I>&gt;<i> is the file used in the host build ? (it seems console.java, but i think
+</I>&gt;<i> i'm wrong!). Adding setChar should be simple, I think, it would be
+</I>&gt;<i> required to add simple lines in jjconsol.c, but i have not understand in
+</I>&gt;<i> which way, starting from jos.system.console, we arrive to jjconsol.c.
+</I>
+	That's because it doesn't.  (I know, I know.)  If you look at the
+source for consoled, the initial (native) console is actually a
+consoleNative -- this was originally just to maintain compatibility
+between host and i386 builds.  So I wrote a very quick and dirty
+consoleNative to make things work.  The host build's driver.console class
+should (as I mentioned in an earliet email, I believe) be re-written to
+use (n)curses pads -- e.g. a whole lot of native code.  (And consoleNative
+should be fully fleshed out.)
+
+	consoleNative arrives at jjconsole.cc by a circutious route, where
+java.io.PrintStream's printX() methods are over-ridden in native
+code.  This native code calls the jjconsole.cc code, which in turns uses
+curses to get the work done.  Since jjconsole.cc uses ncurses, get/setX
+shouldn't be too hard to write, as you correctly surmised.  The difficulty
+will come in deciding and implementing multiple jos consoles.  (Though you
+many not need pads to do this; IIRC, there are linux system calls to
+generate additional virtual consoles, to which you could switch and just
+run a 'stock' consoleNative/jjconsole.cc on.)
+
+&gt;<i> 2. the java.lang.Integer class has some problems, i mean the method
+</I>&gt;<i> &quot;Integer.parseInt()&quot; seems to not work.
+</I>
+	This is a known problem, but not one that I've ever isolated.
+
+&gt;<i> 3. what's happened in etherboot image ? after downloading jos-nbi.zip the
+</I>&gt;<i> booting station hangs up. I've forgot something or is there a (millennium)
+</I>&gt;<i> bug ?
+</I>
+	The java code is hardcoded for 0xB8000 as the VGA text buffer
+address.  Etherboot's native code leaves the buffer at 0xB0000.  I'm not
+sure if this is the problem or not -- someone else reported a similar
+problem and (and I don't think) has gotten back to us yet.  I'm using
+GRUB, which is why the hardcoded 0xB8000 works.
+
+-_Quinn
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000608.html">[JOS-Kernel] host progress and jcurses</A></li>
+	<LI> Next message: <A HREF="000592.html">[JOS-Kernel] File System</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#609">[ date ]</a>
+              <a href="thread.html#609">[ thread ]</a>
+              <a href="subject.html#609">[ subject ]</a>
+              <a href="author.html#609">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

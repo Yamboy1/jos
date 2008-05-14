@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] New paper available on KaffeOS (a Java OS)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tullmann%40cs.utah.edu">
+   <LINK REL="Previous"  HREF="000843.html">
+   <LINK REL="Next" HREF="000845.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] New paper available on KaffeOS (a Java OS)</H1>
+    <B>Patrick Tullmann</B> 
+    <A HREF="mailto:tullmann%40cs.utah.edu"
+       TITLE="[JOS-Kernel] New paper available on KaffeOS (a Java OS)">tullmann@cs.utah.edu</A><BR>
+    <I>Sat, 10 Jun 2000 14:59:23 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000843.html">[JOS-Kernel] New paper available on KaffeOS (a Java OS)</A></li>
+        <LI> Next message: <A HREF="000845.html">[JOS-Kernel] New paper available on KaffeOS (a Java OS)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#844">[ date ]</a>
+              <a href="thread.html#844">[ thread ]</a>
+              <a href="subject.html#844">[ subject ]</a>
+              <a href="author.html#844">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> 	Could you give me a rough guess on the size of the native code in
+</I>&gt;<i> the Kaffe library?  
+</I>
+You could probably get away with only the native code in
+kaffe/libraries/clib/native/, which is about 6,000 lines.  There are
+on the order of 140 native methods defined in that code.
+
+For Kore there are on the order of 70 native methods, you'll need to
+implement.  Kore's native methods are much cleaner in terms of their
+arguments, and are quite focused.
+
+Note: these numbers are for mostly just java.lang (e.g., not java.io)
+and are approximations obtained via 'grep' and 'wc'.
+
+&gt;<i> When I do the first library integration with decaf, I want the
+</I>&gt;<i> smallest possible amount of native code.  (Partly because it means
+</I>&gt;<i> we'll have to rewrite less into BCNI, and partly because if the
+</I>&gt;<i> amount is small enough, I'll be able to put off implementing JNI.)
+</I>
+You'll probably want to go with Kore then.  There's no real reason you 
+can't have both Kore and Kaffe library support (eventually).  Just
+keep the native library support code separate from the core VM.
+
+-Pat
+
+----- ----- ---- ---  ---  --   -    -      -         -               -
+Pat Tullmann                                       <A HREF="mailto:tullmann@cs.utah.edu">tullmann@cs.utah.edu</A>
+     To understand recursion one must first understand recursion.
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000843.html">[JOS-Kernel] New paper available on KaffeOS (a Java OS)</A></li>
+	<LI> Next message: <A HREF="000845.html">[JOS-Kernel] New paper available on KaffeOS (a Java OS)</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#844">[ date ]</a>
+              <a href="thread.html#844">[ thread ]</a>
+              <a href="subject.html#844">[ subject ]</a>
+              <a href="author.html#844">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

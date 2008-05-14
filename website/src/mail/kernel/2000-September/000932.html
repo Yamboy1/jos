@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:iainshigeoka%40yahoo.com">
+   <LINK REL="Previous"  HREF="000928.html">
+   <LINK REL="Next" HREF="000933.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</H1>
+    <B>Iain Shigeoka</B> 
+    <A HREF="mailto:iainshigeoka%40yahoo.com"
+       TITLE="[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine">iainshigeoka@yahoo.com</A><BR>
+    <I>Fri, 29 Sep 2000 15:55:32 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000928.html">[JOS-Kernel] [agenda] Clear separation of kernel and  virtual
+ machine</A></li>
+        <LI> Next message: <A HREF="000933.html">[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#932">[ date ]</a>
+              <a href="thread.html#932">[ thread ]</a>
+              <a href="subject.html#932">[ subject ]</a>
+              <a href="author.html#932">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 12:40 PM 9/26/00 -0400, you wrote:
+&gt;<i>         We've had this discussion before, in another guise.  If JOS does
+</I>&gt;<i>not require anything special from its JVM -- where I contend that it
+</I>&gt;<i>does -- than the java standard itself will provide the necessary
+</I>&gt;<i>portability.  If JOS /does/ require something special -- e.g. java
+</I>&gt;<i>processes -- from its JVM, than there needs to be a standard interface for
+</I>&gt;<i>this.  Since that something special would require VM modifications anyway,
+</I>&gt;<i>it makes sense to define those things at the VM level.  (As opposed to at
+</I>&gt;<i>a Java wrapper level, where the VM provides its own implementation
+</I>&gt;<i>classes.)  If all that JOS requires from its JVM can exposed in this way,
+</I>&gt;<i>there's no reason to standardize on anything at a lower level than
+</I>&gt;<i>this.
+</I>
+Actually, I had an idea regarding this last night.  What if instead, you 
+build anything that's a &quot;special&quot; jvm need into a pure Java JVM (jjvm).  A 
+jvm written in pure java.  So the underlying &quot;classic&quot; jvm loads the 
+special java jvm which provides whatever hooks are needed beyond classic 
+jvm's, and then the special jvm, runs the actual java os (and java apps on 
+top of that).  The special jjvm can trap bytecodes for object creation if 
+it want to do its own memory management/garbage collection, can trap 
+bytecodes for System.exit if desired, etc, etc, etc.
+
+This is similar to that idea about a simple jvm serving to bootstrap 
+another jvm which was written in java and provided the actual jit and fancy 
+optimizations...
+
+Just a thought.
+
+-iain
+
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000928.html">[JOS-Kernel] [agenda] Clear separation of kernel and  virtual
+ machine</A></li>
+	<LI> Next message: <A HREF="000933.html">[JOS-Kernel] [agenda] Clear separation of kernel and
+ virtual machine</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#932">[ date ]</a>
+              <a href="thread.html#932">[ thread ]</a>
+              <a href="subject.html#932">[ subject ]</a>
+              <a href="author.html#932">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

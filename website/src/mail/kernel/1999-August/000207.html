@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Driver writing</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:RegierAveryJ%40JDCORP.deere.com">
+   <LINK REL="Previous"  HREF="000205.html">
+   <LINK REL="Next" HREF="000214.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Driver writing</H1>
+    <B>Regier Avery J</B> 
+    <A HREF="mailto:RegierAveryJ%40JDCORP.deere.com"
+       TITLE="[JOS-Kernel] Driver writing">RegierAveryJ@JDCORP.deere.com</A><BR>
+    <I>Mon, 9 Aug 1999 08:19:28 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000205.html">[JOS-Kernel] Re: Thomas Bocek's VGA driver L-I-V-E-S in CVS!</A></li>
+        <LI> Next message: <A HREF="000214.html">[JOS-Kernel] decaf fixes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#207">[ date ]</a>
+              <a href="thread.html#207">[ thread ]</a>
+              <a href="subject.html#207">[ subject ]</a>
+              <a href="author.html#207">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>	-----Original Message-----
+	From:	Matt Albrecht [SMTP:<A HREF="mailto:onewith1@flash.net">onewith1@flash.net</A>]
+	Sent:	Saturday, August 07, 1999 4:11 PM
+	To:	<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>
+	Subject:	Re: [JOS-Kernel] Driver writing
+
+	Hello
+
+	-----Original Message-----
+	From: John Morrison &lt;<A HREF="mailto:jm@mak.com">jm@mak.com</A>&gt;
+	To: <A HREF="mailto:kernel@jos.org">kernel@jos.org</A> &lt;<A HREF="mailto:kernel@jos.org">kernel@jos.org</A>&gt;
+	Date: Saturday, August 07, 1999 12:56 PM
+	Subject: Re: [JOS-Kernel] Driver writing (was: Re: [JOS-Kernel]
+Garbage
+	collection)
+
+
+
+	&gt;&gt; &gt; How about doing second-tier work?  Like, filesystem
+implementations?
+	&gt;&gt;
+	&gt;&gt; Yes, that's a good possiblity. ext2fs would be a good starting
+point. I
+	&gt;&gt; might even learn something in the process :)
+	&gt;&gt;
+	&gt;&gt; (didn't someone write a FAT implementation a long time ago? I
+think I've
+	&gt;&gt; seen it on the Wiki ages ago when I was new to the project)
+	&gt;
+	&gt;Hmm.. can't recall...
+
+	Yes, there was work done on this. Last I remember it was about a
+year ago.
+	I think that if we are going to do file system stuff, the best way
+to start
+	is have &quot;virtual/embedded file systems&quot;, where one file system is
+stored as
+	a big file in the parent file system.  This way we don't tromp on
+the user's
+	host system.  It would also enable us to easily build upon other
+file
+	systems (like having a FAT-16 system, with a ZIP compression system
+above
+	that, and above that one is a ext2fs), and also have RAM disks.
+
+	This would mean publishing a file type with a raw disk I/O
+interface.  Each
+	disk device (including virtual device for file system and RAM) would
+need an
+	implementation of this type, becoming the driver.
+
+	-Matt
+
+Matt &amp; Peter,
+
+Stephan Reich was leading this project a year ago.  He got to the point
+where he had a filesystem API (it is pretty complete and well thought out)
+and a driver written in Java for FAT16.  He also had a simple program for
+viewing the FAT16 filesystem which was embedded in a file in your local file
+system.  This should give you a good base to work on.
+
+I have put the latest (I think) code that I have for it at:
+<A HREF="ftp://wiki.jos.org/pub/jos/jos-filesystem-4-preview.jar">ftp://wiki.jos.org/pub/jos/jos-filesystem-4-preview.jar</A>
+
+Regards,
+Avery J. Regier
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000205.html">[JOS-Kernel] Re: Thomas Bocek's VGA driver L-I-V-E-S in CVS!</A></li>
+	<LI> Next message: <A HREF="000214.html">[JOS-Kernel] decaf fixes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#207">[ date ]</a>
+              <a href="thread.html#207">[ thread ]</a>
+              <a href="subject.html#207">[ subject ]</a>
+              <a href="author.html#207">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,334 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Makefile error on d/l-ed JOS</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:querist%40malsam.com">
+   <LINK REL="Previous"  HREF="000406.html">
+   <LINK REL="Next" HREF="000408.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Makefile error on d/l-ed JOS</H1>
+    <B>querist</B> 
+    <A HREF="mailto:querist%40malsam.com"
+       TITLE="[JOS-Kernel] Makefile error on d/l-ed JOS">querist@malsam.com</A><BR>
+    <I>Sat, 9 Oct 1999 22:51:20 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000406.html">[JOS-Kernel] Bugs in JJOS</A></li>
+        <LI> Next message: <A HREF="000408.html">[JOS-Kernel] Makefile error on d/l-ed JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#407">[ date ]</a>
+              <a href="thread.html#407">[ thread ]</a>
+              <a href="subject.html#407">[ subject ]</a>
+              <a href="author.html#407">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is a multi-part message in MIME format.
+
+------=_NextPart_000_000A_01BF12A8.CE01E6A0
+Content-Type: text/plain;
+	charset=&quot;iso-8859-1&quot;
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+=20
+I am getting an error &quot;Makefile:17 missing separator&quot; when trying to =
+make the JOS following
+the instructions (go to arch/i386/nativecode and type make).
+=20
+Here are the first 20something lines of the makefile, with line 17 =
+marked with an added comment
+(the comment is not in the makefile i'm running)  I have no idea why =
+it's spaced like that when I
+pasted it, either.
+.KEEP_STATE:
+
+NASM =3D nasm
+
+NASMOPTIONS =3D -f elf=20
+
+CC =3D g++
+
+IFLAGS =3D -I. -I../../../common/nativecode -I../../../common/decaf
+
+CFLAGS =3D -g -Wall -fno-builtin -fno-exceptions -DPARANOID =
+-DHANDLE_CLOCK -DTEST_A20 $(IFLAGS)
+
+ASMHEADERS =3D=20
+
+ASMSOURCES =3D \
+
+head.s86 \
+
+jjidt.s86
+
+GRUB_SOURCES =3D \
+
+grub.s86 \
+
+jjidt.s86
+
+ASMOBJECTS =3D \
+
+head.o \
+
+jjidt.o
+
+TARGET_HEADERS =3D \  # this is line 17
+
+jj386int.h \
+
+jjconsole.h \
+
+jjeflags.h \
+
+jjetherboot.h \
+
+jjidtent.h \
+
+jjramdisk.h \
+
+jjmachin.h \
+
+jjtimer.h
+
+TARGET_SOURCES =3D \
+
+entry.cc \
+
+jj386int.cc \
+
+jjconsol.cc \
+
+jjeflags.cc \
+
+jjetherboot.cc \
+
+jjidtent.cc \
+
+jjmachin.cc \
+
+jjramdisk.cc \
+
+jjfinfo.cc \
+
+jjvinfo.cc \
+
+jjtimer.cc
+
+TARGET_OBJECTS =3D \
+
+entry.o \
+
+jj386int.o \
+
+jjconsol.o \
+
+jjeflags.o \
+
+jjetherboot.o \
+
+jjidtent.o \
+
+jjmachin.o \
+
+jjramdisk.o \
+
+jjfinfo.o \
+
+jjvinfo.o \
+
+jjtimer.o
+
+=20
+
+# end cut of makefile
+
+Again, I have no idea what's wrong here... the makefile looks just fine =
+to me.
+
+=20
+
+Thanks!
+
+-glyn (WikiName: GlynGowing)
+
+=20
+
+
+
+
+------=_NextPart_000_000A_01BF12A8.CE01E6A0
+Content-Type: text/html;
+	charset=&quot;iso-8859-1&quot;
+Content-Transfer-Encoding: quoted-printable
+
+&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD W3 HTML//EN&quot;&gt;
+<HEAD>
+
+<META content=3Dtext/html;charset=3Diso-8859-1 =
+http-equiv=3DContent-Type><!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 =
+HTML//EN">
+<META content=3D'"MSHTML 4.72.3110.7"' name=3DGENERATOR>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT color=3D#000000 size=3D2>Hello,</FONT></DIV>
+<DIV><FONT color=3D#000000 size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT color=3D#000000 size=3D2>I am getting an error =
+&quot;Makefile:17 missing=20
+separator&quot; when trying to make the JOS following</FONT></DIV>
+<DIV><FONT color=3D#000000 size=3D2>the instructions (go to =
+arch/i386/nativecode and=20
+type make).</FONT></DIV>
+<DIV><FONT color=3D#000000 size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT color=3D#000000 size=3D2>Here are the first 20something lines =
+of the=20
+makefile, with line 17 marked with an added comment</FONT></DIV>
+<DIV><FONT size=3D2>(the comment is not in the makefile i'm =
+running)&nbsp; I have=20
+no idea why it's spaced like that when I</FONT></DIV>
+<DIV><FONT size=3D2>pasted it, either.</FONT></DIV>
+<DIV><FONT size=3D2><FONT face=3DTerminal size=3D1>
+<P><FONT face=3DArial><FONT size=3D2>.KEEP_STATE:</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2></FONT></FONT><FONT size=3D2><FONT=20
+face=3DArial>NASM =3D nasm</FONT></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>NASMOPTIONS =3D -f elf =
+</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>CC =3D g++</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>IFLAGS =3D -I. =
+-I../../../common/nativecode=20
+-I../../../common/decaf</FONT></FONT><FONT size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>CFLAGS =3D -g -Wall -fno-builtin =
+-fno-exceptions=20
+-DPARANOID -DHANDLE_CLOCK -DTEST_A20 $(IFLAGS)</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>ASMHEADERS =3D </FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>ASMSOURCES =3D \</FONT></FONT><FONT =
+
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>head.s86 \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidt.s86</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>GRUB_SOURCES =3D =
+\</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>grub.s86 \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidt.s86</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>ASMOBJECTS =3D \</FONT></FONT><FONT =
+
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>head.o \</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidt.o</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>TARGET_HEADERS =3D \&nbsp; # this =
+is line=20
+17</FONT></FONT><FONT size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jj386int.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjconsole.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjeflags.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjetherboot.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidtent.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjramdisk.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjmachin.h \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjtimer.h</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>TARGET_SOURCES =3D =
+\</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>entry.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jj386int.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjconsol.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjeflags.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjetherboot.cc \</FONT></FONT><FONT =
+
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidtent.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjmachin.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjramdisk.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjfinfo.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjvinfo.cc \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjtimer.cc</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>TARGET_OBJECTS =3D =
+\</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>entry.o \</FONT></FONT><FONT =
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jj386int.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjconsol.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjeflags.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjetherboot.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjidtent.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjmachin.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjramdisk.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjfinfo.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjvinfo.o \</FONT></FONT><FONT=20
+size=3D2></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2>jjtimer.o</FONT></FONT></P>
+<P><FONT face=3DArial><FONT size=3D2></FONT></FONT><FONT =
+size=3D2></FONT>&nbsp;</P>
+<P><FONT face=3DArial size=3D2># end cut of makefile</FONT></P>
+<P><FONT face=3DArial size=3D2>Again, I have no idea what's wrong =
+here... the=20
+makefile looks just fine to me.</FONT></P>
+<P><FONT face=3DArial size=3D2></FONT>&nbsp;</P>
+<P><FONT face=3DArial size=3D2>Thanks!</FONT></P>
+<P><FONT face=3DArial size=3D2>-glyn (WikiName: GlynGowing)</FONT></P>
+<P><FONT face=3DArial><FONT size=3D2></FONT></FONT><FONT =
+size=3D2></FONT>&nbsp;</P>
+<P>&nbsp;</P></FONT></FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_000A_01BF12A8.CE01E6A0--
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000406.html">[JOS-Kernel] Bugs in JJOS</A></li>
+	<LI> Next message: <A HREF="000408.html">[JOS-Kernel] Makefile error on d/l-ed JOS</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#407">[ date ]</a>
+              <a href="thread.html#407">[ thread ]</a>
+              <a href="subject.html#407">[ subject ]</a>
+              <a href="author.html#407">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

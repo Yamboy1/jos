@@ -1,0 +1,1813 @@
+From clark.evans@manhattanproject.com Wed, 24 Mar 1999 05:50:46 +0000
+Date: Wed, 24 Mar 1999 05:50:46 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Kernel] [Fwd: New Working Mail Lists...]
+
+Hello!
+
+We have completed the migration of the working 
+mailing lists from spin.de to jos.org  Web
+access to these lists is at: 
+
+	http://jos.org/mailman/listinfo
+
+The jos-kernel and java-os-project list members
+were automagically moved over to the new 
+list server.  Anyway, here are the new lists:
+
+List       | Purpose                 | Old List
+-----------+-------------------------+----------
+info       | Public Relations        |
+admin      | Site Administration     |
+vote-info  | Voting Membership List  |
+ - - - - - + - - - - - - - - - - - - + - - - - - 
+general    | Discussion List         | java-os-project
+kernel     | Kernel Developers       | jos-kernel
+arch       | Architectural Discourse | jos-network, jos-distributed, jos-security
+apps       | Applications            | jos-apps
+games      | Games!                  | jos-games
+ui         | User Interface          | jos-ui
+------------------------------------------------
+
+The announce list will remain on spin.de into
+the future (until mailman@list.org can handle a 
+list with 4000+ members )
+
+Best,
+
+ClarkEvans
+
+
+
+From RegierAveryJ@JDCORP.deere.com Wed, 24 Mar 1999 12:41:33 -0600
+Date: Wed, 24 Mar 1999 12:41:33 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] Linus's thoughts on open source kernel development
+
+There is an excerpt from the book "Open Sources" by Linux Torvalds at
+LinuxWorld:
+http://www.linuxworld.com/linuxworld/lw-1999-03/lw-03-opensources.html
+
+It contains a lot of issues that we want to be aware of and thinking about
+as the development continues on our kernel.
+
+Avery J. Regier
+
+
+
+
+
+
+From tmiller@haverford.edu Wed, 24 Mar 1999 14:22:19 -0500 (EST)
+Date: Wed, 24 Mar 1999 14:22:19 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf update & the keyboard driver
+
+	decaf's bytecode instruction set, excepting monitorenter and
+monitorexit, which are only used in explicit synchronized(){} blocks, is
+complete.  Large chunks have not been thoroughly tested; in particular,
+doubles and longs are known not to work; checkcast and instanceof will
+fail on interfaces (probably -- they certainly aren't coded correctly);
+the code (lookup and table switch) supporting switch/case statements is
+untested and probably chock-full of bugs; the full semantics of any JDK
+are not implemented yet; notably, support for the 1.1 inner classes
+specification is completely lacking; ditto security concerns, bytecode
+verification, and implicit monitor locking.  (Monitors, period, aren't
+implemented.)  The Makefile in common/bytecode does NOT build a class
+library that decaf can properly exploit; this is lacking in part to
+straight-up incompatibilities between decaf and Sun's java interperter,
+as well as the abysmal (but present!) support for native methods.  This
+list is almost certainly not comprehensive.  Work at your own risk;
+cross-check what you can against a known-to-be-behaving JVM.
+
+	Having only recently completed this rounding-out of decaf, and
+feeling loathe to test it at this juncture, I examined Matt Albrecht's
+code for resource allocation & control and his keyboard driver & scancode
+converter, etc.  I'm presenting here a short overview in hopes that Matt
+will correct any oversights or misunderstandings of mine before I start
+implementing his code for/with decaf; suggestions, based on my current
+understandings, are below as well.
+
+In general:
+
+'Device'(s) return 'Driver'(s) via the PrimaryHardwareManager, which is
+java object in charge of a particular i/o bus; the Device class/object
+returns 'Driver'(s) based on its interactions with the PHM via
+'HardwareRequests' of various types.
+
+A 'HardwareResourceInterface' is responsible for implementing the
+(presumambly kernel) wrapper of the native code handling a particular
+HardwareResource (for the i386, interrupts, ioports, memory, etc;
+different architectures will, of course, get their own HardwareResources).
+
+More specifically:
+
+InterruptInterface (and the Driver) model is based on the old,
+non-Listener style of things, and hence, must be changed.  The most
+obvious question is if the InterruptInterface should be more or less
+basically replaced by the InterruptDispatcher or if it should subscribe to
+it; especially w.r.t. the IRQResource concept that seems to be Matt's
+vehicle for allowing interrupt sharing, which is necessary for a variety
+of reasons, not the least of which is the serial port driver.
+
+As far as my stated goal of making jos.system.keyboard as much an
+abstraction as possible, and NOT a driver, necessarily, I looked at the
+KeyboardDevice class idea; where jos.system.keyboard
+would be the default system-wide KeyboardDevice, which hides it back-end
+KeyboardInterperter, which could be replaced on the fly.  (For i18n
+purposes, one would wonders how non-latin character sets are handled in
+the current VK_* system; but since we're almost certain to extend it, that
+question can be safely ignored for now.  Something about unicode...
+perhaps a unicode character set that defines navigation/function keys?)
+
+The basic idea of the above being that at the level where an application,
+including ones like the shell, might get keystoke data, it's safely been
+platform de-dependincied ( how does one verb that? ).  It would, of
+course, be Good Programming to make the shell independent of the Keyboard
+itself, but the telnet daemon feeding the input stream should and could
+just as easily feed the stream with the VK_* series we've defined -- as
+mapped by its ANSI/vt100/vt220 (etc) termcap-equivalent.
+
+Three questions, perhaps induced by not reading the code closely enough:
+first, what use(s) is the DeviceManager intended for?  Second, why have
+two ISAKeyboards?  The method overloads don't appear to be necessary or
+desirous.  Thirdly, how easy (or difficult) is it for this framework to
+handle driver updates on the fly?  I seem to recall several Driver/Device
+constructors that took other Devices or Drivers?
+
+At any rate, before I go any further re: this, I want some feedback from
+the list; and I will have to build the Makefiles for handling the
+architecture-dependent parts of this, so as to get the idea and structure
+firmly in place before the driver-writing really gets off the ground.
+(i.e. ISAKeyboard is probably an architecture-specific bit of code;
+whereas KeyboardDevice probably is not.  This will require a closer
+reading of the code.)
+
+As far as things on my todo list aside from the keyboard driver is
+rewriting the native-code support in interp.cc to handle argument types,
+especially in print() and println(), which will ease the debugging
+immensely, as well as lay a groundwork for 'real' native-code handling
+later.  The end goal of this, for now, being to make a clean & extensible
+keyboard-to-screen echo, and, perhaps, some sort of "hello, world!"-style
+shell, to test things out and demonstrate the way it might be done.
+
+And of course, the procession of things which must be done to
+bring decaf into full compability w/ the 1.2 JDK.  Does anyone know of a
+good compatibility aside from Sun's JCK, which (AFAIK), is not a
+particularly cheap (or at-home) kind of thing?
+
+-_Quinn
+
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Wed, 24 Mar 1999 14:26:40 -0600
+Date: Wed, 24 Mar 1999 14:26:40 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] decaf update & the keyboard driver
+
+> And of course, the procession of things which must be done to
+> bring decaf into full compability w/ the 1.2 JDK.  Does anyone know of a
+> good compatibility aside from Sun's JCK, which (AFAIK), is not a
+> particularly cheap (or at-home) kind of thing?
+
+The only real options available that I know of are Japhar's compatibility
+tests and Mauve (though I think Mauve is more of a library test than a VM
+test right now.)  Both are quite small test suites but really the only free
+alternatives to Sun's JCK.
+
+http://www.japhar.org/
+http://sourceware.cygnus.com/mauve/
+
+Avery J. Regier
+
+
+
+
+From scode_ufp@usa.net Wed, 24 Mar 1999 23:26:57 +0100 (CET)
+Date: Wed, 24 Mar 1999 23:26:57 +0100 (CET)
+From: Peter Schuller scode_ufp@usa.net
+Subject: [JOS-Kernel] decaf update & the keyboard driver
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+> And of course, the procession of things which must be done to
+> bring decaf into full compability w/ the 1.2 JDK.  Does anyone know of a
+> good compatibility aside from Sun's JCK, which (AFAIK), is not a
+> particularly cheap (or at-home) kind of thing?
+
+There is a link on the Japhar website (follow links on www.hungry.org) to an
+open source test suite called Mauve or something like that; I don't remember
+exactly. I haven't tried it or anything, but I thought it might be useful.
+
+/ Peter Schuller
+
+One: Resistance is futile.
+Seven of Nine: Perhaps.
+        - Star Trek: Voyager - "Drone"
+
+- ---
+PGP userID: 0x5584BD98 or 'Peter Schuller <scode_ufp@usa.net>'
+E-Mail: scode_ufp@usa.net Web: http://hem.passagen.se/petersch
+Help create a free Java based operating system - www.jos.org.
+
+
+
+-----BEGIN PGP SIGNATURE-----
+Version: PGPfreeware 5.0i for non-commercial use
+Charset: noconv
+
+iQA/AwUBNvlmRMBfJ1FVhL2YEQJeKgCfc/MZzr2MVVohBDSQgi0ERTw3d8cAn1Y2
+0bj6i4D2A0w7foqj3PdjVUgO
+=ZQ61
+-----END PGP SIGNATURE-----
+
+
+
+From clark.evans@manhattanproject.com Wed, 24 Mar 1999 22:39:31 +0000
+Date: Wed, 24 Mar 1999 22:39:31 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Kernel] A quick note on un-subscribing
+
+This mail server is a bit different than majordomo.
+
+First of all, it currently requires a password 
+for all list users.  I'm not too happy about this
+personally, but when you were all migrated from
+jos-kernel and java-os-project, you were automagically
+assigned a password.
+
+To un-subscribe in the new system:
+
+1. Go to:
+
+  http://www.jos.org/mailman/admin/general
+    or 
+  http://www.jos.org/mailman/admin/kernel
+
+  depending upon which list you no longer are
+  interested in.
+
+2. Scroll down to where it says:
+
+  "To change your subscription (set options like digest 
+   and delivery modes, get a reminder of your password, 
+   or unsubscribe from  General), enter your subscription 
+   email address:"
+
+3. Fill in your e-mail address and press "Edit Options"
+
+4. Scroll down to where it says:
+
+   "Click this button to have your password
+    emailed to your list delivery address"
+
+5. Press the button "Email My Password To Me"
+
+6. Wait for the mail to come....
+
+7. Press the BACK button (to get back to the /subscribe page )
+
+8. Scroll to where it says:
+
+   "To unsubscribe, enter your password and hit the button."
+
+9. Type in your password in the text area, and press "Unsubscribe"
+
+
+That's it.
+
+Once a month you will all receive a message saying
+what lists you are subscribed to and what the passwords
+for those lists are.  This should help remind you that
+you are indeed subscribed to a list... 
+
+As of now, I don't know how to unsubscribe via e-mail,
+so if you know how with mailman, let me know.  Furthermore,
+I don't know if there is an equivalent to the 
+"unsubscribe * username" which is horribly useful...
+
+If you have any problems with the above, please
+e-mail me _personally_ and I will make sure that
+business is taken care of.
+
+Best,
+
+Clark Evans
+
+
+
+From clark.evans@manhattanproject.com Thu, 25 Mar 1999 03:10:16 +0000
+Date: Thu, 25 Mar 1999 03:10:16 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Kernel] A quick note on un-subscribing  (Try #2)
+
+Ok.  I'm dumb, put the wrong link. Very sorry.
+This is a fixed version.
+
+---------------------------------
+
+This mail server is a bit different than majordomo.
+
+First of all, it currently requires a password 
+for all list users.  I'm not too happy about this
+personally, but when you were all migrated from
+jos-kernel and java-os-project, you were automagically
+assigned a password.
+
+To un-subscribe in the new system:
+
+1. Go to:
+
+  http://www.jos.org/mailman/listinfo/general
+    or 
+  http://www.jos.org/mailman/listinfo/kernel
+
+  depending upon which list you no longer are
+  interested in.
+
+2. Scroll down to where it says:
+
+  "To change your subscription (set options like digest 
+   and delivery modes, get a reminder of your password, 
+   or unsubscribe from  General), enter your subscription 
+   email address:"
+
+3. Fill in your e-mail address and press "Edit Options"
+
+4. Scroll down to where it says:
+
+   "Click this button to have your password
+    emailed to your list delivery address"
+
+5. Press the button "Email My Password To Me"
+
+6. Wait for the mail to come....
+
+7. Press the BACK button (to get back to the /subscribe page )
+
+8. Scroll to where it says:
+
+   "To unsubscribe, enter your password and hit the button."
+
+9. Type in your password in the text area, and press "Unsubscribe"
+
+
+That's it.
+
+Once a month you will all receive a message saying
+what lists you are subscribed to and what the passwords
+for those lists are.  This should help remind you that
+you are indeed subscribed to a list... 
+
+As of now, I don't know how to unsubscribe via e-mail,
+so if you know how with mailman, let me know.  Furthermore,
+I don't know if there is an equivalent to the 
+"unsubscribe * username" which is horribly useful...
+
+If you have any problems with the above, please
+e-mail me _personally_ and I will make sure that
+business is taken care of.
+
+Best,
+
+Clark Evans
+
+_______________________________________________
+General maillist  -  General@jos.org
+http://jos.org/mailman/listinfo/general
+
+
+
+From tmiller@haverford.edu Thu, 25 Mar 1999 00:18:09 -0500 (EST)
+Date: Thu, 25 Mar 1999 00:18:09 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf & keyboard driver: follow-up idea
+
+	How about jos.system.keyboard as a KeyEvent dispatcher (i.e.
+jos.system.keyboard.addKeyListener() will do what you'd expect) fed by
+whatever we end up naming the keyboard Driver (or Interperter,
+depending*) from Albrecht's code, and feeding whatever happens to sign up,
+i.e. a shell.  Naturally, since the shell will be signing up as (or be
+signed up as) a KeyListener, one would expect that the telnet daemon would
+also generate the appropriate KeyEvents, except from its network
+connection.
+
+-_Quinn
+
+* This depends on whether or not you think that jos.system.keyboard should
+distribute key events (AWT or not) of raw scan-codes or of
+some-degree-translated scancodes.  I would argue, as a matter of
+abstraction, that jos.system.keyboard should distribute KeyEvents of
+translated scancodes, up to the point where they are VK_* (or equivalent)
+events, but not beyond, i.e. a keyboard interperter would be (should be?)
+used to handle things like upper and lower case, control and alt key
+commands, key concatenation (i.e. ctrl-e-' to make the accented e
+character, etc), and the works.  I suppose one could call this an abstract
+raw feeding into an abstract cooker, which in turn would feed the shell.
+Things that need finer-grained input or do odd things to the keyboard
+(i.e. games) would sign up as KeyListeners on jos.system.keyboard instead
+of using the default keyboard interperter(s).
+
+
+
+
+From onewith1@flash.net Fri, 26 Mar 1999 22:31:00 -0600
+Date: Fri, 26 Mar 1999 22:31:00 -0600
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] decaf update & the keyboard driver
+
+Before I get started, again good work on the JVM.
+
+But, geez, a comment on my code?  Even *I* have trouble understanding it at
+times.  The purpose was to have a level of security, and PnP resource
+allocation all in the same shoe... but I digress.
+
+About the keyboard driver itself - the driver registration and so forth that I
+sent you in code, I'm currently redesigning that whole system. But the
+interface with the platform services currenlty has no plans for major
+modification.  So the reading and interpreting of the keystrokes, and the
+layers of abstraction for the keyboard drivers, is pretty much what I
+currently have in mind as a final cut (pending changes from the group, of
+course).
+
+"Todd L. Miller" wrote:
+
+>         Having only recently completed this rounding-out of decaf, and
+> feeling loathe to test it at this juncture, I examined Matt Albrecht's
+> code for resource allocation & control and his keyboard driver & scancode
+> converter, etc.  I'm presenting here a short overview in hopes that Matt
+> will correct any oversights or misunderstandings of mine before I start
+> implementing his code for/with decaf; suggestions, based on my current
+> understandings, are below as well.
+
+I'll try - and possibly show off my misunderstandings too, as well as my
+flightiness of mind.
+
+>
+>
+> In general:
+>
+> 'Device'(s) return 'Driver'(s) via the PrimaryHardwareManager, which is
+> java object in charge of a particular i/o bus; the Device class/object
+> returns 'Driver'(s) based on its interactions with the PHM via
+> 'HardwareRequests' of various types.
+
+The PrimaryHardwareManager doesn't just have to be the i/o bus you're talking
+to - it could be the computer (w/o network) as a whole.  But the idea is the
+same - it passes off requests to allocate every kind of resource to the
+appropriate resource manager.
+
+>
+> A 'HardwareResourceInterface' is responsible for implementing the
+> (presumambly kernel) wrapper of the native code handling a particular
+> HardwareResource (for the i386, interrupts, ioports, memory, etc;
+> different architectures will, of course, get their own HardwareResources).
+>
+
+And adding security, so you can't access non-allocated memory, I/O ports,
+whatever.
+
+>
+> More specifically:
+>
+> InterruptInterface (and the Driver) model is based on the old,
+> non-Listener style of things, and hence, must be changed.
+
+I tried to keep it open, so that some "black box", either at the kernel level
+or wherever, in an event thread or a separate thread, invokes all registered
+interrupt handlers (via postEvent() call), which would call the device's
+handlers.  So the handlers are a "listener" paradigm - they don't poll for an
+interrupt, but rather are only called when an interrupt occurs.  The names I
+gave everything probably confuse this, so they should be changed to clear
+everything up. (btw - the ISAKeyboardDriver2 follows the design of the
+original kernel idea of polling for the interrupts so that you could use it in
+your current setup - this may be what you were referring to, but I dunno)
+
+>  The most
+> obvious question is if the InterruptInterface should be more or less
+> basically replaced by the InterruptDispatcher or if it should subscribe to
+> it; especially w.r.t. the IRQResource concept that seems to be Matt's
+> vehicle for allowing interrupt sharing, which is necessary for a variety
+> of reasons, not the least of which is the serial port driver.
+
+That's been the current line of debate (If I follow what you're saying) - how
+to deal with interrupt calls.  We may want to put this in a category of an
+"OS-wide event system", either asynchronous or synchronous events; that way we
+can expand this idea to an extremely generic fashion, and possibly (much later
+on) include distributable events under this system.  But that's a discussion
+all into itself.
+
+>
+> As far as my stated goal of making jos.system.keyboard as much an
+> abstraction as possible, and NOT a driver, necessarily, I looked at the
+> KeyboardDevice class idea; where jos.system.keyboard
+> would be the default system-wide KeyboardDevice, which hides it back-end
+> KeyboardInterperter, which could be replaced on the fly.
+
+That's fine - it would save the users a heck of a lot of time trying to
+remember how to query for the keyboard driver and handle errors, all wrapped
+up in a neat package.
+
+>  (For i18n
+> purposes, one would wonders how non-latin character sets are handled in
+> the current VK_* system; but since we're almost certain to extend it, that
+> question can be safely ignored for now.  Something about unicode...
+> perhaps a unicode character set that defines navigation/function keys?)
+
+Sun says in its KeyEvent file that it retains the right to change the VK_*
+mappings at any time, hence add support for additional keyboards.  So we (in
+our infinite wisdom) could just make a Kernel version of the
+java.awt.events.KeyEvent class without all the awt overhead, which uses our
+own VK_* mappings for any keyboard we come across.
+
+>
+> The basic idea of the above being that at the level where an application,
+> including ones like the shell, might get keystoke data, it's safely been
+> platform de-dependincied ( how does one verb that? ).
+
+That's a double negative - how about "it has safely attained platform
+independance"?
+
+>  It would, of
+> course, be Good Programming to make the shell independent of the Keyboard
+> itself, but the telnet daemon feeding the input stream should and could
+> just as easily feed the stream with the VK_* series we've defined -- as
+> mapped by its ANSI/vt100/vt220 (etc) termcap-equivalent.
+
+Right - along with the jos.System.keyboard, which returns VK_* key events, we
+add on an InputStream interface for it which becomes our java.lang.System.in.
+
+>
+>
+> Three questions, perhaps induced by not reading the code closely enough:
+> first, what use(s) is the DeviceManager intended for?
+
+For branching devices.  Mainly for maintenance purposes, so you can clearly
+see under the device configuration "oh, my PCI bus (a DeviceManager) has a
+Modem and a Sound Card (plain Devices, under the DeviceManager)".  It may not
+be all that important.  My newbetter system under design solves this in a more
+efficient way (and more logically, too).
+
+>  Second, why have
+> two ISAKeyboards?
+
+One was the "true" driver using my hardwareResources package, and the other
+used the published driver specs.  That was the only difference, and to show
+just how easy it is to create a device hierarchy with inheritence.
+
+>  The method overloads don't appear to be necessary or
+> desirous.
+
+alright.  I'll give you that.
+
+>  Thirdly, how easy (or difficult) is it for this framework to
+> handle driver updates on the fly?  I seem to recall several Driver/Device
+> constructors that took other Devices or Drivers?
+
+Ah, again I aim your attention to the newbetter specs.  I can send you the
+current copy if you missed it the first time through; I'm figuring out the
+specific details now, so it's not complete, but it gives a general overview.
+
+>
+> At any rate, before I go any further re: this, I want some feedback from
+> the list; and I will have to build the Makefiles for handling the
+> architecture-dependent parts of this, so as to get the idea and structure
+> firmly in place before the driver-writing really gets off the ground.
+> (i.e. ISAKeyboard is probably an architecture-specific bit of code;
+> whereas KeyboardDevice probably is not.  This will require a closer
+> reading of the code.)
+>
+
+This was the intention - have a generic abstract class to encapsulate the
+generally used functions, then the subclasses (concrete device
+implementations) fill in the architecture-specific parts.  I may have failed
+in a few points, though.
+
+>
+> As far as things on my todo list aside from the keyboard driver is
+> rewriting the native-code support in interp.cc to handle argument types,
+> especially in print() and println(), which will ease the debugging
+> immensely, as well as lay a groundwork for 'real' native-code handling
+> later.  The end goal of this, for now, being to make a clean & extensible
+> keyboard-to-screen echo, and, perhaps, some sort of "hello, world!"-style
+> shell, to test things out and demonstrate the way it might be done.
+>
+> And of course, the procession of things which must be done to
+> bring decaf into full compability w/ the 1.2 JDK.  Does anyone know of a
+> good compatibility aside from Sun's JCK, which (AFAIK), is not a
+> particularly cheap (or at-home) kind of thing?
+>
+> -_Quinn
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+
+
+
+From tmiller@haverford.edu Sat, 27 Mar 1999 02:39:32 -0500 (EST)
+Date: Sat, 27 Mar 1999 02:39:32 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf update & the keyboard driver
+
+> Before I get started, again good work on the JVM.
+
+	Thanks.  Assuming all goes well, we should be debugging the
+JIT/adaptive compiler this time next year...
+
+> But, geez, a comment on my code?  Even *I* have trouble understanding it at
+
+	That might explain why I had so many questions :)
+
+> So the reading and interpreting of the keystrokes, and the
+> layers of abstraction for the keyboard drivers, is pretty much what I
+> currently have in mind as a final cut (pending changes from the group, of
+> course).
+
+	Okay.  I'm curious, though, about the keyboard acknowledge code
+you use.  What's the difference between the way I acknowledge the keyboard
+(returning a constant 0xAE) and yours (returning the scancode plus/minus
+some bitmasks)?  (Since mine seems to work... bearing in mind that my
+understanding of keyboard h/w is based on a loose reading of the linux
+source.)
+ 
+> The PrimaryHardwareManager doesn't just have to be the i/o bus you're talking
+> to - it could be the computer (w/o network) as a whole.  But the idea is the
+> same - it passes off requests to allocate every kind of resource to the
+> appropriate resource manager.
+
+	Okay; I think you worded it differently in your docs.  (Although I
+suppose one could construe the whole computer as a bus in some virtual
+sense.)  The important part of your above statement, then, is that the PHM
+is responsible for deciding what's appropriate, right?
+
+> > [HardwareResourceInterface]
+> And adding security, so you can't access non-allocated memory, I/O ports,
+> whatever.
+
+	Hm.  Any ideas on how this would be implemented?  (esp. w.r.t. the
+java 1.2 security model?)
+
+[ InterruptInterface ]
+
+	I'm not sure what I was thinking here, on further review of the
+code.  I probably just didn't write the right class name in due to a brain
+skip; but ISAKeyboard2 *does* need to be rewritten -- or, perhaps
+preferably, interruptinterface (or whatever the equivalent in the new &
+improved system is) accesses the hardware/is accessed by the hardware
+correctly.
+
+> That's been the current line of debate (If I follow what you're saying) - how
+> to deal with interrupt calls.  We may want to put this in a category of an
+> "OS-wide event system", either asynchronous or synchronous events; that way we
+> can expand this idea to an extremely generic fashion, and possibly (much later
+> on) include distributable events under this system.  But that's a discussion
+> all into itself.
+
+	I'm thinking now that for all intents and purposes, it truly
+doesn't matter how things are actually handled in the resource allocation
+system so long as the ResourceInterfaces (or equivalents) hide it away;
+we can, therefore, punt on the discussion until such a time that it
+becomes important.  Basically, InterruptResourceInterface is directly
+equivalent to InterruptDispatcher, if I'm reading the code correctly, in
+that it distributes kernel-generated interrupts to the proper listeners.
+InterruptResourceInterface handles letting the kernel know where to
+dispatch interrupts by a native method register() whereas
+InterruptDispatcher is hard-coded into the kernel.  So long as register()
+only allows one dispatcher/resource interface, we're fine.  And not having
+the interrupt distributor hard-coded is probably the Right Thing to do
+anyway.
+
+> > [jos.system.keyboard handles keyboardinterperter]
+> That's fine - it would save the users a heck of a lot of time trying to
+> remember how to query for the keyboard driver and handle errors, all wrapped
+> up in a neat package.
+
+	That's the idea, alright.  This automagically, BTW, allows for
+global shortcut keys, because there's no reason the keyboardinterperter
+couldn't generate AWT (or other) events while it's running its merry way
+through the decoding.
+
+> Sun says in its KeyEvent file that it retains the right to change the VK_*
+> mappings at any time, hence add support for additional keyboards.  So we (in
+> our infinite wisdom) could just make a Kernel version of the
+> java.awt.events.KeyEvent class without all the awt overhead, which uses our
+> own VK_* mappings for any keyboard we come across.
+
+	It's not so much remapping the VK_* that's a problem as it is the
+VK_* concept that would seem to fail when you're talking about languages
+where the character set is not the same (much less where the character set
+has accents on it!).  Although I suppose there's no reason VK_A couldn't
+always map to the first character of a set, one wonders about character
+sets with more than 26 letters in their alphabet.  But I suppose that we
+(in our infinite wisdom) could retain the right to change the kernel VK_*
+mappings at any time as well... anyway, this is a problem I'm more than
+happy to punt on.
+
+> That's a double negative - how about "it has safely attained platform
+> independance"?
+
+	grammar should be a four-letter-word, no?  (though I don't think
+independence as an 'a' in it...)
+
+> For branching devices.  Mainly for maintenance purposes, so you can clearly
+> see under the device configuration "oh, my PCI bus (a DeviceManager) has a
+> Modem and a Sound Card (plain Devices, under the DeviceManager)".  It may not
+> be all that important.  My newbetter system under design solves this in a more
+> efficient way (and more logically, too).
+
+	Ah.  Makes sense now.  It seemed to be a rather empty class, and I
+suppose that it was.  
+
+> One was the "true" driver using my hardwareResources package, and the other
+> used the published driver specs.  That was the only difference, and to show
+> just how easy it is to create a device hierarchy with inheritence.
+
+	I finally figured this out after reading the InterruptInterface
+code for the third time.  *sigh*
+ 
+> >  The method overloads don't appear to be necessary or desirous.
+> alright.  I'll give you that.
+
+	And I'll grant you that it did show it was very easy to create
+device heirarchy -- had I understood that was the point :)
+
+> Ah, again I aim your attention to the newbetter specs.  I can send you the
+> current copy if you missed it the first time through; I'm figuring out the
+> specific details now, so it's not complete, but it gives a general overview.
+
+	You know, I had read them and then completely forgotten about
+them, but they do (upon re-reading) seem very well done.  I'm looking
+forward to some code.  What kind of time-frame are you looking at?  (There
+are any number of things I could do with the kernel depending on how far
+away it is; but if it's too far off, I might go ahead and write in a
+subset of your work to get the self-hosting stuff started, which is where
+things ought to get interesting and start revealing bugs in decaf.)  BTW:
+currently inner classes are totally unsupported.  It might be a quick fix
+(i.e. read the innerclass attribute) or it might not, depending on what,
+exactly, the the innerclass's special 'needs' are.  Reading the section in
+the VM spec I've got handy was not particularly illuminating; I'll
+probably just have to play around for a while to make sense of it.
+
+> This was the intention - have a generic abstract class to encapsulate the
+> generally used functions, then the subclasses (concrete device
+> implementations) fill in the architecture-specific parts.  I may have failed
+> in a few points, though.
+
+	I wouldn't worry about it.  My structure comment is more closely
+related to how the build tree (i.e. arch/*/bytecode) is setup now than to
+how inheritance is or is not implemented.  Having identically-named
+but totally different classes in different places in Java is a little bit
+of a mindshift.  (Not a large one!  the jb*/jj* convention in JJOS proper
+was good preparation and signals how things should probably be done,
+which is to say archKeyboard and not ISAKeyboard, though archKeyboard
+will probably just redirect to ISAKeyboard except in the presence of the
+dread USBKeybord.  But I digress... and it will hopefully not be my
+problem anyway!)
+
+	Anyway, thanks for the good feedback and the good work.
+-_Quinn
+
+
+
+
+
+From onewith1@flash.net Sat, 27 Mar 1999 21:29:41 -0600
+Date: Sat, 27 Mar 1999 21:29:41 -0600
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] Re: decaf update & the keyboard driver
+
+
+"Todd L. Miller" wrote:
+
+>   Assuming all goes well, we should be debugging the
+> JIT/adaptive compiler this time next year...
+
+wow!
+
+>         Okay.  I'm curious, though, about the keyboard acknowledge code
+> you use.  What's the difference between the way I acknowledge the keyboard
+> (returning a constant 0xAE) and yours (returning the scancode plus/minus
+> some bitmasks)?  (Since mine seems to work... bearing in mind that my
+> understanding of keyboard h/w is based on a loose reading of the linux
+> source.)
+
+That's from my old 8086 (XT) DOS keyboard handler code.  It mainly allows for other
+programs to mess around with the system settings (write port 61h is used for
+keyboard, I/O check enabling, RAM parity check enabling, Read low switches enabling,
+and PC Speaker access), while we only change the necessary bits.  The Linux source
+probably just sets these settings to what it wants, which is just fine for the AT
+system.
+
+>
+> > The PrimaryHardwareManager doesn't just have to be the i/o bus you're talking
+> > to - it could be the computer (w/o network) as a whole.  But the idea is the
+> > same - it passes off requests to allocate every kind of resource to the
+> > appropriate resource manager.
+>
+>         Okay; I think you worded it differently in your docs.  (Although I
+> suppose one could construe the whole computer as a bus in some virtual
+> sense.)  The important part of your above statement, then, is that the PHM
+> is responsible for deciding what's appropriate, right?
+
+Right, in a sense (I just want to make sure that the air is clear here).  The PHM
+has several HardwareManagers registered with it, and any requests for a particular
+type of hardware get sent off to the HardwareManager that accepts that hardware type
+requested.
+
+>
+> > > [HardwareResourceInterface]
+> > And adding security, so you can't access non-allocated memory, I/O ports,
+> > whatever.
+>
+>         Hm.  Any ideas on how this would be implemented?  (esp. w.r.t. the
+> java 1.2 security model?)
+
+As per my code, when an HRI is created, it knows the ranges it was allocated.  Then
+on each call, it just checks to see if the requested range was valid.  If not, it
+throws a HardwareResourceNotAllocatedException.  This could be too much of an
+overhead, though.
+
+>
+> [ InterruptInterface ]
+>
+>         I'm not sure what I was thinking here, on further review of the
+> code.  I probably just didn't write the right class name in due to a brain
+> skip; but ISAKeyboard2 *does* need to be rewritten -- or, perhaps
+> preferably, interruptinterface (or whatever the equivalent in the new &
+> improved system is) accesses the hardware/is accessed by the hardware
+> correctly.
+
+Ok!  I never was too happy with my interrupt interface code anyway.
+
+<snip>
+
+> InterruptResourceInterface handles letting the kernel know where to
+> dispatch interrupts by a native method register() whereas
+> InterruptDispatcher is hard-coded into the kernel.  So long as register()
+> only allows one dispatcher/resource interface, we're fine.  And not having
+> the interrupt distributor hard-coded is probably the Right Thing to do
+> anyway.
+
+Yup.  BTW - I found the JavaOS book at Barnes & Noble today, and the section on
+interrupts describes that JavaOS supports both native and Java interrupt handlers.
+Which makes sense, especially with time critical interrupts like USB or whatever.
+
+>         That's the idea, alright.  This automagically, BTW, allows for
+> global shortcut keys, because there's no reason the keyboardinterperter
+> couldn't generate AWT (or other) events while it's running its merry way
+> through the decoding.
+
+Such as Winblows and OS/2's Ctrl-Esc sequence?  I've been thinking about this - the
+keyboard shouldn't be sending out events to every joe shmoe application that
+registers an event listener.  That would mean that when you type the letter "a", 5
+applications display the letter "a" in their text box.  The keyboard device should
+really restrict who gets actual key events.  Under a GUI, the window manager would
+need to replace the jos.system.keyboard for an application such that it only
+recieves key events when it has the focus.  This is a tricky spot with big warning
+messages flashing in neon.
+
+<snip>
+
+>         I finally figured this out after reading the InterruptInterface
+> code for the third time.  *sigh*
+
+I *really* need to document my code before I ship it out.  At least have a readme
+file to have a general overview of each file and how they work together.  <snicker>
+like I'm really going to make documentation! HA!
+
+<snip>
+
+> > Ah, again I aim your attention to the newbetter specs.  I can send you the
+> > current copy if you missed it the first time through; I'm figuring out the
+> > specific details now, so it's not complete, but it gives a general overview.
+>
+>         You know, I had read them and then completely forgotten about
+> them, but they do (upon re-reading) seem very well done.  I'm looking
+> forward to some code.  What kind of time-frame are you looking at?
+
+<agahst> uh, I dunno.  I was kind of figuring on releasing the general idea with
+some half-code thrown in.  But I'll see what I can do (It's a huge project if I was
+to do it to the hilt).  But I figure that the Platform code I wrote is either going
+to stay in the system, or will go to just raw interfaces to native code for speed
+and no security (except in the native methods...).  Right now I'm wanting to reuse
+the current code and just tweek the interrupt stuff a bit to make it more friendly
+(right now, if you let it sniff your hand it will bite you).
+
+>  (There
+> are any number of things I could do with the kernel depending on how far
+> away it is; but if it's too far off, I might go ahead and write in a
+> subset of your work to get the self-hosting stuff started, which is where
+> things ought to get interesting and start revealing bugs in decaf.)
+
+Go for it!
+
+<snip>
+
+> which is to say archKeyboard and not ISAKeyboard, though archKeyboard
+> will probably just redirect to ISAKeyboard except in the presence of the
+> dread USBKeybord.  But I digress... and it will hopefully not be my
+> problem anyway!)
+
+Egads!  USB?  I'll stay away from that until I get some good documentation on the
+dread pirate Robertson, er, USB :)  Man, how much coffee have I had today?
+
+>         Anyway, thanks for the good feedback and the good work.
+
+Thanks - you too.
+
+>
+> -_Quinn
+
+-Matt
+
+
+
+
+From onewith1@flash.net Sat, 27 Mar 1999 22:09:12 -0600
+Date: Sat, 27 Mar 1999 22:09:12 -0600
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] decaf & keyboard driver: follow-up idea
+
+[I'm passing this onto the UI guys since it kind of involves them, too]
+
+As I was saying in my other message, buried deep:
+
+I've been giving this some serious consideration.  And here's what I've come
+up with:
+
+Have jos.System.keyboard be a system-wide variable implemented the same way
+that java.lang.System.in is - in order to change it, you need to call a
+special function, which will have security checks to see if the app doing the
+call has the right security.  The window manager would replace this with its
+own keyboard class, so that it can handle the appropriate focus control.  It
+would also add new functions, for say application registration of system-wide
+KeyEvent checking.  The original keyboard class would post KeyEvents to all
+the manager's "system-wide listeners", one of which would be the "focus"
+listener, which passes the key event on to the current application for
+reading, with possible translation if the app requested it.
+
+So in this respect, yes, an addKeyListener() would be a good solution.  All we
+need then is a JOS-wide event system to manage acynch events.
+
+-Matt
+
+
+"Todd L. Miller" wrote:
+
+>         How about jos.system.keyboard as a KeyEvent dispatcher (i.e.
+> jos.system.keyboard.addKeyListener() will do what you'd expect) fed by
+> whatever we end up naming the keyboard Driver (or Interperter,
+> depending*) from Albrecht's code, and feeding whatever happens to sign up,
+> i.e. a shell.  Naturally, since the shell will be signing up as (or be
+> signed up as) a KeyListener, one would expect that the telnet daemon would
+> also generate the appropriate KeyEvents, except from its network
+> connection.
+>
+> -_Quinn
+>
+> * This depends on whether or not you think that jos.system.keyboard should
+> distribute key events (AWT or not) of raw scan-codes or of
+> some-degree-translated scancodes.  I would argue, as a matter of
+> abstraction, that jos.system.keyboard should distribute KeyEvents of
+> translated scancodes, up to the point where they are VK_* (or equivalent)
+> events, but not beyond, i.e. a keyboard interperter would be (should be?)
+> used to handle things like upper and lower case, control and alt key
+> commands, key concatenation (i.e. ctrl-e-' to make the accented e
+> character, etc), and the works.  I suppose one could call this an abstract
+> raw feeding into an abstract cooker, which in turn would feed the shell.
+> Things that need finer-grained input or do odd things to the keyboard
+> (i.e. games) would sign up as KeyListeners on jos.system.keyboard instead
+> of using the default keyboard interperter(s).
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+-Matt
+
+
+
+
+From pp@bluewin.ch Sun, 28 Mar 1999 21:15:21 +0200
+Date: Sun, 28 Mar 1999 21:15:21 +0200
+From: Peter Portmann pp@bluewin.ch
+Subject: [JOS-Kernel] I'm a newbie
+
+Hi everybody
+
+I'm new on Jos. And i'm very intressted to help with JOS. But firstable
+I have some questions:
+- What is the meaning of JJOS?
+- What is the meaning of CVS?
+- What is the meaning of decaf?
+- Waht is the meaning of RCS?
+
+I know what GRUB and ELF is.
+
+Thank you for your help!
+PeterPort
+
+
+
+From tmiller@haverford.edu Sun, 28 Mar 1999 15:44:39 -0500 (EST)
+Date: Sun, 28 Mar 1999 15:44:39 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] I'm a newbie
+
+> - What is the meaning of JJOS?
+
+	JJOS is a kernel under development by John Morrison (jm@mak.com)
+for use by the JOS project.  decaf (see below) is built on JJOS, which
+currently has two targets: one the i386 build, the other a 'host' build
+for running under Linux, to assist in debugging.
+
+> - What is the meaning of CVS?
+
+	The Concurrent Versioning System.  It's a way of making the
+computer(s) keep track of the changes that various different authors are
+making to the source, and then merging them.  I don't have any web
+references handy, though a search on yahoo (or your engine of choice)
+should turn up plenty of references.
+
+> - What is the meaning of decaf?
+
+	decaf is the Java Virtual Machine I'm writing for JOS, the one
+that runs on JJOS.  The name is a rather obvious coffee reference, as well
+as a marketing device.  (i.e.: the slogan is "decaf -- it helps you get
+your z's"; we use the IBM ad where the sysadmin is woken up at 3am in
+Paris -- except our sysadmin doesn't get woken up because he's running
+jos.  Hence: decaf helps you get your z's.)
+
+> - Waht is the meaning of RCS?
+
+	Revision Control System.  The local version of CVS; is used by
+some versions earlier versions of CVS to handle the change merges.
+
+-_Quinn
+
+
+
+
+From robfitz@geocities.com Sun, 28 Mar 1999 15:33:55 -0600
+Date: Sun, 28 Mar 1999 15:33:55 -0600
+From: Robert Fitzsimons robfitz@geocities.com
+Subject: [JOS-Kernel] I'm a newbie
+
+Hello Peter
+
+> I'm new on Jos. And i'm very intressted to help with JOS. But
+> firstable I have some questions:
+
+> - What is the meaning of JJOS? 
+
+JJOS is a kernel being mainly developed by John Morrison.  It is 
+written in C++, with some parts written in NASM assembly.  At the 
+moment JJOS boots using etherboot, which requires that you have two 
+computer networked together.  There is also a Linux host where you 
+run JJOS from within Linux.  And I have been working on getting JJOS 
+to boot from a disk drive using GRUB.
+
+> - What is the meaning of CVS?
+
+CVS (Concurrent Versions System) is a client/server version control 
+system.  It allows access to multiple files and allows multiple 
+developers to be working on the same files.  Have a look at 
+http://www.cyclic.com/ for more information.
+
+> - What is the meaning of decaf?
+
+decaf is a JVM (Java Virtual Machine) being mainly developed by Todd 
+Miller (aka _Quinn).  decaf is integrated with JJOS, so it is also 
+written in C++.  It is an interpreter based JVM, and I believe that 
+it can interpreter most of the Java bytecodes.
+
+> - Waht is the meaning of RCS?
+
+RCS (Revision Control System) is a file based version control system.
+I haven't used this, but I do know that files have to be locked and 
+accessed individually making it a lot more complicated to use 
+compared to CVS.
+
+Hope this helps.
+
+Robert Fitzsimons
+robfitz@geocities.com
+
+PS, if I have anything wrong about JJOS or decaf,  John, Todd please 
+correct me.
+
+
+
+
+From tmiller@haverford.edu Sun, 28 Mar 1999 17:14:30 -0500 (EST)
+Date: Sun, 28 Mar 1999 17:14:30 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] I'm a newbie
+
+> > - What is the meaning of decaf?
+> 
+> decaf is a JVM (Java Virtual Machine) being mainly developed by Todd 
+> Miller (aka _Quinn).  decaf is integrated with JJOS, so it is also 
+> written in C++.  It is an interpreter based JVM, and I believe that 
+> it can interpreter most of the Java bytecodes.
+
+	Just to be clear: decaf currently does not interpert only two of
+the bytecodes (monitorenter and monitorexit).  Several of the implemented
+bytecodes have known problems or do not fully implement the VM spec's
+semantics.  The most notable bad bytecodes are the ones dealing with long
+and double primitives, which return bad values; other known bugs include
+incorrect handling of interfaces in checkcast and instanceof.   Other
+opcodes may have undiscovered bugs in them -- there aren't any JVM test
+suites freely available right now, and they are non-trivial to write,
+though I have done what I can.  As you might expect, the most notable
+semantic that is unimplemented are monitors, although the cooperative
+mulitasking functions (eg wait(), notify()) do work.
+
+-_Quinn
+
+
+
+
+From lethin@reservoir.com Fri, 26 Mar 1999 09:51:02 -0500
+Date: Fri, 26 Mar 1999 09:51:02 -0500
+From: Richard Lethin lethin@reservoir.com
+Subject: [JOS-Kernel] decaf update & the keyboard driver
+
+Plum Hall sells a Java compatibility suite.
+
+Peter Schuller wrote:
+
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+>
+> > And of course, the procession of things which must be done to
+> > bring decaf into full compability w/ the 1.2 JDK.  Does anyone know of a
+> > good compatibility aside from Sun's JCK, which (AFAIK), is not a
+> > particularly cheap (or at-home) kind of thing?
+>
+> There is a link on the Japhar website (follow links on www.hungry.org) to an
+> open source test suite called Mauve or something like that; I don't remember
+> exactly. I haven't tried it or anything, but I thought it might be useful.
+>
+> / Peter Schuller
+>
+> One: Resistance is futile.
+> Seven of Nine: Perhaps.
+>         - Star Trek: Voyager - "Drone"
+>
+> - ---
+> PGP userID: 0x5584BD98 or 'Peter Schuller <scode_ufp@usa.net>'
+> E-Mail: scode_ufp@usa.net Web: http://hem.passagen.se/petersch
+> Help create a free Java based operating system - www.jos.org.
+>
+> -----BEGIN PGP SIGNATURE-----
+> Version: PGPfreeware 5.0i for non-commercial use
+> Charset: noconv
+>
+> iQA/AwUBNvlmRMBfJ1FVhL2YEQJeKgCfc/MZzr2MVVohBDSQgi0ERTw3d8cAn1Y2
+> 0bj6i4D2A0w7foqj3PdjVUgO
+> =ZQ61
+> -----END PGP SIGNATURE-----
+>
+> _______________________________________________
+> Kernel maillist  -  Kernel@jos.org
+> http://jos.org/mailman/listinfo/kernel
+
+--
+Reservoir Labs, Inc.
+628 Broadway, Suite 502
+New York, NY 10012
+212-780-0527
+212-780-0542 fax
+
+
+
+
+
+
+From clark.evans@manhattanproject.com Mon, 29 Mar 1999 18:04:47 +0000
+Date: Mon, 29 Mar 1999 18:04:47 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Kernel] Mailman problems.
+
+I've been away from my computer for 2 days, and
+mailman stopped operating sometime between 
+Thursday night and Monday morning.  First, my apologies.
+
+To fix the problem, I copied a dated version
+of the kernel list configuration as the current
+configuration, thus any configuration done in the
+last 3 days has been undone.  Very sorry.
+
+  I have no clue what caused the
+  configuraton for the kernel list
+  to become messed up.  Any information
+  would be helpful, for now, we have
+  just rolled-back.	
+
+Currently, if you send mail to the list and are
+not a subscriber, the message goes to me and I 
+get the chance to approve it or deny it.  This is
+our protection against spam.  If you all think it's
+ok, I can allow these posts to work untill it gets
+to be a problem.  Thoughts?
+
+Best,
+
+Clark
+
+
+
+From tmiller@haverford.edu Mon, 29 Mar 1999 14:29:32 -0500 (EST)
+Date: Mon, 29 Mar 1999 14:29:32 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] decaf & keyboard driver: follow-up idea
+
+> So in this respect, yes, an addKeyListener() would be a good solution.  All we
+> need then is a JOS-wide event system to manage acynch events.
+
+	That's the real kicker, isn't it.  AFAIK, the event system concept
+hasn't made it into operating systems yet.  (Except maybe JavaOS
+itself; I'm checking.)  The major problem regarding
+console applications is two-fold: they aren't event based and they
+use java.lang.System.in/out/err, which hide redirects -- something
+like "jsort < address_book > alpha_address_book" where the j.l.S variables
+enscapulate file streams instead of character streams directed at the
+console.
+
+	The suggestion you make is a good one in that it moves the
+responsibility for event distribution out of the 'kernel' and into
+'user-space.'  It also, however, maintains the 'redirection' idea, which
+might not be a good thing.  In the AWT, a keylistener subscribes to a
+specific Component (i.e. its main window) as the keyspeaker; this
+implicitly takes care of event focus problems.  The major problem is the
+collision between the streams-based and the event-based models in the 
+console application, where there isn't a Component to listen to.
+
+	We must support java.lang.System.in/out/err redirects, simply to
+make 'legacy' (non-JOS-aware) java applications function -- as well as
+make the shell redirection tools usable and implementable.  The question,
+then, becomes:
+
+	We know the application is jos-aware because it wants to listen
+for KeyEvents.  Thusly:
+
+	What should the application listen to?  Itself?
+jos.system.keyboard?  Suppose the application is jos-aware; it could be
+made to inherit from jos.application, in which case the jos.application
+code could take care of the necessary event distribution.  This *does*
+remove the question one step -- it will be necessary to determine how the
+AWT handles distributing events.  Should the application listen to
+jos.system.keyboard, it (perhaps quite simply) becomes necessary for the
+shell to redirect jos.system.keyboard as needed.  A window manager, of
+course, could do the same thing.
+
+	What should the application listen to?  I think it's almost just a
+matter of peronsal preference.  It seems, to me anyway, rather odd to be
+using a streams idea for an eventspeaker, but it might be worth doing
+anyway.  On the other hand, it might be argued that a jos (console)
+application should NOT be, by default, event-based, and therefore
+inheriting a whole bunch of event-dispatching code in the general case is
+a Bad Idea.
+
+	A major factor would be: what other kinds of events might a
+console application (usually) be interested in?  timer events?
+gained-focus events?  (instead of the signal equivalent of whatever
+happens when a job is foregrounded in UNIX)  mouse events?  (would be nice
+to have some standardized interface to the mouse for console apps,
+wouldn't it?)  the joystick?  If you posit that in a fashion similar to
+emacs' x-awareness, console apps might be windowing-aware, you could even
+get Menu and Window events.*
+
+	If we believe the Event model is the Right Way To Go for all
+applications, shouldn't the event model pretty closely resemble the AWT's?
+(or your preferred event model.  I would suggest the AWT's because (a)
+it's available and (b) all java programmers should know it.)
+
+	As for difficulty of implementation, does anyone know how
+classpath.org is handling event dispatching in their AWT implementation?
+
+-_Quinn
+
+* Or, if you posit a 'transparent windowing' shell.  This is an idea
+(along with 'command-line windowing' -- more later) I've been thinking
+about on and off since the jos project began.  Basically, when one starts
+up wash (the windowing application shell), it checks and makes sure
+it's running on a graphic console. (or as an xterm-equivalent under the X
+equivalent.) If it's not, you can ignore the windowing commands.
+Basically, wash uses a text console look-alike VGA framebuffer (for
+example), which, as a basic thing, allows for customized fonts (like the
+linux virtual consoles do.)  The start-up mode would be definable, but use
+an definable-sized font, 80x25 (or definable) at some point (say centered)
+in the (black) background of the console.  Taking this a step forward, it
+would not be beyond reason to implement a command like '&', say '%': instead of forking
+the process off to the background, it forks off a new 'window'.  A wash
+'window' would just be another console somewhere else on the screen;
+overlaps would be indicated with brighter or darker (etc) text. BUT, no
+graphics: wash would be just as fast as a normal shell.  wash would
+determine where the keyboard focus is based on ALT-TAB (definable) or
+equivalent shortcuts: commands like 'minimize,' 'maximize,' 'tile,'
+'cascade,' 'shade,' 'front (process-name)' would do what you might expect
+them to do.  Your sysadmin would log in and do something as follows:
+
+jos.org:~# top % $UPPER_RIGHT
+jos.org:~# front top
+jos.org:~# pine % $LOWER_LEFT
+jos.org:~# focus pine
+[now in pine's window, which is above the root window but below (probably
+ not overlapping) top's window]
+[checks his mail and notices that top is claiming the load just
+skyrocketed]
+[ALT-TAB to the root window]
+jos.org:~# kill 1344
+jos.org:~# pico /var/log/messages % $FULL_SCREEN
+[the FULL_SCREEN 'macro' auto-focuses the newly-spawned window]
+
+and so on.  If the system implements virtual consoles (like Linux) the
+become (if they're running wash) virtual desktops.
+
+	It might be fair to call the idea "an all xterm window manager."
+But I would think that window managers manage more xterms than anything
+else.  (At least, *I* manage more xterms than other windows this way.)
+
+	Anyway, I think it could be a really neat demonstration.
+
+	Command-line windowing is a very simple idea: does anyone remember
+BASIC's and LOGO's mixed-modes?  Where your had four or five lines of text
+on the bottom and the graphics up top?  Wouldn't that be a better way to
+handle the way most people use window managers than xterms?  (The few
+line console, would, of course, have many, many, virtual consoles to play
+with.  On a straight memory comparison with Linux, a 5-line screen could
+have 30 virtual consoles.)  virtual consoles and virtual desktops would be
+independent of each other.  Of course, something like pine might not work
+too well on a five-line console, but that's hardly the point.
+
+	These ideas are not in their stable release form.  They no
+warranty of any kind, explicit or implied; they have not been tested for
+suitability to purpose.  Only load these ideas in a partition of your mind
+you can safely erase later; do not use these ideas for mission-critical
+applications.  They have not been approved by the FDA.  Usage of the
+ideas implies full understanding and agreement with the terms of the
+liscence agreement as described by the First Amendment.  Thank you.
+
+
+
+
+From tmiller@haverford.edu Mon, 29 Mar 1999 14:29:40 -0500 (EST)
+Date: Mon, 29 Mar 1999 14:29:40 -0500 (EST)
+From: Todd L. Miller tmiller@haverford.edu
+Subject: [JOS-Kernel] Re: decaf update & the keyboard driver
+
+> which is just fine for the AT system.
+
+	*shrug*  Is one better than the other for the AT?  (As that the
+target architecture is i386.)
+
+> Right, in a sense (I just want to make sure that the air is clear here).  The PHM
+> has several HardwareManagers registered with it, and any requests for a particular
+> type of hardware get sent off to the HardwareManager that accepts that hardware type
+> requested.
+
+	So who's registering the various HardwareManagers?  Other Devices?
+(The system builds from the PHM by adding the PCI/ISA/AGP/USB bus devices,
+then devices on those busses?  (Although I suppose that PCI, ISA, and AGP
+unregister after scanning for devices.  One would expect the PCI bus
+to discover other busses like SCSI and FireWire, as well?)  That seems to
+be the direction you're heading in with the newbetter approach.)
+
+> As per my code, when an HRI is created, it knows the ranges it was allocated.  Then
+> on each call, it just checks to see if the requested range was valid.  If not, it
+> throws a HardwareResourceNotAllocatedException.  This could be too much of an
+> overhead, though.
+
+	Two questions: who decides if the range is valid?  Secondly, are
+we allowing only certain user's processes to request hardware resources?
+(Probably.  If so, how implement that?  But we can punt on that question
+because we don't have the concept of `users' in JOS yet.  Which will
+probably be another world of pain...)
+
+> Ok!  I never was too happy with my interrupt interface code anyway.
+
+	I think I mentioned this elsewhere: the InterruptInterface becomes
+either a constructor or the primary reciever or "interrupt events."  (i.e.
+either addInterruptListener to jos.system.interruptdispatcher -- which
+should probably be in Machine, but I digress -- or implement
+interruptdispatcher by itself.)
+
+> Yup.  BTW - I found the JavaOS book at Barnes & Noble today, and the section on
+> interrupts describes that JavaOS supports both native and Java interrupt handlers.
+> Which makes sense, especially with time critical interrupts like USB or whatever.
+
+	We can support support both also; whether a particular
+distribution does or not depends on the philosophical outlook of the
+distributor and/or the necessary effiencies.  (There is a single,
+well-known point where the scheduler considers interrupts.  What various
+coders do with it is up to them.  I would, however, suggest that they
+implement their native drivers as native java methods rather than do
+kernel hacking...)
+
+> Such as Winblows and OS/2's Ctrl-Esc sequence?  I've been thinking about this - the
+> keyboard shouldn't be sending out events to every joe shmoe application that
+> registers an event listener.  That would mean that when you type the letter "a", 5
+> applications display the letter "a" in their text box.  The keyboard device should
+> really restrict who gets actual key events.  Under a GUI, the window manager would
+> need to replace the jos.system.keyboard for an application such that it only
+> recieves key events when it has the focus.  This is a tricky spot with big warning
+> messages flashing in neon.
+
+	Yeah.  See my rather lengthy response to your other post.
+
+-_Quinn
+
+
+
+
+
+
+
+From clark.evans@manhattanproject.com Mon, 29 Mar 1999 17:55:24 +0000
+Date: Mon, 29 Mar 1999 17:55:24 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Kernel] Mailman downtime
+
+I've been away from my computer for 2 days, and
+mailman stopped operating sometime between 
+Thursday night and Monday morning.  First, my apologies.
+
+To fix the problem, I copied a dated version
+of the kernel list configuration as the current
+configuration, thus any configuration done in the
+last 3 days has been undone.  Very sorry.
+
+Currently, if you send mail to the list and are
+not a subscriber, the message goes to me and I 
+get the chance to approve it or deny it.  This is
+our protection against spam.  If you all think it's
+ok, I can allow these posts to work untill it gets
+to be a problem.  Thoughts?
+
+Best,
+
+Clark
+
+
+
+From onewith1@flash.net Mon, 29 Mar 1999 21:22:45 -0600
+Date: Mon, 29 Mar 1999 21:22:45 -0600
+From: Matt Albrecht onewith1@flash.net
+Subject: [JOS-Kernel] Re: decaf update & the keyboard driver
+
+
+"Todd L. Miller" wrote:
+
+>         *shrug*  Is one better than the other for the AT?  (As that the
+> target architecture is i386.)
+
+I guess the Linux version works better, as it is faster (doesn't do a read, no bit
+masking).
+
+>         So who's registering the various HardwareManagers?  Other Devices?
+> (The system builds from the PHM by adding the PCI/ISA/AGP/USB bus devices,
+> then devices on those busses?  (Although I suppose that PCI, ISA, and AGP
+> unregister after scanning for devices.  One would expect the PCI bus
+> to discover other busses like SCSI and FireWire, as well?)  That seems to
+> be the direction you're heading in with the newbetter approach.)
+
+Ah - now I see that i have not been clear.  Since this the PHM is under the Platform
+section, it knows nothing about buses and whatnot (buses are a later abstraction,
+technically classified under "driver").  The "hardware resources" under the Platform
+section are things like I/O Addresses, IRQs/Interrupts, DMA channels, and Memory addresses
+- the most basic physical hardware available.  These are registered at boot time to
+reflect the underlying hardware (most probably under the platform-specialized PHM's static
+block).  An i386 system would have I/O Address ranges 0x000 - 0xFFF, interrupts 0 - 255,
+DMA channels 0-7, and memory addresses 0x00000000 - 0xFFFFFFFF (physical addresses would
+depend on the size of physical memory).
+
+>         Two questions: who decides if the range is valid?
+
+The HardwareResource in charge of the requested resource.  If the range is invalid, the
+request does not go through and an exception is thrown (or a null is returned, whichever).
+
+>  Secondly, are we allowing only certain user's processes to request hardware resources?
+> (Probably.  If so, how implement that?  But we can punt on that question
+> because we don't have the concept of `users' in JOS yet.  Which will
+> probably be another world of pain...)
+
+Well, first off only JOS aware products could even access them (I hope - O, save Us from
+Reflection! :).  We could add to the JOS system a security manager which the PHM could
+call for a security violation exception (probably a good idea anyway).  It would be up to
+the "main" program to decree the security priveledge of its applications.
+
+>         I think I mentioned this elsewhere: the InterruptInterface becomes
+> either a constructor or the primary reciever or "interrupt events."  (i.e.
+> either addInterruptListener to jos.system.interruptdispatcher -- which
+> should probably be in Machine, but I digress -- or implement
+> interruptdispatcher by itself.)
+
+I was thinking of having InterruptInterface be a receiver for interrupt events.  JavaOS
+has a (somewhat) good idea behind this.  They have 3 levels of interrupt handlers.  The
+first level is registered as a real-time native code handler (run when the interrupt
+happens), second is a deferred native code handler (run in a separate thread from the
+interrupt), and the third is a Java-code deferred handler.  I was thinking that we could
+have two layers, a real-time and deferred layer - all routines registered can be native or
+Java.  This is very run-time specific, of course.
+
+
+>         We can support support both [native and Java interrupts] also; whether a
+> particular
+> distribution does or not depends on the philosophical outlook of the
+> distributor and/or the necessary effiencies.  (There is a single,
+> well-known point where the scheduler considers interrupts.  What various
+> coders do with it is up to them.  I would, however, suggest that they
+> implement their native drivers as native java methods rather than do
+> kernel hacking...)
+
+Sounds right.  We don't want driver developers releasing kernel patches to use their
+drivers (beware of Sun's endless OS patches!).
+
+-Matt
+
+
+
+
+From pp@bluewin.ch Tue, 30 Mar 1999 09:43:52 +0200
+Date: Tue, 30 Mar 1999 09:43:52 +0200
+From: Peter Portmann pp@bluewin.ch
+Subject: [JOS-Kernel] I'm a newbie
+
+This is a multi-part message in MIME format.
+--------------E9C106DD05E2D2C0B769B496
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hello Todd and Robert
+
+Thank you for your help.
+How can I help you with JOS. I play since JDK 1.0.2 with Java. And I
+like it. 
+My first Computerlanguage was Basic. After that I have learnd Pascal,
+ASM, Portal, C, ADA, C++ and ABAP (SAP). I'm working now with ABAP.
+I have learnd electronic engineer. After this I have studied computer
+science.
+Please tell me what can I do.
+
+Thank you again.
+
+PS, as you can see my mother tongue isn't english. It is german. I hope
+you can understand it anyway.
+--------------E9C106DD05E2D2C0B769B496
+Content-Type: message/rfc822
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+X-Mozilla-Status2: 00000000
+Message-ID: <36FE7FC9.60957868@bluewin.ch>
+Date: Sun, 28 Mar 1999 21:15:21 +0200
+From: Peter Portmann <pp@bluewin.ch>
+Organization: Peter Portmann
+X-Mailer: Mozilla 4.5 [en] (Win95; I)
+X-Accept-Language: en
+MIME-Version: 1.0
+To: kernel@jos.org
+Subject: I'm a newbie
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hi everybody
+
+I'm new on Jos. And i'm very intressted to help with JOS. But firstable
+I have some questions:
+- What is the meaning of JJOS?
+- What is the meaning of CVS?
+- What is the meaning of decaf?
+- Waht is the meaning of RCS?
+
+I know what GRUB and ELF is.
+
+Thank you for your help!
+PeterPort
+
+--------------E9C106DD05E2D2C0B769B496--
+
+
+
+
+
+From RegierAveryJ@JDCORP.deere.com Tue, 30 Mar 1999 08:17:07 -0600
+Date: Tue, 30 Mar 1999 08:17:07 -0600
+From: Regier Avery J RegierAveryJ@JDCORP.deere.com
+Subject: [JOS-Kernel] RE: [JOS-UI] Re: [JOS-Kernel] decaf & keyboard driver: follow-up
+ idea
+ idea
+
+Todd,
+
+I have been working/thinking through the j.l.S.in, out, err problem as part
+of the JOSCore project.  These classes are pretty much defined as those
+required to get java.lang.* implemented on top of a multi-process VM and
+have the responsibility of interacting with the VM and the rest of the OS to
+provide services to applications in the form of the Java API.
+
+Included classes here are things like:  Process, ProcessEnvironment,
+Program, ProgramEnvironment, ClassRepository, ClassRepositoryClassLoader,
+etc.  Here, a ProgramEnvironment defines the classes and versions of classes
+(packages) that a particular application has access to, security privileges
+and restrictions, etc.  The ProcessEnvironment uses the ProgramEnvironment
+to keep track of things specific to a running process, such as instances of
+Class objects (for static variables and static synchronizations which must
+be kept seperate from process to process), the security for that process (a
+particular program may have been started in either a trusted or untrusted
+person or process, causing security needs for that running process to be
+possibly more restricted than the ProgramEnvironment defines) and things
+like j.l.System.in, out, and err.  Most of these settings are going to need
+to be set into some kind of encryped, secure system registry.
+
+Under this scheme, the ProcessEnvironement can also inherit certain traits
+from a parent, such as the in, out, and err streams.  I think that this
+scheme takes care of most, if not all, of the problems mentioned previously
+in this thread.  The top parent ProcessEnvironment can be a listenner for
+KeyEvents to create the InputStream and become a consumer of the
+OutputStream, passing it along to whatever next process should take it as an
+InputStream or putting it out to the console or log file or database, or
+whatever else.  (Where the out and err go to, and where the in come from can
+all be defined in the ProgramEnvironment for the parent Process.)
+
+Please note that not all of this came out of my brain.  Much of it was
+defined in the very early stages of the JOS project and all of that
+documentation is still available on the Wiki.  Just start at the
+ProcessGroup.
+
+Those on the UI list should also recognize here a solid foundation for JADE.
+
+Avery J. Regier
+
+
+
+> -----Original Message-----
+> From:	Todd L. Miller [SMTP:tmiller@haverford.edu]
+> Sent:	Monday, March 29, 1999 2:30 PM
+> To:	kernel@jos.org
+> Cc:	ui@jos.org
+> Subject:	[JOS-UI] Re: [JOS-Kernel] decaf & keyboard driver: follow-up
+> idea
+> 
+> > So in this respect, yes, an addKeyListener() would be a good solution.
+> All we
+> > need then is a JOS-wide event system to manage acynch events.
+> 
+> 	That's the real kicker, isn't it.  AFAIK, the event system concept
+> hasn't made it into operating systems yet.  (Except maybe JavaOS
+> itself; I'm checking.)  The major problem regarding
+> console applications is two-fold: they aren't event based and they
+> use java.lang.System.in/out/err, which hide redirects -- something
+> like "jsort < address_book > alpha_address_book" where the j.l.S variables
+> enscapulate file streams instead of character streams directed at the
+> console.
+> 
+> 	The suggestion you make is a good one in that it moves the
+> responsibility for event distribution out of the 'kernel' and into
+> 'user-space.'  It also, however, maintains the 'redirection' idea, which
+> might not be a good thing.  In the AWT, a keylistener subscribes to a
+> specific Component (i.e. its main window) as the keyspeaker; this
+> implicitly takes care of event focus problems.  The major problem is the
+> collision between the streams-based and the event-based models in the 
+> console application, where there isn't a Component to listen to.
+> 
+> 	We must support java.lang.System.in/out/err redirects, simply to
+> make 'legacy' (non-JOS-aware) java applications function -- as well as
+> make the shell redirection tools usable and implementable.  The question,
+> then, becomes:
+> 
+> 	We know the application is jos-aware because it wants to listen
+> for KeyEvents.  Thusly:
+> 
+> 	What should the application listen to?  Itself?
+> jos.system.keyboard?  Suppose the application is jos-aware; it could be
+> made to inherit from jos.application, in which case the jos.application
+> code could take care of the necessary event distribution.  This *does*
+> remove the question one step -- it will be necessary to determine how the
+> AWT handles distributing events.  Should the application listen to
+> jos.system.keyboard, it (perhaps quite simply) becomes necessary for the
+> shell to redirect jos.system.keyboard as needed.  A window manager, of
+> course, could do the same thing.
+> 
+> 	What should the application listen to?  I think it's almost just a
+> matter of peronsal preference.  It seems, to me anyway, rather odd to be
+> using a streams idea for an eventspeaker, but it might be worth doing
+> anyway.  On the other hand, it might be argued that a jos (console)
+> application should NOT be, by default, event-based, and therefore
+> inheriting a whole bunch of event-dispatching code in the general case is
+> a Bad Idea.
+> 
+> 	A major factor would be: what other kinds of events might a
+> console application (usually) be interested in?  timer events?
+> gained-focus events?  (instead of the signal equivalent of whatever
+> happens when a job is foregrounded in UNIX)  mouse events?  (would be nice
+> to have some standardized interface to the mouse for console apps,
+> wouldn't it?)  the joystick?  If you posit that in a fashion similar to
+> emacs' x-awareness, console apps might be windowing-aware, you could even
+> get Menu and Window events.*
+> 
+> 	If we believe the Event model is the Right Way To Go for all
+> applications, shouldn't the event model pretty closely resemble the AWT's?
+> (or your preferred event model.  I would suggest the AWT's because (a)
+> it's available and (b) all java programmers should know it.)
+> 
+> 	As for difficulty of implementation, does anyone know how
+> classpath.org is handling event dispatching in their AWT implementation?
+> 
+> -_Quinn
+> 
+> * Or, if you posit a 'transparent windowing' shell.  This is an idea
+> (along with 'command-line windowing' -- more later) I've been thinking
+> about on and off since the jos project began.  Basically, when one starts
+> up wash (the windowing application shell), it checks and makes sure
+> it's running on a graphic console. (or as an xterm-equivalent under the X
+> equivalent.) If it's not, you can ignore the windowing commands.
+> Basically, wash uses a text console look-alike VGA framebuffer (for
+> example), which, as a basic thing, allows for customized fonts (like the
+> linux virtual consoles do.)  The start-up mode would be definable, but use
+> an definable-sized font, 80x25 (or definable) at some point (say centered)
+> in the (black) background of the console.  Taking this a step forward, it
+> would not be beyond reason to implement a command like '&', say '%':
+> instead of forking
+> the process off to the background, it forks off a new 'window'.  A wash
+> 'window' would just be another console somewhere else on the screen;
+> overlaps would be indicated with brighter or darker (etc) text. BUT, no
+> graphics: wash would be just as fast as a normal shell.  wash would
+> determine where the keyboard focus is based on ALT-TAB (definable) or
+> equivalent shortcuts: commands like 'minimize,' 'maximize,' 'tile,'
+> 'cascade,' 'shade,' 'front (process-name)' would do what you might expect
+> them to do.  Your sysadmin would log in and do something as follows:
+> 
+> jos.org:~# top % $UPPER_RIGHT
+> jos.org:~# front top
+> jos.org:~# pine % $LOWER_LEFT
+> jos.org:~# focus pine
+> [now in pine's window, which is above the root window but below (probably
+>  not overlapping) top's window]
+> [checks his mail and notices that top is claiming the load just
+> skyrocketed]
+> [ALT-TAB to the root window]
+> jos.org:~# kill 1344
+> jos.org:~# pico /var/log/messages % $FULL_SCREEN
+> [the FULL_SCREEN 'macro' auto-focuses the newly-spawned window]
+> 
+> and so on.  If the system implements virtual consoles (like Linux) the
+> become (if they're running wash) virtual desktops.
+> 
+> 	It might be fair to call the idea "an all xterm window manager."
+> But I would think that window managers manage more xterms than anything
+> else.  (At least, *I* manage more xterms than other windows this way.)
+> 
+> 	Anyway, I think it could be a really neat demonstration.
+> 
+> 	Command-line windowing is a very simple idea: does anyone remember
+> BASIC's and LOGO's mixed-modes?  Where your had four or five lines of text
+> on the bottom and the graphics up top?  Wouldn't that be a better way to
+> handle the way most people use window managers than xterms?  (The few
+> line console, would, of course, have many, many, virtual consoles to play
+> with.  On a straight memory comparison with Linux, a 5-line screen could
+> have 30 virtual consoles.)  virtual consoles and virtual desktops would be
+> independent of each other.  Of course, something like pine might not work
+> too well on a five-line console, but that's hardly the point.
+> 
+> 	These ideas are not in their stable release form.  They no
+> warranty of any kind, explicit or implied; they have not been tested for
+> suitability to purpose.  Only load these ideas in a partition of your mind
+> you can safely erase later; do not use these ideas for mission-critical
+> applications.  They have not been approved by the FDA.  Usage of the
+> ideas implies full understanding and agreement with the terms of the
+> liscence agreement as described by the First Amendment.  Thank you.
+> 
+> 
+> _______________________________________________
+> UI maillist  -  UI@jos.org
+> http://jos.org/mailman/listinfo/ui
+
+
+
+From clark.evans@manhattanproject.com Wed, 31 Mar 1999 14:52:57 +0000
+Date: Wed, 31 Mar 1999 14:52:57 +0000
+From: Clark Evans clark.evans@manhattanproject.com
+Subject: [JOS-Kernel] java-discuss
+
+The EGCS Java Compiler is starting to be used.  There is now
+a whole 15 posts on the java-discuss@egcs.com mailing list.
+The posts are interesting, most of them are talking about
+embedded usage.  Some of them discuss exception handling,
+dynamic class loading, managing binary vs bytecode classes,
+etc.  Anyway, just thought you'd all be interested in the
+developments over at cygnus.   
+
+Ok.  Hope all is well.
+
+Clark
+
+
+

@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jJOS speed</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000245.html">
+   <LINK REL="Next" HREF="000235.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jJOS speed</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] jJOS speed">jm@mak.com</A><BR>
+    <I>Tue, 17 Aug 1999 07:15:08 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000245.html">[JOS-Kernel] jJOS speed</A></li>
+        <LI> Next message: <A HREF="000235.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#246">[ date ]</a>
+              <a href="thread.html#246">[ thread ]</a>
+              <a href="subject.html#246">[ subject ]</a>
+              <a href="author.html#246">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Thomas;
+
+Thomas Bocek wrote:
+&gt;<i> while devoloping the vga driver I executed some of the code in text mode
+</I>&gt;<i> to see what's wrong and there I had some jbHeap errors and once a &lt;00000000&gt;.
+</I>&gt;<i> Perhaps the error is the same, but I'm not sure.  I just said (wanted
+</I>&gt;<i> to say) that this were the two errors I saw while developing the driver.
+</I>
+The &lt;00000000&gt; things are actually interrupts (?!) -- interrupt zero, actually
+-- that occur but have no registered/assigned handler routine.  And, of course,
+I don't have my books in front of me now, so I can't tell you what interrupt
+that is.  I'll check up on this.  Weird.
+
+The only error the heap currently can detect is an &quot;out of memory&quot; error.  Is
+this the other problem you're seeing?
+
+&gt;<i> BTW the line:
+</I>&gt;<i> String[][] test={{&quot;0x0D10&quot;,&quot;test&quot;,&quot;Matrox Impression Plus&quot;,&quot;test&quot;}};
+</I>&gt;<i> does an jbHeap::allocate error too.
+</I>
+Hmm...  Either the heap really thinks it's out of memory, or it could be a bug
+in the Java array stuff (which is kind of built-in).
+
+Might I be so bold as to ask you to please let me and/or Todd know about such
+easily-reproducible errors?  They're wonderful in that they will help us to
+debug jjos and decaf, and it sure is better to track down bugs like that than it
+is to let them quietly lie dormant until the rear up and bite us on the
+collective ass.
+
+Thanks!  I'll look into both of these ASAP (probably Thursday at the earliest,
+Friday at the latest).
+
+By the way, George (Hi, George!) was kind enough to send me a cut at the
+conservative GC heap implementation, which I'll also be looking into ASAP. 
+Hopefully, jjos+decaf should stay up long enough to be &quot;interesting&quot; after it's
+integrated.
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000245.html">[JOS-Kernel] jJOS speed</A></li>
+	<LI> Next message: <A HREF="000235.html">[JOS-Kernel] jJOS speed</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#246">[ date ]</a>
+              <a href="thread.html#246">[ thread ]</a>
+              <a href="subject.html#246">[ subject ]</a>
+              <a href="author.html#246">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

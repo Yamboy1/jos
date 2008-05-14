@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Seeking scheme to handle unsigned data types for drivers</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tullmann%40cs.utah.edu">
+   <LINK REL="Previous"  HREF="000104.html">
+   <LINK REL="Next" HREF="000107.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Seeking scheme to handle unsigned data types for drivers</H1>
+    <B>Patrick Tullmann</B> 
+    <A HREF="mailto:tullmann%40cs.utah.edu"
+       TITLE="[JOS-Kernel] Seeking scheme to handle unsigned data types for drivers">tullmann@cs.utah.edu</A><BR>
+    <I>Thu, 24 Jun 1999 16:39:18 -0600</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000104.html">[JOS-Kernel] Seeking scheme to handle unsigned data types for
+ drivers</A></li>
+        <LI> Next message: <A HREF="000107.html">[JOS-Kernel] Seeking scheme to handle unsigned data types
+ for drivers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#105">[ date ]</a>
+              <a href="thread.html#105">[ thread ]</a>
+              <a href="subject.html#105">[ subject ]</a>
+              <a href="author.html#105">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Somewhat obviously, in writing drivers (e.g., VGA), one wishes to
+</I>&gt;<i> employ unsigned types -- 8-bit and 16-bit for &quot;data,&quot; and (at least)
+</I>&gt;<i> 32-bit for addresses.
+</I>
+Why do you care about the sign of these types?  Java is nice enough
+that all of the primitives types have fixed sizes.  ints are 32 bits,
+shorts and bytes are exactly what you'd expect, etc.  There are
+exactly three places where you will run into problems treating
+unsigned values as signed values, I don't think any of them are common 
+enough to be a real problem.  (All the common operations: like adding 1;
+and clearing and setting bits just work.)
+
+First is sign extension. This only happens when casting from a small
+size to a larger bit width.  Using masks prevents the problem:
+	int x = (int)byteVal &amp; 0xFF;
+
+Second is comparisons.  Comparing unsigned quantities via unsigned
+operators may not always give you what you want.  How often does that
+happen in a driver anyway?  Casting (without sign extension) to a
+larger type will work, though.
+
+Third problem is printing the number on the screen.  Thankfully we
+have Integer.toHexString(x).
+
+Certainly, this isn't nearly as clean as having real support in the
+language for signed vs. unsigned types, but its quite workable. (Of
+course, that invites its own host of problems.)
+
+-Pat
+
+----- ----- ---- ---  ---  --   -    -      -         -               -
+Pat Tullmann                                       <A HREF="mailto:tullmann@cs.utah.edu">tullmann@cs.utah.edu</A>
+	  This signature witticism intentionally left blank.
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000104.html">[JOS-Kernel] Seeking scheme to handle unsigned data types for
+ drivers</A></li>
+	<LI> Next message: <A HREF="000107.html">[JOS-Kernel] Seeking scheme to handle unsigned data types
+ for drivers</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#105">[ date ]</a>
+              <a href="thread.html#105">[ thread ]</a>
+              <a href="subject.html#105">[ subject ]</a>
+              <a href="author.html#105">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

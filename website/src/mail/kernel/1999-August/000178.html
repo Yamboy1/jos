@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Garbage collection (was [JOS-Kernel] Re: [JOS-Admin] An idea for
+ increasing the number of  code-writers)
+ increasing the number of  code-writers)</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000176.html">
+   <LINK REL="Next" HREF="000180.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Garbage collection (was [JOS-Kernel] Re: [JOS-Admin] An idea for
+ increasing the number of  code-writers)
+ increasing the number of  code-writers)</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Garbage collection (was [JOS-Kernel] Re: [JOS-Admin] An idea for
+ increasing the number of  code-writers)
+ increasing the number of  code-writers)">jm@mak.com</A><BR>
+    <I>Tue, 03 Aug 1999 14:02:33 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000176.html">[JOS-Kernel] Garbage collection (was [JOS-Kernel] Re: [JOS-Admin] An idea for
+ increasing the number of  code-writers)
+ increasing the number of  code-writers)</A></li>
+        <LI> Next message: <A HREF="000180.html">[JOS-Kernel] Garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#178">[ date ]</a>
+              <a href="thread.html#178">[ thread ]</a>
+              <a href="subject.html#178">[ subject ]</a>
+              <a href="author.html#178">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi;
+
+<A HREF="mailto:George.Marrows@Smallworld.co.uk">George.Marrows@Smallworld.co.uk</A> wrote:
+&gt;<i>         [GAM] I was aware of the synchronisation problems, which I would
+</I>&gt;<i> have thought could be very unpleasant indeed. The benefits of interrupt
+</I>&gt;<i> driven scheduling hadn't occurred to me. I guess another benefit of native
+</I>&gt;<i> threads is the ability to make use of more than one processor in a
+</I>&gt;<i> multi-processor box (though I imagine support for these is a low priority /
+</I>&gt;<i> a long way off). I would still question whether the gains from native
+</I>&gt;<i> threads will outweigh the pain of implementing them (both in terms of
+</I>&gt;<i> reworking the kernel and putting in all the necessary synchronisation)?
+</I>&gt;<i> [Please note that these comments are based on zero experience of
+</I>&gt;<i> implementing operating systems and can therefore be safely ignored.]
+</I>
+I think we're on the same page.  Basically, we'll get green threads running, and
+if native threads is the next-hottest fire, then we'll put that one out.
+
+&gt;<i>         [GAM]  With the heap as it currently is, there's nothing I can do
+</I>&gt;<i> with the information that a piece of memory is free *now* -- this info is
+</I>&gt;<i> gathered during the mark phase. So carry on nulling out pointers for now. If
+</I>&gt;<i> it seems like there would be useful gains from doing something sensible with
+</I>&gt;<i> explicit frees, I'll try to work that into a later version.
+</I>
+OK.  Nulling-out-pointers it is...
+
+&gt;<i>         [GAM]  The VM tricks also seem useful when doing generational GC --
+</I>&gt;<i> they can be used to implement a write barrier to track pointers to younger
+</I>&gt;<i> generations.
+</I>
+Exactly my understanding.
+
+&gt;<i> &gt; That's OK.  I'm assuming we can just recompile it with the C++ compiler
+</I>&gt;<i> &gt; (it's ANSI C, right?) and link it on in.
+</I>&gt;<i> &gt;
+</I>&gt;<i>         [GAM] Yes it should compile fine with g++ (I'll check this).
+</I>
+OK.  Just let us all know!
+
+&gt;<i>         [GAM]  Apart from the lack of support for large objects (well, not
+</I>&gt;<i> so large actually: &gt;1/2 page) and no way of handling mark stack overflow,
+</I>&gt;<i> it's pretty much getting there. (I managed to get it to allocate and
+</I>&gt;<i> conservatively scan some noddy C structures at the weekend.) As mentioned
+</I>&gt;<i> above, I've haven't put any thought into handling explicit frees, and I'm
+</I>&gt;<i> loath to spend time turning it into an allocate/deallocate heap, cos that
+</I>&gt;<i> will inevitably detract from progress elsewhere. I would very much hope to
+</I>&gt;<i> have something that GCs correctly (albeit slowly) by, say, the 14th of this
+</I>&gt;<i> month. This would include the large object support, but maybe not deal with
+</I>
+That's great!  Hopefully, we'll have something with which it can be integrated
+(Todd and I can thus be advised to be sure to finish anything we start by
+roughly the 14th).
+
+&gt;<i> the mark stack overflow. If I haven't managed to get this far by then, I'll
+</I>
+Yeah, I think we're OK there.  Any improved marking-space improvements can
+certainly wait.
+
+&gt;<i> happily hand over the code for completion by people with more time /
+</I>&gt;<i> speedier coding skills. I hope this is a usable timescale for you and Todd.
+</I>
+You betcha.  It's a lot faster than either of us can come up with one...
+
+&gt;<i> In the meantime, it would be very useful if you could go through the kernel
+</I>&gt;<i> and decaf and identify the roots for garbage collection. Issues I foresee
+</I>
+OK.  We'll start that effort...
+
+&gt;<i> with this: do we need to look in registers; how to find top and bottom of
+</I>&gt;<i> the native code stack for scanning.
+</I>
+I'm thinking with green threads we won't have to, but that's based upon a whole
+10 seconds of thought...  Todd, what sayest thou?
+
+BTW, I'll be out of touch through Wednesday night at the earliest...
+
+Thanks for the help!
+
+-jm
+
+-- 
+==== John Morrison            ==== MaK Technologies, Inc.
+==== Chief Technology Officer ==== 185 Alewife Brook Pkwy, Cambridge, MA 02138
+==== <A HREF="mailto:jm@mak.com">jm@mak.com</A>               ==== <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== vox:617-876-8085 x115    ==== fax:617-876-9208
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000176.html">[JOS-Kernel] Garbage collection (was [JOS-Kernel] Re: [JOS-Admin] An idea for
+ increasing the number of  code-writers)
+ increasing the number of  code-writers)</A></li>
+	<LI> Next message: <A HREF="000180.html">[JOS-Kernel] Garbage collection</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#178">[ date ]</a>
+              <a href="thread.html#178">[ thread ]</a>
+              <a href="subject.html#178">[ subject ]</a>
+              <a href="author.html#178">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

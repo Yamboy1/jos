@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Progress!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000471.html">
+   <LINK REL="Next" HREF="000477.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Progress!</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Progress!">tmiller@haverford.edu</A><BR>
+    <I>Sat, 20 Nov 1999 03:11:29 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000471.html">[JOS-Kernel] Progress!</A></li>
+        <LI> Next message: <A HREF="000477.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#472">[ date ]</a>
+              <a href="thread.html#472">[ thread ]</a>
+              <a href="subject.html#472">[ subject ]</a>
+              <a href="author.html#472">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> If i remember correctly both Linux and it predecessor (minix) use hardware
+</I>&gt;<i> scrolling.
+</I>&gt;<i> You might want to add that functionality to either the console or the vga
+</I>&gt;<i> driver.
+</I>
+	I don't know how to do this, and it would reduce the generality of
+the upper-level console driver to implement it.  Someone who knows more
+about hardware hackery than I is welcome to implement something like this
+in the lower edge, though.
+
+&gt;<i> &gt;put together an IP stack, and I might take a small detour and oblige them
+</I>&gt;<i> &gt;with a serial driver (if I can find docs!) to test against Linux SLIP***.
+</I>&gt;<i> 
+</I>&gt;<i> I'm sorry to sound so negative, but the stack is going to take a while to
+</I>&gt;<i> reach useable (tcp) level. Don't expect it to be fast either. Usually this
+</I>&gt;<i> code uses some tyical C approaches to memory, arrays, structs, unions and
+</I>&gt;<i> typecasts that force me to do most of my packet parsing with byte to byte
+</I>&gt;<i> copies.
+</I>
+	Okay, just let me know if/when a serial driver would come in handy
+for testing.  As for terrible C approaches to data structures, doesn't
+DataInputStream let you pull out varying primitive types? (They probably
+won't be in the right byte order, though...)
+
+&gt;<i> On a lighter note, i would like JEPS (as i like to call the stack) to be
+</I>&gt;<i> more or less compatible with the way jjos handles its classes
+</I>&gt;<i> (NetworkInterfaceDriver is already a superclass of
+</I>&gt;<i> jos.platform.driver.Device), do any of you kernel persons have any hints on
+</I>&gt;<i> that?
+</I>
+	The driver architecture is about to undergo a fairly substantial
+change, and probably another one a few months after that, so I wouldn't
+get too attatched to your package names.  Aside from that, no, not really.
+John, you have anything more substantial to add?
+
+&gt;<i> One other thing, if i have to handle multiple interfaces, i can't allow a
+</I>&gt;<i> call to any of them to block. The neat way of handling this would be the
+</I>&gt;<i> windows WaitForMultipleEvent way ..
+</I>&gt;<i> Pass it a list of events and wake me when one arrives. Then i can service
+</I>&gt;<i> it and wait upon that event list again. 
+</I>&gt;<i> Is an event structure like this going to be implemented?
+</I>
+	Your driver can listen to any number of event sources, viz:
+
+interrupts.addInterruptListener( 9, this );
+interrupts.addInterruptListener( 10, this );
+interrupts.addInterruptListener( 11, this );
+
+	for three different interrupts, or
+
+driver-tree.interface0.addPacketListener(this);
+driver-tree.interface1.addPacketListener(this);
+driver-tree.interface2.addPacketListener(this);
+
+	and so on.  When its init() (or whatever) method exits,
+handleInterrupt() or packetReceived() method will be called; if the
+PacketEvent is done right, it would include the source object.  The
+only tricky bit is that the packetReceived() method might be called by
+three different threads.  It would therefore be wise to synchronize the
+method and have it do a minimum of work and wake up its own dedicated
+servicing thread(s).  Likewise, if you're listening for more than one type
+of event, two different functions might be executing 'simultaneously'.
+
+	On the other hand, does your stack have to be a soliton/static
+class?  Why not create stack objects (who share code but not state data),
+one to an interface?
+
+-_Quinn
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000471.html">[JOS-Kernel] Progress!</A></li>
+	<LI> Next message: <A HREF="000477.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#472">[ date ]</a>
+              <a href="thread.html#472">[ thread ]</a>
+              <a href="subject.html#472">[ subject ]</a>
+              <a href="author.html#472">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

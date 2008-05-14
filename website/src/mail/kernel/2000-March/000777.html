@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Device as a digital resource</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000785.html">
+   <LINK REL="Next" HREF="000781.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Device as a digital resource</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Device as a digital resource">tmiller@haverford.edu</A><BR>
+    <I>Tue, 21 Mar 2000 21:28:16 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000785.html">[JOS-Kernel] Device as a digital resource</A></li>
+        <LI> Next message: <A HREF="000781.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#777">[ date ]</a>
+              <a href="thread.html#777">[ thread ]</a>
+              <a href="subject.html#777">[ subject ]</a>
+              <a href="author.html#777">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I personally prefer the JavaOS for Business solution to this: instead of
+</I>&gt;<i> giving an exact reference to the device when asked for, the device factory
+</I>&gt;<i> instead returns a handler.  When the device itself is removed, it sends a
+</I>&gt;<i> signal to all registered handlers telling them that the device is being
+</I>&gt;<i> removed.  We could have a similar option for swapping devices.
+</I>
+	A Controller which has the only reference to a device driver would
+be one of these handlers, no?  In general, to respond to your concern
+about complicated URIs, it would the responsibility of a given Controller
+to recongnize more abstract forms.  Protocols like file: are higher-level
+protocols that shouldn't do any work on their own, but request services
+from lower-level protocols like filesystem:, which in turn operates on
+device:s like harddrive: or network:.  file: would post requests like
+'<A HREF="filesystem:///',">filesystem:///',</A> and then ask filesystem_root for the filesystem object
+representing /mnt -- e.g. filesystem_root.getFS( &quot;mnt&quot; ); -- and then
+NFSmount, and finally getFile( &quot;myFile&quot; ); -- which the NFS
+filesystem: would implement by asking for network: device at some point.
+
+-_Quinn
+
+
+
+
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000785.html">[JOS-Kernel] Device as a digital resource</A></li>
+	<LI> Next message: <A HREF="000781.html">[JOS-Kernel] Device as a digital resource</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#777">[ date ]</a>
+              <a href="thread.html#777">[ thread ]</a>
+              <a href="subject.html#777">[ subject ]</a>
+              <a href="author.html#777">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] jos.vm.* packages?</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000639.html">
+   <LINK REL="Next" HREF="000641.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] jos.vm.* packages?</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] jos.vm.* packages?">gchii@mindspring.com</A><BR>
+    <I>Mon, 24 Jan 2000 16:35:23 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000639.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+        <LI> Next message: <A HREF="000641.html">[JOS-Kernel] jJOS Bytecode w/ BCNI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#640">[ date ]</a>
+              <a href="thread.html#640">[ thread ]</a>
+              <a href="subject.html#640">[ subject ]</a>
+              <a href="author.html#640">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 11:22 PM 1/23/00 -0500, &quot;Todd L. Miller&quot; &lt;<A HREF="mailto:tmiller@haverford.edu">tmiller@haverford.edu</A>&gt; wrote:
+&gt;<i>Shared code which uses these drivers should be platform-agnostic, which
+</I>&gt;<i>for now means having the same class names.
+</I>
+Common code is identical for all builds. The common code defines the
+platform. The jos.platform.keyboard class is an example of common code.
+
+With BCNI, I have eliminated the jos.platform.driver package.
+
+Build-specific code should be different for each build. First, before doing
+anything else, a &quot;build&quot; needs to install a build-specific, BCNI-compatible
+factory. The jos.host.driver.HostKeyboard is an example of build-specific
+code.
+
+The host build should install jos.host.driver.HostFactory. See also the
+jos.host.hostinit class as an example.
+
+The i386 build should install the jos.i386.driver.i386Factory. See also the
+jos.i386.i386init class as an example.
+
+&gt;<i>At such a point where decaf and the class libraries can support factories
+</I>&gt;<i>-- so that common code never sees a 'naked' driver to begin with --
+</I>&gt;<i>I'll reconsider my position.
+</I>
+See the BCNI version of the jos.* packages:
+
+&lt;URL:<A HREF="http://www.mindspring.com/~gchii/jos/jjos1e/index.html">http://www.mindspring.com/~gchii/jos/jjos1e/index.html</A>&gt;
+
+I created a new jos.platform.VGADriver interface. Both jos.host.StandardVGA
+and jos.i386.StandardVGA implement the jos.platform.VGADriver interface.
+
+Let me clarify. When I said two different classes should not have the same
+name, I meant a fully qualified name such as jos.host.StandardVGA. I find
+it most helpful to have both StandardVGA in jos.host and jos.i386.
+
+-----
+
+Bug List
+
+For me, the TestSuite program won't compile at all. There seem to be a few
+classes without source code.
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000639.html">[JOS-Kernel] jos.vm.* packages?</A></li>
+	<LI> Next message: <A HREF="000641.html">[JOS-Kernel] jJOS Bytecode w/ BCNI</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#640">[ date ]</a>
+              <a href="thread.html#640">[ thread ]</a>
+              <a href="subject.html#640">[ subject ]</a>
+              <a href="author.html#640">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

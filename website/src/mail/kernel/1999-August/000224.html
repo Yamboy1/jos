@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Big changes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:jm%40mak.com">
+   <LINK REL="Previous"  HREF="000223.html">
+   <LINK REL="Next" HREF="000226.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Big changes</H1>
+    <B>John Morrison</B> 
+    <A HREF="mailto:jm%40mak.com"
+       TITLE="[JOS-Kernel] Big changes">jm@mak.com</A><BR>
+    <I>Fri, 13 Aug 1999 21:03:00 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000223.html">[JOS-Kernel] Web Page</A></li>
+        <LI> Next message: <A HREF="000226.html">[JOS-Kernel] Re: Big changes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#224">[ date ]</a>
+              <a href="thread.html#224">[ thread ]</a>
+              <a href="subject.html#224">[ subject ]</a>
+              <a href="author.html#224">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi Todd;
+
+Made some big changes.  In order to try and perk up the performance, I
+changed the successive logical &quot;if&quot; tests for built-in methods to be
+hash-table based.  
+
+It works, but I had to make extensive changes.  Basically, decaf needed
+state -- I had to make a hash table after most of decaf was initialized,
+but before it really started.  Most of this happens in d_main.cc.  I
+also teased apart some of the bigger resolution routines into smaller
+ones, until I figured out that doing this the next-to-be-described way
+would entail REALLY extensive changes to the code, and then some
+algorithmic behavioral changes...  I also put most of the char*/UTF8
+routines into a new utf8.cc file.  I also put all the builtin methods
+into one new file jvmbuiltins.cc.  There are obviously-named header
+files for each.  There's a new hashtable template in jjos underlying
+this.  I also tried to remove some globals and make them instance
+variables on the new decafJVM class, which puts them in the heap, which
+should make our job of finding the GC roots easier.
+
+I verified both builds, but didn't notice a real performance boost on
+the VGA driver screen clearing stuff (although I wasn't smart enough to
+save the old binary before I overwrote it (Doh!), so I couldn't do A/B
+testing -- Thomas and Hilary, please don't make the same mistake I did).
+
+Eventually, I think maybe we should replace this mechanism with one that
+forces the loading and resolution of each class for which there's a
+builtin method, and then over-writes the resolved_method data structure
+with one that calls a builtin.  Then we won't need a separate data
+structure, and this would be even faster (probably twice as fast) as the
+new scheme.
+
+BTW, I should've incorporated the fixes you asked me to, too.
+
+Whew.
+
+I plan to check these in tomorrow AM US EST...
+
+When George gets the conservative GC
+
+Later!
+
+-jm
+
+-- 
+==== John Morrison ==== <A HREF="mailto:jm@mak.com">jm@mak.com</A> == <A HREF="http://www.mak.com/welcome.html">http://www.mak.com/welcome.html</A>
+==== MaK Technologies Inc., 185 Alewife Brook Parkway, Cambridge, MA
+02138
+==== vox:617-876-8085 x115
+==== fax:617-876-9208
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000223.html">[JOS-Kernel] Web Page</A></li>
+	<LI> Next message: <A HREF="000226.html">[JOS-Kernel] Re: Big changes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#224">[ date ]</a>
+              <a href="thread.html#224">[ thread ]</a>
+              <a href="subject.html#224">[ subject ]</a>
+              <a href="author.html#224">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

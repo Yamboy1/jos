@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] [VM Kit] Calculator</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000871.html">
+   <LINK REL="Next" HREF="000873.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] [VM Kit] Calculator</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] [VM Kit] Calculator">gchii@mindspring.com</A><BR>
+    <I>Thu, 14 Sep 2000 22:08:35 -0400</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000871.html">[JOS-Kernel] kissme JVM + linux kernel</A></li>
+        <LI> Next message: <A HREF="000873.html">[JOS-Kernel] [VM Kit] field list</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#872">[ date ]</a>
+              <a href="thread.html#872">[ thread ]</a>
+              <a href="subject.html#872">[ subject ]</a>
+              <a href="author.html#872">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At first, I thought the prototype for calculator functions, such as iadd,
+isub, imul, idiv, irem, jadd, jsub, jmul, jdiv, jrem, etc., might look
+something like this:
+
+jint iadd( jint a, jint b );
+
+But this prototype does not allow for math errors. I am leaning toward a
+prototype that's more like this:
+
+short iadd( jint a, jint b, jint *result );
+
+where a calculated result is returned through a parameter and the literal
+return value of the function is an error code. The error code could be
+mapped like the errno in the standard C library, where zero is for success
+and non-zero is for failure. The calculator knows nothing of a virtual
+machine, so it cannot &quot;throw&quot; an exception object.
+
+When it uses the calculator library, the virtual machine can throw an
+appropriate exception.
+
+
+
+</pre>
+
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000871.html">[JOS-Kernel] kissme JVM + linux kernel</A></li>
+	<LI> Next message: <A HREF="000873.html">[JOS-Kernel] [VM Kit] field list</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#872">[ date ]</a>
+              <a href="thread.html#872">[ thread ]</a>
+              <a href="subject.html#872">[ subject ]</a>
+              <a href="author.html#872">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

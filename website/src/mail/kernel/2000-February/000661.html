@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Integration</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000660.html">
+   <LINK REL="Next" HREF="000662.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Integration</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] Integration">tmiller@haverford.edu</A><BR>
+    <I>Tue, 15 Feb 2000 00:19:44 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000660.html">[JOS-Kernel] Integration</A></li>
+        <LI> Next message: <A HREF="000662.html">[JOS-Kernel] status report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#661">[ date ]</a>
+              <a href="thread.html#661">[ thread ]</a>
+              <a href="subject.html#661">[ subject ]</a>
+              <a href="author.html#661">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> I think decafJVM::internBuiltInMethod() is a better mechanism than JNI.
+</I>
+	Unfortunately, it currently requires statically linking all native
+code into the kernel.  (BTW, internBuiltInMethod will almost certainly
+sprout some more parameters: internBuiltInMethod( builtInMethod * fcnp,
+char * classname, char * fcnname, char * fnsig, ClassLoader * cl ) --
+where fnsig is checked for overloaded native calls (which I think is a
+terrible idea, but it's apparently legal) and cl for security, identity,
+and multiprocessing reasons.)
+
+&gt;<i> It should be possible to create a corresponding
+</I>&gt;<i> decafJVM::internOpcodeMethod(), which binds an opcode to its machine code.
+</I>
+	A good idea for a JIT compiler down the road.  Not sure how useful
+it would be for the interpreter; my understanding is that gcc already
+converts the swith-case statement to a table-lookup.
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000660.html">[JOS-Kernel] Integration</A></li>
+	<LI> Next message: <A HREF="000662.html">[JOS-Kernel] status report</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#661">[ date ]</a>
+              <a href="thread.html#661">[ thread ]</a>
+              <a href="subject.html#661">[ subject ]</a>
+              <a href="author.html#661">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

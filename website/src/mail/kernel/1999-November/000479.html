@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Progress!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:gchii%40mindspring.com">
+   <LINK REL="Previous"  HREF="000477.html">
+   <LINK REL="Next" HREF="000481.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Progress!</H1>
+    <B>Gilbert Carl Herschberger II</B> 
+    <A HREF="mailto:gchii%40mindspring.com"
+       TITLE="[JOS-Kernel] Progress!">gchii@mindspring.com</A><BR>
+    <I>Sun, 21 Nov 1999 19:22:23 -0500</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000477.html">[JOS-Kernel] Progress!</A></li>
+        <LI> Next message: <A HREF="000481.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#479">[ date ]</a>
+              <a href="thread.html#479">[ thread ]</a>
+              <a href="subject.html#479">[ subject ]</a>
+              <a href="author.html#479">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>At 01:36 PM 11/21/99 +0100, Ranieri Argentini
+&lt;<A HREF="mailto:R.Argentini@student.tudelft.nl">R.Argentini@student.tudelft.nl</A>&gt; wrote:
+&gt;<i>If anyone knows where to find an example of an OO tcp/ip stack, please tell
+</I>&gt;<i>me. I could really use some more info in analysing this..
+</I>
+Building a prototype in Java code might explain how the IP stack does what
+it does. The &quot;source&quot; of the packets can be a OS file. Or, a program can
+create packets pseudo-randomly. A TCP/IP stack is a sparsely populated
+array of IP packet queues and a kind of IP packet listener.
+
+While it manages 65,536 ports, all of these ports are rarely used at once.
+In addition, the low-level network driver is not complex. It is a packet
+source; it passes the raw packet from native code to an entry point in
+bytecode. The bytecode constructs a incoming packet queue, so that no
+packets are lost.
+
+The first class is a model of a network packet.
+
+public interface Packet {
+:<i>
+</I>  int getSourceHost();
+  int getSourcePort();
+  int getTargetHost();
+  int getTargetPort();
+:<i>
+</I>  byte[] getData();
+}
+
+public class BasicPacket
+    implements Packet {
+  public BasicPacket( byte[] v ) {
+  }
+:<i>
+</I>  private byte[] raw_data;
+}
+
+public interface PacketListener {
+  public void onPacket( Packet v );
+}
+
+A TCP/IP stack is used by a network card driver. All incoming packets are
+stuffed into a Packet object and passed to the TCP/IP stack.
+
+  public void incoming_packet( byte[] v ) {
+    listener.onPacket( new Packet( v ) );
+  }
+
+From the other perspective of a sparsely populated array of PacketQueues, a
+PacketQueue is also a PacketListener. A packet queue is available
+(virtually) at every IP port (from 0 to 65,565).
+
+I believe the TCP/IP project is important for the future of the JOS project
+because it enables critical inter-process communication (IPC) and
+inter-machine communication. With a TCP/IP stack, a single-step mechanism
+and non-console trace can be introduced into a JOS JVM for additional
+debugging.
+
+While the driver software constantly reads all incoming packets, throws
+away packets that are not targeted for this TCP/IP stack, throws away
+packets that have no corresponding packet queue associated with a port.
+When a ServerSocket &quot;opens&quot; a port, a PacketQueue is opened for that port.
+Only that ServerSocket can read the packets in its PacketQueue. Each
+connection, of course, creates an incoming packet queue for the
+stack-assigned port. Only that Socket can read the packets in its PacketQueue.
+
+Almost all of this OO design can be written and refined in Java. Incoming
+packets can be single- or double-queued. Outgoing packets should be
+single-queued, one outgoing queue for the stack instead of one outgoing
+queue for each port.
+
+The only non-Java part is between the NIC and native code that calls
+incoming_packet( byte[] v ).
+
+Interface
+  Packet
+  Stack
+  PacketQueue
+  PacketSource
+  Socket
+  ServerSocket
+Class
+  BasicPacket
+  BasicStack
+  BasicPacketQueue
+  BasicSocket
+  BasicServerSocket
+  FilePacketSource
+  RandomPacketSource
+
+I look forward to using it.
+
+
+</pre>
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000477.html">[JOS-Kernel] Progress!</A></li>
+	<LI> Next message: <A HREF="000481.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#479">[ date ]</a>
+              <a href="thread.html#479">[ thread ]</a>
+              <a href="subject.html#479">[ subject ]</a>
+              <a href="author.html#479">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

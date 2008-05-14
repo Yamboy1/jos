@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf updates</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:draft%40fear.ch">
+   <LINK REL="Previous"  HREF="000295.html">
+   <LINK REL="Next" HREF="000297.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf updates</H1>
+    <B>Thomas Bocek</B> 
+    <A HREF="mailto:draft%40fear.ch"
+       TITLE="[JOS-Kernel] decaf updates">draft@fear.ch</A><BR>
+    <I>Wed, 25 Aug 1999 13:21:11 +0200 (CEST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000295.html">[JOS-Kernel] decaf updates</A></li>
+        <LI> Next message: <A HREF="000297.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#296">[ date ]</a>
+              <a href="thread.html#296">[ thread ]</a>
+              <a href="subject.html#296">[ subject ]</a>
+              <a href="author.html#296">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hi all
+
+I updated the vga driver, made some bugfixes, added a stop routine that
+switches to the previous video mode and a bitblt to draw sprites (I  hate
+bit shiftings *g*). Found 2 bugs in the jvm -&gt; idiv and irem. 
+
+I will update (send code to John-&gt; still no cvs access) the code when
+the general driver implementation is done (end of this week, I guess).
+
+The problem is the speed: I think we (Hilary?, you have done something
+similar) should implement a native memcopy to speed up the vga output. 
+
+vga and speed:
+To avoid flickering, you have to write into the vga-mem when the vertical
+retrace is active. the memcopy should be finished before the vertical
+retrace ends. If not, you will see the sprite flickering. The current
+speed of the write8/16/32 is to slow to finish before the vertical retrace
+gets inactive.
+
+
+Thomas Bocek
+
+
+On Wed, 25 Aug 1999, Todd L. Miller wrote:
+
+&gt;<i> 	Implemented synchronized methods; implemented virtual consoles in
+</I>&gt;<i> a java daemon, `consoled', though I've decided against implementing a
+</I>&gt;<i> screen-redraw hack, waiting for the VGA driver to mature instead.  Began
+</I>&gt;<i> to implement throws/exceptions for the native code, within interp.cc.
+</I>&gt;<i> Tried to do a little housecleaning w.r.t. to the tools/ directory in CVS.
+</I>&gt;<i> 
+</I>&gt;<i> 	Hopefully, I didn't break anything.  Added a few builtins for
+</I>&gt;<i> keyboard emulation (very basic) and to allow the vga driver to 'run.'  (At
+</I>&gt;<i> least, with 24 MB on the emulation's heap, until the JVM halts, out of
+</I>&gt;<i> memory.)
+</I>&gt;<i> 
+</I>&gt;<i> 	Up next is testing checking if a method is native before trying to
+</I>&gt;<i> look it up in the builtins hash, which may lead to classpath integration
+</I>&gt;<i> (and a fully functional class library!).  Or maybe getting GC to work, but
+</I>&gt;<i> we'll see.
+</I>&gt;<i> 
+</I>&gt;<i> -_Quinn
+</I>&gt;<i> 
+</I>&gt;<i> 
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> Kernel maillist  -  <A HREF="mailto:Kernel@jos.org">Kernel@jos.org</A>
+</I>&gt;<i> <A HREF="http://jos.org/mailman/listinfo/kernel">http://jos.org/mailman/listinfo/kernel</A>
+</I>&gt;<i> 
+</I>
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000295.html">[JOS-Kernel] decaf updates</A></li>
+	<LI> Next message: <A HREF="000297.html">[JOS-Kernel] decaf updates</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#296">[ date ]</a>
+              <a href="thread.html#296">[ thread ]</a>
+              <a href="subject.html#296">[ subject ]</a>
+              <a href="author.html#296">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

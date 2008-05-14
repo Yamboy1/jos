@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Calling for Directory Designs!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:al%40outworld.org">
+   <LINK REL="Previous"  HREF="000034.html">
+   <LINK REL="Next" HREF="000036.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Calling for Directory Designs!</H1>
+    <B>Al</B> 
+    <A HREF="mailto:al%40outworld.org"
+       TITLE="[JOS-Kernel] Calling for Directory Designs!">al@outworld.org</A><BR>
+    <I>Fri, 09 Apr 1999 17:27:31 +0300</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000034.html">[JOS-Kernel] Calling for Directory Designs!</A></li>
+        <LI> Next message: <A HREF="000036.html">[JOS-Kernel] 2nd Edition of Java VM spec finally available</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#35">[ date ]</a>
+              <a href="thread.html#35">[ thread ]</a>
+              <a href="subject.html#35">[ subject ]</a>
+              <a href="author.html#35">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Guan Yang wrote:
+
+&gt;<i> /user/system  /* All the stuff in /system that the user has access
+</I>&gt;<i>    to. Perhaps /system should be executable-only?
+</I>&gt;<i>    This should be represented in a simplefied manner.
+</I>&gt;<i>    (In Linux, executable on directories mean that you
+</I>&gt;<i>    can see what's in them.) */
+</I>
+This, though, implies that the system can change from user to user.
+Since system classes have system access, would not this impose a
+security hole? If you make system classes that don't have system access,
+why name them system?
+
+How about something more security oriented, like:
+
+/jos/                         // JOS home
+/jos/system/                  // JOS System
+/jos/system/vm/               // Virtual Machine
+/jos/system/vm/bin/           // native executable code, if any
+/jos/system/vm/lib/           // run time Java (latest version)
+/jos/system/vm/lib/ext/       // standard Java extensions
+/jos/system/lib/              // jos.* and org.jos.*
+/jos/system/lib/ext/          // system add-ons by root
+/jos/system/lib/services/     // services added by root
+/jos/system/registry/         // preferences and central registry
+
+I am not quite sure what else is needed, but this looks good (it is also
+similar to the JDK hierarchy).
+
+-- 
+
+      &quot;Learn from others' mistakes, for you won't live long
+          enough to make them all yourself...&quot;
+___________________________________________________________________
+[EMAIL: mailto:<A HREF="mailto:al@outworld.org">al@outworld.org</A>] [DSS: 0xDBEF8ECC | RSA: 0xBC469499]
+[URL: <A HREF="http://www.outworld.org/people/al/">http://www.outworld.org/people/al/</A> ]  [<A HREF="mailto:spambait@outworld.net">spambait@outworld.net</A>]
+DO NOT SEND ME UNSOLICITED COMMERCIAL, RELIGIOUS OR POLITICAL EMAIL
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000034.html">[JOS-Kernel] Calling for Directory Designs!</A></li>
+	<LI> Next message: <A HREF="000036.html">[JOS-Kernel] 2nd Edition of Java VM spec finally available</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#35">[ date ]</a>
+              <a href="thread.html#35">[ thread ]</a>
+              <a href="subject.html#35">[ subject ]</a>
+              <a href="author.html#35">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

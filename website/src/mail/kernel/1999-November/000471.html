@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] Progress!</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:R.Argentini%40student.tudelft.nl">
+   <LINK REL="Previous"  HREF="000503.html">
+   <LINK REL="Next" HREF="000472.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] Progress!</H1>
+    <B>Ranieri Argentini</B> 
+    <A HREF="mailto:R.Argentini%40student.tudelft.nl"
+       TITLE="[JOS-Kernel] Progress!">R.Argentini@student.tudelft.nl</A><BR>
+    <I>Sat, 20 Nov 1999 08:12:03 +0100</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000503.html">[JOS-Kernel] Progress</A></li>
+        <LI> Next message: <A HREF="000472.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#471">[ date ]</a>
+              <a href="thread.html#471">[ thread ]</a>
+              <a href="subject.html#471">[ subject ]</a>
+              <a href="author.html#471">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>There was soemthing wrong with my subscriptio, and now the moderator got
+his own personal copy! Cheers moderator! :)
+
+&gt;<i>there's a noticeable lag when you have to scroll lines at the bottom of
+</I>&gt;<i>the screen.
+</I>
+If i remember correctly both Linux and it predecessor (minix) use hardware
+scrolling.
+You might want to add that functionality to either the console or the vga
+driver.
+
+&gt;<i>In other news, it looks like some people are trying to
+</I>&gt;<i>put together an IP stack, and I might take a small detour and oblige them
+</I>&gt;<i>with a serial driver (if I can find docs!) to test against Linux SLIP***.
+</I>
+I'm sorry to sound so negative, but the stack is going to take a while to
+reach useable (tcp) level. Don't expect it to be fast either. Usually this
+code uses some tyical C approaches to memory, arrays, structs, unions and
+typecasts that force me to do most of my packet parsing with byte to byte
+copies.
+As a i said on the Arch list, tcp is going to be a major hassle to implement.
+
+On a lighter note, i would like JEPS (as i like to call the stack) to be
+more or less compatible with the way jjos handles its classes
+(NetworkInterfaceDriver is already a superclass of
+jos.platform.driver.Device), do any of you kernel persons have any hints on
+that?
+
+One other thing, if i have to handle multiple interfaces, i can't allow a
+call to any of them to block. The neat way of handling this would be the
+windows WaitForMultipleEvent way ..
+Pass it a list of events and wake me when one arrives. Then i can service
+it and wait upon that event list again. 
+Is an event structure like this going to be implemented?
+
+Ranieri Argentini. 
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000503.html">[JOS-Kernel] Progress</A></li>
+	<LI> Next message: <A HREF="000472.html">[JOS-Kernel] Progress!</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#471">[ date ]</a>
+              <a href="thread.html#471">[ thread ]</a>
+              <a href="subject.html#471">[ subject ]</a>
+              <a href="author.html#471">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

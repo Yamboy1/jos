@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] interrupt handling</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT">
+   <LINK REL="Previous"  HREF="000433.html">
+   <LINK REL="Next" HREF="000444.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] interrupt handling</H1>
+    <B>Corrado Santoro</B> 
+    <A HREF="mailto:Corrado.Santoro%40IIT.UNICT.IT"
+       TITLE="[JOS-Kernel] interrupt handling">Corrado.Santoro@IIT.UNICT.IT</A><BR>
+    <I>Tue, 26 Oct 1999 16:53:13 +0200</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000433.html">[JOS-Kernel] interrupt handling</A></li>
+        <LI> Next message: <A HREF="000444.html">[JOS-Kernel] interrupt handling</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#442">[ date ]</a>
+              <a href="thread.html#442">[ thread ]</a>
+              <a href="subject.html#442">[ subject ]</a>
+              <a href="author.html#442">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hummm.... Todd (or Quinn?)....
+I think your third possibility is very good... however...:
+a) what do you think about making (with a programmer option) an interrupt
+service thread NON-INTERRUPTABLE or, anyway, allowing a priority-based
+interrupt management ?
+b) I don't know if, in the future, it will be implemented a kind of memory
+management based on swapping. In this case, any interrupt service thread must
+not be swapped!
+
+Bye,
+	Corrado
+
+On Sun, 24 Oct 1999, Todd L. Miller wrote:
+&gt;<i> 
+</I>&gt;<i> 	The third possibility is a hybrid of the two.  Have a well-known
+</I>&gt;<i> class, say jos.system.machine, which has [add|remove]InterruptListener
+</I>&gt;<i> methods adding listeners to a well-known (constant static***) array of
+</I>&gt;<i> vectors therein. The kernel can then extract this information and schedule
+</I>&gt;<i> the interested threads appropriately (i.e. at the top of the queue,
+</I>&gt;<i> aborting the current thread).  This solution is efficient, exposes the
+</I>&gt;<i> internals of the scheduler minimally to the Java, and imposes minimal
+</I>&gt;<i> restrictions on the Java code.  Combined with a timer mechanism
+</I>&gt;<i> (jos.system.machine.setTimer()?) (and native support for it!), this should
+</I>&gt;<i> make the driver writers' jobs much simpler.  It should also translate
+</I>&gt;<i> pretty closely into the JavaOS/B model whenever we might implement it.
+</I>--
+======================================================
+Eng. Corrado Santoro - PhD Student
+
+Unversity of Catania - Engineering Faculty
+Institute of Computer Science and Telecommunications
+Viale A. Doria, 6 - 95125 CATANIA (ITALY)
+
+Tel: +39 095 7382365           Fax: +39 095 7382397
+
+EMail: <A HREF="mailto:csanto@iit.unict.it">csanto@iit.unict.it</A>
+Personal Home Page:
+            <A HREF="http://www.cdc.unict.it/~csanto">http://www.cdc.unict.it/~csanto</A>
+
+ARCA Mobile Agent Framework Home Page:
+            <A HREF="http://netra.cdc.unict.it/ARCA">http://netra.cdc.unict.it/ARCA</A>
+======================================================
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000433.html">[JOS-Kernel] interrupt handling</A></li>
+	<LI> Next message: <A HREF="000444.html">[JOS-Kernel] interrupt handling</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#442">[ date ]</a>
+              <a href="thread.html#442">[ thread ]</a>
+              <a href="subject.html#442">[ subject ]</a>
+              <a href="author.html#442">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

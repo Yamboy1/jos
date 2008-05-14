@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] new interrupt model</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000446.html">
+   <LINK REL="Next" HREF="000448.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] new interrupt model</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] new interrupt model">tmiller@haverford.edu</A><BR>
+    <I>Wed, 27 Oct 1999 14:38:26 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000446.html">[JOS-Kernel] new interrupt model</A></li>
+        <LI> Next message: <A HREF="000448.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#447">[ date ]</a>
+              <a href="thread.html#447">[ thread ]</a>
+              <a href="subject.html#447">[ subject ]</a>
+              <a href="author.html#447">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Is it possible to dispatch/register more than one interrupt?
+</I>
+	Yes.  That's part of what make this model so much more flexible
+than the other one.  handleInterupt() is declared with an int parameter,
+which is the interrupt number, so you can check which one fired.
+
+&gt;<i> The fdc-driver (not event based) has 2 lines in &quot;handleInterrupt&quot; I hope
+</I>&gt;<i> that is not time critical. Or does this driver has to be event based too?
+</I>
+	The event basis is just to notify you about the interrupt.  Two
+lines is actually quite a bit less than what the keyboard driver has right
+now (it loops over the keyboard controller until it stops sending new
+scancodes), but that's because the the driver would miss data otherwise.
+To make it clear: I have removed the wait()-based model while implementing
+this one (they aren't really compatible).  If you choose to use some other
+model internally in your code, it shouldn't really matter that much; your
+handleInterrupt() method would just update the varibles your driver thread
+is looking at.  (For instance, the driver thread could .wait() on
+something in the driver object, to be notified() by handleInterrupt().)
+
+&gt;<i> The &quot;jos.platform.driver.screen&quot; function is hooked into
+</I>&gt;<i> classpath ,probably with the reflection-class, and will decide which
+</I>&gt;<i> driver to load (Vga,Matrox or whatever) and there will also be  
+</I>&gt;<i> jos.platform.driver.networt, jos.platform.driver.hd,....
+</I>
+	Right.  If we know that a particular platform object will need
+different drivers on a finer-grained level than platform (i386/host/etc),
+it can be constructed such that jos.platform.driver.screen is an object
+factory, returning driver objects as appropriate.  The drivers could, for
+instance, all be implemented against the JavaOS/B specs without changing
+the appearance of the JOSBox (or whatever).  Sub-packages of jos.platform
+are OK, too, if we need them.
+
+-_Quinn
+
+
+</pre>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000446.html">[JOS-Kernel] new interrupt model</A></li>
+	<LI> Next message: <A HREF="000448.html">[JOS-Kernel] Static members and process model.</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#447">[ date ]</a>
+              <a href="thread.html#447">[ thread ]</a>
+              <a href="subject.html#447">[ subject ]</a>
+              <a href="author.html#447">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf fixes</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000207.html">
+   <LINK REL="Next" HREF="000215.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf fixes</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf fixes">tmiller@haverford.edu</A><BR>
+    <I>Mon, 9 Aug 1999 20:17:26 -0400 (EDT)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000207.html">[JOS-Kernel] Driver writing</A></li>
+        <LI> Next message: <A HREF="000215.html">[JOS-Kernel] Re: decaf fixes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#214">[ date ]</a>
+              <a href="thread.html#214">[ thread ]</a>
+              <a href="subject.html#214">[ subject ]</a>
+              <a href="author.html#214">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>in jos/util/Queue.java, on or about line 16, the constructor:
+
+  data = new Object[Q_SIZE+1];
+
+in common/decaf/interp.cc, on or about line 2618, in frame::instanceof:
+
+  /* catches null java objects... */
+  if ( cast_from == NULL )
+    {
+      op_stack.push_jint( 0 );
+      return true;
+    }
+
+&quot;			&quot;, on or about line 1215, in frame::checkcast:
+
+	return true;
+
+
+	No big fixes, just a trio of stupid oversights on my part.
+Haven't tested this against the i386 build, but I can't think of a reason
+why it wouldn't work.  (FYI, this came in the course of testing out an
+implementation of virtual consoles.  I don't know if any of you'd have
+come across this problem in your work, but I'd appreciate it, JM, if you
+could put them in when you can; my sources are still too far divorced from
+CVS to make a merge something worthwhile.)
+
+-_Quinn
+
+
+
+</pre>
+
+
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000207.html">[JOS-Kernel] Driver writing</A></li>
+	<LI> Next message: <A HREF="000215.html">[JOS-Kernel] Re: decaf fixes</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#214">[ date ]</a>
+              <a href="thread.html#214">[ thread ]</a>
+              <a href="subject.html#214">[ subject ]</a>
+              <a href="author.html#214">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>

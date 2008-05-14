@@ -1,0 +1,205 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [JOS-Kernel] decaf update &amp; the keyboard driver</TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:tmiller%40haverford.edu">
+   <LINK REL="Previous"  HREF="000008.html">
+   <LINK REL="Next" HREF="000010.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[JOS-Kernel] decaf update &amp; the keyboard driver</H1>
+    <B>Todd L. Miller</B> 
+    <A HREF="mailto:tmiller%40haverford.edu"
+       TITLE="[JOS-Kernel] decaf update &amp; the keyboard driver">tmiller@haverford.edu</A><BR>
+    <I>Sat, 27 Mar 1999 02:39:32 -0500 (EST)</I>
+    <P><UL>
+        <LI> Previous message: <A HREF="000008.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+        <LI> Next message: <A HREF="000010.html">[JOS-Kernel] Re: decaf update &amp; the keyboard driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#9">[ date ]</a>
+              <a href="thread.html#9">[ thread ]</a>
+              <a href="subject.html#9">[ subject ]</a>
+              <a href="author.html#9">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>&gt;<i> Before I get started, again good work on the JVM.
+</I>
+	Thanks.  Assuming all goes well, we should be debugging the
+JIT/adaptive compiler this time next year...
+
+&gt;<i> But, geez, a comment on my code?  Even *I* have trouble understanding it at
+</I>
+	That might explain why I had so many questions :)
+
+&gt;<i> So the reading and interpreting of the keystrokes, and the
+</I>&gt;<i> layers of abstraction for the keyboard drivers, is pretty much what I
+</I>&gt;<i> currently have in mind as a final cut (pending changes from the group, of
+</I>&gt;<i> course).
+</I>
+	Okay.  I'm curious, though, about the keyboard acknowledge code
+you use.  What's the difference between the way I acknowledge the keyboard
+(returning a constant 0xAE) and yours (returning the scancode plus/minus
+some bitmasks)?  (Since mine seems to work... bearing in mind that my
+understanding of keyboard h/w is based on a loose reading of the linux
+source.)
+ 
+&gt;<i> The PrimaryHardwareManager doesn't just have to be the i/o bus you're talking
+</I>&gt;<i> to - it could be the computer (w/o network) as a whole.  But the idea is the
+</I>&gt;<i> same - it passes off requests to allocate every kind of resource to the
+</I>&gt;<i> appropriate resource manager.
+</I>
+	Okay; I think you worded it differently in your docs.  (Although I
+suppose one could construe the whole computer as a bus in some virtual
+sense.)  The important part of your above statement, then, is that the PHM
+is responsible for deciding what's appropriate, right?
+
+&gt;<i> &gt; [HardwareResourceInterface]
+</I>&gt;<i> And adding security, so you can't access non-allocated memory, I/O ports,
+</I>&gt;<i> whatever.
+</I>
+	Hm.  Any ideas on how this would be implemented?  (esp. w.r.t. the
+java 1.2 security model?)
+
+[ InterruptInterface ]
+
+	I'm not sure what I was thinking here, on further review of the
+code.  I probably just didn't write the right class name in due to a brain
+skip; but ISAKeyboard2 *does* need to be rewritten -- or, perhaps
+preferably, interruptinterface (or whatever the equivalent in the new &amp;
+improved system is) accesses the hardware/is accessed by the hardware
+correctly.
+
+&gt;<i> That's been the current line of debate (If I follow what you're saying) - how
+</I>&gt;<i> to deal with interrupt calls.  We may want to put this in a category of an
+</I>&gt;<i> &quot;OS-wide event system&quot;, either asynchronous or synchronous events; that way we
+</I>&gt;<i> can expand this idea to an extremely generic fashion, and possibly (much later
+</I>&gt;<i> on) include distributable events under this system.  But that's a discussion
+</I>&gt;<i> all into itself.
+</I>
+	I'm thinking now that for all intents and purposes, it truly
+doesn't matter how things are actually handled in the resource allocation
+system so long as the ResourceInterfaces (or equivalents) hide it away;
+we can, therefore, punt on the discussion until such a time that it
+becomes important.  Basically, InterruptResourceInterface is directly
+equivalent to InterruptDispatcher, if I'm reading the code correctly, in
+that it distributes kernel-generated interrupts to the proper listeners.
+InterruptResourceInterface handles letting the kernel know where to
+dispatch interrupts by a native method register() whereas
+InterruptDispatcher is hard-coded into the kernel.  So long as register()
+only allows one dispatcher/resource interface, we're fine.  And not having
+the interrupt distributor hard-coded is probably the Right Thing to do
+anyway.
+
+&gt;<i> &gt; [jos.system.keyboard handles keyboardinterperter]
+</I>&gt;<i> That's fine - it would save the users a heck of a lot of time trying to
+</I>&gt;<i> remember how to query for the keyboard driver and handle errors, all wrapped
+</I>&gt;<i> up in a neat package.
+</I>
+	That's the idea, alright.  This automagically, BTW, allows for
+global shortcut keys, because there's no reason the keyboardinterperter
+couldn't generate AWT (or other) events while it's running its merry way
+through the decoding.
+
+&gt;<i> Sun says in its KeyEvent file that it retains the right to change the VK_*
+</I>&gt;<i> mappings at any time, hence add support for additional keyboards.  So we (in
+</I>&gt;<i> our infinite wisdom) could just make a Kernel version of the
+</I>&gt;<i> java.awt.events.KeyEvent class without all the awt overhead, which uses our
+</I>&gt;<i> own VK_* mappings for any keyboard we come across.
+</I>
+	It's not so much remapping the VK_* that's a problem as it is the
+VK_* concept that would seem to fail when you're talking about languages
+where the character set is not the same (much less where the character set
+has accents on it!).  Although I suppose there's no reason VK_A couldn't
+always map to the first character of a set, one wonders about character
+sets with more than 26 letters in their alphabet.  But I suppose that we
+(in our infinite wisdom) could retain the right to change the kernel VK_*
+mappings at any time as well... anyway, this is a problem I'm more than
+happy to punt on.
+
+&gt;<i> That's a double negative - how about &quot;it has safely attained platform
+</I>&gt;<i> independance&quot;?
+</I>
+	grammar should be a four-letter-word, no?  (though I don't think
+independence as an 'a' in it...)
+
+&gt;<i> For branching devices.  Mainly for maintenance purposes, so you can clearly
+</I>&gt;<i> see under the device configuration &quot;oh, my PCI bus (a DeviceManager) has a
+</I>&gt;<i> Modem and a Sound Card (plain Devices, under the DeviceManager)&quot;.  It may not
+</I>&gt;<i> be all that important.  My newbetter system under design solves this in a more
+</I>&gt;<i> efficient way (and more logically, too).
+</I>
+	Ah.  Makes sense now.  It seemed to be a rather empty class, and I
+suppose that it was.  
+
+&gt;<i> One was the &quot;true&quot; driver using my hardwareResources package, and the other
+</I>&gt;<i> used the published driver specs.  That was the only difference, and to show
+</I>&gt;<i> just how easy it is to create a device hierarchy with inheritence.
+</I>
+	I finally figured this out after reading the InterruptInterface
+code for the third time.  *sigh*
+ 
+&gt;<i> &gt;  The method overloads don't appear to be necessary or desirous.
+</I>&gt;<i> alright.  I'll give you that.
+</I>
+	And I'll grant you that it did show it was very easy to create
+device heirarchy -- had I understood that was the point :)
+
+&gt;<i> Ah, again I aim your attention to the newbetter specs.  I can send you the
+</I>&gt;<i> current copy if you missed it the first time through; I'm figuring out the
+</I>&gt;<i> specific details now, so it's not complete, but it gives a general overview.
+</I>
+	You know, I had read them and then completely forgotten about
+them, but they do (upon re-reading) seem very well done.  I'm looking
+forward to some code.  What kind of time-frame are you looking at?  (There
+are any number of things I could do with the kernel depending on how far
+away it is; but if it's too far off, I might go ahead and write in a
+subset of your work to get the self-hosting stuff started, which is where
+things ought to get interesting and start revealing bugs in decaf.)  BTW:
+currently inner classes are totally unsupported.  It might be a quick fix
+(i.e. read the innerclass attribute) or it might not, depending on what,
+exactly, the the innerclass's special 'needs' are.  Reading the section in
+the VM spec I've got handy was not particularly illuminating; I'll
+probably just have to play around for a while to make sense of it.
+
+&gt;<i> This was the intention - have a generic abstract class to encapsulate the
+</I>&gt;<i> generally used functions, then the subclasses (concrete device
+</I>&gt;<i> implementations) fill in the architecture-specific parts.  I may have failed
+</I>&gt;<i> in a few points, though.
+</I>
+	I wouldn't worry about it.  My structure comment is more closely
+related to how the build tree (i.e. arch/*/bytecode) is setup now than to
+how inheritance is or is not implemented.  Having identically-named
+but totally different classes in different places in Java is a little bit
+of a mindshift.  (Not a large one!  the jb*/jj* convention in JJOS proper
+was good preparation and signals how things should probably be done,
+which is to say archKeyboard and not ISAKeyboard, though archKeyboard
+will probably just redirect to ISAKeyboard except in the presence of the
+dread USBKeybord.  But I digress... and it will hopefully not be my
+problem anyway!)
+
+	Anyway, thanks for the good feedback and the good work.
+-_Quinn
+
+
+
+</pre>
+
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI> Previous message: <A HREF="000008.html">[JOS-Kernel] decaf update &amp; the keyboard driver</A></li>
+	<LI> Next message: <A HREF="000010.html">[JOS-Kernel] Re: decaf update &amp; the keyboard driver</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#9">[ date ]</a>
+              <a href="thread.html#9">[ thread ]</a>
+              <a href="subject.html#9">[ subject ]</a>
+              <a href="author.html#9">[ author ]</a>
+         </LI>
+       </UL>
+</body></html>
