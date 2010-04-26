@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+<HTML>
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+    <TITLE>GnuTextutilsRevisited.Imported @ jos.sf.net</TITLE>
+  </HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- The FORM encloses the entire header, because it renders better that way. !-->
+<FORM ACTION="/jump.php"><input type="hidden" name="PHPSESSID" value="57d6ed82d0b6a5599aca0cbf8b1b2f1f" />
+
+<!-- The JOS logo. !-->
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR VALIGN="TOP" ALIGN="LEFT">
+	<TD><A HREF="http://cjos.sourceforge.net/archive/"><IMG 
+		VSPACE="0" HSPACE="0" ALIGN="MIDDLE" BORDER="0"
+		SRC="image/wikiHome.gif"></A></TD>
+	<!-- The tab table. !-->
+	<TD WIDTH="100%" ALIGN="RIGHT" BGCOLOR="#FFFFFF" VALIGN="BOTTOM"> 
+		<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%" ALIGN="RIGHT">
+			<TR VALIGN="MIDDLE" ALIGN="LEFT">
+
+<TD BGCOLOR="White" WIDTH="60%">&nbsp;</TD>
+<TD BGCOLOR="#FFFFCC"><A HREF="http://cjos.sourceforge.net/archive/">Home</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/info/">Info</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/dev/">DevZone</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFCC66" ALIGN="CENTER"><A
+HREF="http://jos.sourceforge.net/">Wiki</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+			</TR>
+			<TR>
+				<TD BGCOLOR="#FFCC66" ALIGN="RIGHT" COLSPAN="9">
+					<A HREF="UsersWebHome.html">UsersWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="MainWebHome.html">MainWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="InfoWebHome.html">InfoWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="DevZoneWebHome.html">DevZoneWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="SupportWebHome.html">SupportWeb</A>
+				</TD>
+			</TR>
+		</TABLE>
+	</TD>		
+</TR>
+<!-- The WikiHeader. !-->
+<TR><TD COLSPAN="2">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="CENTER">
+		<B>[&nbsp;<! page="">GnuTextutilsRevisited</a>&nbsp;]</B>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="CENTER">
+		<B>[ not logged in ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="CENTER">
+		<B>[ Web: <a href="ImportedWebHome.html">Imported</a> ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFCC66" VALIGN="CENTER">
+		goto:&nbsp;<INPUT TYPE="TEXT" SIZE="10" NAME="topic"><!--<INPUT TYPE="IMAGE" SRC="/media/go.gif?PHPSESSID=57d6ed82d0b6a5599aca0cbf8b1b2f1f" BORDER="0" VALUE="topic" ALT="goto">!-->&nbsp;<! page=""><FONT SIZE="-1">options</FONT></a>
+	</TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+	<TR>
+	<TD ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="TOP">
+		[&nbsp;get <! page="">info</a> on or <a href="WebHome.html">edit</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="TOP">
+		[&nbsp;<! page="">login</a> or <! page="">new&nbsp;user</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="TOP">
+		[&nbsp;list of <a href="Glossary.html">topics</a>, <! page="">hubs&nbsp;&amp;&nbsp;nodes</a>, or <a href="NewArticles2a.html">recent&nbsp;changes</a>&nbsp;]	</TD>
+	</TR>
+</TABLE>
+
+<!-- From CommonHeader !-->
+</TR></TD>
+</TABLE>
+</FORM>
+
+<!-- start BODY page !-->
+<P>
+The <a href="GNU.html">GNU</a> textutil package (see ftp search engine or any prep mirror) 
+contains 26 utilities for different purposes, all at least related to handling of 8-bit text, from the commandline or through scripts. This paper tries to set priorities regarding their usefulness in <! page="">JOS</a> or in Java, in general. Comments and additions to the paper are welcome. 
+</P><P>
+The textutils can be divided in several groups:
+<UL> <LI> mainly used for text database handling (TDB),
+<LI> mainly used for text formatting (TF),
+<LI> checksumming tools,
+<LI> tools useful for development,
+<LI> tools often used from the CLI,
+<LI> other tools.
+</UL> 
+In the following, we'll discuss the need for the tools from the various group in order to set priorities for implementation within the <a href="JosAccessories.html">JosAccessories</a> group. Apart from probably being incomplete, the offered conclusions are in no way intended as binding for the 
+<! page="">JOS</a> effort. YMMV. 
+</P><P>
+__Text Database Tools__
+</P><P>
+The use for text files as databases is tradition in Un*x but questionable in JOS. The implementation of <! page="">TDB</a> tools is not high priority. 
+</P><P>
+__Text Formatting Tools__
+</P><P>
+With <a href="HTML.html">HTML</a> the minimum, and <a href="XML.html">XML</a> the optimal choice for all documents in JOS, there is no need for <! page="">ASCII</a> text formatting. Not needed. 
+</P><P>
+__Checksumming Tools__
+</P><P>
+MD5 may be slower than simpler checksum programs but it is cryptographically secure and thus should be preferred. A shasum would be an idea, and the original cksum(1) might provide both a CRC-32 and a fast Adler CRC. High priority. The 16bit sum(1) should be tossed. 
+</P><P>
+__Development Tools__ 
+</P><P>
+expand(1), unexpand(1), nl(1) might be useful for development. Medium 
+priority. 
+</P><P>
+__Often used tools__ 
+</P><P>
+wc(1), cat(1), head(1), split(1), tail(1) are used often from the CLI, by me anyway. High priority. 
+</P><P>
+__Others__
+</P><P>
+There are some tools that are not used often but might make interesting beans, like fold(1) and tr(1). Totally unneeded are ansi2knr(1), od(1), system(1). 
+</P><P>
+This leads to the following priorities: 
+</P><P>
+<UL> <LI> ansi2knr - C stuff, null
+<LI> cat - needed for <a href="CLI.html">CLI</a> and scripts, high 
+<LI> cksum - use Java CRC32 and Adler32, high 
+<LI> comm - TDB, not needed, low 
+<LI> csplit - TDB, not needed, low
+<LI> cut - TDB, not needed, low 
+<LI> expand - needed for development, medium
+<LI> fmt - TF, use HTML/XML, null
+<LI> fold - maybe a useful bean, medium 
+<LI> head - often used in CLI, high 
+<LI> join - TDB, not needed, low 
+<LI> md5sum - needed, high 
+<LI> nl - needed for development, medium 
+<LI> od - deprecated, use hexdump(1), null 
+<LI> paste - TDB, not needed, low 
+<LI> pr - TF, use HTML/XML, null 
+<LI> sort - TDB, not needed, low 
+<LI> split - needed, high 
+<LI> sum - not needed, null 
+<LI> system - huh, what for?, null 
+<LI> tac - TDB, not needed, low 
+<LI> tail - often used in CLI, high 
+<LI> tr - maybe a useful bean, low 
+<LI> unexpand - needed for development, medium 
+<LI> uniq - TDB, not needed, low 
+<LI> wc - implemented 
+</UL> 
+<HR> 
+-- <a href="RalfStephan.html">RalfStephan</a>, 19-Nov-97<BR><BR></P><!--
+
+<TABLE width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="737b9c">
+<TR><TD ALIGN="CENTER">
+<! page="">login</a> or <! page="">new&nbsp;user</a><TR><TD>
+</TABLE>
+
+!-->
+<!-- end BODY page !-->
+
+<HR>
+
+<DIV ALIGN="CENTER">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR>
+	<TD ALIGN="CENTER" COLSPAN="2">
+		Content of these pages are owned and copyrighted by the poster.
+	</TD>
+</TR>
+<TR>
+	<TD ALIGN="RIGHT" WIDTH="50%">
+		Hosted by:
+	</TD>
+	<TD ALIGN="LEFT">
+		<A HREF="http://sourceforge.net/"><IMG 
+			SRC="http://sourceforge.net/sflogo.php?group_id=2376&type=1"
+			BORDER=0 HSPACE=0 VSPACE=0></A>
+	</TD>
+</TR>
+</TABLE>
+</DIV>
+</BODY>
+</HTML>

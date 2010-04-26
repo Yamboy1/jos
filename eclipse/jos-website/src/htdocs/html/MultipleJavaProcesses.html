@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+<HTML>
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+    <TITLE>MultipleJavaProcesses.Imported @ jos.sf.net</TITLE>
+  </HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- The FORM encloses the entire header, because it renders better that way. !-->
+<FORM ACTION="/jump.php"><input type="hidden" name="PHPSESSID" value="2b091e8a4df88756ed833c99ac04ba82" />
+
+<!-- The JOS logo. !-->
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR VALIGN="TOP" ALIGN="LEFT">
+	<TD><A HREF="http://cjos.sourceforge.net/archive/"><IMG 
+		VSPACE="0" HSPACE="0" ALIGN="MIDDLE" BORDER="0"
+		SRC="image/wikiHome.gif"></A></TD>
+	<!-- The tab table. !-->
+	<TD WIDTH="100%" ALIGN="RIGHT" BGCOLOR="#FFFFFF" VALIGN="BOTTOM"> 
+		<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%" ALIGN="RIGHT">
+			<TR VALIGN="MIDDLE" ALIGN="LEFT">
+
+<TD BGCOLOR="White" WIDTH="60%">&nbsp;</TD>
+<TD BGCOLOR="#FFFFCC"><A HREF="http://cjos.sourceforge.net/archive/">Home</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/info/">Info</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/dev/">DevZone</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFCC66" ALIGN="CENTER"><A
+HREF="http://jos.sourceforge.net/">Wiki</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+			</TR>
+			<TR>
+				<TD BGCOLOR="#FFCC66" ALIGN="RIGHT" COLSPAN="9">
+					<A HREF="UsersWebHome.html">UsersWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="MainWebHome.html">MainWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="InfoWebHome.html">InfoWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="DevZoneWebHome.html">DevZoneWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="SupportWebHome.html">SupportWeb</A>
+				</TD>
+			</TR>
+		</TABLE>
+	</TD>		
+</TR>
+<!-- The WikiHeader. !-->
+<TR><TD COLSPAN="2">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="CENTER">
+		<B>[&nbsp;<! page="">MultipleJavaProcesses</a>&nbsp;]</B>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="CENTER">
+		<B>[ not logged in ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="CENTER">
+		<B>[ Web: <a href="ImportedWebHome.html">Imported</a> ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFCC66" VALIGN="CENTER">
+		goto:&nbsp;<INPUT TYPE="TEXT" SIZE="10" NAME="topic"><!--<INPUT TYPE="IMAGE" SRC="/media/go.gif?PHPSESSID=2b091e8a4df88756ed833c99ac04ba82" BORDER="0" VALUE="topic" ALT="goto">!-->&nbsp;<! page=""><FONT SIZE="-1">options</FONT></a>
+	</TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+	<TR>
+	<TD ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="TOP">
+		[&nbsp;get <! page="">info</a> on or <a href="WebHome.html">edit</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="TOP">
+		[&nbsp;<! page="">login</a> or <! page="">new&nbsp;user</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="TOP">
+		[&nbsp;list of <a href="Glossary.html">topics</a>, <! page="">hubs&nbsp;&amp;&nbsp;nodes</a>, or <a href="NewArticles2a.html">recent&nbsp;changes</a>&nbsp;]	</TD>
+	</TR>
+</TABLE>
+
+<!-- From CommonHeader !-->
+</TR></TD>
+</TABLE>
+</FORM>
+
+<!-- start BODY page !-->
+<P>
+	Processes can be defined as two or more threads with disjoint
+memory spaces, where each group of threads (<! page="">ThreadGroup</a> or not) which
+shares a memory space constituting a process.  Because Java lacks
+pointers, disjoint namespaces are sufficient to ensure disjoint memory
+spaces.  (So long as object references are not shared between the threads we wish to distinguish as separate processes.)  Java namespaces are managed by classloaders; therefore, disjoint classloaders generate processes.
+</P><P>
+	While Java lacks pointers, and is therefore that much less
+vulnerable to the class of potential problems usually cited as motivation for establishing (conventional, native) processes in (conventional, native-code-oriented) operating systems, the single-process assumptions made in the Java class libraries and virtual machine spec lend us ample reason to desire multiple Java processes.  (Where my desire is to pass the 'ultimate test': piping the output of one legacy program into the input of another.)  The desire for multiple Java processes in a single <! page="">JVM</a> stems from two sources: first, the <a href="JJOS.html">JJOS</a> kernel's current lack of multiple native
+processes (that is, we can't take the 'easy way out' and run multiple
+instances of decaf); second, the potential space efficiency benefits.	 Most elegant implentations of multiple processes require shared-object IPC, if for nothing aside from the created process object.  (Strictly, the process object returned to the creating function could be a message-passing stub, like RMI.)
+</P><P>
+	The insight of disjoint classloaders generating processes combined with an examination of the <! page="">JVM</a> spec leads to the realization that we must 'clarify' it to allow more than a single primordial classloader <a href="#fn6">[6]</a>.  A Java application can not (and must not) be able to distinguish between running in its own (conventional) <! page="">JVM</a> and in its own primordial classloader.  That is, the from the application's point of view, a <! page="">JVM</a> is comprised of the statics in the classes returned by findSystemClass().  This clarification, then, gives us multiple processes in a single JVM, but quite inefficiently (sp?).  Efficiency is gained by sharing class definitions <a href="#fn3">[3]</a>, which are the portions of class invariant under writes to static variables.  (From the implementation standpoint, a class definition is the everything in the native representation of class that isn't the value of the statics.)  This sharing of class definitions -- that is,
+/not/ reloading the whole class library for each process -- must be done very carefully to ensure two things: type-safety <a href="#fn1">[1]</a> and transparency.  (That is, legacy applications must behave identically in decaf with multiple processes as in decaf with a single process.)
+</P><P>
+	A share may be attempted if and only if <a href="#fn4">[4]</a>
+</P><P>
+<UL>
+<LI>
+(1) The class definitions involved are identical.  This may be	 determined in an implementation-dependent manner <a href="#fn5">[5]</a>. Likewise, implementations would determine when to check for class definition shares based on their criteria for quality.
+</LI>
+<LI>
+(2) The classloader which is defining the class is a (native) <a href="#fn2">[2]</a> primordial class loader, and the cached class definition under consideration for sharing was also loaded/defined by a (native) <a href="#fn2">[2]</a> primordial class loader.
+</LI>
+</UL>
+</P><P>
+	These conditions have two sources; the source for rule one is
+rather obvious.  The source for rule two is the requirement that legacy programs which utilize custom classloaders must operate properly; that is, custom classloaders do not expect to share definitions unless they explicitly arrange for it, and it appears to be impossible to assure the correctness of any implicit sharing we may arrange.
+</P><P>
+</P><P>
+	With processes and an object-oriented language, the natural
+extension is object-oriented IPC.  Message-based OO-IPC is already handled by the class libraries and conventional <! page="">JVM</a> spec.  (See my earlier mail about Serializable and RMI.)  Shared-memory (shared-object) OO-IPC requires special handling by the JVM.  Without a spec, we (JOS) may define our own.  The key realization for shared-memory OO-IPC is that the classloaders, being disjoint, do not share classes, and thus, the object can not be cast from one process to another.  We solve this by allowing 'illegal' cast operations as follows:
+</P><P>
+<UL><LI>
+(1) The security system must OK the object share.  This can be done in an implementation-specific manner; efficiency may be gained in checking for 'illegal' cast operations in various ways by taking advantage of this requirement.
+</LI><LI>
+(2) The object's class definition must be shared between the two	 processes.  (Implying it was loaded by a (native) <a href="#fn2">[2]</a> primordial	classloader.)
+</LI></UL>
+</P><P>
+	Furthermore, we must assure that native methods are accessible
+from any classloader which would 'normally' (e.g. in another <! page="">JVM</a>
+process) have access.  Currently, as <a href="JJOS.html">JJOS</a> / <a href="decaf.html">decaf</a> has one library and one revision of it loadable at a time, we don't need to worry about this; everyone's native calls resolve the same way.  Later, it seems that a model more-or-less identical to the one above described for sharing class definitions would be applicable to native methods; in fact, in may be possible to fold the location (e.g. instance of loaded library for this classloader) into the class definition, and have everything work out auto-magically.  (I'll need to read up more on libraries for this.)
+</P><P>
+	Once an object is shared, it must explicitly generate additional shares if it wishes to share objects.  Otherwise, objects generated by that shared object for a process will remain specific to that process.  Objects generated before the share will retain their ownership.  This ought to take care of everything.
+</P><P>
+-_Quinn
+</P><P>
+<a name="fn1">[1]</a> Amusingly enough, Java isn't
+<a href="http://www.research.att.com/~vj/bug.html">type-safe</a> anyway, though this may have been
+<a href="http://java.sun.com/people/gbracha/classloaders.ps">fixed</a>
+in the 1.2 JDK.  Likewise, Java's memory model -- which I'm mostly ignoring, in part because of this -- is horribly <a href="http://www.cs.umd.edu/~pugh/java/">broken</a>.  
+</P><P>
+<a name="fn2">[2]</a> Gilbert has some very interesting ideas about Java primordial classloaders that I must admit I'm avoiding because they'd confuse things (or me, anyway!) immensely before I get the processes thing nailed down.
+</P><P>
+<a name="fn3">[3]</a> A later refinement (like the above footnote) may be gained by utilising a bytecode cache; see other emails for my thoughts on that.  Like the previous footnote, I'm ignoring a perfectly good idea because it might confuse me.
+</P><P>
+<a name="fn4">[4]</a> The phrase "if and only if" means I'm suggesting that when these conditions are met, you /must/ share the definition.
+</P><P>
+<a name="fn5">[5]</a> Ryan suggests classfile/archive location and modification date.  Gilbert suggested integration with the bytecode cache, and a straight call to memcmp(); I've commented on both of these before.  However, it occured to me that location &amp; date could utilise URIs instead of filenames, which would allow the primordial (java or otherwise) classloaders to do more interesting things and still share class definitions; one would expect the classloaders which implement remote URIs to use a bytecode cache.
+</P><P>
+<a name="fn6">[6]</a> Ryan's rheise.os package demonstrating that a very large chunk of the functionality can be duplicated with smoke &amp; mirrors rather than native support. :)
+</P><P>
+-- <a href="ToddMiller.html">ToddMiller</a> - 25 Apr 100
+</P><P>
+/* hey, look I found a y2k bug in wiki! */ 
+</P><P>
+</P><P><BR><BR></P><!--
+
+<TABLE width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="737b9c">
+<TR><TD ALIGN="CENTER">
+<! page="">login</a> or <! page="">new&nbsp;user</a><TR><TD>
+</TABLE>
+
+!-->
+<!-- end BODY page !-->
+
+<HR>
+
+<DIV ALIGN="CENTER">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR>
+	<TD ALIGN="CENTER" COLSPAN="2">
+		Content of these pages are owned and copyrighted by the poster.
+	</TD>
+</TR>
+<TR>
+	<TD ALIGN="RIGHT" WIDTH="50%">
+		Hosted by:
+	</TD>
+	<TD ALIGN="LEFT">
+		<A HREF="http://sourceforge.net/"><IMG 
+			SRC="http://sourceforge.net/sflogo.php?group_id=2376&type=1"
+			BORDER=0 HSPACE=0 VSPACE=0></A>
+	</TD>
+</TR>
+</TABLE>
+</DIV>
+</BODY>
+</HTML>

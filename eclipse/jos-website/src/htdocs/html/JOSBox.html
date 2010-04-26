@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+<HTML>
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+    <TITLE>JOSBox.Imported @ jos.sf.net</TITLE>
+  </HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- The FORM encloses the entire header, because it renders better that way. !-->
+<FORM ACTION="/jump.php"><input type="hidden" name="PHPSESSID" value="eab2d43bc3b588399f0e9cd98ba05dc0" />
+
+<!-- The JOS logo. !-->
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR VALIGN="TOP" ALIGN="LEFT">
+	<TD><A HREF="http://cjos.sourceforge.net/archive/"><IMG 
+		VSPACE="0" HSPACE="0" ALIGN="MIDDLE" BORDER="0"
+		SRC="image/wikiHome.gif"></A></TD>
+	<!-- The tab table. !-->
+	<TD WIDTH="100%" ALIGN="RIGHT" BGCOLOR="#FFFFFF" VALIGN="BOTTOM"> 
+		<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%" ALIGN="RIGHT">
+			<TR VALIGN="MIDDLE" ALIGN="LEFT">
+
+<TD BGCOLOR="White" WIDTH="60%">&nbsp;</TD>
+<TD BGCOLOR="#FFFFCC"><A HREF="http://cjos.sourceforge.net/archive/">Home</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/info/">Info</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/dev/">DevZone</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFCC66" ALIGN="CENTER"><A
+HREF="http://jos.sourceforge.net/">Wiki</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+			</TR>
+			<TR>
+				<TD BGCOLOR="#FFCC66" ALIGN="RIGHT" COLSPAN="9">
+					<A HREF="UsersWebHome.html">UsersWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="MainWebHome.html">MainWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="InfoWebHome.html">InfoWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="DevZoneWebHome.html">DevZoneWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="SupportWebHome.html">SupportWeb</A>
+				</TD>
+			</TR>
+		</TABLE>
+	</TD>		
+</TR>
+<!-- The WikiHeader. !-->
+<TR><TD COLSPAN="2">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="CENTER">
+		<B>[&nbsp;<! page="">JOSBox</a>&nbsp;]</B>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="CENTER">
+		<B>[ not logged in ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="CENTER">
+		<B>[ Web: <a href="ImportedWebHome.html">Imported</a> ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFCC66" VALIGN="CENTER">
+		goto:&nbsp;<INPUT TYPE="TEXT" SIZE="10" NAME="topic"><!--<INPUT TYPE="IMAGE" SRC="/media/go.gif?PHPSESSID=eab2d43bc3b588399f0e9cd98ba05dc0" BORDER="0" VALUE="topic" ALT="goto">!-->&nbsp;<! page=""><FONT SIZE="-1">options</FONT></a>
+	</TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+	<TR>
+	<TD ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="TOP">
+		[&nbsp;get <! page="">info</a> on or <a href="WebHome.html">edit</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="TOP">
+		[&nbsp;<! page="">login</a> or <! page="">new&nbsp;user</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="TOP">
+		[&nbsp;list of <a href="Glossary.html">topics</a>, <! page="">hubs&nbsp;&amp;&nbsp;nodes</a>, or <a href="NewArticles2a.html">recent&nbsp;changes</a>&nbsp;]	</TD>
+	</TR>
+</TABLE>
+
+<!-- From CommonHeader !-->
+</TR></TD>
+</TABLE>
+</FORM>
+
+<!-- start BODY page !-->
+<P>
+<FONT SIZE="-1"><a href="PlatformAPIPages.html">PlatformAPIPages</a></FONT>
+<HR SIZE="1" NOSHADOW>
+<H4>Introduction</H4>
+<P>A JOSBox is part of <a href="JOSystem.html">JOSystem</a>. It is critical to the success of the <! page="">JOS</a> Project. The time has come to gather together more information about this layer of the JOS architecture and its impact on the performance of a JOS JVM.</P>
+<HR>
+<BLOCKQUOTE><EM>The JOSBox would start and load JOSCore...</EM> - <a href="DigiGod.html">DigiGod</a> <A HREF="JOSystem.html">[3]</A></BLOCKQUOTE>
+<P>In other words, the first bytecode interpreted by a JOSBox must be stored inside JOSCore. When written in machine code on a foreign processor, the JOSBox is loaded and started by a boot loader. It contains a kernel and JVM. The <! page="">JVM</a> interprets bytecode, starting with the <CODE>init</CODE> class stored in JOSCore. The <CODE>init</CODE> class performs a similar start up sequence on every implementation of JOSBox. Through custom configuration and <! page="">JVMSpecificClasses</a>, a JOSBox can perform any data processing function.</P>
+<P>From the start up sequence, a JOSBox must be initialized first and then the JOSBox starts JOSCore. Here is the start-up sequence from the bottom up.</P>
+<TABLE BORDER="1" CELLPADDING="10" BGCOLOR="#FFFFCC">
+<TR>
+<TD ALIGN="CENTER">
+<STRONG>boot loader</STRONG>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+<STRONG>JOSBox</STRONG>
+<TABLE BORDER="1" CELLPADDING="4" BGCOLOR="#FFCC00">
+<TR>
+<TD ALIGN="CENTER">
+<STRONG>kernel</STRONG>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+<STRONG>virtual machine</STRONG>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+<STRONG>JOSCore</STRONG>
+</TD>
+</TR>
+</TABLE>
+<P>By keeping JOSBox separate from the kernel and <a href="VirtualMachine.html">VirtualMachine</a>, we can build one JOSCore that runs on many implementations of JOSBox. While there is only one implemenation of JOSCore, there are many implementation of JOSBox.</P>
+<P>When a class in JOSCore uses a native method, that method is part of the native method API between JOSCore and any JOSBox. While it is not required for JOS to use the <! page="">JavaNativeInterface</a> as the mechanism for JOSCore to call JOSBox, something like the Java Native Interface is required. Something must be invented to cross the barrier between Java code and its native methods.</P>
+<P>Pure bytecode application will run on JOS. A custom package must use JOSCore to implement what might otherwise be implemented in a shared library. Sorry, but your typical shared (or dynamic link) library will not run on JOS. It must be recompiled to meet the requirements of the JOSBox. The format of shared libraries, calling convention and many other details are yet to be discovered. -- <a href="GilbertHerschberger.html">GilbertHerschberger</a> (17 November 1999)</P>
+</P><P>
+<HR>
+</P><P>
+From a traditional OS standpoint, <a href="DeviceDrivers.html">DeviceDrivers</a> need to have some place where they can be referenced from, and where they are discovered. Drivers are not part of <a href="JOSBox.html">JOSBox</a>, nor are they part of <a href="JOSCore.html">JOSCore</a>, yet they are <EM>used</EM> by <a href="JOSCore.html">JOSCore</a> to help implement the <tt>java.<STRONG></tt> and <tt>javax.</STRONG></tt> packages.
+</P><P>
+The <a href="JavaOS.html">JavaOS</a> for Business documents describe in detail the device discovery and usage mechanisms. Discovery of devices does not belong in the above diagram, as the diagram describes how the APIs build upon one another, whereas the discovery is a process performed by an <a href="API.html">API</a> layer.  The devices operate in a layer within the JOSBox (according to our model), since they use both native and Java code.
+</P><P>
+The discussion of <a href="DeviceDrivers.html">DeviceDrivers</a> may seem out of place here, but they are critical to the operation of the OS. Where they stand in relation to the packages which use them, and which the drivers depend on, is one of the architecture's foundation.
+</P><P>
+-- <a href="MattAlbrecht.html">MattAlbrecht</a> - 17 Nov 1999
+<HR>
+<BLOCKQUOTE><EM>The JOSBox is the computer were writing this OS for, in a sense. It is the virtual hardware the <a href="JOSystem.html">JOSystem</a> "kernel" is running on, if someone made this into real hardware a modified JOSystem would run JOS on it directly. It is the true kernel and the JVM.</EM> -- <a href="DigiGod.html">DigiGod</a></BLOCKQUOTE>
+<P>The JOSBox is an <STRONG>abstraction of hardware</STRONG>. It is the low-level stuff that must be written with native code. It is limited to computer processors and I/O chips on the processor bus. It deals with RAM, hardware interrupts, and <a href="DMA.html">DMA</a> channels.</P>
+<P>The JOSBox isn't the high level operating system stuff you might have grown accustomed to. It uses very few of high level concepts. It does not contain a driver for your favorite printer. It doesn't even contain a driver for a printer device. Rather, it contains the lowest level mechanism of writing a byte to any port, reading a byte from any port, initializing a port and checking on low level port status. -- <a href="GilbertHerschberger.html">GilbertHerschberger</a> (17 November 1999)</P><BR><BR></P><!--
+
+<TABLE width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="737b9c">
+<TR><TD ALIGN="CENTER">
+<! page="">login</a> or <! page="">new&nbsp;user</a><TR><TD>
+</TABLE>
+
+!-->
+<!-- end BODY page !-->
+
+<HR>
+
+<DIV ALIGN="CENTER">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR>
+	<TD ALIGN="CENTER" COLSPAN="2">
+		Content of these pages are owned and copyrighted by the poster.
+	</TD>
+</TR>
+<TR>
+	<TD ALIGN="RIGHT" WIDTH="50%">
+		Hosted by:
+	</TD>
+	<TD ALIGN="LEFT">
+		<A HREF="http://sourceforge.net/"><IMG 
+			SRC="http://sourceforge.net/sflogo.php?group_id=2376&type=1"
+			BORDER=0 HSPACE=0 VSPACE=0></A>
+	</TD>
+</TR>
+</TABLE>
+</DIV>
+</BODY>
+</HTML>

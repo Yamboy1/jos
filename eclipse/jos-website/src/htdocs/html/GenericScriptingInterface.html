@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+<HTML>
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+    <TITLE>GenericScriptingInterface.Imported @ jos.sf.net</TITLE>
+  </HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- The FORM encloses the entire header, because it renders better that way. !-->
+<FORM ACTION="/jump.php"><input type="hidden" name="PHPSESSID" value="a9457a500d1bda694b7baf51586f73a0" />
+
+<!-- The JOS logo. !-->
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR VALIGN="TOP" ALIGN="LEFT">
+	<TD><A HREF="http://cjos.sourceforge.net/archive/"><IMG 
+		VSPACE="0" HSPACE="0" ALIGN="MIDDLE" BORDER="0"
+		SRC="image/wikiHome.gif"></A></TD>
+	<!-- The tab table. !-->
+	<TD WIDTH="100%" ALIGN="RIGHT" BGCOLOR="#FFFFFF" VALIGN="BOTTOM"> 
+		<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%" ALIGN="RIGHT">
+			<TR VALIGN="MIDDLE" ALIGN="LEFT">
+
+<TD BGCOLOR="White" WIDTH="60%">&nbsp;</TD>
+<TD BGCOLOR="#FFFFCC"><A HREF="http://cjos.sourceforge.net/archive/">Home</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/info/">Info</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/dev/">DevZone</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFCC66" ALIGN="CENTER"><A
+HREF="http://jos.sourceforge.net/">Wiki</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+			</TR>
+			<TR>
+				<TD BGCOLOR="#FFCC66" ALIGN="RIGHT" COLSPAN="9">
+					<A HREF="UsersWebHome.html">UsersWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="MainWebHome.html">MainWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="InfoWebHome.html">InfoWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="DevZoneWebHome.html">DevZoneWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="SupportWebHome.html">SupportWeb</A>
+				</TD>
+			</TR>
+		</TABLE>
+	</TD>		
+</TR>
+<!-- The WikiHeader. !-->
+<TR><TD COLSPAN="2">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="CENTER">
+		<B>[&nbsp;<! page="">GenericScriptingInterface</a>&nbsp;]</B>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="CENTER">
+		<B>[ not logged in ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="CENTER">
+		<B>[ Web: <a href="ImportedWebHome.html">Imported</a> ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFCC66" VALIGN="CENTER">
+		goto:&nbsp;<INPUT TYPE="TEXT" SIZE="10" NAME="topic"><!--<INPUT TYPE="IMAGE" SRC="/media/go.gif?PHPSESSID=a9457a500d1bda694b7baf51586f73a0" BORDER="0" VALUE="topic" ALT="goto">!-->&nbsp;<! page=""><FONT SIZE="-1">options</FONT></a>
+	</TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+	<TR>
+	<TD ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="TOP">
+		[&nbsp;get <! page="">info</a> on or <a href="WebHome.html">edit</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="TOP">
+		[&nbsp;<! page="">login</a> or <! page="">new&nbsp;user</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="TOP">
+		[&nbsp;list of <a href="Glossary.html">topics</a>, <! page="">hubs&nbsp;&amp;&nbsp;nodes</a>, or <a href="NewArticles2a.html">recent&nbsp;changes</a>&nbsp;]	</TD>
+	</TR>
+</TABLE>
+
+<!-- From CommonHeader !-->
+</TR></TD>
+</TABLE>
+</FORM>
+
+<!-- start BODY page !-->
+<P>
+<H2><B>GSI</B> - The Generic Scripting Interface</H2>
+<HR <! page="">NOBREAK</a> SIZE="1">
+The <! page="">GSI</a> is a generic way to encapsulate any scripting language in Java and allow communication between the two via a simple interface.
+</P><P>
+<H3><B>Basic API</B></H3>
+</P><P>
+<DL>
+ <DT><CODE>ScriptLoader</CODE> <FONT COLOR="blue">(abstract)</FONT>
+ <DD>Similiar to class loader, it loads a script (text or binary) into a script object. There is one per scripting language (like <! page="">LuaScriptLoader</a>).<BR><BR>
+ <DT><CODE>Script</CODE> <FONT COLOR="blue">(abstract)</FONT>
+ <DD>Encapsulates the script, starts interpretations via the abstract void execute() throws <CODE>ScriptException</CODE>;.<BR><BR>
+ <DT><CODE>Script.Element</CODE> <FONT COLOR="blue">(abstract inner)</FONT>
+ <DD>Represents an element of a script in a generic way, can be a function, global value or a class depending on the scripting language.<BR><BR>
+ <DT><CODE>Scriptable</CODE> <FONT COLOR="blue">(interface)</FONT>
+ <DD>Says a class can be linked to a script, one method public <CODE>ScriptInfo</CODE> getScriptInfo();.<BR><BR>
+ <DT><CODE>ScriptInfo</CODE>
+ <DD>Similiar to <! page="">BeanInfo</a>, encaps methods and variables that can be accesed by a <CODE>Script</CODE><BR><BR>
+ <DT><CODE>ScriptException</CODE>
+ <DD>The super for all Script related exceptions (<! page="">NoScriptFoundException</a>, <! page="">ScriptInterpeterationException</a>, et al.).<BR><BR>
+</DL>
+</P><P>
+<H3><B>Script as Application</B>:</H3>
+</P><P>
+One of the applications of <! page="">GSI</a> is a simple application that can run most any script (assuming its valid and can run solo (that is doesnt need an application to communicate with)) as an application:
+</P><P>
+&lt;CODE&gt;<PRE>
+package org.jos.apps;
+
+import org.jos.gsi.*;
+
+public class ScriptRunner {
+ private Script script;
+ 
+ public static void main(String args[]) {
+  ScriptRunner runner;
+  if(args.length &lt; 1) {
+	System.out.println("You must specify a script file in the command arguments.");
+	System.exit(1);
+  }
+  runner = new ScriptRunner(args[0]); //or is that args[1], I can never remember
+  runner.start();
+  System.exit(0);
+ }
+
+ public ScriptRunner(String scriptToRun) {
+  try {
+	script = ScriptLoader.load(scriptToRun)
+  } catch(ScriptException e) {
+	System.out.println(e);
+  }
+ }
+
+ public void start() {
+  try {
+	script.execute();
+  } catch(ScriptException e) {
+	System.out.println(e);
+  }
+ }
+}
+</PRE></CODE>
+</P><P>
+This app has no idea what script or even what language its running.
+</P><P>
+--DigiGod 99.08.01<BR><BR></P><!--
+
+<TABLE width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="737b9c">
+<TR><TD ALIGN="CENTER">
+<! page="">login</a> or <! page="">new&nbsp;user</a><TR><TD>
+</TABLE>
+
+!-->
+<!-- end BODY page !-->
+
+<HR>
+
+<DIV ALIGN="CENTER">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR>
+	<TD ALIGN="CENTER" COLSPAN="2">
+		Content of these pages are owned and copyrighted by the poster.
+	</TD>
+</TR>
+<TR>
+	<TD ALIGN="RIGHT" WIDTH="50%">
+		Hosted by:
+	</TD>
+	<TD ALIGN="LEFT">
+		<A HREF="http://sourceforge.net/"><IMG 
+			SRC="http://sourceforge.net/sflogo.php?group_id=2376&type=1"
+			BORDER=0 HSPACE=0 VSPACE=0></A>
+	</TD>
+</TR>
+</TABLE>
+</DIV>
+</BODY>
+</HTML>

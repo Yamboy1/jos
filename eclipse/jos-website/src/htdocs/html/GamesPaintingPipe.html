@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+<HTML>
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+    <TITLE>GamesPaintingPipe.Imported @ jos.sf.net</TITLE>
+  </HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- The FORM encloses the entire header, because it renders better that way. !-->
+<FORM ACTION="/jump.php"><input type="hidden" name="PHPSESSID" value="73d4cbf70227387dec926a3f9e670977" />
+
+<!-- The JOS logo. !-->
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR VALIGN="TOP" ALIGN="LEFT">
+	<TD><A HREF="http://cjos.sourceforge.net/archive/"><IMG 
+		VSPACE="0" HSPACE="0" ALIGN="MIDDLE" BORDER="0"
+		SRC="image/wikiHome.gif"></A></TD>
+	<!-- The tab table. !-->
+	<TD WIDTH="100%" ALIGN="RIGHT" BGCOLOR="#FFFFFF" VALIGN="BOTTOM"> 
+		<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%" ALIGN="RIGHT">
+			<TR VALIGN="MIDDLE" ALIGN="LEFT">
+
+<TD BGCOLOR="White" WIDTH="60%">&nbsp;</TD>
+<TD BGCOLOR="#FFFFCC"><A HREF="http://cjos.sourceforge.net/archive/">Home</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/info/">Info</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/dev/">DevZone</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFCC66" ALIGN="CENTER"><A
+HREF="http://jos.sourceforge.net/">Wiki</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+			</TR>
+			<TR>
+				<TD BGCOLOR="#FFCC66" ALIGN="RIGHT" COLSPAN="9">
+					<A HREF="UsersWebHome.html">UsersWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="MainWebHome.html">MainWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="InfoWebHome.html">InfoWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="DevZoneWebHome.html">DevZoneWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="SupportWebHome.html">SupportWeb</A>
+				</TD>
+			</TR>
+		</TABLE>
+	</TD>		
+</TR>
+<!-- The WikiHeader. !-->
+<TR><TD COLSPAN="2">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="CENTER">
+		<B>[&nbsp;<! page="">GamesPaintingPipe</a>&nbsp;]</B>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="CENTER">
+		<B>[ not logged in ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="CENTER">
+		<B>[ Web: <a href="ImportedWebHome.html">Imported</a> ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFCC66" VALIGN="CENTER">
+		goto:&nbsp;<INPUT TYPE="TEXT" SIZE="10" NAME="topic"><!--<INPUT TYPE="IMAGE" SRC="/media/go.gif?PHPSESSID=73d4cbf70227387dec926a3f9e670977" BORDER="0" VALUE="topic" ALT="goto">!-->&nbsp;<! page=""><FONT SIZE="-1">options</FONT></a>
+	</TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+	<TR>
+	<TD ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="TOP">
+		[&nbsp;get <! page="">info</a> on or <a href="WebHome.html">edit</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="TOP">
+		[&nbsp;<! page="">login</a> or <! page="">new&nbsp;user</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="TOP">
+		[&nbsp;list of <a href="Glossary.html">topics</a>, <! page="">hubs&nbsp;&amp;&nbsp;nodes</a>, or <a href="NewArticles2a.html">recent&nbsp;changes</a>&nbsp;]	</TD>
+	</TR>
+</TABLE>
+
+<!-- From CommonHeader !-->
+</TR></TD>
+</TABLE>
+</FORM>
+
+<!-- start BODY page !-->
+<P>
+<EM>Article contributed by <a href="MattAlbrecht.html">MattAlbrecht</a></EM>
+</P><P>
+</P><P>
+<h2>Introduction</h2>
+</P><P>
+Java provides a unique environment for supporting games. Unlike most other game platforms, Java doesn't support low-level, down-n-gritty programming that most game developers have come to love.  Instead, Java forces us to focus on design (shock!) and efficient algorithms (horror!).
+</P><P>
+One primary good thing that Java does provide is threads and easy synchronization. This helps to distribute the work-load and better break up the processing jobs into logical units of work.
+</P><P>
+When dealing with the graphics under the hood of Java, one must proceed with caution to avoid being crushed by bad code and lack of understanding of the underlying plumbing.
+</P><P>
+<h2>Triple Buffering</h2>
+</P><P>
+For a purist, Java by itself, when interacting with the AWT, is a partial double-buffer. However, since a line draw method call to the base <! page="">AWT</a> causes a line to appear on the screen, without waiting for a finish call or something, the AWT's activity is similar to a single-buffer. That is, whatever is put on the buffer is immediately put on the screen. This has a big problem of causing "flickering" on the display.
+</P><P>
+A common technique is the double-buffer, which means that an off-screen image buffer is drawn to before it is passed to the <! page="">AWT</a> for display. This removes most of the flickering. However, it still puts the drawing processing into the <! page="">AWT</a> event thread, which harms overal system performance.
+</P><P>
+A more viable alternative for graphics-intensive applications is a threaded drawing framework, in which drawing is done first to an off-screen image buffer in thread A, then it is passed to the <! page="">AWT</a> event thread for display there. The greatest difficulty with this solution is synchronizing between the two threads. If the <! page="">AWT</a> event thread is processing, waiting to <tt>repaint()</tt> your component, thread A may be drawing over that buffer, in preparation for the next frame. The solution is to create two buffers, one for the <! page="">AWT</a> event thread to display, and one to draw to. Hence, this technique is often called "triple-buffering". It poses many problems, where the two threads can often wait on each other to finish, causing deadlock. But when these problems are solved, triple-buffering can be a powerful tool.
+</P><P>
+This is fine and dandy for the classic games programmer, who is used to doing all graphics rendering under a single thread. However, Java gives us more flexibility than a single-threaded approach. A more robust implementation can be forged with a Painting Pipeline.
+</P><P>
+<h2>The Painting Pipeline</h2>
+</P><P>
+One common approach to drawing graphics in most text-books is the idea of a "pipeline" - the image drawing and processing proceeds through several phases to divide the work into segments.  These segments can be removed and recombined to make various drawing jobs easier.
+</P><P>
+With most systems out today, the pipeline has almost vanished, as efficient coding forces loop unrolling, and combination of routines to remove the calling overhead. Threads help pull these apart again.
+</P><P>
+Now, we can put each unit of work into a thread. The end threads process raw data, producing a refined object to be sent in a Queue (or pipe) to the listening thread. A listening (middle-tier) thread can listen to multiple other threads (end and middle). These combine data and do more refining. The last threads push these elements onto the screen.
+</P><P>
+<h2>Example</h2>
+</P><P>
+A simple tile-based adventure game has several layers of tiles.  At the bottom is the map itself, consisting of a grid of images covering the screen.  Above this could be low-level static objects, like rocks and bushes.  Above this could be the moving Actors, and above this could be trees and other such things.  These non-bottom layers do not cover the whole screen.  Instead, it has a few pixels it wants to draw on top of the lower levels.
+</P><P>
+Using a painting pipeline, we can have a thread per layer.  Each layer  would send to its listener an image with a location in a Queue.  The listening layer would collect and sort these incoming images, and output them in-order to its listening thread (level C) when the layer image outputter reports that it's done.  Level C assembles a big image to be displayed on the screen (for double-buffering purposes). As each layer declares its completion, they are added onto the buffer. These layers can only be painted to the buffer when the layer below it has finished painting.  (For those inclined to know, this is a simple z-ordering problem).
+</P><P>
+That's the first cut. Additional optimizations can be added onto this. For instance, it is known that the bottom layer will <EM>always</EM> fill the entire screen, and all other layers most probably will not cover the entire bottom layer, and all those layers can only be drawn when the bottom layer has finished. So, we could cause Level C to create the bottom image, only making slight modifications to it based on any screen adjustments (thus reducing the number of drawImage() calls).  Then Level C would proceed to paint each layer onto this new image.
+</P><P>
+<h2>Problems and Solutions</h2>
+</P><P>
+There are some major implementation details that need to be discovered and solved before one can proceed to make this work. 
+</P><P>
+First off is synchronizing all the threads. The threads need to be able to work together efficiently and smoothly. When the frame has been drawn, all the threads need to be woken up to start drawing again. There can be some optimizations in this, but we cannot allow a thread, which is going onto the next frame, send drawing events to the listening threads which are drawing the older frame.  Also, if for some reason the frame needs to have its drawing canceled and proceed to the next frame (say, that frame was way too complex and took far to long to draw), there needs to be a way to interrupt the drawing threads and quit if need be.
+</P><P>
+This was solved by forcing all painting routines to not catch <! page="">InterruptedException</a> errors (this includes the queue waiting for posted events). Also, if a painting routine has involved looping which may take a while, it should call <tt>Thread.isInterrupted()</tt> occationally to determine if an interrupt was generated on the thread. 
+</P><P>
+The glue of the pipeline is the queue. This is a simple queue which <tt>wait()</tt>s if a request for the next element is performed on an empty queue, and <tt>notify()</tt>s if an element was put into the empty queue. Once the initial synchronization problems are ironed out, this isn't a difficult piece of software to write. It has the advantage of conserving time with <tt>wait()</tt>s, rather than polling the queue.
+</P><P>
+A disadvantage to the queue is that it causes synchronization between frames to be difficult. Say a frame has finished drawing, and a interrupt is called to stop all drawing threads. The drawing threads should stop what they're doing, and wait for a start-of-frame signal in order to begin drawing the next frame. The problem arises when a thread pulling data from a queue stops. It can clear its queue and all sorts of tricks, but after it waits for the start-of-frame signal, any 
+thread pushing data into the queue can continue putting any number of events into the queue, which relate to the frame being stopped. When the pulling thread wakes up, it finds out-of-date events in the queue, without being able to distinguish which frames each event relatees to.
+</P><P>
+To solve this, we force each event posted to the queue to report which frame it relates to, and the queue knows which frame it's listening for. Older events are thrown out, current events are queued, while future events are stored in a separate queue. This way, the pulling thread updates the queue to its current frame, and listens to only the pressing frame events.
+</P><P>
+A difficulty arises from this solution: how to synchronize the frame number across threads. The current solution is to pass the current frame number to each pipeline thread during the start-of-frame event cycle. A problem could appear where a new thread is started and plugged into the pipeline after drawing has been going on for a while. Unless methods are taken, the new thread will think it's on frame 0 while all the other frames are in frame 12,960. But with the above solution, this mis-synchronization will only happen on the first frame. All other frames will give the new thread the correct frame number.
+</P><P>
+All these problems need to come together and combine with the basic Triple-Buffering solution (and synchronization problem) above. The eventual all-consuming pipeline ending thread is in charge of getting the completed image, and sending it to the <! page="">AWT</a> (or Swing) for rendering to the screen. A simple solution is to copy the received final image to another buffer, and send that to the AWT. However, this causes an unnecessary extra copy to add to the overhead. A better solution is to combine the final image construction with the triple-buffering solution.
+</P><P>
+</P><P>
+<h2>Framework</h2>
+</P><P>
+The basis behind everything in the <! page="">PaintingPipe</a> is the <tt>ThreadQueue</tt>, which implements methods to <tt>dequeue</tt>, which pulls an object out of the queue, or <tt>wait()</tt>s if it is empty, and <tt>enqueue</tt>, which pushes an object into the queue, and <tt>notify()</tt>s all waiting threads.
+</P><P>
+The subclass of this, used explicitly in the framework, is the <tt>PaintQueue</tt>, which allows only events implementing <tt>PaintEvent</tt> to be enqueued and dequeued. The <tt>PaintEvent</tt> interface specifies which frame it's associated with. The <tt>PaintQueue</tt> is constantly updated by its owner on which frame to look for. Events for old frames are thrown out, events for later frames are put in a future queue, and current frame events are put in the current queue.
+</P><P>
+The <tt>PainterThread</tt>, the meat of the framework, is the base class for each thread in the pipe. It can use metrics to monitor the performance of the pipe thread. It maintains the state of the painting thread in a way compatible with <! page="">JDK</a> 1.2 (i.e. it doesn't use <tt>suspend()</tt> or <tt>stop()</tt>). It also allows ways to interrupt the painting processing. Subclasses implement several "hooks" to add processing at critical points in the framework.
+</P><P>
+The subclasses created include an Output Painter, which only generates paint events. Another is the Pipe Painter, which receives paint events, and can output them. The Refresh Painter is in charge of passing refresh events to a graphics component, with the new frame's picture.
+</P><P>
+Several example subclasses include the Sorting Painter, with its specific Z-Ordering examples. Also is the Timer Thread, which pushes a Kill Frame Painting event after a time limit has been exceeded for a single frame, thus preventing the frame rate from going under a certain speed.
+</P><P>
+<h2>Implementation</h2>
+</P><P>
+This is included in the Source Code.
+</P><P>
+<h2>Source Code</h2>
+</P><P>
+You can e-mail the author (<a href="mailto:onewith1@flash.net">onewith1@flash.net</a>) in request for the source code. If there's enough positive feedback, I'll ship it to the <a href="CVS.html">CVS</a> server.
+</P><P>
+-- <a href="MattAlbrecht.html">MattAlbrecht</a> - 15 Nov 1999, 16 Nov 1999
+</P><P>
+</P><P>
+<HR>
+</P><P>
+<h1>Comments</h1>
+</P><P>
+<EM>Feel free to add comments, and correct grammar and spelling mistakes.</EM>
+</P><P>
+</P><P><BR><BR></P><!--
+
+<TABLE width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="737b9c">
+<TR><TD ALIGN="CENTER">
+<! page="">login</a> or <! page="">new&nbsp;user</a><TR><TD>
+</TABLE>
+
+!-->
+<!-- end BODY page !-->
+
+<HR>
+
+<DIV ALIGN="CENTER">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR>
+	<TD ALIGN="CENTER" COLSPAN="2">
+		Content of these pages are owned and copyrighted by the poster.
+	</TD>
+</TR>
+<TR>
+	<TD ALIGN="RIGHT" WIDTH="50%">
+		Hosted by:
+	</TD>
+	<TD ALIGN="LEFT">
+		<A HREF="http://sourceforge.net/"><IMG 
+			SRC="http://sourceforge.net/sflogo.php?group_id=2376&type=1"
+			BORDER=0 HSPACE=0 VSPACE=0></A>
+	</TD>
+</TR>
+</TABLE>
+</DIV>
+</BODY>
+</HTML>

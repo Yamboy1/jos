@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+<HTML>
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+    <TITLE>JosCommunicationBusArchitecture.Imported @ jos.sf.net</TITLE>
+  </HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- The FORM encloses the entire header, because it renders better that way. !-->
+<FORM ACTION="/jump.php"><input type="hidden" name="PHPSESSID" value="0f194fc7946e7be0c5bfec937ffedee1" />
+
+<!-- The JOS logo. !-->
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR VALIGN="TOP" ALIGN="LEFT">
+	<TD><A HREF="http://cjos.sourceforge.net/archive/"><IMG 
+		VSPACE="0" HSPACE="0" ALIGN="MIDDLE" BORDER="0"
+		SRC="image/wikiHome.gif"></A></TD>
+	<!-- The tab table. !-->
+	<TD WIDTH="100%" ALIGN="RIGHT" BGCOLOR="#FFFFFF" VALIGN="BOTTOM"> 
+		<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%" ALIGN="RIGHT">
+			<TR VALIGN="MIDDLE" ALIGN="LEFT">
+
+<TD BGCOLOR="White" WIDTH="60%">&nbsp;</TD>
+<TD BGCOLOR="#FFFFCC"><A HREF="http://cjos.sourceforge.net/archive/">Home</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/info/">Info</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/dev/">DevZone</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFCC66" ALIGN="CENTER"><A
+HREF="http://jos.sourceforge.net/">Wiki</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+			</TR>
+			<TR>
+				<TD BGCOLOR="#FFCC66" ALIGN="RIGHT" COLSPAN="9">
+					<A HREF="UsersWebHome.html">UsersWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="MainWebHome.html">MainWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="InfoWebHome.html">InfoWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="DevZoneWebHome.html">DevZoneWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="SupportWebHome.html">SupportWeb</A>
+				</TD>
+			</TR>
+		</TABLE>
+	</TD>		
+</TR>
+<!-- The WikiHeader. !-->
+<TR><TD COLSPAN="2">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="CENTER">
+		<B>[&nbsp;<! page="">JosCommunicationBusArchitecture</a>&nbsp;]</B>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="CENTER">
+		<B>[ not logged in ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="CENTER">
+		<B>[ Web: <a href="ImportedWebHome.html">Imported</a> ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFCC66" VALIGN="CENTER">
+		goto:&nbsp;<INPUT TYPE="TEXT" SIZE="10" NAME="topic"><!--<INPUT TYPE="IMAGE" SRC="/media/go.gif?PHPSESSID=0f194fc7946e7be0c5bfec937ffedee1" BORDER="0" VALUE="topic" ALT="goto">!-->&nbsp;<! page=""><FONT SIZE="-1">options</FONT></a>
+	</TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+	<TR>
+	<TD ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="TOP">
+		[&nbsp;get <! page="">info</a> on or <a href="WebHome.html">edit</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="TOP">
+		[&nbsp;<! page="">login</a> or <! page="">new&nbsp;user</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="TOP">
+		[&nbsp;list of <a href="Glossary.html">topics</a>, <! page="">hubs&nbsp;&amp;&nbsp;nodes</a>, or <a href="NewArticles2a.html">recent&nbsp;changes</a>&nbsp;]	</TD>
+	</TR>
+</TABLE>
+
+<!-- From CommonHeader !-->
+</TR></TD>
+</TABLE>
+</FORM>
+
+<!-- start BODY page !-->
+<P>
+<p><big>Communication Bus Architecture (CBA)</big></p>
+</P><P>
+<p>-- conceived of and written by Borne Mace</p>
+<p>Get the source! <a href="http://www.jos.org/source/org/jos/util/bus/">http://www.jos.org/source/org/jos/util/bus/</a> </p>
+</P><P>
+<p>Technologies Involved:
+</P><P>
+<ul>
+  <li>InfoBus 1.1</li>
+  <li>JDK 1.2</li>
+  <li>Servlet Extension</li>
+</ul>
+</P><P>
+<p>Objects Involved:
+</P><P>
+<ul>
+  <li>(class)BusMember</li>
+  <li>(class)BusEvent</li>
+  <li>(interface)BusMemberListener</li>
+  <li>(interface)BusMemberInterface</li>
+  <li>(class)TcpListenerManager</li>
+  <li>(class)TcpListener</li>
+  <li>(class)UdpListenerManager</li>
+  <li>(class)UdpListener</li>
+  <li>(interface)TcpConnectionListener</li>
+  <li>(interface)UdpConnectionListener</li>
+  <li>(class)ServletManager</li>
+  <li>(class)ServiceRegistry</li>
+</ul>
+</P><P>
+<p>Overview (Draft 2 (17-April-1998)):</p>
+</P><P>
+<p>The <! page="">CBA</a> has changed in scope a bit from its conception, and what I used to refer to as the <! page="">CBA</a> is now two separate entities, one still being referred to as the <! page="">CBA</a> and the other being the Massively Extensible Service Systems (MESS).</p>
+</P><P>
+<p>CBA Overview (Draft 1 (17-April-1998)):</p>
+</P><P>
+<p>The current concept is that there will be a main <a href="InfoBus.html">InfoBus</a> for the Jos JVM. &nbsp; Applications will need only implement the <! page="">BusMemberListener</a> interface and access the <a href="InfoBus.html">InfoBus</a> though the instantiation of a <! page="">BusMember</a> object.&nbsp; The <! page="">BusMember</a> object was
+developed to greatly simplify the process of connecting, listening, and posting to the <a href="InfoBus.html">InfoBus</a>.&nbsp; The application can register it's interest with the <! page="">BusMember</a>, and the <! page="">BusMember</a> can automatically filter incoming bus information so that the application only
+gets the information it is interested in.&nbsp; <! page="">BusEvent</a> are what is sent to the application from the <! page="">BusMember</a>, it is sent though the <! page="">BusMemberListener</a> interface. &nbsp; In this way, multiple classes can listen for incoming information from a single <! page="">BusMember</a> object.&nbsp; </p>
+</P><P>
+<p>The <! page="">BusMember</a> can hold information about the application it is acting as a proxy for.&nbsp; Information it can hold includes a name, description, and a list of attributes. &nbsp; These attributes can be any kind of object.&nbsp; The information is accessed through the <! page="">BusMemberInterface</a> interface.&nbsp; The <! page="">BusMembers</a> information holding
+capabilities are implemented using a <! page="">BeanDescriptor</a> object.</p>
+</P><P>
+<p>The <! page="">MESS</a> is being implemented using the CBA, this will be both a proof of concept for the <! page="">CBA</a> and an excellent example for integrating <! page="">CBA</a> capabilities quickly and easily into any application.&nbsp; The alpha release of the <! page="">CBA</a> is finished other then some additional documentation that needs to be done, for the alpha release a few lesser capabilities have not been implemented.</p>
+</P><P>
+<p>MESS Overview (Draft 1 (17-April-1998)):</p>
+</P><P>
+<p>The <! page="">MESS</a> involves most of what I explained in the 1st Draft of the CBA(below) and based on that you can see where I got the name.&nbsp; I will attempt to clarify it's capabilities a little further in this version of the document.</p>
+</P><P>
+<p>The alpha release of the <! page="">MESS</a> is based mainly on two objects, the <! page="">ServletManager</a> and the <! page="">TcpListenerManager</a>, so it will be those two objects and their interaction that I will explain further.</p>
+</P><P>
+<p>The <! page="">TcpListenerManager</a> will allow an object implementing the <! page="">TcpConnectionListener</a> interface to register as being interested in information about incoming connections on a certain <! page="">TCP</a> socket.&nbsp; At this point the <! page="">TcpListenerManager</a> will create a <! page="">TcpListener</a>
+to listen for incoming requests on that port.&nbsp; If there is already a <! page="">TcpListener</a> assigned to that port the requestor will be notified and no <! page="">TcpListener</a> will be created. &nbsp; If/When a connection comes in on a port a <! page="">TcpListener</a> is listening on, it will
+notify the requestor that a connection was made and pass the requestor the connection socket, the <! page="">TcpListener</a> will then go back to listening on the socket for more connections.</p>
+</P><P>
+<p>The <! page="">ServletManager</a> acts as a single point of control for most/all system services (such as an <a href="HTTP.html">HTTP</a> server, imap4 server, pop3 server, ftp server, etc..).&nbsp; These services will be implemented in the form of servlets.&nbsp; The <! page="">ServletManager</a> will register with the <! page="">TcpListenerManager</a> for it's servlets, and hand incoming client requests off to the appropriate servlet.&nbsp; Several services which the servlets may need (such as authentication and encryption services) could be offered at this <! page="">ServletManager</a> level.</p>
+</P><P>
+<p>Currently the <! page="">MESS</a> is implemented to the point that the <! page="">TcpListenerManager</a> can communicate with the <! page="">ServletManager</a> through the <! page="">CBA</a> but that is all.&nbsp; I have estimated an alpha release of the <! page="">MESS</a> by the 1st of May.&nbsp; At that point additional capabilities (such as the <! page="">ServiceRegistry</a> and <! page="">RMI</a> functionality) can be added before the beta release.</p>
+</P><P>
+<p>I have currently postponed the implementation of the <! page="">UdpListenerManager</a>, <! page="">UdpListener</a>, and <! page="">UdpConnectionListener</a> until a not yet determined point in the future. &nbsp; There is a lot more to get working before worrying about the lesser used datagrams.</p>
+</P><P>
+<p>Overview (Draft 1 (15-April-1998)):</p>
+</P><P>
+<p>Object communication and socket communication are somewhat different, and my approach attempts to combine the two together to support both old style socket services and RMI/IIOP compliant server side objects. The <! page="">JosServiceRegistry</a> would be in essence an
+RMIRegistry and support the registration of <! page="">RMI</a> Services and brokerage of <! page="">RMI</a> requests to the appropriate service. The <! page="">JosServletManager</a> would support the registration and invocation of servlets based on incoming TCP/UDP information from the <! page="">JosTcpListenerManager</a> and <! page="">JosUdpListenerManager</a>. The <! page="">ServletManager</a> would register interest in information (TCP or UDP) with the appropriate <! page="">ListenerManager</a>, at which point the <! page="">ListenerManager</a> would start up a Listener of the appropriate type on the appropriate port, and wait for incoming information. When incoming information was received the <! page="">ListenerManager</a> would notify whomever registered interest in the port that an incoming connection was received. This means objects other then the <! page="">JosServletManager</a> could use the <! page="">TCP</a> and <! page="">UDP</a> <! page="">ListenerManagers</a>. </p>
+</P><P>
+<p>The <! page="">JosServletManager</a> would implement <! page="">JosConnectionSubscriber</a> (as would any other object interested in receiving information about incoming connections) and the <! page="">ListenerManagers</a> would implement the <! page="">JosConnectionPublisher</a> interface. In this way multiple objects could receive information about incoming packets on a certain port. It is
+questionable whether information beyond the arrival of the connection should be distributed in this manner, since if multiple objects were given a handle to a tcp socket and used it greatly odd things could occur, then again, perhaps we want capabilities like
+that.</p>
+</P><P>
+<p>My reasoning behind the break up of the <! page="">TCP</a> and <! page="">UDP</a> <! page="">ListenerManagers</a> was two fold. First was because <! page="">TCP</a> and <! page="">UDP</a> network communications are very different and specialized
+managers should be faster at handling incoming connections. On the other hand, the <! page="">UDP</a> service may very well want a direct reference to it's <! page="">JosUdpListener</a> without the overhead of the <! page="">JosUdpListenerManager</a> in cases where streaming <! page="">UDP</a> information is coming across the
+network, and it could bog down the <! page="">JosUdpListenerManager</a>. I think it also feasible to run <! page="">RMI</a> in the same manner, and create the Server side <! page="">RMI</a> objects one the request comes in. In this was Servlets could often act as TCP, UDP, and <! page="">RMI</a> information handlers to provide a specific functionality across all network protocols.</p>
+</P><P>
+<p>Other then initial discovery I don't know to what point I currently want to use the <a href="InfoBus.html">InfoBus</a> technology, but lets all talk about this and hash out some concepts. I would like to get implementing this (or whatever we decide on) ASAP.</p><BR><BR></P><!--
+
+<TABLE width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="737b9c">
+<TR><TD ALIGN="CENTER">
+<! page="">login</a> or <! page="">new&nbsp;user</a><TR><TD>
+</TABLE>
+
+!-->
+<!-- end BODY page !-->
+
+<HR>
+
+<DIV ALIGN="CENTER">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR>
+	<TD ALIGN="CENTER" COLSPAN="2">
+		Content of these pages are owned and copyrighted by the poster.
+	</TD>
+</TR>
+<TR>
+	<TD ALIGN="RIGHT" WIDTH="50%">
+		Hosted by:
+	</TD>
+	<TD ALIGN="LEFT">
+		<A HREF="http://sourceforge.net/"><IMG 
+			SRC="http://sourceforge.net/sflogo.php?group_id=2376&type=1"
+			BORDER=0 HSPACE=0 VSPACE=0></A>
+	</TD>
+</TR>
+</TABLE>
+</DIV>
+</BODY>
+</HTML>

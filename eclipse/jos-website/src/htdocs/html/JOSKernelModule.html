@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+<HTML>
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+    <TITLE>JOSKernelModule.Imported @ jos.sf.net</TITLE>
+  </HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- The FORM encloses the entire header, because it renders better that way. !-->
+<FORM ACTION="/jump.php"><input type="hidden" name="PHPSESSID" value="c15f875dd3ab86ad473fbfa611a990ac" />
+
+<!-- The JOS logo. !-->
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR VALIGN="TOP" ALIGN="LEFT">
+	<TD><A HREF="http://cjos.sourceforge.net/archive/"><IMG 
+		VSPACE="0" HSPACE="0" ALIGN="MIDDLE" BORDER="0"
+		SRC="image/wikiHome.gif"></A></TD>
+	<!-- The tab table. !-->
+	<TD WIDTH="100%" ALIGN="RIGHT" BGCOLOR="#FFFFFF" VALIGN="BOTTOM"> 
+		<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%" ALIGN="RIGHT">
+			<TR VALIGN="MIDDLE" ALIGN="LEFT">
+
+<TD BGCOLOR="White" WIDTH="60%">&nbsp;</TD>
+<TD BGCOLOR="#FFFFCC"><A HREF="http://cjos.sourceforge.net/archive/">Home</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/info/">Info</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/dev/">DevZone</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFCC66" ALIGN="CENTER"><A
+HREF="http://jos.sourceforge.net/">Wiki</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+			</TR>
+			<TR>
+				<TD BGCOLOR="#FFCC66" ALIGN="RIGHT" COLSPAN="9">
+					<A HREF="UsersWebHome.html">UsersWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="MainWebHome.html">MainWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="InfoWebHome.html">InfoWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="DevZoneWebHome.html">DevZoneWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="SupportWebHome.html">SupportWeb</A>
+				</TD>
+			</TR>
+		</TABLE>
+	</TD>		
+</TR>
+<!-- The WikiHeader. !-->
+<TR><TD COLSPAN="2">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="CENTER">
+		<B>[&nbsp;<! page="">JOSKernelModule</a>&nbsp;]</B>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="CENTER">
+		<B>[ not logged in ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="CENTER">
+		<B>[ Web: <a href="ImportedWebHome.html">Imported</a> ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFCC66" VALIGN="CENTER">
+		goto:&nbsp;<INPUT TYPE="TEXT" SIZE="10" NAME="topic"><!--<INPUT TYPE="IMAGE" SRC="/media/go.gif?PHPSESSID=c15f875dd3ab86ad473fbfa611a990ac" BORDER="0" VALUE="topic" ALT="goto">!-->&nbsp;<! page=""><FONT SIZE="-1">options</FONT></a>
+	</TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+	<TR>
+	<TD ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="TOP">
+		[&nbsp;get <! page="">info</a> on or <a href="WebHome.html">edit</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="TOP">
+		[&nbsp;<! page="">login</a> or <! page="">new&nbsp;user</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="TOP">
+		[&nbsp;list of <a href="Glossary.html">topics</a>, <! page="">hubs&nbsp;&amp;&nbsp;nodes</a>, or <a href="NewArticles2a.html">recent&nbsp;changes</a>&nbsp;]	</TD>
+	</TR>
+</TABLE>
+
+<!-- From CommonHeader !-->
+</TR></TD>
+</TABLE>
+</FORM>
+
+<!-- start BODY page !-->
+<P>
+<FONT SIZE="-1"><a href="PlatformAPIPages.html">PlatformAPIPages</a></FONT>
+<HR SIZE="1" NOSHADOW>
+<P><EM>Article contributed by <a href="GilbertHerschberger.html">GilbertHerschberger</a> (6 December 1999).</EM></P>
+<H4>Introduction</H4>
+<P>When a module plugs into a kernel, the kernel must provide a mechanism to load and unload modules. The kernel invokes only machine code methods, not bytecode. A bytecode interpreter is beyond the scope of a kernel.</P>
+<H4>Machine code</H4>
+<P>A kernel module itself is machine code. It is native code running on a specific processor. Through classic porting techniques, a machine code modules can be ported to more than one processor.</P>
+<P>A module uses the kernel to load other modules. The kernel interface is available to modules. If a module is-a virtual machine, it can interpret bytecode. If a module obtains a handle for a virtual machine, it can use a virtual machine to interpret bytecode.</P>
+<H4>Loading</H4>
+<P>The kernel creates a linked list module holders. When a kernel is created, the linked list is empty. Modules are held by module holders, after they are loaded and initialized. Handles are managed by the module holder, not by a kernel nor by a module.</P>
+<PRE>
+static KernelModuleHolder *Kernel::top = NULL;
+
+class KernelModuleHolder {
+  public:
+:
+	 virtual MODULEHANDLE openHandle();
+	 virtual bool isOpen( MODULEHANDLE v );
+	 virtual void closeHandle( MODULEHANDLE v );
+	 virtual KernelModuleHolder *getNext();
+	 virtual KernelModule *getModule();
+:
+  private:
+	 KernelModuleHolder *next;
+	 KernelModule *module;
+	 int count;
+	 int *handles;
+}
+</PRE>
+<P>When an application needs to load an external module, it passes the name of the external module to the kernel and gets a <! page="">MODULEHANDLE</a> in return:
+<PRE>
+  typedef int MODULEHANDLE;
+  MODULEHANDLE mh = Kernel.loadModule( "module-1" );
+</PRE>
+<P>The module handle is an index into module list. Once a module has been closed, its module handle is obsolete.</P>
+<H4>Unloading</H4>
+<P>When an application needs to unload an external module, it passes a module handle to the kernel. The kernel shuts down an external module, releasing all of its resources.</P>
+<PRE>
+  Kernel.unloadModule( MODULEHANDLE v );
+</PRE>
+<H4>Threads</H4>
+<P>Kernel modules do not run in their own thread. They are not part of an independent process. A kernel module might have more than one module handle. The kernel does not need to remove a module until all handles to the module have been closed.</P>
+<P>When a module is loaded, its init() method is invoked by the kernel. Before unloading a module, its exit() method is invoked by the kernel. When a module is loaded, any process can use it through its module handle.</P>
+<H4>list()</H4>
+<PRE>
+  Method[] Kernel.list( MODULEHANDLE v );
+</PRE>
+<P>The kernel is asked for a list of all static methods available in a module. In turn, the kernel asks a module for a list of all its methods.</P>
+<PRE>
+  void Module::list( char *&amp;list );
+</PRE>
+<H4>getMethodID()</H4>
+<PRE>
+  int Kernel.getMethodID( MODULEHANDLE v, String v );
+</PRE>
+<P>The kernel is asked by an application for the method ID for a specific method in a module. In turn, the kernel asks a module for its method ID.</P>
+<PRE>
+  int Module::getMethodID( const char *v );
+</PRE>
+<H4>About priority and timeslice</H4>
+<P>As a general rules, kernel modules have a priority of zero. Their timeslice() method returns immediately because a kernel module does not run itside its own "thread". A general purpose module runs inside the "thread" of a virtual machine.</P>
+<P>Unlike general purpose kernel modules, a virtual machine has its own priority and timeslice. When a virtual machine is loaded as a module, it must be plugged into the timeslice mechanism of a kernel.</P>
+<P>Therefore, the explicit difference between a "module" and "thread" from the kernel's viewpoint is the module priority. A "thread" with a no-op priority (like zero) is a "module". When the following method is called with priority equal to zero, it returns control to the kernel immediately.</P>
+<PRE>
+  void ModuleHolder::timeslice() {
+	 int iMax = module.getPriority();
+	 for ( int i = 0; i &lt; iMax; i++ ) {
+		module.step();
+	 }
+  }
+</PRE><BR><BR></P><!--
+
+<TABLE width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="737b9c">
+<TR><TD ALIGN="CENTER">
+<! page="">login</a> or <! page="">new&nbsp;user</a><TR><TD>
+</TABLE>
+
+!-->
+<!-- end BODY page !-->
+
+<HR>
+
+<DIV ALIGN="CENTER">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR>
+	<TD ALIGN="CENTER" COLSPAN="2">
+		Content of these pages are owned and copyrighted by the poster.
+	</TD>
+</TR>
+<TR>
+	<TD ALIGN="RIGHT" WIDTH="50%">
+		Hosted by:
+	</TD>
+	<TD ALIGN="LEFT">
+		<A HREF="http://sourceforge.net/"><IMG 
+			SRC="http://sourceforge.net/sflogo.php?group_id=2376&type=1"
+			BORDER=0 HSPACE=0 VSPACE=0></A>
+	</TD>
+</TR>
+</TABLE>
+</DIV>
+</BODY>
+</HTML>

@@ -1,0 +1,265 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+<HTML>
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+    <TITLE>oStoreInfo.Imported @ jos.sf.net</TITLE>
+  </HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- The FORM encloses the entire header, because it renders better that way. !-->
+<FORM ACTION="/jump.php"><input type="hidden" name="PHPSESSID" value="f29b9c59a0c5a867063f0abb7570c713" />
+
+<!-- The JOS logo. !-->
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR VALIGN="TOP" ALIGN="LEFT">
+	<TD><A HREF="http://cjos.sourceforge.net/archive/"><IMG 
+		VSPACE="0" HSPACE="0" ALIGN="MIDDLE" BORDER="0"
+		SRC="image/wikiHome.gif"></A></TD>
+	<!-- The tab table. !-->
+	<TD WIDTH="100%" ALIGN="RIGHT" BGCOLOR="#FFFFFF" VALIGN="BOTTOM"> 
+		<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%" ALIGN="RIGHT">
+			<TR VALIGN="MIDDLE" ALIGN="LEFT">
+
+<TD BGCOLOR="White" WIDTH="60%">&nbsp;</TD>
+<TD BGCOLOR="#FFFFCC"><A HREF="http://cjos.sourceforge.net/archive/">Home</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/info/">Info</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/dev/">DevZone</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFCC66" ALIGN="CENTER"><A
+HREF="http://jos.sourceforge.net/">Wiki</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+			</TR>
+			<TR>
+				<TD BGCOLOR="#FFCC66" ALIGN="RIGHT" COLSPAN="9">
+					<A HREF="UsersWebHome.html">UsersWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="MainWebHome.html">MainWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="InfoWebHome.html">InfoWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="DevZoneWebHome.html">DevZoneWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="SupportWebHome.html">SupportWeb</A>
+				</TD>
+			</TR>
+		</TABLE>
+	</TD>		
+</TR>
+<!-- The WikiHeader. !-->
+<TR><TD COLSPAN="2">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="CENTER">
+		<B>[&nbsp;<! page="">oStoreInfo</a>&nbsp;]</B>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="CENTER">
+		<B>[ not logged in ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="CENTER">
+		<B>[ Web: <a href="ImportedWebHome.html">Imported</a> ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFCC66" VALIGN="CENTER">
+		goto:&nbsp;<INPUT TYPE="TEXT" SIZE="10" NAME="topic"><!--<INPUT TYPE="IMAGE" SRC="/media/go.gif?PHPSESSID=f29b9c59a0c5a867063f0abb7570c713" BORDER="0" VALUE="topic" ALT="goto">!-->&nbsp;<! page=""><FONT SIZE="-1">options</FONT></a>
+	</TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+	<TR>
+	<TD ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="TOP">
+		[&nbsp;get <! page="">info</a> on or <a href="WebHome.html">edit</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="TOP">
+		[&nbsp;<! page="">login</a> or <! page="">new&nbsp;user</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="TOP">
+		[&nbsp;list of <a href="Glossary.html">topics</a>, <! page="">hubs&nbsp;&amp;&nbsp;nodes</a>, or <a href="NewArticles2a.html">recent&nbsp;changes</a>&nbsp;]	</TD>
+	</TR>
+</TABLE>
+
+<!-- From CommonHeader !-->
+</TR></TD>
+</TABLE>
+</FORM>
+
+<!-- start BODY page !-->
+<P>
+This utility should be designed 'open' enough to start as a 'bare bones' design with no-caching, no-networking and no-fault tolerance - with the option to apply these sections (mentioned above) as 'pluggable' modules.
+</P><P>
+In a nutshell, every object instance has a 'key' related to it - whether it be another object instance or an integer ID. Using this 'key', object can be added, retrieved, updated and removed from the media.
+</P><P>
+From the work I have done so far, these are the sections I have divided this utility into:
+</P><P>
+<UL> <LI> <! page="">StorageTracker</a>: An interface used to retrieve locations and sizes (Mappings) of objects written to media
+<LI> Mapping: An interface used to track the location and size of each stored object
+<LI> <! page="">StorageIO</a>: An interface for reading and writing to media 
+</UL> 
+There are four main actions that can be catered for: create, read, modify and remove. I will go through each one as I have implemented so far (in order of difficulty).
+</P><P>
+<STRONG>Read</STRONG>
+</P><P>
+Using a method such as get(long) or get(Object) (where long or Object are the 'key'), the <! page="">StorageTracker</a> will retrieve, either from disk or from memory, the Mapping for this particular 'key'. The Mapping contains the location and size of the byte array storing the 'key's object instance. The Mapping interface is the bare minimum for reading and writing data to <! page="">StorageIO</a>, but can be expanded to implement caching. I will go further into this later.
+</P><P>
+The location and size are passed to the <! page="">StorageIO</a>, which at present, is a thread-safe class, used to read and write byte arrays to disk.
+</P><P>
+Once the byte array has been read from the media, it can be converted back to its original state using <a href="AlterKit.html">AlterKit</a> or sent across a network in its encrypted form to a client for conversion at the workstation.
+</P><P>
+If caching had been implemented, using another interface (extending the Mapping interface), an object could be checked for its 'cache status' and determined whether it is currently stored in memory.
+</P><P>
+<STRONG>Remove</STRONG>
+</P><P>
+Using a method such as remove(long) or remove(Object), the <! page="">StorageTracker</a> will retrieve the Mapping for this particular 'key', after which it would delete this entry. The location and size are passed to the <! page="">StorageIO</a>, the byte array has been read from the media. We could optionally not return anything from a remove method, but this is not a large issue as I see it. Once all reference to the storage of the object has been removed, it is treated as free space. In future we could implement a undelete/purge system, where recently deleted objects are temporarily stored for an amount of time and purged afterwards.
+</P><P>
+If caching had been implemented, the object could be checked for its 'cache status' and removed from memory if necessary.
+</P><P>
+A note, if any indexing of locations or 'still-to-be-written' status (both to be mentioned later) are used, a remove method would remove any entries.
+</P><P>
+<STRONG>Modify</STRONG>
+</P><P>
+Using <a href="AlterKit.html">AlterKit</a>, the objects instance is converted to a byte array and its size noted. The Mapping is read and if its current size is less than or equal to its previous size, it can remain at the same location. Otherwise it is sent to the end of the file. As a possibility, if the object had been 'null', the action could be treated as a remove - but this is optional and not a large issue. Once the location has been determined, the mapping can be stored and the byte array sent to <! page="">StorageIO</a>, for writing to media.
+</P><P>
+This procedure is actually a little more complicated than this. When checking if the current size will fit in the previous size, <! page="">StorageTracker</a> will have to check where the byte array before it ends and where the next byte array begins. It is possible that the last time this byte array had been written to media, that the byte array before it has gotten smaller since then, allowing a larger size. This is where the 'location index' comes in. If an index of start locations of all byte array is implemented, before and after locations can be found much easier, rather than scanning all 'key' Mappings. Also, that last byte array location can be found easier too.
+</P><P>
+Here is an example of how the indexing would work.
+</P><P>
+Three byte arrays:
+</P><P>
+<PRE>
+ID	Location	Size
+
+56	12650		370
+
+34	13020		520
+
+98	13540		120
+</pre>
+</P><P>
+Now, ID 56 is modified and becomes smaller (350) leaving a 20 byte gap between 56 and 34.
+</P><P>
+Then ID 34 is modified. Its new size is 530, which if stored at its current location wouldn't fit. But there is a 20 byte gap to the previous byte array. Therefore, the starting location is changed to 12650+350 = 13000 and the byte array is stored without problem.
+</P><P>
+Once the mapping is stored, the location index could be updated accordingly.
+</P><P>
+If a 'still-to-be-written' queue was used, the byte array could be 'cached' and written to disk as a medium priority thread. Once written, the 'cache status' could change to signify it is on disk.
+</P><P>
+<STRONG>Create</STRONG>
+</P><P>
+Well actually, creating a new entry is part of the Modify procedure. If a Mapping is not found for the ID, a new Mapping is created and the last location+size is used as a new location.
+</P><P>
+The new entry is added to a location index if necessary and 'still-to-be-written' queue updated if implemented.
+</P><P>
+<STRONG>Other Features</STRONG>
+</P><P>
+Some features I have thought of implementing:
+</P><P>
+<UL> <LI> Across the network object retrieval: basically identical to a local system, but <! page="">RMI</a> interface used for actions and <a href="AlterKit.html">AlterKit</a> implemented on client workstation.
+<LI> Compacter Thread: low priority thread scans for gaps between byte arrays and relocates them accordingly.
+<LI> 'Still-to-be-written' queue: where newly created and modified byte arrays are stored in a queue and written to disk on a medium priority thread.
+<LI> Cache Expire Thread: checks cached information for time since last access, and removes them from system.
+<LI> Read Ahead: possible read ahead caching.
+</UL> <HR>
+<STRONG><a href="FAQ.html">FAQ</a> &amp; Comments</STRONG>
+</P><P>
+(Q) exceptions
+</P><P>
+There is no oStore defined exceptions. How could the application
+programmer be aware of commom errors like: out of disk space, wrong file
+name
+etc
+Should this exceptions be declared inside oStore interfaces? Should we
+declare a oStoreException class?
+</P><P>
+(A) Ok, first of all, I haven't thought that far ahead yet, and I don't
+think we need too. Its a good question, but I think we should consider it
+further up the track. It is an easy task to implement these exceptions in
+an 'alpha' stage and as I see it, and exceptions do not affect the 'normal'
+running of oStore. But certainly a subject to be dealt with in the
+future.
+</P><P>
+(Q) object key
+</P><P>
+If a instance oStore is made persistent, where the object ids will be
+stored from a process execution to another? How could one tell what class
+belongs the object retrieved on a second process execution?
+</P><P>
+Should the object keys be stored in some sort of global index?
+</P><P>
+(A) Not sure if I understood this one correctly. If I understand correctly,
+I think all instance of oStore can be considered 'persistent' as such.
+And when an application using <! page="">ObjStore</a> closes and starts later, all keys
+will be retrieved as before. As for classes, well all objects are stored as
+serialized objects, and can be cast into their proper classes when
+retrieved. (Just write back if I missed the point!)
+</P><P>
+(Q) object key generation
+</P><P>
+Supose a multi-user oStore, it is safe to let objectkey creation to
+the
+application programmer? Whai if there are two processes issuing the same
+objectkey to the same oStore instance.
+Should the keys be generated by oStore class and the application
+programmer just keeps an object key?
+</P><P>
+(A) Well, its a good point, and if the IDs are created by oStore, it
+wouldn't pose a problem. Also, if we must consider that multiple
+'front-ends' can be developed, one for automatic id creation, another for
+object-key use. And if processes would write to the same key,  well, we can
+develop some type of 'contention rule module' to deal with the matter.
+</P><P>
+(Q) Is there anyway to flush said cache on exit? specifically without having to manually call a flush() member?
+<a href="DigiGod.html">DigiGod</a> 
+</P><P>
+(A) Well, since that version of oStore (on <a href="SourceServer.html">SourceServer</a>), I've
+realised you can use the method:
+<pre>Runtime.runFinalizersOnExit(true);</pre>
+and then implement a <pre>finalize()</pre> method to automatically close. I do need to post the latest versions of source code, not to cause too much confusion.
+</P><P>
+(Q) It think that the synchronization is indeed desired. Without it, multiple processes/threads couldn't safely read/write the same "object" (represented by a Mapping if I got it right) simultaneously, which is <! page="">IMO</a> not a good thing, as that kind of functionality is probably going to be needed.
+</P><P>
+However, why not consider doing the synchronization at the Mapping level; that is, to allow simultaneous reading and writing to a particular media, but not to the same Object/Mapping? It would mean more overhead, but I think it would be beneficial in the long run. If an application stores a 1 meg chunk of data on disk, that would disable reading from that media for quite some time. But maybe you didn't intend oStore to be used on large amounts of
+data? 
+<a href="PeterSchuller.html">PeterSchuller</a>
+</P><P>
+(A) It certainly is a limitation, and I wouldn't want to stop the use of large amounts of data over that. We could always rename this class <! page="">SafeStorageIO</a> and the non-synchronised version <! page="">DefaultStorageIO</a> - what you think ? Seems the best solution in my eyes. <! page="">IMO</a> the <! page="">StorageTracker</a> (as Mapping is just a pointer really) could still implement a system, where the object being written to media, if given a read request is read from memory.
+</P><P>
+(Q) Is oStore a file system?
+</P><P>
+(A) Nope - its a primitive hybrid of a relative and OO database.
+</P><P>
+<HR>
+Created: 5-Jul-98 <a href="StefanBorg.html">StefanBorg</a> 
+</P><P>
+Edited :19-Jul-98 <a href="StefanBorg.html">StefanBorg</a>
+</P><P>
+Go back to <a href="oStore.html">oStore</a><BR><BR></P><!--
+
+<TABLE width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="737b9c">
+<TR><TD ALIGN="CENTER">
+<! page="">login</a> or <! page="">new&nbsp;user</a><TR><TD>
+</TABLE>
+
+!-->
+<!-- end BODY page !-->
+
+<HR>
+
+<DIV ALIGN="CENTER">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR>
+	<TD ALIGN="CENTER" COLSPAN="2">
+		Content of these pages are owned and copyrighted by the poster.
+	</TD>
+</TR>
+<TR>
+	<TD ALIGN="RIGHT" WIDTH="50%">
+		Hosted by:
+	</TD>
+	<TD ALIGN="LEFT">
+		<A HREF="http://sourceforge.net/"><IMG 
+			SRC="http://sourceforge.net/sflogo.php?group_id=2376&type=1"
+			BORDER=0 HSPACE=0 VSPACE=0></A>
+	</TD>
+</TR>
+</TABLE>
+</DIV>
+</BODY>
+</HTML>

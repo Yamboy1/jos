@@ -1,0 +1,444 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+<HTML>
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+    <TITLE>ClarkOnLine.Imported @ jos.sf.net</TITLE>
+  </HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- The FORM encloses the entire header, because it renders better that way. !-->
+<FORM ACTION="/jump.php"><input type="hidden" name="PHPSESSID" value="a224e9a901cb4b126377b0df10b10ba5" />
+
+<!-- The JOS logo. !-->
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR VALIGN="TOP" ALIGN="LEFT">
+	<TD><A HREF="http://cjos.sourceforge.net/archive/"><IMG 
+		VSPACE="0" HSPACE="0" ALIGN="MIDDLE" BORDER="0"
+		SRC="image/wikiHome.gif"></A></TD>
+	<!-- The tab table. !-->
+	<TD WIDTH="100%" ALIGN="RIGHT" BGCOLOR="#FFFFFF" VALIGN="BOTTOM"> 
+		<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%" ALIGN="RIGHT">
+			<TR VALIGN="MIDDLE" ALIGN="LEFT">
+
+<TD BGCOLOR="White" WIDTH="60%">&nbsp;</TD>
+<TD BGCOLOR="#FFFFCC"><A HREF="http://cjos.sourceforge.net/archive/">Home</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/info/">Info</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/dev/">DevZone</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFCC66" ALIGN="CENTER"><A
+HREF="http://jos.sourceforge.net/">Wiki</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+			</TR>
+			<TR>
+				<TD BGCOLOR="#FFCC66" ALIGN="RIGHT" COLSPAN="9">
+					<A HREF="UsersWebHome.html">UsersWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="MainWebHome.html">MainWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="InfoWebHome.html">InfoWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="DevZoneWebHome.html">DevZoneWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="SupportWebHome.html">SupportWeb</A>
+				</TD>
+			</TR>
+		</TABLE>
+	</TD>		
+</TR>
+<!-- The WikiHeader. !-->
+<TR><TD COLSPAN="2">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="CENTER">
+		<B>[&nbsp;<! page="">ClarkOnLine</a>&nbsp;]</B>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="CENTER">
+		<B>[ not logged in ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="CENTER">
+		<B>[ Web: <a href="ImportedWebHome.html">Imported</a> ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFCC66" VALIGN="CENTER">
+		goto:&nbsp;<INPUT TYPE="TEXT" SIZE="10" NAME="topic"><!--<INPUT TYPE="IMAGE" SRC="/media/go.gif?PHPSESSID=a224e9a901cb4b126377b0df10b10ba5" BORDER="0" VALUE="topic" ALT="goto">!-->&nbsp;<! page=""><FONT SIZE="-1">options</FONT></a>
+	</TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+	<TR>
+	<TD ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="TOP">
+		[&nbsp;get <! page="">info</a> on or <a href="WebHome.html">edit</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="TOP">
+		[&nbsp;<! page="">login</a> or <! page="">new&nbsp;user</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="TOP">
+		[&nbsp;list of <a href="Glossary.html">topics</a>, <! page="">hubs&nbsp;&amp;&nbsp;nodes</a>, or <a href="NewArticles2a.html">recent&nbsp;changes</a>&nbsp;]	</TD>
+	</TR>
+</TABLE>
+
+<!-- From CommonHeader !-->
+</TR></TD>
+</TABLE>
+</FORM>
+
+<!-- start BODY page !-->
+<P>
+</P><P>
+Yep.  I'm in the same boat... should head home.
+</P><P>
+<HR>
+More details...
+</P><P>
+Basically, the memory manager would then service the request and 
+put/get the memory from the stack.  That's that.
+</P><P>
+There are a few items that need to be addressed:
+<OL> <LI>  Not all classes can be supported by all managers
+<LI>  Inter-manager object references.  
+</OL> 
+Hmmmm.....
+</P><P>
+<HR>
+</P><P>
+<i> Database=no file system? </i>  Well, from a users perspective, NO.  They have no clue how the information is stored (unlike, say Word).
+</P><P>
+<HR>
+To detail how this <EM>might</EM> work for references:
+</P><P>
+Ok.  First of all, the VM reference says that object
+references are 32 bits.  Fun.  I do not think that there is
+a reason why we can't implement this differently as long as
+we meet this illusion to the corrsponding bytecodes.
+</P><P>
+For the time being, let us limit our conversation to get/set
+for fields of an object since this is 80% of the meat.
+</P><P>
+Lets say that our "Reference" data type is partitioned
+into two parts.  The high word gives an address or offset
+in a jump table for the interface of the memory manager 
+being used to minipulate the object.  The low word is
+can be used by the memory manager any way we see fit.
+</P><P>
+Although this is not the best solution, it is the most obvious.
+This gives us 16 bits to define the memory managers (too much)
+and 16 bits that the memory manager can use to identify an
+object (too few).  We could play lots of games to make this
+ratio a bit better, for instance we could use the first bit
+to denote if we are using the "normal, volitale RAM" manager.  This would give us 31 bits of address space for that one manager, 15 bits for other managers, and 16 bits for the address space in that manager.  Alternatively, a double dispach can be used... but these are just (important) details....
+<HR>
+<b> Did you get what I was saying about the bytecodes?</b>
+</P><P>
+They are the interface to move information from the data
+store (RAM,Disk,OODBMS,RDBMS,DistributedObject,etc) to 
+the stack.
+</P><P>
+Make sence?  They are interface unified model. Processing:
+</P><P>
+<OL> <LI>   Input (Get <! page="">ByteCodes</a>, Implemented by memory manager)
+<LI>   Processing (Implemented by the other bytecodes)
+<LI>   Output (Set Bytecodes, Implemented by memory manager)
+</OL> 
+The Oracle memory manager, for instance, would be serving
+up objects.. the objects would <EM>never</EM> actually exist
+in <! page="">RAM</a> on the computer... the Get/Set would be translated
+into the correct <! page="">SQL</a> and executed.  There are lots of
+issues here... but it would be great if the OS supported
+the pluggable opportunity.
+</P><P>
+<HR>
+<! page="">GrandUnifiedMemoryModel</a>?	Do you have a better
+name for the <! page="">MultipleMemoryManagers</a> concept then?  
+</P><P>
+Actually, most of the applcations I work with are database
+applications.  So, yes, there is no file system.  Just one
+big gigantic object space.  And it is a shit load of code
+to make the illusion magical.  I just keep having to reinvent
+this wheel again and again and again and again and frankly
+I'm getting sick of operating systems that don't <! page="">DoTheRightThing</a>(tm).
+Basically the user interface talks to the user in "their" 
+terms.  When a word processing document is finished it says
+"publish?" not "save?".  Save is stupid. Of course it is saved.
+</P><P>
+Oracle's object-relational support is mediocre.  The binding
+is what is really poor and needs help.  Yep, actually in this
+years <! page="">EuroPloP</a> a rather nice 15 page paper was published on
+the topic.  Code listings don't really help much since it
+lacked so much necessary detail.  <! page="">JavaBlend</a> is basically 
+the same approach.... although majorly flawed.  It sits on
+top of JDBC.  I need to spend more time to really evaluate it,
+but so far I am not really that impressed.  I can imagine
+it being painfullly slow and not handling all of the distribued
+concerns that you need to be worried about (JDBC simply
+hides most of them).  Anyway, a Oracle memory manager woudl
+talk directly to the sockets of the Oracle <a href="DBMS.html">DBMS</a> and leverage
+distribued transactions, etc the whole shebang!
+</P><P>
+</P><P>
+<HR>
+I don't know, perhaps I am just being plain old weird here.
+But why not?  Sure performance. Well, lets finish brain storming
+it out, make a quick prototype and claim inneficient later?  Or
+is this too much to ask.
+</P><P>
+<OL> <LI>  One interface for object storage
+<LI>  One interface for array allocations.
+<LI>  One for local variables?
+<LI>  One for stacks? (really far fetched here.)
+<LI>  etc.
+</OL> 
+A memory manager can implement the interfaces it chooses.
+A class can specify which memory manager is used for
+its class instances in the <a href="ClassRepository.html">ClassRepository</a>.  We can
+make an intelligent guess (the default) for most entries.
+</P><P>
+In addition, different <! page="">ProcessEnvironments</a> might want
+to use different managers for their objects if the
+classes requested have not specified which one they
+require.
+</P><P>
+</P><P>
+<HR>
+About <! page="">GrandUnifiedMemoryModel</a>,
+</P><P>
+Well... the Java byte codes __are__ the model.
+</P><P>
+Sure you can say that it is an ideal, and some of 
+the later things are a bit on the, well, shall we say,
+heated list?  I have read Sun's papers on making distribued
+access the same as local acess.. they have valid points, but
+I think they are being overly pessimistic.  
+</P><P>
+Anyway, persistent storage <EM>is</EM> about ignoring the 
+difference between ram and disk and leaving it up
+to the operating system to handle the details.
+</P><P>
+It would be nice if we could make our memory management
+model open so that people could play around and perhaps
+find a practical way to do this effectively...
+It just <EM>might</EM> happen.  (I might make 
+access to objects in an relational Oracle database happen)
+Any other way to do this is <EM>just</EM> as flawed.  And database
+programmers <EM>do not</EM> handle the errors, I say let's push
+it down to the memory manager level where I believe
+it really belongs.
+</P><P>
+</P><P>
+<HR>
+</P><P>
+About the bytecodes....
+</P><P>
+<UL> <LI> Field variables: Sure they take a value in the stack and modify the memory.  This is the responsibility of the memory manager to go out and make the update / read actually happen.
+</UL> 
+<UL> <LI> Local storage: Same thing, only dealing with "process" level storage bytes.  It is taking items to/from a memory space and putting them on the stack for minipulation.
+</UL> 
+<UL> <LI> Creating objects&amp; arrays. Glad we agree here.
+</UL> 
+<UL> <LI> Array Elements:  Same thing.  Does this make sence?  
+</UL> 
+<HR>
+<i>  When I think memory manager, I'm thinking of the part of the OS that's responsible for allocating RAM, tracking available RAM, and managing paging to disk. </i>  Yep.
+</P><P>
+There is nothing saying that a user level memory manager 
+might not use default kernel level memroy managers for
+some of the really nasty implementation stuff.  
+</P><P>
+<! page="">WhatThisAllows</a>:
+</P><P>
+<OL> <LI>  Different memory managers implement different policies.
+<LI>  Some memory managers manage "persistent memory".
+<LI>  There might be some "don't cash" memory mangers.
+<LI>  Depending upon object granulairy a few classes (sound files) might want to implement their own memory manger that would cashe the object appropriately for performance.
+<LI>  (I always get slammed here, but remote objects)
+<LI>  A memory manger to handle objects in a relational datbase
+<LI>  A memory manager to handle object oriented databases
+<LI>  A memory manager for my <! page="">EEPROM</a> or Hardware card.
+<LI>  Security to be moved to a lower level (if needed)
+</OL> 
+</P><P>
+<HR>
+About half of the bytecodes are used for the following:
+</P><P>
+<UL> <LI> Getting/Setting member field variables
+<LI> Getting/Setting static field variables
+<LI> Getting/Setting local storage
+<LI> Creating objects 
+<LI> Creating arrays
+<LI> Getting/Setting elements in arrays
+<LI> etc. 
+</UL> 
+Anyway, there is no reason why we could not make an interface
+out of this and allow multiple memory managers on a 
+process/class level?  Mabye even object level.
+</P><P>
+<HR>
+</P><P>
+Hmm. Well.	<! page="">MemoryManger</a>...  the problem with many operating
+systems is that you are forced into the memory management 
+policies set by the one and only memory manager.  In short
+I would like this monster replaceable... on a class by class 
+level.  In this way my Order objects can be managed by
+a <! page="">OracleMemoryManager</a>... etc.  Bathroom break. <grin>
+</P><P>
+</P><P>
+<HR>
+</P><P>
+Well, sure desktop vs process.  I need to think more on this
+one.  However, what is a "service" in Windows?  It is a
+program that is always running in the background - infact
+some services do their best to carry on as they left off.
+</P><P>
+There is another big problem with saving processes, that
+is transient variables.... this might make things unworkable.
+</P><P>
+But actually, saving process is only about 5% or less of what
+I am really after....
+</P><P>
+<HR>
+</P><P>
+1.  I agree here.  We <EM>could</EM> use serilization to save classes.
+I see this as a policy of a memory manager.  :) Agree here
+</P><P>
+2.  Nope, nothing dictates, infact even though they say that
+references are 32 bits, nothing saying we can use something else as long as the VM works as expected.  :) Agree here
+</P><P>
+3.  <a href="ObjectStore.html">ObjectStore</a> TM  They have a pre compiler that creates Load/Save
+methods on existing class files.  Basically they modify the class
+files and do swizzling without help of the VM.  It is a <EM>really</EM> nasty way to do it and it is not very transparent.. they use proxy objects everwhere.  (The pre compiler generates a class with the identical interface that does a residency check and then delegates)
+</P><P>
+4. I am no expert here either.  Just interested.  I have alot of Oracle background and a math degree so it is not so rough.  Simple stuff they have going.
+</P><P>
+5.  Hmm.  Don't get this point.  Let me try to explain the Memory Manager.
+<HR>
+</P><P>
+Yes.  Processes __can__ be persisted.	This saves the users
+desktop right were they left off, etc.  It brings up a host of problems, like locks.  I guess your point is somewhat valid, what <EM>good</EM> is it.  Hmm.  Well it would leave the user right where they
+left off... plain and simple.  With their "unsaved" (or I would re-name it "unpublished" ) document up in their editor...
+</P><P>
+<HR>
+</P><P>
+Great!
+Hmm History, well Markus is the one who wrote the 
+1. 
+</P><P>
+<a href="WikiClone.html">WikiClone</a> and set up the mailing lists.  I can get you
+the source if you want.  Can Markus
+This mechinism for chatting really sucks.  Goddamit!
+I should just write a <a href="HTTP.html">HTTP</a> tunneling vesion of <! page="">IQC</a>
+so I can get through the firewall here.
+</P><P>
+2.  Hmm bit aggressive.  It is not always good to put everything in the glossary.. but you recognize this.	I would love a
+<! page="">NameJustRight</a> TM but am very afraid that it is impractical.
+</P><P>
+3.  :)  This is nice, sounds a bit like <a href="JavaLobby.html">JavaLobby</a>....
+My vision for this is different than Java Lobby.  I <EM>want</EM>
+people to edit other peoples stuff.  This is what
+is different.  This signing shit is for the birds. I wish
+for instance, that you would have edited in your
+comments/uncertienties and merged them with what I wrote.
+It ends up being much more cohesive document that way.
+Hmm... well I don't know.	
+</P><P>
+</P><P>
+<HR>
+</P><P>
+Bill wrote:
+<i>What did you think about the idea that processes don't have
+persistence? That's at least partially false, I guess, if we're
+going to put them to sleep with some sort of time slicing &amp;
+paging algorithms. But maybe that works? Can we say a process
+has it's own <a href="ClassRepository.html">ClassRepository</a> which references the system and
+user repositories but contains local copies of unsafe code. This
+<a href="ClassRepository.html">ClassRepository</a> is part of the disk space used by the Process
+when it is "sleeped" by the scheduler. Sorry, can't remember the
+word for switched out tasks. </i>
+</P><P>
+Well, I think that process can be persisted.  If you read the grasshopper stuff they are doing it, PJama will do this in the future as well....  There is nothing saying that during the "stabiliation" process the stack is saved, etc....  We can pull really nice tricks to pull this off beacuse we are writing our own VM.
+</P><P>
+<HR>
+  1. A persistence mechanism exists in Java: Serializable, etc.
+</P><P>
+Yes it does, but it is an all or nothing kind of thing.  You have to stream the object and all of its references in one big file.  This does not scale to a corporate order entry system.
+</P><P>
+  2. This mechanism relies on streams.
+</P><P>
+Yep. It is also slow beacuse the "saved" format is different from teh internal format.  Read about Grasshopper and PJama.... they are doing what is called <! page="">OthogonalPersistence</a>
+</P><P>
+  3. If we define some "default" serialization for Object in the
+VM or kernel that makes sense for JOS, we could persist anything we wanted to.
+</P><P>
+Yep.  This is the way to go.....
+</P><P>
+<OL> <LI> 5 Alternatively, we might have created a portable object store if we can implement it in 100% Pure
+</OL> 
+Hmm.  Nope <! page="">ODI</a> has done the best they can... and it sucks. Working within the confines of 100% Pure is good, but it is just not going to scale.  Sun recognizes this, which is why they are funding a bunch of persistence research... eventually this will make its way into Java.
+</P><P>
+  4. A streaming file system can be efficient. Look up the stuff
+on Sprite that I added to the OS readings. It claims improved performance over Unix I/O.
+</P><P>
+Hmm. Could you educate me here?
+</P><P>
+  5. I just generally like the idea that we build on Java to
+handle what we want, instead of hacking extra stuff in if we can help it.
+</P><P>
+I understand the concern.  I want the kernel extensible.  And yes, the kernel extensions will not be compatible with other VMs.  My pet favorite kernel extension is persistence.
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P>
+</P><P><BR><BR></P><!--
+
+<TABLE width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="737b9c">
+<TR><TD ALIGN="CENTER">
+<! page="">login</a> or <! page="">new&nbsp;user</a><TR><TD>
+</TABLE>
+
+!-->
+<!-- end BODY page !-->
+
+<HR>
+
+<DIV ALIGN="CENTER">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR>
+	<TD ALIGN="CENTER" COLSPAN="2">
+		Content of these pages are owned and copyrighted by the poster.
+	</TD>
+</TR>
+<TR>
+	<TD ALIGN="RIGHT" WIDTH="50%">
+		Hosted by:
+	</TD>
+	<TD ALIGN="LEFT">
+		<A HREF="http://sourceforge.net/"><IMG 
+			SRC="http://sourceforge.net/sflogo.php?group_id=2376&type=1"
+			BORDER=0 HSPACE=0 VSPACE=0></A>
+	</TD>
+</TR>
+</TABLE>
+</DIV>
+</BODY>
+</HTML>

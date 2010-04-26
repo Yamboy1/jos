@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+<HTML>
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+    <TITLE>WebRCSProudctSpecificationB.Imported @ jos.sf.net</TITLE>
+  </HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<!-- The FORM encloses the entire header, because it renders better that way. !-->
+<FORM ACTION="/jump.php"><input type="hidden" name="PHPSESSID" value="46b9f1b7cdba96c351332e3b6e2a7b76" />
+
+<!-- The JOS logo. !-->
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR VALIGN="TOP" ALIGN="LEFT">
+	<TD><A HREF="http://cjos.sourceforge.net/archive/"><IMG 
+		VSPACE="0" HSPACE="0" ALIGN="MIDDLE" BORDER="0"
+		SRC="image/wikiHome.gif"></A></TD>
+	<!-- The tab table. !-->
+	<TD WIDTH="100%" ALIGN="RIGHT" BGCOLOR="#FFFFFF" VALIGN="BOTTOM"> 
+		<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%" ALIGN="RIGHT">
+			<TR VALIGN="MIDDLE" ALIGN="LEFT">
+
+<TD BGCOLOR="White" WIDTH="60%">&nbsp;</TD>
+<TD BGCOLOR="#FFFFCC"><A HREF="http://cjos.sourceforge.net/archive/">Home</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/info/">Info</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFFFCC" ALIGN="CENTER"><A HREF="http://cjos.sourceforge.net/archive/dev/">DevZone</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+<TD WIDTH="10%" BGCOLOR="#FFCC66" ALIGN="CENTER"><A
+HREF="http://jos.sourceforge.net/">Wiki</A></TD>
+<TD BGCOLOR="White">&nbsp;</TD>
+			</TR>
+			<TR>
+				<TD BGCOLOR="#FFCC66" ALIGN="RIGHT" COLSPAN="9">
+					<A HREF="UsersWebHome.html">UsersWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="MainWebHome.html">MainWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="InfoWebHome.html">InfoWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="DevZoneWebHome.html">DevZoneWeb</A>
+					&nbsp;|&nbsp;
+					<A HREF="SupportWebHome.html">SupportWeb</A>
+				</TD>
+			</TR>
+		</TABLE>
+	</TD>		
+</TR>
+<!-- The WikiHeader. !-->
+<TR><TD COLSPAN="2">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+<TR>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="CENTER">
+		<B>[&nbsp;<! page="">WebRCSProudctSpecificationB</a>&nbsp;]</B>
+	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="CENTER">
+		<B>[ not logged in ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="CENTER">
+		<B>[ Web: <a href="ImportedWebHome.html">Imported</a> ]</B>	</TD>
+	<TD WIDTH="25%" ALIGN="CENTER" BGCOLOR="#FFCC66" VALIGN="CENTER">
+		goto:&nbsp;<INPUT TYPE="TEXT" SIZE="10" NAME="topic"><!--<INPUT TYPE="IMAGE" SRC="/media/go.gif?PHPSESSID=46b9f1b7cdba96c351332e3b6e2a7b76" BORDER="0" VALUE="topic" ALT="goto">!-->&nbsp;<! page=""><FONT SIZE="-1">options</FONT></a>
+	</TD>
+</TR>
+</TABLE>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="3" WIDTH="100%">
+	<TR>
+	<TD ALIGN="CENTER" BGCOLOR="#FFFFCC" VALIGN="TOP">
+		[&nbsp;get <! page="">info</a> on or <a href="WebHome.html">edit</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFEE88" VALIGN="TOP">
+		[&nbsp;<! page="">login</a> or <! page="">new&nbsp;user</a>&nbsp;]	</TD>
+	<TD ALIGN="CENTER" BGCOLOR="#FFDD77" VALIGN="TOP">
+		[&nbsp;list of <a href="Glossary.html">topics</a>, <! page="">hubs&nbsp;&amp;&nbsp;nodes</a>, or <a href="NewArticles2a.html">recent&nbsp;changes</a>&nbsp;]	</TD>
+	</TR>
+</TABLE>
+
+<!-- From CommonHeader !-->
+</TR></TD>
+</TABLE>
+</FORM>
+
+<!-- start BODY page !-->
+<P>
+<P ALIGN="CENTER">Return to <a href="WebRCS.html">WebRCS</a> page</P>
+<PRE>
+web revision control system -- product specs
+revision 0.2 - 9.3.98
+
+1. Server Interface
+ a. Installation
+  i. Java 1.1 application
+  ii. should have both text-only and AWT interfaces
+  iii. uninstallation as well? (possible future)
+ b. Web Server Integration
+  i. CGI (Java Servlets)
+	- Java 1.1 API only (no use of 1.0 techniques)
+	- possibly look at support for Java 1.2 API
+  ii. standard HTML's
+	- upload/download from client
+	- information presentation
+	- server-side configuration
+  iii. standard graphics (jpeg/gif, possibly png)
+  iv. which server?
+	- I personally will be developing under Apache and doing some testing with
+	  MS Personal Web Server (similar to IIS)
+	- should be as server-independent as possible
+
+2. Client Interface
+ a. Web Interface
+	i. standard HTML's
+	 - upload/download to server
+	 - information presentation
+	 - client-side preferences
+	ii. standard graphics (jpeg/gif, possibly png)
+	iii. perform standard rcs functions
+	 - access (view) a resource, area, project
+	 - upload a resource
+	 - download a resource
+	 - create a resource, area, project
+	 - relocate a resource, area
+	 - rename a resource, area, project
+	 - build a resource, area project
+
+3. Resource Database
+ a. Security Checks
+  i. server-implemented
+	- useful for settings rcs-wide protection (i.e. first line of defense if the rcs
+	  database is stored on a publicly-accessible website)
+	- shouldn't use server passwords within the rcs database structure (may interfere
+	  with normal rcs security operation)
+  ii. rcs-implemented
+	- can lock individual resources, areas, projects
+	- can set members for individual resources, areas, projects
+ b. Resource check-in
+  i. be sure to check member's upload permissions for resource
+  ii. use HTTP upload
+ c. Resource check-out
+  i. be sure to check member's download permissions for resource
+  ii. use HTTP download
+ d. upload/download locations (see server and client interfaces)
+ e. Types of Resources
+  i. files
+	- source code
+	- graphics
+	- HTML
+	- plain text
+	- user-defined
+  ii. notes
+	- memos
+	- bug tracking
+	- user-defined
+ f. Organization of Resources
+  i. projects
+	- top-most level is populated by projects
+	- has a director who is "super-user" for the entire project
+	- one "super-user" for the entire system (i.e. all projects)
+	- stored in individual directories on web server
+	- should be able to define "make" rules for a project, with
+	  the ability to include areas in the build
+	- can set list of members or groups who can initiate a project-
+	  level "make" or "build"
+  ii. areas
+	- stored in individual directories under projects
+	- should be able to rename areas with ease
+	- should be able to define "make" rules for an area, with
+	  the ability to include resources in the build
+	- can set list of members or groups who can initiate an area-level
+	  "make" or "build"
+	- "upload/download all" (i.e. all resources contained in the area) feature
+	  needed
+  iii. resources
+	- stored in individual files under areas
+	- represent the working pieces to each project
+	- should be able to rename or relocate resources with ease
+	- can set individual permissions for each resource by way of
+	  a list of members or groups with the following permissions:
+	 + view
+	 + upload
+	 + download
+	 + create
+	 + relocate
+	 + rename
+	 + build
+	- should be able to define "make" rules for a resource
+  iv. members
+	- one or more members for each resource, area, or project
+	- should be able to group members into one or more groups
+  v. builds
+	- separated storage for finished products
+	- can set list of members or groups who can access individual builds
+  vi. storage
+	- projects, areas, and resources are represented by directories and
+	  files within the web server document root
+	- all information should be maintained in a database, most likely
+	  a SQL database that will be accessed using JDBC
+ f. logging
+  i. should keep careful track of all actions performed
+	- access (view) a resource, area, project
+	- upload a resource
+	- download a resource
+	- create a resource, area, project
+	- relocate a resource, area
+	- rename a resource, area, project
+	- build a resource, area project
+  ii. should be able to control which of the above events are logged and how much
+		detail is provided (logging/debug level)
+  iii. the logs themselves should be treated as a resource so as to allow access
+		 control by different members
+</PRE>
+<P ALIGN="CENTER">Return to <a href="WebRCS.html">WebRCS</a> page</P><BR><BR></P><!--
+
+<TABLE width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="737b9c">
+<TR><TD ALIGN="CENTER">
+<! page="">login</a> or <! page="">new&nbsp;user</a><TR><TD>
+</TABLE>
+
+!-->
+<!-- end BODY page !-->
+
+<HR>
+
+<DIV ALIGN="CENTER">
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR>
+	<TD ALIGN="CENTER" COLSPAN="2">
+		Content of these pages are owned and copyrighted by the poster.
+	</TD>
+</TR>
+<TR>
+	<TD ALIGN="RIGHT" WIDTH="50%">
+		Hosted by:
+	</TD>
+	<TD ALIGN="LEFT">
+		<A HREF="http://sourceforge.net/"><IMG 
+			SRC="http://sourceforge.net/sflogo.php?group_id=2376&type=1"
+			BORDER=0 HSPACE=0 VSPACE=0></A>
+	</TD>
+</TR>
+</TABLE>
+</DIV>
+</BODY>
+</HTML>
