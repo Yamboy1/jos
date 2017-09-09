@@ -53,19 +53,8 @@ final class QueryStringTool {
 	}
 
 	/**
-	 * Convert a query string from
-	 * 
-	 * <PRE>
-	 * name-1=value-1&name-2=value-2&name-3=value-3
-	 * </PRE>
-	 * 
-	 * to a parameter list
-	 * 
-	 * <PRE>
-	 * name-1=value-1
-	 * name-2=value-2
-	 * name-3=value-3
-	 * </PRE>
+	 * Convert from a query string name-1=value-1&name-2=value-2&name-3=value-3
+	 * to a parameter list name-1=value-1 name-2=value-2 name-3=value-3
 	 */
 	public String[] getParameters(String v) {
 		if (v == null) {

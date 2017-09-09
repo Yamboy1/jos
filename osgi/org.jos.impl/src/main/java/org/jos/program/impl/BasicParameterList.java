@@ -11,7 +11,15 @@ import org.jos.uritool.URITool;
  * a list of parameters from a query string.
  */
 final class BasicParameterList implements ParameterList {
-	private static final String SEPARATOR = "=";
+	/**
+	 * Name and value in a parameter are separated by the equal (=) character.
+	 */
+	private static final String EQ = "=";
+
+	/**
+	 * Parameters in a query string are separates by the ampersand character.
+	 */
+	public static final String AMP = "&";
 
 	private String[] data = null;
 
@@ -66,7 +74,7 @@ final class BasicParameterList implements ParameterList {
 
 			String property = (String) list.nextElement();
 
-			int pos = property.indexOf(SEPARATOR);
+			int pos = property.indexOf(EQ);
 			if (pos < 0) {
 				continue;
 			}
@@ -87,8 +95,8 @@ final class BasicParameterList implements ParameterList {
 			return null;
 		}
 
-		String[] result = new String[]{};
-		
+		String[] result = new String[] {};
+
 		Enumeration<String> list = getParameters();
 		for (;;) {
 			if (!list.hasMoreElements()) {
@@ -97,7 +105,7 @@ final class BasicParameterList implements ParameterList {
 
 			String property = (String) list.nextElement();
 
-			int pos = property.indexOf(SEPARATOR);
+			int pos = property.indexOf(EQ);
 			if (pos < 0) {
 				continue;
 			}
@@ -120,5 +128,13 @@ final class BasicParameterList implements ParameterList {
 	@Override
 	public Enumeration<String> getParameters() {
 		return new ObjectArrayEnumeration(data);
+	}
+
+	/**
+	 * Convert from a query string name-1=value-1&name-2=value-2&name-3=value-3
+	 * to a parameter list name-1=value-1 name-2=value-2 name-3=value-3
+	 */
+	public String[] getParameters(String v) {
+		return QueryStringTool.getTool().getParameters(v);
 	}
 }
