@@ -10,11 +10,6 @@ import java.util.Enumeration;
  */
 public abstract interface ParameterList {
 	/**
-	 * Gets Path property.
-	 */
-	// public abstract String getPath();
-
-	/**
 	 * Parse arguments, from query string.
 	 */
 	public abstract void parseArguments(String v);

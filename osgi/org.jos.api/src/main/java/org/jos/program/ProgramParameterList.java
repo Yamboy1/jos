@@ -10,6 +10,11 @@ import java.util.Enumeration;
  */
 public interface ProgramParameterList extends ParameterList {
 	/**
+	 * Gets Path property.
+	 */
+	public abstract String getPath();
+
+	/**
 	 * Sets Path property.
 	 */
 	public abstract void setPath(String v);
