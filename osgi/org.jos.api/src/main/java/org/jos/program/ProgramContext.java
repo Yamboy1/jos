@@ -10,6 +10,11 @@ package org.jos.program;
  */
 public interface ProgramContext extends ParameterList {
 	/**
+	 * Gets Path property.
+	 */
+	public abstract String getPath();
+	
+	/**
 	 * Gets ResultCode property.
 	 */
 	public int getResultCode();
