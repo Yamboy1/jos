@@ -1,8 +1,9 @@
-package org.jos.program;
+package org.jos.program2a;
 
 /**
  * This class should be useful as a base class for all your compatible programs.
  */
+@Deprecated
 public interface TerminalProgram extends Terminal, Program {
 	/**
 	 * Gets Terminal property.

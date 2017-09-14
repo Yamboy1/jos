@@ -1,9 +1,10 @@
-package org.jos.program;
+package org.jos.program2a;
 
 /**
  * A terminal reads and writes lines (messages). A terminal program context
  * implements a simple terminal interface.
  */
+@Deprecated
 public interface Terminal {
 	/**
 	 * Reads a line of text.

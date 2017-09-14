@@ -1,4 +1,4 @@
-package org.jos.program;
+package org.jos.program2a;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -6,6 +6,7 @@ import java.io.OutputStream;
 /**
  * An I/O stream interface is necessary for the classic stream-based program.
  */
+@Deprecated
 public interface IOStream {
 	/**
 	 * Gets InputStream property. This method returns an instance of

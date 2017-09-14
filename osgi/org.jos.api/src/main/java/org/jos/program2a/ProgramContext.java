@@ -1,4 +1,4 @@
-package org.jos.program;
+package org.jos.program2a;
 
 /**
  * A program has-an program context. The program context is given to a program
@@ -8,12 +8,8 @@ package org.jos.program;
  * This object contains an equivalent to String[] args for traditional Java
  * applications.
  */
+@Deprecated
 public interface ProgramContext extends ParameterList {
-	/**
-	 * Gets Path property.
-	 */
-	public abstract String getPath();
-
 	/**
 	 * Gets ResultCode property.
 	 */
