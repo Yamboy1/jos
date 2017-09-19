@@ -1,8 +1,8 @@
 package org.jos.streamconsole3a;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 
 /**
  * This is a basic implementation of a stream console. It converts any
