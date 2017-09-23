@@ -3,7 +3,7 @@ package org.jos.console3a;
 /**
  * This is a basic implementation of a console filter. It is most helpful when
  * providing temporary console to another object.
- * 
+ *
  * <PRE>
  * public void example() {
  * 	Console c = getConsole();
@@ -23,7 +23,7 @@ public class BasicConsoleFilter implements ConsoleFilter {
 
 	/**
 	 * Creates a console filter, with a given console.
-	 * 
+	 *
 	 * @param v
 	 *            another console
 	 */
@@ -47,7 +47,7 @@ public class BasicConsoleFilter implements ConsoleFilter {
 
 	/**
 	 * Prints a message.
-	 * 
+	 *
 	 * @param v
 	 *            a message.
 	 */
