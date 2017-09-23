@@ -14,10 +14,10 @@ public class ConsoleFilter_Test {
 	public void test() {
 		final BasicConsoleFilter bcf = new BasicConsoleFilter();
 		assertNotNull("basic console filter is missing", bcf);
-		
+
 		final ConsoleFilter cf = bcf;
 		assertNotNull("console filter is missing", cf);
-		
+
 		final Console c = cf;
 		assertNotNull("console is missing", c);
 
@@ -31,13 +31,13 @@ public class ConsoleFilter_Test {
 			}
 		};
 		assertNotNull("expected console is missing", cExpected);
-		
+
 		cf.setConsole(cExpected);
-		
+
 		final Console cActual = cf.getConsole();
 		assertNotNull("actual console is missing", cActual);
 		assertEquals("expected console is not actual console", cExpected, cActual);
-		
+
 		c.println("sending message to console");
 	}
 }
