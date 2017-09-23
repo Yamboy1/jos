@@ -1,6 +1,5 @@
 package org.jos.program2a;
 
-// *D! import com.realignsoft.consolestudio2a.Console;
 import org.jos.console3a.Console;
 
 /**
