@@ -18,7 +18,7 @@ public class IndentConsole extends BasicConsoleFilter {
 
 	/**
 	 * Creates a console, a console filter for another console.
-	 * 
+	 *
 	 * @param other
 	 *            any other <CODE>jose.Console</CODE>
 	 */
@@ -39,7 +39,7 @@ public class IndentConsole extends BasicConsoleFilter {
 	 * Set Level property. The indentation level is from 0 to MAX. 0 is no
 	 * indentation at all. 1 is smallest indentation and MAX is maximum
 	 * indentation.
-	 * 
+	 *
 	 * @param v
 	 *            an integer from 0 to MAX
 	 */
@@ -72,12 +72,6 @@ public class IndentConsole extends BasicConsoleFilter {
 	 * Calculates the whitespace for current level.
 	 */
 	protected String getSpacer() {
-		// *D!
-		// String prefix = "";
-		// for (int i = 0; i < indentLevel; i++) {
-		// prefix = prefix + spacerUnit;
-		// }
-		// return prefix;
 		StringBuffer buffer = new StringBuffer();
 		for (int i = 0; i < indentLevel; i++) {
 			buffer.append(spacerUnit);
@@ -104,11 +98,6 @@ public class IndentConsole extends BasicConsoleFilter {
 			return;
 		}
 
-		// *D!
-		// if ( v > 15 ) {
-		// return;
-		// }
-		// spacerUnit = "               ".substring( 0, v + 1 );
 		char[] buf = new char[v];
 		for (int i = 0; i < v; i++) {
 			buf[i] = ' ';

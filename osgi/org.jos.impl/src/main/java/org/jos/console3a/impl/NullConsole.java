@@ -2,7 +2,7 @@ package org.jos.console3a.impl;
 
 import org.jos.console3a.Console;
 
-public class NullConsole implements Console {
+public final class NullConsole implements Console {
 	/**
 	 * Creates a console.
 	 */
