@@ -26,7 +26,7 @@ public interface ProgramParameterList extends ParameterList {
 
 	/**
 	 * Gets Parameter[] property.
-	 * <P>
+	 *
 	 * Properties are consistently numbered from 0 through n. This corresponds
 	 * exactly to the argument list from
 	 * <CODE>public static void main( String[] )</CODE>. It also corresponds to
@@ -35,22 +35,14 @@ public interface ProgramParameterList extends ParameterList {
 	 */
 	public abstract String getParameter(int index);
 
-	/*
-	 * *D! Gets Value[] property. <P>For those parameters in the form of
-	 * name=value, this method uses name to find a property and return its
-	 * value. <P>For command line parameters, the key includes dashes (-) and
-	 * slashes (/). / public abstract String getValue( String key );
-	 */
-
 	/**
 	 * Gets parameters.
-	 * <P>
+	 *
 	 * Parameters are enumerated in the order in which they appear or a command
 	 * line or query string.
-	 * 
+	 *
 	 * @returns The whole parameter (name or name=value) is returned as a string
 	 *          object.
 	 */
-	@SuppressWarnings("rawtypes")
-	public abstract Enumeration getParameters();
+	public abstract Enumeration<String> getParameters();
 }

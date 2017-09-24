@@ -11,7 +11,7 @@ public interface Program extends Runnable {
 	public abstract ProgramContext getProgramContext();
 
 	/**
-	 * The host environment provices a program context.
+	 * The host environment provides a program context.
 	 */
 	public abstract void setProgramContext(ProgramContext v);
 }

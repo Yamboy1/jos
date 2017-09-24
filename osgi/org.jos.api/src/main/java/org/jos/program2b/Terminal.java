@@ -1,9 +1,5 @@
 package org.jos.program2b;
 
-// *D! import java.util.Enumeration;
-
-// *D! import com.realignsoft.consolestudio2a.Console;
-
 /**
  * A terminal reads and writes lines (messages). A terminal program context
  * implements a simple terminal interface.
